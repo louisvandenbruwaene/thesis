@@ -1,0 +1,6986 @@
+{
+  "simple_undirected_edge": {
+    "n=2_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 5
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        }
+      ],
+      "total_labelled": 125,
+      "complete": true
+    },
+    "n=5_m=3": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=5_m=4": {
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=6_m=2": {
+      "extremal_value": 5,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 6
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 120
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 90
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        }
+      ],
+      "total_labelled": 1296,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 7,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 90
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 180
+        }
+      ],
+      "total_labelled": 630,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 9,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "simple_undirected_vertex": {
+    "n=2_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=6_m=2": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 7
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        }
+      ],
+      "total_labelled": 217,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 9,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 11,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "simple_directed_edge": {
+    "n=2_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 9,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 8
+        }
+      ],
+      "total_labelled": 8,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 16,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 15,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 19,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 16,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 22,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "simple_directed_vertex": {
+    "n=2_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=3": {
+      "extremal_value": 9,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 8
+        }
+      ],
+      "total_labelled": 8,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 11,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 16,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 18,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 13,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 23,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "multi_undirected_edge": {
+    "n=2_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 9,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              0,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 5
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        }
+      ],
+      "total_labelled": 125,
+      "complete": true
+    },
+    "n=5_m=3": {
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 5
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              2,
+              2,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              2,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        }
+      ],
+      "total_labelled": 125,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 5
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              0,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              3,
+              3
+            ],
+            [
+              0,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              3,
+              0,
+              3,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        }
+      ],
+      "total_labelled": 125,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 5,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 6
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 120
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 90
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              1,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        }
+      ],
+      "total_labelled": 1296,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 10,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 6
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 120
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              2,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 90
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              0,
+              2,
+              2,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              0,
+              2,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 360
+        }
+      ],
+      "total_labelled": 576,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 15,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 6
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              0,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 120
+        }
+      ],
+      "total_labelled": 126,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 7
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              0,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 420
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              2,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              2,
+              0,
+              2,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 840
+        }
+      ],
+      "total_labelled": 1477,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 17,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              2,
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 42
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2
+            ],
+            [
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 105
+        }
+      ],
+      "total_labelled": 147,
+      "complete": false
+    }
+  },
+  "multi_undirected_vertex": {
+    "n=2_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 9,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3,
+              3
+            ],
+            [
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              0,
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              2,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              0,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 18,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3,
+              3,
+              3
+            ],
+            [
+              3,
+              0,
+              3,
+              3
+            ],
+            [
+              3,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 23,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 14,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 27,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 7
+        }
+      ],
+      "total_labelled": 7,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 16,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 36,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "multi_directed_edge": {
+    "n=2_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              0,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": false
+    },
+    "n=4_m=4": {
+      "extremal_value": 18,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 4
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              0,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 12
+        }
+      ],
+      "total_labelled": 16,
+      "complete": false
+    },
+    "n=5_m=2": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 15,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 20
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 20
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              2,
+              2,
+              1,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 60
+        }
+      ],
+      "total_labelled": 100,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 24,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 18,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 26,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 12,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 20,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 42
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              1,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 105
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              1,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 420
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              1,
+              2,
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 840
+        }
+      ],
+      "total_labelled": 2037,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 29,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              2,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              1,
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              1,
+              2,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 210
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              1,
+              3,
+              3,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 420
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            [
+              1,
+              3,
+              2,
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 840
+        }
+      ],
+      "total_labelled": 2100,
+      "complete": false
+    }
+  },
+  "multi_directed_vertex": {
+    "n=2_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=2_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=2": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 3
+        }
+      ],
+      "total_labelled": 3,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              2,
+              2
+            ],
+            [
+              2,
+              0,
+              2
+            ],
+            [
+              2,
+              2,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 18,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3,
+              3
+            ],
+            [
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=3": {
+      "extremal_value": 15,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=4": {
+      "extremal_value": 36,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              3,
+              3,
+              3
+            ],
+            [
+              3,
+              0,
+              3,
+              3
+            ],
+            [
+              3,
+              3,
+              0,
+              3
+            ],
+            [
+              3,
+              3,
+              3,
+              0
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 17,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 32,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 22,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 42,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 24,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 32,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "hyper_undirected_r3_edge": {
+    "n=3_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 4
+        }
+      ],
+      "total_labelled": 4,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              3
+            ]
+          ],
+          "labelled_count": 4
+        }
+      ],
+      "total_labelled": 4,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              3
+            ],
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=5_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              4
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=5_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              1,
+              4
+            ],
+            [
+              0,
+              2,
+              3
+            ],
+            [
+              0,
+              2,
+              4
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 5
+        }
+      ],
+      "total_labelled": 5,
+      "complete": true
+    },
+    "n=6_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "hyper_undirected_r3_vertex": {
+    "n=3_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 1,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "labelled_count": 4
+        }
+      ],
+      "total_labelled": 4,
+      "complete": true
+    },
+    "n=4_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              3
+            ]
+          ],
+          "labelled_count": 4
+        }
+      ],
+      "total_labelled": 4,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              3
+            ],
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=5_m=2": {
+      "extremal_value": 2,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
+    },
+    "n=5_m=3": {
+      "extremal_value": 4,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              2,
+              4
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 6,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              0,
+              1,
+              3
+            ],
+            [
+              0,
+              1,
+              4
+            ],
+            [
+              0,
+              2,
+              3
+            ],
+            [
+              0,
+              2,
+              4
+            ],
+            [
+              0,
+              3,
+              4
+            ]
+          ],
+          "labelled_count": 5
+        }
+      ],
+      "total_labelled": 5,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 6,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "hyper_directed_r3_edge": {
+    "n=3_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=3": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=4": {
+      "extremal_value": 11,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=2": {
+      "extremal_value": 3,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 3,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 3,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  },
+  "hyper_directed_r3_vertex": {
+    "n=3_m=2": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=3": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=3_m=4": {
+      "extremal_value": 3,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                0,
+                2
+              ]
+            ],
+            [
+              2,
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "labelled_count": 1
+        }
+      ],
+      "total_labelled": 1,
+      "complete": true
+    },
+    "n=4_m=2": {
+      "extremal_value": 4,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=3": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=4_m=4": {
+      "extremal_value": 10,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=2": {
+      "extremal_value": 3,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=5_m=4": {
+      "extremal_value": 8,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=6_m=4": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=2": {
+      "extremal_value": 2,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=3": {
+      "extremal_value": 5,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    },
+    "n=7_m=4": {
+      "extremal_value": 7,
+      "classes": [],
+      "total_labelled": 0,
+      "complete": false
+    }
+  }
+}

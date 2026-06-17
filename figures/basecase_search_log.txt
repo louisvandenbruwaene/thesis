@@ -1,0 +1,13 @@
+Exhaustive search over all simple digraphs with lambda^max <= 1 (directed, m=2).
+Branch and bound; reported max arc count = ell_2^dir(n) = max(2(n-1), floor(n^2/4)).
+
+  n=2:  max= 2,  formula= 2,  proved (complete),  nodes=5,          0.0s
+  n=3:  max= 4,  formula= 4,  proved (complete),  nodes=22,         0.0s
+  n=4:  max= 6,  formula= 6,  proved (complete),  nodes=537,        0.0s
+  n=5:  max= 8,  formula= 8,  proved (complete),  nodes=17823,      0.1s
+  n=6:  max=10,  formula=10,  proved (complete),  nodes=788101,     9.1s
+  n=7:  max=12,  formula=12,  proved (complete),  nodes=45122129,   718.1s
+
+The cut-MILP certifier of the multigraph problem closes n <= 6 (n = 6 in about
+21 minutes); the directed m = 2 base cases through n = 7 that the induction
+requires are settled by this exhaustive search instead.

@@ -1,0 +1,143 @@
+\input{preamble}
+
+\begin{document}
+
+% ============================================================================
+% FRONT MATTER
+% ============================================================================
+
+% The cover carries no page number, so it needs no hyperref page anchor. Without
+% this, the cover (physical page 1) and the first numbered page both claim the
+% anchor "page.1", which pdfTeX reports as a duplicate destination. Disable the
+% anchor across the cover, then restore it for the numbered pages.
+\hypersetup{pageanchor=false}
+\makefacultycover
+\hypersetup{pageanchor=true}
+
+\pagenumbering{Roman}
+\setcounter{page}{1}
+
+\thispagestyle{empty}
+\noindent{\Large\bfseries Open Access Disclaimer}
+
+\medskip
+
+\noindent This master's thesis is a student work submitted as part of an academic programme at KU Leuven. The work is made available for examination and archiving in accordance with the applicable KU Leuven regulations and open-access policy for master's theses.
+
+\vspace*{\fill}
+{\small
+\noindent \copyright{} Copyright by KU Leuven
+
+\medskip
+
+\noindent Without written permission from the supervisors and the author, it is forbidden to reproduce or adapt in any form or by any means any part of this publication. Requests for obtaining the right to reproduce or utilize parts of this publication should be addressed to KU Leuven, Faculty of Science, Celestijnenlaan 200H - box 2100, 3001 Leuven (Heverlee), Telephone +32 16 32 14 01.
+
+\medskip
+
+\noindent Written permission from the supervisor is also required to use the methods, products, schematics, and programs described in this work for industrial or commercial use, and for submitting this publication in scientific contests.
+}
+
+
+\chapter*{Foreword}
+\addcontentsline{toc}{chapter}{Foreword}
+This thesis studies how many edges or arcs a network can contain when no pair of vertices is allowed to have too many independent routes between them. The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. The work is told as a journey. It begins with the variants whose answers can be proved cleanly by hand, watches those proofs grow longer and more delicate as the model changes, and at the point where a single argument no longer suffices it turns to a unified program: one representation for every variant, an exact connectivity checker built on maximum flow (a standard routine for finding the most independent routes between two points), a certificate engine that turns finite checks into proofs, and a temperature-guided search that hunts for extremal graphs in the space of all graphs.
+
+I am grateful to my supervisor, Prof.\ Stijn Cambie, and my daily advisor for their guidance, corrections, and mathematical feedback throughout the project. I also thank the people who discussed early versions of the arguments, checked examples, or helped clarify the presentation. Any remaining mistakes are my own.
+
+\chapter*{Contribution Statement}
+\addcontentsline{toc}{chapter}{Contribution Statement}
+The author was responsible for the literature study, the formulation of the variants, the design and implementation of the unified program, the construction and verification of the examples, the writing of the proofs included in the thesis, and the final \LaTeX{} implementation. Results from the literature are cited explicitly, in particular the theorems of Mader, Leonard, S{\o}rensen-Thomassen, Menger, Gomory-Hu, Baranyai, the hypergraph connectivity results of B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni, and the probabilistic connectivity results used for random graphs.
+
+The connectivity checker computes local connectivity exactly through maximum flow. The certificate engine yields a genuine upper-bound proof for a fixed size whenever it reports an optimal solution with zero gap over a finite domain. The temperature-guided search is a discovery tool: it produces constructions and therefore lower bounds, proposes conjectures, and rediscovers known extremal graphs, but it never certifies an upper bound on its own. Every general statement in the thesis rests on a hand proof or a cited theorem. Computational searches are supporting evidence, not substitutes for proofs. AI language models, including Claude Code, ChatGPT, and Gemini, were used as tools for literature search assistance, \LaTeX{} editing, proofreading, and exploring proof drafts. Every mathematical statement and proof included in the thesis was checked by the author, who takes full responsibility for the content.
+
+The following new results are contributed by this thesis. The hypergraph vertex problem is solved completely at $m=2$ and $m=3$ for all uniformities $r$ and all $n$ (Theorems~\ref{thm:hyper-vertex-m2} and~\ref{thm:hyper-vertex-m3}): the vertex-disjoint and edge-disjoint extremal values coincide, equalling $\lfloor(m-1)(n-1)/(r-1)\rfloor$. The $m=3$ proof rests on a new rank bound for incidence graphs, derived via Tutte's triconnected decomposition (Lemma~\ref{lem:incidence-rank}). For the directed multigraph problem at $m=3$, an unconditional attachment lemma (Lemma~\ref{lem:attachment}) and an odd-step theorem (Theorem~\ref{thm:odd-step}, Remark~\ref{rem:odd-step-roadmap}) reduce the entire problem for all $n$ to two finite machine-checkable statements about multigraphs on seven vertices, without requiring the unproved minimum-degree conjecture.
+
+\chapter*{Short Summary}
+\addcontentsline{toc}{chapter}{Short Summary}
+\emph{Erd\H{o}s Problem~915}, posed by Bollob\'{a}s and Erd\H{o}s \cite{BollobasErdos62}, asks for the maximum number of edges in a graph on $n$ vertices such that no two vertices are connected by $m$ edge-disjoint paths. In modern notation this asks for
+\[
+\ell_m(n)=\max\{|E(G)|:|V(G)|=n,\ \lambda_G^{\max}\le m-1\}.
+\]
+Mader proved that, for simple graphs and $n\ge m\ge2$,
+\[
+\ell_m(n)=\left\lfloor \frac{m(n-1)}2\right\rfloor .
+\]
+This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, and hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint), and the presence or absence of directions. Sampled random graphs $G(n,p)$ run alongside throughout as a lens on the typical case rather than as a separate model.
+
+The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the random-graph threshold $p^*=m/n$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-3$. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture supported by an explicit counterexample. The centerpiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a simulated-annealing search guided by edge sensitivity discovers extremal graphs. The program rediscovers the double star, the hub, the one-directional bipartite digraph, and the augmented-bipartite construction as extremal graphs, certifies the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ for $n\le6$, and frames the remaining open problems on the directed frontier.
+
+The interplay then pays back in the other direction. The hypergraph vertex problem is settled completely at $m=2$ and $m=3$: $k_m^{(r)}(n)=\bigl\lfloor (m-1)(n-1)/(r-1) \bigr\rfloor$ for every uniformity $r$, the $m=3$ case through a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. On the directed side, an unconditional attachment lemma and a conditional odd-step theorem reduce the entire directed multigraph problem at $m=3$, value and extremal characterisation for all $n$, to two finite, machine-checkable statements about multigraphs on seven vertices, and directed hypergraphs receive their first bounds, quadratic in $n$.
+
+\chapter*{Abbreviations and Symbols}
+\addcontentsline{toc}{chapter}{Abbreviations and Symbols}
+\begin{tabular}{ll}
+GH & Gomory-Hu \\
+w.h.p. & with high probability \\
+\end{tabular}
+
+\bigskip
+
+\begin{tabular}{ll}
+$G=(V,E)$ & graph with vertex set $V$ and edge set $E$ \\
+$D=(V,A)$ & directed graph with vertex set $V$ and arc set $A$ \\
+$n$ & number of vertices \\
+$m$ & forbidden-connectivity parameter, with all local connectivities at most $m-1$ \\
+$\lambda_G(u,v)$ & maximum number of edge-disjoint $u$-$v$ paths \\
+$\lambda_G^{\max}$ & maximum local edge-connectivity over all vertex pairs \\
+$\kappa_G(u,v)$ & maximum number of internally vertex-disjoint $u$-$v$ paths \\
+$\kappa_G^{\max}$ & maximum local vertex-connectivity over all vertex pairs \\
+$\ell_m(n)$ & simple undirected edge-disjoint extremal function \\
+$L_m(n)$ & undirected multigraph edge-disjoint extremal function \\
+$k_m(n)$ & simple undirected vertex-disjoint extremal function \\
+$\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
+$L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
+$k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
+$\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
+$\sigma(e)$ & edge sensitivity $\lambda^{\max}(G)-\lambda^{\max}(G-e)$ \\
+$G(n,p)$ & binomial random graph
+\end{tabular}
+
+\tableofcontents
+
+% ============================================================================
+% MAIN MATTER
+% ============================================================================
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\chapter{The Problem and Its Base Cases}\label{ch:basecases}
+\input{chapters/ch1_basecases}
+
+\chapter{Certifying Bounds by Machine}\label{ch:certify}
+\input{chapters/ch2_certify}
+
+\chapter{Discovering Bounds by Search}\label{ch:discover}
+\input{chapters/ch3_discover}
+
+\chapter{Synthesis, Results, and Open Problems}\label{ch:synthesis}
+\input{chapters/ch4_synthesis}
+
+% ============================================================================
+% APPENDICES
+% ============================================================================
+
+\appendix
+
+\chapter{Full Proofs and Computational Transcripts}\label{app:proofs}
+\input{chapters/app_proofs}
+
+\chapter{Supplementary Figures}\label{app:gallery}
+\input{chapters/app_gallery}
+
+% ============================================================================
+% BACK MATTER
+% ============================================================================
+
+% Bibliography
+\bibliographystyle{abbrv}
+\bibliography{ref}
+
+\makefacultybackcover
+
+\end{document}

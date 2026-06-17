@@ -1,0 +1,339 @@
+The last chapter ended in three different kinds of stuckness, and all three share a shape. The objects are graphs of one flavour or another, the constraint is always a ceiling on connectivity, and the work is always either measuring a given graph or checking many small ones. That shared shape is what a single program can exploit. This chapter builds it, and then uses it for one purpose only: to \emph{prove}. It gives every variant one representation, measures connectivity exactly through a max-flow checker, checks small cases by honest enumeration, and turns the finite checks the proofs of \Cref{ch:basecases} relied on into a single auditable certifier. The hunt for dense examples, which proves nothing on its own, waits until \Cref{ch:discover}.
+
+A word on what the program is for. It is a microscope, not a source of final answers. It measures connectivity exactly, so what it reports about a given graph is a fact. It enumerates graphs of a fixed size, so for that size it can prove a theorem. It will later discover dense graphs, which are only lower bounds, but not here. Each of these has a different epistemic weight, and the program is built so that the three never get confused. \Cref{fig:spine} draws this spine: a single \emph{model} holds every variant, one exact \emph{measure} reads connectivity off it, and from that measurement a \emph{prove} step bounds a fixed size from above, with the \emph{discover} step of the next chapter and a final \emph{observe} step for the random model added later. Every routine introduced from here on is shown as a small card carrying its name, its inputs and output, a one-line account of how it works, and a coloured badge naming its place in the spine. The function bodies are not reproduced, because the point is the interface, not the code.
+
+\begin{figure}[ht]
+\centering
+\spinediagram
+\caption{The architecture as one pipeline. A single data model, the multiplicity matrix $\mu$, feeds an exact measurement, the max-flow checker. That measurement feeds the two bound-producing roles: a prover for upper bounds (the cut-counting optimisation and the exhaustive search), built in this chapter, and a discoverer for lower bounds (simulated annealing), built in \Cref{ch:discover}. A final sampling role studies the random model. The badge colours on the code cards below match the boxes here.}
+\label{fig:spine}
+\end{figure}
+
+\section{The solver}
+
+Everything in this chapter is a single function, \code{solve}, and it helps to hold its most basic version in mind from the start, because every later idea is a refinement of it and nothing is ever a separate program for a separate case. Given $n$ and $m$, the basic strategy is as plain as it sounds. Walk through every graph on $n$ vertices, measure the largest local connectivity $\lambda^{\max}$ of each with a max-flow computation, and keep the densest graph that stays at or below the ceiling $m - 1$. Because it has looked at every graph, the count it returns is the exact answer, not an estimate.
+
+That one loop already settles the smallest cases, and the rest of the chapter is built on top of it without ever leaving \code{solve}. We first make the measurement step trustworthy and quick, via the connectivity checker and a Gomory--Hu shortcut for undirected graphs. We then make the enumeration step skip whole families of hopeless graphs, via a pruned search. Finally, for the directed multigraph case, we replace enumeration altogether with one small optimisation that proves every $m$ at once, which is the certifier. Each of these is the same \code{solve} doing less work for the same guarantee, and the choice among them is made automatically from the booleans it receives.
+
+\codecard{solve(n, m, directed, simple, separation, exhaustive, maxSeconds)}{DRIVER}
+{the variant booleans \code{directed} and \code{simple}, the \code{separation} (edge or vertex), $n$, $m$, a mode, and a time budget}
+{a value with an honest label: exact, lower bound, or upper bound}
+{picks the method the case allows: brute-force enumeration, the pruned search, or the cut-counting certifier when proving, or the temperature search when discovering (\Cref{ch:discover}). It always respects the budget, and it is the one function the rest of the thesis ever calls.}
+
+\section{A single representation for all variants}
+Two of the three axes from \Cref{ch:basecases}, the model and the direction, are properties of the object, and a single data structure holds them all. Of the three structural models, simple graphs and multigraphs fit the matrix directly, while the hypergraph keeps the separate storage promised in \Cref{ch:basecases} and rejoins at the end of this chapter. The hypergraph could in principle be pressed into the same shape as a higher-order tensor, an $r$-dimensional array marking which $r$-sets are present, but that array is almost entirely zero and costs $n^r$ entries, so the program keeps the compact list of hyperedges instead and pays nothing for the empty cells. Sampled $G(n,p)$ graphs are ordinary simple graphs and therefore use this same representation without any change. A graph or digraph on $n$ vertices is stored as an integer matrix $\mu$, where $\mu(u, v)$ is the multiplicity of the edge or arc from $u$ to $v$. A simple graph is the case $\mu \in \{0, 1\}$, an undirected graph satisfies $\mu = \mu^{\top}$, and a multigraph allows larger entries. The third axis, edge against vertex separation, is a property of the question rather than the object, so it lives in how we measure $\mu$, not in $\mu$ itself. \Cref{fig:matrix-rep} illustrates the encoding.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth]
+\node[vertex] (A) at (0,   0)   {$1$};
+\node[vertex] (B) at (2.2, 0)   {$2$};
+\node[vertex] (C) at (1.1, 1.9) {$3$};
+\draw[edge] (A) to[bend left=15]  (B);
+\draw[edge] (A) to[bend right=15] (B);
+\draw[edge] (B) -- (C);
+\draw[edge] (A) -- (C);
+\node[font=\small] at (1.1, -0.7) {multigraph $G$};
+\node at (3.5, 0.85) {$\xrightarrow{\;\mu\;}$};
+\node at (5.7, 0.85) {$\begin{pmatrix} 0 & 2 & 1 \\ 2 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}$};
+\node[font=\small] at (5.7, -0.7) {multiplicity matrix $\mu$};
+\end{tikzpicture}
+\caption{A multigraph on three vertices and its multiplicity matrix $\mu$. Entry $\mu(u,v)$ records the number of parallel edges between $u$ and $v$. The double edge between vertices $1$ and $2$ gives $\mu(1,2) = 2$. A simple graph is the case $\mu \in \{0,1\}$, an undirected graph satisfies $\mu = \mu^\top$, and a directed graph allows $\mu(u,v) \ne \mu(v,u)$.}
+\label{fig:matrix-rep}
+\end{figure}
+
+\codecard{Graph(n, directed, simple)}{MODEL}
+{the vertex count $n$ and the two booleans}
+{a graph whose whole state is the matrix $\mu$}
+{one $n \times n$ integer matrix is the object, an undirected graph keeps $\mu=\mu^{\top}$, and a simple graph caps every entry at one.}
+
+Keeping a single representation is what lets one measurement routine, one certifier, and one search serve every case. Nothing downstream asks which of the twelve problems it is solving. It asks only the two booleans (directed or undirected, simple or multi) and the matrix. Everything that builds or edits a graph is a thin wrapper around $\mu$ that respects those booleans, and these operations are so routine that they need no individual exposition, and \Cref{tab:graph-ops} lists them together.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Operation & Meaning \\
+\midrule
+\code{addEdge(G, u, v, k)}        & add $k$ parallel edges or arcs $u \to v$ (a simple graph saturates at one) \\
+\code{removeEdge(G, u, v, k)}     & remove $k$ copies, never below zero \\
+\code{setMultiplicity(G, u, v, c)}& set $\mu(u,v) = c$ directly \\
+\code{multiplicity(G, u, v)}      & read $\mu(u,v)$ \\
+\code{hasEdge(G, u, v)}           & whether $\mu(u,v) > 0$ \\
+\code{degree(G, v)}               & total degree of $v$ (in- plus out-degree if directed) \\
+\code{edgeCount(G)}               & number of edges or arcs, counted with multiplicity \\
+\code{edges(G)}, \code{vertices(G)} & iterate the present edges, and the vertex set \\
+\code{copy(G)}                    & an independent duplicate \\
+\bottomrule
+\end{tabularx}
+\caption{The routine operations on the graph model. Each is a one-line wrapper that reads or writes the matrix $\mu$ while keeping an undirected graph symmetric and a simple graph binary. They are bookkeeping, and the chapter's attention belongs to the routines that follow.}
+\label{tab:graph-ops}
+\end{table}
+
+\section{The connectivity checker built on maximum flow}
+Menger's theorem turns the connectivity question into a flow computation. A maximum flow is the standard way to ask how much can be pushed from one point to another through a network in which every link has a limited capacity. Menger's theorem says the maximum number of edge-disjoint $u$--$v$ paths equals the minimum $u$--$v$ edge cut, and that number is exactly the value of such a maximum flow once each multiplicity $\mu(u,v)$ is read as the capacity of that link. The routine that runs this flow and reports the route count is the connectivity \emph{checker}. It is the single most important routine in the program: it is the only place graph theory meets computation, and every later claim about connectivity passes through it.
+
+\codecard{localEdgeConnectivity(G, s, t) $\to \mathbb{N}$}{MEASURE}
+{a graph $G$ and an ordered pair $(s,t)$}
+{$\lambda_G(s,t)$, the maximum number of edge-disjoint $s$--$t$ paths}
+{a single maximum flow on the network whose arc capacities are the multiplicities $\mu$, so by Menger the flow value is the path count.}
+
+\codecard{maxEdgeConnectivity(G) $\to \mathbb{N}$}{MEASURE}
+{a graph $G$}
+{$\lambda^{\max}(G)$, the largest local edge-connectivity over all pairs}
+{one max-flow per pair (ordered if directed), take the largest. This is the quantity the edge problem caps at $m-1$.}
+
+The vertex-disjoint version follows the same idea after one construction: split each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}). Every arc $u \to v$ of the original graph becomes $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the split network. Routing through $v$ now consumes the one unit of capacity on its internal arc, so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow. A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network therefore equals the number of internally vertex-disjoint $u$--$v$ paths in the original graph.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth]
+\node[vertex] (v) at (1.0, 0) {$v$};
+\draw[->, edge] (0.0,  0.6) -- (v);
+\draw[->, edge] (0.0, -0.6) -- (v);
+\draw[->, edge] (v) -- (2.0,  0.6);
+\draw[->, edge] (v) -- (2.0, -0.6);
+\node[font=\small] at (1.0, -1.05) {vertex $v$};
+\draw[->, very thick, color=KULblauw3b] (2.8, 0) -- (3.8, 0);
+\node[above, font=\small] at (3.3, 0.05) {split};
+\node[smallvertex] (vi) at (5.0, 0) {$v^{\mathrm{in}}$};
+\node[smallvertex] (vo) at (7.0, 0) {$v^{\mathrm{out}}$};
+\draw[->, edge, color=KULblauw3b] (vi) -- node[above, font=\scriptsize]{cap $1$} (vo);
+\draw[->, edge] (4.0,  0.6) -- (vi);
+\draw[->, edge] (4.0, -0.6) -- (vi);
+\draw[->, edge] (vo) -- (8.0,  0.6);
+\draw[->, edge] (vo) -- (8.0, -0.6);
+\node[font=\small] at (6.0, -1.05) {split vertex $v$};
+\end{tikzpicture}
+\caption{Vertex splitting for the vertex-disjoint checker. Incoming arcs attach to $v^{\mathrm{in}}$ and outgoing arcs leave from $v^{\mathrm{out}}$, connected by a single unit-capacity arc. Any directed path that uses $v$ as an intermediate vertex passes through this bottleneck, and two such paths would need two units of capacity and are therefore separated.}
+\label{fig:vertex-split}
+\end{figure}
+
+\codecard{maxVertexConnectivity(G) $\to \mathbb{N}$}{MEASURE}
+{a graph $G$}
+{$\kappa^{\max}(G)$, the largest local vertex-connectivity over all pairs}
+{the same sweep as the edge checker, but each flow runs on the split network of \Cref{fig:vertex-split}, so the unit internal arcs count internally vertex-disjoint paths. Parallel edges are given capacity one here, so they never raise $\kappa$.}
+
+The two checkers are the entire interface between graph theory and computation in this thesis. As a sanity check, applied to the directed double star on $n$ vertices, the edge checker reports $\lambda^{\max} = 1$, and the arc count $2(n-1)$ matches the proved values $\ell_2^{\mathrm{dir}}(n) = 2, 4, 6, 8$ for $n = 2, 3, 4, 5$.
+
+The same checker answers two different questions. Throughout this chapter it runs in its exact-value mode, returning $\lambda^{\max}$ or $\kappa^{\max}$ on the nose, and every proved or reported number rests on that exact reading. The search of \Cref{ch:discover} needs only the cheaper yes-or-no question ``is the binding connectivity above the bound?'', so there the same flow runs in a capped mode that stops as soon as it has seen one route too many. The capped mode never changes a reported value: it is a faster way to ask for a single bit, and \Cref{ch:discover} shows that the search built on it reproduces the exact search step for step.
+
+The Gomory--Hu tree from \Cref{ch:basecases} reappears here as an efficiency, and it is the honest kind. For undirected graphs all $\binom{n}{2}$ edge-connectivities are read off a single weighted tree, so $\lambda^{\max}$ is the heaviest tree edge rather than the maximum over $\binom{n}{2}$ separate flows. The speed-up is real, but it is bought with a theorem, not a heuristic.
+
+\codecard{maxEdgeConnectivityViaTree(G) $\to \mathbb{N}$}{MEASURE}
+{an undirected graph $G$}
+{$\lambda^{\max}(G)$, identical to the pairwise sweep}
+{build one Gomory--Hu tree, then return its heaviest edge, which costs $n-1$ flows in place of $\binom{n}{2}$ and cross-checks the checker.}
+
+The hypergraph is the one model that never used the multiplicity matrix, since it is stored as a plain list of hyperedges, each one a set of $r$ vertices. The checker still has to read it, and the trick is to do the same flow computation as before on a slightly larger network that we build on the spot. The difficulty is that one hyperedge ties several vertices together at once and, by the definition of a Berge route in \Cref{ch:basecases}, it may be used by only one route at a time, so we cannot simply treat it as a bundle of ordinary links. Instead, for every hyperedge we add one extra helper point and connect each of that hyperedge's member vertices to it (\Cref{fig:hyper-gadget}). A route that wants to use the hyperedge now enters through one member vertex, passes through the helper point, and leaves through another. By letting only a single route pass through each helper point, we capture exactly the rule that one hyperedge serves one route. Counting routes between two vertices is then the very same maximum flow as before, run on this enlarged network, and when a hyperedge happens to hold just two vertices the helper point collapses back to an ordinary link, so the answer agrees with the graph case. That the flow on the enlarged network counts exactly the hyperedge-disjoint Berge routes is the hypergraph version of Menger's theorem, proved in \Cref{app:proofs} (\Cref{thm:menger-hyper}), so the checker rests on a theorem rather than an analogy.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth]
+% --- left: a hyperedge as a set of three vertices ---
+\draw[rounded corners=14pt, fill=black!7, draw=black!30]
+   (-0.85,-0.95) rectangle (0.85,1.2);
+\node[vertex] (a) at (0, 0.75) {$a$};
+\node[vertex] (b) at (-0.5, -0.35) {$b$};
+\node[vertex] (c) at (0.5, -0.35) {$c$};
+\node[font=\small] at (0, -1.45) {hyperedge $e = \{a,b,c\}$};
+% --- arrow ---
+\draw[->, very thick, color=KULblauw3b] (1.6, 0) -- (2.7, 0);
+\node[above, font=\small] at (2.15, 0.05) {becomes};
+% --- right: the gadget ---
+\begin{scope}[xshift=4.3cm]
+\node[vertex] (a2) at (0, 0.75) {$a$};
+\node[vertex] (b2) at (0, -0.05) {$b$};
+\node[vertex] (c2) at (0, -0.85) {$c$};
+\node[smallvertex, fill=KULblauw3b!18] (h) at (2.0, -0.05) {$h_e$};
+\draw[edge] (a2) -- (h);
+\draw[edge] (b2) -- (h);
+\draw[edge] (c2) -- (h);
+\node[font=\small, align=center] at (2.0, -1.4) {helper point\\(one route only)};
+\end{scope}
+\end{tikzpicture}
+\caption{Measuring Berge connectivity by maximum flow. A hyperedge $e$ joining several vertices (left) is replaced by a helper point $h_e$ joined to each of its members (right). Because at most one route may pass through $h_e$, the helper point enforces that the hyperedge serves only one route at a time. Counting independent routes between two vertices is then an ordinary maximum flow on this enlarged network, and a two-vertex hyperedge collapses to a single ordinary edge.}
+\label{fig:hyper-gadget}
+\end{figure}
+One way to picture the helper point: think of each hyperedge as a room with several doors. Entering through any door counts as using that room. Because only one path may pass through the helper node, at most one traveller can occupy the room at once, so the second traveller must find a route that never enters it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that avoid sharing any room, which is exactly what Berge edge-disjointness means.
+
+\codecard{maxHyperedgeConnectivity(H) $\to \mathbb{N}$}{MEASURE}
+{an $r$-uniform hypergraph $H$}
+{$\lambda^{\max}(H)$, the largest Berge edge-connectivity over all pairs}
+{build the enlarged network in which every hyperedge becomes a helper point that only one route may pass through, then take the same maximum flow as the graph checker. On two-vertex hyperedges it matches ordinary edge-connectivity.}
+
+On the complete graph $K_n$ the hypergraph checker returns $n - 1$, and on the complete three-uniform hypergraph $K_4^{(3)}$ it returns $3$, larger than the two hyperedges through each pair because longer Berge routes also carry flow. The self-test confirms both of these values, so the construction is checked rather than merely asserted. The same helper-point network answers the other three hypergraph questions without alteration: splitting each ordinary vertex as in \Cref{fig:vertex-split} counts internally vertex-disjoint Berge routes, and reading a hyperedge as a single tail feeding its remaining heads gives a directed version, so \code{solve} measures all four hypergraph variants through this one construction. With the checker in place the proposed value of \Cref{prop:hyper-edge} can be tested on any small hypergraph the way every other variant is, which is the subject of the next section.
+
+\section{Checking every graph of a fixed size}
+The checker measures one graph. To bound \emph{every} graph of a given size, the most direct method is the one the base cases of \Cref{ch:basecases} already needed: enumerate them all. A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal cell, a multigraph a choice in $\{0,\dots,m-1\}$, and a digraph varies every ordered pair rather than only the upper triangle. Walking that product, measuring each candidate with the checker, and keeping the densest feasible one settles the value exactly, and because it has looked at every graph it is a genuine upper bound, not evidence.
+
+This is the first thing \code{solve} does when it is asked to prove a small case. With its exhaustive flag set it walks that product, measures each candidate with the checker, and keeps the densest feasible one. The value it returns is exact and exhausted, a true upper bound for that $n$, but only while the count of graphs stays small. No new routine is involved, only \code{solve} choosing to enumerate.
+
+Run on the small cases this confirms the proved values directly, with no induction and no cleverness. \Cref{tab:bruteforce} collects a spread of variants where the enumeration finishes: in every row the machine returns exactly the value \Cref{ch:basecases} proved by hand. This is the first payoff of the uniform representation. One driver, \code{solve}, pointed at six different problems, settles all six.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabularx}{\linewidth}{@{}Xcccc@{}}
+\toprule
+Variant & $m$ & $n$ & \code{solve} & Theory \\
+\midrule
+simple undirected, edge   & 2 & 5 & 4  & $\floor{m(n-1)/2}=4$ \\
+simple undirected, edge   & 3 & 5 & 6  & $\floor{m(n-1)/2}=6$ \\
+multigraph undirected, edge & 3 & 5 & 8  & $(m-1)(n-1)=8$ \\
+simple undirected, vertex & 2 & 6 & 5  & $k_2(n)=n-1=5$ \\
+simple directed, arc      & 2 & 5 & 8  & $\max(2(n-1),\floor{n^2/4})=8$ \\
+simple directed, arc      & 2 & 6 & 10 & $\max(2(n-1),\floor{n^2/4})=10$ \\
+\bottomrule
+\end{tabularx}
+\caption{Variants that converge under plain enumeration. For each small case \code{solve}, in its exhaustive mode, walks every graph of the variant, measures it with the checker, and returns the densest feasible one. Every value matches the hand proof of \Cref{ch:basecases} exactly.}
+\label{tab:bruteforce}
+\end{table}
+
+The honesty of the method is also its limit. The number of graphs it must visit grows as $2^{\binom{n}{2}}$ for simple graphs and $2^{n(n-1)}$ for digraphs, and a cap of $m$ on multiplicities raises the base to $m$. The enumeration is exact wherever it finishes, and it finishes only for the smallest sizes. \Cref{ch:discover} opens with exactly how fast this wall arrives. For now the point is that the wall arrives precisely where \Cref{ch:basecases} needed help, at the directed base cases $n = 6, 7$, so the rest of this chapter is about reaching a little further than blind enumeration can.
+
+\section{Reaching further: a pruned search for the directed base cases}
+The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-exact}) are the finite checks the induction of \Cref{app:proofs} depends on, and they sit just past where blind enumeration of digraphs is tractable. They can be reached by enumerating more cleverly. Feasibility is monotone: adding an arc can never lower $\lambda^{\max}$, so once a partial digraph is infeasible every completion of it is infeasible too and the whole branch is abandoned at once. A counting bound prunes further, dropping any branch that cannot beat the best feasible digraph found so far. What remains is a branch and bound over simple digraphs with the connectivity checker as the feasibility test, exact and complete at these sizes where the blind walk is not.
+
+Here \code{solve} changes its implementation without changing its interface. For a simple digraph it runs this branch and bound in place of the blind walk, still with the connectivity checker as the feasibility test, and so reaches the base cases $n \le 7$ that blind enumeration cannot. The booleans alone decide which of the two it uses, and the caller never asks.
+
+Run on the directed $m = 2$ problem \code{solve} returns the complete sequence $2, 4, 6, 8, 10, 12$ for $n = 2, \dots, 7$, each proved complete at its size. These are exactly the base cases the induction requires, and with them the long proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather than on anything done by hand. The exhaustive-search transcript is in \Cref{app:proofs}.
+
+\section{Proving every \texorpdfstring{$m$}{m} at once}
+
+The pruned search proves one $(n, m)$ at a time. For the directed multigraph arc problem \code{solve} has a sharper implementation, one that proves every $m$ at a fixed $n$ in a single pass, and it is worth the extra machinery because it closes the directed multigraph case outright for the sizes it reaches.
+
+The key is that $m$ can be scaled out of the problem completely, so that it never appears in the computation at all. Take any directed multigraph that is feasible at level $m$, meaning $\lambda^{\max} \le m - 1$, and divide every multiplicity by $m - 1$. The result is a matrix of weights $w(u, v) \in [0, 1]$, and since dividing all capacities by $m - 1$ divides every flow value by the same factor, the maximum flow between each pair is now at most one. Its total weight is $\sum_{u \ne v} w(u, v) = |A| / (m - 1)$, so a feasible multigraph with many arcs becomes a feasible weight matrix with large total weight, and vice versa. Writing $M^{*}(n)$ for the largest total weight any such matrix can carry,
+\[
+    L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n), \qquad
+    M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s, t\Bigr\}.
+\]
+There is no $m$ on the right-hand side. One solve for $M^{*}(n)$ therefore fixes $L_m^{\mathrm{dir}}(n)$ for every $m$ at once. The scaling down always gives the upper bound $L_m^{\mathrm{dir}}(n) \le (m - 1) M^{*}(n)$, and the matching lower bound holds because the heaviest matrix the solve finds is the \emph{double star}: the bidirected star, with weight one on both arcs $h \to v$ and $v \to h$ between the hub and every other vertex. Its weights lie in $\{0, 1\}$, so multiplied back by $m - 1$ it is an honest integer multigraph for each $m$, not a fractional one --- the directed multigraph carrying every arc of the bidirected star at full multiplicity $m - 1$, with $2(n-1)(m-1)$ arcs and $\lambda^{\max} = m - 1$. So the two bounds meet for every $m$ together.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth, font=\small]
+    % Left: integer multigraph (m=3), multiplicities in {0,1,2}
+    \node[vertex] (A1) at (-4.2, 0)   {$A$};
+    \node[vertex] (B1) at (-2.4, 1.1) {$B$};
+    \node[vertex] (C1) at (-2.4,-1.1) {$C$};
+    % A->B multiplicity 2: two parallel arcs
+    \draw[->, arc] (A1) to[bend left=22]  node[above, font=\scriptsize]{$2$} (B1);
+    \draw[->, arc] (A1) to[bend right=5]  (B1);
+    % A->C multiplicity 1
+    \draw[->, arc] (A1) -- node[below, font=\scriptsize]{$1$} (C1);
+    % B->C multiplicity 0: absent (dotted, grayed out)
+    \draw[->, arc, color=gray!50, dashed] (B1) -- node[right, font=\scriptsize, color=gray!60]{$0$} (C1);
+    \node[above, font=\footnotesize\itshape] at (-3.3, 1.8) {multigraph ($m=3$)};
+
+    % Scaling arrow
+    \draw[->, very thick] (-1.2, 0) -- (1.2, 0);
+    \node[above, font=\small] at (0, 0.1) {$\div\,(m-1)\;=\;\div\,2$};
+
+    % Right: weight matrix, weights in [0,1]
+    \node[vertex] (A2) at (2.4, 0)   {$A$};
+    \node[vertex] (B2) at (4.2, 1.1) {$B$};
+    \node[vertex] (C2) at (4.2,-1.1) {$C$};
+    % A->B weight 1
+    \draw[->, arc] (A2) -- node[above, font=\scriptsize]{$1$} (B2);
+    % A->C weight 1/2
+    \draw[->, arc] (A2) -- node[below, font=\scriptsize]{$\tfrac{1}{2}$} (C2);
+    % B->C weight 0: absent
+    \draw[->, arc, color=gray!50, dashed] (B2) -- node[right, font=\scriptsize, color=gray!60]{$0$} (C2);
+    \node[above, font=\footnotesize\itshape] at (3.3, 1.8) {weight matrix ($M^*$)};
+\end{tikzpicture}
+\caption{The scaling step for $m = 3$. Dividing each multiplicity by $m - 1 = 2$ maps the integer multigraph (left) to a weight matrix with all values in $[0, 1]$ and max-flow at most one between every pair (right). The double arc $A \to B$ (multiplicity $2$) becomes weight $1$; the single arc $A \to C$ (multiplicity $1$) becomes weight $\tfrac{1}{2}$; the absent arc $B \to C$ (multiplicity $0$, shown dashed) stays absent. Crucially, $m$ drops out on the right, so a single optimisation over all weight matrices pins $L_m^{\mathrm{dir}}(n) = (m-1)\,M^*(n)$ for every $m$ simultaneously.}
+\label{fig:scaling-reduction}
+\end{figure}
+
+What remains is to compute $M^{*}(n)$, and the difficulty is that the constraint ``maximum flow at most one'' is itself the answer to a flow problem rather than a plain inequality on $w$. The max-flow / min-cut theorem removes it. The maximum $s$--$t$ flow equals the smallest capacity of any \emph{cut} separating $s$ from $t$, where a cut splits the vertices into a source side holding $s$ and a sink side holding $t$, and its capacity is the total weight of the arcs crossing from the source side to the sink side. So $\mathrm{maxflow}(s, t) \le 1$ holds exactly when there is at least one such cut of capacity at most one. We can drop the flow entirely and instead let the optimisation choose, for every ordered pair $(s, t)$, one cut and require that its capacity stay at or below one.
+
+A cut is described by a yes/no label $x^{st}_u$ on each vertex, equal to one when $u$ is on the source side, with $s$ fixed on the source side and $t$ on the sink side. An arc $u \to v$ crosses the cut exactly when $u$ is on the source side and $v$ is not, and a helper variable $p^{st}_{uv}$ then picks up its weight $w(u, v)$. Forcing the crossing weights to sum to at most one for every pair forces every pair to admit a cut of capacity one, hence maximum flow at most one. This is the exact feasible region, not a relaxation of it, and that is what turns the result into a proof. The optimisation reports both the best total weight it has found and a value it has shown no matrix can exceed, and when those two meet the gap is zero and $M^{*}(n)$ is certified.
+
+For the directed multigraph arc problem, then, \code{solve} runs this cut-counting optimisation in place of any enumeration: it chooses the minimum cut for every ordered pair, and a zero gap makes the reported $M^{*}(n)$ a proved upper bound, from which $L_m^{\mathrm{dir}}(n) = (m-1)M^{*}(n)$ delivers every $m$ at once.
+
+\code{solve} assembles this optimisation from $n$ alone, and a reader content to take it on the strength of the cut argument just given can skip to \Cref{thm:dir-multi-small} without loss. Written out it reads more heavily than it behaves, so we first name every symbol in plain words, then show the one inequality that looks cryptic is a simple yes-or-no switch.
+
+Three quantities appear, and only three. The first is already familiar.
+\begin{itemize}
+    \item $w(u,v) \in [0,1]$ is the \emph{scaled multiplicity} of the arc $u \to v$, the amount of arc weight the matrix places on $u \to v$ after the division by $m-1$ of the previous section. It is what we are maximising the total of.
+    \item $x^{st}_u \in \{0,1\}$ is a \emph{side label} that exists once for every ordered pair $(s,t)$. For that pair the optimisation is choosing one cut, and $x^{st}_u$ records the answer to ``is vertex $u$ on the source side of that cut?'', with $1$ for yes and $0$ for no. The two endpoints are pinned, $x^{st}_s = 1$ and $x^{st}_t = 0$, because $s$ defines the source side and $t$ the sink side.
+    \item $p^{st}_{uv} \ge 0$ is a \emph{crossing weight}, the part of $w(u,v)$ that this pair's chosen cut is forced to count. It equals $w(u,v)$ when the arc $u \to v$ runs from the source side to the sink side, and is otherwise left at zero.
+\end{itemize}
+With those three named, the program is short:
+\begin{align*}
+    \text{maximise} \quad & \sum_{u \ne v} w(u, v) \\
+    \text{subject to} \quad & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
+    & \sum_{u \ne v} p^{st}_{uv} \le 1 && \text{for all } (s,t), \\
+    & w(s,t) + \sum_{x} \min\bigl(w(s,x), w(x,t)\bigr) \le 1 && \text{for all } (s,t), \\
+    & d(v_0) \le d(v_1) \le \dots \le d(v_{n-1}), && \text{with } d(v) = \textstyle\sum_{u \ne v} \bigl(w(u,v) + w(v,u)\bigr), \\
+    & w \in [0,1], \quad x \in \{0,1\}.
+\end{align*}
+
+The first line is the only one that looks cryptic, and it is just an indicator written as an inequality. Its right-hand side $w(u,v) + x^{st}_u - x^{st}_v - 1$ takes one of four shapes according to which side the cut puts the two endpoints $u$ and $v$ on, and \Cref{tab:crossing-cases} works all four out. Because $w(u,v) \le 1$, the right-hand side is positive in one case only, the crossing case, where it equals $w(u,v)$ and so forces $p^{st}_{uv} \ge w(u,v)$. In the other three cases it is zero or negative, so the constraint reads $p^{st}_{uv} \ge (\text{something} \le 0)$ and leaves $p^{st}_{uv}$ free to stay at zero, which the maximisation is happy to let it do.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{cclcc}
+\toprule
+$x^{st}_u$ & $x^{st}_v$ & meaning & $w + x^{st}_u - x^{st}_v - 1$ & forces \\
+\midrule
+$1$ & $0$ & $u$ source side, $v$ sink side: arc \emph{crosses} & $w(u,v)$ & $p^{st}_{uv} \ge w(u,v)$ \\
+$1$ & $1$ & both on the source side & $w(u,v) - 1 \le 0$ & $p^{st}_{uv} \ge 0$ \\
+$0$ & $0$ & both on the sink side & $w(u,v) - 1 \le 0$ & $p^{st}_{uv} \ge 0$ \\
+$0$ & $1$ & $u$ sink side, $v$ source side & $w(u,v) - 2 \le 0$ & $p^{st}_{uv} \ge 0$ \\
+\bottomrule
+\end{tabular}
+\caption{The first constraint, case by case. This is where the bound $w \le 1$ earns its keep: it makes the three non-crossing rows land at or below zero, so the helper $p^{st}_{uv}$ is pushed up to the arc weight in exactly one case, the crossing one. The constraint is therefore an exact indicator, ``count $w(u,v)$ when the arc crosses this cut, and nothing otherwise'', with no slack and no fudge.}
+\label{tab:crossing-cases}
+\end{table}
+
+\Cref{fig:cut} shows one chosen cut and the weights it counts. The second line of the program now reads plainly. It says the total crossing weight of this pair's cut, $\sum_{u \ne v} p^{st}_{uv}$, is at most one. By max-flow / min-cut a cut of capacity at most one exists for $(s,t)$ exactly when $\mathrm{maxflow}(s,t) \le 1$, so the two lines together say ``every ordered pair admits a cut of capacity at most one'', which is precisely the feasibility we want. This is the true feasible region, not a relaxation of it, so an optimal solution reported with zero gap is a proof and not merely evidence.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small}]
+    % the dashed cut line
+    \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
+    \node[color=KULblauw3b] at (0,2.65) {cut};
+    \node at (-2.2,2.65) {source side ($x=1$)};
+    \node at ( 2.2,2.65) {sink side ($x=0$)};
+    % source-side vertices
+    \node[vertex] (s)  at (-2.6, 1.1) {$s$};
+    \node[vertex] (a)  at (-1.3,-1.1) {$a$};
+    % sink-side vertices
+    \node[vertex] (t)  at ( 2.6,-1.1) {$t$};
+    \node[vertex] (b)  at ( 1.3, 1.1) {$b$};
+    % non-crossing arcs (p = 0)
+    \draw[->, edge, color=gray] (s) -- node[above left, font=\scriptsize]{$p=0$} (a);
+    \draw[->, edge, color=gray] (b) -- node[above right, font=\scriptsize]{$p=0$} (t);
+    % crossing arcs source -> sink (p = w), highlighted
+    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[above, font=\scriptsize]{$p=w$} (b);
+    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[below, font=\scriptsize]{$p=w$} (t);
+    % a back-crossing arc sink -> source (p = 0), not counted
+    \draw[->, edge, color=gray] (b) to[bend left=12] node[above, font=\scriptsize]{$p=0$} (a);
+\end{tikzpicture}
+\caption{One ordered pair's chosen cut. The dashed line splits the vertices into the source side, where $x^{st}_u = 1$, and the sink side, where $x^{st}_u = 0$. Only arcs running from source side to sink side cross the cut, and the first constraint forces their helper $p^{st}_{uv}$ up to the arc weight $w$ (the two thick arcs). Arcs that stay on one side, and arcs that run the other way across the line, contribute nothing. The second constraint then caps the total counted weight, the thick arcs, at one.}
+\label{fig:cut}
+\end{figure}
+
+The last two lines change no answer. They only help the solver finish in time. The third is a redundant shortcut: the direct arc $s \to t$ and one two-step detour $s \to x \to t$ through each intermediate vertex $x$ already form that many routes between $s$ and $t$, so $w(s,t) + \sum_x \min(w(s,x), w(x,t)) \le 1$ must hold of any feasible matrix anyway, and stating it outright tightens the continuous picture the solver reasons from (each $\min$ carried by a small yes-or-no selector). The fourth orders the vertices by weighted degree, which is allowed because renaming vertices cannot change any count, and it spares the solver the many relabelled copies of each graph that differ only in vertex names.
+
+\begin{theorem}[Directed multigraph value, small $n$]\label{thm:dir-multi-small}
+For $n \le 6$ and all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star. Equivalently $M^{*}(n) = 2(n-1)$.
+\end{theorem}
+
+It is worth being clear about what ``for all $m$'' rests on, because the theorem proves infinitely many values from finitely many solves. It is not that each $m$ was tested. In this mode \code{solve} never sees $m$ at all. It proves the single $m$-free number $M^{*}(n)$, and the identity $L_m^{\mathrm{dir}}(n) = (m-1) M^{*}(n)$ then carries that one fact to every $m$ at once. The only quantity that is checked case by case, and the only genuine limit on how far the result reaches, is $n$.
+
+\code{solve} proves \Cref{thm:dir-multi-small} by returning $M^{*}(3) = 4$, $M^{*}(4) = 6$, $M^{*}(5) = 8$, and $M^{*}(6) = 10$, each optimal with zero gap, so that $M^{*}(n) = 2(n-1)$ over this range. The first three run in well under a second, under a second, and a few seconds. The case $n = 6$ takes about twenty minutes. At $n = 7$ the same encoding does not close, and we do not pretend otherwise: it is a finite obstacle of scale, not a new idea, and it marks the current edge of certified knowledge for this variant. The solver transcript is in \Cref{app:proofs}.
+
+\section{What the solver may claim}
+
+Now that the pieces inside \code{solve} are built, it is worth stating plainly, because the rest of the thesis depends on it, what each is allowed to claim. The checker \emph{measures}: its connectivity values are exact. Its three proving implementations, the exhaustive enumeration, the pruned search, and the cut-counting, \emph{prove}: an exhausted enumeration or an optimal, zero-gap solve is an upper bound for that fixed $n$. The search of \Cref{ch:discover} will \emph{discover}: it produces concrete graphs, hence lower bounds, and never an upper bound. These three claims are exactly what \code{solve} labels its answer with, so that an exact value, a lower bound, and an upper bound can never be quietly confused with one another.
+
+With the microscope built and aimed at proof, the variants with small answers are settled and the directed base cases the hand proof needed are in hand. What proof by enumeration cannot do is reach the sizes where the answers are only conjectured, because the number of graphs explodes long before the interesting cases arrive. The next chapter measures that explosion exactly, and then turns the same program loose to \emph{discover} the dense graphs that blind enumeration can never reach.
+
+\section{Reproducibility}
+
+Every claim in this thesis that rests on computation can be re-run from a single file. All of the program's logic lives in \code{program/erdos915\_unified.py}, a self-contained Python program whose only dependencies are \code{numpy}, \code{networkx}, \code{scipy}, and \code{matplotlib}, with no build step. Running \code{python erdos915\_unified.py} executes the built-in self-test, the suite of invariant checks that confirms the connectivity values quoted throughout this chapter, including the sanity checks on the directed double star and on $K_n$ and $K_4^{(3)}$. Every figure in the thesis is regenerated by its companion driver \code{program/make\_figures.py}, which imports that same file and fixes every random seed, so the pictures are reproduced exactly rather than merely resembled; the table in \code{program/README.md} records which routine produces which figure. The solver transcripts behind the certified values of this chapter, the pruned-search log for \Cref{thm:dir-arc-m2-exact} and the cut-counting certificate for \Cref{thm:dir-multi-small}, are reproduced verbatim in \Cref{app:proofs}, so a reader may check the proofs without running anything at all.

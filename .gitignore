@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Program run logs (regenerated; not part of the deliverable)
+program/logs/
+
+# LaTeX build artifacts (the built main.pdf IS committed on purpose)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.loa
+*.lof
+*.lot
+*.synctex.gz
+program/erdos915_unified.baseline.py

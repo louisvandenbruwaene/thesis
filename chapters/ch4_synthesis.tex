@@ -1,0 +1,155 @@
+The journey set out from one clean theorem and followed it across twelve variants, proving what proved cleanly, building a machine where the proofs ran out, certifying the small cases the machine could close, and using the search to discover the dense graphs the proofs had singled out and to point at the ones still open. This closing chapter draws the threads together. It maps the directed frontier, where proof and certificate both still fall short of the full answer, names the three genuine surprises the landscape contains, gathers the twelve answers into one picture, and says plainly what the program changed and where it stops.
+
+\section{The directed frontier and the single open lemma}
+
+Two of the open directions are directed, and they share a structure worth stating exactly rather than hiding. The directed arc problem is a race between two constructions on different scales. The directed hub (\Cref{const:directed-hub}) reaches $m(n-1)$ arcs and grows linearly. The augmented bipartite construction (\Cref{const:augmented-bipartite}) packs $\floor{(n+m-2)^2/4}$ arcs and grows quadratically. Which leads depends on $n$, and the two cross at an order linear in $m$, near $n = 9$ at the $m = 3$ of \Cref{fig:crossover}. \Cref{conj:dir-arc} asserts that together they are the whole story.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.76\textwidth]{figures/directed_crossover.png}
+    \caption{The two directed lower bounds at $m = 3$. The linear hub branch leads for small $n$. The quadratic augmented-bipartite branch overtakes it near $n = 9$ and leads thereafter. \Cref{conj:dir-arc} asserts their maximum is the exact value.}
+    \label{fig:crossover}
+\end{figure}
+
+\Cref{conj:dir-arc} is proved as a lower bound for all $m$, and it is a theorem at $m = 2$ by \Cref{thm:dir-arc-m2-exact}. Past $m = 2$ it sits squarely in the second regime of the trichotomy of \Cref{sec:trichotomy}: certified by exhaustion at the small sizes \code{solve} can close for $m = 3$, conjectured by the temperature search beyond, and never beaten anywhere the search reaches. What is missing is a general upper bound for $m \ge 3$, and the obstacle is structural rather than computational.
+
+The route to the upper bound is to show that an extremal digraph, once it is past the hub regime, must look like the augmented bipartite construction: its vertices split into a part $A$ and a part $B$ with every arc running $A \to B$, and $B$ thickened only mildly. Three structural facts, each proved in \Cref{app:proofs}, push in this direction. Out-neighbourhoods are mutually unreachable, second out-neighbourhoods are disjoint, and a complete $A \to B$ partition forces each vertex of $B$ to absorb at most $m - 2$ arcs from inside $B$. With the partition free to vary, the total arc count $|B|(|A| + m - 2) = |B|(n - |B| + m - 2)$ is maximised at $|B| = \ceil{(n+m-2)/2}$, which gives $\floor{(n+m-2)^2/4}$, precisely the conjectured upper bound.
+
+The reduction is clean except at a single point, and it is worth naming the point exactly rather than hiding it. The count goes through provided the extremal digraph has \emph{no arc from $B$ back to $A$}: under that hypothesis a route between two vertices of $B$ can never escape $B$, so the connectivity inside $B$ is governed entirely by $B$'s own arcs and the budget applies. The bare existence of a complete $A \to B$ partition is not enough on its own, because a small example shows a backward arc can manufacture an extra route. So the whole upper bound for $m \ge 3$ now rests on one missing lemma: that an extremal non-hub digraph has no backward arc. The natural delete-and-compensate exchange that would prove it is not monotone, which is the precise reason it remains open. The machine has been useful here in the negative direction too: a proposed counterexample to the conjecture, a backward arc bolted onto the thirty-arc graph, was refuted by the checker, which found the third route the construction's author had missed.
+
+The directed vertex-disjoint problem needs no separate machinery. Vertex-disjoint routes are at most as numerous as arc-disjoint ones, and the constructions that achieve the arc bounds also achieve them for vertices, so the two directed problems share both their constructions and their conjecture, and the $m = 2$ value transfers exactly in \Cref{thm:dir-vertex-m2-exact}. For $m \ge 3$ the vertex value is conjectured equal to the arc value, and it will follow from the arc case the moment the missing backward-arc lemma is supplied. The directed multigraph problem has its own two-branch story, parallel to the simple one. The conjectured value is
+\[
+L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,\max\!\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr),
+\]
+where the double star realises the linear branch and the one-directional bipartite multigraph, every arc at multiplicity $m-1$, realises the quadratic one. The branches cross at $n = 7$, exactly as in the simple case. On the linear side the certifier closes the problem, proving $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ and every $m$ at once (\Cref{thm:dir-multi-small}), and at $m = 2$ the whole problem collapses onto the simple digraph theorem for every $n$, because two parallel arcs are already two routes (\Cref{thm:dir-multi-m2}). On the quadratic side, a scaling-and-deletion induction proves the bipartite bound for even $n \ge 8$ conditional on the bound one vertex below, and that odd case once reduced to a single minimum-degree statement (\Cref{conj:min-degree}), confirmed by the program in the purely saturated and purely unsaturated regimes but open in the mixed one, where multiplicities strictly between $0$ and $m-1$ defeat the integrality the two pure regimes lean on (\Cref{app:proofs}).
+
+A sharper route now bypasses that conjecture at $m = 3$, and the way it does so is the cleanest instance in the thesis of the proof handing its remaining work to the machine. An \emph{attachment lemma} (\Cref{lem:attachment}) bounds the degree of a vertex glued onto the bipartite extremiser, and a \emph{conditional odd step} built on it (\Cref{thm:odd-step}, for $m \in \{3,4\}$) carries the value and extremal characterisation from each even level to the next odd one. At $m = 3$ that characterisation propagates through both parities (\Cref{rem:odd-step-roadmap}), so the entire problem for all $n \ge 8$ collapses onto two finite, integral statements at $n = 7$:
+\begin{itemize}
+    \item[(a)] $L_3^{\mathrm{dir}}(7) = 24$, and
+    \item[(b)] the only $24$-arc feasible multigraphs on $7$ vertices with maximum degree at most $8$ are $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$.
+\end{itemize}
+
+\Cref{conj:min-degree} is thereby off the critical path for $m = 3$, replaced by two machine-checkable targets: a MILP infeasibility check for fact (a), and an exhaustive enumeration of degree-bounded multigraphs for fact (b). Both are running as this is written.
+
+The linear branch turns out to be richer than the double star first suggested. Every doubled bidirected spanning tree is extremal, confirmed exhaustively at $n = 4$ and $5$, and several distinct extremisers tie at $24$ arcs for $n = 7$. Sifting and classifying them is precisely what the enumeration must do.
+
+For $m \ge 4$ the conditional step still yields the value but uniqueness no longer propagates through odd levels, and for $m \ge 5$ even the value step stalls. These residual gaps are stated precisely among the open problems below. They are finite, identified targets rather than mysteries, and natural goals for the next round of certified computation.
+
+\section{Three principal phenomena}
+
+Across all the variation, three phenomena stand out as the ones a first guess would not have predicted.
+
+The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 3$ pulling strictly above $\ell_5(n)$, and beyond it the vertex problem becomes genuinely hard and has stayed open since 1974.
+
+The second is the quadratic bipartite phenomenon. Undirected graphs tie their edge count to their connectivity through vertex degrees, but a digraph can lean entirely one way, and a single-direction wall of arcs holds $\floor{n^2/4}$ arcs at connectivity one. This has no undirected counterpart, it overturns the naive directed conjecture, and it is the reason the directed cases are the hardest in the thesis.
+
+The third is the universality of the threshold $p^* = m/n$, with one honest asterisk. \Cref{ch:basecases} proves the appearance threshold $p^* = m/n$ for simple $G(n, p)$ (\Cref{thm:gnp-threshold}), and its mechanism is a degree count: below threshold the maximum degree stays under $m$, so the degree bound caps every local connectivity, and above it Mader's bound forces a high pair into existence. That mechanism does not care which model it runs on, so the natural general statement is that the forbidden configuration appears once the \emph{expected degree} crosses $m$, of which $p^* = m/n$ is merely the simple-graph face, since there $\mathbb E[\deg] = p(n-1)$. To put this to all twelve variants at once we extend $G(n,p)$ by a single rule: every cell (a pair, an ordered pair, or an $r$-set) carries an independent weight, Bernoulli$(p)$ for simple graphs and hypergraphs, and for multigraphs a \emph{hurdle-geometric} weight that is empty with probability $1-p$ and otherwise $1 + \mathrm{Geometric}(\alpha)$ parallel copies, so the multiplicity decays geometrically (we use $\alpha = \tfrac{1}{2}$ throughout) and $\alpha = 0$ recovers $G(n,p)$ exactly. For multigraph panels, multiplicities are capped at $m-1$ so that a single fat edge cannot trivially breach the connectivity ceiling. For simple-graph and hypergraph panels no cap is needed, since those models already admit at most one copy per cell or hyperedge.
+
+\Cref{fig:threshold} samples all six generative shapes and plots, against the measured mean degree in units of $m$, the chance that a sample already holds a pair of binding connectivity at least $m$. The universality is real but \emph{asymptotic}. The degree argument is model-free only in the regime $m/\ln n \to \infty$; at the fixed small $m$ a computation can reach, the curves are visibly \emph{ordered} rather than coincident. The ordering, from cheapest to most expensive in mean degree required to force a high pair, is: directed multigraph, directed simple, undirected simple, undirected multigraph, undirected hypergraph, directed hypergraph. The directed multigraph crosses first because parallel edges concentrate connectivity into a few pairs without spreading degree evenly. The undirected multigraph lands further right than the simple cases because a lower inclusion probability (needed to keep mean degree fixed) leaves many pairs absent, making the minimum-degree bound harder to satisfy. The directed hypergraph needs the most degree because each hyperedge serves only one Berge route at a time. The vertical line is the asymptotic threshold, degree $= m$, and the spread of crossings around it is exactly the finite-$m$ gap \Cref{thm:gnp-threshold} already disclaims --- the collapse onto one density is a statement about the limit, not about any size we can sample.
+
+That same sampler also lets the binding-connectivity \emph{distribution} be seen for every variant at sizes enumeration cannot reach. \Cref{fig:sampled-grid} histograms it across all twelve, at the common density where the expected degree is $m$, feasible graphs ($\lambda^{\max} \le m-1$) blue and infeasible red. The colour balance reads off the ordering of \Cref{fig:threshold} in distributional form: at this one density the models that turn degree into connectivity cheaply (the directed multigraph above all) already sit deep in the infeasible regime, while the dear directed hypergraph is still mostly feasible, and the simple and undirected cases straddle the boundary. That the same ordering survives at $n$ up to $26$, far past the $n \le 6$ of exact enumeration, is the point: it is a property of the models, not of the tiny sizes.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.82\textwidth]{figures/degree_threshold.png}
+    \caption{The appearance threshold across all six generative models, read against expected degree ($n = 12$, $m = 4$, multigraph panels use the hurdle-geometric model with $\alpha = \tfrac{1}{2}$, multiplicities capped at $m-1$). Each curve samples one model (simple, multigraph, or $3$-uniform hypergraph, each undirected and directed) and plots the probability that a sample already contains a pair of binding connectivity at least $m$ against its \emph{measured} mean binding degree, in units of $m$. The vertical line is the asymptotic threshold degree $= m$ of \Cref{thm:gnp-threshold}. At this finite $m$ the curves form a strict six-way ordering, not a coincident band: multigraph directed crosses first (parallel edges concentrate connectivity into a few pairs), then simple directed, then simple undirected, then multigraph undirected (lower inclusion probability offsets the per-pair multiplicity gain), then $3$-uniform hypergraph undirected, and finally $3$-uniform hypergraph directed last (each Berge route consumes an entire hyperedge, so connectivity is hardest to force). The model-free collapse onto one threshold is the $m/\ln n \to \infty$ limit. The spread here is the finite-$m$ gap.}
+    \label{fig:threshold}
+\end{figure}
+
+A three-dimensional view of the same transition, tracking how the whole binding-connectivity distribution migrates from low to high as the density crosses $p^* = m/n$, is given for three representative variants in \Cref{fig:threshold-3d} of \Cref{app:m6}.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sampled_variant_grid.png}
+    \caption{Binding-connectivity distribution under random sampling for all twelve variants, at sizes up to $n = 26$ (far past the $n \le 6$ exact enumeration reaches), each at the common density where the expected degree is about $m = 4$. Blue is feasible ($\lambda^{\max} \le m-1$), red infeasible, and the dashed line in each panel marks the boundary $\lambda^{\max} = m-1$. At this shared density the four simple panels are already infeasible almost everywhere, their mass sitting well to the right of the boundary in red, because a simple graph reaches high local connectivity readily once its degree is about $m$. Connectivity is hardest to force in the directed hypergraph panels, which stay mostly feasible in blue, since each Berge route consumes an entire hyperedge. The multigraph rows and the vertex-separation panels keep more blue than their simple, edge-disjoint counterparts and fall between these extremes. Multigraph rows use the hurdle-geometric model ($\alpha = \tfrac{1}{2}$, multiplicities capped at $m-1$), and the per-panel $n$ is annotated.}
+    \label{fig:sampled-grid}
+\end{figure}
+
+That same scarcity of extremal graphs is the thread through the remaining figures, which pin it down from three complementary angles: where the frontier runs, how far the typical graph sits below it in connectivity, and how far below it in sheer edge count. \Cref{fig:scatter-landscape} answers the first. It plots every labelled graph at small $n$ as a single point, its binding connectivity $\lambda^{\max}$ on the horizontal axis and its edge count on the vertical, so the whole population of graphs is visible at once. The points crowd into the low-connectivity, low-edge corner and thin out upward, where the blue extremal envelope, an integer staircase carrying one dot per connectivity level, traces the densest graph available at each level. The empty region above that staircase is precisely the part the main theorems forbid a graph to occupy. The extremal problem is the question of where that staircase runs, and the figure shows it is a thin frontier with almost nothing pressed against it from below.
+
+The two enumeration histograms then look at the same populations from two angles. \Cref{fig:conn-dist-m3} sorts every graph in the full small-$n$ enumeration by its $\lambda^{\max}$ at $m = 3$, colouring the feasible graphs ($\lambda^{\max} \le 2$) blue and the infeasible ones red. The balance of the two varies markedly across the twelve variants, from panels where most graphs already violate the bound to panels where the feasible graphs dominate, so the constraint $\lambda^{\max} \le m-1$ is one that a large fraction of graphs genuinely fail. \Cref{fig:edge-dist-m3} turns the same enumeration the other way, by edge count, and marks the extremal value at that size with a dotted line that lands far out in the sparse right tail, so the densest feasible graphs are exceptional in every variant. Together the histograms place the extremal graphs as a thin population at the frontier, and \Cref{fig:scatter-landscape} shows that frontier directly. The same picture holds at $m = 6$, only shifted: the feasibility boundary moves out to $\lambda^{\max} \le 5$ and the extremal edge counts grow with $m$ exactly as the formulas predict, so raising the threshold relocates the boundary without changing the verdict. The full $m = 6$ enumeration views, the companions to \Cref{fig:conn-dist-m3} and \Cref{fig:edge-dist-m3}, are \Cref{fig:conn-dist-m6} and \Cref{fig:edge-dist-m6} in \Cref{app:m6}.
+
+Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at once, drawing the best feasible edge count as a bar surface across every variant. The three proved variants rise as smooth linear or quadratic sheets that the formulas describe exactly, while the open variants show a visible step between the machine-proved blue bars and the search's purple lower bounds, so the surface makes the proved-versus-open divide of the trichotomy a single readable shape. Reading along the $m$ axis recovers the linear scaling in the threshold, and reading along $n$ recovers each variant's growth rate, which is the whole of \Cref{tab:summary} compressed into one object.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/scatter_lambda_edges.png}
+    \caption{The complete landscape of all labeled graphs at small $n$ (see panel annotations for each variant's $n$): every point is one graph, plotted at its binding connectivity $\lambda^{\max}$ horizontally and its edge count vertically. The blue staircase marking the densest graph at each connectivity level is the extremal envelope, the frontier the extremal problem asks about, with one dot per level so its exact value is legible. Graphs crowd the low-connectivity, low-edge region. The extremal graphs live at the top of the staircase. The emptiness above the envelope is exactly the region the main theorems forbid.}
+    \label{fig:scatter-landscape}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/conn_dist_m3.png}
+    \caption{How all graphs (full enumeration, small $n$) distribute by their binding connectivity $\lambda^{\max}$, across all twelve variants at $m = 3$. Blue bars are feasible graphs ($\lambda^{\max} \leq 2$), red bars infeasible ones ($\lambda^{\max} \geq 3$), and the dashed line marks the feasibility boundary. The balance of blue and red varies markedly across the panels, from variants where the infeasible graphs are the clear majority to variants where the feasible ones dominate, so high binding connectivity is common enough that the bound is a genuine constraint rather than a formality. The densest feasible graphs, the extremal ones, are rare in every variant regardless of this balance, as the edge-count view of \Cref{fig:edge-dist-m3} makes precise.}
+    \label{fig:conn-dist-m3}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/edges_dist_m3.png}
+    \caption{The same enumeration viewed by edge count rather than connectivity, at $m = 3$. Feasible graphs are blue, infeasible ones red. The dotted vertical line marks the largest feasible edge count, the extremal value at this $n$ read straight from the full enumeration, so the reader can see directly how far the extremal graphs sit from the bulk of the distribution and whether the extremal density is typical or exceptional.}
+    \label{fig:edge-dist-m3}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{figures/variant_surface_3d.png}
+    \caption{The optimal bound as a surface over the $(n, m)$ grid for all twelve variants, every panel drawn from the same camera so the shapes compare directly. Each bar's height is the largest feasible edge count found by \code{solve} at that vertex count and forbidden threshold $m$. The single thing to read off is colour: a bar is \emph{blue} exactly where the value is machine-proved and \emph{purple} exactly where only a search lower bound is known, so each panel is a little map of what is settled. The three fully proved variants (Mader's undirected edge cases and the multigraph analogue) are solid blue sheets, rising linearly or quadratically as their formulas predict, while the open variants turn purple precisely where proof runs out. Reading along the $m$ axis shows how the bound scales with the forbidden threshold; reading along the $n$ axis shows the growth rate for a fixed variant.}
+    \label{fig:surface-3d}
+\end{figure}
+
+\section{Summary of the twelve variants}
+
+\Cref{tab:summary} records the status of all twelve structural variants. Each entry is marked by how it is known: proved by hand here or in \Cref{app:proofs}, cited to the literature, certified by the cut-counting optimisation for the stated sizes, or conjectured with a proved lower bound. The distinction is the honesty contract of \Cref{ch:certify} carried through to the summary.
+
+\begin{table}[t]
+    \centering
+    % The natural width of this twelve-row summary exceeds the text block, so
+    % the whole tabular is scaled to \textwidth. This keeps every cell on a
+    % single line (no ragged wrapping) while fitting inside the margins.
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{llll}
+        \toprule
+        Separation & Model & Value & Status \\
+        \midrule
+        \multicolumn{4}{l}{\emph{Undirected}} \\
+        edge   & simple & $\floor{m(n-1)/2}$ & proved (Mader) \\
+        edge   & multi  & $(m-1)(n-1)$ & proved \\
+        edge   & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ & proved (cited GH) \\
+        vertex & simple & $\floor{m(n-1)/2}$ ($m\le4$), $\floor{8n/3}-3$ ($m=5$) & cited, open $m\ge6$ \\
+        vertex & multi  & parallel edges do not help & proved \\
+        vertex & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ ($m\le3$), $\ge$ that for all $m$ & proved $m\le3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}), open $m\ge4$ \\
+        \midrule
+        \multicolumn{4}{l}{\emph{Directed}} \\
+        arc    & simple & $\max(2(n-1),\floor{n^2/4})$ ($m=2$) & proved, conj.\ $m\ge3$ \\
+        arc    & multi  & $(m-1)\max(2(n-1),\floor{n^2/4})$ & proved $n{\le}6$ and $m{=}2$, cond.\ $m{=}3$ \\
+        arc    & hyper  & quadratic in $n$, exact value open & lower bd.\ (\Cref{prop:dir-hyper-first}) \\
+        vertex & simple & $\max(2(n-1),\floor{n^2/4})$ ($m=2$) & proved, conj.\ $m\ge3$ \\
+        vertex & multi  & reduces to simple digraph & proved \\
+        vertex & hyper  & quadratic in $n$, exact value open & lower bd.\ (\Cref{prop:dir-hyper-first}) \\
+        \bottomrule
+    \end{tabular}%
+    }
+    \caption{The twelve structural variants of Problem 915 and their status. The threshold result $p^* = m/n$ applies uniformly across all models and separations and is discussed separately in \Cref{ch:basecases} and \Cref{ch:synthesis} as a sampling observation. ``Certified'' means proved by the cut-counting optimisation for the stated sizes. ``conj.''\ means a conjecture with a proved matching lower bound. ``cond.''\ means proved conditional on a finite, identified statement (for $m = 3$ directed multigraphs, the two $n = 7$ computations of \Cref{rem:odd-step-roadmap}). ``lower bd.''\ means only a proved lower bound is known, with the exact value open.}
+    \label{tab:summary}
+\end{table}
+
+\section{Contributions and limitations of the program}
+
+The program turned a per-case craft into a uniform pipeline. Before it, each variant came with its own one-off computation and its own hand argument. After it, one representation holds every variant, one exact checker measures connectivity, one certifier proves small-case upper bounds, and one cooled search discovers extremisers and the lower bounds they witness. The rediscovery of \Cref{ch:discover} is the evidence that the pipeline is faithful: pointed at solved cases, it returns the solved answers.
+
+Its limits are as clear as its reach, and stating them is part of the honesty the thesis insists on. The search proves no upper bounds. It only ever exhibits graphs. The certifier proves upper bounds, but only for a fixed size, and the directed multigraph encoding closed unconditionally only up to $n = 6$ until the deletion-cut strengthening put $n = 7$ within reach (the two $m = 3$ computations that the conditional reduction now hangs on are running as this is written, not yet returned). And no amount of either replaces the two genuinely structural gaps the thesis leaves open: the backward-arc lemma that would turn \Cref{conj:dir-arc} into a theorem, and the vertex-disjoint problem at $m \ge 6$, which has resisted for half a century and which the program can probe but not crack.
+
+\section{Open problems}
+
+\begin{itemize}
+    \item The backward-arc lemma: prove that an extremal non-hub digraph has no arc from $B$ to $A$, completing the upper bound in \Cref{conj:dir-arc} for $m \ge 3$, and with it the directed vertex case.
+    \item The two finite $n = 7$ computations that close the directed multigraph problem at $m = 3$. By the attachment lemma and the conditional odd step (\Cref{lem:attachment}, \Cref{cor:attachment-equality}, \Cref{thm:odd-step}), the entire $m = 3$ problem --- value \emph{and} extremal uniqueness for all $n \ge 8$ --- reduces along a single induction to two integral statements about multigraphs with multiplicities in $\{0, 1, 2\}$ (\Cref{rem:odd-step-roadmap}): (a) $L_3^{\mathrm{dir}}(7) = 24$, and (b) every $24$-arc feasible multigraph on $7$ vertices with maximum degree at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled bidirected path $P_7$. Both sit at sizes the certifier and the enumerator can reach, and both are presently running --- a 24-hour MILP infeasibility check for (a) and an exhaustive enumeration for (b) --- so this is a finite and machine-checkable gap rather than a structural one. \Cref{conj:min-degree} is thereby bypassed for $m = 3$, though it remains open and of independent interest as the natural minimum-degree statement for the directed multigraph problem.
+    \item Extremal uniqueness at odd levels for directed multigraphs with $m \ge 4$. The conditional odd step (\Cref{thm:odd-step}) and the propagation of \Cref{rem:odd-step-roadmap} are stated for $m \in \{3, 4\}$. For $m = 4$ the \emph{value} step goes through, but at an odd extremal level the counting no longer forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ are arithmetically consistent), so the uniqueness statement does not yet propagate. For $m \ge 5$ the same escape climbs one level and even the \emph{value} step stalls: a surplus extremiser could be degree-regular strictly above the deletion bound, so no vertex deletion is forced to land on an extremal multigraph. Closing either hole asks for an arithmetic or structural input the present averaging argument does not supply.
+    \item The undirected vertex-disjoint problem for $m \ge 6$, open since 1974, where even the extremal structure is unknown.
+    \item The hypergraph vertex problem at $m \ge 4$. The problem is now settled at $m = 2$ and $m = 3$ for every uniformity and all $n$, with $k_m^{(r)}(n) = \floorfrac{(m-1)(n-1)}{r-1} = \ell_m^{(r)}(n)$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). The incidence reduction stands for every $m$, but the rank bound that drives it (\Cref{lem:incidence-rank}) leans on the triconnected (Tutte/SPQR) decomposition exactly where $\kap \le 2$ lives. For $m = 4$ it would need a $4$-connectivity analogue, where no comparably clean decomposition is available. Exhaustive computation gives $k_4^{(3)}(5) = 6 = \floor{3 \cdot 4 / 2}$, so the agreement $k_m^{(r)} = \ell_m^{(r)}$ survives at least one step past the theorem and there is no early counterexample. Where it first breaks for $r \ge 3$ (the analogue of the $m = 5$ graph divergence) is unknown.
+    \item The directed hypergraph variants. The tail-and-heads model has first bounds and a quadratic lower-bound family (\Cref{prop:dir-hyper-first}): a pair-codegree count caps the hyperedges at $(m-1)n(n-1)/(r-1)$, and a bipartite construction reaches $\approx (m-1)n^2/(4(r-1))$, so the value is quadratic in $n$. Its exact order, and the matching upper construction, are unexplored.
+\end{itemize}
+
+The map is filled in where honest mathematics could fill it, and where it could not, the blanks are marked precisely, with a machine standing ready at each of them. That, finally, is the use of building the microscope: not that it answers every question, but that it shows exactly which questions are left, and hands the next reader a clean place to start.
