@@ -968,13 +968,17 @@ multiplicity at $2$ and $\mathrm{rank} \le 1 = |X| - 1$.
 \emph{Step 1: a cut vertex.} Let $B_1, \dots, B_c$ ($c \ge 2$) be the
 blocks. A bridge block has rank $0 \le |X \cap B| - 1$, since by (i) it has
 an endpoint in $X$. Every other block is $2$-connected, hence has minimum
-degree $2$, so it satisfies (i)--(iv) and the induction hypothesis. Summing,
-and writing $b(v)$ for the number of blocks containing a cut vertex $v$,
-the block--cut tree identity $\sum_{v\,\mathrm{cut}} (b(v) - 1) = c - 1$ gives
+degree $2$, so it satisfies (i)--(iv) and the induction hypothesis. Write
+$b(v)$ for the number of blocks containing a cut vertex $v$. Each $X$-vertex is
+counted once for every block it lies in, so $\sum_i |X \cap B_i| = |X| +
+\sum_{x \in X\,\mathrm{cut}} (b(x) - 1)$; subtracting the block count
+$c = 1 + \sum_{v\,\mathrm{cut}} (b(v) - 1)$ (the block--cut tree identity) and
+splitting the cut vertices into their $X$- and $Z$-parts leaves
 \[
 \mathrm{rank}(G) = \sum_i \mathrm{rank}(B_i) \le \sum_i (|X \cap B_i| - 1)
-  = |X| - 1 - \sum_{z \in Z\,\mathrm{cut}} (b(z) - 1) \le |X| - 1.
+  = |X| - 1 - \sum_{z \in Z\,\mathrm{cut}} (b(z) - 1) \le |X| - 1,
 \]
+the $Z$-cut surplus only lowering the bound further.
 
 \emph{Step 2: a $Z$-vertex of degree two.} If $G$ is $2$-connected and some
 $z_0 \in Z$ has degree exactly $2$, its two edges reach distinct vertices of
@@ -1021,7 +1025,6 @@ neighbours lie in $X \cap V(L)$ by (i), at most one vertex, reached by at
 most one edge since $G$ is simple --- degree at most $1$, absurd.
 \end{proof}
 
-% this still looks horrible
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[scale=1.0]
