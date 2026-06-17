@@ -1017,3 +1017,39 @@ n=7 jobs a shot?). Empirical, all runs stayed <320 MB RSS:
 
 BOTTOM LINE: the speedups solved the crash (memory) but not the runtime. MILP needs a
 better solver; ENUM needs either a long safe run or the generation pipeline.
+
+## 2026-06-17 (Opus) — repo split + a fresh angle on the backward-arc lemma
+
+REPO: at author's request this directory was split out of MasterThesis/thesis_improved
+into its own repo (renamed `thesis`), fresh git history, pushed private to
+github.com/louisvandenbruwaene/thesis. Only thesis_improved content carried over.
+
+BACKWARD-ARC LEMMA (flagship, TASKS.md top item) — went deep; NO proof, but a new line
+that sidesteps the stuck non-monotone-exchange obstacle. Full writeup +
+mechanically-checked script in working_notes/{backward_arc_min_degree_attempt.md,
+attach_check.py}. Summary:
+- KEY REFRAMING. Forget "no backward arc". Run the m=2 min-degree-deletion engine
+  (thm:dir-arc-m2-exact) on the m=3 quadratic branch Q(n)=floor((n+1)^2/4). Using the
+  true bound ell(n-1)=max(3(n-1),Q(n-1)), the overshoot floor(n/(n-2)ell(n-1))-Q(n) is
+  +0 at odd n>=11, +1 at even n>=10, and +2 only at the crossover seam n=9 (where
+  ell(8)=21 is linear). So the WHOLE m=3 quadratic upper bound reduces to killing one
+  +1 of slack at even n plus finite seam bases — structurally identical to the
+  multigraph thm:odd-step + lem:attachment already in the thesis. The prior attempts
+  (route-counting, repartitioning) worked the backward-arc framing; this engine was
+  never tried for the simple case.
+- FORCED STRUCTURE (proved). If a=Q(2k)+1=k^2+k+1 then every vertex has degree >=k+1, D
+  is (k+1)-regular up to total degree-excess exactly 2, and every degree-(k+1) vertex
+  deletes to an exact odd extremiser on 2k-1 vertices. So the +1 case = "odd extremiser
+  + one degree-(k+1) vertex, still feasible".
+- ATTACHMENT REFUTED for k=4,5,6 (exact max-flow, attach_check.py): taking the odd
+  extremiser as augmented bipartite B_{k-1,k}+k-cycle, NO degree-(k+1) attachment keeps
+  lambda^max<=2. Intuition: the complete A->B layer makes a third arc-disjoint route
+  unavoidable.
+- REMAINING GAPS (why this is NOT yet a proof): (1) odd-extremiser uniqueness on 2k-1
+  vertices [most important; multigraph analogue needed thm:extremal-char]; (2) a uniform
+  all-k argument for the attachment contradiction (promote the third-route sketch to a
+  Menger lemma); (3) seam bases ell_3^dir(9)=25, ell_3^dir(10)=30 via the certifier
+  (Gurobi route, cf. BIG-COMPUTATIONS); (4) m>=4 redo, expecting the known odd-uniqueness
+  hole (rem:odd-step-roadmap).
+- NOTHING entered the thesis .tex (rule: proof-check before uncommenting). Working note
+  only. Next: characterise the odd extremisers (gap 1) — the load-bearing step.

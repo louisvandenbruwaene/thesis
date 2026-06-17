@@ -10,8 +10,17 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       directed vertex case with it). Obstacle named in ch4 §3 / app_proofs: the natural
       delete-and-compensate exchange is non-monotone (a back-arc can manufacture a 3rd
       route — see the refuted 30-arc counterexample). Attempted 2026-06-15: route-
-      counting approach blocked; repartitioning approach outlined but not closed. No
-      proof found. Look for a non-exchange argument (potential/charging, global flow).
+      counting approach blocked; repartitioning approach outlined but not closed.
+      NEW ANGLE 2026-06-17 (see working_notes/backward_arc_min_degree_attempt.md +
+      attach_check.py): drop the backward-arc framing; use the m=2 min-degree-deletion
+      engine on the m=3 quadratic branch. Overshoot is +1 at even n, +0 at odd n (n=9
+      seam is +2). So the whole m=3 quad upper bound reduces to killing one +1 at even n
+      — exactly the multigraph thm:odd-step/lem:attachment pattern. In the +1 case D is
+      (k+1)-regular up to degree-excess 2 and every deg-(k+1) vertex deletes to an odd
+      extremiser; the degree-(k+1) re-attachment is mechanically REFUTED for k=4,5,6.
+      REMAINING GAPS (not a proof yet): (1) odd-extremiser uniqueness on 2k-1 verts;
+      (2) all-k uniform argument for the attachment contradiction; (3) seam bases
+      ell_3(9)=25, ell_3(10)=30 via certifier; (4) m>=4 redo + odd-uniqueness hole.
 - [ ] **Hypergraph vertex at $m=4$.** lem:incidence-rank drives $k_m^{(r)}=\ell_m^{(r)}$
       via Tutte/SPQR exactly where $\kappa\le2$. For $m=4$ it needs a 4-connectivity
       analogue of the triconnected decomposition. No early counterexample: $k_4^{(3)}(5)=6
