@@ -18,8 +18,14 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       — exactly the multigraph thm:odd-step/lem:attachment pattern. In the +1 case D is
       (k+1)-regular up to degree-excess 2 and every deg-(k+1) vertex deletes to an odd
       extremiser; the degree-(k+1) re-attachment is mechanically REFUTED for k=4,5,6.
-      REMAINING GAPS (not a proof yet): (1) odd-extremiser uniqueness on 2k-1 verts;
-      (2) all-k uniform argument for the attachment contradiction; (3) seam bases
+      GAP (1) ADVANCED 2026-06-17 (working_notes/odd_extremiser_characterisation.md):
+      CONDITIONAL THEOREM proved — if non-sources R induce max in-degree <=1 then
+      a<=(n-sigma)(sigma+1)<=Q(n) in BOTH parities, equality = augmented-bipartite family
+      (B_{k-1,k}+ANY fpf permutation of B; not unique). Attachment now refuted for ALL
+      permutation types (k=4,5,6). So the whole m=3 quad upper bound reduces to ONE
+      hypothesis (H): an extremiser has a source adjacent to every non-source.
+      REMAINING GAPS: (1) PROVE (H) [load-bearing; about sources, exchange-free];
+      (2) make the attachment refutation uniform in k (Menger lemma); (3) seam bases
       ell_3(9)=25, ell_3(10)=30 via certifier; (4) m>=4 redo + odd-uniqueness hole.
 - [ ] **Hypergraph vertex at $m=4$.** lem:incidence-rank drives $k_m^{(r)}=\ell_m^{(r)}$
       via Tutte/SPQR exactly where $\kappa\le2$. For $m=4$ it needs a 4-connectivity

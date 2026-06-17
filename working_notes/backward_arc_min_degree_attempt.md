@@ -112,11 +112,17 @@ obstruction. (This is a sketch, not yet a uniform proof.)
 - The attachment is infeasible for `k = 4, 5, 6` (mechanical, exact).
 
 **Open (the remaining gaps -- do not claim the lemma):**
-1. **Odd-extremiser uniqueness.** The refutation assumes the only odd extremiser
-   on `2k-1` vertices is the augmented bipartite `B_{k-1,k}` + one `k`-cycle. If
-   other (non-isomorphic) feasible digraphs reach `k^2` arcs, the attachment must
-   be ruled out for each. *Most important sub-goal.* The multigraph analogue
-   needed exactly such a characterisation (`thm:extremal-char`).
+1. **Odd-extremiser characterisation.** PARTLY ADVANCED 2026-06-17, see
+   `odd_extremiser_characterisation.md`. The extremiser is NOT unique: it is the
+   augmented bipartite `B_{k-1,k}` + *any* fixed-point-free permutation of `B`
+   (one per partition of `k` into parts `>= 2`); the attachment is now refuted
+   for ALL of them at `k=4,5,6` (`attach_check_all_perms.py`). A conditional
+   theorem reduces both the value and the characterisation to one structural
+   hypothesis **(H): an extremiser has a source adjacent to every non-source**
+   (equivalently, non-sources induce max in-degree `<= 1`). Given (H), a two-line
+   count gives `a <= (n-sigma)(sigma+1) <= Q(n)` in both parities, with the
+   bipartite family as the unique equality case. (H) is the new load-bearing open
+   statement -- concrete, about sources, exchange-free.
 2. **All `k`, uniformly.** `k = 4, 5, 6` is evidence, not a proof. Promote the
    informal "third-route" obstruction to a uniform argument (likely a clean
    counting/Menger statement: a degree-`(k+1)` vertex over a complete `A -> B`

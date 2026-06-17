@@ -1053,3 +1053,31 @@ attach_check.py}. Summary:
   hole (rem:odd-step-roadmap).
 - NOTHING entered the thesis .tex (rule: proof-check before uncommenting). Working note
   only. Next: characterise the odd extremisers (gap 1) — the load-bearing step.
+
+## 2026-06-17 (Opus, cont.) — characterising the extremisers (gap 1)
+
+Pushed on gap (1). Files: working_notes/odd_extremiser_characterisation.md +
+characterisation_checks.py + attach_check_all_perms.py (all self-contained, run clean).
+Results (NOTHING in the thesis .tex):
+- ARC PARTITION (proved, sanity-checked): sources have in-degree 0, so every arc is
+  S->R or internal to R; a = e(S,R)+e(R) with e(S,R)<=sigma(n-sigma).
+- LEMMA (proved; 0 violations / 300 random feasible digraphs): for a source s, the
+  subdigraph on N^+(s) has max in-degree <=1 (else 3 arc-disjoint s-routes). So a
+  universal source forces R to have internal max in-degree <=1.
+- CONDITIONAL THEOREM (proved): if non-sources R induce max in-degree <=1 then
+  a <= (n-sigma)(sigma+1) <= Q(n) in BOTH parities (max at sigma=(n-1)/2 odd; checked
+  n=7..19), equality iff augmented-bipartite family. So the WHOLE m=3 quadratic upper
+  bound + characterisation reduce to ONE hypothesis (H): an extremiser has a source
+  adjacent to every non-source. (H) is the new load-bearing open statement — concrete,
+  about sources, exchange-free (sidesteps the non-monotone backward-arc obstacle).
+- EXTREMISER FAMILY (not unique): augmented bipartite B_{k-1,k} + ANY fixed-point-free
+  permutation of B (one per partition of k into parts >=2: k=5 -> {5},{2,3};
+  k=6 -> {6},{2,4},{3,3},{2,2,2}). All feasible at k^2 (verified k=4,5,6). The thesis
+  const:augmented-bipartite (single k-cycle) is one member.
+- ATTACHMENT REFUTATION extended to ALL permutation cycle types (k=4,5,6): no
+  degree-(k+1) attachment stays feasible. So +1 even case dies GIVEN (H).
+- TOOLING NOTE: homemade SA can't reach the optimum at n=9,11 (24/34 vs 25/36) — a
+  search-strength limit, not a result; thesis annealer needs networkx/scipy (absent
+  here). Conditional theorem makes the empirical question secondary; (H) is the target.
+- NEXT: prove (H) [extremisers have a universal source / R max-in-degree<=1]; make the
+  attachment refutation uniform in k (Menger lemma); seam bases ell_3(9)=25, ell_3(10)=30.
