@@ -1154,6 +1154,15 @@ on multi-directed n=5 (16 vs 15), multi-directed n=7 (24 vs 20 — tabu reaches 
 2B(3,4)=L_3^dir(7) extremiser), simple-directed n=7 (18 vs 16). Engineering note only; the
 thesis discovery results are already at the proved/constructed optima, nothing enters .tex.
 
-REPO STATE: working tree has 2 regenerated PNGs + 1 rebuilt main.pdf + 2 new research
-scripts + the research_notes entry + README/TASKS/claude.md updates. NOT committed (author
-hasn't asked). No thesis .tex or program .py changed.
+REPO STATE: committed + pushed to main (author now wants commit+push every session;
+saved as a standing preference in auto-memory). Two commits: (1) the P2 polish +
+research_notes cross-checks above; (2) the thesis incorporation below.
+
+INCORPORATED INTO THE THESIS (author asked, 2026-06-18): new ch2 section 2.6
+"Generating the directed cases faster" presenting the speedup with before/after numbers
+(in-house DFS ~456s at n=5 vs nauty pipeline ~26s, ~17x; watercluster2 ~15x faster than
+directg at n=6; counts = OEIS A000273; n=4->2, n=5->3 families) and crediting Prof. Jan
+Goedgebeur (named there + in the acknowledgments as promotor) for the suggestion. Framed
+honestly as a validated faster route + the practical path to the open n=7 fact (b), not as
+a rewrite of the program. Build clean: 93 pp, 0 overfull, 0 undefined refs/cites; the new
+\cite{McKayPiperno14} reuse and \Cref{rem:odd-step-roadmap} resolve. program .py unchanged.
