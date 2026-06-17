@@ -1096,8 +1096,11 @@ graph $I(\HH)$, with $X$ the vertex class and $Z$ the hyperedge class:
 $Z$ is independent, incidences are simple even when hyperedges repeat,
 hyperedge-nodes have degree $r \ge 2$, components without an $X$-node are
 impossible, and $\kap_{I}(u, v) = \kap_\HH(u, v) \le 2$ for vertex pairs.
-Summing $\mathrm{rank} \le |X_c| - 1$ over the $C$ components,
-$rq - (n + q) + C \le n - C$, hence $q(r-1) \le 2(n-1) + 2(1 - C) \le 2(n-1)$.
+Sum $\mathrm{rank} \le |X_c| - 1$ over the $C$ components. The incidence graph
+$I(\HH)$ has $rq$ edges (each of the $q$ hyperedges contributes $r$ incidences)
+and $n + q$ nodes, so $\sum_c \mathrm{rank} = rq - (n + q) + C$, while
+$\sum_c (|X_c| - 1) = n - C$. The inequality reads $rq - (n + q) + C \le n - C$,
+hence $q(r-1) \le 2(n-1) + 2(1 - C) \le 2(n-1)$, the last step using $C \ge 1$.
 The lower bound is \Cref{prop:hyper-vertex-lower} at $m = 3$.
 \end{proof}
 
