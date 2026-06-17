@@ -3117,7 +3117,8 @@ def plot_complexity_growth(path: str | Path) -> None:
 _GUESS_STYLE = (0, (1, 1))   # dense dots: "we are very much guessing"
 
 
-def plot_variant_grid(panels: list[dict], path: str | Path) -> None:
+def plot_variant_grid(panels: list[dict], path: str | Path,
+                      m: int | None = None) -> None:
     """All twelve variants on one grid, in the proved/conjectured/guessed language.
 
     ``panels`` is a row-major list of twelve dictionaries (rows = model simple,
@@ -3181,10 +3182,13 @@ def plot_variant_grid(panels: list[dict], path: str | Path) -> None:
         axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
                               rotation=90, ha="center", va="center",
                               fontsize=12, fontweight="bold", color=_KUL_DARK)
-    fig.suptitle("Erdős 915 across all twelve variants: "
-                 "proved (solid), conjectured (dashed), guessed (dotted), "
-                 "with machine-checked points",
-                 fontsize=13)
+    # The line styles (solid / dashed / dotted) are named in the per-panel
+    # legends and spelled out in the caption, so the suptitle stays short and
+    # just records the variant family and the threshold m.
+    suptitle = "Erdős 915 across the twelve variants"
+    if m is not None:
+        suptitle += fr",  $m = {m}$"
+    fig.suptitle(suptitle, fontsize=13)
     fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
     _save(path)
 

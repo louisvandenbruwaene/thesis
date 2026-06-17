@@ -1081,3 +1081,27 @@ Results (NOTHING in the thesis .tex):
   here). Conditional theorem makes the empirical question secondary; (H) is the target.
 - NEXT: prove (H) [extremisers have a universal source / R max-in-degree<=1]; make the
   attachment refutation uniform in k (Menger lemma); seam bases ell_3(9)=25, ell_3(10)=30.
+
+## 2026-06-18 (Opus) — standalone build fix + thesis consistency/clarity pass
+
+Focus shifted (author request) to making the thesis better: figures + clearer explanations.
+Author chose "edit plot code only" (author regenerates PNGs) and clarity focus = ch2/ch3.
+- BUILD FIX (important): the repo split left preamble.tex pointing at ../shared/{colors,
+  tikz-styles}.tex, which lived at the old MasterThesis root and was not carried over, so
+  the standalone repo DID NOT BUILD. Vendored both into shared/ and repointed preamble.
+  Clean build now: 93 pages, 0 undefined refs, 0 undefined cites, 0 overfull.
+- CONSISTENCY BUG fixed: conj:dir-arc was corrected in a prior session to
+  floor((n+m-2)^2/4) in ch1 + ch4, but THREE places still printed the old pre-correction
+  formula floor(n^2/4)+(m-2)ceil(n/2) while citing conj:dir-arc — ch3 (display L144 +
+  inline L174) and app_proofs L397 (the proof step, "balanced partition ... uniformly in
+  m"). They agree at m=3 but DIFFER at m=6 (the m=6 figure already uses the corrected one).
+  Fixed all three to the (n+m-2)^2/4 form; app_proofs now uses the optimal partition
+  |B|=ceil((n+m-2)/2) matching ch4 L16.
+- CLARITY: ch2 timing sentence ("well under a second, under a second, and a few seconds")
+  rewritten.
+- FIGURE CODE (author regenerates): plot_variant_grid suptitle was overlong and redundant
+  with the per-panel legends + caption; shortened to "Erdős 915 across the twelve variants,
+  m = M" and threaded m through from make_figures.py. >>> AUTHOR: rerun make_figures.py to
+  refresh variant_bounds_m3.png / variant_bounds_m6.png with the shorter title. <<<
+- NOTE: matplotlib/numpy/scipy/networkx NOT installed in this env, so data figures cannot
+  be regenerated here; only TikZ + .tex + plot-code edits are possible.

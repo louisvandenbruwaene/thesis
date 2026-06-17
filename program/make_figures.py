@@ -474,7 +474,7 @@ def main() -> None:
         print(f"gathering all-variant grid m={m_val} (runs solve many times)...")
         panels = gather_variant_grid(m=m_val)
         out = FIGURES / f"variant_bounds_m{m_val}.png"
-        plot_variant_grid(panels, path=out)
+        plot_variant_grid(panels, path=out, m=m_val)
         print(f"wrote {out.name}")
 
     # --------------------------------------------------------------
