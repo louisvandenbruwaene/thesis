@@ -539,13 +539,23 @@ arc-disjoint route on top of the $m-1$ parallel arcs of a bipartite pair:
 \end{enumerate}
 \emph{Case I: $\mathrm{i}_A \ge 1$.} By (1), $\mathrm{o}_B = 0$.
 If $\mathrm{o}_A \ge 1$, then by (2) all in-arcs from $A$ and all out-arcs
-to $A$ involve one single vertex $a^*$, and the flow estimate
-$\lec(a^*, v) \ge \mu(a^*, v) + \sum_b \min(\mu(a^*, b), \mu(b, v))
- = \mu(a^*, v) + \mathrm{i}_B \le m-1$
-gives $d(v) = \mu(a^*, v) + \mathrm{i}_B + \mu(v, a^*) \le 2(m-1)$.
-If $\mathrm{o}_A = 0$, then $v$ is a pure sink and for \emph{every}
-$a \in A$ the same estimate reads $\mu(a, v) + \mathrm{i}_B \le m - 1$;
-summing over $A$,
+to $A$ involve one single vertex $a^*$ (an in-arc from $a$ and an out-arc to
+$a' \ne a$ would be forbidden, so every $A$-arc at $v$ touches the same vertex).
+The flow estimate
+\[
+\lec(a^*, v) \;\ge\; \mu(a^*, v) + \sum_b \min(\mu(a^*, b), \mu(b, v))
+ \;=\; \mu(a^*, v) + \mathrm{i}_B
+\]
+counts arc-disjoint $a^*$-to-$v$ routes: the $\mu(a^*,v)$ direct arcs, and for
+each $b$ the two-step route $a^* \to b \to v$, which carries
+$\min(\mu(a^*,b), \mu(b,v))$ disjoint copies; since $\mu(a^*, b) = m-1 \ge
+\mu(b, v)$ each $\min$ equals $\mu(b, v)$, and these sum to $\mathrm{i}_B$.
+Feasibility forces this to be $\le m-1$, so
+$d(v) = \mu(a^*, v) + \mathrm{i}_B + \mu(v, a^*) \le 2(m-1)$.
+If $\mathrm{o}_A = 0$, then $v$ is a pure sink and the same estimate applied to
+\emph{every} $a \in A$ reads $\mu(a, v) + \mathrm{i}_B \le m - 1$, so
+$\mu(a,v) \le (m-1) - \mathrm{i}_B$. Summing this over the $p$ vertices of $A$
+gives $\mathrm{i}_A \le p(m-1) - p\,\mathrm{i}_B$, hence
 $d(v) = \mathrm{i}_A + \mathrm{i}_B \le p(m-1) - (p-1)\,\mathrm{i}_B \le p(m-1)$.
 \emph{Case II: $\mathrm{i}_A = 0$, $\mathrm{o}_B \ge 1$.} Symmetric to
 Case I under arc reversal, with (3) in place of (2):
