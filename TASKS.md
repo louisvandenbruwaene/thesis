@@ -57,9 +57,10 @@ the bottleneck and the Phase A-E speedups did not touch it. Empirical n-scaling:
   - [ ] Option 1: a long SAFE run (no longer risks the PC):
     `timeout 14400 python -c "from erdos915_unified import \
       enumerate_extremal_directed_multigraphs as e; print(e(7,3,24,max_degree=8))"`
-  - [ ] Option 2 (principled): Jan's geng+directg/watercluster2 generation pipeline
-        (attacks DFS time itself; see FOLLOW-UP below). His "dedup only fixed RAM" warning
-        is now empirically confirmed.
+  - [~] Option 2 (principled): Jan's geng+directg/watercluster2 pipeline. PROTOTYPED
+        2026-06-18 (research_notes/jan_followup_nauty_and_tabu.md): the support-hybrid
+        is ~17x faster than the DFS at n=5, confirming his "dedup only fixed RAM"
+        warning. For n=7 it still needs per-support Aut dedup + arc/degree prefilter.
 
 ## FOLLOW-UP (from Jan's 2026-06-15 email)
 Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:
@@ -69,12 +70,19 @@ Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:
   watercluster2`. Jan confirms watercluster2 is usually faster than directg.
   This is a GENERATION-TIME pipeline (alternative to our DFS enumerator); it
   would need adapting for multiplicities {0..m-1} + bidirected arcs (non-trivial).
-- [ ] P2: Explore geng+watercluster2 pipeline as a cross-check for ENUM (b) if
-      DFS time remains the bottleneck after the Phase E speedup.
-- [ ] P2: Compare tabu search vs SA (Jan's suggestion): implement
-      `search_for_dense_graph` in tabu mode, compare quality and speed on a few
-      benchmark cases (e.g. n=7, m=3). Similar performance expected but worth
-      quantifying if time permits.
+- [x] P2 DONE 2026-06-18 (nauty now installed locally): pipeline built + verified.
+      counts = OEIS A000273 = program; simple-dir extremal = program solve;
+      watercluster2 ~15x faster than directg (n=6). Multigraph HYBRID (support via
+      nauty + multiplicity layering) reproduces the DFS enum at n=4 (2) and n=5 (3)
+      and is ~17x faster at n=5 (26s vs 456s) -> confirms DFS-time is the wall.
+      See research_notes/jan_followup_nauty_and_tabu.md + scripts/nauty_pipeline.py.
+      NEXT for ENUM(b) n=7: add per-support Aut dedup (directg -G) + arc/degree
+      prefilter so work scales with non-iso multigraphs (pieces all present).
+- [x] P2 DONE 2026-06-18: tabu vs SA benchmarked (scripts/tabu_vs_sa.py). Sharper
+      than expected: TIES on undirected + small directed, but tabu BEATS the thesis
+      annealer on the harder directed cases at equal 6s budget -- reaches the
+      L_3^dir(7)=24 extremiser (SA stalls at 20), multi-dir n=5 16 vs 15, simple-dir
+      n=7 18 vs 16. Engineering note only (not in thesis text).
 
 ## DONE (logged in claude.md, detail there)
 - 2026-06-16 later: verified Sonnet's gallery+Fig 3.2 (tests pass, values match,
@@ -106,5 +114,7 @@ Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:
 ## P2 — remaining polish
 - [x] popularising_summary closing: SIGNED OFF 2026-06-17. Lay terms, names both
       positive results, no jargon, no em dash or semicolon. Approved as-is.
-- [ ] Final pass: overfull hboxes (main build is 0 overfull as of 2026-06-16),
-      figure placement, ToC, spell check.
+- [x] Final pass DONE 2026-06-18: build 0 overfull / 0 undefined refs+cites / 93pp;
+      spell check clean (British English, only names+technical+code flagged); ToC and
+      figure placement fine (the 5 ch4 [p] floats are legit full-page grids). Also
+      refreshed variant_bounds_m3/m6.png with the shortened plot title (author's note).

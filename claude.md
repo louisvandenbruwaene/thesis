@@ -1105,3 +1105,55 @@ Author chose "edit plot code only" (author regenerates PNGs) and clarity focus =
   refresh variant_bounds_m3.png / variant_bounds_m6.png with the shorter title. <<<
 - NOTE: matplotlib/numpy/scipy/networkx NOT installed in this env, so data figures cannot
   be regenerated here; only TikZ + .tex + plot-code edits are possible.
+
+## 2026-06-18 (Opus, cont.) — P2 polish + Jan's two follow-up items (nauty available!)
+Fresh clone of the split-out `thesis` repo into ~/Projects/thesis. KEY ENV DIFFERENCE
+from the morning session: this machine HAS numpy/scipy/matplotlib/networkx AND the full
+nauty toolset (geng, directg, watercluster2, multig, vcolg, countg, ...) on PATH, so the
+figure regen and Jan's pipeline both became runnable for the first time. No Gurobi (MILP
+ENUM(a) still blocked). Author asked for P2 polish + Jan's follow-up.
+
+P2 POLISH (all done, build verified):
+- Baseline build clean: 93 pages, 0 overfull, 0 undefined refs/cites (the 375 "undefined"
+  in a cold latexmk log are just pre-bibtex passes; a converged single pdflatex pass is
+  clean). Program self-check ALL CHECKS PASSED.
+- Refreshed variant_bounds_m3.png + variant_bounds_m6.png via make_figures' gather/plot
+  (only the plot_variant_grid suptitle had changed in the prior session; the committed
+  PNGs predated it). Regenerated ONLY those two to avoid matplotlib-version pixel drift on
+  the other 23 figures. m=6 grid is slow (~6 min, exhaustive solves) so it ran separately.
+  Rebuilt thesis to embed them: 93 pp, 0 overfull.
+- Spell check (hunspell -t over all .tex): clean. 259 flags all = British spellings
+  (colour/behaviour/optimisation), names (Erdős/Bérczi/Sørensen truncate at accents),
+  technical terms, TikZ style names, code identifiers. No doubled words, no common typos.
+- Layout/ToC/placement: fine. The 5 ch4 [p] floats are the legit full-page grid figures
+  (sampled grid, scatter, conn/edges distributions, 3D surface). A couple of cosmetic
+  underfull hboxes in app_proofs captions, left as-is (not overfull).
+
+JAN FOLLOW-UP #1 (geng+directg/watercluster2 pipeline) — research_notes/
+jan_followup_nauty_and_tabu.md + scripts/nauty_pipeline.py. VERIFIED:
+- COUNTS: nauty non-iso simple-digraph count = OEIS A000273 = program's own canonical-form
+  dedup count (3,16,218,9608,1540944). Two independent iso engines agree.
+- EXTREMAL: feeding nauty's digraphs through the program's max-flow checker reproduces the
+  program's exact simple-directed L_3^dir(n) = 2,6,9,12 for n=2..5. (Small-n values exceed
+  the asymptotic conj:dir-arc floor((n+m-2)^2/4); correct, the conjecture is the large-n
+  branch.)
+- TIMING: watercluster2 ~15x faster than directg at n=6 (0.08s vs 1.22s) — Jan's claim
+  confirmed. n=7 simple is 882M digraphs, out of reach for raw generation.
+- MULTIGRAPH HYBRID (the non-trivial ENUM(b) cross-check): layer multiplicities {1..m-1}
+  onto nauty-generated simple-digraph SUPPORTS, dedup finished multigraphs by the program's
+  canonical form. Reproduces enumerate_extremal_directed_multigraphs at n=4 (2 classes) and
+  n=5 (3 classes), and is ~17x FASTER at n=5 (26.3s vs the DFS's 456.0s). Direct evidence
+  for Jan's "DFS time is the wall, dedup only fixed RAM". For n=7 ENUM(b) the principled
+  next step is per-support Aut dedup (directg -G) + arc/degree prefilter.
+
+JAN FOLLOW-UP #2 (tabu vs SA) — scripts/tabu_vs_sa.py. MEASURED, sharper than Jan's
+"similar performance expected": same energy + neighbourhood, equal 6s wall-clock, SA =
+the thesis's own best_of_searches (empty-graph restarts, no bipartite seeding). TIES on
+simple-undirected n=7 (9), multi-undirected n=6 (10), simple-directed n=6 (15); TABU WINS
+on multi-directed n=5 (16 vs 15), multi-directed n=7 (24 vs 20 — tabu reaches the 24-arc
+2B(3,4)=L_3^dir(7) extremiser), simple-directed n=7 (18 vs 16). Engineering note only; the
+thesis discovery results are already at the proved/constructed optima, nothing enters .tex.
+
+REPO STATE: working tree has 2 regenerated PNGs + 1 rebuilt main.pdf + 2 new research
+scripts + the research_notes entry + README/TASKS/claude.md updates. NOT committed (author
+hasn't asked). No thesis .tex or program .py changed.
