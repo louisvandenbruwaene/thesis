@@ -1026,8 +1026,8 @@ github.com/louisvandenbruwaene/thesis. Only thesis_improved content carried over
 
 BACKWARD-ARC LEMMA (flagship, TASKS.md top item) — went deep; NO proof, but a new line
 that sidesteps the stuck non-monotone-exchange obstacle. Full writeup +
-mechanically-checked script in working_notes/{backward_arc_min_degree_attempt.md,
-attach_check.py}. Summary:
+mechanically-checked script in research_notes/ (directed_arc_m3_reduction.md +
+scripts/attach_check.py). Summary:
 - KEY REFRAMING. Forget "no backward arc". Run the m=2 min-degree-deletion engine
   (thm:dir-arc-m2-exact) on the m=3 quadratic branch Q(n)=floor((n+1)^2/4). Using the
   true bound ell(n-1)=max(3(n-1),Q(n-1)), the overshoot floor(n/(n-2)ell(n-1))-Q(n) is
@@ -1056,7 +1056,7 @@ attach_check.py}. Summary:
 
 ## 2026-06-17 (Opus, cont.) — characterising the extremisers (gap 1)
 
-Pushed on gap (1). Files: working_notes/odd_extremiser_characterisation.md +
+Pushed on gap (1). Files: research_notes/directed_arc_m3_extremisers.md +
 characterisation_checks.py + attach_check_all_perms.py (all self-contained, run clean).
 Results (NOTHING in the thesis .tex):
 - ARC PARTITION (proved, sanity-checked): sources have in-degree 0, so every arc is

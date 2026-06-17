@@ -26,6 +26,9 @@ program/
   make_figures.py     regenerates every figure from the program (fixed seeds)
   tests/              unit tests
 popularising_summary/ lay summary
+research_notes/       conjectures and supposed proofs NOT in the thesis: too
+                      specific or unfinished for the text, kept for future work
+                      (AI or human). Self-contained, with reproducible scripts.
 CLAUDE.md, TASKS.md   operating notes and the prioritized open-problem queue
 main.pdf              the compiled thesis
 ```
