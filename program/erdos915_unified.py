@@ -104,6 +104,25 @@ try:
 except ImportError:
     GUROBI_AVAILABLE = False
 
+import ctypes as _ct
+_C = None
+_so_path = Path(__file__).with_name("_erdos_fast.so")
+if _so_path.exists():
+    _C = _ct.CDLL(str(_so_path))
+    _C.tiny_maxflow.restype = _ct.c_int
+    _C.tiny_maxflow.argtypes = [
+        _ct.POINTER(_ct.c_int), _ct.c_int, _ct.c_int, _ct.c_int, _ct.c_int,
+    ]
+    _C.max_connectivity_exceeds.restype = _ct.c_int
+    _C.max_connectivity_exceeds.argtypes = [
+        _ct.POINTER(_ct.c_int), _ct.c_int, _ct.c_int, _ct.c_int,
+    ]
+    _C.canonical_form_min.restype = None
+    _C.canonical_form_min.argtypes = [
+        _ct.POINTER(_ct.c_int), _ct.c_int, _ct.POINTER(_ct.c_int),
+    ]
+C_EXTENSION_LOADED = _C is not None
+
 # matplotlib needs its backend chosen before pyplot is imported, so that the
 # figure code runs head-less (writes PNG files, never opens a window).
 import matplotlib
@@ -841,6 +860,10 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     n = graph.num_vertices
     if separation == "edge":
         mu = graph.mu
+        if _C is not None:
+            flat, ptr = _c_flat(mu)
+            directed = int(graph.variant.directed)
+            return bool(_C.max_connectivity_exceeds(ptr, n, k, directed))
         for s, t in _pairs(graph):
             if _tiny_maxflow(mu, n, s, t, k):
                 return True
@@ -3908,6 +3931,13 @@ def verify_hyper_vertex_value(n: int, r: int, m: int) -> bool:
     return attained and not hyper_vertex_feasible_exists(n, r, m, target + 1)
 
 
+def _c_flat(mu: np.ndarray) -> tuple[np.ndarray, "_ct.POINTER[_ct.c_int]"]:
+    """Return a contiguous int32 copy of ``mu`` and a ctypes c_int pointer into it."""
+    flat = np.ascontiguousarray(mu, dtype=np.int32)
+    ptr = flat.ctypes.data_as(_ct.POINTER(_ct.c_int))
+    return flat, ptr   # caller must keep flat alive while ptr is in use
+
+
 def _tiny_maxflow(mu: np.ndarray, n: int, s: int, t: int, cap: int) -> bool:
     """Return True iff the integer max-flow from s to t under capacities ``mu``
     exceeds ``cap``.  Plain DFS augmentation (Ford-Fulkerson with a stack, not
@@ -3919,6 +3949,9 @@ def _tiny_maxflow(mu: np.ndarray, n: int, s: int, t: int, cap: int) -> bool:
     cap+1 augmenting paths).  Correct for integer capacities: each augmentation
     increases flow by at least 1, so the loop terminates in at most
     max-flow-value iterations."""
+    if _C is not None and n <= 7:
+        flat, ptr = _c_flat(mu)
+        return bool(_C.tiny_maxflow(ptr, n, s, t, cap))
     residual = mu.astype(int)          # astype already returns a fresh, mutable copy
     flow = 0
     while flow <= cap:
@@ -3960,6 +3993,12 @@ def _canonical_form(mu: np.ndarray) -> bytes:
     the number of labelled copies.
     """
     n = mu.shape[0]
+    if _C is not None:
+        flat, ptr = _c_flat(mu)
+        out = np.empty(n * n, dtype=np.int32)
+        out_ptr = out.ctypes.data_as(_ct.POINTER(_ct.c_int))
+        _C.canonical_form_min(ptr, n, out_ptr)
+        return out.tobytes()
     best: bytes | None = None
     for perm in permutations(range(n)):
         p = list(perm)
@@ -4986,4 +5025,5 @@ def _run_checks() -> int:
 
 
 if __name__ == "__main__":
+    print(f"C extension: {'LOADED (_erdos_fast.so)' if C_EXTENSION_LOADED else 'not found (pure Python)'}")
     raise SystemExit(_run_checks())
