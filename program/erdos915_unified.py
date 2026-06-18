@@ -78,7 +78,9 @@ import json
 import math
 import pickle
 import random
+import shutil
 import statistics
+import subprocess
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -4020,7 +4022,7 @@ def _tiny_maxflow(mu: np.ndarray, n: int, s: int, t: int, cap: int) -> bool:
     cap+1 augmenting paths).  Correct for integer capacities: each augmentation
     increases flow by at least 1, so the loop terminates in at most
     max-flow-value iterations."""
-    residual = mu.astype(int).copy()
+    residual = mu.astype(int)          # astype already returns a fresh, mutable copy
     flow = 0
     while flow <= cap:
         parent = [-1] * n
@@ -4170,6 +4172,182 @@ def enumerate_extremal_directed_multigraphs(
 
     dfs(0, 0)
     return representatives
+
+
+def _geng_support_graphs(
+    n: int, min_edges: int, max_edges: int, geng_path: str = "geng",
+) -> Iterator[list[tuple[int, int]]]:
+    """Yield one edge list per isomorphism class of simple graph on ``n``
+    vertices with ``min_edges`` to ``max_edges`` edges, via nauty's ``geng``.
+
+    Each edge is an ordered tuple ``(u, v)`` with ``u < v``; isolated vertices
+    are kept (``geng`` always emits all ``n`` vertices).  ``geng`` writes the
+    non-isomorphic graphs in graph6 to stdout and we parse each with networkx.
+    Raises ``RuntimeError`` if ``geng`` is not on PATH.
+    """
+    exe = shutil.which(geng_path)
+    if exe is None:
+        raise RuntimeError(
+            f"nauty's '{geng_path}' was not found on PATH.  Install nauty "
+            "(e.g. the 'nauty' package) or pass geng_path=...; the "
+            "generation enumerator needs it."
+        )
+    if max_edges < min_edges:
+        return
+    proc = subprocess.run(
+        [exe, str(n), f"{min_edges}:{max_edges}"],
+        capture_output=True, check=True,
+    )
+    for line in proc.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        g = nx.from_graph6_bytes(line)
+        yield [(min(u, v), max(u, v)) for u, v in g.edges()]
+
+
+def enumerate_extremal_directed_multigraphs_via_generation(
+    n: int, m: int, target_arcs: int, max_degree: int | None = None,
+    up_to_iso: bool = True, geng_path: str = "geng",
+) -> list[np.ndarray]:
+    """Sound, geng-seeded twin of :func:`enumerate_extremal_directed_multigraphs`.
+
+    Lists every directed multigraph on ``n`` vertices with multiplicities in
+    {0..m-1}, ``lambda^max <= m-1``, exactly ``target_arcs`` arcs and
+    (optionally) maximum total degree ``<= max_degree``, deduplicated up to
+    isomorphism.  Same object and same return format (multiplicity matrices) as
+    the DFS enumerator.
+
+    Following J. Goedgebeur's suggestion, the underlying undirected SUPPORT
+    graph (the pairs carrying at least one arc) is generated once per
+    isomorphism class by nauty's ``geng``; each support is then decorated, in
+    vertex-block order, with a directed multiplicity pair ``(mu[u,v], mu[v,u])``
+    in {0..m-1}^2 minus (0,0) per support edge.  Pruning is the running arc
+    total, the degree cap, and -- at each completed prefix on ``j`` vertices --
+    the PROVED induced-arc bound ``arcs(prefix) <= (m-1) M*(j)`` together with a
+    prefix feasibility check (induced max-flows only grow, so a prefix that
+    already exceeds the cap is dead).
+
+    Soundness for every ``n``.  Two directed multigraphs with non-isomorphic
+    supports are non-isomorphic, and every isomorphism class with a given
+    support class has a labelling whose support equals geng's representative, so
+    decorating every representative and canonical-deduplicating returns exactly
+    one matrix per isomorphism class.  Crucially the induced-arc bound is used
+    ONLY for ``j <= 6``, where ``M*(j)`` is proved; for ``j >= 7`` no arc bound
+    is applied (only the global ``target_arcs`` and feasibility).  This is the
+    difference from :func:`enumerate_extremal_directed_multigraphs`, which falls
+    back to the CONJECTURED ``floor(j^2/4)`` at ``j >= 7`` and is therefore a
+    complete search only for ``n <= 6``.  This generator is complete for all
+    ``n`` (it never assumes an unproved value), so it can certify the finite
+    ``n = 7`` classification once it finishes.
+
+    Requires nauty's ``geng`` on PATH.  For ``n <= 6`` it returns the same set
+    of isomorphism classes as :func:`enumerate_extremal_directed_multigraphs`;
+    ``tests/test_solve`` checks that equality.
+    """
+    if m < 1:
+        raise ValueError("m must be >= 1")
+    per_edge_max = 2 * (m - 1)            # most arcs one undirected pair can hold
+    if per_edge_max == 0:                 # m == 1: only the empty graph is feasible
+        return [np.zeros((n, n), dtype=int)] if target_arcs == 0 else []
+    min_edges = (target_arcs + per_edge_max - 1) // per_edge_max
+    max_edges = min(target_arcs, n * (n - 1) // 2)
+
+    # Per-edge decoration states (a, b) = (mu[u,v], mu[v,u]), excluding (0,0):
+    # a support edge carries at least one arc in some direction.
+    states = [(a, b) for a in range(m) for b in range(m) if (a, b) != (0, 0)]
+    # PROVED M*(j) = L_m^dir(j) / (m-1) for j <= 6 (cut-counting MILP / base
+    # cases).  No entry for j >= 7: that value is exactly what statement (a)
+    # would establish, so using it would be circular and is deliberately omitted.
+    proved_mstar = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}
+
+    seen: set[bytes] = set()
+    representatives: list[np.ndarray] = []
+    mu = np.zeros((n, n), dtype=int)
+    deg = np.zeros(n, dtype=int)          # running total (in+out) degree per vertex
+    out_deg = np.zeros(n, dtype=int)      # running out-degree per vertex
+    in_deg = np.zeros(n, dtype=int)       # running in-degree per vertex
+
+    def feasible_prefix(j: int) -> bool:
+        # True iff no ordered pair inside {0..j-1} exceeds the cap m-1.
+        # max-flow(s,t) <= min(out_deg[s], in_deg[t]), so only pairs whose
+        # source out-degree AND sink in-degree both exceed the cap can violate
+        # it -- in a sparse feasible prefix that is a handful of pairs, which
+        # avoids almost every max-flow call.
+        cap = m - 1
+        for s in range(j):
+            if out_deg[s] <= cap:
+                continue
+            for t in range(j):
+                if s != t and in_deg[t] > cap and _tiny_maxflow(mu, n, s, t, cap):
+                    return False
+        return True
+
+    def decorate(sps: list[tuple[int, int]], bound: list[int | None],
+                 idx: int, arcs: int) -> None:
+        remaining = len(sps) - idx
+        # Each remaining support edge carries between 1 and per_edge_max arcs.
+        if arcs + remaining > target_arcs:
+            return
+        if arcs + remaining * per_edge_max < target_arcs:
+            return
+        if idx == len(sps):                       # every support edge decorated
+            if arcs == target_arcs and feasible_prefix(n):
+                if up_to_iso:
+                    canon = _canonical_form(mu)
+                    if canon in seen:
+                        return
+                    seen.add(canon)
+                representatives.append(mu.copy())
+            return
+        u, v = sps[idx]
+        j = bound[idx]            # prefix size to verify after this edge, or None
+        for a, b in states:
+            s = a + b
+            if arcs + s > target_arcs:
+                continue
+            if max_degree is not None and (deg[u] + s > max_degree
+                                           or deg[v] + s > max_degree):
+                continue
+            mu[u, v] = a
+            mu[v, u] = b
+            deg[u] += s
+            deg[v] += s
+            out_deg[u] += a; in_deg[v] += a
+            out_deg[v] += b; in_deg[u] += b
+            ok = True
+            if j is not None:     # block boundary: prefix {0..j-1} is complete
+                cap = proved_mstar.get(j)         # j == prefix size
+                if cap is not None and arcs + s > (m - 1) * cap:
+                    ok = False                    # PROVED induced-arc bound
+                elif not feasible_prefix(j):
+                    ok = False
+            if ok:
+                decorate(sps, bound, idx + 1, arcs + s)
+            deg[u] -= s
+            deg[v] -= s
+            out_deg[u] -= a; in_deg[v] -= a
+            out_deg[v] -= b; in_deg[u] -= b
+            mu[u, v] = 0
+            mu[v, u] = 0
+
+    for edges in _geng_support_graphs(n, min_edges, max_edges, geng_path):
+        # Decorate in vertex-block order: pairs sorted by larger endpoint, then
+        # smaller.  After the last support pair whose larger endpoint is w, the
+        # induced subgraph on {0..w} is complete, so we can apply the prefix
+        # bound for size w+1 there.
+        sps = sorted(edges, key=lambda e: (e[1], e[0]))
+        bound: list[int | None] = [None] * len(sps)
+        for i, (_, w) in enumerate(sps):
+            if i + 1 == len(sps) or sps[i + 1][1] > w:
+                bound[i] = w + 1                  # prefix size = w + 1 vertices
+        deg[:] = 0
+        out_deg[:] = 0
+        in_deg[:] = 0
+        decorate(sps, bound, 0, 0)
+    return representatives
+
+
 
 
 # ==================================================================

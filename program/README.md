@@ -30,6 +30,12 @@ program/
 
 `numpy`, `networkx`, `scipy`, `matplotlib`. No other dependencies, no build step.
 
+One optional extra: `enumerate_extremal_directed_multigraphs_via_generation` (the
+sound, generation-based directed-multigraph enumerator that follows J. Goedgebeur's
+`geng` suggestion) shells out to nauty's `geng`. Everything else, including the
+self-test, the figures, and the test suite, runs without it; the one unit test that
+exercises it skips automatically when `geng` is not on `PATH`.
+
 ## How to run
 
 From this `program/` directory:

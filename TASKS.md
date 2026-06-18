@@ -57,10 +57,22 @@ the bottleneck and the Phase A-E speedups did not touch it. Empirical n-scaling:
   - [ ] Option 1: a long SAFE run (no longer risks the PC):
     `timeout 14400 python -c "from erdos915_unified import \
       enumerate_extremal_directed_multigraphs as e; print(e(7,3,24,max_degree=8))"`
-  - [~] Option 2 (principled): Jan's geng+directg/watercluster2 pipeline. PROTOTYPED
-        2026-06-18 (research_notes/jan_followup_nauty_and_tabu.md): the support-hybrid
-        is ~17x faster than the DFS at n=5, confirming his "dedup only fixed RAM"
-        warning. For n=7 it still needs per-support Aut dedup + arc/degree prefilter.
+  - [x] Option 2 (principled) NOW IN-PROGRAM + SOUND (2026-06-18 merge): the geng
+        support pipeline is implemented in erdos915_unified.py itself as
+        `enumerate_extremal_directed_multigraphs_via_generation` (+ `_geng_support_graphs`),
+        not just a research_notes script. geng emits each undirected support iso-class
+        once; we decorate each support edge with a directed multiplicity pair
+        (directg/watercluster2 are NOT used: they emit one orientation per edge and
+        cannot express bidirected arcs or multiplicities). Prunes with the PROVED
+        M*(j<=6) prefix bound only (no conjectured j>=7 bound), so it is a SOUND complete
+        search at every n, unlike the DFS. Validated == DFS iso-class set at n=4 (all
+        targets/caps) and n=5 (doubled P_5; 3 doubled trees). Degree-gated feasibility
+        (flow<=min(outdeg,indeg)) + dropped a redundant _tiny_maxflow .copy() cut n=5
+        cap=8 from 91s to 41s. Unit test tests/test_solve.GengGeneration.
+  - [~] n=7 fact (b) RUN launched 2026-06-18 in background, still going at 3h+
+        (n=5 cap=8 ~41s, n=6 cap=8 several min, so n=7 is a multi-hour wall even for the
+        geng path). Expect {2B_{3,4}, 2B_{4,3}, doubled P_7}. Runtime, not soundness, is
+        now the only obstacle to closing fact (b).
 
 ## FOLLOW-UP (from Jan's 2026-06-15 email)
 Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:

@@ -1166,3 +1166,42 @@ Goedgebeur (named there + in the acknowledgments as promotor) for the suggestion
 honestly as a validated faster route + the practical path to the open n=7 fact (b), not as
 a rewrite of the program. Build clean: 93 pp, 0 overfull, 0 undefined refs/cites; the new
 \cite{McKayPiperno14} reuse and \Cref{rem:odd-step-roadmap} resolve. program .py unchanged.
+
+## 2026-06-18 (Opus) -- MERGE of the two diverged repos into this one
+
+Context: the thesis existed as TWO independent git repos with no shared history -- this
+one (`louisvandenbruwaene/thesis`, at ~/Projects/thesis, canonical going forward) and
+`louisvandenbruwaene/MasterThesis` (at ~/Documents/.../thesis_improved), each with one
+session of unique work. The author asked to merge "best of both" into THIS repo and keep
+the other as a mirror. Diffed the two trees and reconciled file by file.
+
+Kept from THIS (codex) repo: the corrected conj:dir-arc formula floor((n+m-2)^2/4) in ch3
+(the other repo's ch3 still had the old floor(n^2/4)+(m-2)ceil(n/2), wrong for m>=4); the
+app_proofs proof-detail expansions (incidence-count, block-cut count, attachment flow
+estimate, the two-hop/no-back-arc bound); the new ch2 "Generating faster" section; the
+main.tex Goedgebeur acknowledgment; preamble shared/ vendoring; research_notes/ and shared/.
+
+Brought in from the other repo: (1) the punctuation/spelling sweep -- removed all prose
+em-dashes and semicolons and fixed Br/Am spelling across ch1-ch4 + app_proofs (this repo
+had not had that sweep: 12 em-dashes + 25 semicolons); the missing-arc-notation, "dear"
+typo, and stale "running" fixes were already here. (2) the geng pipeline as a PROPER
+in-program function `enumerate_extremal_directed_multigraphs_via_generation` +
+`_geng_support_graphs` in erdos915_unified.py (this repo only had it as a research_notes
+prototype script using directg/watercluster2). Mine generates the UNDIRECTED support with
+geng and decorates multiplicities/bidirection in-program, prunes with PROVED M*(j<=6) only
+(no conjectured bound -> sound at all n), validated == DFS at n=4/n=5. (3) the geng unit
+test, the program README geng note, the _tiny_maxflow .copy() drop, shutil/subprocess
+imports.
+
+Reconciled conflict: this repo's ch2 section described `directg`/`watercluster2` orienting
++ "layering multiplicities" and cited 26s/17x and watercluster2-vs-directg numbers from the
+SEPARATE research_notes script. Rewrote it to match the SHIPPED in-program implementation
+(geng undirected support + in-program decoration; directg/watercluster2 can't express
+bidirected arcs or multiplicities), kept Goedgebeur's credit and the validated facts
+(2 families at n=4, 3 at n=5; sound at all n), dropped the unverified-for-this-impl
+speed multiples (left "substantially faster"). Kept codex's plot_variant_grid(m) shorter
+suptitle + its make_figures caller + its variant_bounds figures.
+
+Verify: full suite 77 tests pass (was 75 + my 2 geng tests), 1 slow-enum skip. n=7 fact (b)
+run still going in the other tree's logs/. Build + commit + push pending at end of this
+entry; the MasterThesis repo will be mirrored to match this one.
