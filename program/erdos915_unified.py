@@ -88,10 +88,19 @@ from itertools import combinations, combinations_with_replacement, permutations,
 from pathlib import Path
 from typing import Callable, Iterator
 
+import concurrent.futures
+
 import numpy as np
 import networkx as nx
 from scipy import sparse
 from scipy.optimize import Bounds, LinearConstraint, milp
+
+try:
+    import gurobipy as _gp
+    from gurobipy import GRB as _GRB
+    GUROBI_AVAILABLE = True
+except ImportError:
+    GUROBI_AVAILABLE = False
 
 # matplotlib needs its backend chosen before pyplot is imported, so that the
 # figure code runs head-less (writes PNG files, never opens a window).
@@ -1163,10 +1172,144 @@ def _add_degree_order_rows(acc: _MilpRows, var: _VariableIndex, n: int,
                      if abs(coefficient) > 1e-12], 0.0, np.inf)
 
 
+def _prove_with_gurobi(
+    n: int,
+    *,
+    time_limit: float,
+    use_two_hop: bool,
+    use_symmetry_breaking: bool,
+    use_deletion_cuts: bool,
+    show_solver_log: bool,
+) -> "ProofResult":
+    """Build and solve the M*(n) MILP using Gurobi.
+
+    Called only when GUROBI_AVAILABLE is True.  Builds the identical model as
+    prove_directed_multigraph (same variables, same constraints, same objective)
+    but through the gurobipy API, which typically solves n=7 in minutes via
+    the KU Leuven academic licence whereas scipy/HiGHS times out.
+    """
+    pairs = _ordered_pairs(n)
+    triples = _two_hop_triples(n) if use_two_hop else []
+
+    env = _gp.Env(empty=True)
+    env.setParam("OutputFlag", 1 if show_solver_log else 0)
+    env.start()
+    model = _gp.Model(env=env)
+    model.Params.TimeLimit = time_limit
+    model.Params.MIPGap = 0.0   # zero gap = proof
+
+    # --- variables ---
+    w = {(u, v): model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
+         for (u, v) in pairs}
+    x = {(s, t, u): model.addVar(vtype=_GRB.BINARY)
+         for (s, t) in pairs for u in range(n)}
+    p = {(s, t, u, v): model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
+         for (s, t) in pairs for (u, v) in pairs}
+
+    # fix source/sink labels
+    for (s, t) in pairs:
+        x[s, t, s].lb = x[s, t, s].ub = 1.0
+        x[s, t, t].lb = x[s, t, t].ub = 0.0
+
+    # --- objective: maximise sum w ---
+    model.setObjective(_gp.quicksum(w[u, v] for (u, v) in pairs), _GRB.MAXIMIZE)
+
+    # --- (1)+(2) cut-counting core ---
+    for (s, t) in pairs:
+        for (u, v) in pairs:
+            model.addConstr(p[s, t, u, v] >= w[u, v] + x[s, t, u] - x[s, t, v] - 1)
+        model.addConstr(_gp.quicksum(p[s, t, u, v] for (u, v) in pairs) <= 1.0)
+
+    # --- (3)+(4) two-hop inequalities ---
+    if use_two_hop:
+        z = {}
+        b = {}
+        for (s, xx, t) in triples:
+            z[s, xx, t] = model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
+            b[s, xx, t] = model.addVar(vtype=_GRB.BINARY)
+            model.addConstr(z[s, xx, t] <= w[s, xx])
+            model.addConstr(z[s, xx, t] <= w[xx, t])
+            model.addConstr(z[s, xx, t] >= w[s, xx] + b[s, xx, t] - 1)
+            model.addConstr(z[s, xx, t] >= w[xx, t] - b[s, xx, t])
+        for (s, t) in pairs:
+            model.addConstr(
+                w[s, t]
+                + _gp.quicksum(z[s, xx, t] for xx in range(n) if xx != s and xx != t)
+                <= 1.0
+            )
+
+    # --- (5) symmetry breaking: d(v_0) <= d(v_1) <= ... ---
+    if use_symmetry_breaking:
+        for v in range(n - 1):
+            d_v  = (_gp.quicksum(w[u, v]   for u in range(n) if u != v) +
+                    _gp.quicksum(w[v, u]   for u in range(n) if u != v))
+            d_v1 = (_gp.quicksum(w[u, v+1] for u in range(n) if u != v + 1) +
+                    _gp.quicksum(w[v+1, u] for u in range(n) if u != v + 1))
+            model.addConstr(d_v <= d_v1)
+
+    # --- (6) deletion and degree-pair cuts ---
+    if use_deletion_cuts:
+        if n - 1 in _PROVEN_MSTAR:
+            for v in range(n):
+                model.addConstr(
+                    _gp.quicksum(w[a, b_] for (a, b_) in pairs if a != v and b_ != v)
+                    <= float(_PROVEN_MSTAR[n - 1])
+                )
+        if n - 2 in _PROVEN_MSTAR:
+            for u in range(n):
+                for v in range(u + 1, n):
+                    model.addConstr(
+                        _gp.quicksum(
+                            w[a, b_] for (a, b_) in pairs
+                            if a not in (u, v) and b_ not in (u, v)
+                        ) <= float(_PROVEN_MSTAR[n - 2])
+                    )
+        for (s, t) in pairs:
+            model.addConstr(
+                _gp.quicksum(w[s, v] for v in range(n) if v != s)
+                + _gp.quicksum(w[u, t] for u in range(n) if u != t)
+                - w[s, t] <= float(n - 1)
+            )
+
+    start = time.time()
+    model.optimize()
+    elapsed = time.time() - start
+
+    _STATUS = {
+        _GRB.OPTIMAL:   "OPTIMAL",
+        _GRB.TIME_LIMIT: "LIMIT",
+        _GRB.INFEASIBLE: "INFEASIBLE",
+        _GRB.UNBOUNDED:  "UNBOUNDED",
+    }
+    status = _STATUS.get(model.Status, str(model.Status))
+
+    weight_matrix = None
+    obj_val = float("nan")
+    if model.SolCount > 0:
+        obj_val = model.ObjVal
+        weight_matrix = np.zeros((n, n))
+        for (u, v) in pairs:
+            weight_matrix[u, v] = w[u, v].X
+
+    gap_zero = (model.Status == _GRB.OPTIMAL)
+    if model.Status == _GRB.TIME_LIMIT and model.SolCount > 0:
+        try:
+            gap_zero = model.MIPGap < 1e-8
+        except Exception:
+            gap_zero = False
+
+    return ProofResult(
+        n=n, status=status, scaled_optimum=obj_val,
+        relative_gap_zero=gap_zero, solve_seconds=elapsed,
+        weight_matrix=weight_matrix,
+    )
+
+
 def prove_directed_multigraph(
     n: int,
     *,
     time_limit: float = 1500.0,
+    use_gurobi: bool | None = None,
     use_two_hop: bool = True,
     use_symmetry_breaking: bool = True,
     use_deletion_cuts: bool = False,
@@ -1177,7 +1320,27 @@ def prove_directed_multigraph(
     Returns a :class:`ProofResult`. When its :meth:`is_proof` is true the
     value is a proven upper bound, and ``value_for(m)`` gives ``L_m^dir(n)`` for
     every ``m``.
+
+    Args:
+        use_gurobi: if ``True``, use Gurobi (faster; requires the gurobipy
+            package and a licence).  If ``False``, always use scipy/HiGHS.
+            If ``None`` (default), use Gurobi when available and fall back to
+            scipy/HiGHS otherwise.
     """
+    # Dispatch to Gurobi when available and not explicitly disabled.
+    want_gurobi = GUROBI_AVAILABLE if use_gurobi is None else use_gurobi
+    if want_gurobi:
+        if not GUROBI_AVAILABLE:
+            raise RuntimeError(
+                "use_gurobi=True but gurobipy is not installed. "
+                "Install it and activate a licence, then retry."
+            )
+        return _prove_with_gurobi(
+            n, time_limit=time_limit, use_two_hop=use_two_hop,
+            use_symmetry_breaking=use_symmetry_breaking,
+            use_deletion_cuts=use_deletion_cuts, show_solver_log=show_solver_log,
+        )
+
     pairs = _ordered_pairs(n)
     triples = _two_hop_triples(n) if use_two_hop else []
 
@@ -1727,6 +1890,12 @@ def search_for_dense_graph(
     return SearchResult(best_graph, best_edges, feasible_found, history)
 
 
+def _run_one_search(args: tuple) -> SearchResult:
+    """Module-level worker for parallel restarts (must be picklable for ProcessPoolExecutor)."""
+    variant, n, m, seed, search_options = args
+    return search_for_dense_graph(variant, n, m, seed=seed, **search_options)
+
+
 def best_of_searches(
     variant: Variant,
     n: int,
@@ -1734,23 +1903,37 @@ def best_of_searches(
     *,
     restarts: int = 6,
     seed: int = 0,
+    parallel: bool = True,
     **search_options,
 ) -> SearchResult:
     """Run several independent cooling schedules and keep the densest result.
 
     A single search can settle into a local optimum, so for reliable
     rediscovery we restart from a fresh random seed a handful of times and return
-    the run that found the most edges.  Any keyword understood by :func:`search_for_dense_graph`
-    (``steps``, ``penalty``, ``separation``, and so on) is forwarded unchanged.
+    the run that found the most edges.  Any keyword understood by
+    :func:`search_for_dense_graph` (``steps``, ``penalty``, ``separation``, and
+    so on) is forwarded unchanged.
+
+    Args:
+        parallel: when ``True`` (default), run the restarts concurrently using
+            :class:`~concurrent.futures.ProcessPoolExecutor`.  Each restart has
+            a distinct seed so the runs are genuinely independent.  Falls back
+            to sequential execution if multiprocessing is unavailable.
     """
-    best = None
-    for restart in range(restarts):
-        # Each restart uses a distinct seed so the runs are genuinely independent.
-        outcome = search_for_dense_graph(variant, n, m, seed=seed + restart, **search_options)
-        if best is None or outcome.best_edge_count > best.best_edge_count:
-            best = outcome
-    assert best is not None
-    return best
+    task_args = [(variant, n, m, seed + r, search_options) for r in range(restarts)]
+
+    if parallel and restarts > 1:
+        try:
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                results = list(executor.map(_run_one_search, task_args))
+        except Exception:
+            # Graceful fallback: multiprocessing unavailable (e.g., during test
+            # collection in some frameworks) or an object couldn't be pickled.
+            results = [_run_one_search(a) for a in task_args]
+    else:
+        results = [_run_one_search(a) for a in task_args]
+
+    return max(results, key=lambda r: r.best_edge_count)
 
 
 # ==================================================================
