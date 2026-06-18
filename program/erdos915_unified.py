@@ -94,6 +94,8 @@ import numpy as np
 import networkx as nx
 from scipy import sparse
 from scipy.optimize import Bounds, LinearConstraint, milp
+from scipy.sparse import csr_matrix as _csr
+from scipy.sparse.csgraph import maximum_flow as _csgraph_maxflow
 
 try:
     import gurobipy as _gp
@@ -111,8 +113,6 @@ from matplotlib.ticker import MaxNLocator  # noqa: E402  (integer-only axis tick
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' projection)
 
 
-
-
 ######################################################################
 ##
 ##  CHAPTER 1 — THE PROBLEM AND ITS BASE CASES
@@ -120,20 +120,7 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' proje
 ##
 ######################################################################
 
-# ==================================================================
-# VARIANT  (the graph model)
-# ------------------------------------------------------------------
-# WHAT: a single integer multiplicity matrix represents every matrix-shaped
-# variant of the problem.  ``mu[u, v]`` is the number of parallel edges/arcs
-# from u to v.  Simple == every entry is 0/1; undirected == the matrix is kept
-# symmetric.  Random graphs are not a separate object: they are ordinary graphs
-# that happen to have been sampled, so they reuse this class.
-# HOW IT FITS: this is the foundation.  One representation here is what later
-# lets one search loop and one prover serve every case without special-casing.
-# The edge-vs-vertex separation axis is a property of the *question*, so it lives
-# in the CHECKER section, not here.
-# DEPENDENCIES: none inside the program (only numpy, dataclasses, typing).
-# ==================================================================
+# --- VARIANT: mu[u,v] = multiplicity from u to v; simple = {0,1}; undirected = symmetric ---
 
 
 @dataclass(frozen=True)
@@ -303,17 +290,7 @@ class Graph:
                 f"edges={self.edge_count()})")
 
 
-# ==================================================================
-# BOUNDS  (the formula library)
-# ------------------------------------------------------------------
-# WHAT: the known and conjectured extremal values as pure closed forms.  Each
-# docstring records its status (proved / cited / conjectured): that distinction
-# is the whole point of the honesty contract.
-# HOW IT FITS: this is the "theory predicts" side.  Kept apart from the graphs
-# and the search so a plot or a test can compare what the program *found*
-# against what the theory *predicts* without any risk of the two drifting apart.
-# DEPENDENCIES: none (pure arithmetic).
-# ==================================================================
+# --- BOUNDS: closed-form extremal values; docstrings record proved/conjectured status ---
 
 
 def simple_undirected_edge(n: int, m: int) -> int:
@@ -380,21 +357,7 @@ def directed_multigraph_arc(n: int, m: int) -> int:
     return max(double_star_branch, bipartite_branch)
 
 
-# ==================================================================
-# HYPERGRAPH  (the fourth model, Berge-path connectivity)
-# ------------------------------------------------------------------
-# WHAT: a hyperedge joins more than two vertices, so it does not fit the
-# multiplicity matrix; a hypergraph is stored by its incidence (a list of vertex
-# sets).  Connectivity is measured along Berge paths (alternating vertices and
-# hyperedges where consecutive vertices share the listed hyperedge); two Berge
-# paths are edge-disjoint when they share no hyperedge.
-# HOW IT FITS: the same Menger idea, the same max-flow.  The construction is the
-# key step: each HYPEREDGE BECOMES A NODE of capacity one (so at most one
-# disjoint path may use it), and each incident vertex connects to it without
-# limit.  For two-element hyperedges this reduces to ordinary edge-connectivity,
-# so this is the honest generalisation of the graph checker, not a separate story.
-# DEPENDENCIES: networkx (its own Hypergraph class is defined here).
-# ==================================================================
+# --- HYPERGRAPH: stored as incidence list; Berge-path connectivity via helper-node max-flow ---
 
 
 class Hypergraph:
@@ -529,19 +492,7 @@ def max_hyperedge_connectivity(hypergraph: Hypergraph) -> int:
     return max_hyper_connectivity(hypergraph, vertex_split=False)
 
 
-# ==================================================================
-# CONSTRUCTIONS  (the named extremal graphs)
-# ------------------------------------------------------------------
-# WHAT: the named extremal graphs of the thesis, each a small readable function
-# returning a Graph (or Hypergraph).  Every function states the value it
-# attains, so a test can confirm two things at once: the construction has the
-# claimed number of edges, and its connectivity is exactly m - 1 (so it really
-# is feasible for the forbidden value m).
-# HOW IT FITS: these are the targets the temperature search is meant to
-# rediscover.  They are the concrete witnesses behind the lower bounds.
-# DEPENDENCIES: Graph/Variant flags (Section 1), Hypergraph (Section 5),
-# itertools.combinations.
-# ==================================================================
+# --- CONSTRUCTIONS: named extremal graphs; each states its edge count and lambda^max ---
 
 
 def double_star(n: int, m: int, directed: bool = True) -> Graph:
@@ -691,8 +642,6 @@ def star_hypertree(n: int, r: int) -> Hypergraph:
     return hypergraph
 
 
-
-
 ######################################################################
 ##
 ##  CHAPTER 2 — PROVING BOUNDS BY MACHINE
@@ -700,28 +649,7 @@ def star_hypertree(n: int, r: int) -> Hypergraph:
 ##
 ######################################################################
 
-# ==================================================================
-# CHECKER  (exact local connectivity by max-flow)  [MEASURE]
-# ------------------------------------------------------------------
-# WHAT: the trusted core.  By Menger's theorem the maximum number of
-# edge-disjoint u-v paths equals the minimum u-v edge cut, and the maximum
-# number of internally vertex-disjoint paths equals the minimum vertex cut.
-# Both minimum cuts are maximum flows, so this module is exact max-flow dressed
-# in graph-theoretic clothing.  Edge and vertex are NOT two procedures but one,
-# parameterised by a single ``vertex_split`` boolean (the same convention the
-# hypergraph section uses): flip it on and every vertex is split into a
-# capacity-one in/out gate, turning edge-disjoint counts into vertex-disjoint
-# ones.  Three functions -- network, local, max -- therefore serve both measures.
-#   lambda^max(G) = max over pairs of local EDGE connectivity   (vertex_split=False).
-#   kappa^max(G)  = max over pairs of local VERTEX connectivity  (vertex_split=True).
-# Forbidding m independent routes between every pair is exactly the constraint
-# lambda^max <= m - 1 (or kappa^max <= m - 1).
-# HOW IT FITS: because the answers are EXACT, anything the checker reports is a
-# fact, not an estimate.  The search and the prover are checked against it.
-# Multigraph convention: parallel edges do NOT raise vertex-connectivity, which
-# is realised by giving each adjacency capacity one in the vertex-split network.
-# DEPENDENCIES: Graph (Section 1), networkx.
-# ==================================================================
+# --- CHECKER: exact max-flow connectivity; vertex_split=True gives kappa^max ---
 
 # A capacity large enough to never be the bottleneck of any cut we build.
 _UNBOUNDED = 10 ** 9
@@ -777,20 +705,18 @@ def local_connectivity(graph: Graph, source: int, target: int,
     ``vertex_split=True``.  An isolated endpoint is absent from the network, so
     the answer is then zero.
     """
-    network = _flow_network(graph, vertex_split=vertex_split)
-    # In the split network flow LEAVES the source's out-copy and ARRIVES at the
-    # target's in-copy; in edge mode the endpoints are their plain nodes.
-    src = (source, "out") if vertex_split else source
-    dst = (target, "in") if vertex_split else target
+    if not vertex_split:
+        # scipy.sparse.csgraph.maximum_flow is a C implementation; faster than
+        # NetworkX for the small integer capacity matrices we use.
+        return int(_csgraph_maxflow(_csr(graph.mu, dtype=int), source, target).flow_value)
+    # Vertex mode: use the NetworkX split network (the split graph has string
+    # node labels that _csgraph_maxflow cannot address; NetworkX handles it cleanly).
+    network = _flow_network(graph, vertex_split=True)
+    src, dst = (source, "out"), (target, "in")
     if src not in network or dst not in network:
         return 0
-    if vertex_split:
-        # Menger counts INTERNALLY disjoint routes, so the endpoints must not be
-        # the bottleneck: lift the cap on their own in->out gates.
-        network[(source, "in")][(source, "out")]["capacity"] = float(_UNBOUNDED)
-        network[(target, "in")][(target, "out")]["capacity"] = float(_UNBOUNDED)
-    # max-flow value == min cut == #disjoint routes. Round: networkx returns a
-    # float, but the true answer is an integer here.
+    network[(source, "in")][(source, "out")]["capacity"] = float(_UNBOUNDED)
+    network[(target, "in")][(target, "out")]["capacity"] = float(_UNBOUNDED)
     return int(round(nx.maximum_flow_value(network, src, dst)))
 
 
@@ -800,14 +726,10 @@ def max_connectivity(graph: Graph, *, vertex_split: bool = False) -> int:
     undirected graph each unordered pair once.
     """
     if not vertex_split:
-        # Edge mode: the network never changes between pairs, so build it once
-        # and reuse it -- all vertices are present, so every pair is queryable.
-        network = _flow_network(graph)
-        return max((int(round(nx.maximum_flow_value(network, s, t)))
+        # Build the CSR matrix once and reuse it for every pair.
+        csr = _csr(graph.mu, dtype=int)
+        return max((int(_csgraph_maxflow(csr, s, t).flow_value)
                     for s, t in _pairs(graph)), default=0)
-    # Vertex mode: each pair needs its OWN endpoints uncapped, so we let
-    # local_connectivity rebuild the (cheap) network per pair -- simpler than
-    # mutating and restoring endpoint capacities in place.
     return max((local_connectivity(graph, s, t, vertex_split=True)
                 for s, t in _pairs(graph)), default=0)
 
@@ -940,19 +862,7 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     raise ValueError("separation must be 'edge' or 'vertex'")
 
 
-# ==================================================================
-# GOMORY-HU  (all pairwise connectivities from one tree)
-# ------------------------------------------------------------------
-# WHAT: for an undirected graph there are n(n-1)/2 pairs; naively lambda^max
-# needs one max-flow per pair.  Gomory and Hu proved something stronger: a
-# single weighted tree on the same vertex set encodes EVERY pairwise edge
-# connectivity, because lambda(u, v) equals the lightest edge on the tree path
-# between u and v.  All n(n-1)/2 numbers live in n-1 tree edges.
-# HOW IT FITS: this is the honest sense of an "efficient data structure": the
-# tree is a theorem, not a convenience, and lambda^max drops out as the single
-# heaviest tree edge.  It is a cross-check on the checker for undirected graphs.
-# DEPENDENCIES: Graph (Section 1), networkx (undirected graphs only).
-# ==================================================================
+# --- GOMORY-HU: encode all pairwise edge-connectivities in n-1 flows (undirected only) ---
 
 
 def _undirected_capacity_graph(graph: Graph) -> nx.Graph:
@@ -992,34 +902,10 @@ def max_edge_connectivity_via_tree(graph: Graph) -> int:
     return int(round(max(weights)))
 
 
-# ==================================================================
-# PROVE  (upper bounds, by counting cuts)
-# ------------------------------------------------------------------
-# WHAT: the search finds dense graphs but cannot prove none is denser.  For the
-# directed multigraph arc problem this section closes the gap exactly, for a
-# fixed n, with a small cut-counting optimisation (whole-number cut choices plus
-# continuous weights) solved by HiGHS via scipy.milp.
-#
-# Scaling.  Dividing every multiplicity by m - 1 turns a directed multigraph
-# with lambda^max <= m - 1 into a fractional weight matrix w in [0,1] with
-# max-flow <= 1 between every ordered pair.  So L_m^dir(n) = (m-1) * M*(n) where
-# M*(n) is the largest total weight sum(w) subject to maxflow(s,t;w) <= 1 for
-# all pairs.  Solving M*(n) once settles every m at that n.
-#
-# Encoding the flow constraint exactly.  By max-flow/min-cut, maxflow(s,t) <= 1
-# iff there is an s-t cut of capacity <= 1.  The program CHOOSES that cut with
-# binaries x[s,t,u] (1 if u is on the source side; fixed 1 at s, 0 at t) and
-# forces the chosen cut's capacity <= 1 via auxiliary p[s,t,u,v] that pick up
-# w[u,v] exactly on crossing arcs.  This is the true non-convex feasible region,
-# not a relaxation, so an optimal solution with zero gap is a genuine proof.
-#
-# Two exactness-preserving tighteners: a two-hop inequality and degree-ordering
-# symmetry breaking.  Reference values: M*(n) = 2(n-1) for n <= 6 (double star),
-# which this proves optimal with gap zero.
-# HOW IT FITS: this is the PROVE corner.  It produces upper bounds; the search
-# produces lower bounds; when they meet, the value is pinned down exactly.
-# DEPENDENCIES: numpy, scipy.sparse, scipy.optimize (Bounds/LinearConstraint/milp).
-# ==================================================================
+# --- PROVE: MILP for M*(n) via cut-counting (scipy/HiGHS or Gurobi backend) ---
+# L_m^dir(n) = (m-1)*M*(n) where M*(n) = max sum(w) s.t. maxflow(s,t;w)<=1 all pairs.
+# Flow constraint encoded exactly: choose a cut x in {0,1}^n per pair, cap crossing
+# weight via p; zero MIP gap = proof.  Shared helpers build constraints for both backends.
 
 
 @dataclass
@@ -1160,7 +1046,6 @@ def _add_degree_order_rows(acc: _MilpRows, var: _VariableIndex, n: int,
     relabellings of the same graph and never cuts the optimum.
     """
     for v in range(n - 1):
-        # d(v+1) - d(v) >= 0, merging coefficients so each column appears once.
         merged: dict[int, float] = {}
         for u in range(n):
             for (a, b, sign) in ((u, v + 1, 1.0), (v + 1, u, 1.0),
@@ -1168,8 +1053,70 @@ def _add_degree_order_rows(acc: _MilpRows, var: _VariableIndex, n: int,
                 if a != b:
                     column = var((weight_key, a, b))
                     merged[column] = merged.get(column, 0.0) + sign
-        acc.add_row([(column, coefficient) for column, coefficient in merged.items()
-                     if abs(coefficient) > 1e-12], 0.0, np.inf)
+        acc.add_row([(col, coef) for col, coef in merged.items()
+                     if abs(coef) > 1e-12], 0.0, np.inf)
+
+
+def _add_two_hop_rows(acc: _MilpRows, var: _VariableIndex,
+                      n: int, pairs: list, triples: list) -> None:
+    """McCormick linearisation of min() for the two-hop tightening cuts.
+
+    For each (s, x, t) triple: introduce z = min(w[s,x], w[x,t]) via binary
+    selector b, then add w[s,t] + sum_x z <= 1.  Both provers use these rows.
+    """
+    add_row = acc.add_row
+    for (s, x, t) in triples:
+        z = var(("z", s, x, t))
+        b = var(("b", s, x, t))
+        w_sx = var(("w", s, x))
+        w_xt = var(("w", x, t))
+        add_row([(z, 1.0), (w_sx, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_sx
+        add_row([(z, 1.0), (w_xt, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_xt
+        add_row([(z, 1.0), (w_sx, -1.0), (b, -1.0)], lower=-1.0, upper=np.inf)  # z >= w_sx+b-1
+        add_row([(z, 1.0), (w_xt, -1.0), (b, 1.0)], lower=0.0, upper=np.inf)    # z >= w_xt-b
+    for (s, t) in pairs:
+        add_row(
+            [(var(("w", s, t)), 1.0)]
+            + [(var(("z", s, x, t)), 1.0) for x in range(n) if x != s and x != t],
+            lower=-np.inf, upper=1.0,
+        )
+
+
+def _add_deletion_cut_rows(acc: _MilpRows, var: _VariableIndex,
+                            n: int, pairs: list) -> None:
+    """Deletion and degree-pair valid inequalities, shared by both provers.
+
+    Three families, all proved valid (restrict-and-compare, vertex-pair variant,
+    degree-pair flow lower bound):
+      (a) sum_{{a,b} off v} w[a,b] <= M*(n-1)  for each v
+      (b) sum_{{a,b} off {u,v}} w[a,b] <= M*(n-2)  for each pair
+      (c) d+(s) + d-(t) - w[s,t] <= n-1
+    """
+    add_row = acc.add_row
+    if n - 1 in _PROVEN_MSTAR:
+        for v in range(n):
+            terms = [(var(("w", a, b)), 1.0) for (a, b) in pairs
+                     if a != v and b != v]
+            add_row(terms, lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 1]))
+    if n - 2 in _PROVEN_MSTAR:
+        for u in range(n):
+            for v in range(u + 1, n):
+                terms = [(var(("w", a, b)), 1.0) for (a, b) in pairs
+                         if a not in (u, v) and b not in (u, v)]
+                add_row(terms, lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 2]))
+    for (s, t) in pairs:
+        merged: dict[int, float] = {}
+        for x in range(n):
+            if x != s:
+                col = var(("w", s, x))
+                merged[col] = merged.get(col, 0.0) + 1.0
+            if x != t:
+                col = var(("w", x, t))
+                merged[col] = merged.get(col, 0.0) + 1.0
+        col_st = var(("w", s, t))
+        merged[col_st] = merged.get(col_st, 0.0) - 1.0
+        add_row([(c, k) for c, k in merged.items() if abs(k) > 1e-12],
+                lower=-np.inf, upper=float(n - 1))
 
 
 def _prove_with_gurobi(
@@ -1183,103 +1130,94 @@ def _prove_with_gurobi(
 ) -> "ProofResult":
     """Build and solve the M*(n) MILP using Gurobi.
 
-    Called only when GUROBI_AVAILABLE is True.  Builds the identical model as
-    prove_directed_multigraph (same variables, same constraints, same objective)
-    but through the gurobipy API, which typically solves n=7 in minutes via
-    the KU Leuven academic licence whereas scipy/HiGHS times out.
+    Shares all constraint-building logic with the scipy path: builds the
+    variable index and constraint rows via the same helpers, then translates
+    the COO row data into Gurobi addConstr calls.  This ensures the two
+    backends always solve the identical model.
     """
     pairs = _ordered_pairs(n)
     triples = _two_hop_triples(n) if use_two_hop else []
 
+    # --- build the shared variable index and constraint rows ---
+    var = _VariableIndex()
+    for (u, v) in pairs:
+        var.declare(("w", u, v))
+    for (s, t) in pairs:
+        for u in range(n):
+            var.declare(("x", s, t, u))
+    for (s, t) in pairs:
+        for (u, v) in pairs:
+            var.declare(("p", s, t, u, v))
+    for (s, x, t) in triples:
+        var.declare(("z", s, x, t))
+        var.declare(("b", s, x, t))
+    num_vars = len(var)
+
+    acc = _MilpRows()
+    _add_crossing_cut_rows(acc, var, pairs, "w", 1.0)
+    if use_two_hop:
+        _add_two_hop_rows(acc, var, n, pairs, triples)
+    if use_symmetry_breaking:
+        _add_degree_order_rows(acc, var, n, "w")
+    if use_deletion_cuts:
+        _add_deletion_cut_rows(acc, var, n, pairs)
+
+    # --- set up integrality and bounds (same as scipy path) ---
+    integrality = np.zeros(num_vars)
+    lower_b = np.zeros(num_vars)
+    upper_b = np.ones(num_vars)
+    for (s, t) in pairs:
+        lower_b[var(("x", s, t, s))] = upper_b[var(("x", s, t, s))] = 1.0
+        lower_b[var(("x", s, t, t))] = upper_b[var(("x", s, t, t))] = 0.0
+        for u in range(n):
+            integrality[var(("x", s, t, u))] = 1
+    for (s, x, t) in triples:
+        integrality[var(("b", s, x, t))] = 1
+
+    # --- create Gurobi model and add variables as a flat vector ---
     env = _gp.Env(empty=True)
     env.setParam("OutputFlag", 1 if show_solver_log else 0)
     env.start()
     model = _gp.Model(env=env)
     model.Params.TimeLimit = time_limit
-    model.Params.MIPGap = 0.0   # zero gap = proof
+    model.Params.MIPGap = 0.0
 
-    # --- variables ---
-    w = {(u, v): model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
-         for (u, v) in pairs}
-    x = {(s, t, u): model.addVar(vtype=_GRB.BINARY)
-         for (s, t) in pairs for u in range(n)}
-    p = {(s, t, u, v): model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
-         for (s, t) in pairs for (u, v) in pairs}
+    vtypes = [_GRB.BINARY if integrality[i] else _GRB.CONTINUOUS
+              for i in range(num_vars)]
+    gvars = [model.addVar(lb=lower_b[i], ub=upper_b[i], vtype=vtypes[i])
+             for i in range(num_vars)]
+    model.update()
 
-    # fix source/sink labels
-    for (s, t) in pairs:
-        x[s, t, s].lb = x[s, t, s].ub = 1.0
-        x[s, t, t].lb = x[s, t, t].ub = 0.0
+    # --- translate _MilpRows COO data into Gurobi constraints ---
+    A = sparse.csr_matrix(
+        (acc.data, (acc.rows, acc.cols)), shape=(acc.n_rows, num_vars)
+    )
+    for row_i in range(acc.n_rows):
+        row = A.getrow(row_i)
+        expr = _gp.quicksum(float(row.data[j]) * gvars[row.indices[j]]
+                            for j in range(len(row.data)))
+        lo, hi = acc.lower[row_i], acc.upper[row_i]
+        if lo == -np.inf:
+            model.addConstr(expr <= hi)
+        elif hi == np.inf:
+            model.addConstr(expr >= lo)
+        else:
+            model.addConstr(expr >= lo)
+            model.addConstr(expr <= hi)
 
     # --- objective: maximise sum w ---
-    model.setObjective(_gp.quicksum(w[u, v] for (u, v) in pairs), _GRB.MAXIMIZE)
-
-    # --- (1)+(2) cut-counting core ---
-    for (s, t) in pairs:
-        for (u, v) in pairs:
-            model.addConstr(p[s, t, u, v] >= w[u, v] + x[s, t, u] - x[s, t, v] - 1)
-        model.addConstr(_gp.quicksum(p[s, t, u, v] for (u, v) in pairs) <= 1.0)
-
-    # --- (3)+(4) two-hop inequalities ---
-    if use_two_hop:
-        z = {}
-        b = {}
-        for (s, xx, t) in triples:
-            z[s, xx, t] = model.addVar(lb=0.0, ub=1.0, vtype=_GRB.CONTINUOUS)
-            b[s, xx, t] = model.addVar(vtype=_GRB.BINARY)
-            model.addConstr(z[s, xx, t] <= w[s, xx])
-            model.addConstr(z[s, xx, t] <= w[xx, t])
-            model.addConstr(z[s, xx, t] >= w[s, xx] + b[s, xx, t] - 1)
-            model.addConstr(z[s, xx, t] >= w[xx, t] - b[s, xx, t])
-        for (s, t) in pairs:
-            model.addConstr(
-                w[s, t]
-                + _gp.quicksum(z[s, xx, t] for xx in range(n) if xx != s and xx != t)
-                <= 1.0
-            )
-
-    # --- (5) symmetry breaking: d(v_0) <= d(v_1) <= ... ---
-    if use_symmetry_breaking:
-        for v in range(n - 1):
-            d_v  = (_gp.quicksum(w[u, v]   for u in range(n) if u != v) +
-                    _gp.quicksum(w[v, u]   for u in range(n) if u != v))
-            d_v1 = (_gp.quicksum(w[u, v+1] for u in range(n) if u != v + 1) +
-                    _gp.quicksum(w[v+1, u] for u in range(n) if u != v + 1))
-            model.addConstr(d_v <= d_v1)
-
-    # --- (6) deletion and degree-pair cuts ---
-    if use_deletion_cuts:
-        if n - 1 in _PROVEN_MSTAR:
-            for v in range(n):
-                model.addConstr(
-                    _gp.quicksum(w[a, b_] for (a, b_) in pairs if a != v and b_ != v)
-                    <= float(_PROVEN_MSTAR[n - 1])
-                )
-        if n - 2 in _PROVEN_MSTAR:
-            for u in range(n):
-                for v in range(u + 1, n):
-                    model.addConstr(
-                        _gp.quicksum(
-                            w[a, b_] for (a, b_) in pairs
-                            if a not in (u, v) and b_ not in (u, v)
-                        ) <= float(_PROVEN_MSTAR[n - 2])
-                    )
-        for (s, t) in pairs:
-            model.addConstr(
-                _gp.quicksum(w[s, v] for v in range(n) if v != s)
-                + _gp.quicksum(w[u, t] for u in range(n) if u != t)
-                - w[s, t] <= float(n - 1)
-            )
+    model.setObjective(
+        _gp.quicksum(gvars[var(("w", u, v))] for (u, v) in pairs),
+        _GRB.MAXIMIZE,
+    )
 
     start = time.time()
     model.optimize()
     elapsed = time.time() - start
 
     _STATUS = {
-        _GRB.OPTIMAL:   "OPTIMAL",
-        _GRB.TIME_LIMIT: "LIMIT",
-        _GRB.INFEASIBLE: "INFEASIBLE",
-        _GRB.UNBOUNDED:  "UNBOUNDED",
+        _GRB.OPTIMAL: "OPTIMAL", _GRB.TIME_LIMIT: "LIMIT",
+        _GRB.INFEASIBLE: "INFEASIBLE", _GRB.UNBOUNDED: "UNBOUNDED",
     }
     status = _STATUS.get(model.Status, str(model.Status))
 
@@ -1289,7 +1227,7 @@ def _prove_with_gurobi(
         obj_val = model.ObjVal
         weight_matrix = np.zeros((n, n))
         for (u, v) in pairs:
-            weight_matrix[u, v] = w[u, v].X
+            weight_matrix[u, v] = gvars[var(("w", u, v))].X
 
     gap_zero = (model.Status == _GRB.OPTIMAL)
     if model.Status == _GRB.TIME_LIMIT and model.SolCount > 0:
@@ -1360,85 +1298,22 @@ def prove_directed_multigraph(
     num_vars = len(var)
 
     # ----- assemble the linear constraints ----------------------------------
-    # One shared accumulator (the cut-counting skeleton, see _MilpRows); add_row
-    # appends one inequality lower <= (sum of coeff*var) <= upper.
     acc = _MilpRows()
-    add_row = acc.add_row
-
-    # (1)+(2) The cut-counting core: for every ordered pair pick one cut and cap
-    # its crossing weight at one, i.e. maxflow(s,t) <= 1.  cap=1 here because the
-    # weights w already live in [0,1] after the (m-1) scaling.
     _add_crossing_cut_rows(acc, var, pairs, weight_key="w", cap=1.0)
 
-    # (3) z = min(w[s,x], w[x,t]) via McCormick with the selector b, and
-    # (4) the two-hop inequality w[s,t] + sum_x z <= 1.
+    # (3)+(4) Two-hop tightening cuts: w[s,t] + sum_x min(w[s,x],w[x,t]) <= 1.
+    # Each min is linearised via McCormick with a binary selector b (see
+    # _add_two_hop_rows for the full explanation).
     if use_two_hop:
-        for (s, x, t) in triples:
-            z = var(("z", s, x, t))
-            b = var(("b", s, x, t))
-            w_sx = var(("w", s, x))
-            w_xt = var(("w", x, t))
-            # CONSTRAINT (3), exact min via the McCormick linearisation with a
-            # binary selector b that says which of the two arcs is the smaller:
-            add_row([(z, 1.0), (w_sx, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_sx
-            add_row([(z, 1.0), (w_xt, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_xt
-            add_row([(z, 1.0), (w_sx, -1.0), (b, -1.0)], lower=-1.0, upper=np.inf)  # z >= w_sx + b - 1
-            add_row([(z, 1.0), (w_xt, -1.0), (b, 1.0)], lower=0.0, upper=np.inf)    # z >= w_xt - b
-            # Together the four rows pin z to exactly min(w_sx, w_xt): b=1 makes
-            # the lower bounds active for w_sx, b=0 for w_xt.
-        for (s, t) in pairs:
-            # CONSTRAINT (4), the two-hop inequality: the direct arc plus the
-            # best single detour through any x cannot give a flow above one.
-            # Valid for ANY flow-one matrix, so it only sharpens the relaxation.
-            add_row(
-                [(var(("w", s, t)), 1.0)]
-                + [(var(("z", s, x, t)), 1.0) for x in range(n) if x != s and x != t],
-                lower=-np.inf, upper=1.0,
-            )
+        _add_two_hop_rows(acc, var, n, pairs, triples)
 
-    # (5) Degree-ordering symmetry break: d(v_0) <= ... <= d(v_{n-1}) (see
-    # _add_degree_order_rows).  Prunes relabelled duplicates without cutting the
-    # optimum.
+    # (5) Degree-ordering symmetry break: prunes relabelled duplicates.
     if use_symmetry_breaking:
         _add_degree_order_rows(acc, var, n, weight_key="w")
 
-    # (6) Deletion and degree-pair cuts (added by Claude, PENDING REVIEW).
-    # All three families are proved valid inequalities, so they only sharpen
-    # the LP relaxation; none cuts a feasible point:
-    #  (6a) restricting a feasible weighting to V minus {v} stays feasible, so
-    #       sum(w) - d(v) <= M*(n-1) for every v (proved smaller value);
-    #  (6b) likewise for a deleted pair {u,v}:
-    #       sum(w) - d(u) - d(v) + w[u,v] + w[v,u] <= M*(n-2);
-    #  (6c) flow(s,t) >= w[s,t] + sum_x (w[s,x] + w[x,t] - 1) rearranges to
-    #       d+(s) + d-(t) - w[s,t] <= n - 1 (tight on the bipartite branch).
+    # (6) Deletion and degree-pair valid inequalities (see _add_deletion_cut_rows).
     if use_deletion_cuts:
-        if n - 1 in _PROVEN_MSTAR:
-            for v in range(n):
-                merged: dict[int, float] = {}
-                for (a, b) in pairs:  # sum(w) minus v's degree = weight off v
-                    if a != v and b != v:
-                        merged[var(("w", a, b))] = 1.0
-                add_row(list(merged.items()),
-                        lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 1]))
-        if n - 2 in _PROVEN_MSTAR:
-            for u in range(n):
-                for v in range(u + 1, n):
-                    merged = {}
-                    for (a, b) in pairs:
-                        if a not in (u, v) and b not in (u, v):
-                            merged[var(("w", a, b))] = 1.0
-                    add_row(list(merged.items()),
-                            lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 2]))
-        for (s, t) in pairs:
-            merged = {}
-            for x in range(n):
-                if x != s:
-                    merged[var(("w", s, x))] = merged.get(var(("w", s, x)), 0.0) + 1.0
-                if x != t:
-                    merged[var(("w", x, t))] = merged.get(var(("w", x, t)), 0.0) + 1.0
-            merged[var(("w", s, t))] = merged.get(var(("w", s, t)), 0.0) - 1.0
-            add_row([(c, k) for c, k in merged.items() if abs(k) > 1e-12],
-                    lower=-np.inf, upper=float(n - 1))
+        _add_deletion_cut_rows(acc, var, n, pairs)
 
     constraint = acc.constraint(num_vars)
 
@@ -1495,8 +1370,6 @@ def prove_directed_multigraph(
     )
 
 
-
-
 ######################################################################
 ##
 ##  CHAPTER 3 — DISCOVERING BOUNDS BY SEARCH
@@ -1504,20 +1377,7 @@ def prove_directed_multigraph(
 ##
 ######################################################################
 
-# ==================================================================
-# SENSITIVITY  (how load-bearing each edge is)
-# ------------------------------------------------------------------
-# WHAT: for an edge e define its sensitivity
-#       sigma(e) = lambda^max(G) - lambda^max(G - e),
-# the amount by which deleting e relaxes the binding connectivity.  A
-# load-bearing edge sits on a tightest cut and has positive sigma; a free edge
-# has sigma = 0 and can be moved somewhere more useful.
-# HOW IT FITS: this is precisely the dial the temperature search turns.  A hot
-# search ignores sigma; as it cools it disturbs load-bearing edges less and less
-# until only free edges still move and the graph settles onto an extremal shape.
-# The same numbers colour the figures that show WHY an extremiser is extremal.
-# DEPENDENCIES: max_edge_connectivity (Section 3), Graph (Section 1).
-# ==================================================================
+# --- SENSITIVITY: sigma(e) = lambda^max(G) - lambda^max(G-e); dial for the cooling schedule ---
 
 # A connectivity measure maps a graph to its lambda^max or kappa^max.
 ConnectivityMeasure = Callable[[Graph], int]
@@ -1569,35 +1429,8 @@ def sensitivity_map(
     return result
 
 
-# ==================================================================
-# SEARCH  (find a dense graph by trial and error)  [DISCOVER]
-# ------------------------------------------------------------------
-# WHAT: a guided random search over the space of graphs, seeking the densest
-# graph on n vertices with connectivity within the forbidden bound (lambda^max
-# <= m-1, or kappa^max <= m-1).  Each graph is a state with energy
-#       E(G) = -|E(G)| + penalty * max(0, connectivity(G) - (m - 1)),
-# which rewards edges and punishes excess connectivity.
-#
-# A move toggles one adjacency.  ACCEPTANCE RULE: a move that lowers the energy
-# is always accepted; a worsening move is accepted only with probability
-# exp(-Delta E / T) -- so a worse graph is taken sometimes, which is what lets
-# the search climb out of dead ends (this accept-worse rule, together with the
-# cooling below, is the method known as simulated annealing).  TEMPERATURE
-# SCHEDULE: T starts high at T_0 and is multiplied by a factor < 1 every step
-# (it "cools"), so early on almost any move is accepted (wide roaming, willing to
-# break load-bearing edges) and late on only improving moves survive.
-#
-# SENSITIVITY-GUIDED MOVES: when removing an edge we sample it with probability
-# proportional to exp(-sigma(e) / T).  Hot searches ignore sensitivity; cold
-# searches almost never propose removing a load-bearing edge.  This literally is
-# the dial the thesis describes: cooling shifts removals from "anything" toward
-# "only free edges", settling the graph onto an extremal shape.
-#
-# HONESTY: the search only ever produces a concrete graph, hence a LOWER bound;
-# it never proves no denser graph exists.  That is the prover's job.
-# DEPENDENCIES: max_edge/vertex_connectivity (Section 3), sensitivity_map
-# (Section 6), Graph/Variant (Section 1), math, random.
-# ==================================================================
+# --- SEARCH: simulated annealing; E = -|E(G)| + penalty*max(0,lambda^max-(m-1)) ---
+# Metropolis rule with geometric cooling; removal proposals biased by edge sensitivity.
 
 
 @dataclass
@@ -1936,29 +1769,7 @@ def best_of_searches(
     return max(results, key=lambda r: r.best_edge_count)
 
 
-# ==================================================================
-# SOLVE  (the one unified driver)
-# ------------------------------------------------------------------
-# WHAT: a single entry point that ties the whole program together.  You give it
-# the problem axes -- n, m, the directed/simple/hypergraph booleans (and the
-# hyperedge size r), and the edge-vs-vertex separation -- plus one switch:
-#   exhaustive=True   try to PROVE the exact extremal value: by a pruned
-#                     exhaustive digraph search (simple directed), the cut-counting
-#                     (directed multigraph), or honest brute force otherwise.
-#   exhaustive=False  DISCOVER a dense feasible example within a time budget
-#                     (random search for graphs, a randomised greedy
-#                     search for hypergraphs).
-# It returns a SolveResult carrying the value and an honest label saying whether
-# that value is "exact" (proved), a "lower" bound (a witness was found), or an
-# "upper" bound (proved nothing is denser, but with no matching witness in this
-# exact variant).  HOW IT FITS: every earlier section is a tool; this is the
-# front door that picks the right tool for the requested case, so a single call
-# -- not a bespoke script -- answers any of the variants.  The time budget is
-# always respected: an exhaustive run that cannot finish reports the best value
-# it managed to establish, flagged as incomplete.
-# DEPENDENCIES: essentially everything above (checker, prover, search,
-# constructions) and time for the budget.
-# ==================================================================
+# --- SOLVE: unified driver; exhaustive=True proves, exhaustive=False discovers ---
 
 
 @dataclass
@@ -2366,8 +2177,6 @@ def solve(
                        time.time() - start, done, witness, note)
 
 
-
-
 ######################################################################
 ##
 ##  CHAPTER 4 — SYNTHESIS AND RESULTS
@@ -2375,20 +2184,7 @@ def solve(
 ##
 ######################################################################
 
-# ==================================================================
-# MONTE CARLO  (random-graph sampling)  [OBSERVE]
-# ------------------------------------------------------------------
-# WHAT: the random graph G(n, p) is the fourth model, best studied by sampling.
-# This module draws many random graphs/digraphs, measures each with the EXACT
-# checker, and averages.  Two quantities: the appearance probability (fraction of
-# samples with lambda^max >= m, whose sweep against p traces the threshold at
-# p* = m/n), and the average lambda^max (typical binding connectivity).
-# HOW IT FITS: nothing here PROVES anything; a Monte Carlo estimate is an
-# estimate.  Its role is to make the proved threshold VISIBLE and to let the
-# random model be explored at sizes where exact enumeration is hopeless.
-# DEPENDENCIES: max_edge/vertex_connectivity (Section 3), Graph and the simple
-# variant flags (Section 1), random.
-# ==================================================================
+# --- MONTE CARLO: sample G(n,p) graphs, measure with exact checker, average ---
 
 
 def sample_random_graph(n: int, p: float, directed: bool, rng: random.Random) -> Graph:
@@ -2520,19 +2316,7 @@ def edge_vertex_distribution(
     return lambda_max, kappa_max
 
 
-# ==================================================================
-# SAMPLING ALL TWELVE VARIANTS  (one random model per generative shape)
-# ------------------------------------------------------------------
-# G(n,p) extends to the other models by a single rule: every cell -- a pair, an
-# ordered pair, or an r-set -- gets an i.i.d. weight.  Simple graphs and
-# hypergraphs draw Bernoulli(p); a multigraph draws a hurdle-geometric weight,
-# empty w.p. 1-p and otherwise 1 + Geometric(alpha) copies, so the multiplicity
-# decays exponentially and alpha=0 recovers G(n,p).  The natural common scale is
-# the expected (Berge) degree, on which p* = m/n is the simple-graph face of the
-# asymptotic statement "expected degree = m" (the m/ln n -> infinity regime of
-# thm:gnp-threshold).  At the finite m a computation reaches, the models are
-# ORDERED rather than coincident -- see plot_degree_threshold.
-# ==================================================================
+# --- SAMPLING ALL VARIANTS: Bernoulli for simple/hypergraph, hurdle-geometric for multigraph ---
 
 
 def sample_random_multigraph(
@@ -2650,20 +2434,7 @@ _VARIANT_SAMPLE_CONFIGS: list[dict] = [
 ]
 
 
-# ==================================================================
-# FIGURES  (matplotlib plots and drawings)
-# ------------------------------------------------------------------
-# WHAT: figure emitters that turn the program's findings into thesis-ready PNGs.
-# Each function takes an output path and writes a file, using the Agg backend
-# (selected once, up top) so the scripts run head-less.
-# HOW IT FITS: these functions are intentionally free of any computation beyond
-# plotting; the numbers come from BOUNDS, SEARCH and SENSITIVITY, so a figure
-# can never silently disagree with the rest of the program.  The palette echoes
-# the KU Leuven blues of the document.
-# DEPENDENCIES: matplotlib.pyplot, networkx, bounds functions (Section 2),
-# SearchResult (Section 9), sensitivity_map (Section 6), Graph (Section 1),
-# pathlib.
-# ==================================================================
+# --- FIGURES: headless matplotlib PNGs; each function takes a path and writes a file ---
 
 _KUL_BLUE = "#1D8DB0"
 _KUL_DARK = "#1E6E87"
@@ -3239,8 +3010,6 @@ def _save(path: str | Path) -> None:
     plt.close()  # release the figure so head-less runs don't leak memory
 
 
-
-
 # --- two figures added for the discovery chapter ---
 
 _GREEN = "#3CA050"
@@ -3378,18 +3147,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     _save(path)
 
 
-# ==================================================================
-# ENUMERATION LANDSCAPES  (scatter and distribution figures)
-# ------------------------------------------------------------------
-# enumerate_all_graphs visits every labeled graph of a given type on n
-# vertices and returns (edge_count, lambda_max) for each.  This is the
-# exhaustive enumeration of the search space, not a sample.
-#
-# The n values are chosen so the enumeration stays under ~10^6 candidates
-# (see _VARIANT_ENUM_CONFIGS below), keeping a single-variant run under
-# about five minutes.  Results are written to a pickle cache so subsequent
-# make_figures runs are instant.
-# ==================================================================
+# --- ENUMERATION LANDSCAPES: visit every labeled graph, collect (edges, lambda^max) ---
 
 # Row-major table of all twelve variants, matching gather_variant_grid.
 # ``enum_n`` is the vertex count used for full enumeration.
@@ -3735,14 +3493,7 @@ def plot_edge_dist_grid(
                        row_label_fontsize=11)
 
 
-# ==================================================================
-# 3-D BOUND SURFACE  (solve over the (n, m) grid)
-# ------------------------------------------------------------------
-# compute_surface_cache runs solve() at every (variant, n, m) triple and
-# writes a JSON cache.  Re-running reads the cache and skips done entries,
-# so the computation can be interrupted and resumed.  plot_variant_3d_surfaces
-# reads the cache and draws the twelve-panel 3-D figure.
-# ==================================================================
+# --- 3-D BOUND SURFACE: cache solve() over (variant, n, m) grid; plot_variant_3d_surfaces draws it ---
 
 # 12 variant configs for the surface computation.
 _SURFACE_VARIANT_CONFIGS: list[dict] = [
@@ -3975,14 +3726,7 @@ def plot_variant_3d_surfaces(
     plt.close()
 
 
-# ==================================================================
-# 3-D THRESHOLD HISTOGRAM  (random model, binding connectivity vs p)
-# ------------------------------------------------------------------
-# For three representative variants (undirected edge, directed arc,
-# hypergraph edge), sample G(n, p) at many p values and show the
-# connectivity distribution as a 3-D bar chart, revealing the sharp
-# threshold at p* = m/n.
-# ==================================================================
+# --- 3-D THRESHOLD HISTOGRAM: lambda^max distribution vs p for three variants ---
 
 
 def plot_conn_threshold_3d(
@@ -4087,37 +3831,7 @@ def plot_conn_threshold_3d(
     plt.close()
 
 
-# ==================================================================
-# OPEN-VARIANT EXPLORATION  (added by Claude, 2026-06, PENDING AUTHOR REVIEW)
-# ------------------------------------------------------------------
-# WHAT: verification tools for the previously open variants attacked in the
-# accompanying notes (claude.md and the commented-out blocks in the LaTeX):
-#
-#   1. The hypergraph VERTEX-disjoint problem at m = 2 (Theorem: the value is
-#      floor((n-1)/(r-1)), the same as the edge problem -- proof via the
-#      incidence-forest characterisation; rigorous, all n and r).
-#      `hypergraph_vertex_m2` is the proved value, `verify_hyper_vertex_value`
-#      is the exhaustive small-case confirmation.
-#   2. The vertex value k_m^{(r)}(n) = floor((m-1)(n-1)/(r-1)) for r >= 3:
-#      PROVED for m = 3 as well (incidence rank lemma via Tutte's
-#      triconnected decomposition; see lem:incidence-rank /
-#      thm:hyper-vertex-m3 in the commented appendix block).  Lower bound
-#      for all m via Whitney + the simple sparse construction; open m >= 4.
-#      `verify_hyper_vertex_value` with m >= 3 sweeps multi-hypergraphs
-#      exhaustively at small sizes (confirmed: r=3 at n=5,6 for m=3, n=5
-#      for m=4, and 150 random maximal sets at n=7, m=3 cap at 6).
-#   3. The fractional relaxation behind conj:min-degree (directed multigraph,
-#      odd n).  `fractional_flows_feasible` checks the all-pairs max-flow
-#      ceiling for a [0,1]-weighting; `fractional_search` is a counterexample
-#      hunter for both the minimum-degree and the total-weight versions.
-#      No counterexample exists at n = 7, 9 (bipartite point is rigid).
-#
-# HOW IT FITS: everything here uses only the existing checker
-# (`hyper_connectivity` with ``vertex_split=True``) and networkx max-flow, so
-# a positive verification is exactly as trustworthy as the chapter-2 checker.
-# Nothing below is called by the self-test by default; suggested (commented)
-# checks are listed at the bottom of `_run_checks`.
-# ==================================================================
+# --- OPEN-VARIANT EXPLORATION: hypergraph vertex connectivity, fractional search tools ---
 
 
 def hypergraph_vertex_m2(n: int, r: int) -> int:
@@ -4531,16 +4245,7 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     return representatives
 
 
-
-
-# ==================================================================
-# GALLERY  --  all non-isomorphic extremal graphs for small (n, m)
-# ------------------------------------------------------------------
-# Public entry-point: gallery_extremal_graphs().
-# Internal helpers: _graph_from_mu, _aut_count_matrix, _hyper_canonical,
-# _aut_count_hyper, _hyper_to_lists, _enum_matrix_extremals,
-# _enum_hyper_extremals, save_gallery_json.
-# ==================================================================
+# --- GALLERY: all non-isomorphic extremal graphs for small (n, m); entry point gallery_extremal_graphs ---
 
 
 def _graph_from_mu(mu: np.ndarray, variant: Variant) -> Graph:
@@ -5071,19 +4776,7 @@ def fractional_search(n: int, objective: str = "min_degree", steps: int = 6000,
     return best_w, best
 
 
-# ==================================================================
-# __main__  (the invariant self-check suite)
-# ------------------------------------------------------------------
-# WHAT: runs the full invariant suite, with no pytest needed, printing a
-# PASS/FAIL line for each and ending in either
-# "ALL CHECKS PASSED" (exit 0) or a failure count (exit 1).
-# HOW IT FITS: this is the program checking itself end to end -- the checker's
-# measurements against the proved m=2 values, the Gomory-Hu shortcut against the
-# brute-force checker, the named constructions against their predicted sizes and
-# connectivities, the hypergraph Berge values, the Monte Carlo threshold and the
-# Whitney inequality, the cut-counting optima for small n, and the search reaching
-# the proved optimum.
-# ==================================================================
+# --- SELF-CHECK: python erdos915_unified.py runs every invariant; exits 0 on all-PASS ---
 
 _failures = 0
 
