@@ -132,7 +132,7 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
 \label{fig:three-models}
 \end{figure}
 
-The second axis is the \emph{direction}: arcs may be one-way, and then a network can be lopsided in a manner no undirected graph can imitate. Although it might seem a generalisation of the undirected setting, they are distinct in complexity and methodology: the arcs $u \to v$ and $v \to u$ offer a round trip while the edge $uv$ doesn't. This distinction fades when we no longer distinguish paths by their edges, as in our next choice of interpretation.
+The second axis is the \emph{direction}: arcs may be one-way, and then a network can be lopsided in a manner no undirected graph can imitate. Although it might seem a generalisation of the undirected setting, they are distinct in complexity and methodology: the arcs $u \to v$ and $v \to u$ offer a round trip while the edge $uv$ does not. This distinction fades when we no longer distinguish paths by their edges, as in our next choice of interpretation.
 
 The third axis is the \emph{separation}: routes may be required to avoid sharing an edge, as above, or the stricter \emph{internally vertex-disjoint}, sharing no intermediate vertex, which gives the local vertex-connectivity $\kap_G(u, v)$ and its maximum $\kap_G^{\max}$. Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges, and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex.
 

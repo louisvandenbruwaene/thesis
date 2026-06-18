@@ -1186,7 +1186,7 @@ Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement fo
 
 \section{Computational transcripts}
 
-The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source accompanies the document as a single self-contained file, \texttt{erdos915\_unified.py} in the \texttt{program/} directory, which runs with only \texttt{numpy}, \texttt{networkx}, \texttt{scipy}, and \texttt{matplotlib}.
+The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source accompanies the document as a single self-contained file, \texttt{erdos915\_unified.py} in the \texttt{program/} directory, which runs with \texttt{numpy}, \texttt{networkx}, \texttt{scipy}, and \texttt{matplotlib}; an optional compiled helper accelerates selected small hot paths but is not needed for correctness.
 
 \lstinputlisting[style=pythonkul, language={}, caption={Solver output: $M^{*}(n) = 2(n-1)$, optimal with zero gap, for $n = 3, 4, 5, 6$.}]{figures/certificate_log.txt}
 

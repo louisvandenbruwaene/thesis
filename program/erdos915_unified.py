@@ -860,7 +860,7 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     n = graph.num_vertices
     if separation == "edge":
         mu = graph.mu
-        if _C is not None:
+        if _C is not None and n <= 16:
             flat, ptr = _c_flat(mu)
             directed = int(graph.variant.directed)
             return bool(_C.max_connectivity_exceeds(ptr, n, k, directed))
@@ -3993,7 +3993,7 @@ def _canonical_form(mu: np.ndarray) -> bytes:
     the number of labelled copies.
     """
     n = mu.shape[0]
-    if _C is not None:
+    if _C is not None and n <= 7:
         flat, ptr = _c_flat(mu)
         out = np.empty(n * n, dtype=np.int32)
         out_ptr = out.ctypes.data_as(_ct.POINTER(_ct.c_int))

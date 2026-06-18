@@ -20,9 +20,11 @@ chapters/             the thesis text (ch1 base cases, ch2 certify, ch3 discover
 main.tex, preamble.tex, ref.bib, kulakreport.cls, *.pdf/*.png   LaTeX sources + logos
 figures/              all figures: matplotlib PNGs + their data caches
 program/
-  erdos915_unified.py one file: the model, exact max-flow checker, cut-counting
-                      certifier, simulated-annealing search, and the proof-support
-                      solvers. ALL runnable code lives here (project rule).
+  erdos915_unified.py one Python driver: the model, exact max-flow checker,
+                      cut-counting certifier, simulated-annealing search, and
+                      the proof-support solvers.
+  _erdos_fast.c       optional C hot-path helper, built as _erdos_fast.so
+                      by build_fast.sh; correctness does not depend on it.
   make_figures.py     regenerates every figure from the program (fixed seeds)
   tests/              unit tests
 popularising_summary/ lay summary

@@ -1,11 +1,12 @@
 # erdos915: the unified program
 
-One self-contained Python file, `erdos915_unified.py`, that models every variant
-of Erdős Problem 915, measures connectivity exactly, certifies upper bounds for
-small sizes, and searches for extremal graphs with a temperature-guided walk. It
-is written to be read top to bottom: clear names, docstrings everywhere, and a
-strict separation between what is *measured*, what is *proved*, and what is merely
-*discovered*.
+One main Python file, `erdos915_unified.py`, models every variant of Erdős
+Problem 915, measures connectivity exactly, certifies upper bounds for small
+sizes, and searches for extremal graphs with a temperature-guided walk. It is
+written to be read top to bottom: clear names, docstrings everywhere, and a
+strict separation between what is *measured*, what is *proved*, and what is
+merely *discovered*. An optional C helper accelerates small hot paths, but the
+Python implementation is the correctness path.
 
 There is one solver. Whatever the question, you call `solve(...)`: it picks the
 right method for the case (brute-force enumeration, the pruned exhaustive search,
@@ -21,6 +22,9 @@ program/
                         Gomory-Hu, the cut-counting certifier, sensitivity, the
                         temperature search, solve(), the random-model sampling,
                         the figure routines, and a self-check in __main__
+  _erdos_fast.c         optional C hot-path helpers for small max-flow and
+                        canonical-form calls
+  build_fast.sh         builds the optional _erdos_fast.so accelerator
   make_figures.py       regenerates every thesis figure into ../figures/
   tests/                an extensive unittest suite covering the whole program
   README.md             this file
@@ -28,7 +32,9 @@ program/
 
 ## Requirements
 
-`numpy`, `networkx`, `scipy`, `matplotlib`. No other dependencies, no build step.
+`numpy`, `networkx`, `scipy`, `matplotlib`. The program runs without a build
+step; `bash build_fast.sh` optionally compiles `_erdos_fast.so` to accelerate
+small hot-path searches.
 
 One optional extra: `enumerate_extremal_directed_multigraphs_via_generation` (the
 sound, generation-based directed-multigraph enumerator that follows J. Goedgebeur's

@@ -19,3 +19,4 @@ program/logs/
 *.lot
 *.synctex.gz
 program/erdos915_unified.baseline.py
+program/_erdos_fast.so
