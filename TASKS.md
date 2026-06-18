@@ -41,6 +41,12 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       (below) attack these numerically; a clean structural proof would be stronger and
       is independently interesting. (m=3 directed multigraph closes the moment these land.)
 
+## C EXTENSION DONE 2026-06-19 (commit 5c00dd8, both repos pushed)
+_erdos_fast.c + build_fast.sh: tiny_maxflow (~2x dense), max_connectivity_exceeds (2.2x),
+canonical_form_min (147x). Pure-Python fallback intact; 77/77 tests pass with C loaded.
+Rebuild: `cd program && bash build_fast.sh`. Next: parallel sensitivity_map + parallel geng
+enumeration (plan: dazzling-finding-codd.md steps 3–4, each ~4–6x additional gain).
+
 ## BIG COMPUTATIONS — MEMORY SOLVED, RUNTIME IS THE WALL (measured 2026-06-16)
 Phase E fixed the crash: every measurement below stayed <320 MB RSS, the ~22 GB
 blow-up is gone, both jobs are now SAFE to leave running. But runtime, not RAM, is
