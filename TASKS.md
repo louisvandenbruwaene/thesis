@@ -75,13 +75,23 @@ the bottleneck and the Phase A-E speedups did not touch it. Empirical n-scaling:
         targets/caps) and n=5 (doubled P_5; 3 doubled trees). Degree-gated feasibility
         (flow<=min(outdeg,indeg)) + dropped a redundant _tiny_maxflow .copy() cut n=5
         cap=8 from 91s to 41s. Unit test tests/test_solve.GengGeneration.
-  - [ ] n=7 fact (b) NOT yet closed. The 2026-06-18 background run was interrupted
-        (logs/geng_n7_20260618.log has START but no result; no job running as of
-        2026-06-19). n=5 cap=8 ~41s, n=6 cap=8 several min, so n=7 is a multi-hour wall
-        even for the geng path. Needs ONE long uninterrupted run (memory-safe, so it will
-        not crash the desktop) or a cluster. Expect {2B_{3,4}, 2B_{4,3}, doubled P_7}.
-        Runtime, not soundness, is the only obstacle. Launch:
-        `cd program && timeout 21600 python -c "from erdos915_unified import \
+  - [ ] n=7 fact (b) NOT yet closed; the wall is now empirically > 6 HOURS.
+        A clean single-threaded geng run (e(7,3,24,max_degree=8)) was launched
+        2026-06-19 09:35 and TIMED OUT at the 6h cap (rc=124, memory-safe the whole
+        time, ~126 MB RSS, so it never risks the desktop). Scaling: n=5 cap=8 ~31-41s,
+        n=6 cap=8 several min, n=7 > 6h. So a plain re-run will NOT finish in a normal
+        sitting. Real options, in order of effort:
+        (1) PARALLELISE the generation enumerator across CPU cores at the support level
+            (geng emits supports independently; decorate+dedup per support is embarrassingly
+            parallel). TASKS already flags ~4-6x; on this box that could bring 6h+ under ~1-1.5h.
+            Add per-support Aut dedup (directg -G) + arc/degree prefilter so work scales with
+            non-iso MULTIGRAPHS, not labelled prefixes. Needs care (keep the canonical-dedup
+            source of truth; validate == DFS set at n=4,5 before trusting n=7).
+        (2) Run it overnight/uninterrupted with a larger cap, or on the KU Leuven cluster.
+        (3) Fact (a) via Gurobi MILP (academic licence) - independent of (b).
+        Expect {2B_{3,4}, 2B_{4,3}, doubled P_7}. Runtime, not soundness, is the obstacle.
+        Plain relaunch (will exceed 6h):
+        `cd program && nohup timeout 36000 python -u -c "from erdos915_unified import \
           enumerate_extremal_directed_multigraphs_via_generation as e; \
           print(e(7,3,24,max_degree=8))" > logs/geng_n7_$(date +%Y%m%d).log 2>&1 &`
 
