@@ -7,6 +7,7 @@ import numpy as np
 
 from erdos915_unified import (
     MULTI_DIRECTED,
+    PULP_AVAILABLE,
     Graph,
     _canonical_form,
     enumerate_extremal_directed_multigraphs,
@@ -15,6 +16,7 @@ from erdos915_unified import (
 )
 
 
+@unittest.skipUnless(PULP_AVAILABLE, "the MILP certifier needs the optional pulp")
 class Prover(unittest.TestCase):
     def test_small_optima_are_proved(self):
         # M*(n) = 2(n-1), optimal with zero gap, for the reachable sizes.

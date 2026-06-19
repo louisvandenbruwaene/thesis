@@ -1,0 +1,20 @@
+# Dependencies for erdos915_unified.py.
+#
+# Core (required): the model, the connectivity checker, the search, the
+# enumeration, the random-model sampling, and the built-in self-test all run on
+# these two alone, because every connectivity measure is one scipy integer
+# maximum flow on a capacity matrix.
+numpy>=2.0
+scipy>=1.13
+
+# MILP certifier (prove_directed_multigraph / prove_integral_arc_bound): one
+# solver-agnostic cut-counting model. pulp ships CBC; pass use_gurobi=True to
+# switch to Gurobi. Pinned below 4.0, whose API rename would otherwise break the
+# stable 3.x calls this program uses.
+pulp>=2.8,<4
+
+# Optional, presentation only. matplotlib renders the figures (make_figures.py);
+# networkx supplies the Gomory-Hu tree behind one figure. Everything else, including
+# the test suite, runs without them.
+# matplotlib>=3.8
+# networkx>=3.0

@@ -91,19 +91,14 @@ from typing import Callable, Iterator
 import concurrent.futures
 
 import numpy as np
-from scipy import sparse
-from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.sparse import csr_matrix as _csr
 from scipy.sparse.csgraph import maximum_flow as _csgraph_maxflow
 
 # networkx is OPTIONAL.  Every connectivity measure the thesis reports is computed
-# through scipy's integer max-flow on a capacity matrix (see _split_value and
-# _hyper_value below), so the core checker, search, provers, and enumeration run on
-# numpy + scipy alone.  networkx is needed only for three non-core extras: the
-# Gomory-Hu tree (a figure/analysis helper), the circular layout used when drawing a
-# graph, parsing geng's graph6 output, and the fractional max-flow helper (float
-# capacities, which scipy's integer routine cannot take).  Each of those raises a
-# clear message if called without networkx installed.
+# through scipy's integer max-flow on a capacity matrix, so the core checker,
+# search, provers, and enumeration run on numpy + scipy alone.  networkx is needed
+# only for the Gomory-Hu tree (one figure/analysis helper), which raises a clear
+# message if called without it installed.
 try:
     import networkx as nx
     NETWORKX_AVAILABLE = True
@@ -120,12 +115,31 @@ def _require_networkx(feature: str):
             f"measures do not: they run on numpy + scipy alone."
         )
 
+# pulp is OPTIONAL.  It backs the MILP certifier (prove_directed_multigraph and
+# prove_integral_arc_bound): one solver-agnostic cut-counting model that CBC (pulp's
+# bundled solver) runs by default and Gurobi runs by a one-line switch.  The model,
+# checker, search, enumeration, and sampling do not need it.
 try:
-    import gurobipy as _gp
-    from gurobipy import GRB as _GRB
-    GUROBI_AVAILABLE = True
+    import pulp
+    # pulp 3.x emits migration notices for its 4.0 API (LpVariable construction,
+    # the PULP_CBC_CMD name).  We use the stable 3.x API on purpose and pin it in
+    # requirements.txt, so silence that forward-looking noise.
+    import warnings as _warnings
+    _warnings.filterwarnings("ignore", message=r".*PuLP 4\.0.*",
+                             category=DeprecationWarning)
+    PULP_AVAILABLE = True
 except ImportError:
-    GUROBI_AVAILABLE = False
+    pulp = None
+    PULP_AVAILABLE = False
+
+
+def _require_pulp():
+    """Raise a clear error when the MILP certifier is used without pulp installed."""
+    if not PULP_AVAILABLE:
+        raise ImportError(
+            "the MILP certifier needs pulp (pip install pulp). The checker, search, "
+            "and enumeration do not: they run on numpy + scipy alone."
+        )
 
 import ctypes as _ct
 _C = None
@@ -941,7 +955,7 @@ class ProofResult:
     n: int
     status: str               # OPTIMAL, LIMIT, INFEASIBLE, UNBOUNDED, ...
     scaled_optimum: float     # M*(n) = max total weight, exact if status OPTIMAL
-    relative_gap_zero: bool   # whether HiGHS closed the gap to zero
+    relative_gap_zero: bool   # whether the solver closed the gap to zero
     solve_seconds: float
     weight_matrix: np.ndarray | None  # a witnessing matrix w, if one was found
 
@@ -955,24 +969,6 @@ class ProofResult:
         # Only an OPTIMAL solve with a closed gap counts as a proof; a LIMIT
         # (timed out) result is merely a feasible lower bound, never a proof.
         return self.status == "OPTIMAL" and self.relative_gap_zero
-
-
-class _VariableIndex:
-    """A tiny registry mapping named variables to contiguous integer columns."""
-
-    def __init__(self) -> None:
-        self._index: dict[tuple, int] = {}
-
-    def declare(self, key: tuple) -> None:
-        # First time we see a named variable, assign it the next column index.
-        if key not in self._index:
-            self._index[key] = len(self._index)
-
-    def __call__(self, key: tuple) -> int:
-        return self._index[key]  # look up the column of a declared variable
-
-    def __len__(self) -> int:
-        return len(self._index)
 
 
 def _ordered_pairs(n: int) -> list[tuple[int, int]]:
@@ -993,280 +989,118 @@ _PROVEN_MSTAR = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}
 
 
 # ------------------------------------------------------------------
-# Shared cut-counting MILP skeleton
+# The cut-counting MILP: one PuLP model for both provers, any solver
 # ------------------------------------------------------------------
-# The two provers below -- the fractional one (prove_directed_multigraph, which
-# scales m out and maximises the total weight M*(n)) and the integral one
-# (prove_integral_arc_bound, which decides feasibility at a fixed arc target) --
-# are the SAME cut-counting optimisation over two different weight domains.  The
-# pieces they share verbatim live here, parameterised by the weight variable's
-# key ("w" continuous in [0,1], or "mu" integer in {0..m-1}) and the cut
-# capacity ``cap`` (1 for the scaled prover, m-1 for the integral one).  The
-# two-hop min-linearisation and the deletion cuts differ between the two and so
-# stay inline in each.
+# The two provers below are the SAME cut-counting optimisation over two weight
+# domains: the fractional one (prove_directed_multigraph, weights w in [0, 1], cut
+# cap 1) maximises the total weight M*(n); the integral one (prove_integral_arc_
+# bound, multiplicities mu in {0..m-1}, cut cap m-1) decides feasibility at a fixed
+# arc target.  One builder serves both, and any MILP solver runs it: CBC (bundled
+# with pulp) by default, Gurobi by a one-line switch.  Because the cut formulation
+# is exact and not a relaxation, an OPTIMAL or INFEASIBLE verdict is a genuine proof.
 
-class _MilpRows:
-    """A growing sparse constraint system in COO form.
+_PULP_STATUS = {"Optimal": "OPTIMAL", "Infeasible": "INFEASIBLE",
+                "Unbounded": "UNBOUNDED"}
 
-    ``add_row`` appends one inequality ``lower <= sum(coef * var) <= upper``;
-    ``constraint`` packs everything into the ``scipy`` LinearConstraint the
-    solver consumes.  Both cut-counting provers build the identical kind of
-    system, so they share this accumulator.
+
+def _pick_solver(time_limit: float, show_log: bool, use_gurobi: bool | None):
+    """Choose the MILP solver.  ``gapRel=0`` demands a closed gap, which is what
+    makes an OPTIMAL verdict a proof rather than a heuristic.
+
+    ``use_gurobi``: ``True`` forces Gurobi (error if it is not usable), ``False``
+    forces CBC, ``None`` uses Gurobi when its licence is active and CBC otherwise.
+    Switching to Gurobi is the whole change needed to attack the open n=7 facts.
     """
-
-    def __init__(self) -> None:
-        self.rows: list[int] = []
-        self.cols: list[int] = []
-        self.data: list[float] = []
-        self.lower: list[float] = []
-        self.upper: list[float] = []
-        self.n_rows = 0
-
-    def add_row(self, terms: list[tuple[int, float]], lower: float, upper: float) -> None:
-        for column, coefficient in terms:
-            self.rows.append(self.n_rows)
-            self.cols.append(column)
-            self.data.append(coefficient)
-        self.lower.append(lower)
-        self.upper.append(upper)
-        self.n_rows += 1
-
-    def constraint(self, num_vars: int) -> LinearConstraint:
-        return LinearConstraint(
-            sparse.csr_matrix((self.data, (self.rows, self.cols)),
-                              shape=(self.n_rows, num_vars)),
-            self.lower, self.upper)
-
-
-def _add_crossing_cut_rows(acc: _MilpRows, var: _VariableIndex,
-                           pairs: list[tuple[int, int]], weight_key: str,
-                           cap: float) -> None:
-    """The cut-counting core, shared by both provers.
-
-    For every ordered pair (s, t) the optimisation chooses one cut via the side
-    indicators x, and the helper p picks up each crossing arc's weight: the
-    constraint ``p >= weight + cap*(x_u - x_v) - cap`` forces ``p >= weight``
-    exactly on a crossing arc (x_u=1, x_v=0) and leaves p free at 0 otherwise.
-    Capping the crossing total at ``cap`` then says maxflow(s, t) <= cap.  With
-    cap=1, weight_key="w" this is the scaled prover; with cap=m-1,
-    weight_key="mu" the integral one -- the rows are identical up to that scale.
-    """
-    for (s, t) in pairs:
-        for (u, v) in pairs:
-            acc.add_row(
-                [(var(("p", s, t, u, v)), 1.0),
-                 (var((weight_key, u, v)), -1.0),
-                 (var(("x", s, t, u)), -cap),
-                 (var(("x", s, t, v)), cap)],
-                -cap, np.inf,
+    if use_gurobi is not False:
+        gurobi = pulp.GUROBI_CMD(msg=show_log, timeLimit=time_limit,
+                                 options=[("MIPGap", 0)])
+        if gurobi.available():
+            return gurobi
+        if use_gurobi is True:
+            raise RuntimeError(
+                "use_gurobi=True but no usable Gurobi was found. Install gurobipy "
+                "and activate a licence, then retry."
             )
-        acc.add_row([(var(("p", s, t, u, v)), 1.0) for (u, v) in pairs],
-                    -np.inf, cap)
+    return pulp.PULP_CBC_CMD(msg=show_log, timeLimit=time_limit, gapRel=0.0)
 
 
-def _add_degree_order_rows(acc: _MilpRows, var: _VariableIndex, n: int,
-                           weight_key: str) -> None:
-    """Symmetry break shared by both provers: order vertices by weighted total
-    degree d(v) = sum_u (w[u,v] + w[v,u]), forcing d(v_0) <= ... <= d(v_{n-1}).
-    Relabelling cannot change any flow, so this only prunes duplicate
-    relabellings of the same graph and never cuts the optimum.
-    """
-    for v in range(n - 1):
-        merged: dict[int, float] = {}
-        for u in range(n):
-            for (a, b, sign) in ((u, v + 1, 1.0), (v + 1, u, 1.0),
-                                 (u, v, -1.0), (v, u, -1.0)):
-                if a != b:
-                    column = var((weight_key, a, b))
-                    merged[column] = merged.get(column, 0.0) + sign
-        acc.add_row([(col, coef) for col, coef in merged.items()
-                     if abs(coef) > 1e-12], 0.0, np.inf)
+def _cut_counting_model(n: int, *, cap: float, integer: bool, two_hop: bool,
+                        symmetry: bool, deletion: bool, degree_pair: bool):
+    """Build the shared cut-counting MILP as a PuLP model (no objective set yet).
 
+    For every ordered pair (s, t) the model CHOOSES one cut: the side indicators
+    fix s on the source side (constant 1) and t on the sink side (constant 0), and
+    every other vertex takes a binary side.  The helper p picks up each crossing
+    arc's weight through ``p >= w + cap*(x_u - x_v) - cap``, which forces ``p >= w``
+    exactly on a crossing arc (x_u = 1, x_v = 0) and leaves p free at 0 otherwise.
+    Capping the crossing total at ``cap`` says maxflow(s, t) <= cap, and letting the
+    optimisation pick the cut means it picks the MINIMUM cut, so this is exactly
+    maxflow(s, t) <= cap, the true feasible region.  ``cap=1`` with continuous
+    weights is the scaled prover; ``cap=m-1`` with integer weights the arc one.
 
-def _add_two_hop_rows(acc: _MilpRows, var: _VariableIndex,
-                      n: int, pairs: list, triples: list) -> None:
-    """McCormick linearisation of min() for the two-hop tightening cuts.
-
-    For each (s, x, t) triple: introduce z = min(w[s,x], w[x,t]) via binary
-    selector b, then add w[s,t] + sum_x z <= 1.  Both provers use these rows.
-    """
-    add_row = acc.add_row
-    for (s, x, t) in triples:
-        z = var(("z", s, x, t))
-        b = var(("b", s, x, t))
-        w_sx = var(("w", s, x))
-        w_xt = var(("w", x, t))
-        add_row([(z, 1.0), (w_sx, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_sx
-        add_row([(z, 1.0), (w_xt, -1.0)], lower=-np.inf, upper=0.0)       # z <= w_xt
-        add_row([(z, 1.0), (w_sx, -1.0), (b, -1.0)], lower=-1.0, upper=np.inf)  # z >= w_sx+b-1
-        add_row([(z, 1.0), (w_xt, -1.0), (b, 1.0)], lower=0.0, upper=np.inf)    # z >= w_xt-b
-    for (s, t) in pairs:
-        add_row(
-            [(var(("w", s, t)), 1.0)]
-            + [(var(("z", s, x, t)), 1.0) for x in range(n) if x != s and x != t],
-            lower=-np.inf, upper=1.0,
-        )
-
-
-def _add_deletion_cut_rows(acc: _MilpRows, var: _VariableIndex,
-                            n: int, pairs: list) -> None:
-    """Deletion and degree-pair valid inequalities, shared by both provers.
-
-    Three families, all proved valid (restrict-and-compare, vertex-pair variant,
-    degree-pair flow lower bound):
-      (a) sum_{{a,b} off v} w[a,b] <= M*(n-1)  for each v
-      (b) sum_{{a,b} off {u,v}} w[a,b] <= M*(n-2)  for each pair
-      (c) d+(s) + d-(t) - w[s,t] <= n-1
-    """
-    add_row = acc.add_row
-    if n - 1 in _PROVEN_MSTAR:
-        for v in range(n):
-            terms = [(var(("w", a, b)), 1.0) for (a, b) in pairs
-                     if a != v and b != v]
-            add_row(terms, lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 1]))
-    if n - 2 in _PROVEN_MSTAR:
-        for u in range(n):
-            for v in range(u + 1, n):
-                terms = [(var(("w", a, b)), 1.0) for (a, b) in pairs
-                         if a not in (u, v) and b not in (u, v)]
-                add_row(terms, lower=-np.inf, upper=float(_PROVEN_MSTAR[n - 2]))
-    for (s, t) in pairs:
-        merged: dict[int, float] = {}
-        for x in range(n):
-            if x != s:
-                col = var(("w", s, x))
-                merged[col] = merged.get(col, 0.0) + 1.0
-            if x != t:
-                col = var(("w", x, t))
-                merged[col] = merged.get(col, 0.0) + 1.0
-        col_st = var(("w", s, t))
-        merged[col_st] = merged.get(col_st, 0.0) - 1.0
-        add_row([(c, k) for c, k in merged.items() if abs(k) > 1e-12],
-                lower=-np.inf, upper=float(n - 1))
-
-
-def _prove_with_gurobi(
-    n: int,
-    *,
-    time_limit: float,
-    use_two_hop: bool,
-    use_symmetry_breaking: bool,
-    use_deletion_cuts: bool,
-    show_solver_log: bool,
-) -> "ProofResult":
-    """Build and solve the M*(n) MILP using Gurobi.
-
-    Shares all constraint-building logic with the scipy path: builds the
-    variable index and constraint rows via the same helpers, then translates
-    the COO row data into Gurobi addConstr calls.  This ensures the two
-    backends always solve the identical model.
+    The optional families are all proved-valid inequalities that tighten the
+    relaxation without ever moving the optimum: ``two_hop`` (a two-arc-disjoint
+    detour bound via z = min of the two hops), ``degree_pair`` (a flow lower bound
+    on each pair), ``deletion`` (an induced-subgraph bound from proved smaller
+    M*(k)), and ``symmetry`` (a degree ordering that prunes relabelled duplicates).
+    Returns ``(prob, w)`` with ``w`` the weight variables keyed by ordered pair.
     """
     pairs = _ordered_pairs(n)
-    triples = _two_hop_triples(n) if use_two_hop else []
+    prob = pulp.LpProblem("erdos915", pulp.LpMaximize)
+    category = "Integer" if integer else "Continuous"
+    w = {(u, v): pulp.LpVariable(f"w_{u}_{v}", 0, cap, cat=category)
+         for (u, v) in pairs}
 
-    # --- build the shared variable index and constraint rows ---
-    var = _VariableIndex()
-    for (u, v) in pairs:
-        var.declare(("w", u, v))
     for (s, t) in pairs:
-        for u in range(n):
-            var.declare(("x", s, t, u))
-    for (s, t) in pairs:
+        # s is always on the source side, t always on the sink side: constants, not
+        # variables (which also avoids pulp resetting a Binary's bounds to [0, 1]).
+        side = {u: 1 if u == s else 0 if u == t
+                else pulp.LpVariable(f"x_{s}_{t}_{u}", cat="Binary")
+                for u in range(n)}
+        crossing = []
         for (u, v) in pairs:
-            var.declare(("p", s, t, u, v))
-    for (s, x, t) in triples:
-        var.declare(("z", s, x, t))
-        var.declare(("b", s, x, t))
-    num_vars = len(var)
+            p_uv = pulp.LpVariable(f"p_{s}_{t}_{u}_{v}", 0, cap)
+            prob += p_uv >= w[(u, v)] + cap * (side[u] - side[v]) - cap
+            crossing.append(p_uv)
+        prob += pulp.lpSum(crossing) <= cap          # crossing weight <= cap
 
-    acc = _MilpRows()
-    _add_crossing_cut_rows(acc, var, pairs, "w", 1.0)
-    if use_two_hop:
-        _add_two_hop_rows(acc, var, n, pairs, triples)
-    if use_symmetry_breaking:
-        _add_degree_order_rows(acc, var, n, "w")
-    if use_deletion_cuts:
-        _add_deletion_cut_rows(acc, var, n, pairs)
+    if two_hop:
+        z = {}
+        for (s, x, t) in _two_hop_triples(n):
+            z[(s, x, t)] = pulp.LpVariable(f"z_{s}_{x}_{t}", 0, cap)
+            selector = pulp.LpVariable(f"b_{s}_{x}_{t}", cat="Binary")
+            # z = min(w[s,x], w[x,t]): two upper bounds, and the selector forces z
+            # up to whichever argument is the minimum (big-M with M = cap).
+            prob += z[(s, x, t)] <= w[(s, x)]
+            prob += z[(s, x, t)] <= w[(x, t)]
+            prob += z[(s, x, t)] >= w[(s, x)] - cap * (1 - selector)
+            prob += z[(s, x, t)] >= w[(x, t)] - cap * selector
+        for (s, t) in pairs:
+            prob += w[(s, t)] + pulp.lpSum(
+                z[(s, x, t)] for x in range(n) if x != s and x != t) <= cap
 
-    # --- set up integrality and bounds (same as scipy path) ---
-    integrality = np.zeros(num_vars)
-    lower_b = np.zeros(num_vars)
-    upper_b = np.ones(num_vars)
-    for (s, t) in pairs:
-        lower_b[var(("x", s, t, s))] = upper_b[var(("x", s, t, s))] = 1.0
-        lower_b[var(("x", s, t, t))] = upper_b[var(("x", s, t, t))] = 0.0
-        for u in range(n):
-            integrality[var(("x", s, t, u))] = 1
-    for (s, x, t) in triples:
-        integrality[var(("b", s, x, t))] = 1
+    if degree_pair:
+        for (s, t) in pairs:           # d+(s) + d-(t) - w[s,t] <= (n-1)*cap
+            prob += (pulp.lpSum(w[(s, x)] for x in range(n) if x != s)
+                     + pulp.lpSum(w[(x, t)] for x in range(n) if x != t)
+                     - w[(s, t)]) <= (n - 1) * cap
 
-    # --- create Gurobi model and add variables as a flat vector ---
-    env = _gp.Env(empty=True)
-    env.setParam("OutputFlag", 1 if show_solver_log else 0)
-    env.start()
-    model = _gp.Model(env=env)
-    model.Params.TimeLimit = time_limit
-    model.Params.MIPGap = 0.0
+    if deletion:
+        for k, holes in ((n - 1, 1), (n - 2, 2)):
+            if k not in _PROVEN_MSTAR:
+                continue
+            bound = cap * _PROVEN_MSTAR[k]      # induced subgraph on k vertices
+            for gone in combinations(range(n), holes):
+                prob += pulp.lpSum(w[(a, b)] for (a, b) in pairs
+                                   if a not in gone and b not in gone) <= bound
 
-    vtypes = [_GRB.BINARY if integrality[i] else _GRB.CONTINUOUS
-              for i in range(num_vars)]
-    gvars = [model.addVar(lb=lower_b[i], ub=upper_b[i], vtype=vtypes[i])
-             for i in range(num_vars)]
-    model.update()
+    if symmetry:
+        degree = [pulp.lpSum(w[(u, v)] for (u, v) in pairs if v0 in (u, v))
+                  for v0 in range(n)]
+        for v0 in range(n - 1):
+            prob += degree[v0] <= degree[v0 + 1]
 
-    # --- translate _MilpRows COO data into Gurobi constraints ---
-    A = sparse.csr_matrix(
-        (acc.data, (acc.rows, acc.cols)), shape=(acc.n_rows, num_vars)
-    )
-    for row_i in range(acc.n_rows):
-        row = A.getrow(row_i)
-        expr = _gp.quicksum(float(row.data[j]) * gvars[row.indices[j]]
-                            for j in range(len(row.data)))
-        lo, hi = acc.lower[row_i], acc.upper[row_i]
-        if lo == -np.inf:
-            model.addConstr(expr <= hi)
-        elif hi == np.inf:
-            model.addConstr(expr >= lo)
-        else:
-            model.addConstr(expr >= lo)
-            model.addConstr(expr <= hi)
-
-    # --- objective: maximise sum w ---
-    model.setObjective(
-        _gp.quicksum(gvars[var(("w", u, v))] for (u, v) in pairs),
-        _GRB.MAXIMIZE,
-    )
-
-    start = time.time()
-    model.optimize()
-    elapsed = time.time() - start
-
-    _STATUS = {
-        _GRB.OPTIMAL: "OPTIMAL", _GRB.TIME_LIMIT: "LIMIT",
-        _GRB.INFEASIBLE: "INFEASIBLE", _GRB.UNBOUNDED: "UNBOUNDED",
-    }
-    status = _STATUS.get(model.Status, str(model.Status))
-
-    weight_matrix = None
-    obj_val = float("nan")
-    if model.SolCount > 0:
-        obj_val = model.ObjVal
-        weight_matrix = np.zeros((n, n))
-        for (u, v) in pairs:
-            weight_matrix[u, v] = gvars[var(("w", u, v))].X
-
-    gap_zero = (model.Status == _GRB.OPTIMAL)
-    if model.Status == _GRB.TIME_LIMIT and model.SolCount > 0:
-        try:
-            gap_zero = model.MIPGap < 1e-8
-        except Exception:
-            gap_zero = False
-
-    return ProofResult(
-        n=n, status=status, scaled_optimum=obj_val,
-        relative_gap_zero=gap_zero, solve_seconds=elapsed,
-        weight_matrix=weight_matrix,
-    )
+    return prob, w
 
 
 def prove_directed_multigraph(
@@ -1281,118 +1115,36 @@ def prove_directed_multigraph(
 ) -> ProofResult:
     """Prove ``M*(n)`` for the directed multigraph arc problem.
 
-    Returns a :class:`ProofResult`. When its :meth:`is_proof` is true the
-    value is a proven upper bound, and ``value_for(m)`` gives ``L_m^dir(n)`` for
-    every ``m``.
-
-    Args:
-        use_gurobi: if ``True``, use Gurobi (faster; requires the gurobipy
-            package and a licence).  If ``False``, always use scipy/HiGHS.
-            If ``None`` (default), use Gurobi when available and fall back to
-            scipy/HiGHS otherwise.
+    Returns a :class:`ProofResult`.  When its :meth:`is_proof` is true the value
+    is a proven upper bound, and ``value_for(m)`` gives ``L_m^dir(n)`` for every
+    ``m``.  ``use_gurobi`` picks the solver (see :func:`_pick_solver`); the default
+    uses Gurobi when its licence is active and CBC otherwise.
     """
-    # Dispatch to Gurobi when available and not explicitly disabled.
-    want_gurobi = GUROBI_AVAILABLE if use_gurobi is None else use_gurobi
-    if want_gurobi:
-        if not GUROBI_AVAILABLE:
-            raise RuntimeError(
-                "use_gurobi=True but gurobipy is not installed. "
-                "Install it and activate a licence, then retry."
-            )
-        return _prove_with_gurobi(
-            n, time_limit=time_limit, use_two_hop=use_two_hop,
-            use_symmetry_breaking=use_symmetry_breaking,
-            use_deletion_cuts=use_deletion_cuts, show_solver_log=show_solver_log,
-        )
-
-    pairs = _ordered_pairs(n)
-    triples = _two_hop_triples(n) if use_two_hop else []
-
-    # ----- declare variables, in a fixed readable order ---------------------
-    var = _VariableIndex()
-    for (u, v) in pairs:
-        var.declare(("w", u, v))                     # scaled weight in [0, 1]
-    for (s, t) in pairs:
-        for u in range(n):
-            var.declare(("x", s, t, u))              # cut side indicator (binary)
-    for (s, t) in pairs:
-        for (u, v) in pairs:
-            var.declare(("p", s, t, u, v))           # crossing-arc contribution
-    for (s, x, t) in triples:
-        var.declare(("z", s, x, t))                  # min(w[s,x], w[x,t])
-        var.declare(("b", s, x, t))                  # which argument is the min
-    num_vars = len(var)
-
-    # ----- assemble the linear constraints ----------------------------------
-    acc = _MilpRows()
-    _add_crossing_cut_rows(acc, var, pairs, weight_key="w", cap=1.0)
-
-    # (3)+(4) Two-hop tightening cuts: w[s,t] + sum_x min(w[s,x],w[x,t]) <= 1.
-    # Each min is linearised via McCormick with a binary selector b (see
-    # _add_two_hop_rows for the full explanation).
-    if use_two_hop:
-        _add_two_hop_rows(acc, var, n, pairs, triples)
-
-    # (5) Degree-ordering symmetry break: prunes relabelled duplicates.
-    if use_symmetry_breaking:
-        _add_degree_order_rows(acc, var, n, weight_key="w")
-
-    # (6) Deletion and degree-pair valid inequalities (see _add_deletion_cut_rows).
-    if use_deletion_cuts:
-        _add_deletion_cut_rows(acc, var, n, pairs)
-
-    constraint = acc.constraint(num_vars)
-
-    # ----- bounds, integrality, and objective -------------------------------
-    lower = np.zeros(num_vars)
-    upper = np.ones(num_vars)  # all variables live in [0, 1] (w fractional, x/b binary)
-    for (s, t) in pairs:  # fix the cut endpoints: s on the source side, t off it
-        lower[var(("x", s, t, s))] = upper[var(("x", s, t, s))] = 1.0
-        lower[var(("x", s, t, t))] = upper[var(("x", s, t, t))] = 0.0
-
-    # Integrality vector: 1 marks a variable that must be integer.  The cut
-    # indicators x and the min-selectors b are binary; w and z stay continuous.
-    integrality = np.zeros(num_vars)
-    for (s, t) in pairs:
-        for u in range(n):
-            integrality[var(("x", s, t, u))] = 1
-    for (s, x, t) in triples:
-        integrality[var(("b", s, x, t))] = 1
-
-    # Objective: maximise sum w  ==  minimise -sum w (scipy.milp minimises).
-    objective = np.zeros(num_vars)
-    for (u, v) in pairs:
-        objective[var(("w", u, v))] = -1.0
-
-    # ----- solve ------------------------------------------------------------
-    start = time.time()
-    result = milp(
-        c=objective, constraints=constraint, integrality=integrality,
-        bounds=Bounds(lower, upper),
-        # mip_rel_gap=0.0 demands a closed gap, which is what makes the result a
-        # proof rather than a heuristic when it returns OPTIMAL.
-        options={"disp": show_solver_log, "time_limit": time_limit, "mip_rel_gap": 0.0},
+    _require_pulp()
+    prob, w = _cut_counting_model(
+        n, cap=1.0, integer=False, two_hop=use_two_hop,
+        symmetry=use_symmetry_breaking, deletion=use_deletion_cuts,
+        degree_pair=use_deletion_cuts,
     )
+    prob += pulp.lpSum(w.values())                  # maximise total weight = M*(n)
+
+    start = time.time()
+    prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
     elapsed = time.time() - start
+    status = _PULP_STATUS.get(pulp.LpStatus[prob.status], "LIMIT")
 
-    status_names = {0: "OPTIMAL", 1: "LIMIT", 2: "INFEASIBLE", 3: "UNBOUNDED"}
-    status = status_names.get(result.status, str(result.status))
-
-    # Reconstruct the witnessing weight matrix from the solution vector, if any.
     weight_matrix = None
-    if result.success:
+    if status == "OPTIMAL":
         weight_matrix = np.zeros((n, n))
-        for (u, v) in pairs:
-            weight_matrix[u, v] = result.x[var(("w", u, v))]
+        for (u, v), variable in w.items():
+            weight_matrix[u, v] = variable.value() or 0.0
 
     return ProofResult(
-        n=n,
-        status=status,
-        # -result.fun undoes the negation of the objective: back to max sum w.
-        scaled_optimum=(-result.fun if result.success else float("nan")),
+        n=n, status=status,
+        scaled_optimum=(pulp.value(prob.objective) if status == "OPTIMAL"
+                        else float("nan")),
         relative_gap_zero=(status == "OPTIMAL"),
-        solve_seconds=elapsed,
-        weight_matrix=weight_matrix,
+        solve_seconds=elapsed, weight_matrix=weight_matrix,
     )
 
 
@@ -4651,6 +4403,7 @@ def save_gallery_json(gallery: dict, path: str | Path) -> None:
 
 def prove_integral_arc_bound(n: int, m: int, target: int, *,
                                time_limit: float = 3000.0,
+                               use_gurobi: bool | None = None,
                                show_solver_log: bool = False) -> str:
     """Decide by MILP whether some directed multigraph on ``n`` vertices with
     multiplicities in {0..m-1} and ``lambda^max <= m-1`` has >= ``target`` arcs.
@@ -4658,99 +4411,24 @@ def prove_integral_arc_bound(n: int, m: int, target: int, *,
     Returns "INFEASIBLE" (proving L_m^dir(n) < target), "FEASIBLE", or
     "LIMIT".  This is the integral companion of the fractional prover: the
     m = 3 chain (rem:odd-step-roadmap) needs only L_3^dir(7) = 24, i.e.
-    INFEASIBLE at target 25, which is a far friendlier MILP than M*(7)
-    because the weights themselves are integers.  The encoding is the exact
-    cut-counting one (one cut of capacity <= m-1 per ordered pair) plus the
-    proved deletion cuts from proved smaller values and the degree-pair
-    inequality d+(s) + d-(t) - mu(s,t) <= (m-1)(n-1).
+    INFEASIBLE at target 25, which is a far friendlier MILP than M*(7) because the
+    weights themselves are integers.  Same exact :func:`_cut_counting_model` with
+    cap = m-1 and integer multiplicities, all its proved-valid families on, plus the
+    one constraint that the multiplicities total at least ``target``.
     """
-    pairs = _ordered_pairs(n)
-    triples = _two_hop_triples(n)
-    cap = float(m - 1)
-    var = _VariableIndex()
-    for (u, v) in pairs:
-        var.declare(("mu", u, v))
-    for (s, t) in pairs:
-        for u in range(n):
-            var.declare(("x", s, t, u))
-    for (s, t) in pairs:
-        for (u, v) in pairs:
-            var.declare(("p", s, t, u, v))
-    for (s, x, t) in triples:
-        var.declare(("z", s, x, t))   # min(mu[s,x], mu[x,t])
-        var.declare(("b", s, x, t))   # binary selector for the min
-    num_vars = len(var)
+    _require_pulp()
+    prob, w = _cut_counting_model(
+        n, cap=float(m - 1), integer=True, two_hop=True,
+        symmetry=True, deletion=True, degree_pair=True,
+    )
+    prob += pulp.lpSum(w.values()) >= target        # the arc target
+    prob += 0                                        # feasibility, no objective
 
-    acc = _MilpRows()
-    add_row = acc.add_row
-
-    # The cut-counting core, shared with the fractional prover: one cut of
-    # capacity <= m-1 per ordered pair (cap is the integer multiplicity ceiling
-    # here, not 1).
-    _add_crossing_cut_rows(acc, var, pairs, weight_key="mu", cap=cap)
-    # Degree-pair inequality d+(s) + d-(t) - mu(s,t) <= (m-1)(n-1) for each pair.
-    for (s, t) in pairs:
-        merged: dict[int, float] = {}
-        for x in range(n):
-            if x != s:
-                merged[var(("mu", s, x))] = merged.get(var(("mu", s, x)), 0.0) + 1.0
-            if x != t:
-                merged[var(("mu", x, t))] = merged.get(var(("mu", x, t)), 0.0) + 1.0
-        merged[var(("mu", s, t))] = merged.get(var(("mu", s, t)), 0.0) - 1.0
-        add_row([(c, k) for c, k in merged.items() if abs(k) > 1e-12],
-                -np.inf, cap * (n - 1))
-    # two-hop inequalities with exact mins (the prover's strongest rows):
-    # flow(s,t) >= mu(s,t) + sum_x min(mu(s,x), mu(x,t)) <= m-1.
-    for (s, x, t) in triples:
-        z = var(("z", s, x, t)); b = var(("b", s, x, t))
-        add_row([(z, 1.0), (var(("mu", s, x)), -1.0), (b, -cap)], -np.inf, 0.0)
-        add_row([(z, 1.0), (var(("mu", x, t)), -1.0), (b, cap)], -np.inf, cap)
-        add_row([(z, 1.0), (var(("mu", s, x)), -1.0), (b, -cap)], -cap, np.inf)
-        add_row([(z, 1.0), (var(("mu", x, t)), -1.0), (b, cap)], 0.0, np.inf)
-    for (s, t) in pairs:
-        add_row([(var(("mu", s, t)), 1.0)]
-                + [(var(("z", s, x, t)), 1.0)
-                   for x in range(n) if x != s and x != t],
-                -np.inf, cap)
-    # deletion cuts from proved smaller values L_m = (m-1) * M*(k)
-    for k, holes in ((n - 1, 1), (n - 2, 2)):
-        if k not in _PROVEN_MSTAR:
-            continue
-        bound = cap * _PROVEN_MSTAR[k]
-        for removed in combinations(range(n), holes):
-            terms = [(var(("mu", a, b)), 1.0) for (a, b) in pairs
-                     if a not in removed and b not in removed]
-            add_row(terms, -np.inf, bound)
-    # degree-ordering symmetry breaking (see _add_degree_order_rows)
-    _add_degree_order_rows(acc, var, n, weight_key="mu")
-    # the target: total arcs >= target
-    add_row([(var(("mu", u, v)), 1.0) for (u, v) in pairs], float(target), np.inf)
-
-    lower = np.zeros(num_vars)
-    upper = np.ones(num_vars)
-    integrality = np.zeros(num_vars)
-    for (u, v) in pairs:
-        upper[var(("mu", u, v))] = cap
-        integrality[var(("mu", u, v))] = 1
-    for (s, t) in pairs:
-        for (u, v) in pairs:
-            upper[var(("p", s, t, u, v))] = cap
-        for u in range(n):
-            integrality[var(("x", s, t, u))] = 1
-        lower[var(("x", s, t, s))] = upper[var(("x", s, t, s))] = 1.0
-        lower[var(("x", s, t, t))] = upper[var(("x", s, t, t))] = 0.0
-    for (s, x, t) in triples:
-        upper[var(("z", s, x, t))] = cap
-        integrality[var(("b", s, x, t))] = 1
-
-    constraint = acc.constraint(num_vars)
-    result = milp(c=np.zeros(num_vars), constraints=constraint,
-                  integrality=integrality, bounds=Bounds(lower, upper),
-                  options={"disp": show_solver_log, "time_limit": time_limit,
-                           "mip_rel_gap": 0.0})
-    if result.status == 2:
+    prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
+    status = pulp.LpStatus[prob.status]
+    if status == "Infeasible":
         return "INFEASIBLE"
-    if result.status == 0 and result.x is not None:
+    if status == "Optimal":
         return "FEASIBLE"
     return "LIMIT"
 
@@ -4966,46 +4644,49 @@ def _run_checks() -> int:
     check(f"n=16: Whitney holds and kappa^max < lambda^max on {large_gap} of 200 samples",
           large_gap > 0 and all(k <= l for k, l in zip(kap_large, lam_large)))
 
-    section("Prover: cut-counting proves M*(n) = 2(n-1) optimal for small n")
-    # The thesis (ch2) claims L_m^dir(n) = 2(n-1)(m-1) is proved for ALL n <= 6
-    # via the cut-counting MILP (thm:dir-multi-small).  n=3,4,5 all finish in
-    # well under 60 s and are verified here.  n=6 takes ~1315 s (~22 min) on a
-    # typical laptop and is NOT included in this fast loop -- it must be
-    # verified separately:
-    #
-    #   result = prove_directed_multigraph(6, time_limit=2000.0)
-    #   assert result.is_proof() and round(result.scaled_optimum) == 10
-    #
-    # The confirmed run (2026-06-13) is logged in program/logs/selftest_check.log
-    # (search "n=6 OPTIMAL M*(6)=10 in 1315s").  Omitting n=6 from this loop is
-    # not an error in the proof -- the proof ran -- but it means this self-test
-    # alone does not reproduce the full n<=6 certification.
-    for n in [3, 4, 5]:
-        result = prove_directed_multigraph(n, time_limit=300.0)
-        check(f"n={n}: status={result.status}, M*={result.scaled_optimum:.1f}, proof={result.is_proof()}",
-              result.is_proof() and round(result.scaled_optimum) == 2 * (n - 1))
+    if not PULP_AVAILABLE:
+        section("Prover sections skipped (optional pulp not installed)")
+    else:
+        section("Prover: cut-counting proves M*(n) = 2(n-1) optimal for small n")
+        # The thesis (ch2) claims L_m^dir(n) = 2(n-1)(m-1) is proved for ALL n <= 6
+        # via the cut-counting MILP (thm:dir-multi-small).  n=3,4,5 all finish in
+        # well under 60 s and are verified here.  n=6 takes ~1315 s (~22 min) on a
+        # typical laptop and is NOT included in this fast loop -- it must be
+        # verified separately:
+        #
+        #   result = prove_directed_multigraph(6, time_limit=2000.0)
+        #   assert result.is_proof() and round(result.scaled_optimum) == 10
+        #
+        # The confirmed run (2026-06-13) is logged in program/logs/selftest_check.log
+        # (search "n=6 OPTIMAL M*(6)=10 in 1315s").  Omitting n=6 from this loop is
+        # not an error in the proof -- the proof ran -- but it means this self-test
+        # alone does not reproduce the full n<=6 certification.
+        for n in [3, 4, 5]:
+            result = prove_directed_multigraph(n, time_limit=300.0)
+            check(f"n={n}: status={result.status}, M*={result.scaled_optimum:.1f}, proof={result.is_proof()}",
+                  result.is_proof() and round(result.scaled_optimum) == 2 * (n - 1))
 
-    section("Prover: the valid inequalities sharpen but never move the optimum")
-    # Turning the two-hop and symmetry-breaking rows off leaves the BARE exact
-    # cut formulation, which must still prove the same M*(3) = 4.  If any row we
-    # call a "valid inequality" were in fact invalid, it would cut a feasible
-    # point and shift this optimum -- so this is the regression tripwire that
-    # guards the prover's soundness, not just a re-run of the value.
-    bare = prove_directed_multigraph(3, time_limit=120.0,
-                                     use_two_hop=False, use_symmetry_breaking=False)
-    check(f"M*(3) with the tighteners off = {bare.scaled_optimum:.1f} (expect 4), proof={bare.is_proof()}",
-          bare.is_proof() and round(bare.scaled_optimum) == 4)
+        section("Prover: the valid inequalities sharpen but never move the optimum")
+        # Turning the two-hop and symmetry-breaking rows off leaves the BARE exact
+        # cut formulation, which must still prove the same M*(3) = 4.  If any row we
+        # call a "valid inequality" were in fact invalid, it would cut a feasible
+        # point and shift this optimum -- so this is the regression tripwire that
+        # guards the prover's soundness, not just a re-run of the value.
+        bare = prove_directed_multigraph(3, time_limit=120.0,
+                                         use_two_hop=False, use_symmetry_breaking=False)
+        check(f"M*(3) with the tighteners off = {bare.scaled_optimum:.1f} (expect 4), proof={bare.is_proof()}",
+              bare.is_proof() and round(bare.scaled_optimum) == 4)
 
-    section("Prover (integral): an INFEASIBLE verdict is a genuine upper-bound proof")
-    # L_3^dir(4) = 12: a 12-arc multigraph exists, no 13-arc one does.  This
-    # exercises the exact mechanism behind the thesis's L_3(7) = 24 result
-    # (INFEASIBLE one above the optimum) on a value small enough to re-run here,
-    # so a regression in the integral encoding cannot pass unnoticed.
-    feasible_at_12 = prove_integral_arc_bound(4, 3, 12, time_limit=120.0)
-    infeasible_at_13 = prove_integral_arc_bound(4, 3, 13, time_limit=120.0)
-    check(f"target 12 -> {feasible_at_12} (expect FEASIBLE), "
-          f"target 13 -> {infeasible_at_13} (expect INFEASIBLE)",
-          feasible_at_12 == "FEASIBLE" and infeasible_at_13 == "INFEASIBLE")
+        section("Prover (integral): an INFEASIBLE verdict is a genuine upper-bound proof")
+        # L_3^dir(4) = 12: a 12-arc multigraph exists, no 13-arc one does.  This
+        # exercises the exact mechanism behind the thesis's L_3(7) = 24 result
+        # (INFEASIBLE one above the optimum) on a value small enough to re-run here,
+        # so a regression in the integral encoding cannot pass unnoticed.
+        feasible_at_12 = prove_integral_arc_bound(4, 3, 12, time_limit=120.0)
+        infeasible_at_13 = prove_integral_arc_bound(4, 3, 13, time_limit=120.0)
+        check(f"target 12 -> {feasible_at_12} (expect FEASIBLE), "
+              f"target 13 -> {infeasible_at_13} (expect INFEASIBLE)",
+              feasible_at_12 == "FEASIBLE" and infeasible_at_13 == "INFEASIBLE")
 
     section("Search: rediscovering ell_2^dir(4) = 6 by random search")
     result = search_for_dense_graph(SIMPLE_DIRECTED, n=4, m=2, steps=6000, seed=0)

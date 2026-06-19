@@ -20,3 +20,6 @@ program/logs/
 *.synctex.gz
 program/erdos915_unified.baseline.py
 program/_erdos_fast.so
+
+# Python virtualenv (per-machine; not part of the deliverable)
+.venv/

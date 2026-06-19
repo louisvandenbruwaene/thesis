@@ -32,11 +32,16 @@ program/
 
 ## Requirements
 
-The core needs only `numpy` and `scipy`: the model, the connectivity checker,
-the provers, the search, the enumeration, and the self-check all run on those two
-alone, because every connectivity measure is one scipy integer max-flow on a
-capacity matrix (Menger). Two libraries are optional:
+Install with `pip install -r requirements.txt`. The core needs only `numpy` and
+`scipy`: the model, the connectivity checker, the search, the enumeration, the
+random-model sampling, and the self-check all run on those two alone, because every
+connectivity measure is one scipy integer max-flow on a capacity matrix (Menger).
+One more library backs the certifier and two are optional:
 
+- `pulp` backs the MILP certifier (`prove_directed_multigraph` and
+  `prove_integral_arc_bound`): one solver-agnostic cut-counting model that runs on
+  CBC (bundled with `pulp`) by default and on Gurobi by passing `use_gurobi=True`.
+  The certifier raises a clear message if it is called without `pulp`.
 - `matplotlib` is needed only to render the figures (`make_figures.py` and the
   `plot_*` routines). Without it everything else still runs.
 - `networkx` is needed only for the Gomory-Hu tree, a single figure/analysis
