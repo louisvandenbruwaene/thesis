@@ -527,17 +527,8 @@ def hyper_connectivity(hypergraph: Hypergraph, source: int, target: int,
 
 def max_hyper_connectivity(hypergraph: Hypergraph, *, vertex_split: bool = False) -> int:
     """``lambda^max`` (edge) or ``kappa^max`` (vertex) over all pairs."""
-    best = 0
-    n = hypergraph.num_vertices
-    for source in range(n):
-        # Directed Berge routes are ordered; undirected ones are unordered pairs.
-        targets = range(n) if hypergraph.directed else range(source + 1, n)
-        for target in targets:
-            if target == source:
-                continue
-            best = max(best, hyper_connectivity(hypergraph, source, target,
-                                                vertex_split=vertex_split))
-    return best
+    return max((hyper_connectivity(hypergraph, source, target, vertex_split=vertex_split)
+                for source, target in _pairs(hypergraph)), default=0)
 
 
 def hyperedge_connectivity(hypergraph: Hypergraph, source: int, target: int) -> int:
@@ -804,13 +795,18 @@ def min_vertex_connectivity(graph: Graph) -> int:
 # Shared helpers
 # ------------------------------------------------------------------
 
-def _pairs(graph: Graph):
-    """Yield the vertex pairs to test: ordered if directed, unordered if not."""
-    n = graph.num_vertices
+def _pairs(obj):
+    """Yield the vertex pairs to test: ordered if directed, unordered if not.
+
+    Works for both a ``Graph`` (directedness on ``variant``) and a ``Hypergraph``
+    (directedness on the object), so one pair sweep serves every variant.
+    """
+    directed = obj.directed if hasattr(obj, "directed") else obj.variant.directed
+    n = obj.num_vertices
     for source in range(n):
-        # Directed graphs need both (s, t) and (t, s); undirected need each
+        # Directed objects need both (s, t) and (t, s); undirected need each
         # unordered pair once, so we start the inner loop above the source.
-        start = 0 if graph.variant.directed else source + 1
+        start = 0 if directed else source + 1
         for target in range(start, n):
             if source != target:
                 yield source, target
@@ -2234,21 +2230,13 @@ def sample_random_graph(n: int, p: float, directed: bool, rng: random.Random) ->
     return graph
 
 
-def _measure(separation: str):
-    if separation == "edge":
-        return max_edge_connectivity
-    if separation == "vertex":
-        return max_vertex_connectivity
-    raise ValueError("separation must be 'edge' or 'vertex'")
-
-
 def estimate_appearance_probability(
     n: int, p: float, m: int, *, trials: int = 200,
     separation: str = "edge", directed: bool = False, seed: int = 0,
 ) -> float:
     """Estimate the probability that a sample has $\\lambda^{\\max} \\ge m$."""
     rng = random.Random(seed)
-    measure = _measure(separation)
+    measure = _connectivity_measure(separation)
     # Count the fraction of samples that already exhibit m independent routes
     # somewhere (lambda^max >= m): the empirical appearance probability.
     appearances = sum(
@@ -2264,7 +2252,7 @@ def average_max_connectivity(
 ) -> float:
     """Estimate the average of $\\lambda^{\\max}$ over samples of $G(n, p)$."""
     rng = random.Random(seed)
-    measure = _measure(separation)
+    measure = _connectivity_measure(separation)
     total = sum(measure(sample_random_graph(n, p, directed, rng)) for _ in range(trials))
     return total / trials
 
@@ -2282,7 +2270,7 @@ def connectivity_distribution(
     the edge and vertex distributions can be compared sample by sample.
     """
     rng = random.Random(seed)
-    measure = _measure(separation)
+    measure = _connectivity_measure(separation)
     # Same seed + same (n, p) reproduces the identical sequence of graphs, so an
     # edge run and a vertex run can be compared sample by sample (Whitney check).
     return [measure(sample_random_graph(n, p, directed, rng)) for _ in range(trials)]
@@ -2396,7 +2384,7 @@ def _measure_variant(obj, *, separation, hypergraph):
     """Binding connectivity of a sampled object under the chosen separation."""
     if hypergraph:
         return max_hyper_connectivity(obj, vertex_split=(separation == "vertex"))
-    return _measure(separation)(obj)
+    return _connectivity_measure(separation)(obj)
 
 
 def _mean_binding_degree(obj, *, directed, hypergraph):
