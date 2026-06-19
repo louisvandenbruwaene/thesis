@@ -75,10 +75,15 @@ the bottleneck and the Phase A-E speedups did not touch it. Empirical n-scaling:
         targets/caps) and n=5 (doubled P_5; 3 doubled trees). Degree-gated feasibility
         (flow<=min(outdeg,indeg)) + dropped a redundant _tiny_maxflow .copy() cut n=5
         cap=8 from 91s to 41s. Unit test tests/test_solve.GengGeneration.
-  - [~] n=7 fact (b) RUN launched 2026-06-18 in background, still going at 3h+
-        (n=5 cap=8 ~41s, n=6 cap=8 several min, so n=7 is a multi-hour wall even for the
-        geng path). Expect {2B_{3,4}, 2B_{4,3}, doubled P_7}. Runtime, not soundness, is
-        now the only obstacle to closing fact (b).
+  - [ ] n=7 fact (b) NOT yet closed. The 2026-06-18 background run was interrupted
+        (logs/geng_n7_20260618.log has START but no result; no job running as of
+        2026-06-19). n=5 cap=8 ~41s, n=6 cap=8 several min, so n=7 is a multi-hour wall
+        even for the geng path. Needs ONE long uninterrupted run (memory-safe, so it will
+        not crash the desktop) or a cluster. Expect {2B_{3,4}, 2B_{4,3}, doubled P_7}.
+        Runtime, not soundness, is the only obstacle. Launch:
+        `cd program && timeout 21600 python -c "from erdos915_unified import \
+          enumerate_extremal_directed_multigraphs_via_generation as e; \
+          print(e(7,3,24,max_degree=8))" > logs/geng_n7_$(date +%Y%m%d).log 2>&1 &`
 
 ## FOLLOW-UP (from Jan's 2026-06-15 email)
 Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:
