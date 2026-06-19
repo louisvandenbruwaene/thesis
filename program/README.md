@@ -32,9 +32,18 @@ program/
 
 ## Requirements
 
-`numpy`, `networkx`, `scipy`, `matplotlib`. The program runs without a build
-step; `bash build_fast.sh` optionally compiles `_erdos_fast.so` to accelerate
-small hot-path searches.
+The core needs only `numpy` and `scipy`: the model, the connectivity checker,
+the provers, the search, the enumeration, and the self-check all run on those two
+alone, because every connectivity measure is one scipy integer max-flow on a
+capacity matrix (Menger). Two libraries are optional:
+
+- `matplotlib` is needed only to render the figures (`make_figures.py` and the
+  `plot_*` routines). Without it everything else still runs.
+- `networkx` is needed only for the Gomory-Hu tree, a single figure/analysis
+  helper. `gomory_hu_tree` raises a clear message if it is called without it.
+
+The program runs without a build step; `bash build_fast.sh` optionally compiles
+`_erdos_fast.so` to accelerate small hot-path searches.
 
 One optional extra: `enumerate_extremal_directed_multigraphs_via_generation` (the
 sound, generation-based directed-multigraph enumerator that follows J. Goedgebeur's
@@ -48,7 +57,7 @@ From this `program/` directory:
 
 ```bash
 python erdos915_unified.py            # run the built-in invariant self-check
-python -m unittest discover -s tests  # run the full test suite (75 tests, stdlib only)
+python -m unittest discover -s tests  # run the full test suite (77 tests, stdlib only)
 python make_figures.py                # regenerate the figures in ../figures/
 ```
 

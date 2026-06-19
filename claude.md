@@ -1241,3 +1241,57 @@ No Unicode em/en dashes anywhere. Suite 77 pass / 1 skip. Build: latexmk exit 0,
 Note for the author: maintaining two repos with parallel agents caused duplicate work (both
 trees independently fixed the same C guard bug). Recommend treating MasterThesis purely as a
 pre-submission mirror and doing all development here.
+
+## 2026-06-19 (Opus) -- dropped networkx + matplotlib to OPTIONAL; one max-flow engine
+
+Author: carte blanche ("more C, cleaning up the code, rewriting the paper, etc"). This
+machine has numpy+scipy+gcc but NOT networkx/matplotlib/geng/Gurobi, so the program would
+not even import (hard `import networkx`/`matplotlib` at module top) and nothing could be
+verified. Fixed that AND unified the checker, which is a genuine cleanup, not a workaround.
+
+WHAT CHANGED (program/erdos915_unified.py):
+- networkx + matplotlib are now OPTIONAL try/except imports (NETWORKX_AVAILABLE /
+  MATPLOTLIB_AVAILABLE flags, same pattern as the existing GUROBI_AVAILABLE). Stringized
+  annotations (`from __future__ import annotations`) mean the `-> nx.DiGraph` signatures
+  never evaluate at import, so the module loads on numpy+scipy alone.
+- THE UNIFICATION: every connectivity measure now runs through ONE scipy integer max-flow
+  on a capacity matrix (Menger), exactly as edge mode already did. Removed the two
+  networkx network builders `_flow_network` and `_hyper_flow_network` (the only callers
+  were the vertex/hyper connectivity fns). Vertex mode reuses `_split_capacity_matrix`;
+  added `_hyper_capacity_matrix` (integer-indexed transcription of the old nx builder:
+  vertices 0..base-1, hyperedge gate i at base+2i / base+2i+1). local_connectivity (vertex)
+  and hyper_connectivity now call `_csgraph_maxflow`. Net: fewer lines, one engine, no nx
+  on any reported-number path.
+- networkx now used in exactly ONE place: `gomory_hu_tree` (a figure/analysis helper),
+  guarded by `_require_networkx(...)` with a clear message. Dropped nx from drawing (replaced
+  nx.circular_layout with a 3-line numpy unit-circle layout), from the geng pipeline (new
+  pure-python `_graph6_edges` graph6 decoder replaces nx.from_graph6_bytes), and from
+  `fractional_flows_feasible` (new `_float_maxflow_value`, Edmonds-Karp for FLOAT capacities,
+  since scipy csgraph is integer-only).
+- matplotlib: flag-gated only (figures are reachable only from the figure driver, like the
+  Gurobi prover path), import guarded so the module loads headless.
+
+VALIDATION (independent oracles, since networkx -- the old oracle -- is absent here):
+- vertex-mode scipy value vs brute-force Menger min-vertex-cut: 0 mismatches / 19,161 pairs.
+- vertex value vs the already-nx-validated `exceeds_bound` predicate (incl adjacent +
+  multigraph): 0 / 31,388 pairs.
+- hypergraph edge-connectivity scipy vs brute Menger on the incidence graph: 0 / 17,148.
+- `_float_maxflow_value` vs scipy scaled-integer max-flow on random rationals: max abs diff
+  1.8e-15 over 3,000 graphs.
+- `_graph6_edges` encode/decode round-trip: 0 bad / 5,000 graphs up to n=12.
+- Test suite: 77 pass, 5 skipped (2 Gomory-Hu need nx; 2 geng need the binary; 1 slow enum
+  flag) -- all legitimate, no silent breakage. Self-check: ALL CHECKS PASSED headless
+  (guarded the one Gomory-Hu self-check block behind NETWORKX_AVAILABLE). C extension built
+  + loaded (gcc here), C_EXTENSION_LOADED True.
+- test_connectivity.GomoryHu now @skipUnless(NETWORKX_AVAILABLE).
+
+DOCS updated to match: program/README.md Requirements (core = numpy+scipy; matplotlib for
+figures, networkx for Gomory-Hu only) + test count 75->77; ch2_certify.tex reproducibility
+sentence rewritten ("core needs only numpy and scipy ... two further libraries optional").
+Build: latexmk rc=0, 95 pp, 0 overfull, 0 undefined refs/cites.
+
+WHY IT MATTERS: (1) the reproducibility claim is now true for a minimal scientific-Python
+install, not a four-library one; (2) the checker is genuinely one engine (the thesis says
+"one max-flow checker" -- now literally true, no second networkx path); (3) future sessions
+on a numpy+scipy box (like this one) can run + verify everything. No reported value, bound,
+or figure number changed (validated). Author's machine (has nx) behaves identically.

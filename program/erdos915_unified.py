@@ -91,11 +91,34 @@ from typing import Callable, Iterator
 import concurrent.futures
 
 import numpy as np
-import networkx as nx
 from scipy import sparse
 from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.sparse import csr_matrix as _csr
 from scipy.sparse.csgraph import maximum_flow as _csgraph_maxflow
+
+# networkx is OPTIONAL.  Every connectivity measure the thesis reports is computed
+# through scipy's integer max-flow on a capacity matrix (see _split_value and
+# _hyper_value below), so the core checker, search, provers, and enumeration run on
+# numpy + scipy alone.  networkx is needed only for three non-core extras: the
+# Gomory-Hu tree (a figure/analysis helper), the circular layout used when drawing a
+# graph, parsing geng's graph6 output, and the fractional max-flow helper (float
+# capacities, which scipy's integer routine cannot take).  Each of those raises a
+# clear message if called without networkx installed.
+try:
+    import networkx as nx
+    NETWORKX_AVAILABLE = True
+except ImportError:
+    nx = None
+    NETWORKX_AVAILABLE = False
+
+
+def _require_networkx(feature: str):
+    """Raise a clear error when an optional networkx-only feature is used headless."""
+    if not NETWORKX_AVAILABLE:
+        raise ImportError(
+            f"{feature} needs networkx (pip install networkx). The core connectivity "
+            f"measures do not: they run on numpy + scipy alone."
+        )
 
 try:
     import gurobipy as _gp
@@ -123,13 +146,22 @@ if _so_path.exists():
     ]
 C_EXTENSION_LOADED = _C is not None
 
-# matplotlib needs its backend chosen before pyplot is imported, so that the
-# figure code runs head-less (writes PNG files, never opens a window).
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402  (after backend selection)
-from matplotlib.ticker import MaxNLocator  # noqa: E402  (integer-only axis ticks)
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' projection)
+# matplotlib is OPTIONAL: it is needed only to render the figures (the plot_*
+# functions in the FIGURES section).  It needs its backend chosen before pyplot is
+# imported, so that the figure code runs head-less (writes PNG files, never opens a
+# window).  When it is absent the model, checker, provers, search, and enumeration
+# all still run; only figure generation is unavailable.
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt  # noqa: E402  (after backend selection)
+    from matplotlib.ticker import MaxNLocator  # noqa: E402  (integer-only axis ticks)
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' projection)
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    plt = None
+    MaxNLocator = None
+    MATPLOTLIB_AVAILABLE = False
 
 
 ######################################################################
@@ -437,8 +469,8 @@ class Hypergraph:
         return [i for i, edge in enumerate(self.hyperedges) if v in self.members(edge)]
 
 
-def _hyper_flow_network(hypergraph: Hypergraph, *, vertex_split: bool = False) -> nx.DiGraph:
-    """One flow network for every hypergraph variant, edge or vertex, directed or not.
+def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False):
+    """Integer capacity matrix of the hypergraph flow network (one per variant).
 
     Each hyperedge becomes an in/out gate joined by a capacity-1 arc, so at most
     one disjoint Berge route may traverse it: this is the hyperedge-as-node trick.
@@ -448,42 +480,49 @@ def _hyper_flow_network(hypergraph: Hypergraph, *, vertex_split: bool = False) -
     only from the tail and left only toward a head; for an undirected one every
     member links to the gate both ways.  The four hypergraph variants are thus the
     same construction with two booleans flipped, not four separate measures.
+
+    Vertices index ``0..base-1`` (``base = 2n`` split, else ``n``); hyperedge gate
+    ``i`` indexes ``base+2i`` (in) and ``base+2i+1`` (out).  ``leave(v)``/``enter(v)``
+    return the index a route leaves/enters vertex ``v`` through, so the same scipy
+    max-flow that serves plain graphs serves hypergraphs too.
     """
-    network = nx.DiGraph()
-    leave = (lambda v: (v, "out")) if vertex_split else (lambda v: v)
-    enter = (lambda v: (v, "in")) if vertex_split else (lambda v: v)
+    n = hypergraph.num_vertices
+    base = 2 * n if vertex_split else n
+    size = base + 2 * len(hypergraph.hyperedges)
+    cap = np.zeros((size, size), dtype=int)
+    leave = (lambda v: 2 * v + 1) if vertex_split else (lambda v: v)
+    enter = (lambda v: 2 * v) if vertex_split else (lambda v: v)
     if vertex_split:
-        for v in hypergraph.vertices():
-            network.add_edge((v, "in"), (v, "out"), capacity=1.0)  # one route per vertex
+        for v in range(n):
+            cap[2 * v, 2 * v + 1] = 1            # one route through each vertex
     for index, edge in enumerate(hypergraph.hyperedges):
-        gate_in = ("edge", index, "in")
-        gate_out = ("edge", index, "out")
-        network.add_edge(gate_in, gate_out, capacity=1.0)  # one route per hyperedge
+        gate_in, gate_out = base + 2 * index, base + 2 * index + 1
+        cap[gate_in, gate_out] = 1               # one route through each hyperedge
         if hypergraph.directed:
             tail, heads = edge
-            network.add_edge(leave(tail), gate_in, capacity=float(_UNBOUNDED))
+            cap[leave(tail), gate_in] = _UNBOUNDED
             for head in heads:
-                network.add_edge(gate_out, enter(head), capacity=float(_UNBOUNDED))
+                cap[gate_out, enter(head)] = _UNBOUNDED
         else:
             for vertex in edge:
-                network.add_edge(leave(vertex), gate_in, capacity=float(_UNBOUNDED))
-                network.add_edge(gate_out, enter(vertex), capacity=float(_UNBOUNDED))
-    return network
+                cap[leave(vertex), gate_in] = _UNBOUNDED
+                cap[gate_out, enter(vertex)] = _UNBOUNDED
+    return cap, size, leave, enter
 
 
 def hyper_connectivity(hypergraph: Hypergraph, source: int, target: int,
                        *, vertex_split: bool = False) -> int:
-    """Edge- or vertex-disjoint Berge routes from ``source`` to ``target``."""
-    network = _hyper_flow_network(hypergraph, vertex_split=vertex_split)
-    src = (source, "out") if vertex_split else source
-    dst = (target, "in") if vertex_split else target
-    if src not in network or dst not in network:
-        return 0
+    """Edge- or vertex-disjoint Berge routes from ``source`` to ``target``.
+
+    A single scipy integer max-flow on the matrix above.  An isolated endpoint
+    (in no hyperedge) has no incident arcs, so the flow is then zero.
+    """
+    cap, _, leave, enter = _hyper_capacity_matrix(hypergraph, vertex_split=vertex_split)
     if vertex_split:
         # Endpoints must not be the bottleneck: only interior vertices are capped.
-        network[(source, "in")][(source, "out")]["capacity"] = float(_UNBOUNDED)
-        network[(target, "in")][(target, "out")]["capacity"] = float(_UNBOUNDED)
-    return int(round(nx.maximum_flow_value(network, src, dst)))
+        cap[2 * source, 2 * source + 1] = _UNBOUNDED
+        cap[2 * target, 2 * target + 1] = _UNBOUNDED
+    return int(_csgraph_maxflow(_csr(cap, dtype=int), leave(source), enter(target)).flow_value)
 
 
 def max_hyper_connectivity(hypergraph: Hypergraph, *, vertex_split: bool = False) -> int:
@@ -677,66 +716,31 @@ _UNBOUNDED = 10 ** 9
 # ------------------------------------------------------------------
 # One flow network and one measure, parameterised by edge vs vertex
 # ------------------------------------------------------------------
-
-def _flow_network(graph: Graph, *, vertex_split: bool = False) -> nx.DiGraph:
-    """The capacitated digraph whose max-flows ARE this graph's disjoint-route counts.
-
-    EDGE mode (``vertex_split=False``): one node per vertex, and each adjacency
-    ``u -> v`` becomes an arc of capacity ``mu[u, v]``.  A max-flow of value f is
-    then f edge-disjoint routes (Menger), since each unit of capacity is one
-    parallel edge.  For an undirected graph the matrix is symmetric, so both arc
-    directions appear with the same capacity, exactly as edge-connectivity needs.
-
-    VERTEX mode (``vertex_split=True``): additionally split every vertex ``v``
-    into ``(v,"in") -> (v,"out")`` of capacity one, so any route crosses that
-    single unit and thus uses ``v`` at most once; each adjacency then becomes a
-    capacity-ONE arc ``(u,"out") -> (v,"in")``.  Capacity one (not the
-    multiplicity) encodes the convention that parallel edges do not raise
-    vertex-connectivity.  This one boolean is the ONLY difference between
-    lambda^max and kappa^max -- edge vs vertex is a parameter, not a second path.
-    """
-    network = nx.DiGraph()
-    # Where an adjacency attaches: a vertex's raw node (edge mode) or its split
-    # out/in copies (vertex mode).  Naming the two ends lets one arc loop below
-    # serve both modes -- the same trick the hypergraph network uses.
-    leave = (lambda v: (v, "out")) if vertex_split else (lambda v: v)
-    enter = (lambda v: (v, "in")) if vertex_split else (lambda v: v)
-    if vertex_split:
-        for v in graph.vertices():
-            network.add_edge((v, "in"), (v, "out"), capacity=1.0)  # one route through v
-    else:
-        network.add_nodes_from(graph.vertices())  # keep isolated vertices present too
-    for u in graph.vertices():
-        for v in graph.vertices():
-            if u != v and graph.mu[u, v] > 0:
-                # Edge mode carries the full multiplicity; vertex mode caps every
-                # adjacency at one (parallel edges are still one direct route).
-                capacity = 1.0 if vertex_split else float(graph.mu[u, v])
-                network.add_edge(leave(u), enter(v), capacity=capacity)
-    return network
-
+# Every measure here is a single scipy integer max-flow on a capacity matrix
+# (Menger).  EDGE mode runs directly on the multiplicity matrix mu: each unit of
+# capacity is one parallel edge, so a max-flow of value f is f edge-disjoint
+# routes.  VERTEX mode runs on the 2n x 2n split matrix (see _split_capacity_matrix)
+# where each vertex becomes a capacity-one in/out gate, so a route uses a vertex at
+# most once.  Edge vs vertex is one boolean, not a second code path.
 
 def local_connectivity(graph: Graph, source: int, target: int,
                        *, vertex_split: bool = False) -> int:
     """Disjoint ``source``-``target`` routes by a single max-flow (Menger).
 
     Edge-disjoint with ``vertex_split=False``; internally vertex-disjoint with
-    ``vertex_split=True``.  An isolated endpoint is absent from the network, so
-    the answer is then zero.
+    ``vertex_split=True``.  An isolated endpoint yields zero (no augmenting path).
     """
     if not vertex_split:
         # scipy.sparse.csgraph.maximum_flow is a C implementation; faster than
         # NetworkX for the small integer capacity matrices we use.
         return int(_csgraph_maxflow(_csr(graph.mu, dtype=int), source, target).flow_value)
-    # Vertex mode: use the NetworkX split network (the split graph has string
-    # node labels that _csgraph_maxflow cannot address; NetworkX handles it cleanly).
-    network = _flow_network(graph, vertex_split=True)
-    src, dst = (source, "out"), (target, "in")
-    if src not in network or dst not in network:
-        return 0
-    network[(source, "in")][(source, "out")]["capacity"] = float(_UNBOUNDED)
-    network[(target, "in")][(target, "out")]["capacity"] = float(_UNBOUNDED)
-    return int(round(nx.maximum_flow_value(network, src, dst)))
+    # Vertex mode: the same scipy max-flow on the split matrix.  Uncapping the two
+    # endpoints' own in->out gates makes Menger count internally vertex-disjoint
+    # routes (only interior vertices stay capacity-capped at one).
+    cap, _ = _split_capacity_matrix(graph)
+    cap[2 * source, 2 * source + 1] = _UNBOUNDED
+    cap[2 * target, 2 * target + 1] = _UNBOUNDED
+    return int(_csgraph_maxflow(_csr(cap, dtype=int), 2 * source + 1, 2 * target).flow_value)
 
 
 def max_connectivity(graph: Graph, *, vertex_split: bool = False) -> int:
@@ -828,8 +832,9 @@ def _pairs(graph: Graph):
 def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
     """The ``2n x 2n`` capacity matrix of the vertex-split network.
 
-    Same convention as :func:`_flow_network` in vertex mode, written as a plain
-    matrix so :func:`_tiny_maxflow` can consume it.  Vertex ``v`` becomes an
+    The vertex-mode network as a plain matrix, consumed by both the exact measure
+    (:func:`local_connectivity` via scipy max-flow) and the capped search predicate
+    (:func:`exceeds_bound` via :func:`_tiny_maxflow`).  Vertex ``v`` becomes an
     in-copy ``2v`` and an out-copy ``2v+1`` joined by an internal arc of capacity
     one (so any route uses ``v`` at most once), and each adjacency ``u -> v``
     becomes a capacity-one arc ``(2u+1) -> (2v)`` (parallel edges do NOT raise
@@ -904,8 +909,10 @@ def gomory_hu_tree(graph: Graph) -> nx.Graph:
     """Return a Gomory-Hu tree of ``graph`` as a weighted ``networkx`` tree.
 
     Each tree edge carries a ``weight`` equal to the capacity of the minimum cut
-    it represents.
+    it represents.  This is the one place that genuinely needs networkx's
+    Gomory-Hu routine; it backs a figure, not any reported bound.
     """
+    _require_networkx("gomory_hu_tree")
     return nx.gomory_hu_tree(_undirected_capacity_graph(graph), capacity="capacity")
 
 
@@ -2969,10 +2976,12 @@ def draw_graph_with_sensitivity(
 
     sensitivities = sensitivity_map(graph)
     if layout is None:
-        scaffold = nx.DiGraph()
-        scaffold.add_nodes_from(graph.vertices())
-        scaffold.add_edges_from(sensitivities)
-        layout = nx.circular_layout(scaffold)
+        # Evenly spaced on the unit circle (the same picture nx.circular_layout
+        # draws), computed directly so drawing needs no networkx.
+        verts = list(graph.vertices())
+        layout = {v: (math.cos(2 * math.pi * i / len(verts)),
+                      math.sin(2 * math.pi * i / len(verts)))
+                  for i, v in enumerate(verts)}
     labels = (node_labels if node_labels is not None
               else {v: str(v) for v in graph.vertices()})
 
@@ -4138,8 +4147,29 @@ def _geng_support_graphs(
         line = line.strip()
         if not line:
             continue
-        g = nx.from_graph6_bytes(line)
-        yield [(min(u, v), max(u, v)) for u, v in g.edges()]
+        yield _graph6_edges(line)
+
+
+def _graph6_edges(data: bytes) -> list[tuple[int, int]]:
+    """Decode one graph6 line (geng's output format) into its ``(i, j)`` edges, ``i < j``.
+
+    graph6 stores ``n`` in the first byte (offset 63), then the upper-triangle
+    adjacency bits column by column (for ``j`` from 1, all ``i < j``), six bits per
+    subsequent byte, high bit first.  We only ever generate ``n <= 12`` supports, so
+    the single-byte header case is all that is needed and the format needs no
+    networkx to read.
+    """
+    values = [byte - 63 for byte in data]
+    n = values[0]
+    bits = [(value >> shift) & 1 for value in values[1:] for shift in range(5, -1, -1)]
+    index = 0
+    edges: list[tuple[int, int]] = []
+    for j in range(1, n):
+        for i in range(j):
+            if bits[index]:
+                edges.append((i, j))
+            index += 1
+    return edges
 
 
 def enumerate_extremal_directed_multigraphs_via_generation(
@@ -4737,6 +4767,43 @@ def prove_integral_arc_bound(n: int, m: int, target: int, *,
     return "LIMIT"
 
 
+def _float_maxflow_value(capacity: np.ndarray, source: int, target: int,
+                         eps: float = 1e-12) -> float:
+    """Max-flow value for FLOAT capacities (Edmonds-Karp, shortest augmenting path).
+
+    scipy's csgraph max-flow is integer-only, so the fractional check below needs
+    its own tiny routine.  BFS augmenting paths give a polynomial bound independent
+    of the capacity magnitudes, so the loop terminates even on irrational-looking
+    floats; ``eps`` treats a near-zero residual as saturated.
+    """
+    n = capacity.shape[0]
+    residual = capacity.astype(float).copy()
+    flow = 0.0
+    while True:
+        parent = [-1] * n
+        parent[source] = source
+        queue = [source]
+        while queue and parent[target] == -1:
+            u = queue.pop(0)                       # FIFO: shortest augmenting path
+            for v in range(n):
+                if parent[v] == -1 and residual[u, v] > eps:
+                    parent[v] = u
+                    queue.append(v)
+        if parent[target] == -1:
+            return flow
+        bottleneck = float("inf")
+        v = target
+        while v != source:
+            bottleneck = min(bottleneck, residual[parent[v], v])
+            v = parent[v]
+        v = target
+        while v != source:
+            residual[parent[v], v] -= bottleneck
+            residual[v, parent[v]] += bottleneck
+            v = parent[v]
+        flow += bottleneck
+
+
 def fractional_flows_feasible(weights: np.ndarray, tol: float = 1e-9) -> bool:
     """Check the scaled multigraph constraint: all pairwise max-flows <= 1.
 
@@ -4744,18 +4811,11 @@ def fractional_flows_feasible(weights: np.ndarray, tol: float = 1e-9) -> bool:
     the scaled multiplicity matrix mu/(m-1) of lem:scaling-reduction.
     """
     n = weights.shape[0]
-    network = nx.DiGraph()
-    for u in range(n):
-        for v in range(n):
-            if u != v and weights[u, v] > 1e-12:
-                network.add_edge(u, v, capacity=float(weights[u, v]))
+    capacity = np.where(weights > 1e-12, weights, 0.0).astype(float)
+    np.fill_diagonal(capacity, 0.0)
     for s in range(n):
-        if s not in network:
-            continue
         for t in range(n):
-            if t == s or t not in network:
-                continue
-            if nx.maximum_flow_value(network, s, t) > 1 + tol:
+            if t != s and _float_maxflow_value(capacity, s, t) > 1 + tol:
                 return False
     return True
 
@@ -4857,10 +4917,13 @@ def _run_checks() -> int:
         cycle.add_edge(v, (v + 1) % 6)
     check(f"C_6 has lambda^max={max_edge_connectivity(cycle)}", max_edge_connectivity(cycle) == 2)
 
-    section("Gomory-Hu shortcut agrees with brute-force lambda^max")
-    tree = clique_tree(3, 4)
-    check(f"GH={max_edge_connectivity_via_tree(tree)} vs direct={max_edge_connectivity(tree)}",
-          max_edge_connectivity_via_tree(tree) == max_edge_connectivity(tree))
+    if NETWORKX_AVAILABLE:
+        section("Gomory-Hu shortcut agrees with brute-force lambda^max")
+        tree = clique_tree(3, 4)
+        check(f"GH={max_edge_connectivity_via_tree(tree)} vs direct={max_edge_connectivity(tree)}",
+              max_edge_connectivity_via_tree(tree) == max_edge_connectivity(tree))
+    else:
+        section("Gomory-Hu shortcut skipped (optional networkx not installed)")
 
     section("Vertex connectivity: K_4-trees are globally 3-connected")
     for blocks in range(0, 5):

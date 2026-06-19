@@ -7,6 +7,7 @@ from erdos915_unified import (
     Graph,
     MULTI_DIRECTED,
     MULTI_UNDIRECTED,
+    NETWORKX_AVAILABLE,
     SIMPLE_DIRECTED,
     SIMPLE_UNDIRECTED,
     exceeds_bound,
@@ -108,6 +109,7 @@ class VertexConnectivity(unittest.TestCase):
             self.assertLessEqual(max_vertex_connectivity(g), max_edge_connectivity(g))
 
 
+@unittest.skipUnless(NETWORKX_AVAILABLE, "Gomory-Hu trees need the optional networkx")
 class GomoryHu(unittest.TestCase):
     def test_tree_matches_direct_sweep(self):
         for g in (cycle(6), complete_graph(5), star(7)):
