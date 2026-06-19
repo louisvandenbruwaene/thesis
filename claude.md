@@ -1295,3 +1295,45 @@ install, not a four-library one; (2) the checker is genuinely one engine (the th
 "one max-flow checker" -- now literally true, no second networkx path); (3) future sessions
 on a numpy+scipy box (like this one) can run + verify everything. No reported value, bound,
 or figure number changed (validated). Author's machine (has nx) behaves identically.
+
+## 2026-06-19 (Opus, cont.) -- strategy convo + consolidation + PuLP MILP swap
+
+Author asked for my honest read of the code (felt "all over the place", C+Python mix), whether
+to go full C, import libraries instead of hand-rolling, unify variants, whether C speedups give
+new results, and whether to drop the one-file/one-solver rules. My take (saved to auto-memory):
+NO full C rewrite (math thesis, code is apparatus, C is wrong tool for MILP/maxflow/figures and
+would BALLOON his own LOC); the C speedups are constant-factor and will NOT unlock new results
+(the open n=7 facts are algorithm-bound: need Gurobi or cluster); keep one-solver, relax one-file.
+Author then: postponed Gurobi (no KU Leuven wifi), said install any library, relaxed one-file,
+gave carte blanche.
+
+DID THIS SESSION (two commits, pushed):
+1. Consolidation (4891297): `_pairs` now serves Graph or Hypergraph from one sweep;
+   max_hyper_connectivity dropped its hand-rolled loop; deleted `_measure` (byte-identical
+   duplicate of `_connectivity_measure`). 77 tests pass.
+2. PuLP MILP swap (6913ac3): replaced the ~530-line hand-rolled certifier (a _VariableIndex
+   registry, a _MilpRows COO accumulator, four row-builders, a separate ~120-line
+   _prove_with_gurobi backend, two near-duplicate scipy.milp drivers) with ONE solver-agnostic
+   PuLP model `_cut_counting_model` + `_pick_solver`. Net -319 lines in the program. Gurobi is
+   now a one-line switch: prove_*(..., use_gurobi=True). pulp is OPTIONAL (PULP_AVAILABLE),
+   consistent with nx/matplotlib; certifier + its self-check block + its tests skip cleanly
+   without it. Validated faithful vs the OLD scipy impl (captured before swap): M*(3,4,5)=4,6,8
+   (default, deletion, and tighteners-off); integral L_3(4) 12 FEAS/13 INFEAS, L_3(5) 16/17.
+   Found + fixed a real bug while building: cat="Binary" in PuLP RESETS bounds to [0,1], so the
+   cut endpoints (x[s,t,s]=1, x[s,t,t]=0) must be CONSTANTS, not fixed-bound Binary vars (else the
+   cut core is vacuous and M* comes out too high). Pinned pulp<4 (3.x is mid-migration to a 4.0
+   API rename; suppressed the 4.0 DeprecationWarnings); new program/requirements.txt. Docs:
+   README + ch2 + app_proofs reproducibility notes now say core=numpy+scipy, certifier+=pulp,
+   matplotlib/networkx optional.
+
+ENV: made a venv at Projects/thesis/.venv (gitignored) with numpy/scipy/networkx/matplotlib/pulp
+so the FULL suite + figures run here. System python3 has only numpy/scipy (+gcc), which is the
+"minimal core" headless test: self-check passes there with prover + Gomory-Hu sections skipped.
+Suite: 77 pass / 3 skip (venv) ; build 95 pp, 0 overfull, 0 undefined.
+
+NOT DONE (surfaced to author as a decision): the package split (one-file -> small package). Real
+tension discovered: the thesis PROSE repeatedly sells "a single self-contained file" as a
+reproducibility virtue (ch2 L350, app_proofs L1189, both edited this session). A full split
+contradicts that narrative and needs prose rewrites, and the file is already ~640 lines leaner
+across the two 06-19 sessions with the worst duplication gone. Recommended deciding split vs.
+keep-and-keep-consolidating before churning ~4700 lines. Awaiting author's call.
