@@ -1205,3 +1205,39 @@ suptitle + its make_figures caller + its variant_bounds figures.
 Verify: full suite 77 tests pass (was 75 + my 2 geng tests), 1 slow-enum skip. n=7 fact (b)
 run still going in the other tree's logs/. Build + commit + push pending at end of this
 entry; the MasterThesis repo will be mirrored to match this one.
+
+## 2026-06-19 (Opus) — verified the C extension, fixed an app_proofs punctuation regression, repo consolidation
+
+Author asked Opus to review Sonnet's recent work and to make THIS repo (Projects/thesis,
+remote louisvandenbruwaene/thesis, branch main) the single canonical one going forward, with
+the school-tree copy (Documents/.../MasterThesis_Louis/thesis_improved, remote MasterThesis,
+branch master) downstream. Future sessions: pull + work + push HERE.
+
+C extension review (the guards were already in place via 3d1beef; this confirms they are
+correct and were the right call):
+- Differential-tested the C primitives against pure Python AND networkx: _canonical_form
+  0/4000, _tiny_maxflow 0/8000, _tiny_maxflow vs networkx exact max-flow 0/3000; the scipy
+  csgraph exact-connectivity path 0/3000 vs networkx (directed + undirected); exceeds_bound
+  consistent with max_connectivity in vertex mode 0/1500.
+- Confirmed the two guards are load-bearing: without `and n <= 7`, canonical_form_min (buffers
+  best[49]/perm[7]) stack-smashes at n>=8 (reproduced), which the seam-base enumeration at
+  n=9,10 would hit. With the guard, n>=8 falls back to pure Python (0 mismatches at n=8/9/10).
+  The n<=16 guard on max_connectivity_exceeds matches res[256]/parent[16]; the search never
+  reaches it but the guard keeps it sound. .so is gitignored (correct: built per machine via
+  build_fast.sh, so -march=native stays optimal and never ships to a different CPU).
+- ch3's parallel-restart claim is true and harmless: ProcessPoolExecutor over a module-level
+  worker with the SAME seeds + order-preserving map + first-max tie-break, identical to
+  sequential, so no reported number changes.
+
+Fix landed here: the expanded app_proofs.tex (the fuller floor((n+m-2)^2/4) derivation, the
+incidence-graph edge count, the block-cut identity) had reintroduced 8 prose semicolons that
+violate the no-semicolon rule. Replaced with periods/commas, keeping all the new math:
+M*(7)=12 "; and"->", and"; theorem titles [Gomory--Hu; ...]/[Chernoff bounds; see] -> commas;
+"of e; it has"->". It has"; "3-connectivity; the"->". The"; "(Tutte \cite{Tutte66};"->","
+(two-citation parenthetical); "edges; give"->". Give"; "matplotlib; an optional"->". An".
+No Unicode em/en dashes anywhere. Suite 77 pass / 1 skip. Build: latexmk exit 0, 95 pp,
+0 overfull, 0 undefined refs/cites. Pushed to origin/main.
+
+Note for the author: maintaining two repos with parallel agents caused duplicate work (both
+trees independently fixed the same C guard bug). Recommend treating MasterThesis purely as a
+pre-submission mirror and doing all development here.

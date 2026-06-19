@@ -654,7 +654,7 @@ So every deletion is bipartite-type, the attachment equality applies, and
 $D = 2 \cdot B_{4,4}$ again. The whole $m = 3$ problem therefore rests on
 two finite integral statements about multigraphs with multiplicities in
 $\{0,1,2\}$:
-(a) $L_3^{\mathrm{dir}}(7) = 24$, equivalently $M^{*}(7) = 12$; and
+(a) $L_3^{\mathrm{dir}}(7) = 24$, equivalently $M^{*}(7) = 12$, and
 (b) every $24$-arc feasible multigraph on $7$ vertices with maximum degree
 at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled
 bidirected path $P_7$.
@@ -746,12 +746,12 @@ For a hypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disj
 Build the flow network of \Cref{fig:hyper-gadget}: for each hyperedge $e$ a helper arc $e^- \to e^+$ of capacity one, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each $x \in e$. A Berge path $u, e_1, v_1, \dots, e_k, v$ becomes the directed walk $u \to e_1^- \to e_1^+ \to v_1 \to \cdots \to v$, and since the $e_i$ are distinct, hyperedge-disjoint Berge paths use distinct helper arcs, so they translate to arc-disjoint flow paths. Conversely an integral maximum flow decomposes into paths, each of which, suppressing the helper nodes, is a Berge path, and no two share a hyperedge because each helper arc has capacity one. Finally, any finite cut of the network consists of helper arcs only, and a set of helper arcs separates $u$ from $v$ exactly when the corresponding hyperedges do. Max-flow min-cut now gives the claim.
 \end{proof}
 
-\begin{theorem}[Hypergraph Gomory--Hu; B\'{e}rczi et al.\ \cite{BercziEtAl24}]\label{thm:hyper-gomory-hu}
+\begin{theorem}[Hypergraph Gomory--Hu, B\'{e}rczi et al.\ \cite{BercziEtAl24}]\label{thm:hyper-gomory-hu}
 Every $r$-uniform hypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$ such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path, and each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with $|\delta_\HH(S_t)| = c^*(t)$, where $\delta_\HH(S)$ is the set of hyperedges meeting both sides.
 \end{theorem}
 
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
-\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$ and let $T^*$ be its Gomory--Hu tree. Every tree weight is a local connectivity, so $\sum_t c^*(t) \le (m-1)(n-1)$. For a hyperedge $e$ let $\mathrm{ST}(e)$ be the smallest subtree of $T^*$ containing the $r$ vertices of $e$; it has at least $r-1$ edges, and for each of its edges $t$ the hyperedge $e$ meets both sides of the induced partition, so $e \in \delta_\HH(S_t)$. Summing over hyperedges and exchanging the order of summation,
+\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$ and let $T^*$ be its Gomory--Hu tree. Every tree weight is a local connectivity, so $\sum_t c^*(t) \le (m-1)(n-1)$. For a hyperedge $e$ let $\mathrm{ST}(e)$ be the smallest subtree of $T^*$ containing the $r$ vertices of $e$. It has at least $r-1$ edges, and for each of its edges $t$ the hyperedge $e$ meets both sides of the induced partition, so $e \in \delta_\HH(S_t)$. Summing over hyperedges and exchanging the order of summation,
 \[
 (r-1)\,|E(\HH)| \;\le\; \sum_{e} |\{t : e \in \delta_\HH(S_t)\}| \;=\; \sum_{t} |\delta_\HH(S_t)| \;=\; \sum_{t} c^*(t) \;\le\; (m-1)(n-1),
 \]
@@ -947,7 +947,7 @@ is feasible for the vertex problem.
 
 The $m = 3$ case also closes completely. The engine is a rank bound for
 graphs in which one side of a partition must stay below local
-$3$-connectivity; the hypergraph theorem then falls out of the incidence
+$3$-connectivity. The hypergraph theorem then falls out of the incidence
 translation. Throughout, $\mathrm{rank}(G) = |E(G)| - |V(G)| + 1$ denotes
 the cycle rank of a connected multigraph.
 
@@ -1003,7 +1003,7 @@ visits $x$ only first and $x'$ only last, so it contains an $x$--$x'$ path
 with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
 (iv). If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
 $|X| \le 1$ and every $z$ has degree at most $1$ by (i), absurd. Otherwise
-decompose $G$ into its triconnected components (Tutte \cite{Tutte66};
+decompose $G$ into its triconnected components (Tutte \cite{Tutte66},
 Hopcroft--Tarjan \cite{HopcroftTarjan73}), whose shape and the leaf at which
 the argument bites are sketched in \Cref{fig:tutte-leaf}: a tree of pieces,
 each a cycle of
@@ -1141,7 +1141,7 @@ each ordered pair is served at most $m-1$ times and
 $(r-1)|E| \le (m-1) n(n-1)$. Lower bound: split $V$ into tails $A$,
 $|A| = \alpha$, and heads $B$. By \Cref{lem:sparse-hypergraph} there is a
 simple $(r-1)$-uniform hypergraph $\mathcal{G}^*$ on $B$ with maximum degree
-$m-1$ and $\floor{(m-1)|B|/(r-1)}$ edges; give every tail $a \in A$ the
+$m-1$ and $\floor{(m-1)|B|/(r-1)}$ edges. Give every tail $a \in A$ the
 hyperedges $(a, H)$, $H \in \mathcal{G}^*$. No vertex of $B$ is a tail, so
 every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
 \le m - 1$, while pairs inside $A$ or starting in $B$ have no routes.
@@ -1152,7 +1152,7 @@ every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
 
 The probabilistic ingredients are two Chernoff bounds, quoted in the form we use them.
 
-\begin{theorem}[Chernoff bounds; see {\cite[Cor.~4.4, Thm.~4.4]{Mulzer18}}]\label{thm:chernoff}
+\begin{theorem}[Chernoff bounds, see {\cite[Cor.~4.4, Thm.~4.4]{Mulzer18}}]\label{thm:chernoff}
 Let $X$ be a sum of independent $\{0,1\}$-valued random variables with mean $\mu$. For $\delta > 0$, $\Pr[X \ge (1+\delta)\mu] \le \exp\bigl(-\tfrac{\min(\delta, \delta^2)\,\mu}{4}\bigr)$, and for $\delta \in (0,1)$, $\Pr[X \le (1-\delta)\mu] \le \exp\bigl(-\tfrac{\delta^2 \mu}{2}\bigr)$.
 \end{theorem}
 
@@ -1186,7 +1186,7 @@ Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement fo
 
 \section{Computational transcripts}
 
-The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source accompanies the document as a single self-contained file, \texttt{erdos915\_unified.py} in the \texttt{program/} directory, which runs with \texttt{numpy}, \texttt{networkx}, \texttt{scipy}, and \texttt{matplotlib}; an optional compiled helper accelerates selected small hot paths but is not needed for correctness.
+The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source accompanies the document as a single self-contained file, \texttt{erdos915\_unified.py} in the \texttt{program/} directory, which runs with \texttt{numpy}, \texttt{networkx}, \texttt{scipy}, and \texttt{matplotlib}. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
 
 \lstinputlisting[style=pythonkul, language={}, caption={Solver output: $M^{*}(n) = 2(n-1)$, optimal with zero gap, for $n = 3, 4, 5, 6$.}]{figures/certificate_log.txt}
 
