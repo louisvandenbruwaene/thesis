@@ -1337,3 +1337,46 @@ reproducibility virtue (ch2 L350, app_proofs L1189, both edited this session). A
 contradicts that narrative and needs prose rewrites, and the file is already ~640 lines leaner
 across the two 06-19 sessions with the worst duplication gone. Recommended deciding split vs.
 keep-and-keep-consolidating before churning ~4700 lines. Awaiting author's call.
+
+## 2026-06-20 (Opus) -- figure helpers + reviewed hypergraph views & enumeration paths
+
+Author DECISION recorded (auto-memory [[feedback-keep-one-file]]): keep one self-contained file,
+consolidate IN PLACE, no package split (the thesis sells the single-file design). Author asked:
+(1) make shared figure helpers to cut lines, (2) look at the hypergraph named-view wrappers, (3)
+look into the two enumeration paths WITHOUT changing them and report. Planned in plan mode
+(/Users/chief/.claude/plans/woolly-snuggling-spindle.md), approved, executed.
+
+DID (figures, erdos915_unified.py only, -14 net lines but the real win is dedup):
+- Generalised the existing `_variant_dist_grid` -> `_variant_panel_grid(draw_panel, *, configs,
+  suptitle, suptitle_fontsize, row_label_fontsize, path)`: it owns the subplots(3,4,figsize
+  16x11), the panel loop, the per-row model-label annotate loop, the suptitle, tight_layout(rect),
+  and _save. Routed ALL FIVE 12-panel grids through it -- the two dist grids (already used it),
+  plus plot_sampled_variant_grid, plot_variant_grid (passes its `panels` as configs), and
+  plot_scatter_lambda_edges -- each now just supplies a draw_panel closure + its config list. The
+  subplots/row-label/tight_layout/save boilerplate was duplicated 4x; now it lives once.
+- Named the red `_RED="#E05050"` (was inline in 4 panel bodies) and pulled the scattered
+  `_GREEN`/`_VIOLET` into the one colour block at the top of FIGURES (each now commented by role).
+- `_save(path, *, tight=True)`: the two 3-D plotters (plot_variant_3d_surfaces,
+  plot_conn_threshold_3d) call `_save(path, tight=False)` instead of duplicating
+  `plt.savefig(...); plt.close()`; tight_layout still skipped for 3-D (it misbehaves there).
+- Behaviour-preserving by construction (moved code verbatim). Did NOT regenerate/commit the PNGs:
+  local matplotlib is 3.11.0 and would add version-drift binary diffs; author regenerates figures.
+
+REVIEWED, report only (no change), per the brief:
+- Hypergraph named-view wrappers (hyperedge_connectivity, max_hyperedge_connectivity,
+  max_hyper_vertex_connectivity): thin wrappers over hyper_connectivity/max_hyper_connectivity,
+  mirroring the graph-side thin views (local_edge_connectivity etc). NOT dead -- used by
+  tests/test_hypergraph + the self-check. KEEP (they are the named API the tests/text use).
+- Two enumeration paths: DFS `enumerate_extremal_directed_multigraphs` is dependency-free but
+  complete only for n<=6 (falls back to the CONJECTURED floor(j^2/4) bound at j>=7). The geng twin
+  `..._via_generation` uses nauty's geng to generate undirected supports and applies the PROVED
+  M*(j) bound only for j<=6 (none for j>=7), so it is SOUND for ALL n and can certify the open n=7
+  classification once it finishes; needs the geng binary. test_solve checks they agree at n<=5.
+  KEEP BOTH (deliberate redundancy: they cross-validate, only geng is sound at n=7). FUTURE-CLEANUP
+  NOTE: the proved table {2:2,3:4,4:6,5:8,6:10} is hardcoded 3x (_PROVEN_MSTAR in the MILP, `known`
+  in the DFS, `proved_mstar` in geng); a single source of truth would be safer but touches the
+  enumeration code that was out of scope here.
+
+VERIFY: all 5 refactored grids + the 3-D tight=False path render to PNGs in the venv with no error;
+suite 77 pass / 3 skip (venv); headless self-check ALL CHECKS PASSED (numpy+scipy only). Committed
+and pushed.

@@ -2206,10 +2206,13 @@ _VARIANT_SAMPLE_CONFIGS: list[dict] = [
 
 # --- FIGURES: headless matplotlib PNGs; each function takes a path and writes a file ---
 
-_KUL_BLUE = "#1D8DB0"
-_KUL_DARK = "#1E6E87"
-_KUL_LIGHT = "#52BDEC"
-_WARM = "#DC8C28"
+_KUL_BLUE = "#1D8DB0"    # feasible / proved
+_KUL_DARK = "#1E6E87"    # row labels, known-max lines
+_KUL_LIGHT = "#52BDEC"   # named branches
+_WARM = "#DC8C28"        # feasibility boundary, certain interval
+_RED = "#E05050"         # infeasible bars
+_GREEN = "#3CA050"       # machine-checked exact markers
+_VIOLET = "#9B5DE5"      # search lower-bound markers
 
 # Four-level sensitivity palette: cool (sigma=0) -> hot (sigma=max).
 _SIGMA_PALETTE = ["#52BDEC", "#F9C74F", "#F4914B", "#DC8C28"]  # 0,1,2,3+
@@ -2409,9 +2412,9 @@ def plot_sampled_variant_grid(
     bulk), then histograms the binding connectivity, blue feasible (``<= m-1``),
     red infeasible.
     """
-    fig, axes = plt.subplots(3, 4, figsize=(16, 11))
     threshold = m - 1
-    for cfg, ax in zip(_VARIANT_SAMPLE_CONFIGS, axes.flat):
+
+    def draw_panel(ax, cfg):
         n = cfg["sample_n"]
         p = _p_for_target_degree(
             target_degree_factor * m, n, directed=cfg["directed"],
@@ -2428,7 +2431,7 @@ def plot_sampled_variant_grid(
         lo, hi = min(vals), max(vals)
         levels = list(range(lo, hi + 1))
         counts = [vals.count(lv) for lv in levels]
-        colours = [_KUL_BLUE if lv <= threshold else "#E05050" for lv in levels]
+        colours = [_KUL_BLUE if lv <= threshold else _RED for lv in levels]
         ax.bar(levels, counts, color=colours, edgecolor="white", linewidth=0.4)
         ax.axvline(threshold + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
         ax.set_title(cfg["title"], fontsize=9.5)
@@ -2441,16 +2444,12 @@ def plot_sampled_variant_grid(
         # title and caption instead of repeated as a per-panel legend.
         ax.text(0.02, 0.98, f"$n={n}$", transform=ax.transAxes, ha="left",
                 va="top", fontsize=8, color="grey")
-    for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
-        axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
-                              rotation=90, ha="center", va="center",
-                              fontsize=12, fontweight="bold", color=_KUL_DARK)
-    fig.suptitle("Binding connectivity under random sampling across all twelve variants "
-                 fr"($m = {m}$, expected degree ${{\approx}}\, m$): "
-                 fr"blue feasible $\leq {threshold}$, red infeasible",
-                 fontsize=13)
-    fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
-    _save(path)
+
+    suptitle = ("Binding connectivity under random sampling across all twelve variants "
+                fr"($m = {m}$, expected degree ${{\approx}}\, m$): "
+                fr"blue feasible $\leq {threshold}$, red infeasible")
+    _variant_panel_grid(draw_panel, configs=_VARIANT_SAMPLE_CONFIGS, suptitle=suptitle,
+                        path=path, suptitle_fontsize=13)
 
 
 def plot_connectivity_distribution(series: dict, n: int, p: float, path: str | Path) -> None:
@@ -2628,7 +2627,7 @@ def plot_search_trace(result: SearchResult, path: str | Path,
     if ceiling is not None:
         boundary = ceiling + 0.5
         ax.axvspan(lo, boundary, color=_GREEN, alpha=0.10)
-        ax.axvspan(boundary, hi, color="#E05050", alpha=0.10)
+        ax.axvspan(boundary, hi, color=_RED, alpha=0.10)
         ax.axvline(boundary, color=_WARM, linestyle="--", linewidth=1.4)
         ax.set_xlim(lo, hi)
         # Labels centred over each shaded region, placed just above the axes box.
@@ -2768,24 +2767,23 @@ def draw_graph_with_sensitivity(
     _save(path)
 
 
-def _save(path: str | Path) -> None:
-    """Tighten the layout, write the file, and close the figure."""
+def _save(path: str | Path, *, tight: bool = True) -> None:
+    """Tighten the layout, write the file, and close the figure.
+
+    ``tight=False`` skips ``tight_layout`` for the 3-D figures, where it
+    misbehaves with the projected axes (they manage their own spacing).
+    """
     import warnings
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    # tight_layout can warn when figures contain colorbars or shared axes;
-    # bbox_inches="tight" in savefig handles the actual bounding box so the
-    # layout warning is cosmetic and safe to suppress.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        plt.tight_layout()
+    if tight:
+        # tight_layout can warn when figures contain colorbars or shared axes;
+        # bbox_inches="tight" in savefig handles the actual bounding box so the
+        # layout warning is cosmetic and safe to suppress.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            plt.tight_layout()
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()  # release the figure so head-less runs don't leak memory
-
-
-# --- two figures added for the discovery chapter ---
-
-_GREEN = "#3CA050"
-_VIOLET = "#9B5DE5"
 
 
 def plot_complexity_growth(path: str | Path) -> None:
@@ -2864,8 +2862,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     where it is dashed it is conjectured, where it is dotted we are guessing, and
     the shaded band is the interval we are certain the truth lies in.
     """
-    fig, axes = plt.subplots(3, 4, figsize=(16, 11))
-    for panel, ax in zip(panels, axes.flat):
+    def draw_panel(ax, panel):
         band = panel.get("band")
         if band is not None:
             xs, lo, hi = band
@@ -2903,20 +2900,14 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=6.8, loc="upper left", framealpha=0.85)
 
-    # Row labels (the model axis) down the left margin.
-    for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
-        axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
-                              rotation=90, ha="center", va="center",
-                              fontsize=12, fontweight="bold", color=_KUL_DARK)
     # The line styles (solid / dashed / dotted) are named in the per-panel
     # legends and spelled out in the caption, so the suptitle stays short and
     # just records the variant family and the threshold m.
     suptitle = "Erdős 915 across the twelve variants"
     if m is not None:
         suptitle += fr",  $m = {m}$"
-    fig.suptitle(suptitle, fontsize=13)
-    fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
-    _save(path)
+    _variant_panel_grid(draw_panel, configs=panels, suptitle=suptitle, path=path,
+                        suptitle_fontsize=13)
 
 
 # --- ENUMERATION LANDSCAPES: visit every labeled graph, collect (edges, lambda^max) ---
@@ -3071,14 +3062,12 @@ def plot_scatter_lambda_edges(
     connectivity value carries an exact extremal edge count and the frontier is
     read off without any interpolation between levels.
     """
-    fig, axes = plt.subplots(3, 4, figsize=(16, 11))
-
-    for cfg, ax in zip(_VARIANT_ENUM_CONFIGS, axes.flat):
+    def draw_panel(ax, cfg):
         key = cfg["key"]
         data = enum_data.get(key, [])
         if not data:
             ax.set_title(cfg["title"], fontsize=9.5)
-            continue
+            return
 
         edges_arr = [e for e, _ in data]
         conn_arr  = [c for _, c in data]
@@ -3111,36 +3100,37 @@ def plot_scatter_lambda_edges(
         ax.text(0.02, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
                 ha="left", va="top", fontsize=8, color="grey")
 
-    for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
-        axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
-                              rotation=90, ha="center", va="center",
-                              fontsize=12, fontweight="bold", color=_KUL_DARK)
-
-    fig.suptitle("Extremal envelope: edge count against binding connectivity "
-                 "across all twelve variants (full enumeration)",
-                 fontsize=13)
-    fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
-    _save(path)
+    _variant_panel_grid(
+        draw_panel, path=path,
+        suptitle=("Extremal envelope: edge count against binding connectivity "
+                  "across all twelve variants (full enumeration)"),
+        suptitle_fontsize=13)
 
 
-def _variant_dist_grid(draw_panel, *, suptitle: str, path: str | Path,
-                       row_label_fontsize: float = 12.0) -> None:
-    """Shared scaffold for the twelve-panel variant distribution grids (three
-    model rows by four columns).  Builds the axes, calls ``draw_panel(ax, cfg)``
-    on each variant in turn, adds the per-row model labels and the suptitle, and
-    saves.  The per-panel drawing is the only thing that differs between the
-    connectivity and edge-count grids, so the caller supplies it as
-    ``draw_panel``; everything else (layout, row labels, save) lives here once.
+def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
+                        configs=None, suptitle_fontsize: float = 12.0,
+                        row_label_fontsize: float = 12.0) -> None:
+    """Shared scaffold for every twelve-panel variant grid (three model rows by
+    four columns): the distribution grids, the proved/conjectured bound grid, the
+    sampled grid, and the extremal-envelope scatter.  Builds the axes, calls
+    ``draw_panel(ax, cfg)`` on each panel config in turn, adds the per-row model
+    labels and the suptitle, and saves.  Only the per-panel drawing and the panel
+    configs differ between the grids, so the caller supplies both; everything else
+    (layout, row labels, save) lives here once.  ``configs`` defaults to the
+    twelve enumeration variants but may be any 12-item list (e.g. the sampled
+    configs or a precomputed ``panels`` list).
     """
+    if configs is None:
+        configs = _VARIANT_ENUM_CONFIGS
     fig, axes = plt.subplots(3, 4, figsize=(16, 11))
-    for cfg, ax in zip(_VARIANT_ENUM_CONFIGS, axes.flat):
+    for cfg, ax in zip(configs, axes.flat):
         draw_panel(ax, cfg)
     for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
         axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
                               rotation=90, ha="center", va="center",
                               fontsize=row_label_fontsize, fontweight="bold",
                               color=_KUL_DARK)
-    fig.suptitle(suptitle, fontsize=12)
+    fig.suptitle(suptitle, fontsize=suptitle_fontsize)
     fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
     _save(path)
 
@@ -3171,7 +3161,7 @@ def plot_conn_dist_grid(
         lo, hi = min(conn_vals), max(conn_vals)
         levels = list(range(lo, hi + 1))
         counts = [conn_vals.count(lv) for lv in levels]
-        bar_colours = [_KUL_BLUE if lv <= threshold else "#E05050" for lv in levels]
+        bar_colours = [_KUL_BLUE if lv <= threshold else _RED for lv in levels]
         ax.bar(levels, counts, color=bar_colours, edgecolor="white", linewidth=0.4)
 
         ax.axvline(threshold + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
@@ -3198,8 +3188,8 @@ def plot_conn_dist_grid(
 
     suptitle = (fr"Connectivity distribution across all twelve variants, $m = {m}$ "
                 fr"(blue = feasible $\lambda^{{\max}} \leq {threshold}$, red = infeasible)")
-    _variant_dist_grid(draw_panel, suptitle=suptitle, path=path,
-                       row_label_fontsize=12)
+    _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
+                        row_label_fontsize=12)
 
 
 def plot_edge_dist_grid(
@@ -3236,7 +3226,7 @@ def plot_edge_dist_grid(
                     alpha=0.8, label=r"$\lambda^{\max} \leq m-1$",
                     edgecolor="white", linewidth=0.3)
         if infeas_edges:
-            ax.hist(infeas_edges, bins=bins, align="left", color="#E05050",
+            ax.hist(infeas_edges, bins=bins, align="left", color=_RED,
                     alpha=0.7, label=r"$\lambda^{\max} \geq m$",
                     edgecolor="white", linewidth=0.3)
 
@@ -3261,8 +3251,8 @@ def plot_edge_dist_grid(
 
     suptitle = (fr"Edge count distribution across all twelve variants, $m = {m}$ "
                 fr"(blue = feasible, red = infeasible)")
-    _variant_dist_grid(draw_panel, suptitle=suptitle, path=path,
-                       row_label_fontsize=11)
+    _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
+                        row_label_fontsize=11)
 
 
 # --- 3-D BOUND SURFACE: cache solve() over (variant, n, m) grid; plot_variant_3d_surfaces draws it ---
@@ -3493,9 +3483,7 @@ def plot_variant_3d_surfaces(
     fig.suptitle("Erdős 915: optimal bound over $(n, m)$, "
                  "blue where proved, purple where only a search lower bound is known",
                  fontsize=13, y=0.99)
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(path, dpi=150, bbox_inches="tight")
-    plt.close()
+    _save(path, tight=False)
 
 
 # --- 3-D THRESHOLD HISTOGRAM: lambda^max distribution vs p for three variants ---
@@ -3598,9 +3586,7 @@ def plot_conn_threshold_3d(
         fr"$m = {m}$ (threshold at $p^* = m/n$)",
         fontsize=12,
     )
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(path, dpi=150, bbox_inches="tight")
-    plt.close()
+    _save(path, tight=False)
 
 
 # --- OPEN-VARIANT EXPLORATION: hypergraph vertex connectivity, fractional search tools ---
