@@ -2,6 +2,65 @@
 
 Status: TODO | IN PROGRESS | BLOCKED(by) | AWAITING AUTHOR | DONE→delete after logging
 
+## NEXT SESSION — SA vs TABU (ch3 expansion + program feature)
+
+Goal: make the thesis's discovery chapter show both search methods, explain and
+compare them, and let the program run either on demand.
+
+### Step 1 — add tabu search to erdos915_unified.py
+
+Tabu search implementation lives in research_notes/scripts/tabu_vs_sa.py. Move
+it into erdos915_unified.py as `tabu_search_for_dense_graph(n, m, variant, ...)`,
+parallel to the existing `search_for_dense_graph` (SA). Add a `method=` kwarg
+to `solve()` / `best_of_searches()` accepting `"sa"` (default) or `"tabu"`. No
+other interface change; all existing tests must still pass.
+
+### Step 2 — produce comparison data
+
+Run a fresh head-to-head benchmark (existing data in
+research_notes/jan_followup_nauty_and_tabu.md if a re-run is not feasible):
+
+| variant           |  n | opt | SA best | tabu best | SA time | tabu time |
+|-------------------|----|-----|---------|-----------|---------|-----------|
+| simple undirected |  7 |  9  |  9      | 9         |   ...   |   ...     |
+| simple directed   |  7 | 18  | 16      | 18        |   ...   |   ...     |
+| multi directed    |  5 | 16  | 15      | 16        |   ...   |   ...     |
+| multi directed    |  7 | 24  | 20      | 24        |   ...   |   ...     |
+
+Equal wall-clock budget (6 s) per method. Report best value found and time-to-
+optimum where the optimum is reached. Add this table as a LaTeX table in ch3.
+
+### Step 3 — add a convergence figure
+
+Plot best-value-found vs. time for SA and tabu on the two cases where they
+diverge (multi-directed n=5 and n=7). One matplotlib figure, saved to
+figures/sa_vs_tabu_convergence.pdf, included in ch3 via \includegraphics.
+The figure should show tabu converging faster/higher and SA plateauing early.
+
+### Step 4 — write the ch3 section
+
+After the existing rediscovery table (around line 123), add a new subsection
+\subsection{Simulated annealing versus tabu search}. Content:
+- How SA works (already in ch3; can cross-reference alg:anneal).
+- How tabu works: best-improving step with a fixed-length tabu list forbidding
+  recently toggled edges; restart on stall. No temperature, no randomness.
+  Pros: deterministic hill-climb, no wasted moves downhill.
+  Cons: can cycle without sufficient list length; less exploration of disconnected
+  optima; sensitive to list-length hyperparameter.
+- When SA wins: undirected and small directed (landscape convex enough, SA's
+  random restarts explore more broadly).
+- When tabu wins: directed multigraph cases where the extremiser is a structured
+  bipartite construction and the annealer's random walk struggles to assemble it
+  within the cooling schedule.
+- Closing sentence: SA is the program's default because it sufficed for every
+  result in this thesis; tabu is the stronger engine for future directed searches.
+
+### Step 5 — verify and build
+
+Run full test suite (77 tests pass), rebuild PDF (0 overfull), confirm the new
+\subsection and figure appear correctly and the rediscovery table is unchanged.
+Commit and push both repos.
+
 ## NEXT SESSION — FABLE (genuine proof attempts; author asked Fable to try these for real)
 Pick ONE and go deep; these are the thesis's own open problems (ch4 §"Open problems").
 Verify any result with a Fable proof-check before it enters the text uncommented.
