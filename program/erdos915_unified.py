@@ -2456,6 +2456,59 @@ def plot_sampled_variant_grid(
                         path=path, suptitle_fontsize=13)
 
 
+def plot_threshold_variant_grid(
+    path: str | Path, *, m: int = 4, alpha: float = 0.5,
+    trials: int = 80, seed: int = 7,
+    targets: tuple = (0.2, 0.35, 0.5, 0.65, 0.8, 1.0, 1.25, 1.6, 2.0),
+) -> None:
+    """12-panel threshold-crossing curves, one per variant.
+
+    Each panel plots the appearance probability of binding connectivity >= m
+    against measured mean binding degree in units of m, showing where the
+    threshold falls for that variant.  Complements :func:`plot_degree_threshold`,
+    which overlays all six generative models; here each of the twelve variants
+    gets its own panel.
+    """
+    def draw_panel(ax, cfg):
+        n = cfg["sample_n"]
+        xs, ys = [], []
+        rng = random.Random(seed)
+        for t in targets:
+            p = _p_for_target_degree(
+                t * m, n, directed=cfg["directed"], simple=cfg["simple"],
+                hypergraph=cfg["hypergraph"], r=cfg["r"], alpha=alpha)
+            degs, hits = [], 0
+            for _ in range(trials):
+                obj = _sample_variant(
+                    n, p, directed=cfg["directed"], simple=cfg["simple"],
+                    hypergraph=cfg["hypergraph"], r=cfg["r"],
+                    alpha=alpha, cap=m - 1, rng=rng)
+                degs.append(_mean_binding_degree(
+                    obj, directed=cfg["directed"], hypergraph=cfg["hypergraph"]))
+                if _measure_variant(obj, separation=cfg["separation"],
+                                    hypergraph=cfg["hypergraph"]) >= m:
+                    hits += 1
+            xs.append(sum(degs) / len(degs) / m)
+            ys.append(hits / trials)
+        ax.plot(xs, ys, "-o", color=_KUL_BLUE, markersize=3.5, linewidth=1.6)
+        ax.axvline(1.0, color="black", linestyle="--", linewidth=1.4)
+        ax.axhline(0.5, color="gray", linestyle=":", linewidth=0.9, alpha=0.5)
+        ax.set_title(cfg["title"], fontsize=9.5)
+        ax.set_xlabel(r"mean degree / $m$", fontsize=8.5)
+        ax.set_ylabel(r"$\hat{P}[\lambda^{\max} \geq m]$", fontsize=8.5)
+        ax.set_ylim(-0.05, 1.05)
+        ax.tick_params(labelsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.text(0.02, 0.98, f"$n={n}$", transform=ax.transAxes, ha="left",
+                va="top", fontsize=8, color="grey")
+
+    suptitle = (fr"Threshold crossing for all twelve variants ($m = {m}$): "
+                r"$\hat{P}[\lambda^{\max} \geq m]$ vs mean degree, "
+                r"vertical line at asymptotic threshold")
+    _variant_panel_grid(draw_panel, configs=_VARIANT_SAMPLE_CONFIGS,
+                        suptitle=suptitle, path=path, suptitle_fontsize=12)
+
+
 def plot_connectivity_distribution(series: dict, n: int, p: float, path: str | Path) -> None:
     """Plot overlaid histograms of the binding connectivity for several models.
 

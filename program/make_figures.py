@@ -35,7 +35,7 @@ from erdos915_unified import (  # noqa: E402
     connectivity_distribution,
     gallery_extremal_graphs,
     plot_degree_threshold,
-    plot_sampled_variant_grid,
+    plot_threshold_variant_grid,
     directed_arc_lower_bound,
     directed_multigraph_arc,
     draw_graph_with_sensitivity,
@@ -553,11 +553,13 @@ def main() -> None:
         FIGURES / "degree_threshold.png", n=12, m=4, alpha=0.5, trials=70, seed=7)
     print("wrote degree_threshold.png")
 
-    # Fig B -- the sampled analogue of the enumeration grid: all twelve variants,
-    # binding-connectivity distributions at sizes well past the enumeration wall.
-    plot_sampled_variant_grid(
-        FIGURES / "sampled_variant_grid.png", m=4, trials=120, seed=7)
-    print("wrote sampled_variant_grid.png")
+    # Fig B -- threshold-crossing curves for all twelve variants: each panel shows
+    # P[lambda_max >= m] against mean binding degree in units of m, with the
+    # vertical asymptotic threshold at degree = m.  Complements plot_degree_threshold,
+    # which overlays all six generative models; here each variant gets its own panel.
+    plot_threshold_variant_grid(
+        FIGURES / "threshold_variant_grid.png", m=4, trials=80, seed=7)
+    print("wrote threshold_variant_grid.png")
 
     # Edge vs vertex disjointness in G(16, p) at three densities (Chapter 1).
     p_values = [0.25, 0.5, 0.75]
