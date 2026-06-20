@@ -41,6 +41,31 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       (below) attack these numerically; a clean structural proof would be stronger and
       is independently interesting. (m=3 directed multigraph closes the moment these land.)
 
+## ERRORS FOUND 2026-06-20 (by Claude Code review of all chapters)
+
+- [ ] **ch1:184 wrong term "arcs" in undirected context (prop:leonard-m2 proof).**
+      "any two vertices on that cycle are joined by the two **arcs** of the cycle"
+      -- "arcs" is directed-graph terminology. Should be "**paths** along the cycle"
+      (or "the two path segments of the cycle"). Simple one-word fix.
+
+- [ ] **ch3:148 misattributed citation `\cite{ErdosProblems}` for "pre-2024 conjecture".**
+      Line reads: "that overturned the naive pre-2024 conjecture `\cite{ErdosProblems}`".
+      The 2026-06-13 session removed this exact citation from ch1 because the directed
+      m>=3 conjecture is not stated in Problem 915. The ch1 version now says "the natural
+      initial conjecture" with no citation; ch3 still has the old misattributed text.
+      Fix: remove the citation and reword to "the natural initial conjecture" to match ch1.
+
+- [ ] **ch1:387 false claim "first at n = m + 8 for m = 4".**
+      Text: "the new formula strictly exceeds floor(n^2/4)+(m-2)ceil(n/2) at even n
+      large enough (first at n = m+8 for m = 4)."
+      WRONG: the new quadratic formula floor((n+m-2)^2/4) exceeds the old balanced-
+      partition formula floor(n^2/4)+(m-2)ceil(n/2) by EXACTLY 1 at EVERY even n for
+      m=4 (verified: diff=1 at n=2,4,6,8,10,12). What is "first at n=12" is that the
+      full conjectured value max(m(n-1), floor((n+m-2)^2/4)) first exceeds the old full
+      value max(m(n-1), floor(n^2/4)+(m-2)ceil(n/2)) -- because the hub term m(n-1)
+      dominates both before n=12, making them equal until then. The sentence needs to
+      compare the full max-formulas, not just the quadratic branches in isolation.
+
 ## C EXTENSION DONE 2026-06-19 (commit 5c00dd8, both repos pushed)
 _erdos_fast.c + build_fast.sh: tiny_maxflow (~2x dense), max_connectivity_exceeds (2.2x),
 canonical_form_min (147x). Pure-Python fallback intact; 77/77 tests pass with C loaded.
