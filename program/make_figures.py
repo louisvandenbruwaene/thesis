@@ -34,7 +34,6 @@ from erdos915_unified import (  # noqa: E402
     compute_surface_cache,
     connectivity_distribution,
     gallery_extremal_graphs,
-    plot_appearance_threshold,
     plot_degree_threshold,
     plot_sampled_variant_grid,
     directed_arc_lower_bound,

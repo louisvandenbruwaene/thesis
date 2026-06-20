@@ -391,13 +391,14 @@ def directed_arc_m2(n: int) -> int:
 def directed_arc_lower_bound(n: int, m: int) -> int:
     """Lower bound and conjectured value for ``ell_m^dir(n)``, ``m >= 2``.
 
-    ``max(m(n-1), floor(n^2/4) + (m-2) ceil(n/2))``.  The two branches are the
-    hub construction and the augmented one-directional bipartite construction.
-    Proved as a lower bound for all ``m``; conjectured to be tight for ``m >= 3``
+    ``max(m(n-1), floor((n+m-2)^2/4))``.  The two branches are the hub
+    construction (``const:directed-hub``) and the shifted-partition augmented
+    bipartite construction (``const:augmented-bipartite``).  Proved as a lower
+    bound for all ``m``; conjectured to be tight for ``m >= 3``
     (``conj:dir-arc``), proved tight for ``m = 2``.
     """
     hub_branch = m * (n - 1)
-    bipartite_branch = (n * n) // 4 + (m - 2) * ((n + 1) // 2)
+    bipartite_branch = (n + m - 2) ** 2 // 4
     return max(hub_branch, bipartite_branch)
 
 
@@ -597,23 +598,26 @@ def one_directional_bipartite(n: int) -> Graph:
 def augmented_bipartite(n: int, m: int) -> Graph:
     """The conjectured directed extremiser for ``m >= 2``.
 
-    Start from the complete one-directional bipartite digraph ``A -> B`` with
-    ``A`` the smaller part, then thicken the larger part ``B`` by a circulant
-    digraph in which every vertex receives ``m - 2`` extra arcs from other
-    ``B`` vertices.  Because no arc leaves ``B`` toward ``A``, a route between
-    two ``B`` vertices never escapes ``B``, and a route from ``A`` to a vertex
-    ``b`` uses the direct arc plus one short detour through each of ``b``'s
-    ``m - 2`` extra in-arcs.  Hence ``lambda^max = m - 1`` while the arc count
-    reaches ``floor(n^2/4) + (m-2) ceil(n/2)``.
+    Set ``|B| = ceil((n+m-2)/2)`` and ``|A| = n - |B|``.  Fill every arc
+    ``A -> B`` (the one-directional wall), then give each ``B``-vertex
+    ``m - 2`` extra in-arcs from its circulant predecessors inside ``B``.
+    Because no arc leaves ``B`` toward ``A``, a route between two ``B``
+    vertices never escapes ``B``, and a route from ``A`` to ``b`` uses the
+    direct arc plus one short detour through each of ``b``'s ``m - 2``
+    in-arcs, giving ``lambda^max = m - 1``.  The arc count is
+    ``floor((n+m-2)^2/4)`` (``const:augmented-bipartite`` in the thesis).
 
-    Requires ``m - 2 < |B| = ceil(n/2)`` so the circulant offsets stay distinct.
-    For ``m = 3, n = 10`` this returns the 30-arc graph that refutes the naive
-    conjecture.
+    Requires ``n >= m`` so that ``|A| >= 1`` and the circulant offsets stay
+    distinct.  At ``m = 2`` or ``m = 3`` the partition equals the balanced
+    ``(floor(n/2), ceil(n/2))`` split and the formula reduces to
+    ``floor(n^2/4) + (m-2)ceil(n/2)``.  At ``m >= 4`` the shifted partition
+    gives strictly more arcs.  For ``m = 3, n = 10`` this is the 30-arc
+    counterexample.
     """
-    size_a = n // 2
-    size_b = n - size_a  # the larger part, ceil(n/2)
-    if m - 2 >= size_b:
-        raise ValueError("augmented_bipartite needs m - 2 < ceil(n/2)")
+    size_b = (n + m - 2 + 1) // 2   # ceil((n+m-2)/2)
+    size_a = n - size_b
+    if size_a < 1:
+        raise ValueError("augmented_bipartite needs n >= m")
 
     graph = Graph(n, SIMPLE_DIRECTED)
     part_a = range(size_a)
@@ -3780,16 +3784,15 @@ def enumerate_extremal_directed_multigraphs(
             order.append((i, j))
             order.append((j, i))
     block_end = {j: 2 * ((j + 1) * j // 2) for j in range(1, n)}  # prefix length
-    known = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}  # M*(j), proved for j <= 6
     # SOUNDNESS NOTE: for j <= 6 the prefix cap (m-1)*M*(j) is a PROVED upper
-    # bound, so pruning at that cap is safe.  For j >= 7, known.get(j, 0) == 0
+    # bound, so pruning at that cap is safe.  For j >= 7, _PROVEN_MSTAR.get(j, 0) == 0
     # and we fall back to (m-1)*floor(j^2/4), which equals the conjectured
     # bipartite bound and is NOT yet proved.  Any call with n >= 7 therefore
     # uses an unverified pruning at the j=7 boundary: the enumeration is sound
     # as a lower-bound search but cannot certify completeness for n >= 7.
     # To produce a proof for n=7 the j=7 pruning must be disabled or replaced
     # by a proved bound (e.g. from the MILP once M*(7) is confirmed).
-    prefix_cap = {j: (m - 1) * max(known.get(j, 0), (j * j) // 4)
+    prefix_cap = {j: (m - 1) * max(_PROVEN_MSTAR.get(j, 0), (j * j) // 4)
                   for j in range(2, n + 1)}
 
     mu = np.zeros((n, n), dtype=int)
@@ -3951,8 +3954,6 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     # PROVED M*(j) = L_m^dir(j) / (m-1) for j <= 6 (cut-counting MILP / base
     # cases).  No entry for j >= 7: that value is exactly what statement (a)
     # would establish, so using it would be circular and is deliberately omitted.
-    proved_mstar = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}
-
     seen: set[bytes] = set()
     representatives: list[np.ndarray] = []
     mu = np.zeros((n, n), dtype=int)
@@ -4009,7 +4010,7 @@ def enumerate_extremal_directed_multigraphs_via_generation(
             out_deg[v] += b; in_deg[u] += b
             ok = True
             if j is not None:     # block boundary: prefix {0..j-1} is complete
-                cap = proved_mstar.get(j)         # j == prefix size
+                cap = _PROVEN_MSTAR.get(j)        # j == prefix size
                 if cap is not None and arcs + s > (m - 1) * cap:
                     ok = False                    # PROVED induced-arc bound
                 elif not feasible_prefix(j):
@@ -4589,7 +4590,7 @@ def _run_checks() -> int:
           counterexample.edge_count() == 30 and max_edge_connectivity(counterexample) == 2)
     for n, m in [(8, 3), (10, 4), (12, 4), (10, 5)]:
         graph = augmented_bipartite(n, m)
-        expected = (n * n) // 4 + (m - 2) * ((n + 1) // 2)
+        expected = (n + m - 2) ** 2 // 4
         check(f"n={n},m={m}: {graph.edge_count()} arcs (expected {expected}), lambda^max={max_edge_connectivity(graph)}",
               graph.edge_count() == expected and max_edge_connectivity(graph) == m - 1)
 

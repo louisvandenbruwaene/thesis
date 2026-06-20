@@ -48,7 +48,7 @@ class Bounds(unittest.TestCase):
         self.assertEqual(directed_arc_lower_bound(4, 2), 6)
         for n in range(3, 14):
             for m in range(2, 5):
-                expected = max(m * (n - 1), (n * n) // 4 + (m - 2) * ((n + 1) // 2))
+                expected = max(m * (n - 1), (n + m - 2) ** 2 // 4)
                 self.assertEqual(directed_arc_lower_bound(n, m), expected)
 
     def test_hypergraph_edge(self):

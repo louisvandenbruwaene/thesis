@@ -37,12 +37,12 @@ class Constructions(unittest.TestCase):
         self.assertEqual(augmented_bipartite(10, 3).edge_count(), 30)
         for n, m in [(8, 3), (10, 4), (12, 4), (10, 5)]:
             g = augmented_bipartite(n, m)
-            self.assertEqual(g.edge_count(), (n * n) // 4 + (m - 2) * ((n + 1) // 2))
+            self.assertEqual(g.edge_count(), (n + m - 2) ** 2 // 4)
             self.assertEqual(max_edge_connectivity(g), m - 1)
 
     def test_augmented_bipartite_guards_its_precondition(self):
         with self.assertRaises(ValueError):
-            augmented_bipartite(4, 5)  # needs m - 2 < ceil(n/2)
+            augmented_bipartite(3, 5)  # needs n >= m
 
     def test_clique_tree_is_globally_connected(self):
         for blocks in range(0, 5):
