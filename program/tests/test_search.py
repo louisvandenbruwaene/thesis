@@ -14,6 +14,7 @@ from erdos915_unified import (
     max_connectivity,
     max_edge_connectivity,
     search_for_dense_graph,
+    tabu_search_for_dense_graph,
 )
 
 
@@ -35,6 +36,34 @@ class Search(unittest.TestCase):
             result = best_of_searches(SIMPLE_UNDIRECTED, n, 3, restarts=6, steps=3000, seed=0)
             self.assertEqual(result.best_edge_count, expected)
             self.assertLessEqual(max_edge_connectivity(result.best_graph), 2)
+
+
+class TabuSearch(unittest.TestCase):
+    """Tabu search is the deterministic twin of the annealer: same energy and
+    neighbourhood, so it rediscovers the same small extremal values.
+    """
+
+    def test_tabu_rediscovers_directed_m2(self):
+        result = tabu_search_for_dense_graph(SIMPLE_DIRECTED, n=4, m=2,
+                                             steps=150, seed=0)
+        self.assertEqual(result.best_edge_count, 6)  # ell_2^dir(4) = 6
+        self.assertTrue(result.feasible_found)
+        self.assertLessEqual(max_edge_connectivity(result.best_graph), 1)
+
+    def test_tabu_rediscovers_undirected_m3(self):
+        result = tabu_search_for_dense_graph(SIMPLE_UNDIRECTED, n=4, m=3,
+                                             steps=150, seed=0)
+        self.assertEqual(result.best_edge_count, 4)  # ell_3(4) = 4
+        self.assertLessEqual(max_edge_connectivity(result.best_graph), 2)
+
+    def test_best_of_searches_accepts_tabu_method(self):
+        result = best_of_searches(SIMPLE_DIRECTED, 4, 2, restarts=2,
+                                  method="tabu", parallel=False, steps=120)
+        self.assertEqual(result.best_edge_count, 6)
+
+    def test_unknown_method_rejected(self):
+        with self.assertRaises(ValueError):
+            best_of_searches(SIMPLE_UNDIRECTED, 4, 3, method="genetic")
 
 
 class FastPathEquivalence(unittest.TestCase):

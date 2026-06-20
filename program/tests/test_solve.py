@@ -3,10 +3,15 @@
 import shutil
 import unittest
 
+import itertools
+
+import numpy as np
+
 from erdos915_unified import (
     solve,
     enumerate_extremal_directed_multigraphs as _dfs_enum,
     enumerate_extremal_directed_multigraphs_via_generation as _gen_enum,
+    _decorate_support_worker,
     _canonical_form,
 )
 
@@ -75,6 +80,43 @@ class GengGeneration(unittest.TestCase):
         # bidirected spanning trees, one per unlabelled tree: 2 on 4 vertices.
         reps = _gen_enum(4, 3, 12)            # L_3^dir(4) = 2(n-1)(m-1) = 12
         self.assertEqual(len(self._classes(reps)), 2)
+
+
+class SupportWorker(unittest.TestCase):
+    """The per-support decorator is the unit the generation enumerator fans out
+    across processes.  Over every support it must reproduce the DFS classes, so
+    the parallel refactor is covered here even without geng on PATH."""
+
+    @staticmethod
+    def _all_supports(n, min_e, max_e):
+        # Every non-isomorphic simple graph on n vertices in the edge range, the
+        # output geng would feed the enumerator, by brute force + canonical dedup.
+        pairs = [(i, j) for i in range(n) for j in range(i + 1, n)]
+        seen, out = set(), []
+        for mask in itertools.product((0, 1), repeat=len(pairs)):
+            if not (min_e <= sum(mask) <= max_e):
+                continue
+            mu = np.zeros((n, n), dtype=int)
+            edges = []
+            for (i, j), bit in zip(pairs, mask):
+                if bit:
+                    mu[i, j] = mu[j, i] = 1
+                    edges.append((i, j))
+            key = _canonical_form(mu)
+            if key not in seen:
+                seen.add(key)
+                out.append(edges)
+        return out
+
+    def test_worker_union_matches_dfs_at_n4(self):
+        n, m, target = 4, 3, 12
+        supports = self._all_supports(n, (target + 3) // 4, min(target, n * (n - 1) // 2))
+        reps = []
+        for edges in supports:
+            reps.extend(_decorate_support_worker((n, m, target, None, True, edges)))
+        worker = {_canonical_form(mu) for mu in reps}
+        dfs = {_canonical_form(mu) for mu in _dfs_enum(n, m, target)}
+        self.assertEqual(worker, dfs)
 
 
 if __name__ == "__main__":

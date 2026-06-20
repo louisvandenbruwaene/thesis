@@ -52,9 +52,12 @@ The program runs without a build step; `bash build_fast.sh` optionally compiles
 
 One optional extra: `enumerate_extremal_directed_multigraphs_via_generation` (the
 sound, generation-based directed-multigraph enumerator that follows J. Goedgebeur's
-`geng` suggestion) shells out to nauty's `geng`. Everything else, including the
-self-test, the figures, and the test suite, runs without it; the one unit test that
-exercises it skips automatically when `geng` is not on `PATH`.
+`geng` suggestion) shells out to nauty's `geng`. It decorates the supports in
+parallel across processor cores (each support is independent), which is what makes
+the open `n = 7` classification practical on a multi-core machine; pass
+`parallel=False` for a single-process run. Everything else, including the
+self-test, the figures, and the test suite, runs without `geng`; the one unit test
+that exercises it skips automatically when `geng` is not on `PATH`.
 
 ## How to run
 
@@ -62,7 +65,7 @@ From this `program/` directory:
 
 ```bash
 python erdos915_unified.py            # run the built-in invariant self-check
-python -m unittest discover -s tests  # run the full test suite (77 tests, stdlib only)
+python -m unittest discover -s tests  # run the full test suite (81 tests, stdlib only)
 python make_figures.py                # regenerate the figures in ../figures/
 ```
 

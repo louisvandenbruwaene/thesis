@@ -82,6 +82,7 @@ import shutil
 import statistics
 import subprocess
 import time
+import warnings
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from itertools import combinations, combinations_with_replacement, permutations, product
@@ -1225,6 +1226,8 @@ class SearchStep:
     edge_count: int
     connectivity: int
     accepted: bool
+    seconds: float = 0.0       # wall-clock since the search began (for timed traces)
+    best_feasible: int = 0     # densest feasible graph seen so far (for convergence)
 
 
 @dataclass
@@ -1415,6 +1418,7 @@ def search_for_dense_graph(
     temperature = initial_temperature
     cached_sensitivity = None
     history: list[SearchStep] = []
+    clock_start = time.perf_counter()  # for the timed convergence trace only
 
     for step in range(steps):
         # Periodically recompute the sensitivity map that guides removals.  It
@@ -1494,6 +1498,8 @@ def search_for_dense_graph(
             edge_count=current.edge_count(),
             connectivity=recorded_connectivity,
             accepted=accept,
+            seconds=time.perf_counter() - clock_start,
+            best_feasible=best_edges,
         ))
         temperature *= cooling  # cool down: T <- cooling * T each step
 
@@ -1505,10 +1511,141 @@ def search_for_dense_graph(
     return SearchResult(best_graph, best_edges, feasible_found, history)
 
 
+def _neighbour_moves(graph: Graph, cap: int) -> list[tuple[int, int, int]]:
+    """Every single add (``+1``) or remove (``-1``) of one edge/arc under the cap.
+
+    The shared neighbourhood of both discoverers: one ordered pair for a digraph,
+    one unordered pair for an undirected graph, addable while below the
+    multiplicity ``cap`` and removable while above zero.
+    """
+    n = graph.num_vertices
+    directed = graph.variant.directed
+    moves: list[tuple[int, int, int]] = []
+    for u in range(n):
+        for v in range(n):
+            if u == v or (not directed and v < u):
+                continue
+            mult = graph.multiplicity(u, v)
+            if mult < cap:
+                moves.append((u, v, +1))
+            if mult > 0:
+                moves.append((u, v, -1))
+    return moves
+
+
+def tabu_search_for_dense_graph(
+    variant: Variant,
+    n: int,
+    m: int,
+    *,
+    separation: str = "edge",
+    steps: int = 4000,
+    penalty: float = 6.0,
+    tenure: int = 7,
+    stall_limit: int = 40,
+    max_multiplicity: int | None = None,
+    seed: int = 0,
+    deadline: float | None = None,
+    record_exact_connectivity: bool = True,
+) -> SearchResult:
+    """Find the densest feasible graph by tabu search, the deterministic twin of
+    :func:`search_for_dense_graph`.
+
+    Same energy ``-|E| + penalty * max(0, connectivity - (m-1))`` and the same
+    neighbourhood (:func:`_neighbour_moves`) as the annealer, but a different
+    engine.  Each step scans the whole neighbourhood and takes the best move whose
+    pair is not on the tabu list, forbids that pair for ``tenure`` steps, and
+    perturbs from the incumbent once it has stalled for ``stall_limit`` steps.
+    Aspiration overrides the tabu flag for any move that beats the global best.
+    There is no temperature and no accept-worse coin: the only randomness is the
+    seed driving the perturbation kicks, so two runs from one seed are identical.
+
+    Returns the same :class:`SearchResult` as the annealer (the best feasible graph
+    and the full timed history), so the two engines are interchangeable through the
+    ``method`` argument of :func:`best_of_searches` and :func:`solve`.
+    """
+    rng = random.Random(seed)
+    measure = _connectivity_measure(separation)
+    cap = 1 if variant.simple else (max_multiplicity if max_multiplicity else m - 1)
+
+    current = Graph(n, variant)            # start empty: feasible, energy 0
+    best_graph, best_edges = current.copy(), 0
+    tabu: dict[tuple[int, int], int] = {}
+    stall = 0
+    history: list[SearchStep] = []
+    clock_start = time.perf_counter()
+
+    def trial_energy_and_feasibility(graph: Graph) -> tuple[float, bool]:
+        """The annealer's energy and exact feasibility, by the same capped trick.
+
+        ``exceeds_bound`` decides feasibility with an early-exit capped flow, and
+        the full ``measure`` runs only on the rare infeasible trial that needs its
+        penalty term, so most moves cost one cheap predicate instead of a full
+        all-pairs flow.  The returned float equals ``_energy`` exactly.
+        """
+        edges = graph.edge_count()
+        if not exceeds_bound(graph, m - 1, separation=separation):
+            return float(-edges), True              # feasible: excess is zero
+        return -edges + penalty * (measure(graph) - (m - 1)), False
+
+    for step in range(steps):
+        if deadline is not None and time.time() > deadline:
+            break
+        best_move: tuple[int, int, int] | None = None
+        best_move_energy: float | None = None
+        best_move_global = False
+        for (u, v, d) in _neighbour_moves(current, cap):
+            trial = current.copy()
+            trial.add_edge(u, v) if d > 0 else trial.remove_edge(u, v)
+            trial_energy, trial_feasible = trial_energy_and_feasibility(trial)
+            improves_global = trial_feasible and trial.edge_count() > best_edges
+            if tabu.get((u, v), 0) > step and not improves_global:
+                continue                   # tabu, with no aspiration to override
+            if (best_move_energy is None or trial_energy < best_move_energy
+                    or (improves_global and not best_move_global)):
+                best_move, best_move_energy = (u, v, d), trial_energy
+                best_move_global = improves_global
+        if best_move is None:              # every move tabu: clear the list, retry
+            tabu.clear()
+            continue
+
+        u, v, d = best_move
+        current.add_edge(u, v) if d > 0 else current.remove_edge(u, v)
+        tabu[(u, v)] = step + tenure
+
+        connectivity = measure(current)    # computed anyway for best-tracking
+        if connectivity <= m - 1 and current.edge_count() > best_edges:
+            best_graph, best_edges = current.copy(), current.edge_count()
+            stall = 0
+        else:
+            stall += 1
+        history.append(SearchStep(
+            step=step, temperature=0.0, energy=best_move_energy,
+            edge_count=current.edge_count(),
+            connectivity=connectivity if record_exact_connectivity else -1,
+            accepted=True,                 # tabu always takes its best legal move
+            seconds=time.perf_counter() - clock_start,
+            best_feasible=best_edges,
+        ))
+
+        if stall >= stall_limit:           # perturb from the incumbent and reset
+            current = best_graph.copy()
+            for _ in range(rng.randint(2, 4)):
+                kicks = _neighbour_moves(current, cap)
+                if kicks:
+                    a, b, dd = rng.choice(kicks)
+                    current.add_edge(a, b) if dd > 0 else current.remove_edge(a, b)
+            tabu.clear()
+            stall = 0
+
+    return SearchResult(best_graph, best_edges, feasible_found=True, history=history)
+
+
 def _run_one_search(args: tuple) -> SearchResult:
     """Module-level worker for parallel restarts (must be picklable for ProcessPoolExecutor)."""
-    variant, n, m, seed, search_options = args
-    return search_for_dense_graph(variant, n, m, seed=seed, **search_options)
+    variant, n, m, seed, method, search_options = args
+    engine = tabu_search_for_dense_graph if method == "tabu" else search_for_dense_graph
+    return engine(variant, n, m, seed=seed, **search_options)
 
 
 def best_of_searches(
@@ -1519,31 +1656,44 @@ def best_of_searches(
     restarts: int = 6,
     seed: int = 0,
     parallel: bool = True,
+    method: str = "sa",
     **search_options,
 ) -> SearchResult:
-    """Run several independent cooling schedules and keep the densest result.
+    """Run several independent discovery schedules and keep the densest result.
 
     A single search can settle into a local optimum, so for reliable
     rediscovery we restart from a fresh random seed a handful of times and return
-    the run that found the most edges.  Any keyword understood by
-    :func:`search_for_dense_graph` (``steps``, ``penalty``, ``separation``, and
-    so on) is forwarded unchanged.
+    the run that found the most edges.  Any keyword understood by the chosen
+    engine (``steps``, ``penalty``, ``separation``, and so on) is forwarded
+    unchanged.
 
     Args:
         parallel: when ``True`` (default), run the restarts concurrently using
             :class:`~concurrent.futures.ProcessPoolExecutor`.  Each restart has
             a distinct seed so the runs are genuinely independent.  Falls back
             to sequential execution if multiprocessing is unavailable.
+        method: ``"sa"`` (default, simulated annealing,
+            :func:`search_for_dense_graph`) or ``"tabu"``
+            (:func:`tabu_search_for_dense_graph`).  Both optimise the same energy
+            over the same neighbourhood and return the same result type.
     """
-    task_args = [(variant, n, m, seed + r, search_options) for r in range(restarts)]
+    if method not in ("sa", "tabu"):
+        raise ValueError("method must be 'sa' or 'tabu'")
+    task_args = [(variant, n, m, seed + r, method, search_options) for r in range(restarts)]
 
     if parallel and restarts > 1:
         try:
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 results = list(executor.map(_run_one_search, task_args))
-        except Exception:
-            # Graceful fallback: multiprocessing unavailable (e.g., during test
-            # collection in some frameworks) or an object couldn't be pickled.
+        except (OSError, concurrent.futures.BrokenExecutor) as exc:
+            # Multiprocessing is genuinely unavailable here (a sandbox with no
+            # fork/spawn, or a worker that could not start).  Fall back to a
+            # sequential run, but say so rather than masking the loss of cores.
+            # A bug inside the worker is NOT caught here, so it fails loudly.
+            warnings.warn(
+                f"parallel restarts unavailable ({exc!r}); running sequentially",
+                RuntimeWarning, stacklevel=2,
+            )
             results = [_run_one_search(a) for a in task_args]
     else:
         results = [_run_one_search(a) for a in task_args]
@@ -1650,14 +1800,15 @@ def _brute_force_matrix(
 
 def _search_within_budget(
     variant: Variant, n: int, m: int, separation: str,
-    deadline: float, seed: int,
+    deadline: float, seed: int, method: str = "sa",
 ) -> SearchResult:
     """Repeated search restarts until the deadline; keep the densest run."""
+    engine = tabu_search_for_dense_graph if method == "tabu" else search_for_dense_graph
     best: SearchResult | None = None
     restart = 0
     while True:
         # Pass the deadline through so a single long restart can be cut short.
-        outcome = search_for_dense_graph(variant, n, m, separation=separation,
+        outcome = engine(variant, n, m, separation=separation,
                          steps=4000, seed=seed + restart, deadline=deadline)
         if best is None or outcome.best_edge_count > best.best_edge_count:
             best = outcome
@@ -1865,7 +2016,7 @@ def solve(
     directed: bool = False, simple: bool = True,
     hypergraph: bool = False, r: int = 3,
     exhaustive: bool = False, separation: str = "edge",
-    max_seconds: float = 60.0, seed: int = 0,
+    max_seconds: float = 60.0, seed: int = 0, method: str = "sa",
 ) -> SolveResult:
     """The single driver: prove the exact value, or discover a dense example.
 
@@ -1911,10 +2062,13 @@ def solve(
 
     # DISCOVER: search within the budget; the witness found is a lower bound.
     if not exhaustive:
-        result = _search_within_budget(variant, n, m, separation, deadline, seed)
+        if method not in ("sa", "tabu"):
+            raise ValueError("method must be 'sa' or 'tabu'")
+        result = _search_within_budget(variant, n, m, separation, deadline, seed, method)
+        method_label = "tabu search" if method == "tabu" else "random search"
         return SolveResult(
             n, m, label, separation, result.best_edge_count, "lower",
-            "random search", time.time() - start, True,
+            method_label, time.time() - start, True,
             result.best_graph, "discovery only ever yields a lower bound")
 
     # EXHAUSTIVE, simple directed: a pruned exhaustive digraph search is exact.
@@ -2721,6 +2875,61 @@ def draw_graph_with_sensitivity(
     ax.set_title("Parallel arcs drawn explicitly, coloured by sensitivity "
                  "$\\sigma$:\ncool ($\\sigma=0$, free) $\\to$ warm (load-bearing)",
                  fontsize=12)
+    _save(path)
+
+
+def _running_best_trace(result: SearchResult) -> tuple[list[float], list[int]]:
+    """Best feasible edge count so far against wall-clock seconds, from a history.
+
+    Reads the timed :class:`SearchStep` log (its ``best_feasible`` field already
+    carries the densest feasible graph seen up to each step) and returns the timed
+    convergence curve both engines record in their native fast modes.
+    """
+    xs = [record.seconds for record in result.history]
+    ys = [record.best_feasible for record in result.history]
+    return xs, ys
+
+
+def plot_sa_vs_tabu_convergence(
+    path: str | Path, *,
+    cases: tuple[tuple[int, int], ...] = ((5, 3), (7, 3)),
+    budget: float = 8.0,
+    seed: int = 0,
+) -> None:
+    """Best-feasible-value against wall-clock for annealing vs tabu search.
+
+    For each ``(n, m)`` it runs one simulated-annealing schedule
+    (:func:`search_for_dense_graph`) and one tabu schedule
+    (:func:`tabu_search_for_dense_graph`) on the directed multigraph at an equal
+    wall-clock ``budget``, and overlays their timed best-so-far traces against the
+    conjectured optimum.  The chosen cases are where the two engines diverge: tabu
+    assembles the bipartite extremiser and reaches the optimum while annealing
+    plateaus a few arcs short.  The time axis is wall-clock, so this one figure is
+    a representative timed run on the reference machine rather than a seed-exact
+    reproduction like the others.
+    """
+    if not MATPLOTLIB_AVAILABLE:
+        raise RuntimeError("matplotlib is required for figures")
+    fig, axes = plt.subplots(1, len(cases), figsize=(11, 4.3))
+    if len(cases) == 1:
+        axes = [axes]
+    for ax, (n, m) in zip(axes, cases):
+        sa = search_for_dense_graph(MULTI_DIRECTED, n, m, seed=seed, steps=10**7,
+                                    deadline=time.time() + budget)
+        tb = tabu_search_for_dense_graph(MULTI_DIRECTED, n, m, seed=seed,
+                                         steps=10**7, deadline=time.time() + budget)
+        for res, label, colour in ((sa, "simulated annealing", _KUL_BLUE),
+                                    (tb, "tabu search", _WARM)):
+            xs, ys = _running_best_trace(res)
+            ax.step(xs, ys, where="post", label=label, color=colour, linewidth=2.0)
+        opt = directed_multigraph_arc(n, m)
+        ax.axhline(opt, linestyle=":", color=_KUL_DARK, linewidth=1.6,
+                   label=f"optimum $L_3^{{\\mathrm{{dir}}}}({n}) = {opt}$")
+        ax.set_title(f"directed multigraph, $n = {n}$, $m = {m}$", fontsize=11)
+        ax.set_xlabel("wall-clock seconds", fontsize=9.5)
+        ax.set_ylabel("densest feasible arc count", fontsize=9.5)
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8.5, loc="lower right")
     _save(path)
 
 
@@ -4037,9 +4246,100 @@ def _graph6_edges(data: bytes) -> list[tuple[int, int]]:
     return edges
 
 
+def _decorate_support_worker(task: tuple) -> list[np.ndarray]:
+    """Every feasible extremal decoration of ONE undirected support graph.
+
+    Module-level and picklable, so :func:`enumerate_extremal_directed_multigraphs_via_generation`
+    can fan the supports out across processes (each support is independent, and
+    two non-isomorphic supports can never yield the same multigraph).  Returns one
+    multiplicity matrix per decoration, deduplicated within this support when
+    ``up_to_iso``.  The decoration logic and its pruning are identical to the
+    sequential generator; only the ownership of the scratch arrays moves here.
+    """
+    n, m, target_arcs, max_degree, up_to_iso, edges = task
+    per_edge_max = 2 * (m - 1)
+    # Per-edge states (a, b) = (mu[u,v], mu[v,u]) excluding (0,0): a support edge
+    # carries at least one arc in some direction.
+    states = [(a, b) for a in range(m) for b in range(m) if (a, b) != (0, 0)]
+    mu = np.zeros((n, n), dtype=int)
+    deg = np.zeros(n, dtype=int)
+    out_deg = np.zeros(n, dtype=int)
+    in_deg = np.zeros(n, dtype=int)
+    seen: set[bytes] = set()
+    reps: list[np.ndarray] = []
+
+    def feasible_prefix(j: int) -> bool:
+        cap = m - 1
+        for s in range(j):
+            if out_deg[s] <= cap:
+                continue
+            for t in range(j):
+                if s != t and in_deg[t] > cap and _tiny_maxflow(mu, n, s, t, cap):
+                    return False
+        return True
+
+    # Decorate in vertex-block order: pairs sorted by larger endpoint, then
+    # smaller, so after the last pair whose larger endpoint is w the induced
+    # subgraph on {0..w} is complete and the prefix bound for size w+1 applies.
+    sps = sorted(edges, key=lambda e: (e[1], e[0]))
+    bound: list[int | None] = [None] * len(sps)
+    for i, (_, w) in enumerate(sps):
+        if i + 1 == len(sps) or sps[i + 1][1] > w:
+            bound[i] = w + 1
+
+    def decorate(idx: int, arcs: int) -> None:
+        remaining = len(sps) - idx
+        if arcs + remaining > target_arcs:
+            return
+        if arcs + remaining * per_edge_max < target_arcs:
+            return
+        if idx == len(sps):                       # every support edge decorated
+            if arcs == target_arcs and feasible_prefix(n):
+                if up_to_iso:
+                    canon = _canonical_form(mu)
+                    if canon in seen:
+                        return
+                    seen.add(canon)
+                reps.append(mu.copy())
+            return
+        u, v = sps[idx]
+        j = bound[idx]            # prefix size to verify after this edge, or None
+        for a, b in states:
+            s = a + b
+            if arcs + s > target_arcs:
+                continue
+            if max_degree is not None and (deg[u] + s > max_degree
+                                           or deg[v] + s > max_degree):
+                continue
+            mu[u, v] = a
+            mu[v, u] = b
+            deg[u] += s
+            deg[v] += s
+            out_deg[u] += a; in_deg[v] += a
+            out_deg[v] += b; in_deg[u] += b
+            ok = True
+            if j is not None:     # block boundary: prefix {0..j-1} is complete
+                cap = _PROVEN_MSTAR.get(j)        # j == prefix size
+                if cap is not None and arcs + s > (m - 1) * cap:
+                    ok = False                    # PROVED induced-arc bound
+                elif not feasible_prefix(j):
+                    ok = False
+            if ok:
+                decorate(idx + 1, arcs + s)
+            deg[u] -= s
+            deg[v] -= s
+            out_deg[u] -= a; in_deg[v] -= a
+            out_deg[v] -= b; in_deg[u] -= b
+            mu[u, v] = 0
+            mu[v, u] = 0
+
+    decorate(0, 0)
+    return reps
+
+
 def enumerate_extremal_directed_multigraphs_via_generation(
     n: int, m: int, target_arcs: int, max_degree: int | None = None,
-    up_to_iso: bool = True, geng_path: str = "geng",
+    up_to_iso: bool = True, geng_path: str = "geng", parallel: bool = True,
 ) -> list[np.ndarray]:
     """Sound, geng-seeded twin of :func:`enumerate_extremal_directed_multigraphs`.
 
@@ -4075,6 +4375,14 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     Requires nauty's ``geng`` on PATH.  For ``n <= 6`` it returns the same set
     of isomorphism classes as :func:`enumerate_extremal_directed_multigraphs`;
     ``tests/test_solve`` checks that equality.
+
+    With ``parallel`` (default) the supports are decorated concurrently across
+    processor cores via a :class:`~concurrent.futures.ProcessPoolExecutor`, since
+    each support is independent.  This is where the ``n = 7`` classification
+    becomes practical on a multi-core machine: the work scales with the number of
+    supports, which is exactly what fans out.  It falls back to a sequential run
+    (with a warning) where multiprocessing is unavailable, and the result is
+    identical either way.
     """
     if m < 1:
         raise ValueError("m must be >= 1")
@@ -4084,96 +4392,47 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     min_edges = (target_arcs + per_edge_max - 1) // per_edge_max
     max_edges = min(target_arcs, n * (n - 1) // 2)
 
-    # Per-edge decoration states (a, b) = (mu[u,v], mu[v,u]), excluding (0,0):
-    # a support edge carries at least one arc in some direction.
-    states = [(a, b) for a in range(m) for b in range(m) if (a, b) != (0, 0)]
-    # PROVED M*(j) = L_m^dir(j) / (m-1) for j <= 6 (cut-counting MILP / base
-    # cases).  No entry for j >= 7: that value is exactly what statement (a)
-    # would establish, so using it would be circular and is deliberately omitted.
-    seen: set[bytes] = set()
+    # geng emits each undirected support iso-class once, and decorating one
+    # support is independent of the others (two non-isomorphic supports can never
+    # yield the same multigraph), so the supports fan out across processes, each
+    # with its own scratch arrays inside _decorate_support_worker.  The PROVED
+    # M*(j) bound is applied there only for j <= 6; j >= 7 gets no arc bound, so
+    # the search stays sound at every n.
+    tasks = [(n, m, target_arcs, max_degree, up_to_iso, edges)
+             for edges in _geng_support_graphs(n, min_edges, max_edges, geng_path)]
+
     representatives: list[np.ndarray] = []
-    mu = np.zeros((n, n), dtype=int)
-    deg = np.zeros(n, dtype=int)          # running total (in+out) degree per vertex
-    out_deg = np.zeros(n, dtype=int)      # running out-degree per vertex
-    in_deg = np.zeros(n, dtype=int)       # running in-degree per vertex
+    if parallel and len(tasks) > 1:
+        try:
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                # chunksize=1: supports vary wildly in cost, so hand them out one
+                # at a time to keep every core busy to the end.
+                for reps in executor.map(_decorate_support_worker, tasks,
+                                         chunksize=1):
+                    representatives.extend(reps)
+        except (OSError, concurrent.futures.BrokenExecutor) as exc:
+            warnings.warn(
+                f"parallel support enumeration unavailable ({exc!r}); running "
+                "sequentially", RuntimeWarning, stacklevel=2,
+            )
+            for task in tasks:
+                representatives.extend(_decorate_support_worker(task))
+    else:
+        for task in tasks:
+            representatives.extend(_decorate_support_worker(task))
 
-    def feasible_prefix(j: int) -> bool:
-        # True iff no ordered pair inside {0..j-1} exceeds the cap m-1.
-        # max-flow(s,t) <= min(out_deg[s], in_deg[t]), so only pairs whose
-        # source out-degree AND sink in-degree both exceed the cap can violate
-        # it -- in a sparse feasible prefix that is a handful of pairs, which
-        # avoids almost every max-flow call.
-        cap = m - 1
-        for s in range(j):
-            if out_deg[s] <= cap:
-                continue
-            for t in range(j):
-                if s != t and in_deg[t] > cap and _tiny_maxflow(mu, n, s, t, cap):
-                    return False
-        return True
-
-    def decorate(sps: list[tuple[int, int]], bound: list[int | None],
-                 idx: int, arcs: int) -> None:
-        remaining = len(sps) - idx
-        # Each remaining support edge carries between 1 and per_edge_max arcs.
-        if arcs + remaining > target_arcs:
-            return
-        if arcs + remaining * per_edge_max < target_arcs:
-            return
-        if idx == len(sps):                       # every support edge decorated
-            if arcs == target_arcs and feasible_prefix(n):
-                if up_to_iso:
-                    canon = _canonical_form(mu)
-                    if canon in seen:
-                        return
-                    seen.add(canon)
-                representatives.append(mu.copy())
-            return
-        u, v = sps[idx]
-        j = bound[idx]            # prefix size to verify after this edge, or None
-        for a, b in states:
-            s = a + b
-            if arcs + s > target_arcs:
-                continue
-            if max_degree is not None and (deg[u] + s > max_degree
-                                           or deg[v] + s > max_degree):
-                continue
-            mu[u, v] = a
-            mu[v, u] = b
-            deg[u] += s
-            deg[v] += s
-            out_deg[u] += a; in_deg[v] += a
-            out_deg[v] += b; in_deg[u] += b
-            ok = True
-            if j is not None:     # block boundary: prefix {0..j-1} is complete
-                cap = _PROVEN_MSTAR.get(j)        # j == prefix size
-                if cap is not None and arcs + s > (m - 1) * cap:
-                    ok = False                    # PROVED induced-arc bound
-                elif not feasible_prefix(j):
-                    ok = False
-            if ok:
-                decorate(sps, bound, idx + 1, arcs + s)
-            deg[u] -= s
-            deg[v] -= s
-            out_deg[u] -= a; in_deg[v] -= a
-            out_deg[v] -= b; in_deg[u] -= b
-            mu[u, v] = 0
-            mu[v, u] = 0
-
-    for edges in _geng_support_graphs(n, min_edges, max_edges, geng_path):
-        # Decorate in vertex-block order: pairs sorted by larger endpoint, then
-        # smaller.  After the last support pair whose larger endpoint is w, the
-        # induced subgraph on {0..w} is complete, so we can apply the prefix
-        # bound for size w+1 there.
-        sps = sorted(edges, key=lambda e: (e[1], e[0]))
-        bound: list[int | None] = [None] * len(sps)
-        for i, (_, w) in enumerate(sps):
-            if i + 1 == len(sps) or sps[i + 1][1] > w:
-                bound[i] = w + 1                  # prefix size = w + 1 vertices
-        deg[:] = 0
-        out_deg[:] = 0
-        in_deg[:] = 0
-        decorate(sps, bound, 0, 0)
+    if up_to_iso:
+        # Distinct geng supports give non-isomorphic multigraphs, so this final
+        # canonical pass is only a safety net over the process-local per-support
+        # dedup; it keeps exactly one representative per isomorphism class.
+        seen: set[bytes] = set()
+        unique: list[np.ndarray] = []
+        for matrix in representatives:
+            key = _canonical_form(matrix)
+            if key not in seen:
+                seen.add(key)
+                unique.append(matrix)
+        representatives = unique
     return representatives
 
 

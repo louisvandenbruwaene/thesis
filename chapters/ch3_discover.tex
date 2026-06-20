@@ -80,7 +80,7 @@ The same sensitivities also explain a finished graph. Colouring a graph's arcs b
     \label{fig:sensitivity}
 \end{figure}
 
-A single cooling schedule can still settle into a local optimum, so in discovery mode \code{solve} runs several independent schedules from different starting seeds and keeps the densest result across all of them. Because the restarts share no state and none depends on the outcome of another, they run in parallel: the program dispatches them across all available processor cores and collects the results when every core finishes, so the total wall-clock time for $k$ restarts is roughly that of one. A handful of parallel restarts is enough to reach the known optima at the sizes we examine. This is a reliability measure, not a change of method, and the parallelism is invisible to every number the thesis reports: the same best graph would eventually be found by running the schedules sequentially, just more slowly.
+A single cooling schedule can still settle into a local optimum, so in discovery mode \code{solve} runs several independent schedules from different starting seeds and keeps the densest result across all of them. Because the restarts share no state and none depends on the outcome of another, they run in parallel: the program dispatches them across the available processor cores, so the wall-clock cost of $k$ restarts is a small multiple of a single run rather than $k$ times it, bounded below by the slowest restart and by the cost of starting the worker processes. A handful of parallel restarts is enough to reach the known optima at the sizes we examine. This is a reliability measure, not a change of method, and the parallelism is invisible to every number the thesis reports: the same best graph would be found by running the schedules sequentially, just more slowly.
 
 \section{Keeping the checker cheap inside the search}
 
@@ -127,6 +127,40 @@ A search method is only worth trusting if it recovers what is already known befo
 What the table hides is that the graphs themselves are the named constructions, not merely graphs of the right size. The simple undirected run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every edge at multiplicity $m - 1$, an instance of the multi-tree extremiser behind \Cref{thm:multigraph-edge}. The directed multigraph runs settle on the double star of \Cref{ch:certify}, both directions of every spoke at full multiplicity. The simple directed runs find the bidirected star at $n = 4$ and, at $n = 7$, land on twelve arcs, the value at which the hub and the one-directional wall tie, exactly the crossover \Cref{thm:dir-arc-m2-exact} predicts. The cooled search does not know these names. It rediscovers the structures because, under the connectivity ceiling, there is nowhere denser to go.
 
 Some extremisers are past the size at which a quick search lands reliably, but the exact checker of \Cref{ch:certify} settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$: the smallest size at which the quadratic phenomenon strictly wins, made concrete. It is also a measured illustration of the search's limit: repeated cooling runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker, not from the search, which is exactly the division of labour this chapter argues for. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{rem:counterexample-m3}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, a lower bound the checker stamps as genuine.
+
+\subsection{Simulated annealing versus tabu search}
+
+The annealer is not the only way to walk this landscape. A natural alternative, suggested by Jan Goedgebeur, is \emph{tabu search}, which keeps the energy and the neighbourhood of \Cref{alg:anneal} but replaces the cooling schedule with a deterministic best-improving step. At each step it evaluates every single-edge move from the current graph and takes the one that lowers the energy most, then forbids the pair it just changed for a fixed number of steps, the \emph{tabu tenure}, so the walk cannot immediately undo its last move and stall in a two-step cycle. When no improving move is left and the search stalls, it perturbs the incumbent with a few random moves and carries on. There is no temperature and no accept-worse coin: apart from the perturbation kicks the walk is deterministic. Where annealing explores by occasionally stepping uphill and trusts the cooling to settle it, tabu climbs greedily and trusts the tabu list to keep it from retracing its path.
+
+The two engines rediscover the same values, but at very different speeds, and on the harder directed cases the difference is decisive. \Cref{tab:sa-vs-tabu} runs them head to head at an equal budget of six seconds each, both restarted within that budget. On the simple undirected problem both reach the optimum at once. On the two directed problems past the certified range tabu reaches the optimum within the budget while the annealer plateaus below it, assembling the eighteen-arc simple-directed extremiser and the full twenty-four-arc double star at $n = 7$ where the annealer stalls at sixteen and twenty. The cause is the one already met at the $n = 8$, $m = 2$ hub stall above. The annealer cools onto whatever dense shape it first reaches and then cannot dismantle it within the budget, whereas tabu's best-improving step follows the steepest density gradient and the tabu list stops it sliding back, so it assembles the structured extremiser the cooled walk struggles to find.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{llrrrcc}
+        \toprule
+         & & & \multicolumn{2}{c}{best in $6$\,s} & \multicolumn{2}{c}{time to optimum} \\
+        \cmidrule(lr){4-5}\cmidrule(lr){6-7}
+        Variant & $n$ & optimum & SA & tabu & SA & tabu \\
+        \midrule
+        simple undirected   & 7 & $9$  & $9$  & $9$  & $1.3$\,s & $0.1$\,s \\
+        simple directed     & 7 & $18$ & $16$ & $18$ & ---      & $2.6$\,s \\
+        directed multigraph & 7 & $24$ & $20$ & $24$ & ---      & $2.5$\,s \\
+        \bottomrule
+    \end{tabular}
+    \caption{Simulated annealing against tabu search at an equal six-second budget per method, the annealer restarted from fresh seeds and tabu restarted on stalls. Both reach the simple undirected optimum; on the two directed problems past the certified range tabu reaches the optimum while the annealer plateaus below it. The last two columns give the wall-clock time each method first reached the optimum on the reference machine, with a dash where it did not reach it in the budget.}
+    \label{tab:sa-vs-tabu}
+\end{table}
+
+\Cref{fig:sa-vs-tabu} shows the divergence directly, plotting the densest feasible graph each engine has found against wall-clock time on the two directed multigraph cases. Tabu climbs in a few decisive steps and holds at the optimum, while a single annealing schedule rises quickly and then flattens a few arcs below it. The annealer's independent restarts recover the optimum on the smaller case, as \Cref{tab:rediscovery} records, so a single plateau is not the whole story there. But at $n = 7$ the plateau persists within the budget, and one tabu schedule already reaches what the restarted annealer does not.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sa_vs_tabu_convergence.pdf}
+    \caption{Densest feasible graph found against wall-clock time, for one simulated-annealing schedule and one tabu schedule on the directed multigraph at $n = 5$ and $n = 7$, $m = 3$. Tabu climbs in a few best-improving steps to the optimum (dotted) and holds, while a single annealing schedule rises quickly and then flattens below it. The time axis is wall-clock on the reference machine, so unlike the seed-reproducible figures elsewhere this one is a representative timed run.}
+    \label{fig:sa-vs-tabu}
+\end{figure}
+
+This advantage comes at a cost the equal-time comparison already absorbs but is worth naming: each tabu step scans the whole neighbourhood, so it is far more expensive than the annealer's single random proposal, and tabu takes many fewer but better-aimed steps in the same wall-clock. Simulated annealing remains the program's default, because it reaches every value this thesis reports, the rediscovery of \Cref{tab:rediscovery} and the conjectural lower bounds alike, and because its independent restarts parallelise trivially across cores. Tabu is the stronger engine for the directed problems past the certified range, and it is the natural tool for any future attempt to push those lower bounds further by machine.
 
 \section{The trichotomy: proved, certified, conjectured}
 \label{sec:trichotomy}

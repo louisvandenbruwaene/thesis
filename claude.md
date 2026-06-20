@@ -1431,3 +1431,59 @@ this log): 35c5c1d + 1c16c0c are Sonnet 4.6; e2188a1 + ed9a3a1 are Opus 4.8. ALL
 NO NEW MATH OR REFERENCE ERRORS FOUND in the recent work. VERIFY: build latexmk exit 0,
 93 pp, 0 overfull, 0 undefined refs/cites, no missing-graphics in the log; suite 77 pass /
 3 skip; self-check ALL CHECKS PASSED; module imports, aug_bip(10,3)=30, dir_arc_lb(12,4)=49.
+
+## 2026-06-21 (Opus) -- parallelism fixes, SA-vs-tabu task, parallel geng enumeration
+
+Author asked: apply the two parallelism fixes I flagged; answer "do we use parallelism?";
+execute the queued SA-vs-tabu task; then (mid-session) explain Gurobi-vs-own-hardware and
+implement the geng parallelism since it speeds things up.
+
+PARALLELISM FIXES (both done):
+- ch3 parallel-restart claim softened from "wall-clock for k restarts is roughly that of
+  one" (overclaim) to "a small multiple of one, bounded by the slowest restart and process
+  startup" -- MEASURED ~2.5x for 6 restarts on 10 cores (56.4s->22.6s), not ~6x. macOS
+  spawn overhead + restart-length variance.
+- best_of_searches fallback: bare `except Exception` -> `except (OSError,
+  concurrent.futures.BrokenExecutor)` + a RuntimeWarning, so a lost-parallelism event is
+  reported, not silently swallowed, and a real worker bug fails loudly. (Validated: a
+  guard-less script triggered BrokenProcessPool and the warning fired + ran sequentially.)
+
+SA vs TABU (TASKS queued task, all 5 steps done):
+- tabu_search_for_dense_graph added (twin of search_for_dense_graph, same energy +
+  _neighbour_moves, deterministic best-improving + tabu tenure + stall perturbation);
+  method="sa"|"tabu" on best_of_searches and solve; SearchStep gained seconds + best_feasible
+  for timed convergence; 4 tabu unit tests (81 tests total, all pass).
+- PERF BUG FOUND + FIXED: the research-note tabu computed the full all-pairs max-flow TWICE
+  per trial move, so in 6s it barely moved (reached 14 at n=7, not 24). Rewrote the inner
+  loop to the annealer's capped trick (one exceeds_bound per trial, full measure only when
+  infeasible) -- identical trajectory, ~3-4x faster, and now it reaches the optima in budget.
+- Benchmark (fresh, 6s/method, native fast modes): simple-undir n=7 9/9 tie; simple-dir n=7
+  SA 16 / tabu 18; dir-multi n=7 SA 20 / tabu 24. Dropped dir-multi n=5 from the thesis TABLE
+  (SA's true ceiling there IS 16 = the double star, reached with normal restarts per
+  tab:rediscovery in ~150s; at a 6s cap SA gets 13 -- so n=5 is a slow tie, not a clean
+  differentiator, and listing 13 would contradict tab:rediscovery's 16). Figure keeps n=5+n=7
+  (single representative schedules; caption says wall-clock/representative).
+- ch3 \subsection{Simulated annealing versus tabu search} + tab:sa-vs-tabu + fig:sa-vs-tabu;
+  build 93pp, 0 overfull, 0 undefined.
+
+PARALLEL GENG ENUMERATION (author asked to implement since it speeds up + isn't buggy):
+- enumerate_extremal_directed_multigraphs_via_generation now fans the geng supports across
+  cores (parallel=True default). Extracted the per-support decoration to a module-level,
+  picklable _decorate_support_worker; main collects via ProcessPoolExecutor.map(chunksize=1)
+  with the same OSError/BrokenExecutor fallback+warning; final canonical dedup as a safety net
+  (distinct geng supports are non-isomorphic, so no cross-support dupes). Embarrassingly
+  parallel: work scales with #supports. This is the practical route to n=7 fact (b) on a
+  multi-core box (Gurobi is only for fact (a)).
+- geng is NOT on PATH on this machine, so validated geng-free: brute-force all non-iso
+  supports, feed the worker -- par==seq==DFS at n=4 (unit test SupportWorker, geng-free) and
+  n=4 manually; n=5 manual check in flight (slow DFS ground-truth). README test count 77->81 +
+  parallel note; function docstring documents parallel=.
+
+GUROBI (answered to author): the n=7 wall is NOT a supercomputer problem. Fact (b)
+(enumeration) is pure CPU and now parallel -- runs on his own multi-core laptop. Fact (a)
+(MILP infeasibility) is solver-bound: bundled CBC is weak, Gurobi is strong and runs LOCALLY
+on his laptop; it only needs the free academic licence activated over eduroam. No cluster
+needed for either; a cluster would only brute-force (b) without the parallelism.
+
+VERIFY: build latexmk 0 overfull / 0 undefined; suite 81 pass / 3 skip; self-check passes
+earlier this session. Commit local; push left to author (direct-to-main push needs his ok).

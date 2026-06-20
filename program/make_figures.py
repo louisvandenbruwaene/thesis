@@ -52,6 +52,7 @@ from erdos915_unified import (  # noqa: E402
     plot_edge_dist_grid,
     plot_scatter_lambda_edges,
     plot_search_trace,
+    plot_sa_vs_tabu_convergence,
     plot_variant_3d_surfaces,
     plot_variant_grid,
     save_gallery_json,
@@ -469,6 +470,12 @@ def main() -> None:
         sens, path=FIGURES / "sensitivity_mixed.png",
         layout=sens_layout, node_labels=sens_labels)
     print("wrote sensitivity_mixed.png")
+
+    # Annealing vs tabu convergence (Ch.3): wall-clock timed, so a representative
+    # run rather than a seed-exact one (see the figure caption).
+    plot_sa_vs_tabu_convergence(FIGURES / "sa_vs_tabu_convergence.pdf",
+                                cases=((5, 3), (7, 3)), budget=8.0, seed=0)
+    print("wrote sa_vs_tabu_convergence.pdf")
 
     plot_complexity_growth(path=FIGURES / "complexity_growth.png")
     print("wrote complexity_growth.png")
