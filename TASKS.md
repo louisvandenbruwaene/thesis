@@ -66,6 +66,36 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       dominates both before n=12, making them equal until then. The sentence needs to
       compare the full max-formulas, not just the quadratic branches in isolation.
 
+## DEEPSEEK REVIEW NOTES 2026-06-20 (genuine new concerns only; false alarms excluded)
+
+DeepSeek flagged 20+ items; most are false alarms or already addressed. Three are real.
+
+- [ ] **prop:hyper-edge "whenever" clause ambiguous between simple and multi.**
+      Proposition 1.14 says "the bound is attained whenever m-1 ≤ C(n-2,r-2)" but
+      doesn't specify simple vs. multihypergraph. For MULTI the bound is always attained
+      (star hypertree with multiplicity m-1 per edge, no condition needed -- confirmed
+      by appendix line 759). The condition is needed for the SIMPLE attainment (app
+      Theorem A.32). As written, a reader of ch1 can't tell which regime the "whenever"
+      applies to, and it looks false for multihypergraphs (true unconditionally there).
+      Fix: add "for simple hypergraphs" before "whenever", or split into two sentences.
+
+- [ ] **rem:threshold-analogues (app_proofs line 1183): vertex-connectivity c>1 exposition
+      too compressed.** The remark correctly cites Bollobás 1984 + Frieze/Karoński 2016
+      for "global connectivities equal minimum degree whp above threshold," but doesn't
+      explain why this beats the naive path κ≤λ≥m ⟹ κ≥m (which fails: κ≤λ, not ≥).
+      The remark is correct but a reader may think the Mader/edge-count argument applies
+      to κ directly, which it does NOT. The DeepSeek reviewer almost missed it. Add one
+      sentence: "Mader's theorem alone does not force κ^max ≥ m; the cited results do."
+
+- [ ] **M*(n) MILP fractional = integer: the gap in exposition (ch2 §2.7 / app §A.7).**
+      The argument has two halves: (a) the fractional MILP optimal = M*(n); (b) the
+      double-star witness achieves M*(n) with weights in {0,1}, so scaling by m-1 gives
+      an integer multigraph. These two facts together prove the fractional relaxation is
+      tight. Currently (a) and (b) are stated in separate places without explicitly
+      connecting them. DeepSeek's concern #16 ("fractional MILP may overestimate") is
+      resolved only when both halves are read together. Add one bridging sentence in
+      the main text that names both facts and concludes M*(n)_fractional = M*(n)_integer.
+
 ## C EXTENSION DONE 2026-06-19 (commit 5c00dd8, both repos pushed)
 _erdos_fast.c + build_fast.sh: tiny_maxflow (~2x dense), max_connectivity_exceeds (2.2x),
 canonical_form_min (147x). Pure-Python fallback intact; 77/77 tests pass with C loaded.
