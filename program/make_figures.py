@@ -200,8 +200,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
     the certain band, since there the search is the only lower bound there is.
     """
     panels = []
-    matrix_ns = list(range(2, 13))   # uniform x-range for all matrix panels
-    hyper_ns = list(range(2, 11))    # uniform x-range for all hypergraph panels
+    # Uniform x-ranges for the search / construction curves.  The machine-PROVED
+    # (exact) points are genuinely limited by enumeration cost and stop early; the
+    # search lower bounds and the formula curves are cheap, so they run well past
+    # that, to show each variant's trend and let the search discover dense
+    # ("maybe extremal") graphs at sizes exhaustion cannot reach.
+    matrix_ns = list(range(2, 17))   # all matrix panels, n = 2..16
+    hyper_ns = list(range(2, 13))    # all hypergraph panels, n = 2..12
 
     def tri_undirected(n):
         return n * (n - 1) // 2
@@ -495,42 +500,18 @@ def main() -> None:
     pair_data = compute_pair_enumeration_cache(cache_path=pair_cache_path)
     print("pair-connectivity cache ready")
 
-    # Known maximum feasible edge counts at the enumeration n, for each variant.
-    # These come from the proved/conjectured formulas evaluated at enum_n.
-    def _known_edge_max(cfg: dict, m_val: int) -> int | None:
-        n = cfg["enum_n"]
-        key = cfg["key"]
-        if key.startswith("simple_undirected_edge"):
-            return simple_undirected_edge(n, m_val)
-        if key.startswith("multi_undirected_edge"):
-            return multigraph_undirected_edge(n, m_val)
-        if key.startswith("simple_directed") or key.startswith("multi_directed"):
-            return min(directed_arc_lower_bound(n, m_val), n * (n - 1))
-        if key.startswith("hyper_undirected_edge"):
-            return min(hypergraph_edge(n, m_val, 3), math.comb(n, 3))
-        return None
+    # Pooled per-pair connectivity histograms (Ch.4): each panel stacks blue/red
+    # at its own mid-range connectivity boundary, so the split is meaningful in
+    # every variant rather than collapsing to one colour at a fixed m.
+    plot_pair_conn_dist_grid(pair_data, path=FIGURES / "pair_conn_dist.png")
+    print("wrote pair_conn_dist.png")
 
-    for m_val in (3, 6):
-        known_edges: dict[str, int] = {}
-        for cfg in _VARIANT_ENUM_CONFIGS:
-            emax = _known_edge_max(cfg, m_val)
-            if emax is not None:
-                known_edges[cfg["key"]] = emax
+    # Edge-count histograms (Ch.4): same mid-range stacked colouring.
+    plot_edge_dist_grid(enum_data, path=FIGURES / "edges_dist.png")
+    print("wrote edges_dist.png")
 
-        # Pooled per-pair connectivity histograms (blue from feasible graphs,
-        # red from infeasible, stacked) -- m=3 in Ch.4, m=6 in App. B.
-        plot_pair_conn_dist_grid(pair_data, m_val,
-                                 path=FIGURES / f"pair_conn_dist_m{m_val}.png")
-        print(f"wrote pair_conn_dist_m{m_val}.png")
-
-        # Edge count histograms: stacked blue/red, with the extremal value marked.
-        plot_edge_dist_grid(enum_data, m_val,
-                            path=FIGURES / f"edges_dist_m{m_val}.png",
-                            known_edge_maxima=known_edges)
-        print(f"wrote edges_dist_m{m_val}.png")
-
-    # Per-graph connectivity distribution: only the m=6 view appears in the thesis
-    # (App. B); the m=3 body version was removed on 2026-06-20.
+    # Per-graph connectivity distribution at the fixed forbidden threshold m=6
+    # (App. B), showing the m=6 feasibility split; m=3 body version removed 2026-06-20.
     plot_conn_dist_grid(enum_data, 6, path=FIGURES / "conn_dist_m6.png")
     print("wrote conn_dist_m6.png")
 

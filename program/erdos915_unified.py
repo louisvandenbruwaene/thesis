@@ -2764,8 +2764,13 @@ def plot_complexity_growth(path: str | Path) -> None:
     def curves(directed: bool):
         # Each model fills a number of off-diagonal cells; the candidate count is
         # (values per cell) ^ (number of cells).  Labels stay plain -- the precise
-        # exponential forms live in the caption, not the legend.
+        # exponential forms live in the caption, not the legend.  Direction
+        # multiplies the cell count: by 2 for graphs (ordered vs unordered pairs,
+        # n(n-1) vs C(n,2)), but by 3 for 3-uniform hypergraphs, since a directed
+        # hyperedge is a tail plus 2 heads (n*C(n-1,2) = 3*C(n,3) candidates).
         cells = (lambda n: n * (n - 1)) if directed else (lambda n: n * (n - 1) / 2)
+        hyper_cells = ((lambda n: n * (n - 1) * (n - 2) / 2) if directed
+                       else (lambda n: n * (n - 1) * (n - 2) / 6))
         return [
             ("simple / random", _KUL_BLUE, "-",
              [log10_pow(2, cells(n)) for n in ns]),
@@ -2774,7 +2779,7 @@ def plot_complexity_growth(path: str | Path) -> None:
             ("multigraph $m=4$", _WARM, "-",
              [log10_pow(4, cells(n)) for n in ns]),
             ("$3$-uniform hypergraph", _VIOLET, ":",
-             [log10_pow(2, n * (n - 1) * (n - 2) / 6) for n in ns]),
+             [log10_pow(2, hyper_cells(n)) for n in ns]),
         ]
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.6), sharey=True)
@@ -3256,42 +3261,59 @@ def plot_conn_dist_grid(
                         row_label_fontsize=12)
 
 
+def _midrange_lambda_threshold(hi: int) -> int:
+    """A per-variant connectivity boundary at the midpoint of the achievable range.
+
+    The distribution figures split graphs by ``lambda^max`` into a blue (low) and
+    a red (high) population.  A single global boundary collapses some panels to one
+    colour (every graph below it, or almost none), because the twelve variants
+    reach very different connectivity ranges at the sizes enumeration allows.
+    Splitting instead at ``round(hi/2)`` -- the middle of what each enumeration can
+    reach -- keeps both populations visible in every panel, scaled to what is
+    possible there.  Floored at one so the red side is never empty.
+    """
+    return max(1, round(hi / 2))
+
+
 def plot_pair_conn_dist_grid(
     pair_data: dict[str, dict[tuple[int, int], int]],
-    m: int,
     path: str | Path,
 ) -> None:
     """12-panel histogram of per-PAIR connectivity, pooled over the full enumeration.
 
     Where :func:`plot_conn_dist_grid` plots one ``lambda^max`` per graph, this
     pools every vertex pair of every graph: one observation per (graph, pair).
-    Each bar is split by the feasibility of the graph the observation came from
-    and STACKED -- the blue part (bottom) is pairs drawn from graphs that stay at
-    ``lambda^max <= m-1``, the red part (top) is pairs from graphs that exceed it
-    -- so the bar's full height is the true number of pair observations at that
-    connectivity level.  Pairs above the boundary ``m-1`` can only come from
-    infeasible graphs, so those bars are wholly red; below it both colours mix,
-    since an infeasible graph still has many low-connectivity pairs.
-    """
-    threshold = m - 1
+    Each bar is split and STACKED by the connectivity of the graph the pair came
+    from -- blue (bottom) for pairs from graphs whose ``lambda^max`` stays at or
+    below the per-panel boundary ``T``, red (top) for pairs from graphs above it
+    -- so the bar's full height is the true number of observations at that level.
 
+    ``T`` is set per variant by :func:`_midrange_lambda_threshold`, not by a single
+    global ``m``: at a fixed boundary some panels are entirely one colour, while the
+    mid-range split keeps both populations visible everywhere.  Pairs whose own
+    connectivity exceeds ``T`` can only come from graphs above ``T``, so those bars
+    are wholly red; below ``T`` the colours mix, since a high-connectivity graph
+    still has many low-connectivity pairs.
+    """
     def draw_panel(ax, cfg):
         table = pair_data.get(cfg["key"], {})
         if not table:
             ax.set_title(cfg["title"], fontsize=9)
             return
 
+        hi = max(lmax for (lmax, _pc) in table)
+        T = _midrange_lambda_threshold(hi)
         levels = sorted({pc for (_lmax, pc) in table})
-        feas = [sum(c for (lmax, pc), c in table.items()
-                    if pc == lv and lmax <= threshold) for lv in levels]
-        infeas = [sum(c for (lmax, pc), c in table.items()
-                      if pc == lv and lmax > threshold) for lv in levels]
+        blue = [sum(c for (lmax, pc), c in table.items()
+                    if pc == lv and lmax <= T) for lv in levels]
+        red = [sum(c for (lmax, pc), c in table.items()
+                   if pc == lv and lmax > T) for lv in levels]
 
-        ax.bar(levels, feas, color=_KUL_BLUE, edgecolor="white", linewidth=0.4,
-               label=r"$\lambda^{\max} \leq m-1$")
-        ax.bar(levels, infeas, bottom=feas, color=_RED, edgecolor="white",
-               linewidth=0.4, label=r"$\lambda^{\max} \geq m$")
-        ax.axvline(threshold + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
+        ax.bar(levels, blue, color=_KUL_BLUE, edgecolor="white", linewidth=0.4,
+               label=fr"from $\lambda^{{\max}}\!\leq\!{T}$")
+        ax.bar(levels, red, bottom=blue, color=_RED, edgecolor="white",
+               linewidth=0.4, label=fr"from $\lambda^{{\max}}\!>\!{T}$")
+        ax.axvline(T + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
 
         ax.set_title(cfg["title"], fontsize=9.5)
         ax.set_xlabel("pair connectivity", fontsize=8.5)
@@ -3299,34 +3321,31 @@ def plot_pair_conn_dist_grid(
         ax.tick_params(labelsize=8)
         ax.set_xticks(levels)
         ax.grid(True, axis="y", alpha=0.3)
-        ax.text(0.98, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
-                ha="right", va="top", fontsize=8, color="grey")
+        ax.legend(fontsize=6.8, loc="upper right", framealpha=0.85)
+        ax.text(0.02, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
+                ha="left", va="top", fontsize=8, color="grey")
 
-    suptitle = (fr"Pair-connectivity distribution across all twelve variants, $m = {m}$ "
-                fr"(every vertex pair of every graph pooled; blue from feasible "
-                fr"graphs $\lambda^{{\max}} \leq {threshold}$, red from infeasible)")
+    suptitle = ("Pair-connectivity distribution across all twelve variants "
+                "(every vertex pair of every graph pooled, split at each variant's "
+                r"mid-range $\lambda^{\max}$: blue from low-connectivity graphs, red from high)")
     _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
                         row_label_fontsize=12)
 
 
 def plot_edge_dist_grid(
     enum_data: dict[str, list[tuple[int, int]]],
-    m: int,
     path: str | Path,
-    known_edge_maxima: dict[str, int] | None = None,
 ) -> None:
-    """12-panel histogram of edge count distribution, all variants, fixed m.
+    """12-panel histogram of edge count distribution, all variants.
 
-    Each bar is split by feasibility and STACKED, not overlaid: the blue part
-    (bottom) counts graphs with lambda_max <= m-1 at that edge count, the red part
-    (top) counts the infeasible graphs (lambda_max >= m), so the full bar height
-    is the true number of graphs at that edge count.  A dotted vertical line marks
-    the largest feasible edge count -- the extremal value at this n, read straight
-    off the full enumeration so it always lands on the right edge of the blue mass
-    (no feasible graph can lie to its right).
+    Each bar is split and STACKED by graph connectivity: blue (bottom) for graphs
+    whose ``lambda^max`` stays at or below the per-panel boundary ``T``, red (top)
+    for graphs above it, so the full bar height is the true number of graphs at
+    that edge count.  ``T`` is the midpoint of each variant's achievable
+    connectivity range (:func:`_midrange_lambda_threshold`); a single global
+    boundary leaves some panels all one colour, the mid-range split keeps both
+    populations visible.  A dotted line marks the densest graph at or below ``T``.
     """
-    threshold = m - 1
-
     def draw_panel(ax, cfg):
         key = cfg["key"]
         data = enum_data.get(key, [])
@@ -3334,27 +3353,28 @@ def plot_edge_dist_grid(
             ax.set_title(cfg["title"], fontsize=9)
             return
 
+        hi = max(c for _e, c in data)
+        T = _midrange_lambda_threshold(hi)
         max_e = max(e for e, _ in data)
         levels = list(range(0, max_e + 1))
-        feas = [0] * (max_e + 1)
-        infeas = [0] * (max_e + 1)
+        blue = [0] * (max_e + 1)
+        red = [0] * (max_e + 1)
         for e, c in data:
-            (feas if c <= threshold else infeas)[e] += 1
+            (blue if c <= T else red)[e] += 1
 
-        # Stacked, not overlaid: blue (feasible) on the bottom, red (infeasible)
-        # on top, so the bar's full height is the true count at each edge count.
-        ax.bar(levels, feas, color=_KUL_BLUE, edgecolor="white", linewidth=0.3,
-               label=r"$\lambda^{\max} \leq m-1$")
-        ax.bar(levels, infeas, bottom=feas, color=_RED, edgecolor="white",
-               linewidth=0.3, label=r"$\lambda^{\max} \geq m$")
+        # Stacked, not overlaid: low-connectivity graphs (blue) on the bottom,
+        # high-connectivity (red) on top, so the full height is the true count.
+        ax.bar(levels, blue, color=_KUL_BLUE, edgecolor="white", linewidth=0.3,
+               label=fr"$\lambda^{{\max}}\!\leq\!{T}$")
+        ax.bar(levels, red, bottom=blue, color=_RED, edgecolor="white",
+               linewidth=0.3, label=fr"$\lambda^{{\max}}\!>\!{T}$")
 
-        # The extremal value at this n: the densest feasible graph in the
-        # enumeration.  Computed from the data itself, so it is consistent with
-        # the blue mass by construction and exists for every panel.
-        if any(feas):
-            kmax = max(e for e in levels if feas[e])
+        # The densest graph in the lower-connectivity population: read straight
+        # off the data, so it lands on the right edge of the blue mass.
+        if any(blue):
+            kmax = max(e for e in levels if blue[e])
             ax.axvline(kmax, color=_KUL_DARK, linestyle=":", linewidth=1.8,
-                       label=f"max feasible = {kmax}")
+                       label=fr"densest $\leq\!{T}$: {kmax}")
 
         ax.set_title(cfg["title"], fontsize=8.5)
         ax.set_xlabel("edge count", fontsize=7.5)
@@ -3363,12 +3383,13 @@ def plot_edge_dist_grid(
         # Edge counts are integers: keep the tick labels integer-valued.
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.grid(True, axis="y", alpha=0.25)
-        ax.legend(fontsize=6.5, loc="upper right", framealpha=0.8)
+        ax.legend(fontsize=6.2, loc="upper right", framealpha=0.8)
         ax.text(0.98, 0.02, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
                 ha="right", va="bottom", fontsize=7, color="grey")
 
-    suptitle = (fr"Edge count distribution across all twelve variants, $m = {m}$ "
-                fr"(blue = feasible, red = infeasible)")
+    suptitle = ("Edge-count distribution across all twelve variants "
+                r"(stacked by connectivity, split at each variant's mid-range "
+                r"$\lambda^{\max}$: blue low-connectivity graphs, red high)")
     _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
                         row_label_fontsize=11)
 

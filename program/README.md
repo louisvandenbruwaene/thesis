@@ -107,8 +107,8 @@ Open Problems. `make_figures.py` writes every figure below.
 | `figures/variant_bounds_m3.png`, `..._m6.png` | proved / conjectured / guessed, all twelve variants (Ch.3) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.4) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.4) |
-| `figures/pair_conn_dist_m3.png` (`..._m6.png`) | pooled per-pair connectivity distributions, all variants (Ch.4; m=6 in App. B) |
-| `figures/edges_dist_m3.png` (`..._m6.png`) | edge-count distributions, all variants (Ch.4; m=6 in App. B) |
+| `figures/pair_conn_dist.png` | pooled per-pair connectivity distributions, all variants, mid-range split (Ch.4) |
+| `figures/edges_dist.png` | edge-count distributions, all variants, mid-range split (Ch.4) |
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (Ch.4) |
 | `figures/conn_dist_m6.png` | per-graph connectivity distributions, all variants (App. B) |
 | `figures/threshold_3d.png` | the threshold across densities, three variants (App. B) |

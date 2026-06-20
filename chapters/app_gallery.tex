@@ -41,27 +41,13 @@ This appendix collects the supplementary figures that the program produces but t
 
 \section{The variant landscape at \texorpdfstring{$m = 6$}{m = 6} and in three dimensions}\label{app:m6}
 
-These are the $m = 6$ companions to the $m = 3$ enumeration views of \Cref{ch:synthesis}, together with a three-dimensional view of the appearance threshold (\Cref{fig:threshold-3d}). They confirm that raising the forbidden threshold relocates the feasibility boundary without changing the qualitative picture.
+This appendix shows the per-graph connectivity distribution at the fixed forbidden threshold $m = 6$, alongside a three-dimensional view of the appearance threshold (\Cref{fig:threshold-3d}). They confirm that raising the forbidden threshold relocates the feasibility boundary without changing the qualitative picture. The pooled pair-connectivity and edge-count grids of \Cref{ch:synthesis} (\Cref{fig:pair-conn-dist,fig:edge-dist}) already split each variant at its own mid-range connectivity, so they carry no separate $m = 6$ companion.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/conn_dist_m6.png}
-    \caption{How the full small-$n$ enumeration distributes by binding connectivity $\lambda^{\max}$ across all twelve variants at $m = 6$. Blue bars are feasible graphs ($\lambda^{\max} \le 5$), red bars infeasible ones, and the dashed line marks the feasibility boundary. The same qualitative balance seen at $m = 3$ in \Cref{ch:synthesis} persists here: some variants sit mostly in the infeasible regime while others dominate in the feasible one. File \code{conn\_dist\_m6.png}.}
+    \caption{How the full small-$n$ enumeration distributes by binding connectivity $\lambda^{\max}$ across all twelve variants at the fixed forbidden threshold $m = 6$. Blue bars are feasible graphs ($\lambda^{\max} \le 5$), red bars infeasible ones, and the dashed line marks the feasibility boundary. At this higher threshold most of the small graphs the enumeration reaches are feasible, so the blue mass dominates: raising $m$ moves the boundary out past the bulk of the distribution. File \code{conn\_dist\_m6.png}.}
     \label{fig:conn-dist-m6}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/pair_conn_dist_m6.png}
-    \caption{Pair-connectivity distribution at $m = 6$, the companion to \Cref{fig:pair-conn-dist-m3}. Every vertex pair of every graph in the full enumeration is pooled; each bar is split and stacked by the feasibility of its graph, blue from graphs with $\lambda^{\max} \le 5$ and red from those above, with the dashed line at the feasibility boundary. File \code{pair\_conn\_dist\_m6.png}.}
-    \label{fig:pair-conn-dist-m6}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/edges_dist_m6.png}
-    \caption{The same enumeration at $m = 6$ viewed by edge count, the companion to \Cref{fig:edge-dist-m3}. Each bar is split and stacked, blue for feasible graphs and red for infeasible, and the dotted vertical line marks the extremal value at that size. File \code{edges\_dist\_m6.png}.}
-    \label{fig:edge-dist-m6}
 \end{figure}
 
 \begin{figure}[htbp]
