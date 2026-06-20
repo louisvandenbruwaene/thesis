@@ -3270,7 +3270,8 @@ def _midrange_lambda_threshold(hi: int) -> int:
     reach very different connectivity ranges at the sizes enumeration allows.
     Splitting instead at ``round(hi/2)`` -- the middle of what each enumeration can
     reach -- keeps both populations visible in every panel, scaled to what is
-    possible there.  Floored at one so the red side is never empty.
+    possible there.  Floored at one so the boundary is never zero, which would
+    push every graph above it and leave the blue (low) side empty.
     """
     return max(1, round(hi / 2))
 

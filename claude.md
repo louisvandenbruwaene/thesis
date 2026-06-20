@@ -1380,3 +1380,54 @@ REVIEWED, report only (no change), per the brief:
 VERIFY: all 5 refactored grids + the 3-D tight=False path render to PNGs in the venv with no error;
 suite 77 pass / 3 skip (venv); headless self-check ALL CHECKS PASSED (numpy+scipy only). Committed
 and pushed.
+
+## 2026-06-20 (Opus) -- queued review fixes + audit of recent Sonnet/Opus work
+
+Author asked to pull, clear the queued fix tasks, then hunt for new mistakes (focus on
+recent Sonnet work). Pull was already up to date.
+
+SIX QUEUED FIXES (TASKS.md "ERRORS FOUND" + "DEEPSEEK REVIEW NOTES", all verified):
+- ch1 prop:leonard-m2 proof: "two arcs of the cycle" -> "two paths of the cycle" (arc is
+  reserved for directed edges in this thesis).
+- ch3: removed the misattributed \cite{ErdosProblems} on the "pre-2024 conjecture" line,
+  reworded to "the natural initial conjecture" to match ch1. ErdosProblems still cited
+  twice in ch1, so no orphaned bib entry.
+- ch1:387 false "first at n=m+8 for m=4": VERIFIED with a script -- the QUADRATIC branches
+  floor((n+m-2)^2/4) vs floor(n^2/4)+(m-2)ceil(n/2) differ by exactly 1 at every even n
+  for m=4 (tie at odd n); the FULL max-formulas (with the hub term m(n-1)) first diverge
+  at n=12. Reworded to compare the full formulas, n=12 at m=4. (n=m+8 does NOT generalise:
+  m=5,6 diverge at degenerate small n.)
+- prop:hyper-edge "whenever" ambiguity: split into "a simple hypergraph attains the bound
+  whenever m-1 <= C(n-2,r-2), and a multihypergraph attains it whenever (r-1)|(n-1)" --
+  exactly what app_proofs proves (the multi star-hypertree only hits the floor cleanly
+  when (r-1)|(n-1); general-n multi attainment holds by a Gale-Ryser argument but the
+  thesis only proves the divisible subcase + the simple route, so I did not overclaim).
+- rem:threshold-analogues (app_proofs): added the sentence that Mader's edge bound does
+  NOT carry to kappa, since kappa<=lambda runs the wrong way; the Bollobas / Frieze-
+  Karonski results are what supply kappa^max>=m.
+- ch2 M* reduction: added a bridging sentence -- the optimisation ranges over fractional
+  weights yet its optimum is realised by a {0,1} matrix, so the relaxation is tight and
+  M*(n) is the largest fractional weight AND the densest integer multigraph / (m-1), never
+  an overestimate (closes DeepSeek concern #16).
+
+AUDIT OF RECENT WORK (the 4 commits after the figure-helpers session, NOT previously in
+this log): 35c5c1d + 1c16c0c are Sonnet 4.6; e2188a1 + ed9a3a1 are Opus 4.8. ALL SOUND:
+- 35c5c1d (Sonnet): augmented_bipartite shifted partition |B|=ceil((n+m-2)/2) and
+  directed_arc_lower_bound -> floor((n+m-2)^2/4). Verified: arc count = ceil(N/2)floor(N/2)
+  = floor(N^2/4), N=n+m-2; the size_a>=1 (n>=m) guard implies m-2<size_b (size_b>=m-1), so
+  the dropped circulant-distinctness check is safe; formula agrees with old at m=2,3.
+  _PROVEN_MSTAR dedup correct (one module constant, None for j>=7 preserved). Tests updated.
+- 1c16c0c (Sonnet): const:augmented-bipartite m=3 prose fix VERIFIED (balanced and shifted
+  partitions give the SAME arc count floor(n^2/4)+ceil(n/2) in both parities). New
+  phenomenon-2 prose numbers all check: n=8,m=2 wall 16 vs hub 14; n=10,m=3 aug-bip 30 vs
+  naive 27; lambda^max reasoning correct.
+- ed9a3a1 (Opus): Fig 3.1 directed 3-uniform count n*C(n-1,2)=3*C(n,3)=n(n-1)(n-2)/2,
+  correct. Adaptive midrange split decouples pair_conn/edge_dist figures from m (deliberate;
+  ch4 prose + captions match). Fixed one stale comment in _midrange_lambda_threshold (the
+  floor protects the BLUE/low side from emptiness, not the red side as the comment said).
+- e2188a1 (Opus): phenomenon 3 removed; section now "Two principal phenomena", intro says
+  "two", no dangling \Cref to fig:threshold / fig:sampled-grid / fig:conn-dist-m3.
+
+NO NEW MATH OR REFERENCE ERRORS FOUND in the recent work. VERIFY: build latexmk exit 0,
+93 pp, 0 overfull, 0 undefined refs/cites, no missing-graphics in the log; suite 77 pass /
+3 skip; self-check ALL CHECKS PASSED; module imports, aug_bip(10,3)=30, dir_arc_lb(12,4)=49.

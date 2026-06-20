@@ -100,60 +100,14 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       (below) attack these numerically; a clean structural proof would be stronger and
       is independently interesting. (m=3 directed multigraph closes the moment these land.)
 
-## ERRORS FOUND 2026-06-20 (by Claude Code review of all chapters)
-
-- [ ] **ch1:184 wrong term "arcs" in undirected context (prop:leonard-m2 proof).**
-      "any two vertices on that cycle are joined by the two **arcs** of the cycle"
-      -- "arcs" is directed-graph terminology. Should be "**paths** along the cycle"
-      (or "the two path segments of the cycle"). Simple one-word fix.
-
-- [ ] **ch3:148 misattributed citation `\cite{ErdosProblems}` for "pre-2024 conjecture".**
-      Line reads: "that overturned the naive pre-2024 conjecture `\cite{ErdosProblems}`".
-      The 2026-06-13 session removed this exact citation from ch1 because the directed
-      m>=3 conjecture is not stated in Problem 915. The ch1 version now says "the natural
-      initial conjecture" with no citation; ch3 still has the old misattributed text.
-      Fix: remove the citation and reword to "the natural initial conjecture" to match ch1.
-
-- [ ] **ch1:387 false claim "first at n = m + 8 for m = 4".**
-      Text: "the new formula strictly exceeds floor(n^2/4)+(m-2)ceil(n/2) at even n
-      large enough (first at n = m+8 for m = 4)."
-      WRONG: the new quadratic formula floor((n+m-2)^2/4) exceeds the old balanced-
-      partition formula floor(n^2/4)+(m-2)ceil(n/2) by EXACTLY 1 at EVERY even n for
-      m=4 (verified: diff=1 at n=2,4,6,8,10,12). What is "first at n=12" is that the
-      full conjectured value max(m(n-1), floor((n+m-2)^2/4)) first exceeds the old full
-      value max(m(n-1), floor(n^2/4)+(m-2)ceil(n/2)) -- because the hub term m(n-1)
-      dominates both before n=12, making them equal until then. The sentence needs to
-      compare the full max-formulas, not just the quadratic branches in isolation.
-
-## DEEPSEEK REVIEW NOTES 2026-06-20 (genuine new concerns only; false alarms excluded)
-
-DeepSeek flagged 20+ items; most are false alarms or already addressed. Three are real.
-
-- [ ] **prop:hyper-edge "whenever" clause ambiguous between simple and multi.**
-      Proposition 1.14 says "the bound is attained whenever m-1 ≤ C(n-2,r-2)" but
-      doesn't specify simple vs. multihypergraph. For MULTI the bound is always attained
-      (star hypertree with multiplicity m-1 per edge, no condition needed -- confirmed
-      by appendix line 759). The condition is needed for the SIMPLE attainment (app
-      Theorem A.32). As written, a reader of ch1 can't tell which regime the "whenever"
-      applies to, and it looks false for multihypergraphs (true unconditionally there).
-      Fix: add "for simple hypergraphs" before "whenever", or split into two sentences.
-
-- [ ] **rem:threshold-analogues (app_proofs line 1183): vertex-connectivity c>1 exposition
-      too compressed.** The remark correctly cites Bollobás 1984 + Frieze/Karoński 2016
-      for "global connectivities equal minimum degree whp above threshold," but doesn't
-      explain why this beats the naive path κ≤λ≥m ⟹ κ≥m (which fails: κ≤λ, not ≥).
-      The remark is correct but a reader may think the Mader/edge-count argument applies
-      to κ directly, which it does NOT. The DeepSeek reviewer almost missed it. Add one
-      sentence: "Mader's theorem alone does not force κ^max ≥ m; the cited results do."
-
-- [ ] **M*(n) MILP fractional = integer: the gap in exposition (ch2 §2.7 / app §A.7).**
-      The argument has two halves: (a) the fractional MILP optimal = M*(n); (b) the
-      double-star witness achieves M*(n) with weights in {0,1}, so scaling by m-1 gives
-      an integer multigraph. These two facts together prove the fractional relaxation is
-      tight. Currently (a) and (b) are stated in separate places without explicitly
-      connecting them. DeepSeek's concern #16 ("fractional MILP may overestimate") is
-      resolved only when both halves are read together. Add one bridging sentence in
-      the main text that names both facts and concludes M*(n)_fractional = M*(n)_integer.
+## REVIEW FIXES DONE 2026-06-20 (Opus; see CLAUDE.md entry, delete after read)
+All six queued items below were applied + verified (build clean 93pp, 77 tests pass):
+3 chapter errors (ch1:184 arcs->paths; ch3 ErdosProblems cite removed; ch1:387 reworded
+to compare the FULL max-formulas, first divergence n=12 at m=4) and 3 DeepSeek concerns
+(prop:hyper-edge simple-vs-multi attainment split; rem:threshold-analogues kappa<=lambda
+note; ch2 M* fractional=integer bridging sentence). Also reviewed the recent Sonnet/Opus
+work (35c5c1d formula+partition, 1c16c0c phenomenon-2 prose, e2188a1/ed9a3a1 figures):
+all sound; fixed one stale code comment in _midrange_lambda_threshold.
 
 ## C EXTENSION DONE 2026-06-19 (commit 5c00dd8, both repos pushed)
 _erdos_fast.c + build_fast.sh: tiny_maxflow (~2x dense), max_connectivity_exceeds (2.2x),
