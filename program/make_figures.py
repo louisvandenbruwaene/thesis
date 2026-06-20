@@ -31,11 +31,10 @@ from erdos915_unified import (  # noqa: E402
     _VARIANT_ENUM_CONFIGS,
     search_for_dense_graph,
     compute_enumeration_cache,
+    compute_pair_enumeration_cache,
     compute_surface_cache,
     connectivity_distribution,
     gallery_extremal_graphs,
-    plot_degree_threshold,
-    plot_threshold_variant_grid,
     directed_arc_lower_bound,
     directed_multigraph_arc,
     draw_graph_with_sensitivity,
@@ -46,6 +45,7 @@ from erdos915_unified import (  # noqa: E402
     plot_conn_dist_grid,
     plot_conn_threshold_3d,
     plot_connectivity_distribution,
+    plot_pair_conn_dist_grid,
     plot_directed_crossover,
     plot_edge_vertex_divergence,
     plot_edge_vertex_histograms,
@@ -488,6 +488,13 @@ def main() -> None:
     plot_scatter_lambda_edges(enum_data, path=FIGURES / "scatter_lambda_edges.png")
     print("wrote scatter_lambda_edges.png")
 
+    # Pooled per-pair connectivity: every vertex pair of every enumerated graph,
+    # tagged with its graph's lambda^max.  Slow first run, cached thereafter.
+    print("building pair-connectivity cache (slow on first run, cached thereafter)...")
+    pair_cache_path = FIGURES / "pair_enumeration_cache.pkl"
+    pair_data = compute_pair_enumeration_cache(cache_path=pair_cache_path)
+    print("pair-connectivity cache ready")
+
     # Known maximum feasible edge counts at the enumeration n, for each variant.
     # These come from the proved/conjectured formulas evaluated at enum_n.
     def _known_edge_max(cfg: dict, m_val: int) -> int | None:
@@ -510,16 +517,22 @@ def main() -> None:
             if emax is not None:
                 known_edges[cfg["key"]] = emax
 
-        # Connectivity histograms: the threshold line already marks m-1.
-        plot_conn_dist_grid(enum_data, m_val,
-                            path=FIGURES / f"conn_dist_m{m_val}.png")
-        print(f"wrote conn_dist_m{m_val}.png")
+        # Pooled per-pair connectivity histograms (blue from feasible graphs,
+        # red from infeasible, stacked) -- m=3 in Ch.4, m=6 in App. B.
+        plot_pair_conn_dist_grid(pair_data, m_val,
+                                 path=FIGURES / f"pair_conn_dist_m{m_val}.png")
+        print(f"wrote pair_conn_dist_m{m_val}.png")
 
-        # Edge count histograms: mark the proved/conjectured extremal value.
+        # Edge count histograms: stacked blue/red, with the extremal value marked.
         plot_edge_dist_grid(enum_data, m_val,
                             path=FIGURES / f"edges_dist_m{m_val}.png",
                             known_edge_maxima=known_edges)
         print(f"wrote edges_dist_m{m_val}.png")
+
+    # Per-graph connectivity distribution: only the m=6 view appears in the thesis
+    # (App. B); the m=3 body version was removed on 2026-06-20.
+    plot_conn_dist_grid(enum_data, 6, path=FIGURES / "conn_dist_m6.png")
+    print("wrote conn_dist_m6.png")
 
     # --------------------------------------------------------------
     # 3-D bound surface over the (n, m) grid.
@@ -534,8 +547,10 @@ def main() -> None:
     print("wrote variant_surface_3d.png")
 
     # --------------------------------------------------------------
-    # 3-D threshold histogram: how lambda_max distribution shifts with p.
-    # Kept fast by using n=20 and 300 samples.
+    # 3-D threshold histogram (appendix): how the lambda_max distribution shifts
+    # with density p, for three representative variants.  Kept as a standalone
+    # appendix figure (fig:threshold-3d) after the Figure 4.2 threshold story was
+    # removed from the body on 2026-06-20.
     # --------------------------------------------------------------
     plot_conn_threshold_3d(
         path=FIGURES / "threshold_3d.png",
@@ -544,22 +559,10 @@ def main() -> None:
         samples=150, seed=7)
     print("wrote threshold_3d.png")
 
-    # Random model (Chapter 4): the appearance threshold across every model.
-    # Fig A -- all six generative shapes (simple/multi/hyper x undirected/directed)
-    # sampled and plotted by appearance probability against mean binding degree in
-    # units of m.  Ordered, not coincident, at finite m: degree = m is the
-    # asymptotic (model-free) threshold; the spread is the finite-m gap.
-    plot_degree_threshold(
-        FIGURES / "degree_threshold.png", n=12, m=4, alpha=0.5, trials=70, seed=7)
-    print("wrote degree_threshold.png")
-
-    # Fig B -- threshold-crossing curves for all twelve variants: each panel shows
-    # P[lambda_max >= m] against mean binding degree in units of m, with the
-    # vertical asymptotic threshold at degree = m.  Complements plot_degree_threshold,
-    # which overlays all six generative models; here each variant gets its own panel.
-    plot_threshold_variant_grid(
-        FIGURES / "threshold_variant_grid.png", m=4, trials=80, seed=7)
-    print("wrote threshold_variant_grid.png")
+    # NOTE: the 2-D random-sampling threshold figures (degree_threshold,
+    # sampled_variant_grid) were removed from the thesis on 2026-06-20.  Their
+    # generators are kept in erdos915_unified.py and the restore recipe is in
+    # research_notes/removed_threshold_phenomenon.md.
 
     # Edge vs vertex disjointness in G(16, p) at three densities (Chapter 1).
     p_values = [0.25, 0.5, 0.75]

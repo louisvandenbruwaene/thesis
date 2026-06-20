@@ -2346,6 +2346,11 @@ def plot_appearance_threshold(
     _save(path)
 
 
+# NOTE: plot_degree_threshold generated the 2-D random-sampling threshold figure
+# (the old Figure 4.2) removed from the thesis on 2026-06-20.  Kept here so the
+# threshold phenomenon can be restored; see
+# research_notes/removed_threshold_phenomenon.md for the recipe.  (Its 3-D
+# companion plot_conn_threshold_3d is still used, for the appendix.)
 def plot_degree_threshold(
     path: str | Path, *, n: int = 12, m: int = 4, alpha: float = 0.5,
     trials: int = 70, seed: int = 7,
@@ -2402,111 +2407,6 @@ def plot_degree_threshold(
     plt.legend(fontsize=8.5, loc="lower right")
     plt.grid(True, alpha=0.3)
     _save(path)
-
-
-def plot_sampled_variant_grid(
-    path: str | Path, *, m: int = 4, trials: int = 120, seed: int = 7,
-    alpha: float = 0.5, target_degree_factor: float = 1.0,
-) -> None:
-    """12-panel binding-connectivity distribution under random sampling, all variants.
-
-    The sampled analogue of the enumeration grid, but at sizes well past the
-    enumeration wall: each panel samples its generative model at a density whose
-    expected degree is about ``m`` (so the feasibility boundary sits inside the
-    bulk), then histograms the binding connectivity, blue feasible (``<= m-1``),
-    red infeasible.
-    """
-    threshold = m - 1
-
-    def draw_panel(ax, cfg):
-        n = cfg["sample_n"]
-        p = _p_for_target_degree(
-            target_degree_factor * m, n, directed=cfg["directed"],
-            simple=cfg["simple"], hypergraph=cfg["hypergraph"], r=cfg["r"], alpha=alpha)
-        rng = random.Random(seed)
-        vals = []
-        for _ in range(trials):
-            obj = _sample_variant(
-                n, p, directed=cfg["directed"], simple=cfg["simple"],
-                hypergraph=cfg["hypergraph"], r=cfg["r"], alpha=alpha,
-                cap=m - 1, rng=rng)
-            vals.append(_measure_variant(
-                obj, separation=cfg["separation"], hypergraph=cfg["hypergraph"]))
-        lo, hi = min(vals), max(vals)
-        levels = list(range(lo, hi + 1))
-        counts = [vals.count(lv) for lv in levels]
-        colours = [_KUL_BLUE if lv <= threshold else _RED for lv in levels]
-        ax.bar(levels, counts, color=colours, edgecolor="white", linewidth=0.4)
-        ax.axvline(threshold + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
-        ax.set_title(cfg["title"], fontsize=9.5)
-        ax.set_xlabel("binding connectivity", fontsize=8.5)
-        ax.set_ylabel("samples", fontsize=8.5)
-        ax.tick_params(labelsize=8)
-        ax.set_xticks(levels)
-        ax.grid(True, axis="y", alpha=0.3)
-        # The boundary line is identical across panels; it is named once in the
-        # title and caption instead of repeated as a per-panel legend.
-        ax.text(0.02, 0.98, f"$n={n}$", transform=ax.transAxes, ha="left",
-                va="top", fontsize=8, color="grey")
-
-    suptitle = ("Binding connectivity under random sampling across all twelve variants "
-                fr"($m = {m}$, expected degree ${{\approx}}\, m$): "
-                fr"blue feasible $\leq {threshold}$, red infeasible")
-    _variant_panel_grid(draw_panel, configs=_VARIANT_SAMPLE_CONFIGS, suptitle=suptitle,
-                        path=path, suptitle_fontsize=13)
-
-
-def plot_threshold_variant_grid(
-    path: str | Path, *, m: int = 4, alpha: float = 0.5,
-    trials: int = 80, seed: int = 7,
-    targets: tuple = (0.2, 0.35, 0.5, 0.65, 0.8, 1.0, 1.25, 1.6, 2.0),
-) -> None:
-    """12-panel threshold-crossing curves, one per variant.
-
-    Each panel plots the appearance probability of binding connectivity >= m
-    against measured mean binding degree in units of m, showing where the
-    threshold falls for that variant.  Complements :func:`plot_degree_threshold`,
-    which overlays all six generative models; here each of the twelve variants
-    gets its own panel.
-    """
-    def draw_panel(ax, cfg):
-        n = cfg["sample_n"]
-        xs, ys = [], []
-        rng = random.Random(seed)
-        for t in targets:
-            p = _p_for_target_degree(
-                t * m, n, directed=cfg["directed"], simple=cfg["simple"],
-                hypergraph=cfg["hypergraph"], r=cfg["r"], alpha=alpha)
-            degs, hits = [], 0
-            for _ in range(trials):
-                obj = _sample_variant(
-                    n, p, directed=cfg["directed"], simple=cfg["simple"],
-                    hypergraph=cfg["hypergraph"], r=cfg["r"],
-                    alpha=alpha, cap=m - 1, rng=rng)
-                degs.append(_mean_binding_degree(
-                    obj, directed=cfg["directed"], hypergraph=cfg["hypergraph"]))
-                if _measure_variant(obj, separation=cfg["separation"],
-                                    hypergraph=cfg["hypergraph"]) >= m:
-                    hits += 1
-            xs.append(sum(degs) / len(degs) / m)
-            ys.append(hits / trials)
-        ax.plot(xs, ys, "-o", color=_KUL_BLUE, markersize=3.5, linewidth=1.6)
-        ax.axvline(1.0, color="black", linestyle="--", linewidth=1.4)
-        ax.axhline(0.5, color="gray", linestyle=":", linewidth=0.9, alpha=0.5)
-        ax.set_title(cfg["title"], fontsize=9.5)
-        ax.set_xlabel(r"mean degree / $m$", fontsize=8.5)
-        ax.set_ylabel(r"$\hat{P}[\lambda^{\max} \geq m]$", fontsize=8.5)
-        ax.set_ylim(-0.05, 1.05)
-        ax.tick_params(labelsize=8)
-        ax.grid(True, alpha=0.3)
-        ax.text(0.02, 0.98, f"$n={n}$", transform=ax.transAxes, ha="left",
-                va="top", fontsize=8, color="grey")
-
-    suptitle = (fr"Threshold crossing for all twelve variants ($m = {m}$): "
-                r"$\hat{P}[\lambda^{\max} \geq m]$ vs mean degree, "
-                r"vertical line at asymptotic threshold")
-    _variant_panel_grid(draw_panel, configs=_VARIANT_SAMPLE_CONFIGS,
-                        suptitle=suptitle, path=path, suptitle_fontsize=12)
 
 
 def plot_connectivity_distribution(series: dict, n: int, p: float, path: str | Path) -> None:
@@ -3058,6 +2958,113 @@ def enumerate_all_graphs(
     return results
 
 
+def _pair_connectivities(obj, *, separation: str, hypergraph: bool) -> list[int]:
+    """Local connectivity of every vertex pair of one graph or hypergraph.
+
+    The same pair sweep ``max_connectivity`` runs, but keeping each value rather
+    than only the maximum.  For the edge case the capacity matrix is built once
+    and reused across pairs (as ``max_connectivity`` does); vertex and hypergraph
+    cases reuse their named per-pair routines.
+    """
+    vsplit = (separation == "vertex")
+    if hypergraph:
+        return [hyper_connectivity(obj, s, t, vertex_split=vsplit)
+                for s, t in _pairs(obj)]
+    if not vsplit:
+        csr = _csr(obj.mu, dtype=int)
+        return [int(_csgraph_maxflow(csr, s, t).flow_value) for s, t in _pairs(obj)]
+    return [local_connectivity(obj, s, t, vertex_split=True) for s, t in _pairs(obj)]
+
+
+def enumerate_pair_connectivities(
+    n: int, *,
+    directed: bool,
+    simple: bool,
+    hypergraph: bool = False,
+    r: int = 3,
+    max_mult: int = 3,
+    separation: str = "edge",
+) -> dict[tuple[int, int], int]:
+    """Pooled 2-D histogram ``{(lambda_max, pair_conn): count}`` over all graphs.
+
+    For every labeled graph on ``n`` vertices and every vertex pair, record the
+    pair's local connectivity tagged with the graph's own ``lambda^max``.  The
+    result is a small threshold-independent table: at plot time a feasibility
+    threshold ``T`` splits each pair-connectivity column into observations from
+    graphs that stay at ``lambda^max <= T`` and those that exceed it.  Much
+    smaller than the raw observation list (a few dozen entries per variant), so
+    it pickles compactly even though the sweep itself enumerates every graph.
+    """
+    from collections import Counter
+    table: Counter = Counter()
+
+    def record(obj):
+        pcs = _pair_connectivities(obj, separation=separation, hypergraph=hypergraph)
+        lmax = max(pcs, default=0)
+        for c in pcs:
+            table[(lmax, c)] += 1
+
+    if hypergraph:
+        candidates = _hyperedge_candidates(n, r, directed)
+        for mask in product((0, 1), repeat=len(candidates)):
+            chosen = [candidates[i] for i, flag in enumerate(mask) if flag]
+            record(Hypergraph(n, chosen, directed=directed))
+        return dict(table)
+
+    variant = _variant_for(directed, simple)
+    cells = _matrix_cells(n, directed)
+    span = 2 if simple else (max_mult + 1)
+    base = Graph(n, variant)
+    for values in product(range(span), repeat=len(cells)):
+        candidate = base.copy()
+        for (u, v), value in zip(cells, values):
+            if value:
+                candidate.set_multiplicity(u, v, value)
+        record(candidate)
+    return dict(table)
+
+
+def compute_pair_enumeration_cache(
+    cache_path: str | Path = "figures/pair_enumeration_cache.pkl",
+    configs: list[dict] | None = None,
+) -> dict[str, dict[tuple[int, int], int]]:
+    """Per-variant pooled pair-connectivity tables, loading from cache if present.
+
+    The pooled analogue of :func:`compute_enumeration_cache`: one
+    ``{(lambda_max, pair_conn): count}`` table per variant.  Slow on first run
+    (it re-sweeps the enumeration measuring every pair), cached thereafter.
+    """
+    cache_path = Path(cache_path)
+    if configs is None:
+        configs = _VARIANT_ENUM_CONFIGS
+
+    if cache_path.exists():
+        with open(cache_path, "rb") as f:
+            cached = pickle.load(f)
+    else:
+        cached = {}
+
+    changed = False
+    for cfg in configs:
+        key = cfg["key"]
+        if key in cached:
+            continue
+        print(f"  pooling pairs for {cfg['title']} (n={cfg['enum_n']})...", flush=True)
+        cached[key] = enumerate_pair_connectivities(
+            cfg["enum_n"],
+            directed=cfg["directed"], simple=cfg["simple"],
+            hypergraph=cfg["hypergraph"], r=cfg["r"],
+            max_mult=cfg["max_mult"], separation=cfg["separation"])
+        changed = True
+
+    if changed:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(cache_path, "wb") as f:
+            pickle.dump(cached, f)
+
+    return cached
+
+
 def compute_enumeration_cache(
     cache_path: str | Path = "figures/enumeration_cache.pkl",
     configs: list[dict] | None = None,
@@ -3249,6 +3256,59 @@ def plot_conn_dist_grid(
                         row_label_fontsize=12)
 
 
+def plot_pair_conn_dist_grid(
+    pair_data: dict[str, dict[tuple[int, int], int]],
+    m: int,
+    path: str | Path,
+) -> None:
+    """12-panel histogram of per-PAIR connectivity, pooled over the full enumeration.
+
+    Where :func:`plot_conn_dist_grid` plots one ``lambda^max`` per graph, this
+    pools every vertex pair of every graph: one observation per (graph, pair).
+    Each bar is split by the feasibility of the graph the observation came from
+    and STACKED -- the blue part (bottom) is pairs drawn from graphs that stay at
+    ``lambda^max <= m-1``, the red part (top) is pairs from graphs that exceed it
+    -- so the bar's full height is the true number of pair observations at that
+    connectivity level.  Pairs above the boundary ``m-1`` can only come from
+    infeasible graphs, so those bars are wholly red; below it both colours mix,
+    since an infeasible graph still has many low-connectivity pairs.
+    """
+    threshold = m - 1
+
+    def draw_panel(ax, cfg):
+        table = pair_data.get(cfg["key"], {})
+        if not table:
+            ax.set_title(cfg["title"], fontsize=9)
+            return
+
+        levels = sorted({pc for (_lmax, pc) in table})
+        feas = [sum(c for (lmax, pc), c in table.items()
+                    if pc == lv and lmax <= threshold) for lv in levels]
+        infeas = [sum(c for (lmax, pc), c in table.items()
+                      if pc == lv and lmax > threshold) for lv in levels]
+
+        ax.bar(levels, feas, color=_KUL_BLUE, edgecolor="white", linewidth=0.4,
+               label=r"$\lambda^{\max} \leq m-1$")
+        ax.bar(levels, infeas, bottom=feas, color=_RED, edgecolor="white",
+               linewidth=0.4, label=r"$\lambda^{\max} \geq m$")
+        ax.axvline(threshold + 0.5, color=_WARM, linestyle="--", linewidth=1.8)
+
+        ax.set_title(cfg["title"], fontsize=9.5)
+        ax.set_xlabel("pair connectivity", fontsize=8.5)
+        ax.set_ylabel("pair observations", fontsize=8.5)
+        ax.tick_params(labelsize=8)
+        ax.set_xticks(levels)
+        ax.grid(True, axis="y", alpha=0.3)
+        ax.text(0.98, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
+                ha="right", va="top", fontsize=8, color="grey")
+
+    suptitle = (fr"Pair-connectivity distribution across all twelve variants, $m = {m}$ "
+                fr"(every vertex pair of every graph pooled; blue from feasible "
+                fr"graphs $\lambda^{{\max}} \leq {threshold}$, red from infeasible)")
+    _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
+                        row_label_fontsize=12)
+
+
 def plot_edge_dist_grid(
     enum_data: dict[str, list[tuple[int, int]]],
     m: int,
@@ -3257,11 +3317,13 @@ def plot_edge_dist_grid(
 ) -> None:
     """12-panel histogram of edge count distribution, all variants, fixed m.
 
-    Bars are split by feasibility: blue bars are graphs with lambda_max <= m-1,
-    red bars are infeasible graphs with lambda_max >= m.  A dotted vertical line
-    marks the largest feasible edge count -- the extremal value at this n, read
-    straight off the full enumeration so it is always present and always lands on
-    the right edge of the blue mass (no feasible graph can lie to its right).
+    Each bar is split by feasibility and STACKED, not overlaid: the blue part
+    (bottom) counts graphs with lambda_max <= m-1 at that edge count, the red part
+    (top) counts the infeasible graphs (lambda_max >= m), so the full bar height
+    is the true number of graphs at that edge count.  A dotted vertical line marks
+    the largest feasible edge count -- the extremal value at this n, read straight
+    off the full enumeration so it always lands on the right edge of the blue mass
+    (no feasible graph can lie to its right).
     """
     threshold = m - 1
 
@@ -3272,26 +3334,25 @@ def plot_edge_dist_grid(
             ax.set_title(cfg["title"], fontsize=9)
             return
 
-        feas_edges  = [e for e, c in data if c <= threshold]
-        infeas_edges = [e for e, c in data if c > threshold]
-
         max_e = max(e for e, _ in data)
-        bins = list(range(0, max_e + 2))
+        levels = list(range(0, max_e + 1))
+        feas = [0] * (max_e + 1)
+        infeas = [0] * (max_e + 1)
+        for e, c in data:
+            (feas if c <= threshold else infeas)[e] += 1
 
-        if feas_edges:
-            ax.hist(feas_edges, bins=bins, align="left", color=_KUL_BLUE,
-                    alpha=0.8, label=r"$\lambda^{\max} \leq m-1$",
-                    edgecolor="white", linewidth=0.3)
-        if infeas_edges:
-            ax.hist(infeas_edges, bins=bins, align="left", color=_RED,
-                    alpha=0.7, label=r"$\lambda^{\max} \geq m$",
-                    edgecolor="white", linewidth=0.3)
+        # Stacked, not overlaid: blue (feasible) on the bottom, red (infeasible)
+        # on top, so the bar's full height is the true count at each edge count.
+        ax.bar(levels, feas, color=_KUL_BLUE, edgecolor="white", linewidth=0.3,
+               label=r"$\lambda^{\max} \leq m-1$")
+        ax.bar(levels, infeas, bottom=feas, color=_RED, edgecolor="white",
+               linewidth=0.3, label=r"$\lambda^{\max} \geq m$")
 
         # The extremal value at this n: the densest feasible graph in the
         # enumeration.  Computed from the data itself, so it is consistent with
-        # the blue bars by construction and exists for every panel.
-        if feas_edges:
-            kmax = max(feas_edges)
+        # the blue mass by construction and exists for every panel.
+        if any(feas):
+            kmax = max(e for e in levels if feas[e])
             ax.axvline(kmax, color=_KUL_DARK, linestyle=":", linewidth=1.8,
                        label=f"max feasible = {kmax}")
 

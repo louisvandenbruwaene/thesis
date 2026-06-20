@@ -41,7 +41,7 @@ This appendix collects the supplementary figures that the program produces but t
 
 \section{The variant landscape at \texorpdfstring{$m = 6$}{m = 6} and in three dimensions}\label{app:m6}
 
-These are the $m = 6$ companions to the $m = 3$ enumeration views of \Cref{ch:synthesis}, together with a three-dimensional view of the appearance threshold. They confirm that raising the forbidden threshold relocates the feasibility boundary without changing the qualitative picture.
+These are the $m = 6$ companions to the $m = 3$ enumeration views of \Cref{ch:synthesis}, together with a three-dimensional view of the appearance threshold (\Cref{fig:threshold-3d}). They confirm that raising the forbidden threshold relocates the feasibility boundary without changing the qualitative picture.
 
 \begin{figure}[htbp]
     \centering
@@ -52,14 +52,21 @@ These are the $m = 6$ companions to the $m = 3$ enumeration views of \Cref{ch:sy
 
 \begin{figure}[htbp]
     \centering
+    \includegraphics[width=\textwidth]{figures/pair_conn_dist_m6.png}
+    \caption{Pair-connectivity distribution at $m = 6$, the companion to \Cref{fig:pair-conn-dist-m3}. Every vertex pair of every graph in the full enumeration is pooled; each bar is split and stacked by the feasibility of its graph, blue from graphs with $\lambda^{\max} \le 5$ and red from those above, with the dashed line at the feasibility boundary. File \code{pair\_conn\_dist\_m6.png}.}
+    \label{fig:pair-conn-dist-m6}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
     \includegraphics[width=\textwidth]{figures/edges_dist_m6.png}
-    \caption{The same enumeration at $m = 6$ viewed by edge count, the companion to \Cref{fig:edge-dist-m3}. Feasible graphs are blue, infeasible ones red, and the dotted vertical line marks the extremal value at that size. File \code{edges\_dist\_m6.png}.}
+    \caption{The same enumeration at $m = 6$ viewed by edge count, the companion to \Cref{fig:edge-dist-m3}. Each bar is split and stacked, blue for feasible graphs and red for infeasible, and the dotted vertical line marks the extremal value at that size. File \code{edges\_dist\_m6.png}.}
     \label{fig:edge-dist-m6}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.86\textwidth]{figures/threshold_3d.png}
-    \caption{The appearance threshold of \Cref{fig:threshold} as a three-dimensional bar chart, for three representative variants (simple undirected edge, simple directed arc, three-uniform hypergraph edge) at $n = 12$, $m = 3$. Each panel plots the fraction of $G(n, p)$ samples (height) reaching each binding connectivity $\lambda^{\max}$ (depth) as the density $p$ varies (width), so the mass migrates from low to high connectivity as $p$ crosses the proved threshold $p^* = m/n$. File \code{threshold\_3d.png}.}
+    \caption{The appearance threshold $p^* = m/n$ as a three-dimensional bar chart, for three representative variants (simple undirected edge, simple directed arc, three-uniform hypergraph edge) at $n = 12$, $m = 3$. Each panel plots the fraction of $G(n, p)$ samples (height) reaching each binding connectivity $\lambda^{\max}$ (depth) as the density $p$ varies (width), so the mass migrates from low to high connectivity as $p$ crosses the proved threshold $p^* = m/n$ of \Cref{thm:gnp-threshold}. File \code{threshold\_3d.png}.}
     \label{fig:threshold-3d}
 \end{figure}
