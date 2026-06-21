@@ -15,6 +15,60 @@ Two of the open directions are directed, and they share a structure worth statin
 
 The route to the upper bound is to show that an extremal digraph, once it is past the hub regime, must look like the augmented bipartite construction: its vertices split into a part $A$ and a part $B$ with every arc running $A \to B$, and $B$ thickened only mildly. Three structural facts, each proved in \Cref{app:proofs}, push in this direction. Out-neighbourhoods are mutually unreachable, second out-neighbourhoods are disjoint, and a complete $A \to B$ partition forces each vertex of $B$ to absorb at most $m - 2$ arcs from inside $B$. With the partition free to vary, the total arc count $|B|(|A| + m - 2) = |B|(n - |B| + m - 2)$ is maximised at $|B| = \ceil{(n+m-2)/2}$, which gives $\floor{(n+m-2)^2/4}$, precisely the conjectured upper bound.
 
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth, scale=0.92,
+    abk/.style={-{Stealth[length=1.6mm]}, line width=0.7pt, KULblauw1!35},
+    inb/.style={-{Stealth[length=2mm]}, line width=1.3pt, KULblauw1},
+    back/.style={-{Stealth[length=2.3mm]}, line width=1.5pt, densely dashed, vertexred},
+    esc/.style={-{Stealth[length=2.6mm]}, line width=2.1pt, vertexgreen!70!black}]
+% ---------- panel (a): the clean A -> B structure ----------
+\begin{scope}
+  \node[smallvertex] (a1) at (0,1.0) {$a_1$};
+  \node[smallvertex] (a2) at (0,-1.0) {$a_2$};
+  \node[smallvertex] (b1) at (3,1.5) {$b_1$};
+  \node[smallvertex] (b2) at (3,0) {$b_2$};
+  \node[smallvertex] (b3) at (3,-1.5) {$b_3$};
+  \node[font=\scriptsize, KULblauw1] at (0,2.05) {part $A$};
+  \node[font=\scriptsize, KULblauw1] at (3,2.35) {part $B$};
+  \foreach \x in {a1,a2}{\foreach \y in {b1,b2,b3}{\draw[abk] (\x) -- (\y);}}
+  \draw[inb] (b1) to[bend left=20] (b2);
+  \draw[inb] (b2) to[bend left=20] (b3);
+  \node[font=\scriptsize, align=center] at (1.5,-2.5)
+     {(a) every arc $A\to B$, $B$ lightly\\thickened, none returns to $A$};
+\end{scope}
+% ---------- panel (b): one backward arc manufactures a route ----------
+\begin{scope}[xshift=7.0cm]
+  \node[smallvertex] (c1) at (0,1.0) {$a_1$};
+  \node[smallvertex] (c2) at (0,-1.0) {$a_2$};
+  \node[smallvertex] (d1) at (3,1.5) {$b_1$};
+  \node[smallvertex] (d2) at (3,0) {$b_2$};
+  \node[smallvertex] (d3) at (3,-1.5) {$b_3$};
+  \foreach \x in {c1,c2}{\foreach \y in {d1,d2,d3}{\draw[abk] (\x) -- (\y);}}
+  \draw[inb] (d1) to[bend left=20] (d2);
+  \draw[inb] (d2) to[bend left=20] (d3);
+  % backward arc b3 -> a1 (red), then the highlighted escape leg a1 -> b2 (green)
+  \draw[back] (d3) to[bend right=28] (c1);
+  \draw[esc] (c1) -- (d2);
+  \node[vertexred, font=\scriptsize] at (1.35,-2.0) {backward arc $b_3\!\to\! a_1$};
+  \node[font=\scriptsize, align=center] at (1.5,-2.5)
+     {(b) the route $b_3\to a_1\to b_2$\\now escapes $B$ through $A$};
+\end{scope}
+\end{tikzpicture}
+\caption[The directed frontier and the backward-arc obstruction]{The directed
+frontier reduction and the single obstruction. \textbf{(a)} The structure the
+upper bound wants. Every arc runs from $A$ to $B$ (faint), $B$ carries only a
+light internal thickening (the $m-2$ budget, dark blue), and no arc returns to
+$A$, so a route between two vertices of $B$ never leaves $B$ and the count
+$|A||B| + (m-2)|B|$ is complete. \textbf{(b)} A single backward arc
+$b_3 \to a_1$ (red) breaks this. The route $b_3 \to a_1 \to b_2$ (red leg then
+green leg) now escapes $B$ through $A$, an extra route the budget never
+counted. Ruling out backward arcs in an extremal digraph is the one missing
+lemma behind the $m \ge 3$ upper bound, and the checker refuted a proposed
+counterexample by finding exactly such a hidden route.}
+\label{fig:backward-arc}
+\end{figure}
+
 The reduction is clean except at a single point, and it is worth naming the point exactly rather than hiding it. The count goes through provided the extremal digraph has \emph{no arc from $B$ back to $A$}: under that hypothesis a route between two vertices of $B$ can never escape $B$, so the connectivity inside $B$ is governed entirely by $B$'s own arcs and the budget applies. The bare existence of a complete $A \to B$ partition is not enough on its own, because a small example shows a backward arc can manufacture an extra route. So the whole upper bound for $m \ge 3$ now rests on one missing lemma: that an extremal non-hub digraph has no backward arc. The natural delete-and-compensate exchange that would prove it is not monotone, which is the precise reason it remains open.
 
 The machine has been useful here in the negative direction too: a proposed counterexample to the conjecture, a backward arc bolted onto the thirty-arc graph, was refuted by the checker, which found the third route the construction's author had missed.
