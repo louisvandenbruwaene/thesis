@@ -2913,7 +2913,7 @@ def plot_sa_vs_tabu_convergence(
     fig, axes = plt.subplots(1, len(cases), figsize=(11, 4.3))
     if len(cases) == 1:
         axes = [axes]
-    for ax, (n, m) in zip(axes, cases):
+    for i, (ax, (n, m)) in enumerate(zip(axes, cases)):
         sa = search_for_dense_graph(MULTI_DIRECTED, n, m, seed=seed, steps=10**7,
                                     deadline=time.time() + budget)
         tb = tabu_search_for_dense_graph(MULTI_DIRECTED, n, m, seed=seed,
@@ -2930,6 +2930,10 @@ def plot_sa_vs_tabu_convergence(
         ax.set_ylabel("densest feasible arc count", fontsize=9.5)
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=8.5, loc="lower right")
+        # Fewer x-ticks declutters the time axis: 4 on the first panel, 6 on the
+        # second, since the action concentrates early and dense ticks add noise.
+        if MaxNLocator is not None:
+            ax.xaxis.set_major_locator(MaxNLocator(nbins=4 if i == 0 else 6))
     _save(path)
 
 
@@ -3002,6 +3006,14 @@ def plot_complexity_growth(path: str | Path) -> None:
         ax.set_title(title)
         ax.set_xlabel("vertices $n$")
         ax.grid(True, alpha=0.3)
+    # Cap the shared vertical axis at 100 so the slowest curve (the directed
+    # 3-uniform hypergraph) runs off the top instead of compressing every other
+    # curve into a thin band near the bottom.  sharey=True propagates the limit.
+    axes[0].set_ylim(0, 100)
+    axes[0].annotate(r"$3$-uniform directed" + "\n" + r"continues off the top",
+                     xy=(9.55, 99.3), xytext=(7.5, 92), fontsize=8, color=_VIOLET,
+                     ha="center", va="center",
+                     arrowprops=dict(arrowstyle="->", color=_VIOLET, lw=1.0))
     axes[0].set_ylabel(r"$\log_{10}$ (number of graphs)")
     axes[0].legend(fontsize=8.5, loc="upper left", title="model")
     fig.suptitle("Number of graphs blind enumeration must visit",
