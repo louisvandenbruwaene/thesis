@@ -1,5 +1,22 @@
 This appendix collects the supplementary figures that the program produces but that the chapters reference rather than reproduce in full. Each one is named where it belongs in the body, and the file name printed in its caption matches the output of \code{make\_figures.py} and the figure table in \code{program/README.md}. Figures already shown in the running text are not repeated here.
 
+\section{A gallery of extremal graphs}\label{app:gallery}
+
+The densest feasible graphs the program finds are not abstractions. \Cref{fig:extremal-gallery} draws a spread of them, one extremal graph per panel across the matrix variants, each annotated with its extremal value and the size of its automorphism group $|\mathrm{Aut}|$, computed as $n!$ divided by the number of distinct labellings of that shape. A multiplicity above one is shown by a $\times k$ label rather than parallel lines, and directed arcs carry arrowheads. The shapes are exactly the named extremisers the body argues about, the tree and Mader graph for the simple undirected problem, the star at full multiplicity for the multigraph, the bidirected star for the simple directed problem, and the double star for the directed multigraph, recovered here by enumeration rather than by hand.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/extremal_graphs_gallery.png}
+    \caption{Machine-found extremal graphs across the matrix variants. Each
+    panel is one densest feasible graph at the stated $n$ and $m$, drawn from
+    the enumeration output, with its extremal value and automorphism count
+    $|\mathrm{Aut}|$ below it. Edge or arc multiplicities appear as $\times k$
+    labels, and a note ``$1$ of $k$'' marks a variant with several
+    non-isomorphic extremisers, of which one is drawn. File
+    \code{extremal\_graphs\_gallery.png}.}
+    \label{fig:extremal-gallery}
+\end{figure}
+
 \section{Search traces across the variants}\label{app:traces}
 
 \Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The runs below repeat that experiment for the other variants. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In every case the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.

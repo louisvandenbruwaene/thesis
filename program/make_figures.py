@@ -42,6 +42,7 @@ from erdos915_unified import (  # noqa: E402
     hypergraph_edge,
     multigraph_undirected_edge,
     plot_complexity_growth,
+    plot_extremal_gallery,
     plot_conn_dist_grid,
     plot_conn_threshold_3d,
     plot_connectivity_distribution,
@@ -479,6 +480,10 @@ def main() -> None:
 
     plot_complexity_growth(path=FIGURES / "complexity_growth.png")
     print("wrote complexity_growth.png")
+
+    # Gallery of machine-found extremal graphs (reads extremal_gallery.json).
+    plot_extremal_gallery(FIGURES / "extremal_graphs_gallery.png")
+    print("wrote extremal_graphs_gallery.png")
 
     # Bounds grids: one for m=3 and one for m=6 (more purple dots).
     for m_val in (3, 6):

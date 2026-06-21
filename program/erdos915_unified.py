@@ -3021,6 +3021,107 @@ def plot_complexity_growth(path: str | Path) -> None:
     _save(path)
 
 
+def _draw_extremal_panel(ax, matrix, *, directed: bool) -> None:
+    """Draw one extremal multiplicity matrix on ``ax`` as a circular graph.
+
+    Vertices sit on a circle, numbered from the top.  An adjacency of
+    multiplicity one is a single line (an arrowed line when ``directed``), and a
+    higher multiplicity is shown by a small count label rather than parallel
+    curves, so the picture stays legible.  Opposite arcs of a bidirected pair
+    are bent apart.
+    """
+    from matplotlib.patches import FancyArrowPatch
+    n = len(matrix)
+    angs = [math.pi / 2 - 2 * math.pi * k / n for k in range(n)]
+    pos = [(math.cos(a), math.sin(a)) for a in angs]
+
+    def edge(i, j, rad, arrow):
+        ax.add_patch(FancyArrowPatch(
+            pos[i], pos[j], connectionstyle=f"arc3,rad={rad}",
+            arrowstyle=("-|>" if arrow else "-"), mutation_scale=12,
+            lw=1.7, color=_KUL_BLUE, shrinkA=10, shrinkB=10, zorder=1))
+
+    def mlabel(i, j, rad, mu):
+        if mu <= 1:
+            return
+        mx, my = (pos[i][0] + pos[j][0]) / 2, (pos[i][1] + pos[j][1]) / 2
+        dx, dy = pos[j][0] - pos[i][0], pos[j][1] - pos[i][1]
+        length = math.hypot(dx, dy) or 1.0
+        mx += (rad * 0.9 + 0.06) * (-dy) / length
+        my += (rad * 0.9 + 0.06) * (dx) / length
+        ax.text(mx, my, f"$\\times{mu}$", fontsize=8, ha="center", va="center",
+                color=_KUL_DARK, zorder=3,
+                bbox=dict(boxstyle="round,pad=0.08", fc="white", ec="none"))
+
+    if directed:
+        for i in range(n):
+            for j in range(n):
+                if i == j or matrix[i][j] == 0:
+                    continue
+                rad = 0.16 if matrix[j][i] else 0.0
+                edge(i, j, rad, True)
+                mlabel(i, j, rad, matrix[i][j])
+    else:
+        for i in range(n):
+            for j in range(i + 1, n):
+                if matrix[i][j] == 0:
+                    continue
+                edge(i, j, 0.0, False)
+                mlabel(i, j, 0.0, matrix[i][j])
+    for k, (x, y) in enumerate(pos):
+        ax.scatter([x], [y], s=300, c="white", edgecolors=_KUL_BLUE,
+                   linewidths=1.6, zorder=2)
+        ax.text(x, y, str(k + 1), ha="center", va="center", fontsize=9,
+                zorder=3, color=_KUL_DARK)
+    ax.set_xlim(-1.45, 1.45)
+    ax.set_ylim(-1.45, 1.45)
+
+
+def plot_extremal_gallery(path: str | Path, *,
+                          gallery_json: str | Path | None = None) -> None:
+    """A gallery of machine-found extremal graphs across the matrix variants.
+
+    Reads ``figures/extremal_gallery.json`` (produced by
+    :func:`gallery_extremal_graphs`) and draws a curated spread of extremal
+    multiplicity matrices, one panel each, annotated with the extremal value and
+    the automorphism count ``|Aut|`` computed as ``n! / labelled_count`` for the
+    drawn class.  This turns the enumeration's real output into a picture rather
+    than leaving it in JSON.
+    """
+    if not MATPLOTLIB_AVAILABLE:
+        raise RuntimeError("matplotlib is required for figures")
+    import json
+    if gallery_json is None:
+        gallery_json = Path(__file__).resolve().parent.parent / "figures" / "extremal_gallery.json"
+    data = json.loads(Path(gallery_json).read_text())
+    cells = [
+        ("simple_undirected_edge",   "n=5_m=3", False, "simple undirected, edge\n$m=3$, $n=5$"),
+        ("simple_undirected_edge",   "n=6_m=3", False, "simple undirected, edge\n$m=3$, $n=6$"),
+        ("multi_undirected_edge",    "n=5_m=3", False, "multigraph undirected, edge\n$m=3$: star at full multiplicity"),
+        ("multi_undirected_edge",    "n=4_m=4", False, "multigraph undirected, edge\n$m=4$, $n=4$"),
+        ("simple_directed_edge",     "n=4_m=2", True,  "simple directed, arc\n$m=2$: bidirected star"),
+        ("multi_directed_edge",      "n=4_m=3", True,  "multigraph directed, arc\n$m=3$: double star"),
+    ]
+    fig, axes = plt.subplots(2, 3, figsize=(11, 7.4))
+    for ax, (var, key, directed, title) in zip(axes.flat, cells):
+        cell = data[var][key]
+        cls = cell["classes"][0]
+        matrix = cls["repr"]
+        n = len(matrix)
+        aut = math.factorial(n) // cls["labelled_count"]
+        _draw_extremal_panel(ax, matrix, directed=directed)
+        sub = f"value $= {cell['extremal_value']}$,  $|\\mathrm{{Aut}}| = {aut}$"
+        if len(cell["classes"]) > 1:
+            sub += f"  (1 of {len(cell['classes'])})"
+        ax.set_title(title, fontsize=10)
+        ax.text(0.5, -0.04, sub, transform=ax.transAxes, ha="center", va="top",
+                fontsize=9)
+        ax.set_aspect("equal")
+        ax.axis("off")
+    fig.suptitle("Machine-found extremal graphs", fontsize=13)
+    _save(path)
+
+
 _GUESS_STYLE = (0, (1, 1))   # dense dots: "we are very much guessing"
 
 
