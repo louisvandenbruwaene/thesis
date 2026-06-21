@@ -110,6 +110,60 @@ The vertex-disjoint version follows the same idea after one construction: split 
 \label{fig:vertex-split}
 \end{figure}
 
+\Cref{fig:vertex-split-example} applies the split to a whole digraph. Two arc-disjoint routes are forced through one shared vertex $w$, so on the split network both must cross the single unit-capacity arc inside $w$, which caps the number of internally vertex-disjoint routes below the edge-disjoint count.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth, scale=0.8,
+   sp/.style={circle, draw=KULblauw1, fill=KULblauw1!12, minimum size=5pt, inner sep=0pt},
+   capf/.style={-{Stealth[length=1.6mm]}, line width=1pt, black!40},
+   capw/.style={-{Stealth[length=2mm]}, line width=1.8pt, vertexred},
+   rxa/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexorange},
+   rxb/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexgreen!70!black}]
+% ----- panel (a): original digraph, two routes through w -----
+\begin{scope}
+  \node[smallvertex] (s) at (0,0) {$s$};
+  \node[smallvertex] (w) at (3,0) {$w$};
+  \node[smallvertex] (t) at (6,0) {$t$};
+  \node[smallvertex] (a) at (1.5,1.55) {$a$};
+  \node[smallvertex] (b) at (4.5,1.55) {$b$};
+  \draw[rxa] (s)--(w); \draw[rxa] (w)--(t);
+  \draw[rxb] (s)--(a); \draw[rxb] (a)--(w); \draw[rxb] (w)--(b); \draw[rxb] (b)--(t);
+  \node[font=\scriptsize] at (3,-1.05) {$\lec(s,t)=2$, both routes use $w$};
+  \node[font=\small] at (3,-1.85) {(a) original digraph};
+\end{scope}
+% ----- panel (b): split network, w_in -> w_out is the cap-1 bottleneck -----
+\begin{scope}[xshift=8.8cm]
+  \foreach \name/\x/\y in {s/0/0, w/3/0, t/6/0, a/1.5/1.55, b/4.5/1.55}{
+    \node[sp] (\name-i) at (\x-0.34,\y) {};
+    \node[sp] (\name-o) at (\x+0.34,\y) {};
+    \node[font=\scriptsize, yshift=11pt] at ($(\name-i)!.5!(\name-o)$) {$\name$};
+  }
+  \foreach \name in {s,a,t,b}{\draw[capf] (\name-i)--(\name-o);}
+  \draw[capw] (w-i)--(w-o);
+  \node[vertexred, font=\scriptsize] at (3,-0.55) {cap $1$};
+  % external route arcs, out -> in
+  \draw[rxa] (s-o) to[bend left=6] (w-i);
+  \draw[rxa] (w-o) to[bend left=6] (t-i);
+  \draw[rxb] (s-o) to[bend left=12] (a-i);
+  \draw[rxb] (a-o) to[bend right=6] (w-i);
+  \draw[rxb] (w-o) to[bend left=6] (b-i);
+  \draw[rxb] (b-o) to[bend left=12] (t-i);
+  \node[font=\small] at (3,-1.85) {(b) split network: $\kap(s,t)=1$};
+\end{scope}
+\end{tikzpicture}
+\caption[Vertex splitting on a whole digraph]{The vertex-split checker on a
+larger example. \textbf{(a)} A digraph in which the two arc-disjoint $s$--$t$
+routes, $s \to w \to t$ (orange) and $s \to a \to w \to b \to t$ (green), both
+pass through $w$, so $\lec(s,t)=2$. \textbf{(b)} The split network replaces
+every vertex $V$ by an arc $V^{\mathrm{in}} \to V^{\mathrm{out}}$ of capacity
+one. Both routes must now traverse the single unit arc inside $w$ (red), which
+carries only one unit, so at most one internally vertex-disjoint route gets
+through and $\kap(s,t)=1$. Splitting every vertex this way turns the
+vertex-disjoint count into an ordinary maximum flow.}
+\label{fig:vertex-split-example}
+\end{figure}
+
 \codecard{maxVertexConnectivity(G) $\to \mathbb{N}$}{MEASURE}
 {a graph $G$}
 {$\kappa^{\max}(G)$, the largest local vertex-connectivity over all pairs}
