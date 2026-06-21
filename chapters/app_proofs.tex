@@ -300,11 +300,19 @@ a \;\le\; \frac{2a}{n} + \floorfrac{(n-1)^2}{4}
 \qquad\Longrightarrow\qquad
 a \;\le\; \frac{n}{n-2} \, \floorfrac{(n-1)^2}{4}.
 \]
-It remains to check that the right-hand side is at most $\floor{n^2/4}$. For even $n = 2k$ ($k \ge 4$): $\floor{(2k-1)^2/4} = k(k-1)$, and $\frac{2k}{2k-2} \cdot k(k-1) = k^2 = \floor{n^2/4}$ exactly. For odd $n = 2k+1$ ($k \ge 4$): $\floor{(2k)^2/4} = k^2$, and the polynomial division $(2k+1)k^2 = (2k-1)(k^2+k) + k$ gives
+It remains to check that this right-hand side never exceeds $\floor{n^2/4}$, and the two parities behave differently enough to treat them in turn.
+
+For even $n = 2k$ with $k \ge 4$, first simplify $\floor{(n-1)^2/4}$. Expanding $(2k-1)^2 = 4k^2 - 4k + 1$ and dividing by $4$ gives $k^2 - k + \tfrac14$, whose floor is $k(k-1)$. The bound then reads
 \[
-\frac{n}{n-2}\,\floorfrac{(n-1)^2}{4} \;=\; \frac{(2k+1)k^2}{2k-1} \;=\; k(k+1) + \frac{k}{2k-1},
+a \;\le\; \frac{2k}{2k-2}\,k(k-1) \;=\; \frac{k}{k-1}\,k(k-1) \;=\; k^2,
 \]
-and since $0 < \frac{k}{2k-1} < 1$ and $a$ is an integer, $a \le k(k+1) = \floor{n^2/4}$. In both parities $a \le M(n)$, completing the induction.
+and since $\floor{n^2/4} = \floor{(2k)^2/4} = k^2$ as well, the bound lands exactly on the target with no slack left over.
+
+For odd $n = 2k+1$ with $k \ge 4$, the same simplification gives $\floor{(n-1)^2/4} = \floor{(2k)^2/4} = k^2$, so the bound is $a \le \frac{2k+1}{2k-1}\,k^2$. To compare this fraction with the target, split off its integer part by dividing $(2k+1)k^2$ by $2k-1$. The remainder is exactly $k$, because $(2k-1)(k^2+k) = 2k^3 + k^2 - k$ and $(2k+1)k^2 = 2k^3 + k^2$ differ by $k$, so
+\[
+\frac{n}{n-2}\,\floorfrac{(n-1)^2}{4} \;=\; \frac{(2k+1)k^2}{2k-1} \;=\; k(k+1) + \frac{k}{2k-1}.
+\]
+The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 1$, so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction.
 \end{proof}
 
 Two remarks on the shape of this proof. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. The proof is long not because it is deep but because the two regimes of $M(n)$ must be carried through the arithmetic separately, and that bookkeeping is precisely what \Cref{ch:certify} hands to the machine at the base cases.
@@ -543,35 +551,71 @@ arc-disjoint route on top of the $m-1$ parallel arcs of a bipartite pair:
 \item $\mu(b, v) \ge 1$ and $\mu(v, b') \ge 1$ with $b' \ne b$: the path
       $a \to b \to v \to b'$ (any $a \in A$) gives $\lec(a, b') \ge m$.
 \end{enumerate}
-\emph{Case I: $\mathrm{i}_A \ge 1$.} By (1), $\mathrm{o}_B = 0$.
-If $\mathrm{o}_A \ge 1$, then by (2) all in-arcs from $A$ and all out-arcs
-to $A$ involve one single vertex $a^*$ (an in-arc from $a$ and an out-arc to
-$a' \ne a$ would be forbidden, so every $A$-arc at $v$ touches the same vertex).
-The flow estimate
+Each bound below rests on one principle. The local connectivity
+$\lec(s, t)$ is at least the number of pairwise arc-disjoint $s$-to-$t$
+routes we can exhibit, because any such family of routes is an integral flow
+from $s$ to $t$. Feasibility says $\lec \le m-1$, so the moment we can name
+$m$ arc-disjoint routes between two vertices we have a contradiction.
+
+\emph{Case I: $\mathrm{i}_A \ge 1$.} Some arc enters $v$ from a vertex
+$a \in A$. Pattern (1) then forces $\mathrm{o}_B = 0$, because any arc
+$v \to b$ would complete the route $a \to v \to b$, an $m$-th route on the
+pair $(a, b)$ laid on top of its $m-1$ parallel arcs.
+
+Suppose first that $\mathrm{o}_A \ge 1$, so $v$ also sends an arc to some
+vertex of $A$. Pattern (2) makes this rigid: an arc into $v$ from $a$ and an
+arc out of $v$ to a different $a' \ne a$ would give the route
+$a \to v \to a' \to b$ for any $b$, again an $m$-th route. So every arc
+between $v$ and $A$, in either direction, must touch one single vertex
+$a^*$. Counting arc-disjoint routes from $a^*$ to $v$, there are the
+$\mu(a^*, v)$ direct arcs, and for each $b \in B$ the two-step route
+$a^* \to b \to v$, which can be run $\min(\mu(a^*, b), \mu(b, v))$ times on
+disjoint arcs. Different $b$ use different arcs, and none reuse a direct arc,
+so
 \[
 \lec(a^*, v) \;\ge\; \mu(a^*, v) + \sum_b \min(\mu(a^*, b), \mu(b, v))
- \;=\; \mu(a^*, v) + \mathrm{i}_B
+ \;=\; \mu(a^*, v) + \mathrm{i}_B,
 \]
-counts arc-disjoint $a^*$-to-$v$ routes: the $\mu(a^*,v)$ direct arcs, and for
-each $b$ the two-step route $a^* \to b \to v$, which carries
-$\min(\mu(a^*,b), \mu(b,v))$ disjoint copies. Since $\mu(a^*, b) = m-1 \ge
-\mu(b, v)$ each $\min$ equals $\mu(b, v)$, and these sum to $\mathrm{i}_B$.
-Feasibility forces this to be $\le m-1$, so
-$d(v) = \mu(a^*, v) + \mathrm{i}_B + \mu(v, a^*) \le 2(m-1)$.
-If $\mathrm{o}_A = 0$, then $v$ is a pure sink and the same estimate applied to
-\emph{every} $a \in A$ reads $\mu(a, v) + \mathrm{i}_B \le m - 1$, so
-$\mu(a,v) \le (m-1) - \mathrm{i}_B$. Summing this over the $p$ vertices of $A$
-gives $\mathrm{i}_A \le p(m-1) - p\,\mathrm{i}_B$, hence
-$d(v) = \mathrm{i}_A + \mathrm{i}_B \le p(m-1) - (p-1)\,\mathrm{i}_B \le p(m-1)$.
-\emph{Case II: $\mathrm{i}_A = 0$, $\mathrm{o}_B \ge 1$.} Symmetric to
-Case I under arc reversal, with (3) in place of (2):
-either $d(v) \le 2(m-1)$, or $v$ is a pure source and
-$\lec(v, b) \ge \mu(v, b) + \mathrm{o}_A \le m-1$ for every $b$ gives
+the last equality because $\mu(a^*, b) = m-1$ is at least $\mu(b, v)$, so
+each minimum is $\mu(b, v)$ and the sum is $\mathrm{i}_B$. Feasibility caps
+the left side at $m-1$, so $\mu(a^*, v) + \mathrm{i}_B \le m-1$. Every arc at
+$v$ now touches either $a^*$ or $B$, so
+$d(v) = \mu(a^*, v) + \mathrm{i}_B + \mu(v, a^*)$, and with the first two
+summing to at most $m-1$ and the last at most $m-1$ we get
+$d(v) \le 2(m-1)$.
+
+Suppose instead $\mathrm{o}_A = 0$. With $\mathrm{o}_B = 0$ already, $v$ is
+now a pure sink. The same two-step count applies to \emph{every} $a \in A$ at
+once, giving $\lec(a, v) \ge \mu(a, v) + \mathrm{i}_B$, hence
+$\mu(a, v) \le (m-1) - \mathrm{i}_B$ for each of the $p$ vertices of $A$.
+Summing over $A$ bounds the in-flow from $A$ by
+$\mathrm{i}_A \le p(m-1) - p\,\mathrm{i}_B$, so
+\[
+d(v) = \mathrm{i}_A + \mathrm{i}_B \le p(m-1) - (p-1)\,\mathrm{i}_B \le p(m-1),
+\]
+the final step because $(p-1)\,\mathrm{i}_B \ge 0$.
+
+\emph{Case II: $\mathrm{i}_A = 0$ and $\mathrm{o}_B \ge 1$.} This is Case I
+read backwards. Reversing every arc turns $(m-1) \cdot B_{p,q}$ into
+$(m-1) \cdot B_{q,p}$, swaps in-arcs with out-arcs, and sends pattern (2) to
+pattern (3), so the same argument applies with the roles of $A$ and $B$
+exchanged. It yields either $d(v) \le 2(m-1)$, or $v$ is a pure source for
+which $\lec(v, b) \ge \mu(v, b) + \mathrm{o}_A \le m-1$ holds for every $b$,
+and summing over the $q$ vertices of $B$ gives
 $d(v) \le q(m-1) - (q-1)\,\mathrm{o}_A \le q(m-1)$.
-\emph{Case III: $\mathrm{i}_A = \mathrm{o}_B = 0$.} Then
-$\lec(a, v) \ge \mathrm{i}_B$ and $\lec(v, b) \ge \mathrm{o}_A$ force
+
+\emph{Case III: $\mathrm{i}_A = \mathrm{o}_B = 0$.} Now $v$ receives nothing
+from $A$ and sends nothing to $B$, so its only arcs are the $\mathrm{i}_B$
+in-arcs from $B$ and the $\mathrm{o}_A$ out-arcs to $A$. For any $a \in A$
+the two-step routes $a \to b \to v$ over all $b$ give
+$\lec(a, v) \ge \mathrm{i}_B$, so $\mathrm{i}_B \le m-1$, and for any
+$b \in B$ the routes $v \to a \to b$ over all $a$ give
+$\lec(v, b) \ge \mathrm{o}_A$, so $\mathrm{o}_A \le m-1$. Hence
 $d(v) = \mathrm{i}_B + \mathrm{o}_A \le 2(m-1)$.
-Since $p, q \ge 2$, all cases give $d(v) \le (m-1)\max(p, q)$.
+
+Every case bounds $d(v)$ by either $2(m-1)$ or $\max(p, q)(m-1)$. Since
+$p, q \ge 2$ we have $2(m-1) \le (m-1)\max(p, q)$, so in all cases
+$d(v) \le (m-1)\max(p, q)$.
 \end{proof}
 
 \begin{corollary}[Attachment equality]\label{cor:attachment-equality}
@@ -989,34 +1033,68 @@ $X$ by (iii), and $0 \le |X| - 1$. On two vertices, (i)--(iii) force both
 into $X$, parallel edges are internally disjoint paths, so (iv) caps the
 multiplicity at $2$ and $\mathrm{rank} \le 1 = |X| - 1$.
 
-\emph{Step 1: a cut vertex.} Let $B_1, \dots, B_c$ ($c \ge 2$) be the
-blocks. A bridge block has rank $0 \le |X \cap B| - 1$, since by (i) it has
-an endpoint in $X$. Every other block is $2$-connected, hence has minimum
-degree $2$, so it satisfies (i)--(iv) and the induction hypothesis. Write
-$b(v)$ for the number of blocks containing a cut vertex $v$. Each $X$-vertex is
-counted once for every block it lies in, so $\sum_i |X \cap B_i| = |X| +
-\sum_{x \in X\,\mathrm{cut}} (b(x) - 1)$. Subtracting the block count
-$c = 1 + \sum_{v\,\mathrm{cut}} (b(v) - 1)$ (the block--cut tree identity) and
-splitting the cut vertices into their $X$- and $Z$-parts leaves
+\emph{Step 1: a cut vertex.} Suppose $G$ has a cut vertex, so it is not yet
+$2$-connected. Break it into its \emph{blocks} $B_1, \dots, B_c$ with
+$c \ge 2$, a block being a maximal piece with no cut vertex of its own, that
+is, either a single bridge edge or a maximal $2$-connected subgraph. Two
+blocks meet in at most one vertex, and any shared vertex is a cut vertex of
+$G$. No cycle can pass through two different blocks, so the cycle rank adds
+up over blocks, $\mathrm{rank}(G) = \sum_i \mathrm{rank}(B_i)$, and it is
+enough to bound each $\mathrm{rank}(B_i)$ by $|X \cap B_i| - 1$ and sum.
+
+Each block inherits the hypotheses. A bridge block is one edge, so its rank
+is $0$, and by (i) at least one endpoint lies in $X$, giving
+$0 \le |X \cap B| - 1$. Every other block is $2$-connected, hence has minimum
+degree at least $2$, so (i) to (iv) hold inside it and the induction
+hypothesis gives $\mathrm{rank}(B_i) \le |X \cap B_i| - 1$.
+
+Adding these requires care, because a cut vertex is shared by several blocks
+and would be counted several times. Write $b(v)$ for the number of blocks
+containing $v$, so $b(v) = 1$ except at cut vertices. Counting each
+$X$-vertex once for every block it lies in,
+\[
+\sum_i |X \cap B_i| = |X| + \sum_{x \in X\,\mathrm{cut}} (b(x) - 1).
+\]
+The number of blocks satisfies the block--cut tree identity
+$c = 1 + \sum_{v\,\mathrm{cut}} (b(v) - 1)$, which holds because the blocks
+and cut vertices form a tree in which each cut vertex $v$ is joined to the
+$b(v)$ blocks that contain it. Subtracting this count of blocks from the
+previous display and separating the cut vertices into their $X$- and
+$Z$-parts leaves
 \[
 \mathrm{rank}(G) = \sum_i \mathrm{rank}(B_i) \le \sum_i (|X \cap B_i| - 1)
   = |X| - 1 - \sum_{z \in Z\,\mathrm{cut}} (b(z) - 1) \le |X| - 1,
 \]
-the $Z$-cut surplus only lowering the bound further.
+where the last inequality holds because each $b(z) - 1 \ge 0$, so the
+$Z$-cut sum only pushes the bound further below $|X| - 1$.
 
-\emph{Step 2: a $Z$-vertex of degree two.} If $G$ is $2$-connected and some
-$z_0 \in Z$ has degree exactly $2$, its two edges reach distinct vertices of
-$X$ (by (i) and (ii)). Suppress $z_0$, replacing it by one new $X$--$X$
-edge. Rank, $|X|$, all local connectivities between remaining vertices, and
-the hypotheses are preserved, and the graph shrinks.
+\emph{Step 2: a $Z$-vertex of degree two.} From now on $G$ is $2$-connected,
+every cut vertex having been handled. Suppose some $z_0 \in Z$ has degree
+exactly $2$. Both its neighbours lie in $X$ by (i), and they are distinct,
+since two edges to the same vertex would be parallel at a $Z$-vertex, which
+(ii) forbids. \emph{Suppress} $z_0$ by deleting it and joining its two
+neighbours $x, x'$ with one new edge. This loses two edges and one vertex
+and gains one edge, so $|E|$ and $|V|$ each drop by one and
+$\mathrm{rank} = |E| - |V| + 1$ is unchanged. The new edge runs $X$ to $X$,
+so $|X|$ is unchanged and (i), (ii), (iii) still hold for the remaining
+$Z$-vertices. Replacing the path $x, z_0, x'$ by a direct edge alters no
+route among the surviving vertices, so every $\kap(x_1, x_2)$ is preserved
+and (iv) holds. The graph is strictly smaller, so the induction hypothesis
+applies and returns the bound for $G$.
 
-\emph{Step 3: an $X$-vertex of degree two.} If $G$ is $2$-connected, every
-$Z$-degree is at least $3$ (Step 2 exhausted), and some $x_0 \in X$ has
-degree $2$, delete $x_0$. The result is connected, its rank is exactly
-$\mathrm{rank}(G) - 1$, the $Z$-degrees stay at least $2$, and $|X|$ drops
-by one (note $|X| \ge 2$: with $|X| \le 1$, (i) and (ii) would force every
-$z$ to have degree at most $1$). Induction gives
-$\mathrm{rank}(G) - 1 \le |X| - 2$.
+\emph{Step 3: an $X$-vertex of degree two.} Now $G$ is $2$-connected and,
+Step 2 being used up, every $Z$-vertex has degree at least $3$. Suppose some
+$x_0 \in X$ has degree $2$, and delete it. Deleting one vertex from a
+$2$-connected graph leaves it connected. Stripping a degree-$2$ vertex
+removes two edges and one vertex, so $\mathrm{rank}$ drops by exactly one.
+Each neighbour of $x_0$ loses one edge, and a neighbour in $Z$ only falls
+from degree at least $3$ to degree at least $2$, so (iii) survives, while
+deleting a vertex cannot raise a connectivity, so (iv) survives. Here $|X|$
+drops by one, and $|X| \ge 2$ to begin with, for if $|X| \le 1$ then by (i)
+and (ii) every $z$ would send all its edges to one $X$-vertex without
+repeats, hence have degree at most $1$, against (iii). The smaller graph
+satisfies the hypotheses, so induction gives
+$\mathrm{rank}(G) - 1 \le (|X| - 1) - 1$, that is $\mathrm{rank}(G) \le |X| - 1$.
 
 \emph{Step 4: the remaining case is impossible.} Now $G$ is $2$-connected
 with $|V| \ge 3$ and every degree at least $3$. First, $G$ is simple: a
