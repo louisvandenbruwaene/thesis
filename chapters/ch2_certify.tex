@@ -156,6 +156,44 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \caption{Measuring Berge connectivity by maximum flow. A hyperedge $e$ joining several vertices (left) is replaced by a helper point $h_e$ joined to each of its members (right). Because at most one route may pass through $h_e$, the helper point enforces that the hyperedge serves only one route at a time. Counting independent routes between two vertices is then an ordinary maximum flow on this enlarged network, and a two-vertex hyperedge collapses to a single ordinary edge.}
 \label{fig:hyper-gadget}
 \end{figure}
+
+\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the same idea to a whole small hypergraph, where a Berge route that switches hyperedge partway becomes a single flow path threading two helper points in turn.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=1.0,
+   mem/.style={line width=1pt, black!40},
+   fA/.style={line width=2.1pt, vertexorange}]
+  % vertices in a left column
+  \node[smallvertex] (u) at (0, 2.0) {$u$};
+  \node[smallvertex] (x) at (0, 1.0) {$x$};
+  \node[smallvertex] (y) at (0, 0.0) {$y$};
+  \node[smallvertex] (z) at (0,-1.0) {$z$};
+  \node[smallvertex] (v) at (0,-2.0) {$v$};
+  % two helper squares to the right
+  \node[hnode, fill=vertexorange!18, minimum size=15pt] (h1) at (2.7, 1.2) {$h_{e_1}$};
+  \node[hnode, fill=KULblauw3b!16, minimum size=15pt] (h2) at (2.7,-1.2) {$h_{e_2}$};
+  % membership edges: e1 = {u,x,y}, e2 = {y,z,v}
+  \draw[mem] (u)--(h1); \draw[mem] (x)--(h1); \draw[mem] (y)--(h1);
+  \draw[mem] (y)--(h2); \draw[mem] (z)--(h2); \draw[mem] (v)--(h2);
+  % the Berge route u,e1,y,e2,v as one flow path through both helpers
+  \draw[fA] (u)--(h1); \draw[fA] (h1)--(y); \draw[fA] (y)--(h2); \draw[fA] (h2)--(v);
+  \node[font=\scriptsize, align=center] at (0,-2.75) {hypergraph vertices};
+  \node[font=\scriptsize, align=center] at (2.7,-2.2)
+     {helper points\\(one route each)};
+  \node[font=\scriptsize, vertexorange!75!black] at (1.75,2.15)
+     {route $u, e_1, y, e_2, v$};
+\end{tikzpicture}
+\caption[The helper-point network on a two-hyperedge route]{The same
+construction on a two-hyperedge hypergraph $e_1 = \{u,x,y\}$,
+$e_2 = \{y,z,v\}$. The Berge route that enters $e_1$ at $u$, switches
+hyperedge at the shared vertex $y$, and leaves $e_2$ at $v$ becomes the single
+flow path $u \to h_{e_1} \to y \to h_{e_2} \to v$ (orange), entering each
+hyperedge through one member and leaving through another. Because each helper
+carries only one unit of flow, a second $u$--$v$ route would have to avoid
+both helpers, which is exactly the rule that one hyperedge serves one route.}
+\label{fig:hyper-gadget-example}
+\end{figure}
 One way to picture the helper point: think of each hyperedge as a room with several doors. Entering through any door counts as using that room. Because only one path may pass through the helper node, at most one traveller can occupy the room at once, so the second traveller must find a route that never enters it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that avoid sharing any room, which is exactly what Berge edge-disjointness means.
 
 \codecard{maxHyperedgeConnectivity(H) $\to \mathbb{N}$}{MEASURE}
