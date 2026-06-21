@@ -524,8 +524,14 @@ $d(v)\le(m-1)\max(p,q)$.}
 \end{figure}
 
 \begin{proof}
-Write $\mathrm{i}_A = \sum_{a} \mu(a, v)$, $\mathrm{i}_B = \sum_{b} \mu(b, v)$,
-$\mathrm{o}_A = \sum_{a} \mu(v, a)$, $\mathrm{o}_B = \sum_{b} \mu(v, b)$, so that
+The strategy is to sort the arcs at the new vertex $v$ into four groups by
+their direction and which side they touch, rule out the combinations that
+would manufacture an $m$-th route between two old vertices, and then bound
+whatever survives. Write $\mathrm{i}_A = \sum_{a} \mu(a, v)$,
+$\mathrm{i}_B = \sum_{b} \mu(b, v)$,
+$\mathrm{o}_A = \sum_{a} \mu(v, a)$, $\mathrm{o}_B = \sum_{b} \mu(v, b)$ for
+the total multiplicities into $v$ from $A$, into $v$ from $B$, out of $v$ to
+$A$, and out of $v$ to $B$, so that
 $d(v) = \mathrm{i}_A + \mathrm{i}_B + \mathrm{o}_A + \mathrm{o}_B$.
 Three route patterns are forbidden outright, because each adds an $m$-th
 arc-disjoint route on top of the $m-1$ parallel arcs of a bipartite pair:
@@ -595,7 +601,16 @@ Then $L_m^{\mathrm{dir}}(2k+1) = (m-1)k(k+1)$.
 \end{theorem}
 
 \begin{proof}
-The lower bound is $(m-1) \cdot B_{k, k+1}$. For the upper bound let $D$ on
+The lower bound is $(m-1) \cdot B_{k, k+1}$. The upper bound is a counting
+squeeze. If the arc count were even one over the target, then deleting any
+single vertex would still leave a feasible multigraph on $2k$ vertices,
+which by (i) cannot exceed $(m-1)k^2$, so every vertex would have to carry a
+large degree. Yet the average degree is only barely above that floor, so
+some vertex must sit exactly on it, and deleting that one lands precisely on
+the even extremiser $(m-1)\cdot B_{k,k}$ of (ii). The attachment lemma then
+caps how much that vertex could have carried, below what the surplus
+requires, and the contradiction forces the surplus to vanish. We now make
+this precise. For the upper bound let $D$ on
 $n = 2k+1$ vertices have $\lec^{\max} \le m-1$ and
 $|A(D)| = (m-1)k(k+1) + j$ with $j \ge 1$. Deleting any vertex $v$ leaves a
 feasible multigraph on $2k$ vertices, so by (i)
@@ -949,7 +964,11 @@ The $m = 3$ case also closes completely. The engine is a rank bound for
 graphs in which one side of a partition must stay below local
 $3$-connectivity. The hypergraph theorem then falls out of the incidence
 translation. Throughout, $\mathrm{rank}(G) = |E(G)| - |V(G)| + 1$ denotes
-the cycle rank of a connected multigraph.
+the cycle rank of a connected multigraph, that is, the number of independent
+cycles it carries. A tree has cycle rank $0$, and each edge added beyond a
+spanning tree closes exactly one new cycle and raises the rank by one, so
+bounding the rank is the same as bounding how many independent cycles the
+graph can hold.
 
 \begin{lemma}[Incidence rank lemma]\label{lem:incidence-rank}
 Let $G$ be a connected multigraph with vertex set $X \cup Z$ such that
@@ -960,7 +979,12 @@ $\mathrm{rank}(G) \le |X| - 1$.
 \end{lemma}
 
 \begin{proof}
-Induction on $|V| + |E|$. \emph{Base $|V| \le 2$.} A single vertex lies in
+Induction on $|V| + |E|$. The proof peels $G$ down to a core that cannot
+exist. Step~1 handles a cut vertex by arguing block by block. Steps~2 and~3
+remove a degree-two $Z$-vertex or $X$-vertex without changing the bound.
+What survives is $2$-connected with minimum degree at least three, and
+Step~4 shows that such a graph already violates the connectivity ceiling
+(iv), so it never arises. \emph{Base $|V| \le 2$.} A single vertex lies in
 $X$ by (iii), and $0 \le |X| - 1$. On two vertices, (i)--(iii) force both
 into $X$, parallel edges are internally disjoint paths, so (iv) caps the
 multiplicity at $2$ and $\mathrm{rank} \le 1 = |X| - 1$.
@@ -1002,18 +1026,31 @@ $w$ inside $G - x'$, then from $w$ to $x'$ inside $G - x$. The concatenation
 visits $x$ only first and $x'$ only last, so it contains an $x$--$x'$ path
 with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
 (iv). If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
-$|X| \le 1$ and every $z$ has degree at most $1$ by (i), absurd. Otherwise
-decompose $G$ into its triconnected components (Tutte \cite{Tutte66},
-Hopcroft--Tarjan \cite{HopcroftTarjan73}), whose shape and the leaf at which
-the argument bites are sketched in \Cref{fig:tutte-leaf}: a tree of pieces,
-each a cycle of
-length at least three, a bond, or a $3$-connected simple graph on at least
-four vertices, glued along virtual edges, where a vertex avoiding all
-virtual edges of its piece lies in that piece alone and keeps its degree,
-and where the far side of any virtual edge $\{a, b\}$ supplies a real
-$a$--$b$ path internally avoiding the piece. Since $G$ is neither a cycle
-(degrees) nor a bond (simple) nor $3$-connected, the tree has at least two
-leaves. Let $L$ be one, with unique virtual edge $\{a, b\}$.
+$|X| \le 1$ and every $z$ has degree at most $1$ by (i), absurd.
+
+Otherwise $G$ is $2$-connected but not $3$-connected, so it can be taken
+apart at its $2$-vertex separators. The classical triconnected
+decomposition (Tutte \cite{Tutte66}, Hopcroft--Tarjan
+\cite{HopcroftTarjan73}) does this in a canonical way, and
+\Cref{fig:tutte-leaf} sketches both its shape and the leaf at which the
+argument bites. It writes $G$ as a \emph{tree of pieces}, where each piece is
+one of three simple shapes: a cycle of length at least three, a \emph{bond}
+(two vertices joined by several parallel edges), or a $3$-connected simple
+graph on at least four vertices. Wherever the decomposition cuts $G$ at a
+separating pair it records the cut by adding a \emph{virtual edge} between
+those two vertices in each piece, a placeholder that stands in for the whole
+rest of the graph on the other side. Two properties are all the proof needs
+from this, and both are visible in the figure. First, a vertex of a piece
+that touches none of that piece's virtual edges belongs to that piece alone,
+so it keeps in $G$ exactly the degree it has in the piece. Second, for any
+virtual edge $\{a, b\}$ the part of $G$ on the far side of the cut contains a
+genuine $a$--$b$ path whose interior avoids the piece, so the virtual edge
+can always be replaced by a real route.
+
+Now $G$ itself is none of the three piece types, since it is not a single
+cycle (its degrees are at least three), not a bond (it is simple), and not
+$3$-connected (the case just handled), so the tree has at least two leaves.
+Let $L$ be one, with unique virtual edge $\{a, b\}$.
 If $L$ is a cycle, a vertex of $L$ off $\{a, b\}$ has degree $2$ in $G$,
 absurd. If $L$ is a bond, it holds at least two real parallel edges, absurd
 in a simple graph. If $L$ is $3$-connected, then any two of its vertices are
