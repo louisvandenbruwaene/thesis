@@ -86,6 +86,26 @@
     },
 }
 
+% --- Hyperedge "metro line" styles -------------------------------------------
+% A hyperedge is drawn as a thick coloured line that threads all of its member
+% vertices, exactly like a single line on a metro map. Each hyperedge gets its
+% own colour, and a vertex lying on several hyperedges shows several coloured
+% lines running through it. This reads far better than overlapping shaded blobs
+% once hyperedges start to share vertices: the eye follows a line, not a smear.
+\definecolor{metroA}{RGB}{200,80,80}     % red line
+\definecolor{metroB}{RGB}{29,141,176}    % blue line
+\definecolor{metroC}{RGB}{60,160,80}     % green line
+\definecolor{metroD}{RGB}{220,140,40}    % orange line
+\definecolor{metroE}{RGB}{140,80,160}    % purple line
+\definecolor{metroF}{RGB}{120,120,120}   % grey line
+\tikzset{
+    metro/.style={line width=3.4pt, line cap=round, line join=round,
+                  rounded corners=4pt},
+    % a station dot: white circle that the coloured lines visibly pass through
+    metrostop/.style={circle, draw=black!72, fill=white, line width=1pt,
+                      minimum size=6mm, inner sep=0pt, font=\scriptsize\bfseries},
+}
+
 % --- Label and Weight Styles ---
 \tikzset{
     treeweight/.style={

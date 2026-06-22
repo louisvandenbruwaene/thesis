@@ -61,7 +61,7 @@ Mader's theorem is the floor we build on, and everything afterwards is a variati
 
 The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple graph allows at most one edge between two vertices. A \emph{multigraph} allows parallel edges, recorded by a multiplicity $\mu(u, v)$, so a single pair can already carry several independent routes. A \emph{hypergraph} lets an edge join more than two vertices at once: a hyperedge is a set of vertices rather than a pair, and a route may pass through it between any two of the vertices it contains. These three models are the three rows of every comparison figure in this thesis.
 
-\begin{figure}[b]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.0,
     mv/.style={circle, draw=roleMeasure, fill=roleMeasure!15, line width=1pt,
@@ -95,40 +95,28 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
     \node[font=\scriptsize, text=black!65] at (0,-2.12) {parallel edges $\mu(u,v)\ge 1$};
   \end{scope}
 
-  % (c) hypergraph: a size-3 (violet) and a size-4 (blue) hyperedge that
-  %     share one vertex hs -- the rightmost of the violet triple and the
-  %     bottom-left of the blue quadruple -- so the two hulls overlap.
-  \begin{scope}[shift={(8.0,0)}]
-    \coordinate (hL1) at (-0.55, 0.60);   % violet: top-left
-    \coordinate (hL2) at (-0.55,-0.45);   % violet: bottom-left
-    \coordinate (hs)  at ( 0.50, 0.05);   % SHARED vertex (violet right / blue bottom-left)
-    \coordinate (hR1) at ( 0.70, 1.00);   % blue: top-left
-    \coordinate (hR2) at ( 1.75, 1.00);   % blue: top-right
-    \coordinate (hR3) at ( 1.75, 0.05);   % blue: bottom-right
-    \coordinate (cl)  at (-0.20, 0.067);  % centroid of the violet triple
-    \coordinate (cr)  at ( 1.175, 0.525); % centroid of the blue quadruple
-    % Translucent fills on the background layer: where the two hulls overlap the
-    % violet and blue blend into a darker mixed tone.
+  % (c) hypergraph: a size-3 (red) and a size-4 (blue) hyperedge drawn as
+  %     metro lines that share one vertex hs, exactly the way a metro map draws
+  %     two lines crossing at a shared station. No shaded blobs.
+  \begin{scope}[shift={(8.1,0)}]
+    \coordinate (rL1) at (-0.68, 0.78);   % red line: upper-left
+    \coordinate (rL2) at (-0.68,-0.55);   % red line: lower-left
+    \coordinate (hs)  at ( 0.50, 0.12);   % SHARED station (red and blue cross here)
+    \coordinate (bR1) at ( 1.10, 1.02);   % blue line: top
+    \coordinate (bR2) at ( 2.00, 0.48);   % blue line: right
+    \coordinate (bR3) at ( 1.72,-0.62);   % blue line: lower-right
+    % the two hyperedges as thick metro lines, drawn behind the vertices
     \begin{scope}[on background layer]
-      \fill[roleObserve, fill opacity=0.32, rounded corners=8pt]
-        ($(cl)!1.5!(hL1)$) -- ($(cl)!1.5!(hL2)$) -- ($(cl)!1.5!(hs)$) -- cycle;
-      \fill[roleMeasure, fill opacity=0.32, rounded corners=8pt]
-        ($(cr)!1.33!(hs)$) -- ($(cr)!1.33!(hR1)$) --
-        ($(cr)!1.33!(hR2)$) -- ($(cr)!1.33!(hR3)$) -- cycle;
+      \draw[metro, metroA] (rL2) -- (rL1) -- (hs);
+      \draw[metro, metroB] (hs) -- (bR1) -- (bR2) -- (bR3);
     \end{scope}
-    % Both darker outlines drawn on top, at full opacity, above both fills.
-    \draw[roleObserve, line width=1pt, rounded corners=8pt]
-      ($(cl)!1.5!(hL1)$) -- ($(cl)!1.5!(hL2)$) -- ($(cl)!1.5!(hs)$) -- cycle;
-    \draw[roleMeasure, line width=1pt, rounded corners=8pt]
-      ($(cr)!1.33!(hs)$) -- ($(cr)!1.33!(hR1)$) --
-      ($(cr)!1.33!(hR2)$) -- ($(cr)!1.33!(hR3)$) -- cycle;
-    % Vertices last, so the dots sit above both hulls.
-    \foreach \p in {hL1,hL2,hs,hR1,hR2,hR3} {\node[mv] at (\p) {};}
-    \node[font=\itshape] at (0.6,-1.65) {hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0.6,-2.12) {hyperedges span $r\ge3$ vertices};
+    % stations on top, so each vertex sits over the line(s) passing through it
+    \foreach \p in {rL1,rL2,hs,bR1,bR2,bR3} {\node[mv] at (\p) {};}
+    \node[font=\itshape] at (0.65,-1.65) {hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0.65,-2.12) {hyperedges span $r\ge3$ vertices};
   \end{scope}
 \end{tikzpicture}
-\caption{The first axis of variation, the \emph{model}. In a \emph{simple} graph each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges: the violet region spans three vertices and the blue region spans four, and they share a single vertex where the two colours blend, illustrating hyperedges of different sizes that may overlap. When all hyperedges have the same size $r$ we call it an $r$-uniform hypergraph. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all three.}
+\caption{The first axis of variation, the \emph{model}. In a \emph{simple} graph each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, drawn here the way a metro map draws lines: the red line threads three vertices and the blue line threads four, and they meet at the single station they share, illustrating hyperedges of different sizes that may overlap. When all hyperedges have the same size $r$ we call it an $r$-uniform hypergraph. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all three.}
 \label{fig:three-models}
 \end{figure}
 
@@ -428,82 +416,58 @@ For simple digraphs and $m \ge 2$,
 For $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. For $m = 3$ the formula $\floor{(n+1)^2/4}$ equals $\floor{n^2/4} + \ceil{n/2}$, so the conjecture reduces to the previous formula for $m = 2$ and $m = 3$. For $m = 3$, $n = 10$ the second branch gives $\floor{121/4} = 30$, matching \Cref{rem:counterexample-m3}. For $m \ge 4$ the new formula and the old balanced-partition count $\floor{n^2/4} + (m-2)\ceil{n/2}$ no longer agree: the quadratic branches already differ (for $m = 4$ the new one is larger by exactly one at every even $n$), but the hub term $m(n-1)$ dominates both at small $n$, so the full conjectured value first overtakes the old one at $n = 12$ for $m = 4$. The construction of \Cref{const:augmented-bipartite} with the shifted partition witnesses the difference. The lower bound holds for all $m$, witnessed by \Cref{const:directed-hub} on the first branch and \Cref{const:augmented-bipartite} on the second. The upper bound is open, and \Cref{ch:synthesis} returns to it with what structural progress the machine and the hand can jointly supply.
 
 \section{The hypergraph variant}
-The third model deserves its own short treatment, not because its base case is hard but because it is the one variant whose objects are stored and manipulated differently from all the rest, and it is worth meeting that difference now rather than at the moment of computation. A hypergraph keeps no multiplicity matrix, only the list of its hyperedges, each a set of $r$ vertices. We fix the edge size $r$, following the extremal literature, for a structural reason: under a connectivity ceiling a small edge is always at least as efficient per route as a large one, so a hypergraph free to mix sizes would maximise its edge count by using pairs only, and the question would collapse back to the graph case. Fixing $r$ is what makes the hypergraph question a new question. The route between two vertices is a \emph{Berge path}, which alternates vertices and hyperedges so that each consecutive pair of vertices lies in the hyperedge listed between them, and two such routes are edge-disjoint when they share no hyperedge. Concretely, in a three-uniform hypergraph a route from $u$ to $w$ might be the single step $u, \{u, x, w\}, w$ that crosses one hyperedge, or a longer alternation $u, \{u, x, y\}, y, \{y, z, w\}, w$ that switches hyperedge at the intermediate vertex $y$. With routes redefined this way the same Gomory--Hu machinery that proved the multigraph value carries over, and the base case has the same linear shape. \Cref{fig:berge-path} draws such a two-hyperedge route.
+The third model deserves its own short treatment, not because its base case is hard but because it is the one variant whose objects are stored and manipulated differently from all the rest, and it is worth meeting that difference now rather than at the moment of computation. A hypergraph keeps no multiplicity matrix, only the list of its hyperedges, each a set of $r$ vertices. We fix the edge size $r$, following the extremal literature, for a structural reason: under a connectivity ceiling a small edge is always at least as efficient per route as a large one, so a hypergraph free to mix sizes would maximise its edge count by using pairs only, and the question would collapse back to the graph case. Fixing $r$ is what makes the hypergraph question a new question. The route between two vertices is a \emph{Berge path}, which alternates vertices and hyperedges so that each consecutive pair of vertices lies in the hyperedge listed between them, and two such routes are edge-disjoint when they share no hyperedge. Concretely, in a three-uniform hypergraph a route from $u$ to $w$ might be the single step $u, \{u, x, w\}, w$ that crosses one hyperedge, or a longer alternation $u, \{u, x, y\}, y, \{y, z, w\}, w$ that switches hyperedge at the intermediate vertex $y$. With routes redefined this way the same Gomory--Hu machinery that proved the multigraph value carries over, and the base case has the same linear shape. The picture to keep in mind is a metro map: each hyperedge is a line, and a route from one vertex to another rides a line and changes to another line at a station the two share.
+
+A single hyperedge may serve only one route, so two Berge routes that share no hyperedge are edge-disjoint, the hypergraph counterpart of two edge-disjoint paths in a graph. \Cref{fig:berge-disjoint} draws a larger hypergraph as a metro map and reads off two such routes between one pair.
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[>=Stealth, scale=1.0,
-    mv/.style={circle, draw=roleMeasure, fill=white, line width=1pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    route/.style={line width=2pt, roleDiscover, -{Stealth[length=2.4mm]}}]
-  \coordinate (u) at (0,0.55);
-  \coordinate (x) at (0,-0.55);
-  \coordinate (y) at (1.9,0);
-  \coordinate (z) at (3.8,-0.55);
-  \coordinate (w) at (3.8,0.55);
-  % two hyperedges as shaded ellipses, sharing the vertex y; translucent fills
-  % in two colours so the lens-shaped overlap blends into a mixed tone
-  \begin{scope}[on background layer]
-    \fill[roleObserve, fill opacity=0.30] (0.85,0) ellipse [x radius=1.45, y radius=0.92];
-    \fill[roleMeasure, fill opacity=0.30] (2.95,0) ellipse [x radius=1.45, y radius=0.92];
-  \end{scope}
-  % both darker outlines on top, full opacity, above both shaded areas
-  \draw[roleObserve, line width=1pt] (0.85,0) ellipse [x radius=1.45, y radius=0.92];
-  \draw[roleMeasure, line width=1pt] (2.95,0) ellipse [x radius=1.45, y radius=0.92];
-  % the Berge route u -> (through e1) -> y -> (through e2) -> w
-  \draw[route] (u) -- (y);
-  \draw[route] (y) -- (w);
-  \node[mv] at (u) {$u$};
-  \node[mv] at (x) {$x$};
-  \node[mv] at (y) {$y$};
-  \node[mv] at (z) {$z$};
-  \node[mv] at (w) {$w$};
-  \node[font=\small, text=roleObserve!85!black] at (0.2,1.2) {$e_1=\{u,x,y\}$};
-  \node[font=\small, text=roleMeasure!85!black] at (3.55,1.2) {$e_2=\{y,z,w\}$};
+\begin{tikzpicture}[scale=1.0,
+    stn/.style={metrostop, minimum size=6.5mm},
+    ends/.style={metrostop, minimum size=7.5mm, draw=black, line width=1.4pt}]
+  \coordinate (u) at (0,0);
+  \coordinate (x) at (1.5,1.7);
+  \coordinate (a) at (3.1,2.0);
+  \coordinate (y) at (4.7,1.55);
+  \coordinate (v) at (6.3,0);
+  \coordinate (z) at (1.5,-1.7);
+  \coordinate (b) at (3.1,-2.0);
+  \coordinate (w) at (4.7,-1.55);
+  \coordinate (c) at (6.0,2.5);
+  \coordinate (d) at (3.9,3.05);
+  % five hyperedges, each a metro line in its own colour
+  \draw[metro, metroA] (u) -- (x) -- (a);   % e1 = {u,x,a}
+  \draw[metro, metroB] (a) -- (y) -- (v);   % e2 = {a,y,v}
+  \draw[metro, metroC] (u) -- (z) -- (b);   % e3 = {u,z,b}
+  \draw[metro, metroD] (b) -- (w) -- (v);   % e4 = {b,w,v}
+  \draw[metro, metroE] (d) -- (c) -- (y);   % e5 = {d,c,y}
+  % line labels in the matching colour
+  \node[metroA, font=\scriptsize\bfseries] at (0.62,1.18) {$e_1$};
+  \node[metroB, font=\scriptsize\bfseries] at (5.78,1.12) {$e_2$};
+  \node[metroC, font=\scriptsize\bfseries] at (0.62,-1.18) {$e_3$};
+  \node[metroD, font=\scriptsize\bfseries] at (5.78,-1.12) {$e_4$};
+  \node[metroE, font=\scriptsize\bfseries] at (5.15,2.62) {$e_5$};
+  % stations on top of the lines
+  \node[stn] at (x) {$x$};
+  \node[stn] at (a) {$a$};
+  \node[stn] at (y) {$y$};
+  \node[stn] at (z) {$z$};
+  \node[stn] at (b) {$b$};
+  \node[stn] at (w) {$w$};
+  \node[stn] at (c) {$c$};
+  \node[stn] at (d) {$d$};
+  \node[ends] at (u) {$u$};
+  \node[ends] at (v) {$v$};
 \end{tikzpicture}
-\caption{A Berge path from $u$ to $w$ in a three-uniform hypergraph, crossing two hyperedges. Each hyperedge (shaded in its own colour) is a set of three vertices, and they meet at the shared vertex $y$ where the two colours blend, and the route (orange) enters $e_1$ at $u$ and leaves it at $y$, then enters $e_2$ at $y$ and leaves it at $w$. The two steps use distinct hyperedges, so this counts as one Berge path. A second route edge-disjoint from it would have to avoid both $e_1$ and $e_2$ entirely. Unlike an ordinary edge, a single hyperedge touches all $\binom{3}{2}=3$ pairs of its vertices at once, which is the bookkeeping the checker of \Cref{ch:certify} must handle.}
-\label{fig:berge-path}
-\end{figure}
-
-A single hyperedge may serve only one route, so two Berge routes that share no hyperedge are edge-disjoint, the hypergraph counterpart of two edge-disjoint paths in a graph. \Cref{fig:berge-disjoint} shows a larger hypergraph in which one pair carries two such routes at once.
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[scale=1.05,
-   rA/.style={line width=2pt, vertexorange, -{Stealth[length=2.4mm]}},
-   rB/.style={line width=2pt, vertexgreen!70!black, -{Stealth[length=2.4mm]}}]
-  \node[smallvertex] (u) at (0,0) {$u$};
-  \node[smallvertex] (p) at (1.3,1.5) {$p$};
-  \node[smallvertex] (q) at (2.5,-0.15) {$q$};
-  \node[smallvertex] (r) at (4.0,1.35) {$r$};
-  \node[smallvertex] (s) at (2.2,-1.75) {$s$};
-  \node[smallvertex] (v) at (5.3,0) {$v$};
-  \begin{scope}[on background layer]
-    \fill[vertexorange!16, draw=vertexorange!55, line width=0.8pt, rounded corners=9pt]
-      ($(1.27,0.45)!1.5!(u)$) -- ($(1.27,0.45)!1.5!(p)$) -- ($(1.27,0.45)!1.5!(q)$) -- cycle;
-    \fill[KULblauw1!13, draw=KULblauw1!55, line width=0.8pt, rounded corners=9pt]
-      ($(3.93,0.40)!1.45!(q)$) -- ($(3.93,0.40)!1.45!(r)$) -- ($(3.93,0.40)!1.45!(v)$) -- cycle;
-    \fill[vertexgreen!13, draw=vertexgreen!55, line width=0.8pt, rounded corners=10pt]
-      ($(2.50,-0.58)!1.45!(u)$) -- ($(2.50,-0.58)!1.45!(s)$) -- ($(2.50,-0.58)!1.45!(v)$) -- cycle;
-  \end{scope}
-  \node[font=\scriptsize, vertexorange!70!black] at (0.55,1.45) {$e_1$};
-  \node[font=\scriptsize, KULblauw1] at (4.55,1.55) {$e_2$};
-  \node[font=\scriptsize, vertexgreen!55!black] at (2.2,-2.35) {$e_3$};
-  % route A (orange): u -e1- q -e2- v
-  \draw[rA] (u) to[bend left=8] (q);
-  \draw[rA] (q) to[bend left=8] (v);
-  % route B (green): u -e3- v
-  \draw[rB] (u) to[bend right=22] (v);
-  \node[font=\scriptsize, vertexorange!75!black] at (3.55,-0.45) {route A};
-  \node[font=\scriptsize, vertexgreen!55!black] at (3.0,-1.5) {route B};
-\end{tikzpicture}
-\caption[Two hyperedge-disjoint Berge routes]{Two Berge routes between $u$ and
-$v$ that share no hyperedge. Route A (orange) threads $e_1$ then $e_2$, hopping
-hyperedge at $q$, and route B (green) crosses the single hyperedge $e_3$. The
-two use disjoint hyperedge sets $\{e_1, e_2\}$ and $\{e_3\}$, so they are
-Berge edge-disjoint and $\lec(u,v) \ge 2$. Any third route would have to reuse
-one of the three hyperedges. This is the hypergraph form of edge-disjoint
-routes, with a whole hyperedge, not a single edge, consumed by each route.}
+\caption[Two hyperedge-disjoint Berge routes]{A three-uniform hypergraph on ten
+vertices, its five hyperedges drawn as metro lines. To travel from $u$ to $v$
+one rides a line and changes at a shared station. \emph{Route A} takes the red
+line $e_1$ to $a$ and changes there to the blue line $e_2$ into $v$; \emph{route
+B} takes the green line $e_3$ to $b$ and changes to the orange line $e_4$. The
+two journeys share no line, so they are hyperedge-disjoint Berge routes and
+$\lec(u,v) \ge 2$. A third route would have to reuse a line already taken. Just
+as a metro line carries one train past a point at a time, a whole hyperedge,
+not a single edge, is what each route consumes.}
 \label{fig:berge-disjoint}
 \end{figure}
 
