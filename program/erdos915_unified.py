@@ -3133,18 +3133,18 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     multi, hyper; columns = undirected edge, undirected vertex, directed arc,
     directed vertex).  Each panel may carry any of:
 
-    ``proved`` ``(xs, ys)`` solid line, a theorem holding for all ``n``;
-    ``conj``   ``(xs, ys)`` dashed line, a conjecture formula;
-    ``guess``  ``(xs, ys)`` densely dotted line, a bare extrapolation of the
+    ``proved`` ``(xs, ys)`` solid blue line, a theorem holding for all ``n``;
+    ``conj``   ``(xs, ys)`` solid red line, a conjecture formula;
+    ``guess``  ``(xs, ys)`` solid yellow line, a bare extrapolation of the
                machine points where no formula is known;
     ``band``   ``(xs, lo, hi)`` the certain interval, an easy construction below
                and the trivial maximum edge count above;
     ``exact``  ``(xs, ys)`` filled squares, sizes the machine proved;
     ``search`` ``(xs, ys)`` open circles, the search lower bounds.
 
-    The point is one honest picture: where a line is solid the value is settled,
-    where it is dashed it is conjectured, where it is dotted we are guessing, and
-    the shaded band is the interval we are certain the truth lies in.
+    The point is one honest picture, distinguished by colour rather than dash
+    pattern: a blue line is settled, a red line is conjectured, a yellow line is
+    a guess, and the shaded band is the interval we are certain the truth lies in.
     """
     def draw_panel(ax, panel):
         band = panel.get("band")
@@ -3162,10 +3162,10 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
             ax.plot(xs, ys, "-", color=_KUL_BLUE, linewidth=2.3, label="proved")
         if panel.get("conj") is not None:
             xs, ys = panel["conj"]
-            ax.plot(xs, ys, "--", color=_KUL_DARK, linewidth=2.0, label="conjectured")
+            ax.plot(xs, ys, "-", color=_RED, linewidth=2.0, label="conjectured")
         if panel.get("guess") is not None:
             xs, ys = panel["guess"]
-            ax.plot(xs, ys, linestyle=_GUESS_STYLE, color=_WARM, linewidth=2.0,
+            ax.plot(xs, ys, "-", color=_WARM, linewidth=2.0,
                     label="guess (interpolated)")
         if panel.get("exact") is not None:
             xs, ys = panel["exact"]
