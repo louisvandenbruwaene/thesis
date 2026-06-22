@@ -3021,19 +3021,33 @@ def plot_complexity_growth(path: str | Path) -> None:
     _save(path)
 
 
-def _draw_extremal_panel(ax, matrix, *, directed: bool) -> None:
-    """Draw one extremal multiplicity matrix on ``ax`` as a circular graph.
+def _circle_layout(n, hub=None):
+    """Vertex positions for a panel: all on a unit circle, or the ``hub`` vertex
+    at the centre and the rest on the circle, which draws stars and hub graphs
+    far more clearly than a plain circle does."""
+    if hub is None:
+        angs = [math.pi / 2 - 2 * math.pi * k / n for k in range(n)]
+        return [(math.cos(a), math.sin(a)) for a in angs]
+    pos = [(0.0, 0.0) for _ in range(n)]
+    others = [k for k in range(n) if k != hub]
+    for idx, k in enumerate(others):
+        a = math.pi / 2 - 2 * math.pi * idx / len(others)
+        pos[k] = (math.cos(a), math.sin(a))
+    return pos
 
-    Vertices sit on a circle, numbered from the top.  An adjacency of
-    multiplicity one is a single line (an arrowed line when ``directed``), and a
-    higher multiplicity is shown by a small count label rather than parallel
-    curves, so the picture stays legible.  Opposite arcs of a bidirected pair
-    are bent apart.
+
+def _draw_extremal_panel(ax, matrix, *, directed: bool, hub=None) -> None:
+    """Draw one extremal multiplicity matrix on ``ax`` as a graph.
+
+    Vertices sit on a circle (or, when ``hub`` is given, that vertex sits at the
+    centre and the rest on the circle).  An adjacency of multiplicity one is a
+    single line (an arrowed line when ``directed``), and a higher multiplicity is
+    shown by a small count label rather than parallel curves, so the picture
+    stays legible.  Opposite arcs of a bidirected pair are bent apart.
     """
     from matplotlib.patches import FancyArrowPatch
     n = len(matrix)
-    angs = [math.pi / 2 - 2 * math.pi * k / n for k in range(n)]
-    pos = [(math.cos(a), math.sin(a)) for a in angs]
+    pos = _circle_layout(n, hub)
 
     def edge(i, j, rad, arrow):
         ax.add_patch(FancyArrowPatch(
@@ -3077,48 +3091,110 @@ def _draw_extremal_panel(ax, matrix, *, directed: bool) -> None:
     ax.set_ylim(-1.45, 1.45)
 
 
+# metro-line palette for hypergraph panels: red, blue, green, orange, purple, grey
+_GALLERY_METRO = ["#C85050", "#1D8DB0", "#3CA050", "#DC8C28", "#8C50A0", "#787878"]
+
+
+def _draw_hyper_panel(ax, hyperedges, n, *, directed: bool, hub=None) -> None:
+    """Draw a hypergraph extremiser as a metro map: vertices on a circle (or a
+    hub at the centre), each hyperedge a thick coloured line through its members
+    when undirected, or a fan of coloured arrows from its tail when directed."""
+    from matplotlib.patches import FancyArrowPatch
+    pos = _circle_layout(n, hub)
+    for idx, he in enumerate(hyperedges):
+        col = _GALLERY_METRO[idx % len(_GALLERY_METRO)]
+        if directed:
+            tail, heads = he
+            tx, ty = pos[tail]
+            for h in heads:
+                hx, hy = pos[h]
+                ax.add_patch(FancyArrowPatch(
+                    (tx, ty), (hx, hy), arrowstyle="-|>", mutation_scale=11,
+                    lw=2.4, color=col, alpha=0.85, shrinkA=11, shrinkB=11,
+                    zorder=1, connectionstyle="arc3,rad=0.10"))
+        else:
+            pts = [pos[v] for v in sorted(he)]
+            cx = sum(p[0] for p in pts) / len(pts)
+            cy = sum(p[1] for p in pts) / len(pts)
+            pts.sort(key=lambda p: math.atan2(p[1] - cy, p[0] - cx))
+            ax.plot([p[0] for p in pts], [p[1] for p in pts], "-", color=col,
+                    lw=4.2, solid_capstyle="round", solid_joinstyle="round",
+                    alpha=0.85, zorder=1)
+    for k, (x, y) in enumerate(pos):
+        ax.scatter([x], [y], s=300, c="white", edgecolors="#333333",
+                   linewidths=1.5, zorder=2)
+        ax.text(x, y, str(k + 1), ha="center", va="center", fontsize=9,
+                zorder=3, color="#222222")
+    ax.set_xlim(-1.45, 1.45)
+    ax.set_ylim(-1.45, 1.45)
+
+
 def plot_extremal_gallery(path: str | Path, *,
                           gallery_json: str | Path | None = None) -> None:
-    """A gallery of machine-found extremal graphs across the matrix variants.
+    """A gallery of the named extremal graphs, drawn at a large representative size.
 
-    Reads ``figures/extremal_gallery.json`` (produced by
-    :func:`gallery_extremal_graphs`) and draws a curated spread of extremal
-    multiplicity matrices, one panel each, annotated with the extremal value and
-    the automorphism count ``|Aut|`` computed as ``n! / labelled_count`` for the
-    drawn class.  This turns the enumeration's real output into a picture rather
-    than leaving it in JSON.
+    These are the structured extremisers the analysis identifies, not the
+    trivial small trees: the directed double and bidirected stars, the dense
+    bidirected complete graphs, the multigraph star at full multiplicity, and
+    the star hypertrees (drawn as metro maps). The program both builds these and,
+    at small ``n``, proves them optimal by the enumeration of
+    :func:`gallery_extremal_graphs`. The ``gallery_json`` argument is accepted for
+    backward compatibility and ignored.
     """
     if not MATPLOTLIB_AVAILABLE:
         raise RuntimeError("matplotlib is required for figures")
-    import json
-    if gallery_json is None:
-        gallery_json = Path(__file__).resolve().parent.parent / "figures" / "extremal_gallery.json"
-    data = json.loads(Path(gallery_json).read_text())
-    cells = [
-        ("simple_undirected_edge",   "n=5_m=3", False, "simple undirected, edge\n$m=3$, $n=5$"),
-        ("simple_undirected_edge",   "n=6_m=3", False, "simple undirected, edge\n$m=3$, $n=6$"),
-        ("multi_undirected_edge",    "n=5_m=3", False, "multigraph undirected, edge\n$m=3$: star at full multiplicity"),
-        ("multi_undirected_edge",    "n=4_m=4", False, "multigraph undirected, edge\n$m=4$, $n=4$"),
-        ("simple_directed_edge",     "n=4_m=2", True,  "simple directed, arc\n$m=2$: bidirected star"),
-        ("multi_directed_edge",      "n=4_m=3", True,  "multigraph directed, arc\n$m=3$: double star"),
+    # dense bidirected complete graphs, built directly
+    bidir_k4 = Graph(4, SIMPLE_DIRECTED)
+    for i in range(4):
+        for j in range(4):
+            if i != j:
+                bidir_k4.set_multiplicity(i, j, 1)
+    k4_mult3 = Graph(4, MULTI_DIRECTED)
+    for i in range(4):
+        for j in range(4):
+            if i != j:
+                k4_mult3.set_multiplicity(i, j, 3)
+    multi_star = Graph(9, MULTI_UNDIRECTED)   # undirected star, mult 2
+    for i in range(1, 9):
+        multi_star.set_multiplicity(0, i, 2)
+    dir_hypertree = [(0, frozenset({1, 2})), (0, frozenset({3, 4})),
+                     (0, frozenset({5, 6}))]   # directed star hypertree on 7 vertices
+
+    # ("g"/"h"/"hd", object, directed, hub, title)
+    panels = [
+        ("g", double_star(9, 3, directed=True), True, 0,
+         "multigraph directed, arc\n$m=3$, $n=9$: double star ($32$ arcs)"),
+        ("g", double_star(9, 2, directed=True), True, 0,
+         "simple directed, arc\n$m=2$, $n=9$: bidirected star ($16$ arcs)"),
+        ("g", multi_star, False, 0,
+         "multigraph undirected, edge\n$m=3$, $n=9$: star at multiplicity $2$ ($16$ edges)"),
+        ("g", bidir_k4, True, None,
+         "simple directed, arc\n$m=4$, $n=4$: bidirected $K_4$ ($12$ arcs)"),
+        ("g", k4_mult3, True, None,
+         "multigraph directed, vertex\n$m=4$, $n=4$: $K_4$ at multiplicity $3$"),
+        ("h", star_hypertree(10, 3), False, 0,
+         "hypergraph, $r=3$\n$m=2$, $n=10$: star hypertree ($4$ hyperedges)"),
+        ("h", star_hypertree(13, 4), False, 0,
+         "hypergraph, $r=4$\n$m=2$, $n=13$: star hypertree ($4$ hyperedges)"),
+        ("h", star_hypertree(16, 3), False, 0,
+         "hypergraph, $r=3$\n$m=2$, $n=16$: star hypertree ($7$ hyperedges)"),
+        ("hd", (dir_hypertree, 7), True, 0,
+         "directed hypergraph, $r=3$\n$m=2$, $n=7$: tail-to-heads star"),
     ]
-    fig, axes = plt.subplots(2, 3, figsize=(11, 7.4))
-    for ax, (var, key, directed, title) in zip(axes.flat, cells):
-        cell = data[var][key]
-        cls = cell["classes"][0]
-        matrix = cls["repr"]
-        n = len(matrix)
-        aut = math.factorial(n) // cls["labelled_count"]
-        _draw_extremal_panel(ax, matrix, directed=directed)
-        sub = f"value $= {cell['extremal_value']}$,  $|\\mathrm{{Aut}}| = {aut}$"
-        if len(cell["classes"]) > 1:
-            sub += f"  (1 of {len(cell['classes'])})"
-        ax.set_title(title, fontsize=10)
-        ax.text(0.5, -0.04, sub, transform=ax.transAxes, ha="center", va="top",
-                fontsize=9)
+    fig, axes = plt.subplots(3, 3, figsize=(12, 12))
+    for ax, (kind, obj, directed, hub, title) in zip(axes.flat, panels):
+        if kind == "g":
+            _draw_extremal_panel(ax, obj.mu.tolist(), directed=directed, hub=hub)
+        elif kind == "h":
+            _draw_hyper_panel(ax, list(obj.hyperedges), obj.num_vertices,
+                              directed=False, hub=hub)
+        else:  # "hd": (hyperedges, n)
+            hes, nn = obj
+            _draw_hyper_panel(ax, hes, nn, directed=True, hub=hub)
+        ax.set_title(title, fontsize=9.5)
         ax.set_aspect("equal")
         ax.axis("off")
-    fig.suptitle("Machine-found extremal graphs", fontsize=13)
+    fig.suptitle("Extremal graphs of the named families, drawn large", fontsize=14)
     _save(path)
 
 

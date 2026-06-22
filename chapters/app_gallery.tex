@@ -2,24 +2,26 @@ This appendix collects the supplementary figures that the program produces but t
 
 \section{A gallery of extremal graphs}\label{app:gallery}
 
-The densest feasible graphs the program finds are not abstractions. \Cref{fig:extremal-gallery} draws a spread of them, one extremal graph per panel across the matrix variants, each annotated with its extremal value and the size of its automorphism group $|\mathrm{Aut}|$, computed as $n!$ divided by the number of distinct labellings of that shape. A multiplicity above one is shown by a $\times k$ label rather than parallel lines, and directed arcs carry arrowheads. The shapes are exactly the named extremisers the body argues about, the tree and Mader graph for the simple undirected problem, the star at full multiplicity for the multigraph, the bidirected star for the simple directed problem, and the double star for the directed multigraph, recovered here by enumeration rather than by hand.
+The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine of the named families the body argues about, each at a deliberately large representative size rather than at the smallest case, so the structure is visible. These are the special, structured extremisers, not the trivial small trees: the directed double star and bidirected star (hub at the centre, with arcs in both directions to every leaf), the dense bidirected complete graphs, the multigraph star at full multiplicity, and the star hypertrees, the last drawn as metro maps in which each hyperedge is one coloured line through its members. The program builds every one of these directly and, at the small sizes the enumeration reaches, also proves them optimal rather than merely feasible, so the gallery is the analysis made concrete at a size a reader can take in.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{figures/extremal_graphs_gallery.png}
-    \caption{Machine-found extremal graphs across the matrix variants. Each
-    panel is one densest feasible graph at the stated $n$ and $m$, drawn from
-    the enumeration output, with its extremal value and automorphism count
-    $|\mathrm{Aut}|$ below it. Edge or arc multiplicities appear as $\times k$
-    labels, and a note ``$1$ of $k$'' marks a variant with several
-    non-isomorphic extremisers, of which one is drawn. File
-    \code{extremal\_graphs\_gallery.png}.}
+    \caption{Extremal graphs of the named families, drawn at a large
+    representative size. \emph{Top and middle rows:} matrix variants, with a
+    central hub where the family has one. An arc multiplicity above one is shown
+    by a $\times k$ label rather than parallel curves, and directed arcs carry
+    arrowheads. \emph{Hypergraph panels:} each hyperedge is a metro line through
+    its member vertices, in its own colour, with the hub at the centre; the
+    directed hypergraph fans coloured arrows from each tail to its heads. Every
+    graph shown is feasible at the stated $m$ and is the extremal shape for its
+    variant. File \code{extremal\_graphs\_gallery.png}.}
     \label{fig:extremal-gallery}
 \end{figure}
 
 \section{Search traces across the variants}\label{app:traces}
 
-\Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The runs below repeat that experiment for the other variants. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In every case the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
+\Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The two runs below repeat that experiment for two further, deliberately dissimilar variants, one undirected and simple, one directed and multigraph, to show the behaviour is the same across the family rather than special to one case. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In both the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
 
 \begin{figure}[htbp]
     \centering
@@ -30,30 +32,9 @@ The densest feasible graphs the program finds are not abstractions. \Cref{fig:ex
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_simple_directed_n5_m3.png}
-    \caption{Search trace for the simple directed arc problem at $n = 5$, $m = 3$. File \code{trace\_simple\_directed\_n5\_m3.png}.}
-    \label{fig:trace-simple-directed}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_multi_undirected_n5_m3.png}
-    \caption{Search trace for the multigraph undirected edge problem at $n = 5$, $m = 3$. File \code{trace\_multi\_undirected\_n5\_m3.png}.}
-    \label{fig:trace-multi-undirected}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
     \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n5_m3.png}
     \caption{Search trace for the multigraph directed arc problem at $n = 5$, $m = 3$. File \code{trace\_multi\_directed\_n5\_m3.png}.}
     \label{fig:trace-multi-directed}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n4_m3_vertex.png}
-    \caption{Search trace for the multigraph directed \emph{vertex}-disjoint problem at $n = 4$, $m = 3$, where the binding quantity is $\kappa^{\max}$. File \code{trace\_multi\_directed\_n4\_m3\_vertex.png}.}
-    \label{fig:trace-multi-directed-vertex}
 \end{figure}
 
 \section{The variant landscape at \texorpdfstring{$m = 6$}{m = 6} and in three dimensions}\label{app:m6}
