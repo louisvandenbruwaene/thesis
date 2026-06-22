@@ -683,7 +683,7 @@ wis.kuleuven.be\\
   \node[rolenode, fill=roleModel!16,    draw=roleModel]    (mod) at (0,0)     {\textbf{MODEL}\\[1pt]\scriptsize $\mu$ matrix};
   \node[rolenode, fill=roleMeasure!16,  draw=roleMeasure]  (mea) at (3.3,0)   {\textbf{MEASURE}\\[1pt]\scriptsize max-flow checker};
   \node[rolenode, fill=roleProve!18,    draw=roleProve]    (pro) at (6.9,1.05){\textbf{PROVE}\\[1pt]\scriptsize cut-counting, search};
-  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (6.9,-1.05){\textbf{DISCOVER}\\[1pt]\scriptsize annealing};
+  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (6.9,-1.05){\textbf{DISCOVER}\\[1pt]\scriptsize annealing, tabu};
   \node[rolenode, fill=roleObserve!18,  draw=roleObserve]  (obs) at (10.5,0)  {\textbf{OBSERVE}\\[1pt]\scriptsize sampling};
   \draw[flow] (mod) -- (mea);
   \draw[flow] (mea) -- (pro);
