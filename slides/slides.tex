@@ -5,7 +5,7 @@
 %  Build:  cd slides && latexmk -pdf slides.tex   (or pdflatex twice)
 %  Reuses the thesis house style from ../shared/colors.tex and tikz-styles.tex.
 % ============================================================================
-\documentclass[aspectratio=169,11pt]{beamer}
+\documentclass[aspectratio=1610,11pt]{beamer}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -196,21 +196,22 @@
 \begin{frame}{The road of a research problem}
 \vfill
 \centering
-\begin{tikzpicture}[scale=0.98,
+\begin{tikzpicture}[scale=0.95,
    stop/.style={circle,fill=KULblauw1,text=white,font=\scriptsize\bfseries,
-                inner sep=0pt,minimum size=18pt,draw=white,line width=1.2pt},
+                inner sep=0pt,minimum size=19pt,draw=white,line width=1.2pt},
    lab/.style={font=\footnotesize\bfseries,text=KULblauw3b}]
-  \draw[line width=15pt,black!18,line cap=round]
-     plot[smooth,tension=0.7] coordinates {(0,0)(2.1,0.9)(4.2,0.5)(6.3,1.5)(8.4,1.0)(10.5,2.0)(12.4,1.7)};
+  % a curvier road, starting top-left and winding down to the bottom-right
+  \def\roadpts{(0,4.0)(1.9,2.6)(3.5,3.4)(5.6,1.7)(7.6,2.6)(9.6,0.7)(11.8,1.3)}
+  \draw[line width=16pt,black!18,line cap=round] plot[smooth,tension=0.85] coordinates \roadpts;
   \draw[line width=1.2pt,vertexorange!85,dash pattern=on 7pt off 7pt,line cap=round]
-     plot[smooth,tension=0.7] coordinates {(0,0)(2.1,0.9)(4.2,0.5)(6.3,1.5)(8.4,1.0)(10.5,2.0)(12.4,1.7)};
-  \node[stop] (m1) at (0,0)    {1}; \node[lab,below=5pt of m1]  {Applications};
-  \node[stop] (m2) at (2.1,0.9){2}; \node[lab,above=5pt of m2]  {Assumptions};
-  \node[stop] (m3) at (4.2,0.5){3}; \node[lab,below=5pt of m3]  {Modelling};
-  \node[stop] (m4) at (6.3,1.5){4}; \node[lab,above=5pt of m4]  {Research};
-  \node[stop] (m5) at (8.4,1.0){5}; \node[lab,below=5pt of m5]  {Proving};
-  \node[stop] (m6) at (10.5,2.0){6};\node[lab,above=5pt of m6]  {Implementing};
-  \node[stop] (m7) at (12.4,1.7){7};\node[lab,below=5pt of m7]  {Efficiency};
+     plot[smooth,tension=0.85] coordinates \roadpts;
+  \node[stop] (m1) at (0,4.0)   {1}; \node[lab,right=6pt of m1] {Applications};
+  \node[stop] (m2) at (1.9,2.6) {2}; \node[lab,left=6pt of m2]  {Assumptions};
+  \node[stop] (m3) at (3.5,3.4) {3}; \node[lab,right=6pt of m3] {Modelling};
+  \node[stop] (m4) at (5.6,1.7) {4}; \node[lab,below=5pt of m4] {Research};
+  \node[stop] (m5) at (7.6,2.6) {5}; \node[lab,above=5pt of m5] {Proving};
+  \node[stop] (m6) at (9.6,0.7) {6}; \node[lab,below=5pt of m6] {Implementing};
+  \node[stop] (m7) at (11.8,1.3){7}; \node[lab,right=6pt of m7] {Efficiency};
 \end{tikzpicture}
 \vfill
 \begin{center}\color{black!70}The slides ahead follow this road.\end{center}
@@ -223,17 +224,18 @@
 \begin{frame}{Problem 915, precisely}
 \begin{columns}[c,onlytextwidth]
   \begin{column}{0.40\textwidth}\centering
-    \begin{tikzpicture}[scale=1.0,every node/.style={transform shape}]
-      \node[smallvertex] (s) at (-2.2,0)   {$s$};
-      \node[smallvertex] (a) at (-0.9,1.1) {};
-      \node[smallvertex] (b) at (0.9,1.1)  {};
-      \node[smallvertex] (c) at (-0.9,-1.1){};
-      \node[smallvertex] (d) at (0.9,-1.1) {};
-      \node[smallvertex] (t) at (2.2,0)    {$t$};
-      \draw[line width=2pt,vertexorange!85!black] (s)--(a)--(b)--(t);
-      \draw[line width=2pt,KULblauw1] (s)--(c)--(d)--(t);
-      \draw[edge] (a)--(c); \draw[edge] (b)--(d);
-      \node[font=\scriptsize\color{black!60}] at (0,-2.0) {two independent $s$-$t$ routes};
+    \begin{tikzpicture}[scale=1.35,every node/.style={transform shape}]
+      \node[smallvertex] (v0) at (0,1)        {$0$};
+      \node[smallvertex] (v1) at (-0.951,0.309){$1$};
+      \node[smallvertex] (v2) at (-0.588,-0.809){$2$};
+      \node[smallvertex] (v3) at (0.588,-0.809) {$3$};
+      \node[smallvertex] (v4) at (0.951,0.309)  {$4$};
+      % K_5 minus the edges {0,4} and {1,3}: the extremal graph for m=4
+      \draw[edge] (v0)--(v1); \draw[edge] (v0)--(v2); \draw[edge] (v0)--(v3);
+      \draw[edge] (v1)--(v2); \draw[edge] (v1)--(v4);
+      \draw[edge] (v2)--(v3); \draw[edge] (v2)--(v4); \draw[edge] (v3)--(v4);
+      \node[font=\scriptsize\color{black!60}] at (0,-1.55)
+        {$K_5$ minus 2 edges: $8=\ell_4(5)$ edges};
     \end{tikzpicture}
   \end{column}
   \begin{column}{0.58\textwidth}
@@ -261,17 +263,17 @@
 \begin{center}{\large\color{KULblauw3b}\bfseries No direct application. The methods are the point.}\end{center}
 \vfill
 \begin{columns}[t,onlytextwidth]
-  \begin{column}{0.31\textwidth}\centering
+  \begin{column}{0.32\textwidth}\centering
     {\bfseries\color{KULblauw1}The question}\\[8pt]
-    {\color{black!75}Quantify a network's\\spare, independent routes.}
+    {\color{black!75}network redundancy}
   \end{column}
-  \begin{column}{0.31\textwidth}\centering
+  \begin{column}{0.32\textwidth}\centering
     {\bfseries\color{KULblauw1}The tools}\\[8pt]
-    {\color{black!75}maximum flow,\\search, certificates}
+    {\color{black!75}flow, search, proofs}
   \end{column}
-  \begin{column}{0.31\textwidth}\centering
+  \begin{column}{0.32\textwidth}\centering
     {\bfseries\color{KULblauw1}Where it lives}\\[8pt]
-    {\color{black!75}grids, pipelines,\\road networks}
+    {\color{black!75}grids, pipelines, roads}
   \end{column}
 \end{columns}
 \vfill
@@ -284,27 +286,29 @@
 \vfill
 \centering
 \begin{tikzpicture}[
-   ax/.style={font=\footnotesize\bfseries,text=KULblauw3b},
+   ax/.style={font=\footnotesize\bfseries,text=KULblauw3b,anchor=east},
    opt/.style={rounded corners=3pt,draw=KULblauw1,fill=KULblauw1!8,
-               font=\scriptsize,inner xsep=6pt,inner ysep=4pt,text=black!80}]
-  \node[ax] at (-5.6,2) {Model};
-  \node[opt] at (-3.0,2) {simple};
-  \node[opt] at (-1.0,2) {multigraph};
-  \node[opt] at (1.3,2)  {hypergraph};
-  \node[font=\large\bfseries,text=black!55] at (3.2,2) {$\times 3$};
+               font=\scriptsize,inner xsep=6pt,inner ysep=4pt,text=black!80},
+   mult/.style={font=\large\bfseries,text=black!55}]
+  % the three option boxes on each line are spread evenly across the same span
+  \node[ax] at (-5.3,1.4) {Model};
+  \node[opt] at (-2.6,1.4) {simple};
+  \node[opt] at (0,1.4)    {multigraph};
+  \node[opt] at (2.6,1.4)  {hypergraph};
+  \node[mult] at (4.5,1.4) {$\times 3$};
 
-  \node[ax] at (-5.6,0.7) {Direction};
-  \node[opt] at (-3.0,0.7) {undirected};
-  \node[opt] at (-1.0,0.7) {directed};
-  \node[font=\large\bfseries,text=black!55] at (3.2,0.7) {$\times 2$};
+  \node[ax] at (-5.3,0) {Direction};
+  \node[opt] at (-2.6,0) {undirected};
+  \node[opt] at (2.6,0)  {directed};
+  \node[mult] at (4.5,0) {$\times 2$};
 
-  \node[ax] at (-5.6,-0.6) {Separation};
-  \node[opt] at (-3.0,-0.6) {edge-disjoint};
-  \node[opt] at (-1.0,-0.6) {vertex-disjoint};
-  \node[font=\large\bfseries,text=black!55] at (3.2,-0.6) {$\times 2$};
+  \node[ax] at (-5.3,-1.4) {Separation};
+  \node[opt] at (-2.6,-1.4) {edge-disjoint};
+  \node[opt] at (2.6,-1.4)  {vertex-disjoint};
+  \node[mult] at (4.5,-1.4) {$\times 2$};
 
   \node[draw=vertexorange!85!black,line width=1.3pt,fill=vertexorange!10,rounded corners=5pt,
-        font=\bfseries,text=vertexorange!55!black,inner sep=8pt] at (5.4,0.7) {$=\;12$};
+        font=\bfseries,text=vertexorange!55!black,inner sep=8pt] at (6.3,0) {$=\;12$};
 \end{tikzpicture}
 \vfill
 \begin{center}\color{black!70}Mader's theorem is one corner. The other eleven are the journey.\end{center}
@@ -334,28 +338,36 @@
 \begin{frame}{What fell, and how hard}
 \vfill
 \centering
-\begin{tikzpicture}[
-   bin/.style={rounded corners=4pt,minimum width=2.8cm,minimum height=3.0cm,line width=1.2pt},
-   hd/.style={font=\bfseries\footnotesize,text=white,align=center},
-   it/.style={font=\scriptsize,align=center,text=black!80}]
-  \draw[-{Stealth[length=4mm]},line width=2pt,black!35] (-6.2,2.05) -- (6.2,2.05);
-  \node[font=\scriptsize\color{black!55}] at (-5.2,2.4) {easier};
-  \node[font=\scriptsize\color{black!55}] at (5.4,2.4)  {harder};
+\begin{tikzpicture}[scale=0.95,
+   seg/.style={rounded corners=4pt,minimum height=0.95cm,text=white,
+               font=\footnotesize\bfseries,align=center,inner sep=2pt},
+   chip/.style={rounded corners=2pt,fill=white,font=\scriptsize,text=black!82,
+                inner xsep=4pt,inner ysep=2.5pt,line width=0.9pt}]
+  % --- the difficulty spectrum: one continuous bar in four colours ---
+  \node[seg,fill=stProved, minimum width=3.25cm] at (-5.15,2.55) {Proved\\by hand};
+  \node[seg,fill=stMachine,minimum width=3.15cm] at (-1.70,2.55) {Certified\\by machine};
+  \node[seg,fill=stConj,   minimum width=3.15cm] at ( 1.70,2.55) {Conjecture\\+ lower bound};
+  \node[seg,fill=stOpen,   minimum width=3.25cm] at ( 5.15,2.55) {Open};
 
-  \node[bin,fill=stProved!12,draw=stProved] at (-4.7,0) {};
-  \node[bin,fill=stMachine!12,draw=stMachine] at (-1.55,0) {};
-  \node[bin,fill=stConj!12,draw=stConj] at (1.6,0) {};
-  \node[bin,fill=stOpen!12,draw=stOpen] at (4.75,0) {};
+  % --- the variants placed under their status, as light chips ---
+  \node[chip,draw=stProved]  at (-5.15,1.30) {undirected edge};
+  \node[chip,draw=stProved]  at (-5.15,0.65) {multigraph vertex};
+  \node[chip,draw=stProved]  at (-5.15,0.00) {directed $m=2$};
 
-  \node[hd,fill=stProved]  at (-4.7,1.25) {Proved\\by hand};
-  \node[hd,fill=stMachine] at (-1.55,1.25){Certified\\by machine};
-  \node[hd,fill=stConj]    at (1.6,1.25)  {Conjecture\\+ lower bound};
-  \node[hd,fill=stOpen]    at (4.75,1.25) {Open};
+  \node[chip,draw=stMachine] at (-1.70,1.30) {directed multigraph $n\!\le\!6$};
+  \node[chip,draw=stMachine] at (-1.70,0.65) {hypergraph vertex $m\!\le\!3$};
 
-  \node[it] at (-4.7,0.1) {undirected edge\\[4pt] multigraph vertex\\[4pt] directed $m=2$};
-  \node[it] at (-1.55,0.1){directed multigraph,\\$n\le 6$\\[4pt] hypergraph vertex,\\$m\le 3$};
-  \node[it] at (1.6,0.1)  {directed arc, $m\ge 3$\\[4pt] directed vertex, $m\ge 3$};
-  \node[it] at (4.75,0.1) {vertex-disjoint, $m\ge 6$\\[4pt] hypergraph vertex,\\$m\ge 4$\\[4pt] directed hypergraph};
+  \node[chip,draw=stConj]    at ( 1.70,1.30) {directed arc $m\!\ge\!3$};
+  \node[chip,draw=stConj]    at ( 1.70,0.65) {directed vertex $m\!\ge\!3$};
+
+  \node[chip,draw=stOpen]    at ( 5.15,1.30) {vertex-disjoint $m\!\ge\!6$};
+  \node[chip,draw=stOpen]    at ( 5.15,0.65) {hypergraph vertex $m\!\ge\!4$};
+  \node[chip,draw=stOpen]    at ( 5.15,0.00) {directed hypergraph};
+
+  % --- easier to harder ---
+  \draw[-{Stealth[length=3mm]},line width=1.6pt,black!30] (-6.8,-0.85) -- (6.8,-0.85);
+  \node[font=\scriptsize\color{black!55},anchor=west] at (-6.8,-1.25) {easier};
+  \node[font=\scriptsize\color{black!55},anchor=east] at (6.8,-1.25)  {harder};
 \end{tikzpicture}
 \vfill
 \end{frame}
@@ -364,55 +376,65 @@
 % S10  HOW THE MACHINE WORKS
 % ----------------------------------------------------------------------------
 \begin{frame}{How the machine works}
+\vfill
 \begin{columns}[t,onlytextwidth]
-  \begin{column}{0.52\textwidth}
-    {\bfseries\color{KULblauw1}Search: annealing vs tabu}\\[8pt]
-    \centering\footnotesize
+  \begin{column}{0.5\textwidth}\centering
+    {\bfseries\color{KULblauw1}Which search wins}\\[10pt]
+    \footnotesize
     \begin{tabular}{lrrr}
       \toprule
-      variant & opt. & SA & tabu \\
+      variant & best & SA & tabu \\
       \midrule
       simple undirected $n{=}7$ & $9$  & $9$  & $\mathbf{9}$ \\
       simple directed $n{=}7$   & $18$ & $16$ & $\mathbf{18}$ \\
       directed multi $n{=}7$    & $24$ & $20$ & $\mathbf{24}$ \\
       \bottomrule
-    \end{tabular}\\[8pt]
-    {\footnotesize\color{black!60}Tabu reaches the directed optima\\where annealing plateaus.}
+    \end{tabular}\\[10pt]
+    {\footnotesize\color{black!65}Tabu reaches the hard directed optima.}
   \end{column}
-  \begin{column}{0.46\textwidth}
-    {\bfseries\color{KULblauw1}Code: Python with a C hot path}\\[10pt]
-    \centering
-    \begin{tikzpicture}[box/.style={rounded corners=3pt,minimum width=5.0cm,
-        minimum height=0.72cm,font=\scriptsize,align=center}]
-      \node[box,fill=KULblauw1!12,draw=KULblauw1] (p)
-        {Python core:\; \texttt{numpy} + \texttt{scipy} max-flow};
-      \node[box,fill=vertexorange!12,draw=vertexorange!85!black,below=5pt of p] (c)
-        {optional C hot path\; (\texttt{\_erdos\_fast.so})};
-    \end{tikzpicture}\\[12pt]
-    \footnotesize\raggedright Speedups:\;\;
-    max-flow $\approx 2\times$,\;\; canonical form $\mathbf{147\times}$.
+  \begin{column}{0.5\textwidth}\centering
+    {\bfseries\color{KULblauw1}What makes it fast}\\[10pt]
+    \footnotesize
+    \begin{tabular}{lr}
+      \toprule
+      C hot-path routine & speedup \\
+      \midrule
+      dense max-flow      & $2\times$ \\
+      connectivity test   & $2.2\times$ \\
+      canonical form      & $\mathbf{147\times}$ \\
+      \bottomrule
+    \end{tabular}\\[10pt]
+    {\footnotesize\color{black!65}Python core, optional C, same answers.}
   \end{column}
 \end{columns}
+\vfill
 \end{frame}
 
 % ----------------------------------------------------------------------------
 % S11  RESULTS ON THE DIRECTED FRONTIER
 % ----------------------------------------------------------------------------
 \begin{frame}{Results on the directed frontier}
+\vfill
 \begin{columns}[c,onlytextwidth]
-  \begin{column}{0.52\textwidth}\centering
-    \includegraphics[width=\linewidth]{directed_crossover.png}\\[2pt]
-    {\scriptsize\color{black!60}At $m=3$: linear hub leads early,\\quadratic family overtakes near $n=9$.}
+  \begin{column}{0.5\textwidth}\centering
+    \includegraphics[width=\linewidth]{directed_crossover.png}\\[4pt]
+    {\scriptsize\color{black!60}The quadratic family overtakes near $n=9$.}
   \end{column}
-  \begin{column}{0.44\textwidth}
-    {\bfseries Two genuine advances}\\[12pt]
-    \chip{stProved}{solved} {\bfseries Hypergraph vertex}, $m\le 3$:
-    \[k_m^{(r)}(n)=\floor{\tfrac{(m-1)(n-1)}{r-1}}.\]
-    \vspace{4pt}
-    \chip{stMachine}{reduced} {\bfseries Directed multigraph}, $m=3$:\\
-    the whole family collapses to {\bfseries two checks} on $7$ vertices.
+  \begin{column}{0.46\textwidth}
+    {\large\bfseries\color{KULblauw3b}Two genuine advances}
+
+    \vspace{14pt}
+    \chip{stProved}{solved}\\[5pt]
+    {\bfseries Hypergraph vertex} \,($m\le 3$)
+    \[k_m^{(r)}(n)=\floor{\tfrac{(m-1)(n-1)}{r-1}}\]
+
+    \vspace{8pt}
+    \chip{stMachine}{reduced}\\[5pt]
+    {\bfseries Directed multigraph} \,($m=3$)
+    \[\text{all } n \;\longrightarrow\; \text{two checks at } n{=}7\]
   \end{column}
 \end{columns}
+\vfill
 \end{frame}
 
 % ----------------------------------------------------------------------------
@@ -451,19 +473,20 @@
 % S13  FUTURE AND CONCLUSION
 % ----------------------------------------------------------------------------
 \begin{frame}{What is left, and why it matters}
+\vfill
 \begin{columns}[t,onlytextwidth]
-  \begin{column}{0.54\textwidth}
-    {\bfseries\color{KULblauw1}Open problems}
-    \begin{itemize}\itemsep6pt
-      \item the backward-arc lemma (closes the directed case)
-      \item two finite $n=7$ checks ($m=3$ multigraph)
-      \item vertex-disjoint $m\ge6$, open since 1974
-      \item hypergraph vertex $m\ge4$
+  \begin{column}{0.5\textwidth}
+    {\large\bfseries\color{KULblauw1}Open problems}
+    \begin{itemize}\itemsep10pt
+      \item the backward-arc lemma
+      \item two finite $n=7$ checks
+      \item vertex-disjoint, $m\ge6$
+      \item hypergraph vertex, $m\ge4$
     \end{itemize}
   \end{column}
-  \begin{column}{0.43\textwidth}
-    {\bfseries\color{KULblauw1}One pipeline, every variant}
-    \begin{itemize}\itemsep6pt
+  \begin{column}{0.5\textwidth}
+    {\large\bfseries\color{KULblauw1}One pipeline, every variant}
+    \begin{itemize}\itemsep10pt
       \item one representation
       \item one exact checker
       \item one certifier
@@ -471,14 +494,7 @@
     \end{itemize}
   \end{column}
 \end{columns}
-
-\vspace{0.5cm}
-\begin{center}
-\begin{tikzpicture}\node[draw=KULblauw1,line width=1.2pt,rounded corners=5pt,
-    fill=KULblauw1!8,inner sep=9pt,text width=0.82\textwidth,align=center]
-  {\itshape The microscope does not answer every question. It shows exactly
-   which questions are left.};\end{tikzpicture}
-\end{center}
+\vfill
 \end{frame}
 
 % ----------------------------------------------------------------------------
