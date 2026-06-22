@@ -18,6 +18,8 @@ program/logs/
 *.lof
 *.lot
 *.synctex.gz
+*.nav
+*.snm
 program/erdos915_unified.baseline.py
 program/_erdos_fast.so
 
