@@ -26,19 +26,38 @@ Two of the three axes from \Cref{ch:basecases}, the model and the direction, are
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth]
+% ---- (a) graph -> multiplicity matrix, diagonal highlighted ----
 \node[vertex] (A) at (0,   0)   {$1$};
-\node[vertex] (B) at (2.2, 0)   {$2$};
-\node[vertex] (C) at (1.1, 1.9) {$3$};
+\node[vertex] (B) at (2.0, 0)   {$2$};
+\node[vertex] (C) at (1.0, 1.7) {$3$};
 \draw[edge] (A) to[bend left=15]  (B);
 \draw[edge] (A) to[bend right=15] (B);
 \draw[edge] (B) -- (C);
 \draw[edge] (A) -- (C);
-\node[font=\small] at (1.1, -0.7) {multigraph $G$};
-\node at (3.5, 0.85) {$\xrightarrow{\;\mu\;}$};
-\node at (5.7, 0.85) {$\begin{pmatrix} 0 & 2 & 1 \\ 2 & 0 & 1 \\ 1 & 1 & 0 \end{pmatrix}$};
-\node[font=\small] at (5.7, -0.7) {multiplicity matrix $\mu$};
+\node[font=\small] at (1.0, -0.8) {multigraph $G$};
+\node at (3.3, 0.55) {$\xrightarrow{\;\mu\;}$};
+\node at (5.4, 0.55) {$\begin{pmatrix} {\color{vertexred}\mathbf 0} & 2 & 1 \\ 2 & {\color{vertexred}\mathbf 0} & 1 \\ 1 & 1 & {\color{vertexred}\mathbf 0} \end{pmatrix}$};
+\node[font=\small] at (5.4, -0.8) {multiplicity matrix $\mu$};
+\node[font=\scriptsize, vertexred] at (5.4, -1.3) {diagonal always $0$: no loops};
+% ---- (b) hypergraph -> list of hyperedges ----
+\begin{scope}[yshift=-3.5cm]
+  \coordinate (p1) at (0.0, 0.6);
+  \coordinate (p2) at (0.0,-0.6);
+  \coordinate (p3) at (1.1, 0.0);
+  \coordinate (p4) at (2.2, 0.6);
+  \coordinate (p5) at (2.2,-0.6);
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (p1)--(p3)--(p2);
+    \draw[metro, metroB] (p4)--(p3)--(p5);
+  \end{scope}
+  \foreach \p/\lbl in {p1/1,p2/2,p3/3,p4/4,p5/5} {\node[smallvertex] at (\p) {$\lbl$};}
+  \node[font=\small] at (1.1,-1.25) {hypergraph $H$};
+  \node at (3.3, 0.0) {$\longrightarrow$};
+  \node[font=\small, align=left] at (5.7, 0.0)
+    {list of hyperedges:\\[3pt] $e_1=\{1,2,3\}$\\[1pt] $e_2=\{3,4,5\}$};
+\end{scope}
 \end{tikzpicture}
-\caption{A multigraph on three vertices and its multiplicity matrix $\mu$. Entry $\mu(u,v)$ records the number of parallel edges between $u$ and $v$. The double edge between vertices $1$ and $2$ gives $\mu(1,2) = 2$. A simple graph is the case $\mu \in \{0,1\}$, an undirected graph satisfies $\mu = \mu^\top$, and a directed graph allows $\mu(u,v) \ne \mu(v,u)$.}
+\caption{How the program stores a graph. Top: a graph or digraph on $n$ vertices is one $n \times n$ integer matrix $\mu$, with $\mu(u,v)$ the number of parallel edges or arcs from $u$ to $v$. The double edge between $1$ and $2$ gives $\mu(1,2) = 2$. The diagonal is always zero (red), since no vertex carries an edge to itself, an undirected graph keeps $\mu = \mu^\top$, a directed graph allows $\mu(u,v) \ne \mu(v,u)$, and a simple graph caps every entry at one. Bottom: the hypergraph is the one model that does not use the matrix at all, since a matrix has no room for an edge on three vertices, so it is kept as a plain list of its hyperedges, here two metro lines that share vertex $3$.}
 \label{fig:matrix-rep}
 \end{figure}
 
@@ -110,57 +129,66 @@ The vertex-disjoint version follows the same idea after one construction: split 
 \label{fig:vertex-split}
 \end{figure}
 
-\Cref{fig:vertex-split-example} applies the split to a whole digraph. Two arc-disjoint routes are forced through one shared vertex $w$, so on the split network both must cross the single unit-capacity arc inside $w$, which caps the number of internally vertex-disjoint routes below the edge-disjoint count.
+\Cref{fig:vertex-split-example} applies the split to a whole digraph. Three arc-disjoint routes are forced through one shared vertex $w$, so on the split network all three must cross the single unit-capacity arc inside $w$, which caps the number of internally vertex-disjoint routes below the edge-disjoint count.
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[>=Stealth, scale=0.8,
+\begin{tikzpicture}[>=Stealth, scale=0.78,
    sp/.style={circle, draw=KULblauw1, fill=KULblauw1!12, minimum size=5pt, inner sep=0pt},
    capf/.style={-{Stealth[length=1.6mm]}, line width=1pt, black!40},
    capw/.style={-{Stealth[length=2mm]}, line width=1.8pt, vertexred},
    rxa/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexorange},
-   rxb/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexgreen!70!black}]
-% ----- panel (a): original digraph, two routes through w -----
+   rxb/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexgreen!70!black},
+   rxc/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexpurple}]
+% ----- panel (a): original digraph, three routes through w -----
 \begin{scope}
   \node[smallvertex] (s) at (0,0) {$s$};
-  \node[smallvertex] (w) at (3,0) {$w$};
-  \node[smallvertex] (t) at (6,0) {$t$};
-  \node[smallvertex] (a) at (1.5,1.55) {$a$};
-  \node[smallvertex] (b) at (4.5,1.55) {$b$};
+  \node[smallvertex] (w) at (4,0) {$w$};
+  \node[smallvertex] (t) at (8,0) {$t$};
+  \node[smallvertex] (a) at (2,1.75) {$a$};
+  \node[smallvertex] (b) at (6,1.75) {$b$};
+  \node[smallvertex] (c) at (2,-1.75) {$c$};
+  \node[smallvertex] (d) at (6,-1.75) {$d$};
   \draw[rxa] (s)--(w); \draw[rxa] (w)--(t);
   \draw[rxb] (s)--(a); \draw[rxb] (a)--(w); \draw[rxb] (w)--(b); \draw[rxb] (b)--(t);
-  \node[font=\scriptsize] at (3,-1.05) {$\lec(s,t)=2$, both routes use $w$};
-  \node[font=\small] at (3,-1.85) {(a) original digraph};
+  \draw[rxc] (s)--(c); \draw[rxc] (c)--(w); \draw[rxc] (w)--(d); \draw[rxc] (d)--(t);
+  \node[font=\scriptsize] at (4,-2.55) {$\lec(s,t)=3$: all three routes pass through $w$};
+  \node[font=\small] at (4,-3.25) {(a) original digraph};
 \end{scope}
 % ----- panel (b): split network, w_in -> w_out is the cap-1 bottleneck -----
-\begin{scope}[xshift=8.8cm]
-  \foreach \name/\x/\y in {s/0/0, w/3/0, t/6/0, a/1.5/1.55, b/4.5/1.55}{
-    \node[sp] (\name-i) at (\x-0.34,\y) {};
-    \node[sp] (\name-o) at (\x+0.34,\y) {};
+\begin{scope}[yshift=-7.2cm]
+  \foreach \name/\x/\y in {s/0/0, w/4/0, t/8/0, a/2/1.75, b/6/1.75, c/2/-1.75, d/6/-1.75}{
+    \node[sp] (\name-i) at (\x-0.36,\y) {};
+    \node[sp] (\name-o) at (\x+0.36,\y) {};
     \node[font=\scriptsize, yshift=11pt] at ($(\name-i)!.5!(\name-o)$) {$\name$};
   }
-  \foreach \name in {s,a,t,b}{\draw[capf] (\name-i)--(\name-o);}
+  \foreach \name in {s,a,b,c,d,t}{\draw[capf] (\name-i)--(\name-o);}
   \draw[capw] (w-i)--(w-o);
-  \node[vertexred, font=\scriptsize] at (3,-0.55) {cap $1$};
+  \node[vertexred, font=\scriptsize] at (4,-0.62) {cap $1$};
   % external route arcs, out -> in
-  \draw[rxa] (s-o) to[bend left=6] (w-i);
-  \draw[rxa] (w-o) to[bend left=6] (t-i);
-  \draw[rxb] (s-o) to[bend left=12] (a-i);
-  \draw[rxb] (a-o) to[bend right=6] (w-i);
-  \draw[rxb] (w-o) to[bend left=6] (b-i);
-  \draw[rxb] (b-o) to[bend left=12] (t-i);
-  \node[font=\small] at (3,-1.85) {(b) split network: $\kap(s,t)=1$};
+  \draw[rxa] (s-o) to[bend left=5] (w-i);
+  \draw[rxa] (w-o) to[bend left=5] (t-i);
+  \draw[rxb] (s-o) to[bend left=10] (a-i);
+  \draw[rxb] (a-o) to[bend right=5] (w-i);
+  \draw[rxb] (w-o) to[bend left=5] (b-i);
+  \draw[rxb] (b-o) to[bend left=10] (t-i);
+  \draw[rxc] (s-o) to[bend right=10] (c-i);
+  \draw[rxc] (c-o) to[bend left=5] (w-i);
+  \draw[rxc] (w-o) to[bend right=5] (d-i);
+  \draw[rxc] (d-o) to[bend right=10] (t-i);
+  \node[font=\small] at (4,-3.25) {(b) split network: $\kap(s,t)=1$};
 \end{scope}
 \end{tikzpicture}
 \caption[Vertex splitting on a whole digraph]{The vertex-split checker on a
-larger example. \textbf{(a)} A digraph in which the two arc-disjoint $s$--$t$
-routes, $s \to w \to t$ (orange) and $s \to a \to w \to b \to t$ (green), both
-pass through $w$, so $\lec(s,t)=2$. \textbf{(b)} The split network replaces
-every vertex $V$ by an arc $V^{\mathrm{in}} \to V^{\mathrm{out}}$ of capacity
-one. Both routes must now traverse the single unit arc inside $w$ (red), which
-carries only one unit, so at most one internally vertex-disjoint route gets
-through and $\kap(s,t)=1$. Splitting every vertex this way turns the
-vertex-disjoint count into an ordinary maximum flow.}
+larger example. \textbf{(a)} A digraph in which three arc-disjoint $s$--$t$
+routes, $s \to w \to t$ (orange), $s \to a \to w \to b \to t$ (green), and
+$s \to c \to w \to d \to t$ (purple), all pass through the single vertex $w$,
+so $\lec(s,t)=3$. \textbf{(b)} The split network replaces every vertex $V$ by
+an arc $V^{\mathrm{in}} \to V^{\mathrm{out}}$ of capacity one. All three routes
+must now traverse the single unit arc inside $w$ (red), which carries only one
+unit, so at most one internally vertex-disjoint route gets through and
+$\kap(s,t)=1$. Splitting every vertex this way turns the vertex-disjoint count
+into an ordinary maximum flow.}
 \label{fig:vertex-split-example}
 \end{figure}
 
@@ -185,67 +213,114 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth]
-% --- left: a hyperedge as a set of three vertices ---
-\draw[rounded corners=14pt, fill=black!7, draw=black!30]
-   (-0.85,-0.95) rectangle (0.85,1.2);
-\node[vertex] (a) at (0, 0.75) {$a$};
-\node[vertex] (b) at (-0.5, -0.35) {$b$};
-\node[vertex] (c) at (0.5, -0.35) {$c$};
-\node[font=\small] at (0, -1.45) {hyperedge $e = \{a,b,c\}$};
+% --- left: a hyperedge drawn as a metro line through its three members ---
+\coordinate (a) at (0.0, 0.85);
+\coordinate (b) at (-0.1,-0.1);
+\coordinate (c) at (0.65,-0.9);
+\begin{scope}[on background layer]
+  \draw[metro, metroA] (a)--(b)--(c);
+\end{scope}
+\node[smallvertex] at (a) {$a$};
+\node[smallvertex] at (b) {$b$};
+\node[smallvertex] at (c) {$c$};
+\node[font=\small] at (0.2, -1.55) {hyperedge $e = \{a,b,c\}$};
 % --- arrow ---
-\draw[->, very thick, color=KULblauw3b] (1.6, 0) -- (2.7, 0);
-\node[above, font=\small] at (2.15, 0.05) {becomes};
+\draw[->, very thick, color=KULblauw3b] (1.9, -0.1) -- (3.0, -0.1);
+\node[above, font=\small] at (2.45, -0.05) {becomes};
 % --- right: the gadget ---
-\begin{scope}[xshift=4.3cm]
-\node[vertex] (a2) at (0, 0.75) {$a$};
-\node[vertex] (b2) at (0, -0.05) {$b$};
-\node[vertex] (c2) at (0, -0.85) {$c$};
-\node[smallvertex, fill=KULblauw3b!18] (h) at (2.0, -0.05) {$h_e$};
+\begin{scope}[xshift=4.6cm]
+\node[smallvertex] (a2) at (0, 0.85) {$a$};
+\node[smallvertex] (b2) at (0, -0.05) {$b$};
+\node[smallvertex] (c2) at (0, -0.95) {$c$};
+\node[hnode, fill=metroA!20, minimum size=15pt] (h) at (2.0, -0.05) {$h_e$};
 \draw[edge] (a2) -- (h);
 \draw[edge] (b2) -- (h);
 \draw[edge] (c2) -- (h);
-\node[font=\small, align=center] at (2.0, -1.4) {helper point\\(one route only)};
+\node[font=\small, align=center] at (2.0, -1.55) {helper point\\(one route only)};
 \end{scope}
 \end{tikzpicture}
-\caption{Measuring Berge connectivity by maximum flow. A hyperedge $e$ joining several vertices (left) is replaced by a helper point $h_e$ joined to each of its members (right). Because at most one route may pass through $h_e$, the helper point enforces that the hyperedge serves only one route at a time. Counting independent routes between two vertices is then an ordinary maximum flow on this enlarged network, and a two-vertex hyperedge collapses to a single ordinary edge.}
+\caption{Measuring Berge connectivity by maximum flow. A hyperedge $e$, drawn as a metro line through its members (left), is replaced by a helper point $h_e$ joined to each member (right). Because at most one route may pass through $h_e$, the line runs one train at a time, so the hyperedge serves only one route. Counting independent routes between two vertices is then an ordinary maximum flow on this enlarged network, and a two-vertex hyperedge collapses to a single ordinary edge.}
 \label{fig:hyper-gadget}
 \end{figure}
 
-\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the same idea to a whole small hypergraph, where a Berge route that switches hyperedge partway becomes a single flow path threading two helper points in turn.
+\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the idea to a whole hypergraph, putting the metro map (before) beside the flow network it becomes (after). A pair $u, v$ that has two hyperedge-disjoint Berge routes turns into a network carrying a maximum flow of two, so the checker reads $\lec(u,v) = 2$ straight off the flow value, and that flow value is the whole of what the checker computes.
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[scale=1.0,
-   mem/.style={line width=1pt, black!40},
-   fA/.style={line width=2.1pt, vertexorange}]
-  % vertices in a left column
-  \node[smallvertex] (u) at (0, 2.0) {$u$};
-  \node[smallvertex] (x) at (0, 1.0) {$x$};
-  \node[smallvertex] (y) at (0, 0.0) {$y$};
-  \node[smallvertex] (z) at (0,-1.0) {$z$};
-  \node[smallvertex] (v) at (0,-2.0) {$v$};
-  % two helper squares to the right
-  \node[hnode, fill=vertexorange!18, minimum size=15pt] (h1) at (2.7, 1.2) {$h_{e_1}$};
-  \node[hnode, fill=KULblauw3b!16, minimum size=15pt] (h2) at (2.7,-1.2) {$h_{e_2}$};
-  % membership edges: e1 = {u,x,y}, e2 = {y,z,v}
-  \draw[mem] (u)--(h1); \draw[mem] (x)--(h1); \draw[mem] (y)--(h1);
-  \draw[mem] (y)--(h2); \draw[mem] (z)--(h2); \draw[mem] (v)--(h2);
-  % the Berge route u,e1,y,e2,v as one flow path through both helpers
-  \draw[fA] (u)--(h1); \draw[fA] (h1)--(y); \draw[fA] (y)--(h2); \draw[fA] (h2)--(v);
-  \node[font=\scriptsize, align=center] at (0,-2.75) {hypergraph vertices};
-  \node[font=\scriptsize, align=center] at (2.7,-2.2)
-     {helper points\\(one route each)};
-  \node[font=\scriptsize, vertexorange!75!black] at (1.75,2.15)
-     {route $u, e_1, y, e_2, v$};
+\begin{tikzpicture}[scale=0.82, >=Stealth,
+   mem/.style={line width=0.7pt, black!32},
+   fa/.style={line width=2.0pt, vertexorange, -{Stealth[length=2mm]}},
+   fb/.style={line width=2.0pt, vertexgreen!70!black, -{Stealth[length=2mm]}},
+   end/.style={smallvertex, draw=black, line width=1.2pt}]
+% shared vertex layout, reused in both panels
+\def\hyperlayout{%
+  \coordinate (u) at (0,0);
+  \coordinate (a) at (1.5,1.55);
+  \coordinate (b) at (3.2,1.55);
+  \coordinate (c) at (4.6,0.85);
+  \coordinate (v) at (6.1,0);
+  \coordinate (d) at (1.5,-1.55);
+  \coordinate (e) at (3.2,-1.55);
+  \coordinate (f) at (4.6,-0.85);
+}
+% ===== panel (a): the hypergraph as a metro map =====
+\begin{scope}
+  \hyperlayout
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (u)--(a)--(b);
+    \draw[metro, metroB] (b)--(c)--(v);
+    \draw[metro, metroC] (u)--(d)--(e);
+    \draw[metro, metroD] (e)--(f)--(v);
+    \draw[metro, metroE] (a)--(c)--(f);
+  \end{scope}
+  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f} {\node[smallvertex] at (\p) {$\l$};}
+  \node[end] at (u) {$u$};
+  \node[end] at (v) {$v$};
+  \node[metroA, font=\scriptsize\bfseries] at (0.7,1.0)  {$e_1$};
+  \node[metroB, font=\scriptsize\bfseries] at (5.4,0.95) {$e_2$};
+  \node[metroC, font=\scriptsize\bfseries] at (0.7,-1.0) {$e_3$};
+  \node[metroD, font=\scriptsize\bfseries] at (5.4,-0.95){$e_4$};
+  \node[font=\small] at (3.0,-2.5) {(a) the hypergraph};
+\end{scope}
+% ===== panel (b): the flow network (a helper turnstile on each line) =====
+\begin{scope}[xshift=8.7cm]
+  \hyperlayout
+  \coordinate (h1) at (1.55,1.0);
+  \coordinate (h2) at (4.55,0.78);
+  \coordinate (h3) at (1.55,-1.0);
+  \coordinate (h4) at (4.55,-0.78);
+  \coordinate (h5) at (3.5,0.5);
+  % faint membership edges to helper squares
+  \draw[mem] (u)--(h1) (a)--(h1) (b)--(h1);
+  \draw[mem] (b)--(h2) (c)--(h2) (v)--(h2);
+  \draw[mem] (u)--(h3) (d)--(h3) (e)--(h3);
+  \draw[mem] (e)--(h4) (f)--(h4) (v)--(h4);
+  \draw[mem] (a)--(h5) (c)--(h5) (f)--(h5);
+  % the two hyperedge-disjoint routes as flow paths through helpers
+  \draw[fa] (u)--(h1); \draw[fa] (h1)--(b); \draw[fa] (b)--(h2); \draw[fa] (h2)--(v);
+  \draw[fb] (u)--(h3); \draw[fb] (h3)--(e); \draw[fb] (e)--(h4); \draw[fb] (h4)--(v);
+  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f} {\node[smallvertex] at (\p) {$\l$};}
+  \node[end] at (u) {$u$};
+  \node[end] at (v) {$v$};
+  \node[hnode, fill=metroA!16] at (h1) {};
+  \node[hnode, fill=metroB!16] at (h2) {};
+  \node[hnode, fill=metroC!16] at (h3) {};
+  \node[hnode, fill=metroD!16] at (h4) {};
+  \node[hnode, fill=metroE!16] at (h5) {};
+  \node[font=\small] at (3.0,-2.5) {(b) the flow network: max flow $=2$};
+\end{scope}
 \end{tikzpicture}
-\caption[The helper-point network on a two-hyperedge route]{The same
-construction on a two-hyperedge hypergraph $e_1 = \{u,x,y\}$,
-$e_2 = \{y,z,v\}$. The Berge route that enters $e_1$ at $u$, switches
-hyperedge at the shared vertex $y$, and leaves $e_2$ at $v$ becomes the single
-flow path $u \to h_{e_1} \to y \to h_{e_2} \to v$ (orange), entering each
-hyperedge through one member and leaving through another. Because each helper
-carries only one unit of flow, a second $u$--$v$ route would have to avoid
-both helpers, which is exactly the rule that one hyperedge serves one route.}
+\caption[The helper-point network on a whole hypergraph]{From hypergraph to
+flow network, before and after. \textbf{(a)} A hypergraph on eight vertices,
+its five hyperedges drawn as metro lines. The pair $u, v$ has two
+hyperedge-disjoint Berge routes, $u, e_1, b, e_2, v$ and $u, e_3, e, e_4, v$.
+\textbf{(b)} The same vertices with one helper square per hyperedge (a
+turnstile on each line). Each Berge route becomes a flow path that enters a
+line through one member, crosses its helper, and leaves through another:
+$u \to h_{e_1} \to b \to h_{e_2} \to v$ (orange) and
+$u \to h_{e_3} \to e \to h_{e_4} \to v$ (green). Because every helper carries
+only one unit, the maximum $u$--$v$ flow is exactly two, which the checker
+reports as $\lec(u,v) = 2$. A third route would have to reuse a helper.}
 \label{fig:hyper-gadget-example}
 \end{figure}
 One way to picture the helper point is the metro map of \Cref{ch:basecases}: each hyperedge is a metro line, its member vertices are the stations on it, and the helper is the line itself. Boarding at any station counts as taking that line. Because only one route may pass through the helper, only one train runs on the line at a time, so a second route must reach its destination without ever boarding it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that share no line, which is exactly what Berge edge-disjointness means.
