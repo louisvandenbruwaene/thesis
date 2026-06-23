@@ -141,40 +141,41 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel edges $\mu(u,v)\!\ge\!1$};
   \end{scope}
 
-  % (c) simple hypergraph: three distinct size-3 hyperedges drawn metro-style,
-  %     each line running cleanly through its own stations. Two trace opposite
-  %     L-shaped corners of the square and the third runs diagonally through a
-  %     central station. No hyperedge is repeated, so no two lines share a track.
+  % (c) simple hypergraph: three distinct size-3 hyperedges, metro-style, on the
+  %     four corner stations (no central station). Two share the bottom stretch
+  %     and run parallel side by side there; the third runs diagonally corner to
+  %     corner. No hyperedge is repeated.
   \begin{scope}[shift={(7.4,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
-    \coordinate (E) at (0,0);
     \begin{scope}[on background layer]
-      \draw[ml, metroB] (A) -- (B) -- (C);   % {A,B,C}
-      \draw[ml, metroC] (C) -- (D) -- (A);   % {A,C,D}
-      \draw[ml, metroD] (D) -- (E) -- (B);   % {B,D,E} diagonal
+      % {A,B,C}: bottom (upper offset) + right
+      \draw[ml, metroB] (-0.85,-0.77) -- (0.85,-0.77) -- (0.85,0.85);
+      % {A,B,D}: left + bottom (lower offset), parallel to the blue line on the bottom
+      \draw[ml, metroC] (-0.85,0.85) -- (-0.85,-0.93) -- (0.85,-0.93);
+      % {A,C,D}: diagonal A--C + top C--D
+      \draw[ml, metroD] (-0.85,-0.85) -- (0.85,0.85) -- (-0.85,0.85);
     \end{scope}
-    \foreach \p in {A,B,C,D,E} {\node[stn] at (\p) {};}
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges span $r\!\ge\!3$};
   \end{scope}
 
-  % (d) multi-hypergraph: the hyperedge {A,B,C} repeated (two parallel lines
-  %     two hyperedges, {A,B,C} (red) and {A,C,D} (blue), each doubled. A repeated
-  %     hyperedge keeps its own colour, so the doubling reads as two same-colour
-  %     lines side by side, the hypergraph counterpart of parallel edges.
+  % (d) multi-hypergraph: one repeated hyperedge {A,B,C} (two parallel red lines
+  %     side by side, the hypergraph counterpart of parallel edges) plus one
+  %     ordinary, non-repeated hyperedge {B,C,D} drawn diagonally corner to
+  %     corner. No central station.
   \begin{scope}[shift={(10.8,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);   % {A,B,C}
       \draw[ml, metroA] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
-      \draw[ml, metroB] (-0.93,-0.85) -- (-0.93,0.93) -- (0.85,0.93);   % {A,C,D}
-      \draw[ml, metroB] (-0.77,-0.85) -- (-0.77,0.77) -- (0.85,0.77);   % {A,C,D} repeated
+      \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);    % {B,C,D} diagonal, single
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges repeated};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
 \caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
