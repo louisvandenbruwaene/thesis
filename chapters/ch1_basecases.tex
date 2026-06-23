@@ -166,19 +166,21 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
   \end{scope}
 
   % (d) multi-hypergraph: the hyperedge {A,B,C} repeated (two parallel lines
-  %     wrapping the corner) plus two further hyperedges {A,C,D} and {B,C,D}.
+  %     two hyperedges, {A,B,C} (red) and {A,C,D} (blue), each doubled. A repeated
+  %     hyperedge keeps its own colour, so the doubling reads as two same-colour
+  %     lines side by side, the hypergraph counterpart of parallel edges.
   \begin{scope}[shift={(10.8,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);   % {A,B,C}
-      \draw[ml, metroB] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
-      \draw[ml, metroC] (-0.93,-0.85) -- (-0.93,0.85) -- (0.85,0.85);   % {A,C,D}
-      \draw[ml, metroD] (0.85,-0.85) -- (0.85,0.93) -- (-0.85,0.93);    % {B,C,D}
+      \draw[ml, metroA] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
+      \draw[ml, metroB] (-0.93,-0.85) -- (-0.93,0.93) -- (0.85,0.93);   % {A,C,D}
+      \draw[ml, metroB] (-0.77,-0.85) -- (-0.77,0.77) -- (0.85,0.77);   % {A,C,D} repeated
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges repeated};
   \end{scope}
 \end{tikzpicture}}
 \caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and two doubles on the complete graph $K_4$, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
