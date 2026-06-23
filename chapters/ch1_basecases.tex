@@ -113,27 +113,34 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
     stn/.style={circle, draw=black!70, fill=white, line width=1pt,
                 minimum size=5mm, inner sep=0pt}]
 
-  % (a) simple graph: single edges only
+  % (a) simple graph: K_4 on four vertices, every pair joined once
   \begin{scope}[shift={(0,0)}]
-    \node[mv] (s1) at (90:0.78) {};
-    \node[mv] (s2) at (210:0.78) {};
-    \node[mv] (s3) at (330:0.78) {};
-    \draw[me] (s1)--(s2)  (s2)--(s3)  (s3)--(s1);
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
+    \draw[me] (A)--(B) (B)--(C) (C)--(D) (D)--(A) (A)--(C) (B)--(D);
+    \foreach \p in {A,B,C,D} {\node[mv] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {simple graph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {one edge per pair};
   \end{scope}
 
-  % (b) multigraph: parallel edges
+  % (b) multigraph: K_4 with one triple and two double edges, the rest single.
+  %     Extra copies bow outward so the interior diagonals stay clear.
   \begin{scope}[shift={(3.7,0)}]
-    \node[mv] (g1) at (90:0.78) {};
-    \node[mv] (g2) at (210:0.78) {};
-    \node[mv] (g3) at (330:0.78) {};
-    \draw[me] (g1) to[bend left=22] (g2);
-    \draw[me] (g1) -- (g2);
-    \draw[me] (g1) to[bend right=22] (g2);
-    \draw[me] (g2) to[bend left=15] (g3);
-    \draw[me] (g2) to[bend right=15] (g3);
-    \draw[me] (g3) -- (g1);
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
+    % single edges: top side and both diagonals
+    \draw[me] (C)--(D) (A)--(C) (B)--(D);
+    % double edge on the right side
+    \draw[me] (B)--(C);
+    \draw[me] (B) to[bend right=20] (C);
+    % double edge on the left side
+    \draw[me] (D)--(A);
+    \draw[me] (D) to[bend right=20] (A);
+    % triple edge on the bottom side
+    \draw[me] (A)--(B);
+    \draw[me] (A) to[bend right=15] (B);
+    \draw[me] (A) to[bend right=30] (B);
+    \foreach \p in {A,B,C,D} {\node[mv] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {multigraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel edges $\mu(u,v)\!\ge\!1$};
   \end{scope}
@@ -142,15 +149,16 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
   %     two stations, drawn metro-style as two coloured lines that run side by
   %     side on the overlap (no shaded blobs). Stations on a horizontal line;
   %     each line is offset perpendicular to the shared track.
-  % (c) simple hypergraph: four vertices on a square, three size-3 hyperedges
-  %     as metro lines, running side by side where they share a square edge.
+  % (c) simple hypergraph: four vertices on a square, all four size-3 hyperedges
+  %     as metro lines, two running side by side on every shared square edge.
   \begin{scope}[shift={(7.4,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      \draw[ml, metroA] (-0.85,-0.77) -- (0.85,-0.77) -- (0.85,0.85);   % {A,B,C}
-      \draw[ml, metroB] (0.85,0.85) -- (-0.93,0.85) -- (-0.93,-0.85);   % {C,D,A}
-      \draw[ml, metroC] (-0.77,0.85) -- (-0.77,-0.93) -- (0.85,-0.93);  % {A,B,D}
+      \draw[ml, metroA] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C}
+      \draw[ml, metroB] (0.85,0.93) -- (-0.85,0.93) -- (-0.85,-0.85);   % {C,D,A}
+      \draw[ml, metroC] (-0.93,0.85) -- (-0.93,-0.93) -- (0.85,-0.93);  % {A,B,D}
+      \draw[ml, metroD] (0.85,-0.85) -- (0.93,0.85) -- (-0.85,0.77);    % {B,C,D}
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {hypergraph};
@@ -158,21 +166,22 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
   \end{scope}
 
   % (d) multi-hypergraph: the hyperedge {A,B,C} repeated (two parallel lines
-  %     wrapping the corner) plus a third hyperedge {A,C,D}.
+  %     wrapping the corner) plus two further hyperedges {A,C,D} and {B,C,D}.
   \begin{scope}[shift={(10.8,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);   % {A,B,C}
       \draw[ml, metroB] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
-      \draw[ml, metroC] (-0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);   % {A,C,D}
+      \draw[ml, metroC] (-0.93,-0.85) -- (-0.93,0.85) -- (0.85,0.85);   % {A,C,D}
+      \draw[ml, metroD] (0.85,-0.85) -- (0.85,0.93) -- (-0.85,0.93);    % {B,C,D}
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
+\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and two doubles on the complete graph $K_4$, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
 \label{fig:three-models}
 \end{figure}
 

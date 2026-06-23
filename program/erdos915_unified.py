@@ -2893,12 +2893,26 @@ def _running_best_trace(result: SearchResult) -> tuple[list[float], list[int]]:
     return xs, ys
 
 
+def _settle_time(xs: list[float], ys: list[int]) -> float:
+    """Wall-clock second at which a trace first reached its own final best value.
+
+    The convergence curves plateau long before the time budget runs out, so this
+    is what the x-axis should track: cropping to the budget would leave a long
+    flat tail and the cropped view would barely change when the budget does.
+    """
+    if not xs:
+        return 0.0
+    final = ys[-1]
+    return next((x for x, y in zip(xs, ys) if y == final), xs[-1])
+
+
 def plot_sa_vs_tabu_convergence(
     path: str | Path, *,
     cases: tuple[tuple[int, int], ...] = ((5, 3), (7, 3)),
     budget: float = 8.0,
     seed: int = 0,
-    xmaxes: tuple[float, ...] = (3.0, 6.0),
+    xmaxes: tuple[float, ...] | None = None,
+    settle_margin: float = 1.3,
 ) -> None:
     """Best-feasible-value against wall-clock for annealing vs tabu search.
 
@@ -2911,6 +2925,12 @@ def plot_sa_vs_tabu_convergence(
     plateaus a few arcs short.  The time axis is wall-clock, so this one figure is
     a representative timed run on the reference machine rather than a seed-exact
     reproduction like the others.
+
+    By default each panel's x-axis stops shortly after the slower engine settles
+    (``settle_margin`` times the later of the two plateau times), so the view
+    tracks the actual run instead of a fixed window: cropping to a hard-coded
+    second count leaves a long flat tail because both engines converge well
+    inside one second.  Pass ``xmaxes`` to force fixed per-panel limits instead.
     """
     if not MATPLOTLIB_AVAILABLE:
         raise RuntimeError("matplotlib is required for figures")
@@ -2922,26 +2942,32 @@ def plot_sa_vs_tabu_convergence(
                                     deadline=time.time() + budget)
         tb = tabu_search_for_dense_graph(MULTI_DIRECTED, n, m, seed=seed,
                                          steps=10**7, deadline=time.time() + budget)
+        settle = 0.0
         for res, label, colour in ((sa, "simulated annealing", _KUL_BLUE),
                                     (tb, "tabu search", _WARM)):
             xs, ys = _running_best_trace(res)
             ax.step(xs, ys, where="post", label=label, color=colour, linewidth=2.0)
+            settle = max(settle, _settle_time(xs, ys))
         opt = directed_multigraph_arc(n, m)
         ax.axhline(opt, linestyle=":", color=_KUL_DARK, linewidth=1.6,
                    label=f"optimum $L_3^{{\\mathrm{{dir}}}}({n}) = {opt}$")
         ax.set_title(f"directed multigraph, $n = {n}$, $m = {m}$", fontsize=11)
         ax.set_xlabel("wall-clock seconds", fontsize=9.5)
         ax.set_ylabel("densest feasible arc count", fontsize=9.5)
-        # Crop the long flat tail: each engine plateaus well before the budget,
-        # so the view stops once both have settled rather than at the full run.
-        if i < len(xmaxes):
+        # Crop the long flat tail: stop just after the slower engine settles, so
+        # the rise fills the panel instead of being squeezed against the y-axis.
+        # A fixed second count cannot do this, since the settle time shifts run to
+        # run; an explicit xmaxes overrides for a reproducible fixed window.
+        if xmaxes is not None and i < len(xmaxes):
             ax.set_xlim(0, xmaxes[i])
+        else:
+            ax.set_xlim(0, max(settle * settle_margin, 0.5))
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=8.5, loc="lower right")
-        # Fewer x-ticks declutters the time axis: 4 on the first panel, 6 on the
-        # second, since the action concentrates early and dense ticks add noise.
+        # Fewer x-ticks declutters the time axis: the action concentrates early
+        # and dense ticks add noise.
         if MaxNLocator is not None:
-            ax.xaxis.set_major_locator(MaxNLocator(nbins=4 if i == 0 else 6))
+            ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
     _save(path)
 
 
