@@ -250,7 +250,7 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
    mem/.style={line width=0.7pt, black!32},
-   tri/.style={line width=0.8pt, black!16},
+   tri/.style={line width=1.0pt, draw opacity=0.6},
    fa/.style={line width=2.0pt, vertexorange, -{Stealth[length=2mm]}},
    fb/.style={line width=2.0pt, vertexgreen!70!black, -{Stealth[length=2mm]}},
    end/.style={smallvertex, draw=black, line width=1.2pt}]
@@ -281,11 +281,6 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
   \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f,w/w} {\node[smallvertex] at (\p) {$\l$};}
   \node[end] at (u) {$u$};
   \node[end] at (v) {$v$};
-  \node[metroA, font=\scriptsize\bfseries] at (0.5, 1.25)  {$e_1$};
-  \node[metroB, font=\scriptsize\bfseries] at (4.6, 2.1)   {$e_2$};
-  \node[metroC, font=\scriptsize\bfseries] at (0.5,-1.25)  {$e_3$};
-  \node[metroD, font=\scriptsize\bfseries] at (4.6,-2.1)   {$e_4$};
-  \node[metroE, font=\scriptsize\bfseries] at (4.35,0.55)  {$e_5$};
   \node[font=\small] at (3.7,-2.85) {(a) the hypergraph};
 \end{scope}
 % ===== panel (b): the flow network (a helper turnstile inside each triangle) =====
@@ -296,12 +291,13 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
   \coordinate (h3) at (1.63,-1.23);
   \coordinate (h4) at (5.63,-1.23);
   \coordinate (h5) at (3.97, 0);
-  % faint hyperedge triangles, so each helper sits visibly inside its members
-  \draw[tri] (u)--(a)--(b)--cycle;
-  \draw[tri] (b)--(c)--(v)--cycle;
-  \draw[tri] (u)--(d)--(e)--cycle;
-  \draw[tri] (e)--(f)--(v)--cycle;
-  \draw[tri] (b)--(w)--(e)--cycle;
+  % hyperedge triangles in the same colours as panel (a), so each helper sits
+  % visibly inside its three members and the two panels read alike
+  \draw[tri, metroA] (u)--(a)--(b)--cycle;
+  \draw[tri, metroB] (b)--(c)--(v)--cycle;
+  \draw[tri, metroC] (u)--(d)--(e)--cycle;
+  \draw[tri, metroD] (e)--(f)--(v)--cycle;
+  \draw[tri, metroE] (b)--(w)--(e)--cycle;
   % faint membership edges from each vertex to its helper
   \draw[mem] (u)--(h1) (a)--(h1) (b)--(h1);
   \draw[mem] (b)--(h2) (c)--(h2) (v)--(h2);

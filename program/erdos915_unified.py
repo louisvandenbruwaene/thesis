@@ -2898,6 +2898,7 @@ def plot_sa_vs_tabu_convergence(
     cases: tuple[tuple[int, int], ...] = ((5, 3), (7, 3)),
     budget: float = 8.0,
     seed: int = 0,
+    xmaxes: tuple[float, ...] = (3.0, 6.0),
 ) -> None:
     """Best-feasible-value against wall-clock for annealing vs tabu search.
 
@@ -2931,6 +2932,10 @@ def plot_sa_vs_tabu_convergence(
         ax.set_title(f"directed multigraph, $n = {n}$, $m = {m}$", fontsize=11)
         ax.set_xlabel("wall-clock seconds", fontsize=9.5)
         ax.set_ylabel("densest feasible arc count", fontsize=9.5)
+        # Crop the long flat tail: each engine plateaus well before the budget,
+        # so the view stops once both have settled rather than at the full run.
+        if i < len(xmaxes):
+            ax.set_xlim(0, xmaxes[i])
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=8.5, loc="lower right")
         # Fewer x-ticks declutters the time axis: 4 on the first panel, 6 on the

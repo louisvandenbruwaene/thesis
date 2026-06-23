@@ -142,32 +142,37 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
   %     two stations, drawn metro-style as two coloured lines that run side by
   %     side on the overlap (no shaded blobs). Stations on a horizontal line;
   %     each line is offset perpendicular to the shared track.
-  \begin{scope}[shift={(7.7,0.15)}]
-    \foreach \i/\x in {1/-1.05, 2/-0.05, 3/0.95, 4/1.95} {\coordinate (h\i) at (\x,0);}
+  % (c) simple hypergraph: four vertices on a square, three size-3 hyperedges
+  %     as metro lines, running side by side where they share a square edge.
+  \begin{scope}[shift={(7.4,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      \draw[ml, metroA] (-1.05,0.12) -- (-0.05,0.12) -- (0.95,0.12);   % e1={1,2,3}
-      \draw[ml, metroB] (-0.05,-0.12) -- (0.95,-0.12) -- (1.95,-0.12); % e2={2,3,4}
+      \draw[ml, metroA] (-0.85,-0.77) -- (0.85,-0.77) -- (0.85,0.85);   % {A,B,C}
+      \draw[ml, metroB] (0.85,0.85) -- (-0.93,0.85) -- (-0.93,-0.85);   % {C,D,A}
+      \draw[ml, metroC] (-0.77,0.85) -- (-0.77,-0.93) -- (0.85,-0.93);  % {A,B,D}
     \end{scope}
-    \foreach \i in {1,2,3,4} {\node[stn] at (h\i) {};}
-    \node[metroA, font=\scriptsize\bfseries] at (-1.35,0.5) {$e_1$};
-    \node[metroB, font=\scriptsize\bfseries] at ( 2.25,-0.5) {$e_2$};
-    \node[font=\itshape] at (0.45,-1.9) {hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0.45,-2.4) {hyperedges span $r\!\ge\!3$};
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges span $r\!\ge\!3$};
   \end{scope}
 
-  % (d) multi-hypergraph: one hyperedge repeated, two parallel metro lines
-  \begin{scope}[shift={(11.8,0.15)}]
-    \foreach \i/\x in {1/-1.0, 2/0.0, 3/1.0} {\coordinate (k\i) at (\x,0);}
+  % (d) multi-hypergraph: the hyperedge {A,B,C} repeated (two parallel lines
+  %     wrapping the corner) plus a third hyperedge {A,C,D}.
+  \begin{scope}[shift={(10.8,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      \draw[ml, metroA] (-1.0,0.12) -- (0.0,0.12) -- (1.0,0.12);
-      \draw[ml, metroB] (-1.0,-0.12) -- (0.0,-0.12) -- (1.0,-0.12);
+      \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);   % {A,B,C}
+      \draw[ml, metroB] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
+      \draw[ml, metroC] (-0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);   % {A,C,D}
     \end{scope}
-    \foreach \i in {1,2,3} {\node[stn] at (k\i) {};}
-    \node[font=\itshape] at (0,-1.9) {multi-hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.4) {a hyperedge repeated};
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations. The red line $e_1$ and the blue line $e_2$ share the corridor between two stations, and there the two run side by side, one colour each, exactly as a metro map separates lines that share a stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
+\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each spanning $r\ge 3$ vertices and drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
 \label{fig:three-models}
 \end{figure}
 
@@ -519,88 +524,7 @@ For $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. For $m = 3$ the formula $\floor
 \section{The hypergraph variant}
 The third model deserves its own short treatment, not because its base case is hard but because it is the one variant whose objects are stored and manipulated differently from all the rest, and it is worth meeting that difference now rather than at the moment of computation. A hypergraph keeps no multiplicity matrix, only the list of its hyperedges, each a set of $r$ vertices. We fix the edge size $r$, following the extremal literature, for a structural reason: under a connectivity ceiling a small edge is always at least as efficient per route as a large one, so a hypergraph free to mix sizes would maximise its edge count by using pairs only, and the question would collapse back to the graph case. Fixing $r$ is what makes the hypergraph question a new question. The route between two vertices is a \emph{Berge path}, which alternates vertices and hyperedges so that each consecutive pair of vertices lies in the hyperedge listed between them, and two such routes are edge-disjoint when they share no hyperedge. Concretely, in a three-uniform hypergraph a route from $u$ to $w$ might be the single step $u, \{u, x, w\}, w$ that crosses one hyperedge, or a longer alternation $u, \{u, x, y\}, y, \{y, z, w\}, w$ that switches hyperedge at the intermediate vertex $y$. With routes redefined this way the same Gomory--Hu machinery that proved the multigraph value carries over, and the base case has the same linear shape. The picture to keep in mind is a metro map: each hyperedge is a line, and a route from one vertex to another rides a line and changes to another line at a station the two share.
 
-A single hyperedge may serve only one route, so two Berge routes that share no hyperedge are edge-disjoint, the hypergraph counterpart of two edge-disjoint paths in a graph. Reading routes off a metro map is a matter of seeing which lines share track: two hyperedges that share several vertices run side by side along the stretch between them. \Cref{fig:berge-disjoint} fixes that convention with $r = 4$ lines, ranging from a fully repeated hyperedge down to two that meet at a single station, and two routes are hyperedge-disjoint exactly when the lines they ride share no track at all.
-
-\begin{figure}[ht]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-    stn/.style={circle, draw=black!55, fill=white, line width=0.9pt,
-                minimum size=5.4mm, inner sep=0pt},
-    shared/.style={circle, draw=black, fill=white, line width=1.5pt,
-                minimum size=5.6mm, inner sep=0pt},
-    ml/.style={metro, line width=2.8pt}]
-
-  % ---- top-left: two r=4 hyperedges sharing ALL 4 vertices (repeated) ----
-  \begin{scope}[shift={(0,2.4)}]
-    \foreach \i in {0,1,2,3} {\coordinate (A\i) at (\i,0);}
-    \begin{scope}[on background layer]
-      \draw[ml, metroA] (0,0.14) -- (3,0.14);
-      \draw[ml, metroB] (0,-0.14) -- (3,-0.14);
-    \end{scope}
-    \foreach \i in {0,1,2,3} {\node[shared] at (A\i) {};}
-    \node[metroA, font=\scriptsize\bfseries] at (-0.55,0.4) {$e_1$};
-    \node[metroB, font=\scriptsize\bfseries] at (-0.55,-0.4) {$e_2$};
-    \node[font=\scriptsize, align=center] at (1.5,-1.0) {share all $4$\\(a repeated hyperedge)};
-  \end{scope}
-
-  % ---- top-right: share 3 of 4 ----
-  \begin{scope}[shift={(7.4,2.4)}]
-    \foreach \i in {0,1,2,3,4} {\coordinate (B\i) at (\i,0);}
-    \begin{scope}[on background layer]
-      \draw[ml, metroA] (0,0.14) -- (3,0.14);
-      \draw[ml, metroB] (1,-0.14) -- (4,-0.14);
-    \end{scope}
-    \node[stn] at (B0) {}; \node[shared] at (B1) {}; \node[shared] at (B2) {};
-    \node[shared] at (B3) {}; \node[stn] at (B4) {};
-    \node[metroA, font=\scriptsize\bfseries] at (-0.55,0.4) {$e_1$};
-    \node[metroB, font=\scriptsize\bfseries] at (4.55,-0.4) {$e_2$};
-    \node[font=\scriptsize] at (2,-1.0) {share $3$ of $4$};
-  \end{scope}
-
-  % ---- bottom-left: share 2 of 4 ----
-  \begin{scope}[shift={(0,0)}]
-    \foreach \i in {0,...,5} {\coordinate (C\i) at (\i,0);}
-    \begin{scope}[on background layer]
-      \draw[ml, metroA] (0,0.14) -- (3,0.14);
-      \draw[ml, metroB] (2,-0.14) -- (5,-0.14);
-    \end{scope}
-    \node[stn] at (C0) {}; \node[stn] at (C1) {}; \node[shared] at (C2) {};
-    \node[shared] at (C3) {}; \node[stn] at (C4) {}; \node[stn] at (C5) {};
-    \node[metroA, font=\scriptsize\bfseries] at (-0.55,0.4) {$e_1$};
-    \node[metroB, font=\scriptsize\bfseries] at (5.55,-0.4) {$e_2$};
-    \node[font=\scriptsize] at (2.5,-1.0) {share $2$ of $4$};
-  \end{scope}
-
-  % ---- bottom-right: share 1 of 4 (a single interchange station) ----
-  \begin{scope}[shift={(7.4,0)}]
-    \foreach \i in {0,...,6} {\coordinate (D\i) at (\i,0);}
-    \begin{scope}[on background layer]
-      \draw[ml, metroA] (0,0.14) -- (3,0.14);
-      \draw[ml, metroB] (3,-0.14) -- (6,-0.14);
-    \end{scope}
-    \node[stn] at (D0) {}; \node[stn] at (D1) {}; \node[stn] at (D2) {};
-    \node[shared] at (D3) {}; \node[stn] at (D4) {}; \node[stn] at (D5) {};
-    \node[stn] at (D6) {};
-    \node[metroA, font=\scriptsize\bfseries] at (-0.55,0.4) {$e_1$};
-    \node[metroB, font=\scriptsize\bfseries] at (6.55,-0.4) {$e_2$};
-    \node[font=\scriptsize] at (3,-1.0) {share $1$ of $4$};
-  \end{scope}
-\end{tikzpicture}}
-\caption[How two hyperedges overlap on a metro map]{Reading hyperedge overlap as
-a metro map, for $r = 4$. Each panel shows two four-vertex hyperedges, the red
-line $e_1$ and the blue line $e_2$, drawn so that wherever they share
-consecutive stations the two lines run parallel, side by side, one colour each,
-exactly as a metro map separates two lines along a shared stretch of track. From
-top-left to bottom-right the hyperedges share $4, 3, 2$, and $1$ of their four
-vertices. Sharing all four (top-left) is a repeated hyperedge, the parallel-edge
-phenomenon one model up, so it lives only in a multi-hypergraph. Sharing just one
-(bottom-right) is a single interchange station where the lines meet but never run
-together. Interchange stations, where both lines stop, are ringed in black. Two
-Berge routes are hyperedge-disjoint exactly when the lines they ride share no
-track at all.}
-\label{fig:berge-disjoint}
-\end{figure}
+A single hyperedge may serve only one route, so two Berge routes that share no hyperedge are edge-disjoint, the hypergraph counterpart of two edge-disjoint paths in a graph. Reading routes off a metro map is a matter of seeing which lines share track: two hyperedges that share several vertices run side by side along the stretch between them, as in \Cref{fig:three-models}, and two routes are hyperedge-disjoint exactly when the lines they ride share no track at all.
 
 \begin{proposition}[Hypergraph edge bound]\label{prop:hyper-edge}
 An $r$-uniform hypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has at most $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
