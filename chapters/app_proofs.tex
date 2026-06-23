@@ -173,10 +173,10 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \centering
 \begin{subfigure}[b]{0.46\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.92]
+\begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
 % hub at centre, three K_4 each sharing the hub.  m=4 => K_4.
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt] (h) at (0,0) {};
-\node[apname] at (0.72,0.42) {$v^*$};
+\node[apx,fill=vertexorange,draw=vertexorange,minimum size=12pt] (h) at (0,0) {};
+\node[apname] at (0.78,0.46) {$v^*$};
 % three cliques arranged around hub at 90, 210, 330 degrees
 \foreach \ang/\name in {90/A, 210/B, 330/C}{
   \begin{scope}[rotate=\ang]
@@ -198,22 +198,19 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \end{subfigure}\hfill
 \begin{subfigure}[b]{0.50\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.92]
-% hub h, spoke vertices v1..v6 on an arc; hub edges + a sparse spoke graph
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt] (h) at (0,0) {};
-\node[apname] at (-0.38,-0.3) {$h$};
-\foreach \i/\ang in {1/30,2/70,3/110,4/150,5/-30,6/-70}{
+\begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
+% hub h centred, six spokes evenly around it; hub edges + a sparse spoke graph
+\node[apx,fill=vertexorange,draw=vertexorange,minimum size=12pt] (h) at (0,0) {};
+\node[apname] at (0.3,-0.36) {$h$};
+\foreach \i/\ang in {1/90,2/150,3/210,4/270,5/330,6/30}{
   \node[apx] (v\i) at (\ang:2.3) {};
 }
-\node[apname,right=2pt] at (v1) {$v_1$};
+\node[apname,above=2pt] at (v1) {$v_1$};
 % hub edges (all present)
 \foreach \i in {1,...,6}{ \draw[apgedge] (h)--(v\i); }
-% sparse spoke graph: each v_i spoke-degree <= m-2 = 2  (here a few edges)
-\draw[apgedge,KULblauw3b] (v1) to[bend left=10] (v2);
-\draw[apgedge,KULblauw3b] (v2) to[bend left=10] (v3);
-\draw[apgedge,KULblauw3b] (v3) to[bend left=10] (v4);
-\draw[apgedge,KULblauw3b] (v5) to[bend left=10] (v1);
-\draw[apgedge,KULblauw3b] (v6) to[bend left=10] (v5);
+% sparse spoke graph: each v_i spoke-degree <= m-2 = 2 (two short paths)
+\draw[apgedge,KULblauw3b] (v1)--(v2) (v2)--(v3);
+\draw[apgedge,KULblauw3b] (v4)--(v5) (v5)--(v6);
 \end{tikzpicture}
 \caption{Hub-and-spokes $H_{m,n}$: the hub edges $\{h,v_i\}$ (light) plus a
 sparse \emph{spoke graph} (dark) of spoke-degree at most $m-2$.}
@@ -482,51 +479,49 @@ hypothesis forbids.
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=1.05]
-% part A (left column) and part B (right column), wide apart; v low centre so
-% the four arc classes at v fan out clear of the A->B layer above.
-\node[apx] (a1) at (0, 0.85) {};
-\node[apx] (a2) at (0,-0.85) {};
-\node[apx] (b1) at (5.6, 0.85) {};
-\node[apx] (b2) at (5.6,-0.85) {};
-\node[apname,below left]  at (a2) {$A$};
-\node[apname,above left]  at (a1) {$a$};
-\node[apname,below right] at (b2) {$B$};
-\node[apname,above right] at (b1) {$b$};
-% the m-1 parallel a->b bundle (multiplicity), bent, kept high
-\foreach \bnd in {-15,0,15}{ \draw[aparc] (a1) to[bend right=\bnd] (b1); }
-\node[apname, text=KULblauw1!85] at (2.8,1.75) {$m-1$ copies $a\!\to\! b$};
-% the other complete A->B pairs, faint thin background (each an (m-1)-bundle)
-\draw[aparc,KULblauw1!25,line width=0.6pt] (a1)--(b2);
-\draw[aparc,KULblauw1!25,line width=0.6pt] (a2)--(b1);
-\draw[aparc,KULblauw1!25,line width=0.6pt] (a2)--(b2);
+\begin{tikzpicture}[scale=1.0,
+   albl/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}]
+% Part A (left) and Part B (right). a, b are the representative pair that
+% carries the (m-1) bundle; a', b' are faint, showing each part has several
+% vertices. v is glued on, low centre, so its four arc classes stay clear.
+\node[apx] (a)  at (0, 1.0)  {};   \node[apname,left=3pt]  at (a) {$a$};
+\node[apx] (b)  at (5.2,1.0) {};   \node[apname,right=3pt] at (b) {$b$};
+\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (ap) at (0,-0.4)  {};
+\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (bp) at (5.2,-0.4) {};
+\node[apname, text=KULblauw1!65, left=3pt]  at (ap) {$A$};
+\node[apname, text=KULblauw1!65, right=3pt] at (bp) {$B$};
+% the m-1 parallel a->b bundle (multiplicity)
+\foreach \bnd in {16,0,-16}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
+\node[albl, text=KULblauw1!85] at (2.6,2.0) {$m-1$ copies $a\!\to\! b$};
+% other complete A->B pairs, faint thin background
+\draw[aparc,KULblauw1!22,line width=0.6pt] (a)--(bp);
+\draw[aparc,KULblauw1!22,line width=0.6pt] (ap)--(b);
+\draw[aparc,KULblauw1!22,line width=0.6pt] (ap)--(bp);
 % new vertex v, low centre
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt]
-   (v) at (2.8,-2.7) {};
-\node[apname,below] at (v) {$v$};
-% four arc classes at v, bold; bends keep them separated from each other
-\draw[aparc,vertexgreen!75!black,line width=1.2pt] (a2) to[bend right=14] (v);
-\node[apname, text=vertexgreen!65!black] at (0.7,-2.15) {$i_A$};
-\draw[aparc,vertexgreen!75!black,line width=1.2pt] (v) to[bend right=14] (a1);
-\node[apname, text=vertexgreen!65!black] at (1.65,-0.55) {$o_A$};
-\draw[aparc,vertexpurple,line width=1.2pt] (b2) to[bend left=14] (v);
-\node[apname, text=vertexpurple] at (4.9,-2.15) {$i_B$};
-\draw[aparc,vertexpurple,line width=1.2pt] (v) to[bend left=14] (b1);
-\node[apname, text=vertexpurple] at (3.95,-0.55) {$o_B$};
-% forbidden route a -> v -> b, outermost red dashed bend
-\draw[apredarc] (a1) to[bend right=46] (v);
-\draw[apredarc] (v) to[bend right=46] (b1);
-\node[apname, text=vertexred,align=center] at (2.8,-3.55)
-  {forbidden $a\!\to\! v\!\to\! b$};
+\node[apx,fill=vertexorange,draw=vertexorange,minimum size=10pt] (v) at (2.6,-2.7) {};
+\node[apname,below=1pt] at (v) {$v$};
+% four arc classes at v. i_A and o_B are red dashed: their two legs ARE the
+% forbidden route a -> v -> b. o_A (green) and i_B (purple) are the other classes.
+\draw[apredarc] (a) to[bend left=13] (v);
+\node[albl, text=vertexred] at (1.62,-0.55) {$i_A$};
+\draw[aparc,vertexgreen!72!black,line width=1.1pt] (v) to[bend left=13] (a);
+\node[albl, text=vertexgreen!58!black] at (0.6,-1.2) {$o_A$};
+\draw[aparc,vertexpurple,line width=1.1pt] (b) to[bend right=13] (v);
+\node[albl, text=vertexpurple] at (4.6,-1.2) {$i_B$};
+\draw[apredarc] (v) to[bend right=13] (b);
+\node[albl, text=vertexred] at (3.58,-0.55) {$o_B$};
+\node[albl, text=vertexred, align=center] at (2.6,-3.55)
+  {$a\to v\to b$: an $m$-th route (forbidden)};
 \end{tikzpicture}
 \caption[Attachment-lemma setup]{The attachment lemma
 (\Cref{lem:attachment}): the new vertex $v$ glued onto
 $(m-1)\cdot B_{p,q}$. Each $a\in A$ sends $m-1$ parallel arcs to each $b\in B$
-(the bent bundle). The arcs at $v$ split into four classes by direction and
-side: $i_A$ (into $v$ from $A$), $o_A$ (out of $v$ to $A$), $i_B$, $o_B$.
-The red dashed route $a\!\to\! v\!\to\! b$ is forbidden: laid on top of the
-$m-1$ existing $a\!\to\! b$ arcs it makes an $m$-th arc-disjoint $a$--$b$
-route, so $\lec(a,b)\ge m$. Ruling out this and two sibling patterns caps
+(the bent bundle along the top). The arcs at $v$ split into four classes by
+direction and side: $i_A$ (into $v$ from $A$), $o_A$ (out of $v$ to $A$),
+$i_B$, $o_B$. The two red dashed legs $i_A$ and $o_B$ together are the route
+$a\!\to\! v\!\to\! b$, which is forbidden: laid on top of the $m-1$ existing
+$a\!\to\! b$ arcs it makes an $m$-th arc-disjoint $a$--$b$ route, so
+$\lec(a,b)\ge m$. Ruling out this and two sibling patterns caps
 $d(v)\le(m-1)\max(p,q)$.}
 \label{fig:attachment}
 \end{figure}
@@ -738,47 +733,44 @@ multigraph and even the \emph{value} step stalls. This is why
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
-% left: doubled bidirected path P_7 (7 vertices in a row), v above the ends
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[apx/.append style={minimum size=10pt},
+   bd/.style={aparc, line width=1.0pt}]
+% ---- left: doubled bidirected path P_7, v forced onto the two ends ----
+% Both panels are centred on y = 0 so they sit at the same height.
 \begin{scope}
-  \foreach \i in {1,...,7}{ \node[apx] (p\i) at (0.85*\i,0) {}; }
-  \node[apname,below] at (p1) {$1$};
-  \node[apname,below] at (p7) {$7$};
+  \foreach \i in {1,...,7}{ \node[apx] (p\i) at (1.0*\i,-0.9) {}; }
+  \node[apname,below=1pt] at (p1) {$1$};
+  \node[apname,below=1pt] at (p7) {$7$};
   \foreach \i in {1,...,6}{
     \pgfmathtruncatemacro{\j}{\i+1}
-    \draw[aparc] (p\i) to[bend left=14] (p\j);
-    \draw[aparc] (p\j) to[bend left=14] (p\i);
+    \draw[bd] (p\i) to[bend left=20] (p\j);
+    \draw[bd] (p\j) to[bend left=20] (p\i);
   }
-  \node[font=\small] at (3.4,-0.85) {doubled bidirected path $P_7$};
-  % new vertex v forced onto the two ends
-  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt]
-     (v) at (3.4,1.9) {};
-  \node[apname,above=2pt] at (v) {$v$};
-  \foreach \bnd in {12}{
-    \draw[apredarc] (p1) to[bend left=10] (v);
-    \draw[apredarc] (v) to[bend left=10] (p1);
-    \draw[apredarc] (p7) to[bend right=10] (v);
-    \draw[apredarc] (v) to[bend right=10] (p7);
-  }
+  % new vertex v, attached with full multiplicity (bidirected) to ends 1 and 7
+  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (4.0,1.7) {};
+  \node[apname,above=1pt] at (v) {$v$};
+  \draw[apredarc] (p1) to[bend right=9] (v);
+  \draw[apredarc] (v) to[bend right=9] (p1);
+  \draw[apredarc] (p7) to[bend left=9] (v);
+  \draw[apredarc] (v) to[bend left=9] (p7);
+  \node[font=\small] at (4.0,-2.0) {doubled bidirected path $P_7$};
 \end{scope}
-\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b]
-   (7.0,1.0) -- (8.2,1.0);
-% right: the closed doubled bidirected C_8 (infeasible)
-\begin{scope}[xshift=11.2cm]
-  \foreach \i in {0,...,7}{
-    \node[apx] (c\i) at ({45*\i+90}:1.35) {};
-  }
-  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt]
-     at ({45*0+90}:1.35) {};
+% ---- arrow at the shared centre height ----
+\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b] (8.1,0.0) -- (9.4,0.0);
+% ---- right: the closed doubled bidirected C_8 (infeasible) ----
+\begin{scope}[xshift=11.7cm]
+  \foreach \i in {0,...,7}{ \node[apx] (c\i) at ({45*\i+90}:1.5) {}; }
+  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] at ({90}:1.5) {};
   \foreach \i in {0,...,7}{
     \pgfmathtruncatemacro{\j}{mod(\i+1,8)}
-    \draw[aparc] (c\i) to[bend left=10] (c\j);
-    \draw[aparc] (c\j) to[bend left=10] (c\i);
+    \draw[bd] (c\i) to[bend left=12] (c\j);
+    \draw[bd] (c\j) to[bend left=12] (c\i);
   }
   \node[font=\small] at (0,-2.0) {doubled bidirected $C_8$};
-  \node[apname, text=vertexred] at (0,0) {$\lec=4>2$};
+  \node[apname, text=vertexred, fill=white, inner sep=1.5pt] at (0,0) {$\lec=4>2$};
 \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}}
 \caption[The $n=8$ seam]{The seam argument of
 \Cref{rem:odd-step-roadmap}. A degree count forces a deleted vertex of the
 $8$-regular extremiser $D$ to leave the doubled bidirected path $P_7$ (left,
@@ -872,29 +864,28 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
 \begin{tikzpicture}[scale=1.0]
 % ----- left: hypergraph H, 3-uniform, vertices 1..6, hyperedges e1,e2,e3 ---
 \begin{scope}
-  % vertices spread left-to-right so each hyperedge has a clear region and
-  % the shared vertices (3 in e1&e2; 4,5 in e2&e3) sit on the overlaps.
-  \node[apx] (1) at (0.0, 1.2) {}; \node[apname,left=2pt]  at (1) {$1$};
-  \node[apx] (2) at (0.0,-0.1) {}; \node[apname,left=2pt]  at (2) {$2$};
-  \node[apx] (3) at (1.6, 0.55){}; \node[apname,below=2pt] at (3) {$3$};
-  \node[apx] (4) at (3.2, 1.25){}; \node[apname,above=2pt] at (4) {$4$};
-  \node[apx] (5) at (3.2,-0.15){}; \node[apname,below=2pt] at (5) {$5$};
-  \node[apx] (6) at (4.8, 0.55){}; \node[apname,right=2pt] at (6) {$6$};
-  % hyperedges as metro lines (like the body figures); e1,e2 green (on the
-  % Berge path), e3 grey (off it). Each line threads its three vertices.
+  % the Berge-path stations 1,3,5 sit on a baseline, the extra members 2,4,6
+  % above, so each hyperedge is a clean metro line arcing over the path.
+  \node[apx] (1) at (0.0, 0.0) {}; \node[apname,below=2pt] at (1) {$1$};
+  \node[apx] (2) at (1.1, 1.3) {}; \node[apname,above=2pt] at (2) {$2$};
+  \node[apx] (3) at (2.2, 0.0) {}; \node[apname,below=2pt] at (3) {$3$};
+  \node[apx] (4) at (3.3, 1.3) {}; \node[apname,above=2pt] at (4) {$4$};
+  \node[apx] (5) at (4.4, 0.0) {}; \node[apname,below=2pt] at (5) {$5$};
+  \node[apx] (6) at (5.5, 1.3) {}; \node[apname,above=2pt] at (6) {$6$};
+  % hyperedges as metro lines, each its own colour: e1 red, e2 blue, e3 grey.
   \begin{scope}[on background layer]
-    \draw[metro, vertexgreen!70!black] (1)--(2)--(3);
-    \draw[metro, vertexgreen!70!black] (3)--(4)--(5);
-    \draw[metro, black!35] (4)--(6)--(5);
+    \draw[metro, metroA]  (1)--(2)--(3);   % e1 = {1,2,3}
+    \draw[metro, metroB]  (3)--(4)--(5);   % e2 = {3,4,5}
+    \draw[metro, black!35] (4)--(6)--(5);  % e3 = {4,5,6}, off the path
   \end{scope}
-  \node[apname, text=vertexgreen!60!black] at (0.35,1.75) {$e_1$};
-  \node[apname, text=vertexgreen!60!black] at (2.55,1.75) {$e_2$};
-  \node[apname, text=black!55]             at (4.25,1.4) {$e_3$};
-  % Berge path 1 -e1- 3 -e2- 5, drawn distinct (orange) and on top
-  \draw[line width=2pt, vertexorange, -{Stealth[length=2.2mm]}] (1)--(3);
-  \draw[line width=2pt, vertexorange, -{Stealth[length=2.2mm]}] (3)--(5);
-  \node[apname, text=vertexorange!85!black] at (1.45,-0.75) {Berge path};
-  \node[font=\small] at (2.4,-1.45) {hypergraph $\HH$};
+  \node[apname, text=metroA]   at (0.55,1.05) {$e_1$};
+  \node[apname, text=metroB]   at (2.75,1.05) {$e_2$};
+  \node[apname, text=black!55] at (5.35,1.05) {$e_3$};
+  % Berge path 1 -e1- 3 -e2- 5: orange arrows along the baseline, clear of lines
+  \draw[line width=2pt, vertexorange, -{Stealth[length=2.4mm]}] (1)--(3);
+  \draw[line width=2pt, vertexorange, -{Stealth[length=2.4mm]}] (3)--(5);
+  \node[apname, text=vertexorange!85!black] at (2.2,-0.75) {Berge path $1\,e_1\,3\,e_2\,5$};
+  \node[font=\small] at (2.75,-1.5) {hypergraph $\HH$};
 \end{scope}
 % arrow
 \draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b]
@@ -925,8 +916,8 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
 graph $I(\HH)$ (right): circles for vertices, hollow squares for hyperedges,
 an edge when the vertex lies in the hyperedge. The Berge path
 $1\,e_1\,3\,e_2\,5$ is traced in orange in both pictures. In $\HH$ it rides the
-two green hyperedges $e_1$ and $e_2$, changing at the shared vertex $3$, while
-the grey hyperedge $e_3$ lies off it. In $I(\HH)$ it is the ordinary path
+red line $e_1$ and the blue line $e_2$, changing at the shared vertex $3$, while
+the grey line $e_3$ lies off it. In $I(\HH)$ it is the ordinary path
 $1\!-\!e_1\!-\!3\!-\!e_2\!-\!5$ alternating sides.}
 \label{fig:incidence-berge}
 \end{subfigure}
@@ -934,21 +925,21 @@ $1\!-\!e_1\!-\!3\!-\!e_2\!-\!5$ alternating sides.}
 \medskip
 \begin{subfigure}[b]{0.99\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.0]
-% star hypertree: hub h, blocks of r-1=2 leaves per hyperedge
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt]
-   (h) at (0,0) {};
-\node[apname,below=2pt] at (0,-0.2) {$h$};
-\foreach \ang/\u/\w in {30/u1/w1, 150/u2/w2, 270/u3/w3}{
-  \begin{scope}[rotate=\ang]
-    \node[apx] (\u) at (1.7,0.45) {};
-    \node[apx] (\w) at (1.7,-0.45) {};
-    \begin{scope}[on background layer]
-      \draw[line width=10pt, vertexgreen!22, line cap=round]
-         (h.center)--(\u.center)--(\w.center)--(h.center);
-    \end{scope}
-  \end{scope}
+\begin{tikzpicture}[
+   stn/.style={metrostop, minimum size=5.5mm},
+   hub/.style={metrostop, minimum size=8mm, draw=black, line width=1.3pt}]
+% star hypertree: each hyperedge {h,u_i,w_i} is one metro line through the hub,
+% leaving radially to an inner station and bending to an outer one.
+\begin{scope}[on background layer]
+  \foreach \ang/\col in {90/metroA, 210/metroB, 330/metroC}{
+    \draw[metro, \col] (0,0) -- (\ang:1.5) -- ({\ang+22}:2.5);
+  }
+\end{scope}
+\foreach \ang in {90,210,330}{
+  \node[stn] at (\ang:1.5) {};
+  \node[stn] at ({\ang+22}:2.5) {};
 }
+\node[hub] at (0,0) {$h$};
 \end{tikzpicture}
 \caption{A star hypertree: every hyperedge $\{h\}\cup G_i$ shares only the
 hub $h$ (orange), and the other $r-1=2$ vertices of each block sit in a
@@ -1145,45 +1136,32 @@ most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=1.0]
-% --- the tree of pieces drawn as blobs ---
-% interior pieces (ellipses) forming the "rest of G"
-\node[draw=KULblauw3b, fill=KULblauw1!10, line width=1pt,
-      ellipse, minimum width=2.4cm, minimum height=1.5cm] (P1) at (0,0) {};
-\node[draw=KULblauw3b, fill=KULblauw1!10, line width=1pt,
-      ellipse, minimum width=2.0cm, minimum height=1.3cm] (P2) at (2.6,1.1) {};
-\node[draw=KULblauw3b, fill=KULblauw1!10, line width=1pt,
-      ellipse, minimum width=2.0cm, minimum height=1.3cm] (P3) at (2.6,-1.1) {};
-\node[font=\scriptsize,KULblauw3b] at (0,0) {pieces};
-\node[font=\scriptsize,KULblauw3b] at (2.6,1.1) {piece};
-\node[font=\scriptsize,KULblauw3b] at (2.6,-1.1) {piece};
-% --- the leaf L (its own blob, 3-connected) ---
-\node[draw=vertexpurple, fill=vertexpurple!10, line width=1.2pt,
-      ellipse, minimum width=2.6cm, minimum height=2.0cm] (L) at (6.5,0) {};
-\node[font=\small,vertexpurple] at (6.5,0.75) {leaf $L$};
-\node[font=\scriptsize,vertexpurple] at (6.5,0.35) {(3-connected)};
-% the shared cut pair a,b on the boundary between far side and L
-\node[apx] (a) at (4.9,0.85) {};  \node[apname,left=2pt] at (a) {$a$};
-\node[apx] (b) at (4.9,-0.85) {}; \node[apname,left=2pt] at (b) {$b$};
-% virtual edge {a,b} dashed red
+\begin{tikzpicture}[apx/.append style={minimum size=9pt}]
+% Two blobs sharing the cut pair {a,b}: the far side ("rest of G", left) and
+% the 3-connected leaf L (right), joined only by the virtual edge {a,b}.
+\node[draw=KULblauw3b, fill=KULblauw1!8, line width=1pt,
+      ellipse, minimum width=3.3cm, minimum height=3.5cm] (R) at (0,0) {};
+\node[font=\small, KULblauw3b] at (0,-2.1) {rest of $G$};
+\node[draw=vertexpurple, fill=vertexpurple!9, line width=1.2pt,
+      ellipse, minimum width=3.3cm, minimum height=3.5cm] (L) at (5.4,0) {};
+\node[font=\small, vertexpurple] at (5.4,2.15) {leaf $L$ (3-connected)};
+% the shared cut pair a,b on the seam between the two blobs
+\node[apx] (a) at (2.7, 1.3) {};  \node[apname, above=2pt] at (a) {$a$};
+\node[apx] (b) at (2.7,-1.3) {};  \node[apname, below=2pt] at (b) {$b$};
+% virtual edge {a,b}: the leaf's single connection to the rest of G
 \draw[apdashed] (a)--(b);
-\node[apname, text=vertexred, fill=white, inner sep=2pt] at (4.9,0)
-   {virtual $\{a,b\}$};
-% glue L to a,b
-\draw[apgedge] (a)--(L); \draw[apgedge] (b)--(L);
-% glue far-side pieces to a,b
-\draw[apgedge] (P2)--(a); \draw[apgedge] (P3)--(b);
-\draw[apgedge] (P1)--(P2); \draw[apgedge] (P1)--(P3);
-% far-side REAL a--b path, routed around the left, replacing the virtual edge
-\node[apx] (s1) at (3.2,2.1) {};
-\node[apx] (s2) at (1.2,2.4) {};
-\node[apx] (s3) at (1.2,-2.4) {};
-\node[apx] (s4) at (3.2,-2.1) {};
-\draw[apgedge,vertexgreen!75!black,line width=1.8pt]
-   (a) to[bend left=10] (s1) -- (s2) to[bend left=18] (s3) -- (s4)
-   to[bend left=10] (b);
-\node[apname, text=vertexgreen!60!black, align=center] at (0.0,2.65)
-   {far-side real $a$--$b$ path};
+\node[apname, text=vertexred, fill=white, inner sep=1.5pt] at (2.7,0) {virtual $\{a,b\}$};
+% inside L: vertices and edges suggesting 3-connectivity, with a far node z*
+\node[apx] (z1) at (5.0, 1.0) {};
+\node[apx] (z2) at (6.5, 0.0) {};   \node[apname, right=2pt] at (z2) {$z^{*}$};
+\node[apx] (z3) at (5.0,-1.0) {};
+\draw[apgedge] (a)--(z1) (a)--(z2) (a)--(z3) (b)--(z1) (b)--(z2) (b)--(z3)
+               (z1)--(z2) (z2)--(z3) (z1)--(z3);
+% far-side real a--b path through the rest of G, avoiding L (green)
+\draw[apgedge, vertexgreen!72!black, line width=1.7pt]
+   (a) to[out=185,in=72] (-1.2,0.1) to[out=-72,in=175] (b);
+\node[apname, text=vertexgreen!56!black, align=center] at (0.55,-0.55)
+   {far-side real\\$a$--$b$ path};
 \end{tikzpicture}
 \caption[Tutte leaf analysis]{The triconnected (Tutte/SPQR) decomposition in
 Step 4 of \Cref{lem:incidence-rank}, schematic: $G$ splits into a tree of

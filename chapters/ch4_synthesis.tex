@@ -47,8 +47,9 @@ The route to the upper bound is to show that an extremal digraph, once it is pas
   \foreach \x in {c1,c2}{\foreach \y in {d1,d2,d3}{\draw[abk] (\x) -- (\y);}}
   \draw[inb] (d1) to[bend left=20] (d2);
   \draw[inb] (d2) to[bend left=20] (d3);
-  % backward arc b3 -> a1 (red), then the highlighted escape leg a1 -> b2 (green)
-  \draw[back] (d3) to[bend right=28] (c1);
+  % backward arc b3 -> a1 (red), then the highlighted escape leg a1 -> b2 (green).
+  % It bends downward (away from the green escape leg) to keep the two clear.
+  \draw[back] (d3) to[bend left=28] (c1);
   \draw[esc] (c1) -- (d2);
   \node[vertexred, font=\scriptsize] at (1.35,-2.0) {backward arc $b_3\!\to\! a_1$};
   \node[font=\scriptsize, align=center] at (1.5,-2.5)

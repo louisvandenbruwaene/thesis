@@ -247,59 +247,71 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[scale=0.82, >=Stealth,
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
    mem/.style={line width=0.7pt, black!32},
+   tri/.style={line width=0.8pt, black!16},
    fa/.style={line width=2.0pt, vertexorange, -{Stealth[length=2mm]}},
    fb/.style={line width=2.0pt, vertexgreen!70!black, -{Stealth[length=2mm]}},
    end/.style={smallvertex, draw=black, line width=1.2pt}]
-% shared vertex layout, reused in both panels
+% shared vertex layout, reused in both panels. Positions are chosen so the five
+% hyperedge triangles do not overlap and each helper sits strictly inside the
+% triangle of its three vertices.
 \def\hyperlayout{%
   \coordinate (u) at (0,0);
-  \coordinate (a) at (1.5,1.55);
-  \coordinate (b) at (3.2,1.55);
-  \coordinate (c) at (4.6,0.85);
-  \coordinate (v) at (6.1,0);
-  \coordinate (d) at (1.5,-1.55);
-  \coordinate (e) at (3.2,-1.55);
-  \coordinate (f) at (4.6,-0.85);
+  \coordinate (a) at (1.4, 2.1);
+  \coordinate (b) at (3.5, 1.6);
+  \coordinate (c) at (6.0, 2.1);
+  \coordinate (v) at (7.4, 0);
+  \coordinate (d) at (1.4,-2.1);
+  \coordinate (e) at (3.5,-1.6);
+  \coordinate (f) at (6.0,-2.1);
+  \coordinate (w) at (4.9, 0);
 }
 % ===== panel (a): the hypergraph as a metro map =====
 \begin{scope}
   \hyperlayout
   \begin{scope}[on background layer]
-    \draw[metro, metroA] (u)--(a)--(b);
-    \draw[metro, metroB] (b)--(c)--(v);
-    \draw[metro, metroC] (u)--(d)--(e);
-    \draw[metro, metroD] (e)--(f)--(v);
-    \draw[metro, metroE] (a)--(c)--(f);
+    \draw[metro, metroA] (u)--(a)--(b);   % e1 = {u,a,b}
+    \draw[metro, metroB] (b)--(c)--(v);   % e2 = {b,c,v}
+    \draw[metro, metroC] (u)--(d)--(e);   % e3 = {u,d,e}
+    \draw[metro, metroD] (e)--(f)--(v);   % e4 = {e,f,v}
+    \draw[metro, metroE] (b)--(w)--(e);   % e5 = {b,w,e}
   \end{scope}
-  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f} {\node[smallvertex] at (\p) {$\l$};}
+  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f,w/w} {\node[smallvertex] at (\p) {$\l$};}
   \node[end] at (u) {$u$};
   \node[end] at (v) {$v$};
-  \node[metroA, font=\scriptsize\bfseries] at (0.7,1.0)  {$e_1$};
-  \node[metroB, font=\scriptsize\bfseries] at (5.4,0.95) {$e_2$};
-  \node[metroC, font=\scriptsize\bfseries] at (0.7,-1.0) {$e_3$};
-  \node[metroD, font=\scriptsize\bfseries] at (5.4,-0.95){$e_4$};
-  \node[font=\small] at (3.0,-2.5) {(a) the hypergraph};
+  \node[metroA, font=\scriptsize\bfseries] at (0.5, 1.25)  {$e_1$};
+  \node[metroB, font=\scriptsize\bfseries] at (4.6, 2.1)   {$e_2$};
+  \node[metroC, font=\scriptsize\bfseries] at (0.5,-1.25)  {$e_3$};
+  \node[metroD, font=\scriptsize\bfseries] at (4.6,-2.1)   {$e_4$};
+  \node[metroE, font=\scriptsize\bfseries] at (4.35,0.55)  {$e_5$};
+  \node[font=\small] at (3.7,-2.85) {(a) the hypergraph};
 \end{scope}
-% ===== panel (b): the flow network (a helper turnstile on each line) =====
-\begin{scope}[xshift=8.7cm]
+% ===== panel (b): the flow network (a helper turnstile inside each triangle) =====
+\begin{scope}[xshift=9.3cm]
   \hyperlayout
-  \coordinate (h1) at (1.55,1.0);
-  \coordinate (h2) at (4.55,0.78);
-  \coordinate (h3) at (1.55,-1.0);
-  \coordinate (h4) at (4.55,-0.78);
-  \coordinate (h5) at (3.5,0.5);
-  % faint membership edges to helper squares
+  \coordinate (h1) at (1.63, 1.23);
+  \coordinate (h2) at (5.63, 1.23);
+  \coordinate (h3) at (1.63,-1.23);
+  \coordinate (h4) at (5.63,-1.23);
+  \coordinate (h5) at (3.97, 0);
+  % faint hyperedge triangles, so each helper sits visibly inside its members
+  \draw[tri] (u)--(a)--(b)--cycle;
+  \draw[tri] (b)--(c)--(v)--cycle;
+  \draw[tri] (u)--(d)--(e)--cycle;
+  \draw[tri] (e)--(f)--(v)--cycle;
+  \draw[tri] (b)--(w)--(e)--cycle;
+  % faint membership edges from each vertex to its helper
   \draw[mem] (u)--(h1) (a)--(h1) (b)--(h1);
   \draw[mem] (b)--(h2) (c)--(h2) (v)--(h2);
   \draw[mem] (u)--(h3) (d)--(h3) (e)--(h3);
   \draw[mem] (e)--(h4) (f)--(h4) (v)--(h4);
-  \draw[mem] (a)--(h5) (c)--(h5) (f)--(h5);
+  \draw[mem] (b)--(h5) (w)--(h5) (e)--(h5);
   % the two hyperedge-disjoint routes as flow paths through helpers
   \draw[fa] (u)--(h1); \draw[fa] (h1)--(b); \draw[fa] (b)--(h2); \draw[fa] (h2)--(v);
   \draw[fb] (u)--(h3); \draw[fb] (h3)--(e); \draw[fb] (e)--(h4); \draw[fb] (h4)--(v);
-  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f} {\node[smallvertex] at (\p) {$\l$};}
+  \foreach \p/\l in {a/a,b/b,c/c,d/d,e/e,f/f,w/w} {\node[smallvertex] at (\p) {$\l$};}
   \node[end] at (u) {$u$};
   \node[end] at (v) {$v$};
   \node[hnode, fill=metroA!16] at (h1) {};
@@ -307,15 +319,16 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
   \node[hnode, fill=metroC!16] at (h3) {};
   \node[hnode, fill=metroD!16] at (h4) {};
   \node[hnode, fill=metroE!16] at (h5) {};
-  \node[font=\small] at (3.0,-2.5) {(b) the flow network: max flow $=2$};
+  \node[font=\small] at (3.7,-2.85) {(b) the flow network: max flow $=2$};
 \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}}
 \caption[The helper-point network on a whole hypergraph]{From hypergraph to
-flow network, before and after. \textbf{(a)} A hypergraph on eight vertices,
-its five hyperedges drawn as metro lines. The pair $u, v$ has two
-hyperedge-disjoint Berge routes, $u, e_1, b, e_2, v$ and $u, e_3, e, e_4, v$.
-\textbf{(b)} The same vertices with one helper square per hyperedge (a
-turnstile on each line). Each Berge route becomes a flow path that enters a
+flow network, before and after. \textbf{(a)} A hypergraph on nine vertices,
+its five hyperedges drawn as metro lines whose triangles do not overlap. The
+pair $u, v$ has two hyperedge-disjoint Berge routes, $u, e_1, b, e_2, v$ and
+$u, e_3, e, e_4, v$. \textbf{(b)} The same vertices, with one helper square
+sitting inside each hyperedge's triangle (a turnstile on the line). Each Berge
+route becomes a flow path that enters a
 line through one member, crosses its helper, and leaves through another:
 $u \to h_{e_1} \to b \to h_{e_2} \to v$ (orange) and
 $u \to h_{e_3} \to e \to h_{e_4} \to v$ (green). Because every helper carries
@@ -501,26 +514,27 @@ $0$ & $1$ & $u$ sink side, $v$ source side & $w(u,v) - 2 \le 0$ & $p^{st}_{uv} \
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[>=Stealth, every node/.style={font=\small}]
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
+    plab/.style={font=\scriptsize, fill=white, inner sep=1.5pt}]
     % the dashed cut line
     \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
     \node[color=KULblauw3b] at (0,2.65) {cut};
-    \node at (-2.2,2.65) {source side ($x=1$)};
-    \node at ( 2.2,2.65) {sink side ($x=0$)};
+    \node at (-2.4,2.65) {source side ($x=1$)};
+    \node at ( 2.4,2.65) {sink side ($x=0$)};
     % source-side vertices
     \node[vertex] (s)  at (-2.6, 1.1) {$s$};
     \node[vertex] (a)  at (-1.3,-1.1) {$a$};
     % sink-side vertices
     \node[vertex] (t)  at ( 2.6,-1.1) {$t$};
     \node[vertex] (b)  at ( 1.3, 1.1) {$b$};
-    % non-crossing arcs (p = 0)
-    \draw[->, edge, color=gray] (s) -- node[above left, font=\scriptsize]{$p=0$} (a);
-    \draw[->, edge, color=gray] (b) -- node[above right, font=\scriptsize]{$p=0$} (t);
+    % non-crossing arcs (p = 0): labels pushed to the outer side, white-filled
+    \draw[->, edge, color=gray] (s) -- node[plab, left=2pt]{$p=0$} (a);
+    \draw[->, edge, color=gray] (b) -- node[plab, right=2pt]{$p=0$} (t);
     % crossing arcs source -> sink (p = w), highlighted
-    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[above, font=\scriptsize]{$p=w$} (b);
-    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[below, font=\scriptsize]{$p=w$} (t);
-    % a back-crossing arc sink -> source (p = 0), not counted
-    \draw[->, edge, color=gray] (b) to[bend left=12] node[above, font=\scriptsize]{$p=0$} (a);
+    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[plab, above]{$p=w$} (b);
+    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[plab, below]{$p=w$} (t);
+    % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
+    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.5]{$p=0$} (a);
 \end{tikzpicture}
 \caption{One ordered pair's chosen cut. The dashed line splits the vertices into the source side, where $x^{st}_u = 1$, and the sink side, where $x^{st}_u = 0$. Only arcs running from source side to sink side cross the cut, and the first constraint forces their helper $p^{st}_{uv}$ up to the arc weight $w$ (the two thick arcs). Arcs that stay on one side, and arcs that run the other way across the line, contribute nothing. The second constraint then caps the total counted weight, the thick arcs, at one.}
 \label{fig:cut}
