@@ -83,6 +83,7 @@ import statistics
 import subprocess
 import time
 import warnings
+from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from itertools import combinations, combinations_with_replacement, permutations, product
@@ -1085,7 +1086,14 @@ def _cut_counting_model(n: int, *, cap: float, integer: bool, two_hop: bool,
                 z[(s, x, t)] for x in range(n) if x != s and x != t) <= cap
 
     if degree_pair:
-        for (s, t) in pairs:           # d+(s) + d-(t) - w[s,t] <= (n-1)*cap
+        # d+(s) + d-(t) - w[s,t] <= (n-1)*cap.  This is the two-hop bound
+        # aggregated: w[s,t] + sum_x min(w[s,x], w[x,t]) <= cap, plus each middle
+        # max(w[s,x], w[x,t]) <= cap, sums to (n-1)*cap.  It is a genuine cut, NOT
+        # trivially satisfied: the box bound alone allows the LHS up to (2n-3)*cap,
+        # and a two-route witness reaches 2(n-1)*cap (e.g. n=4: s->x1->t, s->x2->t
+        # gives LHS 4 > 3).  Dominated by two_hop when that family is on, but
+        # standalone-useful when it is off; valid in both weight domains.
+        for (s, t) in pairs:
             prob += (pulp.lpSum(w[(s, x)] for x in range(n) if x != s)
                      + pulp.lpSum(w[(x, t)] for x in range(n) if x != t)
                      - w[(s, t)]) <= (n - 1) * cap
@@ -5053,9 +5061,9 @@ def _float_maxflow_value(capacity: np.ndarray, source: int, target: int,
     while True:
         parent = [-1] * n
         parent[source] = source
-        queue = [source]
+        queue = deque([source])
         while queue and parent[target] == -1:
-            u = queue.pop(0)                       # FIFO: shortest augmenting path
+            u = queue.popleft()                    # FIFO: shortest augmenting path
             for v in range(n):
                 if parent[v] == -1 and residual[u, v] > eps:
                     parent[v] = u
