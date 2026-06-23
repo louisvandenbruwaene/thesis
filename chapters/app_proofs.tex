@@ -908,24 +908,25 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
   \node[apz] (E1) at (2.4,1.3) {$e_1$};
   \node[apz] (E2) at (2.4,-0.5){$e_2$};
   \node[apz] (E3) at (2.4,-2.0){$e_3$};
-  % incidences (path 1-e1-3-e2-5 highlighted green; rest light)
+  % incidences (path 1-e1-3-e2-5 traced orange to match the left; rest light)
   \draw[apgedge] (n2)--(E1);
   \draw[apgedge] (n4)--(E2);
   \draw[apgedge] (n4)--(E3);
   \draw[apgedge] (n5)--(E3);
   \draw[apgedge] (n6)--(E3);
-  \draw[apgedge,vertexgreen!70!black,line width=2pt] (n1)--(E1);
-  \draw[apgedge,vertexgreen!70!black,line width=2pt] (n3)--(E1);
-  \draw[apgedge,vertexgreen!70!black,line width=2pt] (n3)--(E2);
-  \draw[apgedge,vertexgreen!70!black,line width=2pt] (n5)--(E2);
+  \draw[apgedge,vertexorange,line width=2pt] (n1)--(E1);
+  \draw[apgedge,vertexorange,line width=2pt] (n3)--(E1);
+  \draw[apgedge,vertexorange,line width=2pt] (n3)--(E2);
+  \draw[apgedge,vertexorange,line width=2pt] (n5)--(E2);
   \node[font=\small] at (1.2,-3.0) {incidence graph $I(\HH)$};
 \end{scope}
 \end{tikzpicture}
 \caption{A $3$-uniform hypergraph $\HH$ (left) and its bipartite incidence
 graph $I(\HH)$ (right): circles for vertices, hollow squares for hyperedges,
 an edge when the vertex lies in the hyperedge. The Berge path
-$1\,e_1\,3\,e_2\,5$ is highlighted green in both pictures: in $\HH$ it
-threads two hyperedges, in $I(\HH)$ it is an ordinary path
+$1\,e_1\,3\,e_2\,5$ is traced in orange in both pictures. In $\HH$ it rides the
+two green hyperedges $e_1$ and $e_2$, changing at the shared vertex $3$, while
+the grey hyperedge $e_3$ lies off it. In $I(\HH)$ it is the ordinary path
 $1\!-\!e_1\!-\!3\!-\!e_2\!-\!5$ alternating sides.}
 \label{fig:incidence-berge}
 \end{subfigure}

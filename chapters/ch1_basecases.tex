@@ -10,7 +10,8 @@ To state the question precisely we need only a few ideas. A \emph{graph} $G$ is 
                minimum size=6mm, inner sep=0pt, font=\small},
     me/.style={line width=1.3pt, KULblauw1!80},
     rA/.style={line width=3pt, vertexorange, line cap=round},
-    rB/.style={line width=3pt, vertexgreen!70!black, line cap=round}]
+    rB/.style={line width=3pt, vertexgreen!70!black, line cap=round},
+    rC/.style={line width=3pt, vertexpurple, line cap=round}]
   \foreach \i in {0,...,4} {
     \pgfmathsetmacro{\ang}{90 + 72*\i}
     \coordinate (v\i) at (\ang:1.4);
@@ -19,17 +20,19 @@ To state the question precisely we need only a few ideas. A \emph{graph} $G$ is 
             (v1)--(v2) (v1)--(v4)
             (v2)--(v3) (v2)--(v4)
             (v3)--(v4);
-  % two edge-disjoint routes between the non-adjacent pair 1 and 3
+  % three edge-disjoint routes between the non-adjacent pair 1 and 3
   \draw[rA] (v1)--(v0)--(v3);
   \draw[rB] (v1)--(v2)--(v3);
+  \draw[rC] (v1)--(v4)--(v3);
   \foreach \i in {0,...,4} {
     \pgfmathsetmacro{\ang}{90 + 72*\i}
     \node[mv] at (\ang:1.4) {$\i$};
   }
   \node[vertexorange!80!black, font=\scriptsize] at (-2.2,0.95) {route $1$-$0$-$3$};
   \node[vertexgreen!50!black, font=\scriptsize] at (0.15,-2.1) {route $1$-$2$-$3$};
+  \node[vertexpurple, font=\scriptsize] at (2.25,0.95) {route $1$-$4$-$3$};
 \end{tikzpicture}
-\caption{A simple graph on five vertices. It is $K_5$, the \emph{complete} graph in which every one of the $\binom{5}{2}=10$ pairs is joined by an edge, with the two edges $\{0,4\}$ and $\{1,3\}$ removed, so its edge set $E(G)$ holds eight edges. The five dots are the vertex set $V(G)$ and the lines are the edges. The pair $1,3$ carries no edge of its own, yet it still has two routes that share no edge, $1$-$0$-$3$ (orange) and $1$-$2$-$3$ (green), so its local edge-connectivity, defined just below, is $\lec(1,3)=2$. Since at most one line joins any given pair and no edge loops back to its own endpoint, this is a simple graph.}
+\caption{A simple graph on five vertices. It is $K_5$, the \emph{complete} graph in which every one of the $\binom{5}{2}=10$ pairs is joined by an edge, with the two edges $\{0,4\}$ and $\{1,3\}$ removed, so its edge set $E(G)$ holds eight edges. The five dots are the vertex set $V(G)$ and the lines are the edges. The pair $1,3$ carries no edge of its own, yet three routes still join them with no shared edge, $1$-$0$-$3$ (orange), $1$-$2$-$3$ (green), and $1$-$4$-$3$ (purple), each through a different middle vertex, so its local edge-connectivity, defined just below, is $\lec(1,3)=3$. Since at most one line joins any given pair and no edge loops back to its own endpoint, this is a simple graph.}
 \label{fig:k5-example}
 \end{figure}
 

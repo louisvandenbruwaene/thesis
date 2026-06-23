@@ -2371,6 +2371,9 @@ _WARM = "#DC8C28"        # feasibility boundary, certain interval
 _RED = "#E05050"         # infeasible bars
 _GREEN = "#3CA050"       # machine-checked exact markers
 _VIOLET = "#9B5DE5"      # search lower-bound markers
+_GUESS = "#E6B800"       # "guess" interpolation: a clear yellow/gold, kept well
+                         # apart from the red conjecture curve (proved=blue,
+                         # conjectured=red, guess=yellow)
 
 # Four-level sensitivity palette: cool (sigma=0) -> hot (sigma=max).
 _SIGMA_PALETTE = ["#52BDEC", "#F9C74F", "#F4914B", "#DC8C28"]  # 0,1,2,3+
@@ -3162,10 +3165,10 @@ def plot_extremal_gallery(path: str | Path, *,
 
     # ("g"/"h"/"hd", object, directed, hub, title)
     panels = [
-        ("g", double_star(9, 3, directed=True), True, 0,
-         "multigraph directed, arc\n$m=3$, $n=9$: double star ($32$ arcs)"),
-        ("g", double_star(9, 2, directed=True), True, 0,
-         "simple directed, arc\n$m=2$, $n=9$: bidirected star ($16$ arcs)"),
+        ("g", double_star(7, 3, directed=True), True, 0,
+         "multigraph directed, arc\n$m=3$, $n=7$: double star ($24$ arcs)"),
+        ("g", double_star(7, 2, directed=True), True, 0,
+         "simple directed, arc\n$m=2$, $n=7$: bidirected star ($12$ arcs)"),
         ("g", multi_star, False, 0,
          "multigraph undirected, edge\n$m=3$, $n=9$: star at multiplicity $2$ ($16$ edges)"),
         ("g", bidir_k4, True, None,
@@ -3241,7 +3244,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
             ax.plot(xs, ys, "-", color=_RED, linewidth=2.0, label="conjectured")
         if panel.get("guess") is not None:
             xs, ys = panel["guess"]
-            ax.plot(xs, ys, "-", color=_WARM, linewidth=2.0,
+            ax.plot(xs, ys, "-", color=_GUESS, linewidth=2.0,
                     label="guess (interpolated)")
         if panel.get("exact") is not None:
             xs, ys = panel["exact"]
