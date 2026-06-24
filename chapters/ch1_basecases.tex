@@ -228,50 +228,53 @@ The second axis is the \emph{direction}, a third toggle independent of the other
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel and opposite arcs};
   \end{scope}
 
-  % (c) directed hypergraph: each hyperedge is a metro-styled out-star, its tail
-  %     sending a thick coloured arc to each head. The blue and green stars share
-  %     the tail A and the arc A -> B, drawn as two parallel lines (the directed
-  %     metro "shared stretch").
+  % (c) directed hypergraph: the SAME three hyperedges as fig:three-models,
+  %     {A,B,C} blue, {A,B,D} green, {A,C,D} orange. Each is a metro-styled star
+  %     whose tail is the MIDDLE station of the undirected line, so the arcs land
+  %     on the very same edges. Blue and green share the bottom edge, one arc each
+  %     way (opposite directions -> SAME bend, so they straddle the edge).
   \begin{scope}[shift={(8.6,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      % blue, tail A -> {B, C}: shared A->B (inner) + diagonal A->C
-      \draw[hstar, metroB] (A) to[bend left=4] (B);
-      \draw[hstar, metroB] (A) to (C);
-      % green, tail A -> {B, D}: shared A->B (outer) + left edge A->D
-      \draw[hstar, metroC] (A) to[bend left=12] (B);
+      % blue {A,B,C}, tail B: B->A (bottom) + B->C (right)
+      \draw[hstar, metroB] (B) to[bend left=16] (A);
+      \draw[hstar, metroB] (B) to (C);
+      % green {A,B,D}, tail A: A->B (bottom, opposite blue, same bend) + A->D (left)
+      \draw[hstar, metroC] (A) to[bend left=16] (B);
       \draw[hstar, metroC] (A) to (D);
-      % orange, tail C -> {B, D}: right edge C->B + top edge C->D
-      \draw[hstar, metroD] (C) to (B);
+      % orange {A,C,D}, tail C: C->A (diagonal) + C->D (top)
+      \draw[hstar, metroD] (C) to (A);
       \draw[hstar, metroD] (C) to (D);
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an arc};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an edge};
   \end{scope}
 
-  % (d) directed multi-hypergraph: the out-star (tail A; heads B, C) repeated, so
-  %     each of its two arcs becomes a parallel pair, plus one further star.
+  % (d) directed multi-hypergraph: the SAME two hyperedges as fig:three-models,
+  %     {A,B,C} red repeated and {B,C,D} blue, as metro stars on the same edges
+  %     (tail = middle station). Each repeated arc is a parallel pair (same
+  %     direction -> OPPOSITE bends, so the pair straddles the edge).
   \begin{scope}[shift={(12.9,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      % red, tail A -> {B, C}, drawn twice: each arc a parallel pair
-      \draw[hstar, metroA] (A) to[bend left=4]  (B);
-      \draw[hstar, metroA] (A) to[bend left=12] (B);
-      \draw[hstar, metroA] (A) to[bend right=4]  (C);
-      \draw[hstar, metroA] (A) to[bend right=12] (C);
-      % blue, tail C -> {B, D}: right edge C->B + top edge C->D
-      \draw[hstar, metroB] (C) to (B);
-      \draw[hstar, metroB] (C) to (D);
+      % red {A,B,C}, tail B, repeated: B->A and B->C, each a straddling pair
+      \draw[hstar, metroA] (B) to[bend left=16]  (A);
+      \draw[hstar, metroA] (B) to[bend right=16] (A);
+      \draw[hstar, metroA] (B) to[bend left=16]  (C);
+      \draw[hstar, metroA] (B) to[bend right=16] (C);
+      % blue {B,C,D}, tail D: D->B (diagonal) + D->C (top)
+      \draw[hstar, metroB] (D) to (B);
+      \draw[hstar, metroB] (D) to (C);
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed multi-hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} draws each hyperedge as a metro-styled out-star, the tail sending one thick coloured arc to each head, the star layout of \Cref{fig:dir-hyper-convention} in the metro colours of \Cref{fig:three-models}. Two of the stars share the tail $A$ and its arc to $B$, drawn as two parallel lines, the directed counterpart of two metro lines sharing a stretch of track. The \emph{directed multi-hypergraph} repeats one such star, so each of its arcs becomes a parallel pair. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
+\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} draws the same three hyperedges as \Cref{fig:three-models}, in the same colours, each now a metro-styled star, the tail sending one thick coloured arc to each of its heads, the star convention of \Cref{fig:dir-hyper-convention}. Taking each star's tail to be the middle station of the undirected line keeps every arc on the same edge as before. The blue and green hyperedges still share the bottom edge, now one arc running each way, the directed counterpart of two metro lines sharing a stretch of track. The \emph{directed multi-hypergraph} repeats the red hyperedge, so each of its arcs becomes a parallel pair. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
 \label{fig:three-models-directed}
 \end{figure}
 

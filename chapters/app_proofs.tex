@@ -1304,8 +1304,10 @@ every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=1.0]
-% (a) undirected hyperedge: a single path through its members, no arrows
+\begin{tikzpicture}[scale=1.0,
+  dh/.style={metro, line width=2.7pt, -{Stealth[length=2.8mm]},
+             shorten >=2mm, shorten <=1.4mm}]
+% (a) undirected hyperedge: one metro line threading its members, no arrows
 \begin{scope}
   \node[apx] (u1) at (0.0,0.0) {};
   \node[apx] (u2) at (1.0,0.5) {};
@@ -1313,32 +1315,37 @@ every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
   \node[apx] (u4) at (3.0,0.55){};
   \draw[metro, metroB, line width=2.8pt] (u1)--(u2)--(u3)--(u4);
   \node[font=\small\itshape] at (1.5,-0.85) {undirected hyperedge};
-  \node[font=\scriptsize, text=black!65] at (1.5,-1.35) {one path, no arrows};
+  \node[font=\scriptsize, text=black!65] at (1.5,-1.35) {one line, no arrows};
 \end{scope}
-% (b) directed hyperedge: a star rooted at the tail (top), arcs down to the heads
+% (b) directed hyperedge: a metro-styled star, tail at top, thick arcs to heads,
+%     matching the hypergraph panels of fig:three-models-directed.
 \begin{scope}[xshift=6.4cm]
-  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt] (t) at (1.5,0.85) {};
+  \node[apx] (t) at (1.5,0.9) {};
   \node[apname, above=2pt] at (t) {tail};
-  \node[apx] (h1) at (0.3,-0.45) {};
-  \node[apx] (h2) at (1.5,-0.6) {};
-  \node[apx] (h3) at (2.7,-0.45) {};
-  \draw[aparc] (t)--(h1);
-  \draw[aparc] (t)--(h2);
-  \draw[aparc] (t)--(h3);
-  \node[apname, text=KULblauw1!75] at (3.35,-0.55) {heads};
-  \node[font=\small\itshape] at (1.5,-1.35) {directed hyperedge};
+  \node[apx] (h1) at (0.3,-0.5) {};
+  \node[apx] (h2) at (1.5,-0.65) {};
+  \node[apx] (h3) at (2.7,-0.5) {};
+  \draw[dh, metroB] (t)--(h1);
+  \draw[dh, metroB] (t)--(h2);
+  \draw[dh, metroB] (t)--(h3);
+  \node[apname, text=KULblauw1!75] at (3.4,-0.6) {heads};
+  \node[font=\small\itshape] at (1.5,-1.4) {directed hyperedge};
 \end{scope}
 \end{tikzpicture}
-\caption[Drawing a hyperedge]{Two ways to draw a single hyperedge on its $r$
-vertices, each a tree. \emph{Left:} an undirected hyperedge is a single
-\emph{path} through its members, a tree of maximum degree two, drawn as one metro
-line with no arrows, exactly as in \Cref{fig:three-models}; a route may run
-between any two of its vertices. \emph{Right:} a directed hyperedge is a rooted
-\emph{star}: the tail sits at the top and one arc points down to each of the
-$r-1$ heads, so a Berge route enters at the tail and leaves at any head, and the
-only routes it carries run from the tail outward. The undirected path is the
-symmetric case, the directed star the one-way case, of the same $r$-vertex
-hyperedge.}
+\caption[Drawing a hyperedge]{How the thesis draws a single hyperedge on its $r$
+vertices, in the metro colours of \Cref{fig:three-models}. \emph{Left:} an
+undirected hyperedge is one metro line threading all its members, with no arrows.
+\emph{Right:} a directed hyperedge, a tail with $r-1$ heads, is a star, the tail
+sending one thick arc to each head, so a Berge route enters at the tail and
+leaves at any head. The hypergraph panels of \Cref{fig:three-models-directed} use
+this same star. The shape is a drawing convention, not a path. Each coloured line
+or star is a \emph{single} edge on several vertices, not a sequence of ordinary
+edges, so the line on the left is one hyperedge and not three. One colour means
+one hyperedge, and where two of them meet they cross at a shared station rather
+than joining into a longer line. What might be mistaken for a hyperedge is a
+\emph{route}, which does run edge by edge from one vertex to another, but a route
+is drawn as a thin thread laid over the lines, so the thick coloured hyperedge
+and the thin route never look alike.}
 \label{fig:dir-hyper-convention}
 \end{figure}
 
