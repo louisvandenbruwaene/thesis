@@ -1487,3 +1487,35 @@ needed for either; a cluster would only brute-force (b) without the parallelism.
 
 VERIFY: build latexmk 0 overfull / 0 undefined; suite 81 pass / 3 skip; self-check passes
 earlier this session. Commit local; push left to author (direct-to-main push needs his ok).
+
+## 2026-06-24 (Opus) -- conj:min-degree obstruction remark + numerics task
+
+Author asked: "can you prove conj:min-degree for general m?" Answer: NO (it is the
+thesis's single identified open gap, mixed fractional regime; attacked across many prior
+sessions without closure). Did NOT fabricate a proof. Worked it directly: confirmed the
+averaging route provably cannot finish (granting the even bound, deletion gives
+M <= k(k+1)+k/(2k-1) = (2k+1)k^2/(2k-1), so min-degree <= 2M/(2k+1) <= k+k/(2k-1) < k+1,
+and the fractional leftover k/(2k-1) is not roundable; to force <=k by averaging needs
+M <= k^2+k/2 but the bipartite point already has M=k^2+k, so no averaging bound suffices
+for any m). Also tried the obvious counterexample (bolt backward weight eps onto the
+saturated bipartite point to lift B-degrees to k+eps): it COLLAPSES for any eps>0 because
+recirculation a->b->a0->b' pushes maxflow(a,b') to 1+k*eps>1. Same mechanism as the
+conj:dir-arc back-arc obstruction -- the two open gaps are one phenomenon. (Integral
+version at m=k+2 collapses identically; I initially miscounted it as a counterexample,
+then caught the 3-hop recirculation routes.)
+
+DONE (author: "do one"): added rem:min-degree-obstruction to app_proofs.tex right after
+the mixed-regime paragraph (before lem:attachment), recording both facts above so the
+conjecture is not read as a routine averaging exercise. Math checked: the M bound matches
+the existing prop:dir-multi-even discussion (k(k+1)+k/(2k-1)); references
+lem:scaling-reduction, prop:dir-multi-even, prop:min-degree-m2, lem:attachment,
+conj:dir-arc, ch:discover all resolve. No em-dash/en-dash/semicolon in the prose.
+
+ADDED (author: "add three to the future tasks"): TASKS.md new section
+"CONJ:MIN-DEGREE -- numerical stress test before submission" with a runnable
+fractional_search(n,'min_degree') sweep at n=9,11,13 x {bipartite,random,zero} x 8 seeds;
+expected best min weighted-degree = k=(n-1)/2 exactly, a value > k would REFUTE the
+conjecture. n=7,9 already clean per prior numerics; this extends into the larger odd sizes.
+
+BUILD: latexmk exit 0, 108 pp, 0 overfull, 0 undefined refs/cites, new label in aux.
+No program code touched. Committed + pushed to main.

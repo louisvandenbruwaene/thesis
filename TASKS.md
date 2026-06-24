@@ -60,6 +60,27 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       (below) attack these numerically; a clean structural proof would be stronger and
       is independently interesting. (m=3 directed multigraph closes the moment these land.)
 
+## CONJ:MIN-DEGREE — numerical stress test before submission (added 2026-06-24, Opus)
+conj:min-degree (app_proofs, general m, mixed regime) is the single open gap and now
+carries rem:min-degree-obstruction explaining WHY it resists: averaging cannot finish
+(the overshoot k/(2k-1)<1 is not roundable when degrees are fractional, and the
+bipartite point already has M=k^2+k, so no averaging bound can force min-degree<=k),
+and the natural back-arc construction collapses by recirculation (a->b->a0->b' makes
+the flow 1+k*eps>1). The conjecture is true at n=7,9 (numerics); harden it before
+citing it as well-supported, in the mixed regime the obstruction lives in.
+- [ ] Run fractional_search(n, objective="min_degree", start=...) at n=9,11,13
+      (k=4,5,6), many seeds, starts "bipartite"/"random"/"zero", feasibility checked
+      exactly by fractional_flows_feasible. Expected: best min weighted-degree = k
+      exactly (rigid bipartite point), NO fractional escape above k. A value > k
+      REFUTES conj:min-degree (and confirms the m>=5 value-step hole is a real failure,
+      not just an arithmetic gap) -- report immediately. If clean across all sizes/seeds,
+      add one sentence to rem:min-degree-obstruction citing the extended numerical support.
+      Runnable (from program/, venv):
+      `python -c "from erdos915_unified import fractional_search as f; \
+        [print(n,s,round(f(n,'min_degree',8000,seed,s)[1],4)) \
+         for n in (9,11,13) for s in ('bipartite','random','zero') \
+         for seed in range(8)]"`   # every value should be <= (n-1)/2
+
 ## REVIEW FIXES DONE 2026-06-20 (Opus; see CLAUDE.md entry, delete after read)
 All six queued items below were applied + verified (build clean 93pp, 77 tests pass):
 3 chapter errors (ch1:184 arcs->paths; ch3 ErdosProblems cite removed; ch1:387 reworded
