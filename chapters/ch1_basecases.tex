@@ -100,7 +100,7 @@ One example fixes the scale. The complete graph $K_n$ joins every pair, so every
 
 Mader's theorem is the floor we build on, and everything afterwards is a variation on it. There are three independent ways to change the rules, and they generate the landscape this thesis traverses.
 
-The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple graph allows at most one edge between two vertices. A \emph{multigraph} allows parallel edges, recorded by a multiplicity $\mu(u, v)$, so a single pair can already carry several independent routes. A \emph{hypergraph} lets an edge join any number of vertices at once: a \emph{hyperedge} is a set of $r \ge 2$ vertices, and a route may pass through it between any two of the vertices it contains. At $r = 2$ a hyperedge is an ordinary edge, so graphs are the $r = 2$ special case. The new setting begins at $r \ge 3$. These three models are the three rows of every comparison figure in this thesis.
+The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two independent choices generate it. The first is \emph{arity}: an edge may join exactly two vertices, or a \emph{hyperedge} may join any $r \ge 2$ of them, a route then passing through it between any two of its members. At $r = 2$ a hyperedge is an ordinary edge, so graphs are the $r = 2$ special case and the genuinely new setting begins at $r \ge 3$. The second is \emph{multiplicity}: a \emph{simple} object carries at most one copy of each edge, while a \emph{multi} object allows parallel copies, recorded by a multiplicity $\mu(u, v)$, so a single pair can already carry several independent routes. Because the two choices are independent they form a small lattice. At the top sits the most general object, the \emph{multi-hypergraph}, and lowering one toggle at a time restricts it downward: forbidding repeats gives the simple hypergraph, dropping the arity to two gives the multigraph, and doing both gives the simple graph at the bottom. Every theorem in this thesis is a statement about one node of this lattice, and the three rows of every comparison figure are its simple-graph, multigraph, and hypergraph levels.
 
 \begin{figure}[ht]
 \centering
@@ -182,7 +182,7 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
 \label{fig:three-models}
 \end{figure}
 
-The second axis is the \emph{direction}: arcs may be one-way, and then a network can be lopsided in a manner no undirected graph can imitate. Although it might seem a generalisation of the undirected setting, they are distinct in complexity and methodology: the arcs $u \to v$ and $v \to u$ offer a round trip while the edge $uv$ does not. These digraphs have three degree counts for each vertex. The \emph{out-degree} $d^+(v)$ is the number of arcs leaving $v$, the \emph{in-degree} $d^-(v)$ the number entering it, and the \emph{total degree} $d(v) = d^+(v) + d^-(v)$ is the two added together. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced will be the structural idea behind some of the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a network with three arc-disjoint routes between the two chosen vertices, which equals the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network. 
+The second axis is the \emph{direction}, a third toggle independent of the other two. Setting it at the top of the model lattice gives the single most general object in the thesis, the \emph{directed multi-hypergraph}, of which every other class is a restriction. An undirected object is the symmetric special case of a directed one, each edge standing for a matched pair of opposite arcs $u \to v$ and $v \to u$, so direction strictly enlarges the family of objects. What it does \emph{not} do is let the directed and undirected problems merge into one. The two opposite arcs offer a round trip the single edge $uv$ does not, the extremal digraphs are deliberately \emph{lopsided}, with out-degree and in-degree pulled apart in a way no symmetric object can imitate, and the Gomory-Hu tree that settles every undirected case has no directed analogue (\Cref{app:proofs}), so the one-way variants stay distinct in both difficulty and method. A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+(v)$ counts the arcs leaving $v$, and the vertices they reach are its \emph{out-neighbours}; the \emph{in-degree} $d^-(v)$ counts the arcs entering $v$, and the vertices they come from are its \emph{in-neighbours}; the \emph{total degree} $d(v) = d^+(v) + d^-(v)$ adds the two. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced is the structural idea behind several of the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a network with three arc-disjoint routes between the two chosen vertices, which equals the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network.
 
 \begin{figure}[ht]
 \centering
@@ -225,9 +225,9 @@ The second axis is the \emph{direction}: arcs may be one-way, and then a network
 \draw[me] (v0) to[bend right=12] (v2);
 \draw[me] (v0) to[bend right=24] (v2);   % second arc, more bent
 
-% two arcs from 3 to 0
+% one arc from 0 to 3 and one back:
+\draw[me] (v0) to[bend right=12] (v3);
 \draw[me] (v3) to[bend right=12] (v0);
-\draw[me] (v3) to[bend right=24] (v0);
 
 % a single arc from 2 to 3 (keeps the cycle)
 \draw[me] (v2) to[bend right=12] (v3);
@@ -236,6 +236,7 @@ The second axis is the \emph{direction}: arcs may be one-way, and then a network
 % route A: u → v (orange, direct)
 \draw[rA] (v1) to[bend right=12] (v4);
 
+\draw[me] (v0) to[bend right=12] (v1);
 % route B: u → 0 → v (green)
 \draw[rB] (v1) to[bend right=12] (v0);
 \draw[rB] (v0) to[bend right=12] (v4);
@@ -244,10 +245,16 @@ The second axis is the \emph{direction}: arcs may be one-way, and then a network
 \draw[rC] (v1) to[bend right=12] (v2);
 \draw[rC] (v2) to[bend right=12] (v4);
 
-% ---- Minimum arc-cut: a dashed ring around the source u ----
-% u has out-degree 3 and no in-arcs, so the ring crosses exactly the
-% three arcs leaving u, which are the first arcs of routes A, B, C.
-\draw[cut] (v1) circle (0.58);
+% ---- Minimum arc-cut: snip the three arcs leaving u, the first arc of each
+% route.  u now also receives one arc (v0 -> u, the top 2-cycle): that is a
+% backward arc, which a directed u--v cut does not count, so we mark only the
+% three OUTGOING route-arcs and leave the incoming one untouched.
+\tikzset{cuttick/.style={postaction={decorate, decoration={markings,
+   mark=at position 0.62cm with {\draw[vertexred, line width=1.6pt]
+        (0,-3.6pt) -- (0,3.6pt);}}}}}
+\path[cuttick] (v1) to[bend right=12] (v4);
+\path[cuttick] (v1) to[bend right=12] (v0);
+\path[cuttick] (v1) to[bend right=12] (v2);
 
 \node[vertexred, font=\scriptsize, anchor=east]
   at (-2.25, 0.2) {cut: $3$ arcs};
@@ -270,10 +277,11 @@ The second axis is the \emph{direction}: arcs may be one-way, and then a network
 
 \caption{A directed version of the \(K_5\) example with multiple arcs.
 Three arc-disjoint directed routes connect \(u\) to \(v\) (orange, green, purple).
-The red dashed ring around \(u\) cuts exactly the three arcs leaving it, the first
-arc of each route, so \(\lambda(u,v)=3\) by Menger's theorem.
-The out-degree \(d^{+}(u)=3\) and in-degree \(d^{-}(v)=4\) bound the value from above,
-and \(\lambda(u,v)=\min(3,4)=3\) meets the smaller one, at \(u\).}
+The three red marks cut the arcs leaving \(u\), the first arc of each route, so
+\(\lambda(u,v)=3\) by Menger's theorem. A directed cut counts only the arcs
+leaving \(u\)'s side, so the lone arc entering \(u\) from the top is not part of
+it. The out-degree \(d^{+}(u)=3\) and in-degree \(d^{-}(v)=4\) bound the value
+from above, and \(\lambda(u,v)=\min(3,4)=3\) meets the smaller one, at \(u\).}
 \label{fig:directed-lambda}
 \end{figure}
 

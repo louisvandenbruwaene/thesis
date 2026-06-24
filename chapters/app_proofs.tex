@@ -32,19 +32,21 @@ This appendix holds the arguments deferred from the body: the ones that are eith
 
 \section{Menger, Gomory--Hu, and the degree bound}
 
-The two classical theorems below are the foundation of everything the thesis measures, and we state them in the form we use them.
+The two classical theorems below are the foundation of everything the thesis measures, and we state them at the level of generality at which the program actually applies them. A \emph{capacitated graph}, or \emph{weighted graph}, is a graph, directed or not, carrying a nonnegative capacity $c(e)$ on each edge or arc. A plain graph is read as the \emph{unit-capacity} case $c \equiv 1$, and a multigraph as the integer-capacity case, one unit per parallel copy. A \emph{flow} from $u$ to $v$ sends units along edges without exceeding any capacity, and the \emph{capacity of a cut} is the total capacity of the edges crossing it. Both theorems below are theorems about capacitated graphs, and the thesis uses them mostly at unit and integer capacities, where the maximum flow is exactly the connectivity $\lec$.
 
-\begin{theorem}[Menger \cite{Menger27}]\label{thm:menger}
-For any graph $G$ and distinct vertices $u, v$, the maximum number of pairwise edge-disjoint $u$--$v$ paths equals the minimum number of edges whose removal separates $u$ from $v$:
+\begin{theorem}[Menger, as max-flow min-cut \cite{Menger27}]\label{thm:menger}
+In any capacitated digraph, and for distinct vertices $u, v$, the maximum flow from $u$ to $v$ equals the minimum capacity of a cut separating $u$ from $v$. At unit capacities this is the combinatorial statement we cite throughout: the maximum number of pairwise edge-disjoint $u$--$v$ paths equals the minimum number of edges whose removal separates them,
 \[
     \lec_G(u, v) = \min\{\, |C| : C \subseteq E(G),\ G - C \text{ has no } u\text{--}v \text{ path} \,\}.
 \]
-The same statement holds for digraphs with arc-disjoint directed paths and directed arc cuts, and, replacing edges by internal vertices, for internally vertex-disjoint paths and vertex cuts.
+A directed capacitated graph is the most general object here, and every graph model the thesis uses is a special case of it. An undirected graph is the symmetric case, each edge a pair of opposite unit-capacity arcs; a multigraph is the integer-capacity case, with $\mu(u,v)$ units on the pair $uv$; and the hypergraph version (\Cref{thm:menger-hyper}) is this very theorem applied to the helper-point network of \Cref{fig:hyper-gadget}, a capacitated digraph. The \emph{internally vertex-disjoint} version is obtained not by changing the theorem but by changing the graph it runs on, a device called \emph{vertex splitting}: replace each internal vertex $w$ by two copies joined by a single unit-capacity arc $w^- \to w^+$, send every arc that entered $w$ into $w^-$ and every arc that left $w$ out of $w^+$. A flow may now pass through $w$ at most once, so edge-disjoint paths in the split graph are exactly internally vertex-disjoint paths in the original, and a minimum edge cut there is a minimum vertex cut here. This split graph is literally what the checker of \Cref{ch:certify} builds, which is why a single maximum-flow routine measures all four separations.
 \end{theorem}
 
 \begin{theorem}[Gomory--Hu \cite{GomoryHu61}]\label{thm:gomory-hu}
-Every weighted graph $G$ has a weighted tree $T$ on the same vertex set such that for all $u, v$ the value $\lec_G(u, v)$ equals the minimum edge weight on the $u$--$v$ path in $T$, and each tree edge $e$ corresponds to a minimum cut of $G$ whose capacity is the weight of $e$.
+Every \emph{undirected} capacitated graph $G$ has a weighted tree $T$ on the same vertex set, its \emph{Gomory--Hu tree}, such that for all $u, v$ the value $\lec_G(u, v)$ equals the minimum edge weight on the $u$--$v$ path in $T$, and each tree edge $e$ corresponds to a minimum cut of $G$ whose capacity is the weight of $e$. All $\binom{n}{2}$ pairwise values are thereby stored in the $n-1$ weights of a single tree.
 \end{theorem}
+
+Two features of the statement fix how far it reaches, and both are used below. Being a theorem about capacities, it applies verbatim to a simple graph (unit weights), to a multigraph (integer weights, the multiplicity $\mu$ as capacity), and, in the form of \Cref{thm:hyper-gomory-hu}, to the hyperedge-connectivity of a hypergraph. But it needs the cut function to be \emph{symmetric}, which forces $G$ to be undirected: a digraph has $\lec(u,v) \ne \lec(v,u)$ in general and admits no such tree, and the vertex-connectivity function fails symmetry for the same reason. So the Gomory--Hu tree is precisely the tool for the undirected edge problems, where it drives Mader's theorem and its multigraph and hypergraph cousins (\Cref{thm:mader,thm:multigraph-edge,prop:hyper-edge}) through one argument, and precisely the tool that vanishes once arcs turn one-way.
 
 The most basic constraint on local connectivity is local: a pair cannot have more independent routes than either endpoint has edges. The constructions below use it constantly.
 
@@ -134,10 +136,11 @@ using \Cref{lem:dist-1-count} in the last step.
 \end{proof}
 
 \begin{lemma}[Double-counting identity]\label{lem:double-count}
-For any graph $G$ and Gomory--Hu tree $T$ with weights $c$,
+Let $G$ carry \emph{unit capacities}, so that each weight $c(t)$ of a Gomory--Hu tree $T$ is the plain \emph{number} of edges of $G$ crossing the cut that $t$ induces. Then
 \[
     \sum_{t \in E(T)} c(t) \;=\; \sum_{e \in E(G)} \dist_T(e).
 \]
+This is the form used for Mader's theorem, where $G$ is a simple graph and so unit-capacitated by default.
 \end{lemma}
 
 \begin{proof}
@@ -161,7 +164,7 @@ Note where the factor of two came from: every edge crosses at least one tree cut
 The lower bound is a pair of constructions, drawn side by side in \Cref{fig:mader-lower}. The first is the shape the bound was guessed from, and works when $m - 1$ divides $n - 1$. The second generalises it to every $n \ge m \ge 2$.
 
 \begin{construction}[Shared-clique graph]\label{const:shared-clique}
-For $m \ge 3$ with $(m-1) \mid (n-1)$, take $k = (n-1)/(m-1)$ copies of the complete graph $K_m$ and identify one vertex of each copy into a single shared hub vertex $v^*$. The result has $k(m-1) + 1 = n$ vertices and $k \binom{m}{2} = \frac{m(n-1)}{2}$ edges. Every non-hub vertex has degree $m - 1$, and any pair of vertices contains a non-hub vertex, so $\lec^{\max} \le m-1$ by \Cref{lem:degree-bound}.
+For $m \ge 3$ with $(m-1) \mid (n-1)$, take $k = (n-1)/(m-1)$ copies of the complete graph $K_m$ and identify one vertex of each copy into a single shared hub vertex $h$. The result has $k(m-1) + 1 = n$ vertices and $k \binom{m}{2} = \frac{m(n-1)}{2}$ edges. Every non-hub vertex has degree $m - 1$, and any pair of vertices contains a non-hub vertex, so $\lec^{\max} \le m-1$ by \Cref{lem:degree-bound}.
 \end{construction}
 
 \begin{construction}[Hub-and-spokes graph]\label{const:hub-spokes}
@@ -177,7 +180,7 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
 % hub at centre, three K_4 each sharing the hub.  m=4 => K_4.
 \node[apx,fill=vertexorange,draw=vertexorange,minimum size=12pt] (h) at (0,0) {};
-\node[apname] at (0.78,0.46) {$v^*$};
+\node[apname] at (0.78,0.46) {$h$};
 % three cliques arranged around hub at 90, 210, 330 degrees
 \foreach \ang/\name in {90/A, 210/B, 330/C}{
   \begin{scope}[rotate=\ang]
@@ -193,7 +196,7 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
   \end{scope}
 }
 \end{tikzpicture}
-\caption{Shared-clique graph: three $K_4$'s glued at one hub $v^*$
+\caption{Shared-clique graph: three $K_4$'s glued at one hub $h$
 ($m=4$, $k=3$). Each non-hub vertex has degree $m-1=3$.}
 \label{fig:shared-clique}
 \end{subfigure}\hfill
@@ -266,7 +269,7 @@ Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$ containing a vertex $r$
 \end{lemma}
 
 \begin{proof}
-If $u_1, \dots, u_{m-1}$ were distinct in-neighbours of $v$ other than $r$, the paths $r \to v$ and $r \to u_i \to v$ for $i = 1, \dots, m-1$ would be $m$ arc-disjoint routes, since the $u_i$ are distinct and $d^+(r) = n-1$ supplies every starting arc. That contradicts $\lec_D(r, v) \le m-1$.
+If $u_1, \dots, u_{m-1}$ were distinct in-neighbours of $v$ other than $r$, that is, distinct vertices each sending an arc to $v$, the paths $r \to v$ and $r \to u_i \to v$ for $i = 1, \dots, m-1$ would be $m$ arc-disjoint routes, since the $u_i$ are distinct and $d^+(r) = n-1$ supplies every starting arc. That contradicts $\lec_D(r, v) \le m-1$.
 \end{proof}
 
 \begin{theorem}[Hub upper bound]\label{thm:directed-upper}
@@ -282,7 +285,7 @@ A simple digraph with $\lec^{\max} \le 1$ contains no three vertices $x, y, z$ w
 \end{lemma}
 
 \begin{lemma}[Deletion monotonicity]\label{lem:subdigraph-monotone}
-For any digraph $D$ and vertex $v_0$, $\lec^{\max}(D - v_0) \le \lec^{\max}(D)$, since arc-disjoint paths in $D - v_0$ are arc-disjoint paths in $D$.
+Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ together with all arcs incident to it. For any digraph $D$ and vertex $v_0$, $\lec^{\max}(D - v_0) \le \lec^{\max}(D)$, since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$.
 \end{lemma}
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
@@ -290,7 +293,7 @@ Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \
 
 For the upper bound we show by strong induction on $n$ that $\lec^{\max}_D \le 1$ forces $|A(D)| \le M(n)$.
 
-\emph{Base cases $2 \le n \le 7$.} For $n = 2$ there are at most $2$ arcs and $M(2) = 2$. For $n = 3$, suppose $|A(D)| \ge 5$: then $D$ misses at most one arc of the complete bidirected triangle, and whichever arc is missing, three of the remaining arcs form a transitive triangle, contradicting \Cref{lem:no-transitive-triangle}, hence $|A(D)| \le 4 = M(3)$. For $4 \le n \le 7$ the pruned exhaustive search of \Cref{ch:certify} walks every simple digraph with $\lec^{\max} \le 1$ and reports the maxima $6, 8, 10, 12$, matching $M(n)$. The transcript is reproduced below, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}.
+\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, which walks every simple digraph with $\lec^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is reproduced below, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}. The two smallest are also immediate by hand, as a check on the machine rather than a separate argument: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the rest form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. The point of the theorem is precisely that $n = 4, 5, 6, 7$ are \emph{not} immediate by hand, which is what makes handing the case-check to the program the right move.
 
 \emph{Inductive step $n \ge 8$.} Let $D$ be a simple digraph on $n$ vertices with $\lec^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ minimising the total degree $d(v) = d^+(v) + d^-(v)$. Since $\sum_v d(v) = 2a$, averaging gives $d(v_0) \le 2a/n$. By \Cref{lem:subdigraph-monotone} the digraph $D - v_0$ on $n-1 \ge 7$ vertices satisfies the induction hypothesis, so $a - d(v_0) \le M(n-1) = \floorfrac{(n-1)^2}{4}$. Combining,
 \[
@@ -399,7 +402,15 @@ Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partit
 Fix $a \in A$ and $b \in B$, and let $b'_1, \dots, b'_d$ be the in-neighbours of $b$ inside $B$, where $d = \deg^-_B(b)$. The direct arc $a \to b$ together with the two-step detours $a \to b'_i \to b$ are $1 + d$ arc-disjoint $a$-to-$b$ routes, all present because $A \to B$ is complete. Feasibility forces $1 + d \le m - 1$, so $d \le m - 2$, and summing over $B$ bounds the internal arcs by $(m-2)|B|$.
 \end{proof}
 
-Combining \Cref{prop:two-hop-bipartite} with the best partition gives, for any extremal digraph whose arcs all run from $A$ to $B$ or inside $B$ (a complete $A \to B$ partition with no arc inside $A$ and \emph{no arc from $B$ back to $A$}), the bound $|A(D)| \le |B|(n - |B| + m - 2)$, since the $|A|\,|B|$ arcs across the partition and the at most $(m-2)|B|$ arcs inside $B$ are then all there are: under the no-back-arc hypothesis a route between two vertices of $B$ never leaves $B$, so the two-hop budget applies to $B$'s own arcs. Maximised at $|B| = \ceil{(n+m-2)/2}$, this is $\floor{(n+m-2)^2/4}$, the second branch of \Cref{conj:dir-arc}, uniformly in $m$, and the remaining gap is exactly the backward-arc hypothesis.
+We now combine \Cref{prop:two-hop-bipartite} with the best choice of partition. Suppose every arc of $D$ either runs from $A$ to $B$ or stays inside $B$: the partition $A \to B$ is complete, no arc lies inside $A$, and crucially \emph{no arc runs from $B$ back to $A$}. Write $b = |B|$, so that $|A| = n - b$. The arcs then come in exactly two kinds. The arcs crossing the partition number $|A|\,|B| = (n-b)\,b$, one for each ordered $A$--$B$ pair. The arcs inside $B$ number at most $(m-2)\,b$: since no route between two vertices of $B$ ever needs to leave $B$ (there is no arc back to $A$ to leave by), \Cref{prop:two-hop-bipartite} applies to $B$ on its own and caps the in-degree of each $b \in B$ from inside $B$ at $m-2$. There are no other arcs, so, adding the two kinds,
+\[
+   |A(D)| \;\le\; (n-b)\,b \;+\; (m-2)\,b \;=\; b\,\bigl(n + m - 2 - b\bigr).
+\]
+The right-hand side is a downward parabola in $b$. Writing $s = n + m - 2$, it is $b(s-b) = -b^2 + sb$, maximised at $b = s/2$, so over integers the best partition takes $b = \ceil{s/2}$ (equivalently $\floor{s/2}$), and the maximum value is
+\[
+   \max_{b} \; b\,(s-b) \;=\; \floorfrac{s^2}{4} \;=\; \floorfrac{(n+m-2)^2}{4}.
+\]
+This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. The only thing assumed beyond feasibility was that $B$ sends nothing back to $A$, so that single no-back-arc hypothesis is exactly the gap between this bound and an unconditional proof.
 
 \section{The directed multigraph problem at large \texorpdfstring{$n$}{n}}
 
@@ -410,7 +421,11 @@ Let $D$ be a directed multigraph with $\mu(u,v) \le m-1$ on every ordered pair a
 \end{lemma}
 
 \begin{proof}
-Dividing all capacities by $m-1$ divides every flow value by $m-1$, and by Menger the maximum flow under $\mu$ is $\lec_D(s,t) \le m-1$.
+Set $w = \mu/(m-1)$. Every multiplicity obeys $0 \le \mu(u,v) \le m-1$, so each $w(u,v)$ lies in $[0,1]$. Dividing every capacity by the constant $m-1$ divides every flow value by $m-1$, and by \Cref{thm:menger} the maximum flow under the capacities $\mu$ is $\lec_D(s,t) \le m-1$, so under $w$ it is at most $1$. For the arc count, recall that the number of arcs is the total multiplicity, $|A(D)| = \sum_{u \ne v} \mu(u,v)$, since each parallel copy is one arc. Substituting $\mu = (m-1)w$,
+\[
+   |A(D)| \;=\; \sum_{u \ne v} \mu(u,v) \;=\; \sum_{u \ne v} (m-1)\,w(u,v) \;=\; (m-1)\sum_{u \ne v} w(u,v),
+\]
+which is the claimed identity.
 \end{proof}
 
 \begin{lemma}[Arithmetic identity]\label{lem:floor-identity}
@@ -426,7 +441,23 @@ Let $n = 2k \ge 8$ be even. Suppose every fractional weighting $w'$ on $n-1$ ver
 \end{proposition}
 
 \begin{proof}
-By \Cref{lem:scaling-reduction} it suffices to bound $M := \sum_{u \ne v} w(u,v)$ by $\floor{n^2/4}$ for the scaled weighting $w$. Pick $v_0$ minimising the weighted total degree $d(v_0) = \sum_u (w(u,v_0) + w(v_0,u))$. Averaging gives $d(v_0) \le 2M/n$. Deleting $v_0$ can only lower maximum flows, so the hypothesis applies to the restricted weighting and $M - d(v_0) \le \floor{(n-1)^2/4} = k(k-1)$. Combining, $M(1 - \tfrac{2}{n}) \le k(k-1)$, hence $M \le \tfrac{k}{k-1} \cdot k(k-1) = k^2 = \floor{n^2/4}$.
+By \Cref{lem:scaling-reduction} the arc count is $|A(D)| = (m-1)M$ with $M := \sum_{u \ne v} w(u,v)$, so it suffices to bound $M \le \floor{n^2/4}$ for the scaled weighting $w$, all of whose pairwise maximum flows are at most $1$.
+
+\emph{Averaging.} Give each vertex its weighted total degree $d(v) = \sum_u \bigl(w(u,v) + w(v,u)\bigr)$. Summing over all vertices counts the weight of each ordered pair exactly twice, once at its tail and once at its head, so $\sum_v d(v) = 2M$, and some vertex $v_0$ has $d(v_0) \le 2M/n$.
+
+\emph{Deletion.} The number $d(v_0)$ is exactly the total weight carried by pairs touching $v_0$, so deleting $v_0$ leaves a weighting on $n-1$ vertices of total $M - d(v_0)$. Removing a vertex cannot raise any maximum flow, so that restricted weighting still has all pairwise flows at most $1$, and the hypothesis applies to it:
+\[
+   M - d(v_0) \;\le\; \floorfrac{(n-1)^2}{4} \;=\; \floorfrac{(2k-1)^2}{4} \;=\; k(k-1),
+\]
+the last step because $(2k-1)^2/4 = k^2 - k + \tfrac14$ floors to $k(k-1)$.
+
+\emph{Combining.} Since $n = 2k$ we have $d(v_0) \le 2M/n = M/k$, hence
+\[
+   M - \frac{M}{k} \;\le\; M - d(v_0) \;\le\; k(k-1),
+   \qquad\text{that is}\qquad
+   M\cdot\frac{k-1}{k} \;\le\; k(k-1).
+\]
+Dividing by $(k-1)/k > 0$ gives $M \le k^2 = \floor{n^2/4}$, and multiplying back by $m-1$ gives $|A(D)| \le (m-1)\floor{n^2/4}$.
 \end{proof}
 
 The small cases $n \in \{4, 6\}$ genuinely do not satisfy the conclusion, and must not: there $2(n-1) > \floor{n^2/4}$ and the double star beats the bipartite weighting, which is why the certified values of \Cref{thm:dir-multi-small} sit on the linear branch. For odd $n$ the same deletion gives $M \le k(k+1) + \frac{k}{2k-1}$, an overshoot of less than one that integrality no longer absorbs, because fractional weights need not have integer totals. The induction would close if some vertex always had weighted degree at most $(m-1)k$ before scaling, which is the missing minimum-degree statement.
@@ -473,56 +504,70 @@ any multiset of arcs incident to $v$ (multiplicities at most $m-1$). If
 $\lec^{\max}_D \le m - 1$, then $d(v) \le (m-1)\max(p, q)$.
 \end{lemma}
 
-\Cref{fig:attachment} sets up the proof: the new vertex $v$, the four
-classes its incident arcs fall into, and one of the route patterns that the
-hypothesis forbids.
+The proof is a bookkeeping argument on the arcs at $v$, and \Cref{fig:attachment}
+is its scaffold. Sort those arcs into the four classes $i_A, o_A, i_B, o_B$ of the
+figure, by direction and by which part they touch. Three combinations are
+impossible, because each completes an $m$-th arc-disjoint route between two old
+vertices on top of the $m-1$ parallel arcs they already share: an $i_A$ arc with
+an $o_B$ arc makes $a \to v \to b$; an $i_A$ arc with an $o_A$ arc to a
+\emph{different} source makes $a \to v \to a' \to b$; an $i_B$ arc with an $o_B$
+arc to a \emph{different} sink makes $a \to b \to v \to b'$. Forbidding these
+forces $v$ into one of a few rigid shapes, a pure sink touching a single source,
+a pure source touching a single sink, or a small mixed remnant, and in each shape
+a count of two-step routes through $v$ caps its degree. The three cases below are
+exactly those shapes, and the bound $(m-1)\max(p,q)$ is whichever of them is
+largest.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[scale=1.0,
    albl/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}]
-% Part A (left) and Part B (right). a, b are the representative pair that
-% carries the (m-1) bundle; a', b' are faint, showing each part has several
-% vertices. v is glued on, low centre, so its four arc classes stay clear.
-\node[apx] (a)  at (0, 1.0)  {};   \node[apname,left=3pt]  at (a) {$a$};
-\node[apx] (b)  at (5.2,1.0) {};   \node[apname,right=3pt] at (b) {$b$};
-\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (ap) at (0,-0.4)  {};
-\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (bp) at (5.2,-0.4) {};
+% Parts A (left column) and B (right column). The representatives a, b carry
+% the (m-1) bundle; a', b' sit directly below them, faint, so the reader sees
+% each part is a set. v is glued on at the bottom centre, joined only to the
+% representatives, so its four arc classes read cleanly.
+\node[apx] (a)  at (-2.7, 1.7) {};   \node[apname,left=3pt]  at (a) {$a$};
+\node[apx] (b)  at ( 2.7, 1.7) {};   \node[apname,right=3pt] at (b) {$b$};
+\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (ap) at (-2.7,0.5) {};
+\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (bp) at ( 2.7,0.5) {};
 \node[apname, text=KULblauw1!65, left=3pt]  at (ap) {$A$};
 \node[apname, text=KULblauw1!65, right=3pt] at (bp) {$B$};
-% the m-1 parallel a->b bundle (multiplicity)
-\foreach \bnd in {16,0,-16}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
-\node[albl, text=KULblauw1!85] at (2.6,2.0) {$m-1$ copies $a\!\to\! b$};
-% other complete A->B pairs, faint thin background
-\draw[aparc,KULblauw1!22,line width=0.6pt] (a)--(bp);
-\draw[aparc,KULblauw1!22,line width=0.6pt] (ap)--(b);
-\draw[aparc,KULblauw1!22,line width=0.6pt] (ap)--(bp);
-% new vertex v, low centre
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=10pt] (v) at (2.6,-2.7) {};
+% the m-1 parallel a->b bundle (the multiplicity) along the top
+\foreach \bnd in {13,0,-13}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
+\node[albl, text=KULblauw1!85] at (0,2.5) {$m-1$ copies $a\!\to\! b$};
+% the rest of the complete one-directional A -> B layer, faint
+\draw[aparc,KULblauw1!20,line width=0.6pt] (a)--(bp);
+\draw[aparc,KULblauw1!20,line width=0.6pt] (ap)--(b);
+\draw[aparc,KULblauw1!20,line width=0.6pt] (ap) to[bend right=8] (bp);
+% the new vertex v at bottom centre
+\node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (0,-2.0) {};
 \node[apname,below=1pt] at (v) {$v$};
-% four arc classes at v. i_A and o_B are red dashed: their two legs ARE the
-% forbidden route a -> v -> b. o_A (green) and i_B (purple) are the other classes.
-\draw[apredarc] (a) to[bend left=13] (v);
-\node[albl, text=vertexred] at (1.62,-0.55) {$i_A$};
-\draw[aparc,vertexgreen!72!black,line width=1.1pt] (v) to[bend left=13] (a);
-\node[albl, text=vertexgreen!58!black] at (0.6,-1.2) {$o_A$};
-\draw[aparc,vertexpurple,line width=1.1pt] (b) to[bend right=13] (v);
-\node[albl, text=vertexpurple] at (4.6,-1.2) {$i_B$};
-\draw[apredarc] (v) to[bend right=13] (b);
-\node[albl, text=vertexred] at (3.58,-0.55) {$o_B$};
-\node[albl, text=vertexred, align=center] at (2.6,-3.55)
-  {$a\to v\to b$: an $m$-th route (forbidden)};
+% v's four arc classes.  i_A and o_B (red) are the two legs that together make
+% the forbidden route a -> v -> b, drawn as the inner V through v.  o_A (green)
+% and i_B (purple) are the other two classes, swung wide so nothing overlaps.
+\draw[apredarc] (a) to[bend left=7] (v);
+\node[albl, text=vertexred] at (-0.95,-0.35) {$i_A$};
+\draw[apredarc] (v) to[bend left=7] (b);
+\node[albl, text=vertexred] at (0.95,-0.35) {$o_B$};
+\draw[aparc,vertexgreen!72!black,line width=1.1pt] (v) to[bend right=30] (a);
+\node[albl, text=vertexgreen!58!black] at (-2.15,-1.15) {$o_A$};
+\draw[aparc,vertexpurple,line width=1.1pt] (b) to[bend left=30] (v);
+\node[albl, text=vertexpurple] at (2.15,-1.15) {$i_B$};
+% name the forbidden route under v
+\node[albl, text=vertexred, align=center] at (0,-2.95)
+  {$a\to v\to b$ would be an $m$-th $a$--$b$ route (forbidden)};
 \end{tikzpicture}
 \caption[Attachment-lemma setup]{The attachment lemma
-(\Cref{lem:attachment}): the new vertex $v$ glued onto
-$(m-1)\cdot B_{p,q}$. Each $a\in A$ sends $m-1$ parallel arcs to each $b\in B$
-(the bent bundle along the top). The arcs at $v$ split into four classes by
-direction and side: $i_A$ (into $v$ from $A$), $o_A$ (out of $v$ to $A$),
-$i_B$, $o_B$. The two red dashed legs $i_A$ and $o_B$ together are the route
-$a\!\to\! v\!\to\! b$, which is forbidden: laid on top of the $m-1$ existing
-$a\!\to\! b$ arcs it makes an $m$-th arc-disjoint $a$--$b$ route, so
-$\lec(a,b)\ge m$. Ruling out this and two sibling patterns caps
-$d(v)\le(m-1)\max(p,q)$.}
+(\Cref{lem:attachment}): a new vertex $v$ is glued onto $(m-1)\cdot B_{p,q}$,
+the one-directional complete bipartite multigraph in which every $a\in A$ sends
+$m-1$ parallel arcs to every $b\in B$ (the bundle along the top, faint for the
+pairs other than $a,b$). The arcs at $v$ fall into four classes by direction and
+side: $i_A$ into $v$ from $A$, $o_A$ out of $v$ to $A$, $i_B$ into $v$ from $B$,
+and $o_B$ out of $v$ to $B$. The two red legs $i_A$ and $o_B$ are drawn together
+because they are the worst case: the route $a\!\to\! v\!\to\! b$ laid on top of
+the $m-1$ existing $a\!\to\! b$ arcs is an $m$-th arc-disjoint $a$--$b$ route, so
+$\lec(a,b)\ge m$, which feasibility forbids. Ruling this out, with two siblings
+like it, caps $d(v)\le(m-1)\max(p,q)$.}
 \label{fig:attachment}
 \end{figure}
 
@@ -808,9 +853,23 @@ Every $r$-uniform hypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ o
 \end{theorem}
 
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
-\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$ and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}). Each of the $n-1$ tree weights $c^*(t)$ is a local connectivity, hence at most $m-1$, so $\sum_t c^*(t) \le (m-1)(n-1)$. For a hyperedge $e$ let $\mathrm{ST}(e)$ be its \emph{smallest connected subtree}, the smallest connected subtree of $T^*$ that contains all $r$ vertices of $e$ (its Steiner tree). Connecting $r$ vertices needs at least $r-1$ edges, so $\mathrm{ST}(e)$ has at least $r-1$ of them, and for each such edge $t$ the hyperedge $e$ has a vertex on each side of the partition $(S_t, V\setminus S_t)$, that is, $e \in \delta_\HH(S_t)$. We now read the equation below from left to right. The first inequality counts, for each $e$, at least its $r-1$ Steiner edges. The middle equality is the same count taken the other way round: both sides count the pairs $(e, t)$ with $e \in \delta_\HH(S_t)$, once by grouping on $e$ and once by grouping on $t$. The next equality is the Gomory--Hu property $|\delta_\HH(S_t)| = c^*(t)$, and the final inequality is the bound on the tree weights. Putting these together,
+\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
+
+\emph{Step 1: each hyperedge crosses at least $r-1$ tree cuts.} Fix a hyperedge $e$, a set of $r$ vertices, and let $\mathrm{ST}(e)$ be its \emph{smallest connected subtree}, the minimal subtree of $T^*$ that contains all $r$ of them (its Steiner tree). A tree spanning at least $r$ vertices has at least $r-1$ edges, so $\mathrm{ST}(e)$ has at least $r-1$ of them. Each such edge $t$ is a genuine cut for $e$: deleting $t$ from $T^*$ splits the vertices into the two sides $(S_t, V \setminus S_t)$, and because $t$ lies on $\mathrm{ST}(e)$ the hyperedge $e$ has at least one vertex on each side. So $e$ touches both sides, that is, $e \in \delta_\HH(S_t)$. Therefore
 \[
-(r-1)\,|E(\HH)| \;\le\; \sum_{e} |\{t : e \in \delta_\HH(S_t)\}| \;=\; \sum_{t} |\delta_\HH(S_t)| \;=\; \sum_{t} c^*(t) \;\le\; (m-1)(n-1),
+   \bigl|\{\, t \in E(T^*) : e \in \delta_\HH(S_t) \,\}\bigr| \;\ge\; r-1 \qquad\text{for every hyperedge } e.
+\]
+
+\emph{Step 2: count the incidences two ways.} Sum that inequality over all hyperedges, then exchange the order of summation. This is legitimate because both of the middle sums below simply count the same pairs $(e,t)$ with $e \in \delta_\HH(S_t)$, once grouped by the hyperedge and once by the tree edge:
+\[
+   (r-1)\,|E(\HH)| \;\le\; \sum_{e}\bigl|\{\, t : e \in \delta_\HH(S_t)\,\}\bigr|
+   \;=\; \sum_{t}\bigl|\{\, e : e \in \delta_\HH(S_t)\,\}\bigr|
+   \;=\; \sum_{t} |\delta_\HH(S_t)|.
+\]
+
+\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $|\delta_\HH(S_t)| = c^*(t)$, and each weight $c^*(t)$ is a local connectivity $\lec_\HH$ of its endpoints, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t |\delta_\HH(S_t)| = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
+\[
+   (r-1)\,|E(\HH)| \;\le\; (m-1)(n-1),
 \]
 and dividing by $r-1$, then rounding down because $|E(\HH)|$ is an integer, gives $|E(\HH)| \le \floorfrac{(m-1)(n-1)}{r-1}$.
 \emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the star hypertree whose hyperedges are $\{h\} \cup G_i$, one per group, and give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges.
@@ -1219,7 +1278,7 @@ breaks for $r \ge 3$ is open.
 \begin{proposition}[Directed hypergraphs: first bounds]\label{prop:dir-hyper-first}
 Model a directed $r$-uniform hyperedge as a tail vertex together with $r-1$
 head vertices, a Berge route entering at the tail and leaving at a head (the
-program's convention). If every pair of vertices has at most $m-1$
+program's convention, drawn in \Cref{fig:dir-hyper-convention}). If every pair of vertices has at most $m-1$
 arc-disjoint directed Berge routes, then
 \[
     |E(\HH)| \;\le\; \frac{(m-1)\,n(n-1)}{r-1},
@@ -1242,6 +1301,46 @@ hyperedges $(a, H)$, $H \in \mathcal{G}^*$. No vertex of $B$ is a tail, so
 every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
 \le m - 1$, while pairs inside $A$ or starting in $B$ have no routes.
 \end{proof}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.0]
+% (a) undirected hyperedge: a single path through its members, no arrows
+\begin{scope}
+  \node[apx] (u1) at (0.0,0.0) {};
+  \node[apx] (u2) at (1.0,0.5) {};
+  \node[apx] (u3) at (2.0,0.05){};
+  \node[apx] (u4) at (3.0,0.55){};
+  \draw[metro, metroB, line width=2.8pt] (u1)--(u2)--(u3)--(u4);
+  \node[font=\small\itshape] at (1.5,-0.85) {undirected hyperedge};
+  \node[font=\scriptsize, text=black!65] at (1.5,-1.35) {one path, no arrows};
+\end{scope}
+% (b) directed hyperedge: a star rooted at the tail (top), arcs down to the heads
+\begin{scope}[xshift=6.4cm]
+  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=9pt] (t) at (1.5,0.85) {};
+  \node[apname, above=2pt] at (t) {tail};
+  \node[apx] (h1) at (0.3,-0.45) {};
+  \node[apx] (h2) at (1.5,-0.6) {};
+  \node[apx] (h3) at (2.7,-0.45) {};
+  \draw[aparc] (t)--(h1);
+  \draw[aparc] (t)--(h2);
+  \draw[aparc] (t)--(h3);
+  \node[apname, text=KULblauw1!75] at (3.35,-0.55) {heads};
+  \node[font=\small\itshape] at (1.5,-1.35) {directed hyperedge};
+\end{scope}
+\end{tikzpicture}
+\caption[Drawing a hyperedge]{Two ways to draw a single hyperedge on its $r$
+vertices, each a tree. \emph{Left:} an undirected hyperedge is a single
+\emph{path} through its members, a tree of maximum degree two, drawn as one metro
+line with no arrows, exactly as in \Cref{fig:three-models}; a route may run
+between any two of its vertices. \emph{Right:} a directed hyperedge is a rooted
+\emph{star}: the tail sits at the top and one arc points down to each of the
+$r-1$ heads, so a Berge route enters at the tail and leaves at any head, and the
+only routes it carries run from the tail outward. The undirected path is the
+symmetric case, the directed star the one-way case, of the same $r$-vertex
+hyperedge.}
+\label{fig:dir-hyper-convention}
+\end{figure}
 
 
 \section{The random threshold}
