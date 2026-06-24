@@ -193,19 +193,22 @@ The second axis is the \emph{direction}, a third toggle independent of the other
     stn/.style={circle, draw=black!70, fill=white, line width=1pt,
                 minimum size=5mm, inner sep=0pt},
     darc/.style={-{Stealth[length=2.2mm]}, line width=1.3pt, KULblauw1,
-                 shorten >=2.8mm, shorten <=1.2mm},
-    harc/.style={-{Stealth[length=2.6mm]}, line width=2.6pt, line cap=round,
-                 shorten >=2.8mm, shorten <=1.6mm}]
+                 shorten >=0.8mm},
+    dml/.style={metro, line width=2.7pt,
+                postaction={decorate, decoration={markings,
+                  mark=between positions 0.28 and 0.82 step 0.54
+                       with {\arrow{Stealth[length=2.6mm]}}}}}]
 
   % (a) simple digraph: directed triangle with one bidirected pair
   \begin{scope}[shift={(0,0)}]
     \node[mv] (s1) at (90:0.78) {};
     \node[mv] (s2) at (210:0.78) {};
     \node[mv] (s3) at (330:0.78) {};
-    \draw[darc] (s1) to[bend left=10] (s2);
-    \draw[darc] (s2) to[bend left=10] (s1);
-    \draw[darc] (s2) to (s3);
-    \draw[darc] (s3) to (s1);
+    % directed 3-cycle, every arc bowing slightly outward, plus one back arc
+    \draw[darc] (s1) to[bend right=14] (s2);
+    \draw[darc] (s2) to[bend right=14] (s3);
+    \draw[darc] (s3) to[bend right=14] (s1);
+    \draw[darc] (s2) to[bend right=14] (s1);
     \node[font=\itshape] at (0,-1.75) {simple digraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {one arc per ordered pair};
   \end{scope}
@@ -215,49 +218,57 @@ The second axis is the \emph{direction}, a third toggle independent of the other
     \node[mv] (g1) at (90:0.78) {};
     \node[mv] (g2) at (210:0.78) {};
     \node[mv] (g3) at (330:0.78) {};
-    \draw[darc] (g1) to[bend left=20] (g2);
-    \draw[darc] (g1) to (g2);
-    \draw[darc] (g1) to[bend right=20] (g2);
-    \draw[darc] (g2) to[bend left=12] (g3);
-    \draw[darc] (g3) to[bend left=12] (g2);
-    \draw[darc] (g3) to (g1);
+    % g1 -> g2: a triple of parallel arcs, fanned outward
+    \draw[darc] (g1) to[bend right=8]  (g2);
+    \draw[darc] (g1) to[bend right=16] (g2);
+    \draw[darc] (g1) to[bend right=24] (g2);
+    % g2 <-> g3: opposite arcs (bidirected)
+    \draw[darc] (g2) to[bend right=12] (g3);
+    \draw[darc] (g3) to[bend right=12] (g2);
+    % g3 -> g1: single, outward
+    \draw[darc] (g3) to[bend right=14] (g1);
     \node[font=\itshape] at (0,-1.75) {directed multigraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel and opposite arcs};
   \end{scope}
 
-  % (c) directed hypergraph: two tail-to-heads fans, opposite across the A--C pair
+  % (c) directed hypergraph: the three metro lines of fig:three-models, now with
+  %     direction (arrows run from each tail through its heads). {A,B,C} and
+  %     {A,B,D} share the bottom A->B stretch, drawn as two parallel lines.
   \begin{scope}[shift={(8.6,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
-    % e1: tail C -> heads A, B
-    \draw[harc, metroB] (C) to[bend left=9] (A);
-    \draw[harc, metroB] (C) to[bend left=9] (B);
-    % e2: tail A -> heads C, D
-    \draw[harc, metroD] (A) to[bend left=9] (C);
-    \draw[harc, metroD] (A) to[bend left=9] (D);
+    \begin{scope}[on background layer]
+      % {A,B,C}: tail A, A -> B (upper offset) -> C
+      \draw[dml, metroB] (-0.85,-0.77) -- (0.85,-0.77) -- (0.85,0.85);
+      % {A,B,D}: tail D, D -> A -> B (lower offset), shares the A -> B stretch
+      \draw[dml, metroC] (-0.85,0.85) -- (-0.85,-0.93) -- (0.85,-0.93);
+      % {A,C,D}: tail A, A -> C -> D
+      \draw[dml, metroD] (-0.85,-0.85) -- (0.85,0.85) -- (-0.85,0.85);
+    \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {tail to heads};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an arc};
   \end{scope}
 
-  % (d) directed multi-hypergraph: a repeated fan (two parallel copies) + one more
+  % (d) directed multi-hypergraph: the repeated hyperedge {A,B,C} (two parallel
+  %     directed lines) plus the single {B,C,D}, exactly as fig:three-models but
+  %     with direction added.
   \begin{scope}[shift={(12.9,0)}]
     \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
-    % e1 repeated: tail C -> A, B, two parallel copies
-    \draw[harc, metroA] (C) to[bend left=15] (A);
-    \draw[harc, metroA] (C) to[bend left=3]  (A);
-    \draw[harc, metroA] (C) to[bend left=15] (B);
-    \draw[harc, metroA] (C) to[bend left=3]  (B);
-    % e2: tail D -> A, B
-    \draw[harc, metroB] (D) to[bend right=8] (A);
-    \draw[harc, metroB] (D) to[bend right=8] (B);
+    \begin{scope}[on background layer]
+      % {A,B,C} repeated: tail A, A -> B -> C, two parallel copies
+      \draw[dml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);
+      \draw[dml, metroA] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);
+      % {B,C,D}: tail B, B -> D -> C
+      \draw[dml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);
+    \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed multi-hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} draws each hyperedge as a tail with arcs to its heads, as in \Cref{fig:dir-hyper-convention}, one colour per hyperedge, and the two shown send opposite arcs across the pair they share. The \emph{directed multi-hypergraph} repeats one hyperedge, two parallel fans from the same tail. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
+\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} keeps the metro lines of \Cref{fig:three-models} and adds direction, each line running from its tail through its heads, one colour per hyperedge. Two of them share the bottom arc, drawn as parallel lines running the same way, the directed counterpart of two metro lines sharing a stretch of track. The \emph{directed multi-hypergraph} repeats one directed hyperedge, the two copies running side by side. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
 \label{fig:three-models-directed}
 \end{figure}
 
