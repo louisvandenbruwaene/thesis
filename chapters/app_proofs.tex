@@ -79,7 +79,7 @@ The upper bound of \Cref{thm:mader} rests on three short lemmas about a Gomory--
   \draw[apgedge,vertexred] (e) to[bend right=22] (c);  % dist 3, highlighted
   \node[font=\small] at (1.0,-1.7) {graph $G$};
 \end{scope}
-% --- right: Gomory--Hu tree T (a path) ---
+% --- right: Gomory--Hu tree T (star centred at a and c) ---
 \begin{scope}[xshift=6.4cm]
   \node[apxlab] (te) at (-0.7,0.4) {e};
   \node[apxlab] (ta) at (0.6,1.5) {a};
@@ -87,8 +87,8 @@ The upper bound of \Cref{thm:mader} rests on three short lemmas about a Gomory--
   \node[apxlab] (tc) at (2.8,0.1) {c};
   \node[apxlab] (td) at (1.3,-0.9) {d};
   \draw[aptedge] (te)--(ta) node[aptw,midway] {2};
-  \draw[aptedge] (ta)--(tb) node[aptw,midway] {3};
-  \draw[aptedge] (tb)--(tc) node[aptw,midway] {3};
+  \draw[aptedge] (ta)--(tc) node[aptw,pos=0.4] {3};
+  \draw[aptedge] (tc)--(tb) node[aptw,midway] {3};
   \draw[aptedge] (tc)--(td) node[aptw,midway] {2};
   \node[font=\small] at (1.0,-1.7) {Gomory--Hu tree $T$};
 \end{scope}
@@ -97,14 +97,15 @@ The upper bound of \Cref{thm:mader} rests on three short lemmas about a Gomory--
    (3.4,0.4) -- (4.7,0.4);
 \end{tikzpicture}
 \caption[Graph and Gomory--Hu tree]{A simple graph $G$ (left) and a
-Gomory--Hu tree $T$ of it (right). Both live on the same five vertices, and
-here $T$ is the path $e\!-\!a\!-\!b\!-\!c\!-\!d$ with the marked cut weights.
-The four edges $ea$, $ab$, $bc$, $cd$ are also tree edges, so each has
-$\dist_T(e)=1$: these are the $E_1$ edges of \Cref{lem:dist-1-count}, and a
-\emph{simple} graph admits at most $n-1=4$ of them, one per tree edge.
-The edges $ac$ and $bd$ join tree-distance-$2$ pairs, and the red chord $ec$
-has $\dist_T(ec)=3$, crossing all three cuts on the path
-$e\!-\!a\!-\!b\!-\!c$. Reading $\dist_T(e)$ as the number of tree cuts an
+Gomory--Hu tree $T$ of it (right). Both live on the same five vertices.
+The tree $T$ has edges $ea\,(2)$, $ac\,(3)$, $cb\,(3)$, $cd\,(2)$, where
+each weight equals the local edge-connectivity of its endpoints in $G$.
+These four edges are also edges of $G$, so each has $\dist_T(e)=1$: these
+are the $E_1$ edges of \Cref{lem:dist-1-count}, and a \emph{simple} graph
+admits at most $n-1=4$ of them, one per tree edge.
+The remaining edges $ab$, $bd$, and the red chord $ec$ all join
+tree-distance-$2$ pairs: the path in $T$ from $e$ to $c$ is $e\!-\!a\!-\!c$,
+so $\dist_T(ec)=2$. Reading $\dist_T(e)$ as the number of tree cuts an
 edge crosses makes $\sum_{e}\dist_T(e)=\sum_t c(t)$
 (\Cref{lem:double-count}). Every edge crosses at least one cut, but only the
 $n-1$ tree edges cross exactly one, which is the surplus that drives
@@ -208,12 +209,12 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \node[apname,above=2pt] at (v1) {$v_1$};
 % hub edges (all present)
 \foreach \i in {1,...,6}{ \draw[apgedge] (h)--(v\i); }
-% sparse spoke graph: each v_i spoke-degree <= m-2 = 2 (two short paths)
-\draw[apgedge,KULblauw3b] (v1)--(v2) (v2)--(v3);
-\draw[apgedge,KULblauw3b] (v4)--(v5) (v5)--(v6);
+% spoke graph: two K_3 cliques {v1,v2,v3} and {v4,v5,v6}, each of degree m-2=2
+\draw[apgedge,KULblauw3b] (v1)--(v2) (v2)--(v3) (v1)--(v3);
+\draw[apgedge,KULblauw3b] (v4)--(v5) (v5)--(v6) (v4)--(v6);
 \end{tikzpicture}
 \caption{Hub-and-spokes $H_{m,n}$: the hub edges $\{h,v_i\}$ (light) plus a
-sparse \emph{spoke graph} (dark) of spoke-degree at most $m-2$.}
+$(m-2)$-regular \emph{spoke graph} (dark) in two $K_{m-1}=K_3$ cliques.}
 \label{fig:hub-spokes}
 \end{subfigure}
 \caption[Lower-bound constructions for Mader's theorem]{The two extremal
@@ -366,9 +367,8 @@ arc-disjoint $u$--$w$ routes, against $\lec(u,w)\le1$.}
 \draw[aparc] (u)--(w);
 \node[apname, text=vertexred] at (0.05,1.65) {$v\!\to\! u\!\to\! w$};
 \end{tikzpicture}
-\caption{The counterexample $\{(u,v),(v,u),(u,w)\}$: every local
-connectivity is $1$, yet $w$ \emph{is} reachable from $v$, but only
-\emph{through} $u$.}
+\caption{The counterexample $\{(u,v),(v,u),(u,w)\}$: $\lec^{\max}=1$,
+yet $w$ \emph{is} reachable from $v$, but only \emph{through} $u$.}
 \label{fig:mutual-unreach-counter}
 \end{subfigure}
 \caption[Mutually unreachable out-neighbourhoods]{Why
@@ -377,7 +377,7 @@ connectivity is $1$, yet $w$ \emph{is} reachable from $v$, but only
 $\lec^{\max}\le1$, no $v\rightsquigarrow w$ path can avoid $u$: such a path
 would combine with the lone arc $u\!\to\! w$ into two arc-disjoint routes.
 \textbf{(b)} The restriction to $D-u$ is essential. In the three-vertex
-digraph $\{(u,v),(v,u),(u,w)\}$ all connectivities equal $1$, yet $v$
+digraph $\{(u,v),(v,u),(u,w)\}$ we have $\lec^{\max}=1$, yet $v$
 reaches $w$ via $v\!\to\! u\!\to\! w$, a route that reuses the vertex $u$,
 which the proposition allows.}
 \label{fig:mutual-unreach}
