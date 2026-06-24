@@ -182,46 +182,98 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. A simple g
 \label{fig:three-models}
 \end{figure}
 
-The second axis is the \emph{direction}: arcs may be one-way, and then a network can be lopsided in a manner no undirected graph can imitate. Although it might seem a generalisation of the undirected setting, they are distinct in complexity and methodology: the arcs $u \to v$ and $v \to u$ offer a round trip while the edge $uv$ does not. This distinction fades when we no longer distinguish paths by their edges, as in our next choice of interpretation.
-
-In a digraph each vertex carries two degree counts. The \emph{out-degree} $d^+(v)$ is the number of arcs leaving $v$, the \emph{in-degree} $d^-(v)$ the number entering it, and the \emph{total degree} $d(v) = d^+(v) + d^-(v)$ is the two added together. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced will be the structural idea behind the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a pair joined by two arc-disjoint routes, the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network.
+The second axis is the \emph{direction}: arcs may be one-way, and then a network can be lopsided in a manner no undirected graph can imitate. Although it might seem a generalisation of the undirected setting, they are distinct in complexity and methodology: the arcs $u \to v$ and $v \to u$ offer a round trip while the edge $uv$ does not. These digraphs have three degree counts for each vertex. The \emph{out-degree} $d^+(v)$ is the number of arcs leaving $v$, the \emph{in-degree} $d^-(v)$ the number entering it, and the \emph{total degree} $d(v) = d^+(v) + d^-(v)$ is the two added together. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced will be the structural idea behind some of the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a network with three arc-disjoint routes between the two chosen vertices, which equals the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network. 
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}[>=Stealth, scale=1.15,
-    rarc/.style={-{Stealth[length=2.4mm]}, line width=1.7pt},
-    cutline/.style={vertexred, densely dashed, line width=1.3pt}]
-  \node[vertex] (s) at (0,0) {$s$};
-  \node[vertex] (a) at (2.4,1.3) {$a$};
-  \node[vertex] (b) at (1.7,-1.3) {$b$};
-  \node[vertex] (c) at (3.5,-1.3) {$c$};
-  \node[vertex] (t) at (4.9,0) {$t$};
-  % route 1 (green): s -> a -> t
-  \draw[rarc, vertexgreen!70!black] (s) -- (a);
-  \draw[rarc, vertexgreen!70!black] (a) -- (t);
-  % route 2 (purple): s -> b -> c -> t
-  \draw[rarc, vertexpurple] (s) -- (b);
-  \draw[rarc, vertexpurple] (b) -- (c);
-  \draw[rarc, vertexpurple] (c) -- (t);
-  % minimum arc-cut separating s from t: the two arcs into t
-  \draw[cutline] (4.05,1.75) -- (4.05,-1.75);
-  \node[vertexred, font=\scriptsize] at (4.05,2.05) {cut: $2$ arcs};
-  % degree labels
-  \node[font=\scriptsize, KULblauw1] at (-0.05,-1.0) {$d^{+}(s)=2$};
-  \node[font=\scriptsize, KULblauw1] at (5.0,1.0) {$d^{-}(t)=2$};
-  % route labels
-  \node[vertexgreen!60!black, font=\scriptsize] at (0.75,1.15) {route 1};
-  \node[vertexpurple, font=\scriptsize] at (2.05,-1.85) {route 2};
+\begin{tikzpicture}[>=Stealth, scale=1.2,
+    mv/.style={circle, draw=KULblauw1, fill=KULblauw1!15,
+               line width=1pt, minimum size=6mm,
+               inner sep=0pt, font=\small},
+    me/.style={-{Stealth[length=2.3mm]}, line width=1.0pt,
+               KULblauw1!45, shorten >=3.5mm},
+    rA/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
+               vertexorange, shorten >=3.5mm},
+    rB/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
+               vertexgreen!70!black, shorten >=3.5mm},
+    rC/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
+               vertexpurple, shorten >=3.5mm},
+    cut/.style={vertexred, densely dashed, line width=1.4pt}
+]
+
+% K5 pentagon layout (angles: 90°, 162°, 234°, 306°, 18°)
+\foreach \i in {0,...,4}{
+    \pgfmathsetmacro{\ang}{90+72*\i}
+    \coordinate (v\i) at (\ang:1.6);
+}
+
+% ---- Background directed edges (with extra parallel arcs) ----
+% u = v1,  v = v4
+% out of u: three arcs (keeps out‑degree 3)
+\draw[me] (v1) to[bend right=12] (v0);
+\draw[me] (v1) to[bend right=12] (v2);
+\draw[me] (v1) to[bend right=12] (v4);
+
+% into v: four arcs (in‑degree 4)
+\draw[me] (v0) to[bend right=12] (v4);
+\draw[me] (v2) to[bend right=12] (v4);
+\draw[me] (v3) to[bend right=12] (v4);
+% the fourth is already u->v
+
+% --- extra arcs to make the digraph richer ---
+% two arcs from 0 to 2 (one normal, one parallel)
+\draw[me] (v0) to[bend right=12] (v2);
+\draw[me] (v0) to[bend right=24] (v2);   % second arc, more bent
+
+% two arcs from 3 to 0
+\draw[me] (v3) to[bend right=12] (v0);
+\draw[me] (v3) to[bend right=24] (v0);
+
+% a single arc from 2 to 3 (keeps the cycle)
+\draw[me] (v2) to[bend right=12] (v3);
+
+% ---- Three arc‑disjoint u → v routes (coloured) ----
+% route A: u → v (orange, direct)
+\draw[rA] (v1) to[bend right=12] (v4);
+
+% route B: u → 0 → v (green)
+\draw[rB] (v1) to[bend right=12] (v0);
+\draw[rB] (v0) to[bend right=12] (v4);
+
+% route C: u → 2 → v (purple)
+\draw[rC] (v1) to[bend right=12] (v2);
+\draw[rC] (v2) to[bend right=12] (v4);
+
+% ---- Minimum arc-cut: a dashed ring around the source u ----
+% u has out-degree 3 and no in-arcs, so the ring crosses exactly the
+% three arcs leaving u, which are the first arcs of routes A, B, C.
+\draw[cut] (v1) circle (0.58);
+
+\node[vertexred, font=\scriptsize, anchor=east]
+  at (-2.25, 0.2) {cut: $3$ arcs};
+
+% ---- Degree labels ----
+\node[font=\scriptsize, KULblauw1, anchor=east]
+  at (-2.25, 0.85) {$d^{+}(u)=3$};   % left, above u
+
+\node[font=\scriptsize, KULblauw1, anchor=west]
+  at (2.0, 0.9) {$d^{-}(v)=4$};      % right, near v
+
+% ---- Vertices (only u and v named) ----
+\node[mv] at (v0) {};
+\node[mv] at (v1) {$u$};
+\node[mv] at (v2) {};
+\node[mv] at (v3) {};
+\node[mv] at (v4) {$v$};
+
 \end{tikzpicture}
-\caption[A worked directed graph]{The directed measure on one small digraph.
-The pair $(s,t)$ carries two arc-disjoint directed routes, $s\to a\to t$
-(green) and $s\to b\to c\to t$ (purple). Deleting the two arcs that enter $t$
-separates $s$ from $t$, so by Menger (\Cref{thm:menger}) the local
-connectivity $\lec(s,t)=2$ equals the size of that minimum arc-cut (red
-dashed). The degree bound $\lec(s,t)\le\min(d^{+}(s),d^{-}(t))$ is tight here,
-since both out-degree of $s$ and in-degree of $t$ equal $2$. Arc-disjoint
-routes counted against the smallest arc-cut are the whole of what the directed
-problems measure.}
+
+\caption{A directed version of the \(K_5\) example with multiple arcs.
+Three arc-disjoint directed routes connect \(u\) to \(v\) (orange, green, purple).
+The red dashed ring around \(u\) cuts exactly the three arcs leaving it, the first
+arc of each route, so \(\lambda(u,v)=3\) by Menger's theorem.
+The out-degree \(d^{+}(u)=3\) and in-degree \(d^{-}(v)=4\) bound the value from above,
+and \(\lambda(u,v)=\min(3,4)=3\) meets the smaller one, at \(u\).}
 \label{fig:directed-lambda}
 \end{figure}
 
