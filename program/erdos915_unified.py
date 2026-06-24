@@ -4432,7 +4432,7 @@ def _geng_support_graphs(
 
     Each edge is an ordered tuple ``(u, v)`` with ``u < v``; isolated vertices
     are kept (``geng`` always emits all ``n`` vertices).  ``geng`` writes the
-    non-isomorphic graphs in graph6 to stdout and we parse each with networkx.
+    non-isomorphic graphs in graph6 to stdout and we parse each with _graph6_edges.
     Raises ``RuntimeError`` if ``geng`` is not on PATH.
     """
     exe = shutil.which(geng_path)
