@@ -178,11 +178,88 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two indepe
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each a set of $r \ge 2$ vertices ($r = 2$ gives back ordinary edges; the depicted examples use $r \ge 3$), drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
+\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each a set of $r \ge 2$ vertices ($r = 2$ gives back ordinary edges, and the depicted examples use $r \ge 3$), drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
 \label{fig:three-models}
 \end{figure}
 
-The second axis is the \emph{direction}, a third toggle independent of the other two. Setting it at the top of the model lattice gives the single most general object in the thesis, the \emph{directed multi-hypergraph}, of which every other class is a restriction. An undirected object is the symmetric special case of a directed one, each edge standing for a matched pair of opposite arcs $u \to v$ and $v \to u$, so direction strictly enlarges the family of objects. What it does \emph{not} do is let the directed and undirected problems merge into one. The two opposite arcs offer a round trip the single edge $uv$ does not, the extremal digraphs are deliberately \emph{lopsided}, with out-degree and in-degree pulled apart in a way no symmetric object can imitate, and the Gomory-Hu tree that settles every undirected case has no directed analogue (\Cref{app:proofs}), so the one-way variants stay distinct in both difficulty and method. A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+(v)$ counts the arcs leaving $v$, and the vertices they reach are its \emph{out-neighbours}; the \emph{in-degree} $d^-(v)$ counts the arcs entering $v$, and the vertices they come from are its \emph{in-neighbours}; the \emph{total degree} $d(v) = d^+(v) + d^-(v)$ adds the two. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced is the structural idea behind several of the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a network with three arc-disjoint routes between the two chosen vertices, which equals the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network.
+The second axis is the \emph{direction}, a third toggle independent of the other two. Setting it at the top of the model lattice gives the single most general object in the thesis, the \emph{directed multi-hypergraph}, of which every other class is a restriction. \Cref{fig:three-models-directed} redraws the four models of \Cref{fig:three-models} with arcs in place of edges. An undirected object is the symmetric special case of a directed one, each edge standing for a matched pair of opposite arcs $u \to v$ and $v \to u$, so direction strictly enlarges the family of objects. What it does \emph{not} do is let the directed and undirected problems merge into one. The two opposite arcs offer a round trip the single edge $uv$ does not, the extremal digraphs are deliberately \emph{lopsided}, with out-degree and in-degree pulled apart in a way no symmetric object can imitate, and the Gomory-Hu tree that settles every undirected case has no directed analogue (\Cref{app:proofs}), so the one-way variants stay distinct in both difficulty and method. A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+(v)$ counts the arcs leaving $v$, and the vertices they reach are its \emph{out-neighbours}. The \emph{in-degree} $d^-(v)$ counts the arcs entering $v$, and the vertices they come from are its \emph{in-neighbours}. The \emph{total degree} $d(v) = d^+(v) + d^-(v)$ adds the two. A vertex with high out-degree fans arcs outward, one with high in-degree gathers them, and keeping the two balanced is the structural idea behind several of the directed constructions to come. The directed measure itself is easiest to meet on one concrete digraph. \Cref{fig:directed-lambda} shows a network with three arc-disjoint routes between the two chosen vertices, which equals the smallest arc-cut that separates them, and the degree bound that limits both, which is exactly how Menger reads in a one-way network.
+
+\begin{figure}[ht]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+    mv/.style={circle, draw=roleMeasure, fill=roleMeasure!15, line width=1pt,
+               minimum size=5.5mm, inner sep=0pt},
+    stn/.style={circle, draw=black!70, fill=white, line width=1pt,
+                minimum size=5mm, inner sep=0pt},
+    darc/.style={-{Stealth[length=2.2mm]}, line width=1.3pt, KULblauw1,
+                 shorten >=2.8mm, shorten <=1.2mm},
+    harc/.style={-{Stealth[length=2.6mm]}, line width=2.6pt, line cap=round,
+                 shorten >=2.8mm, shorten <=1.6mm}]
+
+  % (a) simple digraph: directed triangle with one bidirected pair
+  \begin{scope}[shift={(0,0)}]
+    \node[mv] (s1) at (90:0.78) {};
+    \node[mv] (s2) at (210:0.78) {};
+    \node[mv] (s3) at (330:0.78) {};
+    \draw[darc] (s1) to[bend left=10] (s2);
+    \draw[darc] (s2) to[bend left=10] (s1);
+    \draw[darc] (s2) to (s3);
+    \draw[darc] (s3) to (s1);
+    \node[font=\itshape] at (0,-1.75) {simple digraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {one arc per ordered pair};
+  \end{scope}
+
+  % (b) directed multigraph: a triple arc, a bidirected pair, a single arc
+  \begin{scope}[shift={(4.3,0)}]
+    \node[mv] (g1) at (90:0.78) {};
+    \node[mv] (g2) at (210:0.78) {};
+    \node[mv] (g3) at (330:0.78) {};
+    \draw[darc] (g1) to[bend left=20] (g2);
+    \draw[darc] (g1) to (g2);
+    \draw[darc] (g1) to[bend right=20] (g2);
+    \draw[darc] (g2) to[bend left=12] (g3);
+    \draw[darc] (g3) to[bend left=12] (g2);
+    \draw[darc] (g3) to (g1);
+    \node[font=\itshape] at (0,-1.75) {directed multigraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel and opposite arcs};
+  \end{scope}
+
+  % (c) directed hypergraph: two tail-to-heads fans, opposite across the A--C pair
+  \begin{scope}[shift={(8.6,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
+    % e1: tail C -> heads A, B
+    \draw[harc, metroB] (C) to[bend left=9] (A);
+    \draw[harc, metroB] (C) to[bend left=9] (B);
+    % e2: tail A -> heads C, D
+    \draw[harc, metroD] (A) to[bend left=9] (C);
+    \draw[harc, metroD] (A) to[bend left=9] (D);
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {directed hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {tail to heads};
+  \end{scope}
+
+  % (d) directed multi-hypergraph: a repeated fan (two parallel copies) + one more
+  \begin{scope}[shift={(12.9,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
+    % e1 repeated: tail C -> A, B, two parallel copies
+    \draw[harc, metroA] (C) to[bend left=15] (A);
+    \draw[harc, metroA] (C) to[bend left=3]  (A);
+    \draw[harc, metroA] (C) to[bend left=15] (B);
+    \draw[harc, metroA] (C) to[bend left=3]  (B);
+    % e2: tail D -> A, B
+    \draw[harc, metroB] (D) to[bend right=8] (A);
+    \draw[harc, metroB] (D) to[bend right=8] (B);
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {directed multi-hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
+  \end{scope}
+\end{tikzpicture}}
+\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} draws each hyperedge as a tail with arcs to its heads, as in \Cref{fig:dir-hyper-convention}, one colour per hyperedge, and the two shown send opposite arcs across the pair they share. The \emph{directed multi-hypergraph} repeats one hyperedge, two parallel fans from the same tail. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
+\label{fig:three-models-directed}
+\end{figure}
 
 \begin{figure}[ht]
 \centering
