@@ -1646,15 +1646,29 @@ THESIS INTEGRATION (author chose: focused subsection; prove duality + try genera
   4/6; r=4 n=4 m=4: 4/8). Verdict: orientation axis collapses for n>r, so Problem 915 stays a
   TWELVE-variant question and general enters as a margin refinement, not a 13th column. Open-
   problems directed-hyper item cross-links the duality + general bound.
-- ch2_certify.tex: one connector paragraph after fig:dir-hyper-gadget-example noting the gate
-  is indifferent to the tail/head split, pointing to sec:orientation-models. NOT YET COMMITTED
-  (it sits in the working tree on top of the author's fig 2.6 revert; commit it with the figure).
+- ch2_certify.tex: connector paragraph after the directed gate noting the gate is indifferent
+  to the tail/head split, pointing to sec:orientation-models.
 - Build: latexmk exit 0, 112 pp (+2), 0 overfull, 0 undefined refs/cites; lem A.41, prop A.42,
   subsec 4.3.1, tab 4.2 all resolve. Table values re-verified by max_feasible_hyperedges (edge
-  AND vertex coincide). Committed app_proofs.tex + ch4_synthesis.tex + this log; left
-  ch2_certify.tex + main.pdf uncommitted (author's in-progress figure work).
+  AND vertex coincide).
 
-STILL SEPARATE / in flight: the hypergraph metro-map figure rebuild (author reverted the awful
-4-rail fig 2.6 in the working tree; new helper-junction layout from author's coordinates
-drafted + rendered + shown, NOT yet in .tex). NOT done in solve()/variant configs/figure grid
-(deliberately -- general stays a margin refinement, not a first-class 12-grid variant).
+FIGURE REBUILD DONE (author: "do the figure, i gave you all you needed"). The author reverted
+the awful 4-rail fig 2.6 and handed a hand-designed metro layout (15 coords named a..o; the 8
+letters appearing in edges are stations a,c,d,e,j,l,m,n, the other 7 are helper junctions named
+after their edge; 8 hyperedges ead/nmj/elc[typo "els"->c, author-confirmed]/edm/nel/elm/mcj/ldj;
+directed = middle vertex is the tail, author-confirmed). Replaced BOTH whole-hypergraph figures
+in ch2 with single-panel metro maps (the helper junction IS the gate, so map and flow network
+are one drawing, no more two-panel before/after):
+  * fig:hyper-gadget-example (2.6, undirected): 8 stations, 8 colour Y-hyperedges meeting at
+    boxed gates named after the edge; the three spine spokes to hub e nudged into parallel lanes
+    (shared-track effect); checker reads lambda(e,l)=4 (e,l share elc,elm,nel + one longer route).
+    ldj helper placed at (5.2,5.2) (author left it unplaced).
+  * fig:dir-hyper-gadget-example (2.8, directed): same layout, dmetro arrows tail->gate->two
+    heads; checker reads lambda(d,e)=2 (orientation drops it from the undirected 4). Lead-ins +
+    captions rewritten (no more u,v,c interchange / "max flow = 3" two-panel prose). Old layered
+    acyclic directed figure removed.
+  Rendered both in-thesis (pp 35, 37): clean, no overlap, distinct colours, arrows correct.
+  Committed ch2_certify.tex + main.pdf.
+
+NOT done in solve()/variant configs/figure grid (deliberately -- general stays a margin
+refinement, not a first-class 12-grid variant).
