@@ -180,6 +180,31 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
     \label{tab:summary}
 \end{table}
 
+\subsection{Orientation models for the directed hypergraph}
+\label{sec:orientation-models}
+
+The directed rows of \Cref{tab:summary} read a directed Berge edge in one way, the \emph{forward} one of a single tail fanning to $r-1$ heads. It is not the only reading. In general a directed $r$-uniform hyperedge is a split of its vertices into a non-empty tail set $T$ and head set $H$, a route entering at a tail and leaving at a head, and the gate checker of \Cref{ch:certify} measures any such split without change. Three models are worth naming, \emph{forward} ($|T| = 1$), \emph{backward} ($|H| = 1$), and \emph{general} (any split, with genuinely mixed ones appearing once $r \ge 4$). The natural question, and one a reader of the directed figures tends to ask, is whether they multiply the table.
+
+They do not, and two results say why. First, backward is not a new problem. Reversing every hyperarc turns a backward hypergraph into a forward one and reverses every route along the way, so the two models share every extremal number, edge and vertex, for all $r$, $m$ and $n$ (\Cref{lem:dir-hyper-duality}). The backward column is the forward column read upside down. Second, the general model, though it admits more hyperedges on a single vertex set, obeys the same first-order bound. A hyperedge $(T, H)$ occupies $|T|\,|H| \ge r-1$ ordered tail-head pairs, each usable by at most $m-1$ disjoint one-step routes, so $(r-1)|E| \le (m-1)\,n(n-1)$, exactly the forward cap of \Cref{prop:dir-hyper-first} (\Cref{prop:dir-hyper-general}). The forward construction is itself a set of general hyperedges, so general is squeezed between the same lower and upper bounds as forward, and its value too is quadratic in $n$ with the same leading constant.
+
+Where the models part company is only at small sizes, and the program shows exactly where. \Cref{tab:orientation} lists the extremal hyperedge counts the branch-and-bound checker (\code{max\_feasible\_hyperedges}) proves for the forward and general models. The general one is strictly denser precisely when vertices are scarce, $n \approx r$, where the richer set of orientations lets a single vertex-set carry more hyperedges. At $n = r = 4$ it reaches eight hyperarcs against forward's four, and the surplus grows with the connectivity budget. The moment $n$ exceeds $r$ the gap is gone, proved equal already at $r = 3$, $n = 4$, and larger searches find no separation thereafter. This matches the bound: once the hypergraph spreads past a single edge-set, the one-tail model already saturates the Menger budget and extra orientations buy nothing. So the orientation axis collapses for the asymptotics the table records, which is why Problem 915 stays a twelve-variant question. The general model enters as a refinement at the margin, not a thirteenth column.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$r$ & $m$ & $n$ & forward & general \\
+\midrule
+$3$ & $3$ & $3$ & $3$ & $4$ \\
+$3$ & $3$ & $4$ & $8$ & $8$ \\
+$4$ & $3$ & $4$ & $4$ & $6$ \\
+$4$ & $4$ & $4$ & $4$ & $8$ \\
+\bottomrule
+\end{tabular}
+\caption{Extremal hyperedge counts the branch-and-bound checker proves exact for the forward and general directed $r$-uniform models, at the small sizes where they can differ. The general model is strictly denser only when $n \approx r$, doubling the forward count at $n = r = 4$, $m = 4$, and the gap closes once $n$ exceeds $r$ (proved equal at $r = 3$, $n = 4$). Edge- and vertex-disjoint counts agree throughout, and backward equals forward by \Cref{lem:dir-hyper-duality}.}
+\label{tab:orientation}
+\end{table}
+
 \section{Contributions and limitations of the program}
 
 The program turned a per-case craft into a uniform pipeline. Before it, each variant came with its own one-off computation and its own hand argument. After it, one representation holds every variant, one exact checker measures connectivity, one certifier proves small-case upper bounds, and one cooled search discovers extremisers and the lower bounds they witness. The rediscovery of \Cref{ch:discover} is the evidence that the pipeline is faithful: pointed at solved cases, it returns the solved answers.
@@ -194,7 +219,7 @@ Its limits are as clear as its reach, and stating them is part of the honesty th
     \item Extremal uniqueness at odd levels for directed multigraphs with $m \ge 4$. The conditional odd step (\Cref{thm:odd-step}) and the propagation of \Cref{rem:odd-step-roadmap} are stated for $m \in \{3, 4\}$. For $m = 4$ the \emph{value} step goes through, but at an odd extremal level the counting no longer forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ are arithmetically consistent), so the uniqueness statement does not yet propagate. For $m \ge 5$ the same escape climbs one level and even the \emph{value} step stalls: a surplus extremiser could be degree-regular strictly above the deletion bound, so no vertex deletion is forced to land on an extremal multigraph. Closing either hole asks for an arithmetic or structural input the present averaging argument does not supply.
     \item The undirected vertex-disjoint problem for $m \ge 6$, open since 1974, where even the extremal structure is unknown.
     \item The hypergraph vertex problem at $m \ge 4$. The problem is now settled at $m = 2$ and $m = 3$ for every uniformity and all $n$, with $k_m^{(r)}(n) = \floorfrac{(m-1)(n-1)}{r-1} = \ell_m^{(r)}(n)$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). The incidence reduction stands for every $m$, but the rank bound that drives it (\Cref{lem:incidence-rank}) leans on the triconnected (Tutte/SPQR) decomposition exactly where $\kap \le 2$ lives. For $m = 4$ it would need a $4$-connectivity analogue, where no comparably clean decomposition is available. Exhaustive computation gives $k_4^{(3)}(5) = 6 = \floor{3 \cdot 4 / 2}$, so the agreement $k_m^{(r)} = \ell_m^{(r)}$ survives at least one step past the theorem and there is no early counterexample. Where it first breaks for $r \ge 3$ (the analogue of the $m = 5$ graph divergence) is unknown.
-    \item The directed hypergraph variants. The tail-and-heads model has first bounds and a quadratic lower-bound family (\Cref{prop:dir-hyper-first}): a pair-codegree count caps the hyperedges at $(m-1)n(n-1)/(r-1)$, and a bipartite construction reaches $\approx (m-1)n^2/(4(r-1))$, so the value is quadratic in $n$. Its exact order, and the matching upper construction, are unexplored.
+    \item The directed hypergraph variants. The tail-and-heads model has first bounds and a quadratic lower-bound family (\Cref{prop:dir-hyper-first}): a pair-codegree count caps the hyperedges at $(m-1)n(n-1)/(r-1)$, and a bipartite construction reaches $\approx (m-1)n^2/(4(r-1))$, so the value is quadratic in $n$. Its exact order, and the matching upper construction, are unexplored. The orientation of the Berge edge does not widen this gap: the backward model coincides with forward by reversal (\Cref{lem:dir-hyper-duality}), and the general model obeys the same cap (\Cref{prop:dir-hyper-general}), beating forward only in the scarce-vertex regime $n \approx r$ (\Cref{sec:orientation-models}), so a single quadratic question covers all three.
 \end{itemize}
 
 The map is filled in where honest mathematics could fill it, and where it could not, the blanks are marked precisely, with a machine standing ready at each of them. That, finally, is the use of building the microscope: not that it answers every question, but that it shows exactly which questions are left, and hands the next reader a clean place to start.

@@ -1634,9 +1634,27 @@ skip (was 82; +6 new in tests/test_hypergraph.py DirectedOrientationModels). For
 regression spot-checks unchanged (K_4^(3)=3, star hypertree, verify_hyper_vertex_value,
 forward enum class counts + legacy format).
 
-PENDING (author decision, "after the numbers"): thesis presentation -- the duality as a
-short lemma, the general model as a new variant, and whether to grow the twelve-variant
-table (only the directed-hypergraph cells split by orientation, so 12 -> up to 16) or keep
-12 + an orientation subsection. NOT yet integrated into solve()/the variant configs/figures.
-SEPARATELY in flight: the hypergraph metro-map figure rebuild (author reverted the awful
-4-rail fig 2.6 in the working tree; new helper-junction layout drafted, not yet in .tex).
+THESIS INTEGRATION (author chose: focused subsection; prove duality + try general bound):
+- app_proofs.tex: lem:dir-hyper-duality (backward = forward by arc reversal, edge AND vertex,
+  full proof) + prop:dir-hyper-general (the general model obeys the SAME (m-1)n(n-1)/(r-1) cap
+  as forward, since a hyperedge (T,H) fills |T||H| >= r-1 ordered tail-head pairs each usable
+  by <= m-1 disjoint one-step routes; forward construction is itself general, so same quadratic
+  lower bound). Both placed right after prop:dir-hyper-first.
+- ch4_synthesis.tex: new \subsection{Orientation models for the directed hypergraph}
+  (sec:orientation-models) after tab:summary -- taxonomy, the two results, and tab:orientation
+  giving the proved-exact gap (forward vs general at r=3 n=3: 3/4; r=3 n=4: 8/8; r=4 n=4 m=3:
+  4/6; r=4 n=4 m=4: 4/8). Verdict: orientation axis collapses for n>r, so Problem 915 stays a
+  TWELVE-variant question and general enters as a margin refinement, not a 13th column. Open-
+  problems directed-hyper item cross-links the duality + general bound.
+- ch2_certify.tex: one connector paragraph after fig:dir-hyper-gadget-example noting the gate
+  is indifferent to the tail/head split, pointing to sec:orientation-models. NOT YET COMMITTED
+  (it sits in the working tree on top of the author's fig 2.6 revert; commit it with the figure).
+- Build: latexmk exit 0, 112 pp (+2), 0 overfull, 0 undefined refs/cites; lem A.41, prop A.42,
+  subsec 4.3.1, tab 4.2 all resolve. Table values re-verified by max_feasible_hyperedges (edge
+  AND vertex coincide). Committed app_proofs.tex + ch4_synthesis.tex + this log; left
+  ch2_certify.tex + main.pdf uncommitted (author's in-progress figure work).
+
+STILL SEPARATE / in flight: the hypergraph metro-map figure rebuild (author reverted the awful
+4-rail fig 2.6 in the working tree; new helper-junction layout from author's coordinates
+drafted + rendered + shown, NOT yet in .tex). NOT done in solve()/variant configs/figure grid
+(deliberately -- general stays a margin refinement, not a first-class 12-grid variant).

@@ -1362,6 +1362,70 @@ and the thin route never look alike.}
 \label{fig:dir-hyper-convention}
 \end{figure}
 
+The forward model is one of three ways to orient a Berge edge. In general a
+directed $r$-uniform hyperedge is a split of its $r$ vertices into a non-empty
+\emph{tail set} $T$ and a non-empty \emph{head set} $H$, a route entering at a
+tail and leaving at a head; the \emph{forward} model is $|T| = 1$, the
+\emph{backward} model is $|H| = 1$, and the \emph{general} model allows any split
+(genuinely mixed splits, both parts at least two, exist from $r \ge 4$). The next
+two results place all three. The first is that backward needs no separate study,
+and the second is that the general model, despite admitting more hyperedges on a
+single vertex set, obeys the very same first-order bound as forward.
+
+\begin{lemma}[Backward is the reverse of forward]\label{lem:dir-hyper-duality}
+Reversing every hyperarc, $(T, H) \mapsto (H, T)$, is an edge-count-preserving
+bijection between the forward directed $r$-uniform hypergraphs and the backward
+ones on the same vertices, and the reverse $\HH^{R}$ satisfies
+$\lec_{\HH}(u, v) = \lec_{\HH^{R}}(v, u)$ and $\kap_{\HH}(u, v) =
+\kap_{\HH^{R}}(v, u)$. Hence $\lec^{\max}$ and $\kap^{\max}$ are invariant under
+reversal, and the backward edge and vertex extremal numbers equal the forward
+ones, for every $r$, $m$ and $n$.
+\end{lemma}
+
+\begin{proof}
+Reversal sends a backward hyperarc ($|T| = r-1$, $|H| = 1$) to a forward one
+($|T| = 1$) and is its own inverse, so it is an edge-count-preserving bijection of
+the two families. Let $u = x_0, e_1, x_1, \dots, e_k, x_k = v$ be a directed Berge
+route in $\HH$, where $x_{i-1}$ is a tail and $x_i$ a head of $e_i$. The reversed
+edge $e_i^{R} = (H_i, T_i)$ has $x_i$ as a tail and $x_{i-1}$ as a head, so
+$v = x_k, e_k^{R}, x_{k-1}, \dots, e_1^{R}, x_0 = u$ is a directed Berge route
+from $v$ to $u$ in $\HH^{R}$ on the same edges and the same internal vertices. This
+is a bijection between $u$--$v$ routes in $\HH$ and $v$--$u$ routes in $\HH^{R}$
+that preserves which edges and which internal vertices any two routes share, so it
+carries an edge-disjoint (respectively internally vertex-disjoint) family to one of
+equal size. Therefore $\lec_{\HH}(u, v) = \lec_{\HH^{R}}(v, u)$ and
+$\kap_{\HH}(u, v) = \kap_{\HH^{R}}(v, u)$, and maximising over ordered pairs gives
+$\lec^{\max}(\HH) = \lec^{\max}(\HH^{R})$ and the same for $\kap$. Since reversal is
+a bijection preserving feasibility and edge count, the two models share every
+extremal number.
+\end{proof}
+
+\begin{proposition}[The general model obeys the forward bound]\label{prop:dir-hyper-general}
+Let a directed $r$-uniform hyperedge be any split into a non-empty tail set $T$ and
+head set $H$. If every ordered pair has at most $m-1$ arc-disjoint, or at most
+$m-1$ internally vertex-disjoint, directed Berge routes, then
+\[
+    |E(\HH)| \;\le\; \frac{(m-1)\,n(n-1)}{r-1},
+\]
+the same bound as the forward model of \Cref{prop:dir-hyper-first}. The forward
+construction of that proposition is itself a set of general hyperedges, so the
+general value is quadratic in $n$ with the same leading constant.
+\end{proposition}
+
+\begin{proof}
+Fix an ordered pair $(u, v)$. A hyperedge $(T, H)$ with $u \in T$ and $v \in H$
+carries the one-step route $u \to v$ that enters at the tail $u$ and leaves at the
+head $v$. Distinct such hyperedges give routes that share no edge and no internal
+vertex, so if $k$ hyperedges had $u$ in their tail set and $v$ in their head set
+then $\lec(u, v) \ge k$ and $\kap(u, v) \ge k$; feasibility forces $k \le m-1$.
+Each hyperedge $(T, H)$ is counted by exactly the $|T|\,|H|$ ordered pairs $(u, v)$
+with $u \in T$ and $v \in H$, so summing the per-pair bound over all pairs gives
+$\sum_{(T,H)} |T|\,|H| \le (m-1)\,n(n-1)$. As $|T| + |H| = r$ with both parts at
+least one, $|T|\,|H| \ge 1 \cdot (r-1) = r-1$, whence $(r-1)|E| \le (m-1)n(n-1)$.
+The forward family of \Cref{prop:dir-hyper-first} consists of general hyperedges,
+so it witnesses the same ${\approx}\,(m-1)n^2/(4(r-1))$ lower bound.
+\end{proof}
+
 
 \section{The random threshold}
 
