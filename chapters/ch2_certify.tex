@@ -245,87 +245,88 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \label{fig:hyper-gadget}
 \end{figure}
 
-\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the idea to a whole hypergraph, putting the metro map (before) beside the flow network it becomes (after). A pair $u, v$ that has two hyperedge-disjoint Berge routes turns into a network carrying a maximum flow of two, so the checker reads $\lec(u,v) = 2$ straight off the flow value, and that flow value is the whole of what the checker computes.
+\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the idea to a whole hypergraph, putting the metro map (before) beside the flow network it becomes (after). The pair $u, v$ there has four hyperedge-disjoint Berge routes, one along each of the four rails, so the network carries a maximum flow of four and the checker reads $\lec(u,v) = 4$ straight off the flow value, and that flow value is the whole of what the checker computes.
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{0.92\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
-   route/.style={line width=1.7pt, black, line cap=round,
-                 -{Stealth[length=2.6mm]}},
-   end/.style={smallvertex, draw=black, line width=1.2pt}]
-% Shared vertex layout, reused in both panels. The four hyperedges form two
-% rails: e1,e2 share the top stretch a--b and e3,e4 the bottom stretch c--d, so
-% along each rail two metro lines run side by side, far more overlap than a
-% plain graph would show.
-\def\hyperlayout{%
+   route/.style={line width=1.9pt, black, line cap=round,
+                 -{Stealth[length=2.8mm]}},
+   end/.style={smallvertex, draw=black, line width=1.2pt, minimum size=7.5pt}]
+% Shared station layout, reused in both panels. Four rails are stacked
+% vertically. On rail i the two hyperedges e_{i,1} (it holds u) and e_{i,2} (it
+% holds v) share the stretch a_i--b_i, so along each rail two metro lines run
+% side by side, exactly as a metro map separates two lines along one track.
+\def\railskeleton{%
   \coordinate (u) at (0,0);
-  \coordinate (a) at (2.4, 1.3);
-  \coordinate (b) at (5.0, 1.3);
-  \coordinate (c) at (2.4,-1.3);
-  \coordinate (d) at (5.0,-1.3);
-  \coordinate (v) at (7.6, 0);
+  \coordinate (v) at (8.8,0);
+  \coordinate (a1) at (2.7, 3.3);  \coordinate (b1) at (6.1, 3.3);
+  \coordinate (a2) at (2.7, 1.1);  \coordinate (b2) at (6.1, 1.1);
+  \coordinate (a3) at (2.7,-1.1);  \coordinate (b3) at (6.1,-1.1);
+  \coordinate (a4) at (2.7,-3.3);  \coordinate (b4) at (6.1,-3.3);
 }
-% ===== panel (a): the hypergraph as a metro map, lines bundled on each rail ====
+\def\raillines{%
+  % rail i: e_{i,1} (contains u) just above the rail, e_{i,2} (contains v) just
+  % below, so the pair runs side by side along the shared stretch a_i--b_i.
+  \draw[metro, metroA] (u) -- (2.7, 3.46) -- (6.1, 3.46);   % e1 = {u,a1,b1}
+  \draw[metro, metroB] (2.7, 3.14) -- (6.1, 3.14) -- (v);   % e2 = {a1,b1,v}
+  \draw[metro, metroC] (u) -- (2.7, 1.26) -- (6.1, 1.26);   % e3 = {u,a2,b2}
+  \draw[metro, metroD] (2.7, 0.94) -- (6.1, 0.94) -- (v);   % e4 = {a2,b2,v}
+  \draw[metro, metroE] (u) -- (2.7,-0.94) -- (6.1,-0.94);   % e5 = {u,a3,b3}
+  \draw[metro, metroF] (2.7,-1.26) -- (6.1,-1.26) -- (v);   % e6 = {a3,b3,v}
+  \draw[metro, metroG] (u) -- (2.7,-3.14) -- (6.1,-3.14);   % e7 = {u,a4,b4}
+  \draw[metro, metroH] (2.7,-3.46) -- (6.1,-3.46) -- (v);   % e8 = {a4,b4,v}
+}
+\def\railstations{%
+  \foreach \p/\l in {a1/{a_1},b1/{b_1},a2/{a_2},b2/{b_2},
+                     a3/{a_3},b3/{b_3},a4/{a_4},b4/{b_4}}
+     {\node[smallvertex] at (\p) {$\scriptstyle\l$};}
+  \node[end] at (u) {$u$};
+  \node[end] at (v) {$v$};
+}
+% ===== panel (a): the hypergraph as a metro map =====
 \begin{scope}
-  \hyperlayout
-  \begin{scope}[on background layer]
-    % top rail: e1 sits a touch above the rail, e2 a touch below, so the two
-    % lines run visibly side by side along a--b
-    \draw[metro, metroA] (0,0) -- (2.4,1.38) -- (5.05,1.38);          % e1 = {u,a,b}
-    \draw[metro, metroB] (2.35,1.22) -- (5.0,1.22) -- (7.6,0);        % e2 = {a,b,v}
-    % bottom rail, mirrored
-    \draw[metro, metroC] (0,0) -- (2.4,-1.38) -- (5.05,-1.38);        % e3 = {u,c,d}
-    \draw[metro, metroD] (2.35,-1.22) -- (5.0,-1.22) -- (7.6,0);      % e4 = {c,d,v}
-  \end{scope}
-  \foreach \p/\l in {a/a,b/b,c/c,d/d} {\node[smallvertex] at (\p) {$\l$};}
-  \node[end] at (u) {$u$};
-  \node[end] at (v) {$v$};
-  \node[font=\small] at (3.8,-2.35) {(a) the hypergraph};
+  \railskeleton
+  \begin{scope}[on background layer] \raillines \end{scope}
+  \railstations
+  \node[font=\small] at (4.4,-4.4) {(a) the hypergraph};
 \end{scope}
-% ===== panel (b): the same lines, a turnstile per line, routes as black arcs ===
-\begin{scope}[xshift=9.4cm]
-  \hyperlayout
-  \coordinate (h1) at (2.0, 0.65);
-  \coordinate (h2) at (5.6, 0.65);
-  \coordinate (h3) at (2.0,-0.65);
-  \coordinate (h4) at (5.6,-0.65);
-  % the same thick metro lines as panel (a), kept so the two panels read alike
-  \begin{scope}[on background layer]
-    \draw[metro, metroA] (0,0) -- (2.4,1.38) -- (5.05,1.38);
-    \draw[metro, metroB] (2.35,1.22) -- (5.0,1.22) -- (7.6,0);
-    \draw[metro, metroC] (0,0) -- (2.4,-1.38) -- (5.05,-1.38);
-    \draw[metro, metroD] (2.35,-1.22) -- (5.0,-1.22) -- (7.6,0);
-  \end{scope}
-  % each Berge route is one black arc from u to v through the turnstiles it rides
-  \draw[route] plot[smooth, tension=0.62]
-        coordinates {(0,0) (2.0,0.65) (5.0,1.3) (5.6,0.65) (7.6,0)};
-  \draw[route] plot[smooth, tension=0.62]
-        coordinates {(0,0) (2.0,-0.65) (5.0,-1.3) (5.6,-0.65) (7.6,0)};
-  \foreach \p/\l in {a/a,b/b,c/c,d/d} {\node[smallvertex] at (\p) {$\l$};}
-  \node[end] at (u) {$u$};
-  \node[end] at (v) {$v$};
-  \node[hnode, fill=metroA!16] at (h1) {$h_{e_1}$};
-  \node[hnode, fill=metroB!16] at (h2) {$h_{e_2}$};
-  \node[hnode, fill=metroC!16] at (h3) {$h_{e_3}$};
-  \node[hnode, fill=metroD!16] at (h4) {$h_{e_4}$};
-  \node[font=\small] at (3.8,-2.35) {(b) the flow network: max flow $=2$};
+% ===== panel (b): one turnstile per hyperedge, routes as black arcs =====
+\begin{scope}[xshift=12.0cm]
+  \railskeleton
+  \begin{scope}[on background layer] \raillines \end{scope}
+  % four black u--v routes, each riding line 1 then line 2 of its rail
+  \foreach \y in {3.3, 1.1, -1.1, -3.3}{
+     \draw[route] plot[smooth, tension=0.7]
+        coordinates {(0,0) (3.2,\y) (5.6,\y) (8.8,0)};
+  }
+  % one turnstile per hyperedge, tinted with its own line colour, drawn on top
+  \foreach \y/\cone/\ctwo/\ka/\kb in
+     {3.3/metroA/metroB/1/2, 1.1/metroC/metroD/3/4,
+      -1.1/metroE/metroF/5/6, -3.3/metroG/metroH/7/8}{
+     \node[hnode, fill=\cone!18, font=\scriptsize] at (3.2,\y) {$h_{\ka}$};
+     \node[hnode, fill=\ctwo!18, font=\scriptsize] at (5.6,\y) {$h_{\kb}$};
+  }
+  \railstations
+  \node[font=\small] at (4.4,-4.4) {(b) the flow network: max flow $=4$};
 \end{scope}
 \end{tikzpicture}}
 \caption[The helper-point network on a whole hypergraph]{From hypergraph to
-flow network, before and after. \textbf{(a)} A hypergraph on six vertices, its
-four hyperedges drawn as metro lines. Two lines run side by side along each
-rail, $e_1 = \{u,a,b\}$ and $e_2 = \{a,b,v\}$ sharing the top stretch $a$--$b$
-while $e_3 = \{u,c,d\}$ and $e_4 = \{c,d,v\}$ share the bottom stretch $c$--$d$,
-the way a metro map separates two lines along one shared track. The pair $u, v$
-has two hyperedge-disjoint Berge routes, $u, e_1, b, e_2, v$ along the top and
-$u, e_3, d, e_4, v$ along the bottom. \textbf{(b)} The same vertices and the
-same thick lines, now with a helper turnstile inside each hyperedge. Each Berge
-route is drawn as one black arc running from $u$ to $v$ through the turnstiles of
-the lines it rides, the top arc crossing $h_{e_1}$ and $h_{e_2}$, the bottom arc
-crossing $h_{e_3}$ and $h_{e_4}$. Because every turnstile passes only one unit,
-the maximum $u$--$v$ flow is exactly two, which the checker reports as
-$\lec(u,v) = 2$. A third route would have to reuse a turnstile.}
+flow network, before and after. \textbf{(a)} A $3$-uniform hypergraph on ten
+vertices, its eight hyperedges drawn as metro lines and grouped into four rails.
+On rail $i$ the two lines $e_{2i-1} = \{u, a_i, b_i\}$ and $e_{2i} = \{a_i, b_i, v\}$
+share the stretch $a_i$--$b_i$ and run side by side along it, the way a metro
+map separates two lines along one shared track. The pair $u, v$ has four
+hyperedge-disjoint Berge routes, one per rail, $u, e_{2i-1}, b_i, e_{2i}, v$,
+each boarding the first line at $u$, changing to the second at $b_i$, and
+riding it to $v$. \textbf{(b)} The same vertices and the same eight lines, now
+with a helper turnstile $h_k$ inside each hyperedge $e_k$, tinted with that
+line's colour. Each Berge route is one black arc from $u$ to $v$ through the two
+turnstiles of the rail it rides. Because every turnstile passes only one unit,
+the maximum $u$--$v$ flow is exactly four, which the checker reports as
+$\lec(u,v) = 4$. A fifth route would have to reuse a turnstile, since every
+hyperedge at $u$ is already carrying one.}
 \label{fig:hyper-gadget-example}
 \end{figure}
 One way to picture the helper point is the metro map of \Cref{ch:basecases}: each hyperedge is a metro line, its member vertices are the stations on it, and the helper is the line itself. Boarding at any station counts as taking that line. Because only one route may pass through the helper, only one train runs on the line at a time, so a second route must reach its destination without ever boarding it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that share no line, which is exactly what Berge edge-disjointness means.
@@ -335,7 +336,133 @@ One way to picture the helper point is the metro map of \Cref{ch:basecases}: eac
 {$\lambda^{\max}(H)$, the largest Berge edge-connectivity over all pairs}
 {build the enlarged capacity matrix \code{\_hyper\_capacity\_matrix(H)} in which every hyperedge becomes a helper point that only one route may pass through, then take the same maximum flow as the graph checker. On two-vertex hyperedges it matches ordinary edge-connectivity.}
 
-On the complete graph $K_n$ the hypergraph checker returns $n - 1$, and on the complete three-uniform hypergraph $K_4^{(3)}$ it returns $3$, larger than the two hyperedges through each pair because longer Berge routes also carry flow. The self-test confirms both of these values, so the construction is checked rather than merely asserted. The same helper-point network answers the other three hypergraph questions without alteration: splitting each ordinary vertex as in \Cref{fig:vertex-split} counts internally vertex-disjoint Berge routes, and reading a hyperedge as a single tail feeding its remaining heads gives a directed version, so \code{solve} measures all four hypergraph variants through this one construction. With the checker in place the proposed value of \Cref{prop:hyper-edge} can be tested on any small hypergraph the way every other variant is, which is the subject of the next section.
+On the complete graph $K_n$ the hypergraph checker returns $n - 1$, and on the complete three-uniform hypergraph $K_4^{(3)}$ it returns $3$, larger than the two hyperedges through each pair because longer Berge routes also carry flow. The self-test confirms both of these values, so the construction is checked rather than merely asserted. The same helper-point network also answers the vertex-disjoint hypergraph question without alteration: splitting each ordinary vertex as in \Cref{fig:vertex-split} counts internally vertex-disjoint Berge routes. The one remaining direction, the \emph{directed} hypergraph, needs the helper point to learn which way is which, and that is the subject of the next subsection.
+
+\subsection{The directed hypergraph checker}
+A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} vertex together with $r-1$ \emph{head} vertices, drawn as the star of \Cref{fig:dir-hyper-convention}, and a directed Berge route may only enter it at the tail and leave it at one of its heads. The undirected helper point treated a hyperedge as a line any route could board at any station. The directed one must instead be a one-way turnstile: a route may step onto the hyperedge only at its tail and step off only at a head. The gadget that enforces this is the helper point made directional. For a hyperedge $e = (a;\, b, c, \dots)$ we add a gate node $g_e$, send one capacity-one arc from the tail into it, $a \to g_e$, and send an arc out of it to each head, $g_e \to b$, $g_e \to c$, and so on (\Cref{fig:dir-hyper-gadget}). A route reaches $g_e$ only through the tail $a$, and the single unit of capacity on $a \to g_e$ lets just one route use the hyperedge, exactly as the undirected turnstile did, but now it can leave only towards a head.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth,
+   gatearc/.style={-{Stealth[length=2.2mm]}, line width=1.1pt, KULblauw1}]
+% --- left: a directed hyperedge as a star, tail a feeding heads b, c ---
+\node[smallvertex] (a) at (0.0, 1.05) {$a$};
+\node[smallvertex] (b) at (-0.85, -0.55) {$b$};
+\node[smallvertex] (c) at (0.85, -0.55) {$c$};
+\begin{scope}[on background layer]
+  \draw[metro, metroB, -{Stealth[length=2.8mm]}, shorten >=2mm, shorten <=1.4mm] (a) -- (b);
+  \draw[metro, metroB, -{Stealth[length=2.8mm]}, shorten >=2mm, shorten <=1.4mm] (a) -- (c);
+\end{scope}
+\node[font=\small] at (0.0, -1.25) {directed hyperedge $e = (a;\, b, c)$};
+\node[font=\scriptsize, text=black!65] at (0.0, -1.75) {tail $\to$ heads};
+% --- arrow ---
+\draw[->, very thick, color=KULblauw3b] (2.4, 0.1) -- (3.5, 0.1);
+\node[above, font=\small] at (2.95, 0.15) {becomes};
+% --- right: the gate gadget, tail -> gate -> heads ---
+\begin{scope}[xshift=5.4cm]
+  \node[smallvertex] (a2) at (0.0, 1.05) {$a$};
+  \node[hnode, fill=metroB!20, minimum size=15pt] (g) at (0.0, 0.0) {$g_e$};
+  \node[smallvertex] (b2) at (-0.95, -1.05) {$b$};
+  \node[smallvertex] (c2) at (0.95, -1.05) {$c$};
+  \draw[gatearc] (a2) -- node[right, font=\scriptsize]{cap $1$} (g);
+  \draw[gatearc] (g) -- (b2);
+  \draw[gatearc] (g) -- (c2);
+  \node[font=\small, align=center] at (0.0, -1.6) {gate $g_e$\\\scriptsize one route, tail to head};
+\end{scope}
+\end{tikzpicture}
+\caption{The directed helper point. A directed hyperedge $e = (a;\, b, c)$, the tail $a$ fanning to its heads $b, c$ (left), becomes a gate node $g_e$ fed by one capacity-one arc from the tail and feeding an arc to each head (right). A route may reach $g_e$ only through the tail and may leave only towards a head, so the gate is a one-way version of the turnstile of \Cref{fig:hyper-gadget}, and the single unit of capacity still lets only one route use the hyperedge.}
+\label{fig:dir-hyper-gadget}
+\end{figure}
+
+\Cref{fig:dir-hyper-gadget-example} carries the directed gadget to a whole directed hypergraph, the same before-and-after as \Cref{fig:hyper-gadget-example} but one-way. Three directed Berge routes run from $u$ to $v$, each riding two directed hyperedges and transferring at a middle vertex, and because every route must enter each hyperedge at its tail, the arrowheads decide which transfers are legal. The flow network replaces each directed hyperedge by its gate, and the maximum $u$--$v$ flow counts exactly the arc-disjoint directed Berge routes, here three, so the checker reads $\lec(u, v) = 3$. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top of the gates then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+   route/.style={line width=1.9pt, black, line cap=round,
+                 -{Stealth[length=2.8mm]}},
+   sec/.style={metro, line width=2.4pt, -{Stealth[length=2.2mm]},
+               shorten >=1mm, shorten <=0.6mm},
+   main/.style={metro, line width=3.0pt, -{Stealth[length=2.8mm]},
+                shorten >=1.4mm, shorten <=0.8mm},
+   end/.style={smallvertex, draw=black, line width=1.2pt, minimum size=7.5pt}]
+% Shared station layout. Three rails. On rail i the directed hyperedge
+% e_{i,1} = (u; m_i, w_i) fans from u, and e_{i,2} = (m_i; v, w_i) fans from the
+% transfer vertex m_i. The route u -> m_i -> v rides the two main arcs.
+\def\dskeleton{%
+  \coordinate (u) at (0,0);
+  \coordinate (v) at (8.6,0);
+  \coordinate (m1) at (3.4, 2.5);  \coordinate (w1) at (5.2, 3.5);
+  \coordinate (m2) at (3.4, 0.0);  \coordinate (w2) at (5.2, 0.95);
+  \coordinate (m3) at (3.4,-2.5);  \coordinate (w3) at (5.2,-3.5);
+}
+\def\dlines{%
+  % rail 1 (metroA/metroB): e1=(u;m1,w1), e2=(m1;v,w1)
+  \draw[sec, metroA!55] (u) to[bend left=8] (w1);
+  \draw[sec, metroB!55] (m1) -- (w1);
+  \draw[main, metroA] (u) -- (m1);
+  \draw[main, metroB] (m1) -- (v);
+  % rail 2 (metroC/metroD)
+  \draw[sec, metroC!55] (u) to[bend left=10] (w2);
+  \draw[sec, metroD!55] (m2) -- (w2);
+  \draw[main, metroC] (u) -- (m2);
+  \draw[main, metroD] (m2) -- (v);
+  % rail 3 (metroE/metroF)
+  \draw[sec, metroE!55] (u) to[bend right=8] (w3);
+  \draw[sec, metroF!55] (m3) -- (w3);
+  \draw[main, metroE] (u) -- (m3);
+  \draw[main, metroF] (m3) -- (v);
+}
+\def\dstations{%
+  \foreach \p/\l in {m1/{m_1},m2/{m_2},m3/{m_3}} {\node[smallvertex] at (\p) {$\scriptstyle\l$};}
+  \foreach \p/\l in {w1/{w_1},w2/{w_2},w3/{w_3}} {\node[smallvertex] at (\p) {$\scriptstyle\l$};}
+  \node[end] at (u) {$u$};
+  \node[end] at (v) {$v$};
+}
+% ===== panel (a): the directed hypergraph as oriented metro stars =====
+\begin{scope}
+  \dskeleton
+  \begin{scope}[on background layer] \dlines \end{scope}
+  \dstations
+  \node[font=\small] at (4.3,-4.3) {(a) the directed hypergraph};
+\end{scope}
+% ===== panel (b): one gate per hyperedge, routes as black arcs =====
+\begin{scope}[xshift=11.8cm]
+  \dskeleton
+  \begin{scope}[on background layer] \dlines \end{scope}
+  % three black u--v routes, each following its rail u -> m_i -> v with the
+  % gates sitting on the arc midpoints so the route rides the coloured arcs
+  \foreach \y in {2.5, 0, -2.5}{
+     \draw[route] (0,0) -- (1.7,{\y/2}) -- (3.4,\y) -- (6.0,{\y/2}) -- (8.6,0);
+  }
+  % gates on the two main arcs of each rail, tinted by line colour
+  \foreach \y/\cone/\ctwo/\ka/\kb in {2.5/metroA/metroB/1/2, 0/metroC/metroD/3/4, -2.5/metroE/metroF/5/6}{
+     \node[hnode, fill=\cone!18, font=\scriptsize] at (1.7,{\y/2}) {$g_{\ka}$};
+     \node[hnode, fill=\ctwo!18, font=\scriptsize] at (6.0,{\y/2}) {$g_{\kb}$};
+  }
+  \dstations
+  \node[font=\small] at (4.3,-4.3) {(b) the flow network: max flow $=3$};
+\end{scope}
+\end{tikzpicture}}
+\caption[The directed helper-point network on a whole hypergraph]{From directed
+hypergraph to flow network, one-way throughout. \textbf{(a)} A directed
+$3$-uniform hypergraph on eight vertices, its six hyperedges drawn as oriented
+metro stars on three rails. On rail $i$ the hyperedge $e_{2i-1} = (u;\, m_i, w_i)$
+fans from the tail $u$ and $e_{2i} = (m_i;\, v, w_i)$ fans from the transfer
+vertex $m_i$, the thick arcs carrying the route and the thin arcs feeding the
+shared secondary head $w_i$. The pair $u, v$ has three arc-disjoint directed
+Berge routes, $u, e_{2i-1}, m_i, e_{2i}, v$, each entering a hyperedge at its
+tail and leaving at a head. \textbf{(b)} Each directed hyperedge $e_k$ becomes a
+gate $g_k$ that a route may enter only from the tail and leave only towards a
+head. Each black arc is one route through the two gates of its rail. Because
+every gate passes only one unit and $u$ is the tail of just three hyperedges,
+the maximum $u$--$v$ flow is exactly three, which the checker reports as
+$\lec(u, v) = 3$.}
+\label{fig:dir-hyper-gadget-example}
+\end{figure}
+
+With the checker in place the proposed value of \Cref{prop:hyper-edge} can be tested on any small hypergraph the way every other variant is, which is the subject of the next section.
 
 \section{Checking every graph of a fixed size}
 The checker measures one graph. To bound \emph{every} graph of a given size, the most direct method is the one the base cases of \Cref{ch:basecases} already needed: enumerate them all. A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal cell, a multigraph a choice in $\{0,\dots,m-1\}$, and a digraph varies every ordered pair rather than only the upper triangle. Walking that product, measuring each candidate with the checker, and keeping the densest feasible one settles the value exactly, and because it has looked at every graph it is a genuine upper bound, not evidence.

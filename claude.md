@@ -1563,3 +1563,29 @@ sweep over program+make_figures+tests now finds 0 unreferenced top-level defs.
   calls prove_integral_arc_bound(7,3,25) and enumerate_extremal_directed_multigraphs(7,3,24,
   max_degree=8).
 PROVE card page rendered to PNG and visually verified (clean, underscores render, no overflow).
+
+## 2026-06-25 (Opus, cont.) -- bigger hypergraph checker figure + directed companion
+
+Author: figure 2.6 (fig:hyper-gadget-example) should have more vertices, way more
+hyperedges, and more edge-disjoint paths; then repeat the figures + explanation for
+the directed variants.
+
+- preamble.tex: two thesis-local metro colours metroG (magenta), metroH (teal) so an
+  8-line figure can give every hyperedge its own hue (shared file stops at metroF; left
+  untouched so slides keep their look).
+- fig:hyper-gadget-example (2.6) rebuilt: 6 vertices/4 hyperedges/flow 2 -> 10 vertices,
+  8 hyperedges, 4 rails, max flow 4. Four parallel rails, each two lines sharing the
+  stretch a_i--b_i; panel (b) has 8 turnstiles h_1..h_8 and 4 black routes. Lead-in prose
+  and caption updated (lambda(u,v)=4; a 5th route would reuse a turnstile since u sits on
+  only 4 hyperedges). Rendered + visually checked, no overlap.
+- NEW directed subsection "The directed hypergraph checker" with two figures mirroring
+  the undirected pair: fig:dir-hyper-gadget (2.7), one directed hyperedge (tail; heads) ->
+  a one-way GATE g_e (cap-1 tail->gate, gate->each head); fig:dir-hyper-gadget-example
+  (2.8), a directed 3-uniform hypergraph on 8 vertices, 6 oriented metro stars on 3 rails,
+  3 arc-disjoint directed Berge routes u->m_i->v, flow network with 6 gates, max flow 3.
+  Gates placed on the arc midpoints so each black route rides its coloured arcs (fixed an
+  earlier version where the routes floated above the arcs). Prose explains tail/head entry,
+  the gate as a directional turnstile, and that vertex-splitting on top counts internally
+  vertex-disjoint directed routes, so one checker measures all four hypergraph variants.
+- Build clean: 110 pp (+2), 0 overfull, 0 undefined refs/cites. All three labels resolve;
+  no prose em-dash/semicolon.
