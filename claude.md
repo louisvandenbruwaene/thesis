@@ -1519,3 +1519,47 @@ conjecture. n=7,9 already clean per prior numerics; this extends into the larger
 
 BUILD: latexmk exit 0, 108 pp, 0 overfull, 0 undefined refs/cites, new label in aux.
 No program code touched. Committed + pushed to main.
+
+## 2026-06-25 (Opus) -- SA-vs-tabu honesty note, code cleanup, code-into-thesis integration
+
+Author asks: (1) note the SA-vs-tabu values are conjectured/found not proven; (2) integrate
+more implementation detail into the thesis (function names, library names, ideas) like the
+existing codecards; (3) clean the code first, shorter where possible.
+
+ch4 odd-n fix (earlier same day, separate commit): ch4 "balanced partition |A|=|B|=floor(n/2)"
+was wrong for odd n (n=5 gives 4 != floor(25/4)=6); corrected to (floor(n/2), ceil(n/2)).
+
+(1) tab:sa-vs-tabu caption: now states only the simple-undirected value is a proved optimum
+(Mader); the two directed values are best-known/found by search+construction past the certified
+range (n<7), and the "optimum" column is the target each engine aims at.
+
+(2) CODE CLEANUP (verified: self-check PASS, 82 tests OK baseline, montecarlo+hypergraph re-run
+OK, import OK, no cascades): removed 3 genuinely-dead top-level functions --
+average_max_connectivity (unused MC helper), plot_appearance_threshold (orphaned figure, png
+already deleted), hypergraph_vertex_m2 (trivial closed form superseded by verify_hyper_vertex_value;
+its docstring still referenced "the commented block in the appendix", stale). _PROVEN_MSTAR was
+already a single module constant (the triplication noted in older logs is gone). A dead-code
+sweep over program+make_figures+tests now finds 0 unreferenced top-level defs.
+
+(3) CODE INTO THESIS (all cited names verified to exist in erdos915_unified.py; build clean
+108 pp, 0 overfull, 0 undefined):
+- All 8 codecards regrounded from idealized camelCase to the REAL snake_case Python names:
+  solve (max_seconds, SolveResult), Graph(n, Variant(directed, simple)) with numpy self.mu,
+  local_edge_connectivity / max_edge_connectivity / max_vertex_connectivity (_split_capacity_matrix)
+  / max_edge_connectivity_via_tree / max_hyperedge_connectivity (_hyper_capacity_matrix),
+  edge_sensitivity (sensitivity_map).
+- Library routines named at their natural points: scipy.sparse.csgraph.maximum_flow (checker),
+  networkx.gomory_hu_tree (GH view), pulp + CBC/Gurobi via _pick_solver (prover), nauty/geng +
+  graph6 via _graph6_edges (generation), Edmonds-Karp _float_maxflow_value (fractional, since
+  scipy csgraph is integer-only).
+- Two NEW codecards: PROVE prove_directed_multigraph (_cut_counting_model, pulp, _pick_solver,
+  prove_integral_arc_bound) and DISCOVER search_for_dense_graph (best_of_searches).
+- Routines named in prose: _exhaustive_directed (pruned B&B), enumerate_extremal_directed_
+  multigraphs + ..._via_generation + _canonical_form, tabu_search_for_dense_graph,
+  fractional_search / fractional_flows_feasible, _tiny_maxflow, _erdos_fast.c/.so + build_fast.sh.
+- Reproducibility section gained an entry-point index (solve / measures / prove / search).
+- FIXED stale name: app_proofs cited certify_directed_multigraph, renamed to
+  prove_directed_multigraph back on 2026-06-13; corrected, and added the exact fact-(a)/(b)
+  calls prove_integral_arc_bound(7,3,25) and enumerate_extremal_directed_multigraphs(7,3,24,
+  max_degree=8).
+PROVE card page rendered to PNG and visually verified (clean, underscores render, no overflow).

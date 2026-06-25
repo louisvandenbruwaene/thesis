@@ -2164,17 +2164,6 @@ def estimate_appearance_probability(
     return appearances / trials
 
 
-def average_max_connectivity(
-    n: int, p: float, *, trials: int = 200,
-    separation: str = "edge", directed: bool = False, seed: int = 0,
-) -> float:
-    """Estimate the average of $\\lambda^{\\max}$ over samples of $G(n, p)$."""
-    rng = random.Random(seed)
-    measure = _connectivity_measure(separation)
-    total = sum(measure(sample_random_graph(n, p, directed, rng)) for _ in range(trials))
-    return total / trials
-
-
 def connectivity_distribution(
     n: int, p: float, *, trials: int = 200,
     separation: str = "edge", directed: bool = False, seed: int = 0,
@@ -2460,53 +2449,6 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
     plt.ylabel("maximum edges")
     plt.title("Agreement through $m \\leq 4$, first divergence at $m = 5$")
     plt.legend(fontsize=9, loc="upper left")
-    plt.grid(True, alpha=0.3)
-    _save(path)
-
-
-def plot_appearance_threshold(
-    cases: list[tuple[int, int]],
-    path: str | Path,
-    *,
-    x_values: list[float] | None = None,
-    trials: int = 120,
-    seed: int = 7,
-) -> None:
-    """The appearance threshold ``p* = m/n``, with the density axis in units of ``p*``.
-
-    For each ``(n, m)`` in ``cases`` the curve is the estimated probability that a
-    sample of ``G(n, p)`` already contains a pair of edge-connectivity at least
-    ``m``, plotted against ``x = p / p*`` so the proved threshold sits at ``x = 1``
-    for every ``n`` and ``m``.  As the pair grows into the regime
-    ``thm:gnp-threshold`` governs, the rise steepens and pushes up to one by
-    ``x = 1``: above ``p*`` the forbidden configuration is present with high
-    probability, and the single density ``m/n`` -- not the model or the
-    separation -- is what decides the matter.
-    """
-    if x_values is None:
-        x_values = [round(0.3 + 0.1 * i, 2) for i in range(14)]  # 0.3 .. 1.6
-    palette = [_KUL_LIGHT, _KUL_BLUE, _KUL_DARK, _WARM]
-
-    plt.figure(figsize=(7.2, 4.6))
-    for (n, m), colour in zip(cases, palette):
-        p_star = m / n
-        probs = [
-            estimate_appearance_probability(
-                n, min(0.999, x * p_star), m,
-                trials=trials, separation="edge", seed=seed)
-            for x in x_values
-        ]
-        plt.plot(x_values, probs, "o-", color=colour, markersize=4, linewidth=1.9,
-                 label=fr"$n={n}$, $m={m}$  ($p^*={p_star:.3f}$)")
-
-    plt.axvline(1.0, color="black", linestyle="--", linewidth=1.6,
-                label=r"proved threshold $p^*=m/n$")
-    plt.axhline(0.5, color="gray", linestyle=":", linewidth=1.0, alpha=0.6)
-    plt.xlabel(r"density as a multiple of the threshold $p^* = m/n$")
-    plt.ylabel(r"$\hat{P}\,[\,\lambda^{\max}\geq m\,]$")
-    plt.title(r"The appearance threshold $p^* = m/n$")
-    plt.ylim(-0.03, 1.03)
-    plt.legend(fontsize=8.5, loc="lower right")
     plt.grid(True, alpha=0.3)
     _save(path)
 
@@ -4170,19 +4112,6 @@ def plot_conn_threshold_3d(
 
 
 # --- OPEN-VARIANT EXPLORATION: hypergraph vertex connectivity, fractional search tools ---
-
-
-def hypergraph_vertex_m2(n: int, r: int) -> int:
-    """``floor((n-1)/(r-1))`` hyperedges for the ``r``-uniform VERTEX problem at m=2.
-
-    Proved (see the commented block in the appendix): kappa^max <= 1 holds iff
-    the bipartite incidence graph is a forest, because a Berge cycle yields two
-    routes that are hyperedge-disjoint and internally vertex-disjoint, and
-    conversely.  A forest gives r*q <= n + q - 1, i.e. q <= (n-1)/(r-1), and
-    the star hypertree attains the floor.  Hence the vertex and edge problems
-    agree at m = 2 for every uniformity r.
-    """
-    return (n - 1) // (r - 1)
 
 
 def max_hyper_vertex_connectivity(hypergraph: Hypergraph) -> int:
