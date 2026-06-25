@@ -5,9 +5,12 @@ import unittest
 from erdos915_unified import (
     Hypergraph,
     complete_uniform_hypergraph,
+    hyper_connectivity,
     hyperedge_connectivity,
+    max_feasible_hyperedges,
     max_hyperedge_connectivity,
     star_hypertree,
+    _hyperedge_candidates,
 )
 
 
@@ -42,6 +45,55 @@ class BergeConnectivity(unittest.TestCase):
     def test_bad_hyperedge_size_rejected(self):
         with self.assertRaises(ValueError):
             star_hypertree(7, 1)
+
+
+class DirectedOrientationModels(unittest.TestCase):
+    """Forward / backward / general directed hyperedge models."""
+
+    def test_general_gate_is_one_way(self):
+        # A mixed arc {0,1} -> {2,3}: a route enters at a tail, leaves at a head.
+        h = Hypergraph(4, [(frozenset({0, 1}), frozenset({2, 3}))], directed=True)
+        self.assertEqual(sorted(h.members(h.hyperedges[0])), [0, 1, 2, 3])
+        self.assertEqual(hyper_connectivity(h, 0, 2), 1)   # tail -> head
+        self.assertEqual(hyper_connectivity(h, 2, 0), 0)   # head -> tail: none
+
+    def test_forward_legacy_equals_general_form(self):
+        legacy = Hypergraph(3, [(0, frozenset({1, 2}))], directed=True)
+        general = Hypergraph(3, [(frozenset({0}), frozenset({1, 2}))], directed=True)
+        for s, t in [(0, 1), (0, 2), (1, 2)]:
+            self.assertEqual(hyper_connectivity(legacy, s, t),
+                             hyper_connectivity(general, s, t))
+
+    def test_candidate_counts_split_at_r3(self):
+        # At r = 3 every split has a singleton side, so general = forward + backward.
+        fwd = _hyperedge_candidates(4, 3, True, kind="forward")
+        bwd = _hyperedge_candidates(4, 3, True, kind="backward")
+        gen = _hyperedge_candidates(4, 3, True, kind="general")
+        self.assertEqual(len(fwd), 12)
+        self.assertEqual(len(bwd), 12)
+        self.assertEqual(len(gen), 24)
+
+    def test_forward_backward_duality(self):
+        # Arc reversal makes backward the dual of forward: same extremal numbers.
+        for n, m in [(3, 3), (4, 3), (4, 2)]:
+            f, _ = max_feasible_hyperedges(n, 3, m, directed=True, kind="forward", time_limit=2.0)
+            b, _ = max_feasible_hyperedges(n, 3, m, directed=True, kind="backward", time_limit=2.0)
+            self.assertEqual(f, b)
+
+    def test_general_beats_forward_when_vertices_scarce(self):
+        # n = r is the regime where the richer orientation set packs more arcs.
+        g3, e3 = max_feasible_hyperedges(3, 3, 3, directed=True, kind="general", time_limit=2.0)
+        f3, _ = max_feasible_hyperedges(3, 3, 3, directed=True, kind="forward", time_limit=2.0)
+        self.assertTrue(e3)
+        self.assertEqual((g3, f3), (4, 3))
+
+    def test_general_contains_forward(self):
+        # General can never be worse than forward (forward hypergraphs are general).
+        for n, m in [(4, 3), (5, 2)]:
+            f, _ = max_feasible_hyperedges(n, 3, m, directed=True, kind="forward", time_limit=2.0)
+            g, _ = max_feasible_hyperedges(n, 3, m, directed=True, kind="general",
+                                           time_limit=3.0, seed_lb=f)
+            self.assertGreaterEqual(g, f)
 
 
 if __name__ == "__main__":

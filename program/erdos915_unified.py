@@ -432,11 +432,20 @@ class Hypergraph:
     """A hypergraph stored by its incidence (a list of hyperedges).
 
     An undirected hyperedge is a set of vertices, crossed in either direction.  A
-    directed hyperedge (``directed=True``) splits an ``r``-set into one tail and
-    ``r - 1`` heads, stored as ``(tail, frozenset(heads))``: a Berge route may
-    enter it only at the tail and leave only at a head.  This one-tail / many-head
-    reading is the simplest directed sense of an ``r``-uniform Berge edge, and it
-    is the author's own modelling choice for an otherwise unexplored variant.
+    directed hyperedge (``directed=True``) splits an ``r``-set into a non-empty
+    tail set ``T`` and a non-empty head set ``H``: a Berge route may enter it only
+    at a tail and leave only at a head.  Two storage forms are accepted, and the
+    checker treats them identically:
+
+    * the legacy *forward* form ``(tail, frozenset(heads))`` with a single integer
+      tail and ``r - 1`` heads (``|T| = 1``), the one-tail / many-head model the
+      rest of the thesis uses; and
+    * the *general* form ``(frozenset(tails), frozenset(heads))`` for any split,
+      which subsumes forward (``|T| = 1``), backward (``|H| = 1``) and, from
+      ``r >= 4``, genuinely mixed (``|T|, |H| >= 2``) hyperarcs.
+
+    For ``r = 2`` every form collapses to a single arc, so a directed graph is the
+    two-vertex special case.
     """
 
     def __init__(self, num_vertices: int, hyperedges: Iterable = (),
@@ -449,10 +458,25 @@ class Hypergraph:
             self.add_hyperedge(edge)
 
     def add_hyperedge(self, edge) -> None:
-        """Add an undirected vertex set, or a directed ``(tail, heads)`` pair."""
+        """Add an undirected vertex set, or a directed ``(tail, heads)`` pair.
+
+        A directed edge may be the forward form ``(tail:int, heads)`` or the
+        general form ``(tails:frozenset, heads:frozenset)``; the general form is
+        kept verbatim, the forward form is kept verbatim too (no normalisation),
+        so existing forward results are unchanged byte-for-byte.
+        """
         if self.directed:
-            tail, raw_heads = edge
-            heads = frozenset(raw_heads)
+            first, raw_heads = edge
+            if isinstance(first, (set, frozenset)):     # general (tails, heads)
+                tails, heads = frozenset(first), frozenset(raw_heads)
+                members = tails | heads
+                if (tails & heads) or not tails or not heads or len(members) < 2:
+                    raise ValueError("a directed hyperedge needs disjoint, non-empty tail and head sets")
+                if any(v < 0 or v >= self.num_vertices for v in members):
+                    raise ValueError("hyperedge refers to a vertex outside the graph")
+                self.hyperedges.append((tails, heads))
+                return
+            tail, heads = first, frozenset(raw_heads)    # legacy forward (tail, heads)
             members = heads | {tail}
             if tail in heads or len(members) < 2:
                 raise ValueError("a directed hyperedge needs a tail and a distinct head")
@@ -470,8 +494,8 @@ class Hypergraph:
     def members(self, edge) -> frozenset:
         """The vertex set of a stored hyperedge, directed or not."""
         if self.directed:
-            tail, heads = edge
-            return heads | {tail}
+            tails, heads = _dir_tails_heads(edge)
+            return tails | heads
         return edge
 
     def vertices(self) -> range:
@@ -486,6 +510,20 @@ class Hypergraph:
         return [i for i, edge in enumerate(self.hyperedges) if v in self.members(edge)]
 
 
+def _dir_tails_heads(edge) -> tuple[frozenset, frozenset]:
+    """Tail and head sets of a stored directed hyperedge, as frozensets.
+
+    Accepts the legacy forward form ``(tail:int, heads)`` and the general form
+    ``(tails:frozenset, heads:frozenset)``, so every consumer of a directed
+    hyperedge can read one ``(tails, heads)`` shape regardless of how it was
+    built.
+    """
+    first, heads = edge
+    if isinstance(first, (set, frozenset)):
+        return frozenset(first), frozenset(heads)
+    return frozenset((first,)), frozenset(heads)
+
+
 def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False):
     """Integer capacity matrix of the hypergraph flow network (one per variant).
 
@@ -494,9 +532,10 @@ def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False
     With ``vertex_split`` each ORIGINAL vertex is *also* split into an in/out pair
     of capacity one, so the flow counts internally vertex-disjoint Berge routes
     instead of edge-disjoint ones.  For a directed hypergraph the gate is entered
-    only from the tail and left only toward a head; for an undirected one every
-    member links to the gate both ways.  The four hypergraph variants are thus the
-    same construction with two booleans flipped, not four separate measures.
+    only from a tail and left only toward a head (one tail for the forward model,
+    several for the general one); for an undirected one every member links to the
+    gate both ways.  The hypergraph variants are thus the same construction with a
+    boolean or two flipped, not separate measures.
 
     Vertices index ``0..base-1`` (``base = 2n`` split, else ``n``); hyperedge gate
     ``i`` indexes ``base+2i`` (in) and ``base+2i+1`` (out).  ``leave(v)``/``enter(v)``
@@ -516,9 +555,10 @@ def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False
         gate_in, gate_out = base + 2 * index, base + 2 * index + 1
         cap[gate_in, gate_out] = 1               # one route through each hyperedge
         if hypergraph.directed:
-            tail, heads = edge
-            cap[leave(tail), gate_in] = _UNBOUNDED
-            for head in heads:
+            tails, heads = _dir_tails_heads(edge)
+            for tail in tails:                   # enter the gate from any tail
+                cap[leave(tail), gate_in] = _UNBOUNDED
+            for head in heads:                   # leave the gate toward any head
                 cap[gate_out, enter(head)] = _UNBOUNDED
         else:
             for vertex in edge:
@@ -1827,28 +1867,56 @@ def _search_within_budget(
     return best
 
 
-def _hyperedge_candidates(n: int, r: int, directed: bool) -> list:
-    """Every possible ``r``-uniform hyperedge, undirected sets or directed pairs."""
-    if directed:
-        # A directed hyperedge is one tail and r-1 heads chosen from the rest.
+def _hyperedge_candidates(n: int, r: int, directed: bool, *, kind: str = "forward") -> list:
+    """Every possible ``r``-uniform hyperedge.
+
+    Undirected: every ``r``-subset.  Directed: the ``kind`` selects the
+    orientation model.
+
+    * ``"forward"`` (default): one tail, ``r - 1`` heads, stored in the legacy
+      ``(tail:int, heads)`` form so existing forward results are untouched.
+    * ``"backward"``: ``r - 1`` tails, one head (the arc-reversal dual of
+      forward), stored in the general ``(tails, heads)`` form.
+    * ``"general"``: every split of an ``r``-subset into a non-empty tail set and
+      a non-empty head set, i.e. forward, backward, and (from ``r >= 4``) mixed.
+    """
+    if not directed:
+        return [frozenset(s) for s in combinations(range(n), r)]
+    if kind == "forward":
+        # One tail and r-1 heads chosen from the rest (legacy form).
         return [(tail, frozenset(heads))
                 for tail in range(n)
                 for heads in combinations([v for v in range(n) if v != tail], r - 1)]
-    return [frozenset(s) for s in combinations(range(n), r)]
+    if kind == "backward":
+        # r-1 tails and one head: the reverse of every forward arc.
+        return [(frozenset(tails), frozenset((head,)))
+                for head in range(n)
+                for tails in combinations([v for v in range(n) if v != head], r - 1)]
+    if kind == "general":
+        # Every ordered (tails, heads) split of each r-subset, both sides non-empty.
+        out: list = []
+        for subset in combinations(range(n), r):
+            for mask in range(1, (1 << r) - 1):     # exclude all-heads and all-tails
+                tails = frozenset(subset[i] for i in range(r) if mask & (1 << i))
+                heads = frozenset(subset[i] for i in range(r) if not (mask & (1 << i)))
+                out.append((tails, heads))
+        return out
+    raise ValueError(f"unknown directed hyperedge kind {kind!r}")
 
 
 def _brute_force_hypergraph(
     n: int, r: int, m: int, deadline: float,
-    *, directed: bool = False, vertex_split: bool = False,
+    *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
 ) -> tuple[int, Hypergraph | None, bool]:
     """Exhaustively maximise hyperedges over all ``r``-uniform hypergraphs.
 
     Each possible hyperedge is present or absent, so the search visits
     ``2 ** (#candidates)`` hypergraphs; only tiny ``(n, r)`` finish.  The
     ``directed`` and ``vertex_split`` flags select which of the four hypergraph
-    measures decides feasibility, exactly as ``solve`` passes them through.
+    measures decides feasibility, exactly as ``solve`` passes them through, and
+    ``kind`` selects the directed orientation model (forward/backward/general).
     """
-    candidates = _hyperedge_candidates(n, r, directed)
+    candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     best_count, best_h, completed = 0, None, True
     for tick, mask in enumerate(product((0, 1), repeat=len(candidates))):
         if tick % 256 == 0 and time.time() > deadline:
@@ -1864,7 +1932,7 @@ def _brute_force_hypergraph(
 
 def _random_hypergraph_search(
     n: int, r: int, m: int, deadline: float, seed: int,
-    *, directed: bool = False, vertex_split: bool = False,
+    *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
 ) -> tuple[int, Hypergraph | None]:
     """Greedy randomised growth: add random hyperedges while feasible, restart.
 
@@ -1872,9 +1940,10 @@ def _random_hypergraph_search(
     each pass shuffles the candidate hyperedges and adds each one that keeps the
     Berge connectivity within ``m - 1``; the densest pass within budget wins.  The
     feasible hypergraph it returns is the easy construction behind a lower bound.
+    ``kind`` selects the directed orientation model.
     """
     rng = random.Random(seed)
-    candidates = _hyperedge_candidates(n, r, directed)
+    candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     best_count, best_h = 0, None
     while time.time() < deadline:
         order = candidates[:]
@@ -4175,6 +4244,70 @@ def verify_hyper_vertex_value(n: int, r: int, m: int) -> bool:
     return attained and not hyper_vertex_feasible_exists(n, r, m, target + 1)
 
 
+def max_feasible_hyperedges(
+    n: int, r: int, m: int,
+    *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
+    time_limit: float = 20.0, seed_lb: int = 0,
+) -> tuple[int, bool]:
+    """Largest number of ``r``-uniform hyperedges with Berge connectivity ``<= m-1``.
+
+    Returns ``(value, exact)``.  ``exact`` is ``True`` when the branch and bound
+    below proved optimality within ``time_limit`` (the value is then the true
+    extremal number for that variant); otherwise ``value`` is the best feasible
+    construction found, a lower bound.  ``kind`` selects the directed orientation
+    model (forward / backward / general); for the undirected case it is ignored.
+
+    The search is a depth-first include/exclude over the candidate hyperedges with
+    two prunings.  Feasibility is monotone (adding a hyperedge never lowers any
+    Berge connectivity), so once the active set is infeasible no superset can be
+    feasible and the include branch is dropped; and a branch is cut once
+    ``active + remaining`` cannot beat the best feasible count already seen.  A
+    short randomised warm start raises that incumbent first, so the bound prune
+    bites early.  ``seed_lb`` is an externally known feasible lower bound (e.g. the
+    forward value when maximising over the general model, which contains every
+    forward hypergraph) used to start the incumbent; it never changes the proven
+    optimum, only the pruning.
+    """
+    deadline = time.time() + time_limit
+    # Warm start: a short greedy randomised lower bound sharpens the bound prune;
+    # kept brief so the branch and bound, which does the actual proving, keeps
+    # the budget.
+    warm_share = min(0.3 * time_limit, 1.5)
+    lb, _ = _random_hypergraph_search(
+        n, r, m, time.time() + warm_share, seed=0,
+        directed=directed, vertex_split=vertex_split, kind=kind)
+    lb = max(lb, seed_lb)
+
+    candidates = _hyperedge_candidates(n, r, directed, kind=kind)
+    total = len(candidates)
+    best = [lb]
+    timed_out = [False]
+    active = Hypergraph(n, directed=directed)
+
+    def dfs(pos: int, count: int) -> None:
+        if timed_out[0]:
+            return
+        if count + (total - pos) <= best[0]:
+            return                                   # cannot beat the incumbent
+        if time.time() > deadline:
+            timed_out[0] = True
+            return
+        if pos == total:
+            if count > best[0]:
+                best[0] = count
+            return
+        # Include candidates[pos], but only if the set stays feasible.
+        active.add_hyperedge(candidates[pos])
+        if max_hyper_connectivity(active, vertex_split=vertex_split) <= m - 1:
+            dfs(pos + 1, count + 1)
+        active.hyperedges.pop()
+        # Exclude candidates[pos].
+        dfs(pos + 1, count)
+
+    dfs(0, 0)
+    return best[0], (not timed_out[0])
+
+
 def _c_flat(mu: np.ndarray) -> tuple[np.ndarray, "_ct.POINTER[_ct.c_int]"]:
     """Return a contiguous int32 copy of ``mu`` and a ctypes c_int pointer into it."""
     flat = np.ascontiguousarray(mu, dtype=np.int32)
@@ -4614,21 +4747,31 @@ def _aut_count_matrix(mu: np.ndarray) -> int:
                if mu[np.ix_(list(perm), list(perm))].tobytes() == canon)
 
 
+def _dir_relabel_key(edge, p: list) -> tuple:
+    """Permutation-relabelled key of one directed hyperedge.
+
+    Keeps the legacy forward shape ``(int, tuple_of_heads)`` for forward edges
+    (so their canonical keys and dedup counts are unchanged) and uses
+    ``(tuple_of_tails, tuple_of_heads)`` for general edges.
+    """
+    first, heads = edge
+    if isinstance(first, (set, frozenset)):
+        return (tuple(sorted(p[t] for t in first)), tuple(sorted(p[h] for h in heads)))
+    return (p[first], tuple(sorted(p[h] for h in heads)))
+
+
 def _hyper_canonical(hyperedges: list, n: int, directed: bool) -> tuple:
     """Canonical key for a hyperedge collection under vertex permutation.
 
-    Each edge is a frozenset (undirected) or a ``(tail, frozenset(heads))``
-    pair (directed).  Returns the lex-minimum over all n! relabellings,
-    represented as a tuple of sorted-tuple edge representations.
+    Each edge is a frozenset (undirected) or a directed hyperedge in either the
+    forward ``(tail, heads)`` or general ``(tails, heads)`` form.  Returns the
+    lex-minimum over all n! relabellings.
     """
     best: tuple | None = None
     for perm in permutations(range(n)):
         p = list(perm)
         if directed:
-            relabeled: tuple = tuple(sorted(
-                (p[tail], tuple(sorted(p[h] for h in heads)))
-                for (tail, heads) in hyperedges
-            ))
+            relabeled: tuple = tuple(sorted(_dir_relabel_key(edge, p) for edge in hyperedges))
         else:
             relabeled = tuple(sorted(
                 tuple(sorted(p[v] for v in edge)) for edge in hyperedges
@@ -4644,10 +4787,7 @@ def _aut_count_hyper(hyperedges: list, n: int, directed: bool) -> int:
 
     def _relabel(p: list) -> tuple:
         if directed:
-            return tuple(sorted(
-                (p[tail], tuple(sorted(p[h] for h in heads)))
-                for (tail, heads) in hyperedges
-            ))
+            return tuple(sorted(_dir_relabel_key(edge, p) for edge in hyperedges))
         return tuple(sorted(
             tuple(sorted(p[v] for v in edge)) for edge in hyperedges
         ))
@@ -4657,9 +4797,20 @@ def _aut_count_hyper(hyperedges: list, n: int, directed: bool) -> int:
 
 
 def _hyper_to_lists(hyperedges: list, directed: bool) -> list:
-    """Convert hyperedges to JSON-serialisable sorted integer lists."""
+    """Convert hyperedges to JSON-serialisable sorted integer lists.
+
+    Forward edges keep their ``[tail, [heads]]`` shape; general edges use
+    ``[[tails], [heads]]``.
+    """
     if directed:
-        return [[tail, sorted(heads)] for (tail, heads) in hyperedges]
+        out = []
+        for edge in hyperedges:
+            first, heads = edge
+            if isinstance(first, (set, frozenset)):
+                out.append([sorted(first), sorted(heads)])
+            else:
+                out.append([first, sorted(heads)])
+        return out
     return [sorted(edge) for edge in hyperedges]
 
 
@@ -4760,17 +4911,19 @@ def _enum_hyper_extremals(
     m: int,
     target: int,
     deadline: float,
+    *,
+    kind: str = "forward",
 ) -> tuple[list[list], bool]:
     """DFS over all r-uniform hypergraphs on n vertices with exactly ``target`` edges.
 
     Iterates candidate hyperedges in order (include / exclude) and prunes
     immediately when adding a hyperedge pushes the connectivity above m-1
     (monotonicity: adding edges never decreases connectivity, so no superset
-    can be feasible at that branch either).  Returns ``(reps, timed_out)``
-    where each representative in ``reps`` is a list of JSON-serialisable
-    sorted vertex lists.
+    can be feasible at that branch either).  ``kind`` selects the directed
+    orientation model.  Returns ``(reps, timed_out)`` where each representative
+    in ``reps`` is a list of JSON-serialisable sorted vertex lists.
     """
-    candidates = _hyperedge_candidates(n, r, directed)
+    candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     total = len(candidates)
     active: list = []
     seen: set[tuple] = set()
@@ -5162,6 +5315,27 @@ def _run_checks() -> int:
         check(f"star hypertree n={n}, r={r}: {star.edge_count()} edges (expect {(n-1)//(r-1)}), "
               f"lambda^max={max_hyperedge_connectivity(star)}",
               star.edge_count() == (n - 1) // (r - 1) and max_hyperedge_connectivity(star) == 1)
+
+    section("Hypergraphs: directed orientation models (forward / backward / general)")
+    # The general gate admits a mixed arc {0,1} -> {2,3}: a route enters at a tail
+    # and leaves at a head, so 0->2 carries one route and 2->0 carries none.
+    mixed = Hypergraph(4, [(frozenset({0, 1}), frozenset({2, 3}))], directed=True)
+    check("mixed arc {0,1}->{2,3}: lambda(0,2)=1 and lambda(2,0)=0",
+          hyper_connectivity(mixed, 0, 2) == 1 and hyper_connectivity(mixed, 2, 0) == 0)
+    # Backward is the arc-reversal dual of forward, so their extremal numbers agree.
+    fwd, _ = max_feasible_hyperedges(4, 3, 3, directed=True, kind="forward", time_limit=1.5)
+    bwd, _ = max_feasible_hyperedges(4, 3, 3, directed=True, kind="backward", time_limit=1.5)
+    check(f"forward == backward at n=4, r=3, m=3 ({fwd} == {bwd})", fwd == bwd)
+    # General contains forward and strictly beats it where vertices are scarce
+    # (n = r); both values here are proved exact by the branch and bound.
+    g3, e3 = max_feasible_hyperedges(3, 3, 3, directed=True, kind="general", time_limit=1.5)
+    f3, _  = max_feasible_hyperedges(3, 3, 3, directed=True, kind="forward", time_limit=1.5)
+    check(f"general 4 > forward 3 at n=3, r=3, m=3 (got {g3} vs {f3}, exact={e3})",
+          g3 == 4 and f3 == 3 and e3)
+    g4, e4 = max_feasible_hyperedges(4, 4, 4, directed=True, kind="general", time_limit=10.0)
+    f4, _  = max_feasible_hyperedges(4, 4, 4, directed=True, kind="forward", time_limit=3.0)
+    check(f"general 8 doubles forward 4 at n = r = 4, m = 4 ({g4} vs {f4}, exact={e4})",
+          g4 == 8 and f4 == 4 and e4)
 
     section("Monte Carlo: the appearance probability crosses the m/n scale")
     n, m = 30, 3

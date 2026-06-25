@@ -1589,3 +1589,54 @@ the directed variants.
   vertex-disjoint directed routes, so one checker measures all four hypergraph variants.
 - Build clean: 110 pp (+2), 0 overfull, 0 undefined refs/cites. All three labels resolve;
   no prose em-dash/semicolon.
+
+## 2026-06-26 (Opus) -- general directed hyperedge model + orientation bounds
+
+Author liked the "different kinds of directed" hyperedges that surfaced while redrawing the
+hypergraph metro figure and asked to expand the thesis around them (implement the code,
+discover bounds, maybe change the variant count). Scope confirmed with the author: implement
+the GENERAL model (all tail/head splits, subsuming forward/backward/mixed); decide thesis
+presentation AFTER seeing the numbers (so no .tex written yet, code only).
+
+TAXONOMY. A directed hyperedge is a split of an r-set into a non-empty tail set T and head
+set H. forward = |T|=1 (the thesis's existing model), backward = |H|=1, general = any split.
+Two facts shape it: (1) backward is the arc-reversal DUAL of forward, so identical extremal
+numbers (a one-line lemma); (2) at r=3 every split has a singleton side, so general =
+forward + backward (per-edge orientation choice) and genuinely mixed (|T|,|H|>=2) arcs only
+exist from r>=4.
+
+CODE (erdos915_unified.py, all additive, forward path kept byte-identical):
+- Hypergraph now stores a directed edge as the legacy forward (tail:int, heads) OR the
+  general (tails:frozenset, heads:frozenset); new _dir_tails_heads() normalises both. The
+  gate gadget _hyper_capacity_matrix wires every tail->gate and gate->every head, so the
+  same scipy max-flow checker serves all kinds. members(), _hyper_canonical/_aut_count_hyper/
+  _hyper_to_lists (forward [tail,[heads]] shape preserved), _hyperedge_candidates,
+  _brute_force_hypergraph, _random_hypergraph_search, _enum_hyper_extremals all gained a
+  kind="forward"|"backward"|"general" axis.
+- NEW max_feasible_hyperedges(n,r,m,*,directed,vertex_split,kind,time_limit,seed_lb) -> the
+  hypergraph-side branch-and-bound maximiser (matrix side already had one): DFS include/
+  exclude with the monotone-feasibility prune + an incumbent bound prune + a short random
+  warm start; seed_lb lets general start from the forward optimum (forward subset of general)
+  so general >= forward is guaranteed and the prune bites. Returns (value, exact).
+
+FINDINGS (r=3 unless noted; * = branch-and-bound proved exact):
+- forward == backward in EVERY computed cell (duality confirmed empirically).
+- m=2: general == forward everywhere (edge and vertex), no gain (forest-like regime).
+- m=3: general strictly beats forward only when vertices are scarce (n ~ r):
+  * r=3: n=3 general 4* vs forward 3*; n=4 BOTH 8* (gap closes); n=5,6 equal lower bounds.
+  * r=4: n=4 general 6* vs forward 4* (m=3) and 8* vs 4* (m=4, doubles); n=5 no gap found.
+  So extra orientations buy density only while a single hyperedge-set dominates; once n>r,
+  forward already saturates the Menger budget. (n>=5 values are seeded lower bounds, not exact.)
+
+VERIFY: new self-check section "directed orientation models" (mixed-gate one-way, duality,
+the n=3 and n=r=4 gaps, all proved exact) -> ALL CHECKS PASSED. Full suite 88 tests OK / 3
+skip (was 82; +6 new in tests/test_hypergraph.py DirectedOrientationModels). Forward
+regression spot-checks unchanged (K_4^(3)=3, star hypertree, verify_hyper_vertex_value,
+forward enum class counts + legacy format).
+
+PENDING (author decision, "after the numbers"): thesis presentation -- the duality as a
+short lemma, the general model as a new variant, and whether to grow the twelve-variant
+table (only the directed-hypergraph cells split by orientation, so 12 -> up to 16) or keep
+12 + an orientation subsection. NOT yet integrated into solve()/the variant configs/figures.
+SEPARATELY in flight: the hypergraph metro-map figure rebuild (author reverted the awful
+4-rail fig 2.6 in the working tree; new helper-junction layout drafted, not yet in .tex).
