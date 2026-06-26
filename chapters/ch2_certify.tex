@@ -234,7 +234,7 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \node[smallvertex] (a2) at (0.0, 0.0) {$a$};
 \node[smallvertex] (b2) at (1.0, 0.0) {$b$};
 \node[smallvertex] (c2) at (2.0, 0.0) {$c$};
-\node[hnode, fill=metroA!20, minimum size=15pt] (h) at (1.0, 1.15) {$h_e$};
+\node[hnode, fill=metroA!70, minimum size=15pt] (h) at (1.0, 1.15) {$h_e$};
 \draw[edge] (a2) -- (h);
 \draw[edge] (b2) -- (h);
 \draw[edge] (c2) -- (h);
@@ -269,6 +269,7 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
   \begin{scope}[on background layer]
     \draw[metro, metroA] (Se) -- (Sa);
     \draw[metro, metroA] (Sa) -- (Sd);
+    \draw[metro, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[metro, metroB] (Sn) -- (Sm);
     \draw[metro, metroB] (Sm) -- (Sj);
     \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
@@ -290,15 +291,16 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 % --- panel (b): the helper-point flow network for the pair u, v ---
 \begin{scope}[xshift=11cm]
   \stations
-  \coordinate (Helc) at (1.49,3.49);
-  \coordinate (Hmcj) at (4.57,3.43);
-  \coordinate (Hedm) at (3.46,3.62);
-  \coordinate (Helm) at (2.54,6.38);
+  \coordinate (Helc) at (1,3);
+  \coordinate (Hmcj) at (5,4);
+  \coordinate (Hedm) at (3,3.7);
+  \coordinate (Helm) at (1.6,6.7);
   \coordinate (Hnel) at (0.50,6.00);
   \coordinate (Hnmj) at (3.27,7.81);
   \begin{scope}[on background layer]
     \draw[metro, metroA, opacity=0.28, line width=2.2pt] (Se) -- (Sa);
     \draw[metro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Sd);
+    \draw[metro, metroA, opacity=0.28, line width=2.2pt] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[metro, metroB] (Sn) -- (Sm);
     \draw[metro, metroB] (Sm) -- (Sj);
     \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
@@ -394,93 +396,65 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \label{fig:dir-hyper-gadget}
 \end{figure}
 
-\Cref{fig:dir-hyper-gadget-example} orients the same hypergraph one-way, again in two panels. In panel (a) each hyperedge keeps its colour but becomes a directed star: the middle of its three stations is the tail, and two arcs run from that tail to the other two, the heads, so a route may enter only at a tail and leave only at a head. Panel (b) reads it as the gate network and follows the same pair $u, v$ of \Cref{fig:hyper-gadget-example}. Orientation costs connectivity, and here it is dramatic: of the four undirected routes between $u$ and $v$ only one survives the arrows, $\lec(u, v) = 1$, since $u$ is the tail of a single hyperedge and every route must leave it that one way. The lone route boards two lines in turn, through the two directed gates $h_{\bullet}$. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top of the gates then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+\Cref{fig:dir-hyper-gadget-example} orients the same hypergraph one way and traces the routes from $v$ to $u$. Each hyperedge now has one tail and two heads, and a route may enter it only at the tail and leave only at a head, the gate rule of \Cref{fig:dir-hyper-gadget}. Rather than redraw every hyperedge as a full directed star, the figure shows each one only along the rail a route actually rides, with the arrow marking the direction of travel, so the map stays a clean metro picture. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{0.6\textwidth}{!}{%
 \begin{tikzpicture}[scale=0.92, >=Stealth,
-   dmetro/.style={metro, line width=3.0pt, -{Stealth[length=2.6mm]},
-                  shorten >=1.6mm, shorten <=1.2mm},
-   flowarc/.style={line width=1.2pt, black!88, line cap=round, -{Stealth[length=2.4mm]},
-                preaction={draw, -, line width=3.0pt, white}},
-   gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
-                inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
-\def\stations{%
-  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
-  \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
-  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
-\def\drawstops{%
-  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
-     {\node[metrostop] at (\id) {$\lab$};}}
-% --- panel (a): the hypergraph, every hyperedge vertex to vertex ---
-\begin{scope}
-  \stations
-  \begin{scope}[on background layer]
-    \draw[dmetro, metroA] (Sa) -- (Se);
-    \draw[dmetro, metroA] (Sa) -- (Sd);
-    \draw[dmetro, metroB] (Sm) -- (Sn);
-    \draw[dmetro, metroB] (Sm) -- (Sj);
-    \draw[dmetro, metroC] ($(Sl)+(0.14,-0.14)$) -- ($(Se)+(0.14,-0.14)$);
-    \draw[dmetro, metroC] (Sl) -- (Sc);
-    \draw[dmetro, metroD] (Sd) -- (Se);
-    \draw[dmetro, metroD] (Sd) -- (Sm);
-    \draw[dmetro, metroF] (Se) -- (Sn);
-    \draw[dmetro, metroF] (Se) -- (Sl);
-    \draw[dmetro, metroH] ($(Sl)+(-0.14,0.14)$) -- ($(Se)+(-0.14,0.14)$);
-    \draw[dmetro, metroH] (Sl) -- (Sm);
-    \draw[dmetro, metroG] (Sc) -- (Sm);
-    \draw[dmetro, metroG] (Sc) -- (Sj);
-    \draw[dmetro, metroE] (Sd) -- (Sl);
-    \draw[dmetro, metroE] (Sd) -- (Sj);
-  \end{scope}
-  \drawstops
-  \node[font=\small] at (4,-1.4) {(a)};
+   faded/.style={metro, line width=2.2pt, opacity=0.24},
+   route/.style={metro, line width=3.4pt, line cap=round,
+                 -{Stealth[length=3mm]}, shorten >=2.6pt, shorten <=2.6pt}]
+\coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
+\coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
+\coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);
+% --- the whole directed hypergraph, faded, every rail drawn once ---
+\begin{scope}[on background layer]
+  \draw[faded, metroA] (Se) -- (Sa);
+  \draw[faded, metroA] (Sa) -- (Sd);
+  \draw[faded, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
+  \draw[faded, metroB] (Sn) -- (Sm);
+  \draw[faded, metroB] (Sm) -- (Sj);
+  \draw[faded, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
+  \draw[faded, metroC] (Sl) -- (Sc);
+  \draw[faded, metroD] (Se) -- (Sd);
+  \draw[faded, metroD] (Sd) -- (Sm);
+  \draw[faded, metroF] (Sn) -- (Se);
+  \draw[faded, metroF] (Se) -- (Sl);
+  \draw[faded, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
+  \draw[faded, metroH] (Sl) -- (Sm);
+  \draw[faded, metroG] (Sm) -- (Sc);
+  \draw[faded, metroG] (Sc) -- (Sj);
+  \draw[faded, metroE] (Sl) -- (Sd);
+  \draw[faded, metroE] (Sd) -- (Sj);
 \end{scope}
-% --- panel (b): the helper-point flow network for the pair u, v ---
-\begin{scope}[xshift=11cm]
-  \stations
-  \coordinate (Hnel) at (0.43,5.57);
-  \coordinate (Helm) at (4.00,6.80);
-  \begin{scope}[on background layer]
-    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Se);
-    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Sd);
-    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm) -- (Sn);
-    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm) -- (Sj);
-    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] ($(Sl)+(0.14,-0.14)$) -- ($(Se)+(0.14,-0.14)$);
-    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl) -- (Sc);
-    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd) -- (Se);
-    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd) -- (Sm);
-    \draw[dmetro, metroF] (Se) -- (Sn);
-    \draw[dmetro, metroF] (Se) -- (Sl);
-    \draw[dmetro, metroH] ($(Sl)+(-0.14,0.14)$) -- ($(Se)+(-0.14,0.14)$);
-    \draw[dmetro, metroH] (Sl) -- (Sm);
-    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc) -- (Sm);
-    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc) -- (Sj);
-    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sl);
-    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sj);
-  \end{scope}
-  \draw[flowarc] (Se) -- (Hnel);
-  \draw[flowarc] (Hnel) -- (Sl);
-  \draw[flowarc] (Sl) -- (Helm);
-  \draw[flowarc] (Helm) -- (Sm);
-  \node[gate] at (Hnel) {$h_{\textcolor{metroF}{\bullet}}$};
-  \node[gate] at (Helm) {$h_{\textcolor{metroH}{\bullet}}$};
-  \drawstops
-  \node[font=\small] at (4,-1.4) {(b)};
-\end{scope}
+% --- route 1, v to u: m -> j -> c -> l -> e, riding nmj, mcj, elc, nel ---
+\draw[route, metroB] (Sm) -- (Sj);
+\draw[route, metroG] (Sj) -- (Sc);
+\draw[route, metroC] (Sc) -- (Sl);
+\draw[route, metroF] (Sl) -- (Se);
+% --- route 2, v to u: m -> l -> d -> e, riding elm, ldj, edm ---
+\draw[route, metroH] (Sm) -- (Sl);
+\draw[route, metroE] (Sl) -- (Sd);
+\draw[route, metroD] (Sd) -- (Se);
+% --- stations ---
+\foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
+   {\node[metrostop] at (\id) {$\lab$};}
 \end{tikzpicture}}
-\caption[The directed helper-point network on a whole hypergraph]{The hypergraph
-of \Cref{fig:hyper-gadget-example} made directed, each hyperedge oriented so the
-middle of its three stations is the tail. Panel (a) draws every coloured line as a
-one-way star, two arcs running from the tail to the two heads, so a Berge route
-enters at a tail and leaves at a head. Panel (b) reads it as the gate network for
-the same pair $u, v$: each gate $h_{\bullet}$ is now the directed turnstile of
-\Cref{fig:dir-hyper-gadget}, and lines off the route are faded. The arrows forbid
-the reverse transfers the undirected map allowed, so connectivity drops sharply:
-only one directed route survives, $u$ boarding one line to an intermediate station
-and a second on to $v$, and the checker reads $\lec(u, v) = 1$, against the
-undirected four of \Cref{fig:hyper-gadget-example}.}
+\caption[Directed Berge routes on a whole hypergraph]{The hypergraph
+of \Cref{fig:hyper-gadget-example} made directed and read for the routes from $v$ to
+$u$. Every hyperedge is left faded in its colour, and a route is traced only along
+the rails it actually rides, so a coloured line shows in bold exactly where a route
+boards that hyperedge and rides it to the next station. Two edge-disjoint directed
+Berge routes from $v$ to $u$ survive the orientation. The long route
+$v \to j \to c \to l \to u$ boards \textcolor{metroB}{nmj},
+\textcolor{metroG}{mcj}, \textcolor{metroC}{elc} and \textcolor{metroF}{nel} in turn,
+and the short route $v \to l \to d \to u$ boards \textcolor{metroH}{elm},
+\textcolor{metroE}{ldj} and \textcolor{metroD}{edm}. They cross only at the
+interchange $l$, so they share no hyperedge, and the checker reads $\lec(v, u) = 2$,
+since $v$ can set out through only the two hyperedges it heads. Against the
+undirected four of \Cref{fig:hyper-gadget-example}, the arrows have halved the
+count.}
 \label{fig:dir-hyper-gadget-example}
 \end{figure}
 
