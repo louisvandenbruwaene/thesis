@@ -328,6 +328,13 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
   \draw[flow] (Hnel) -- (Sn);
   \draw[flow] (Sn) -- (Hnmj);
   \draw[flow] (Hnmj) -- (Sm);
+  % dotted leg from each gate to the hyperedge's unused third member
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroC] (Helc) -- (Sl);
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroG] (Hmcj) -- (Sj);
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroD] (Hedm) -- (Sd);
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroH] (Helm) -- (Sl);
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroF] (Hnel) -- (Sl);
+  \draw[densely dotted, line width=1pt, opacity=0.7, shorten >=3mm, metroB] (Hnmj) -- (Sj);
   \node[gate] at (Helc) {$h_{\textcolor{metroC}{\bullet}}$};
   \node[gate] at (Hmcj) {$h_{\textcolor{metroG}{\bullet}}$};
   \node[gate] at (Hedm) {$h_{\textcolor{metroD}{\bullet}}$};
@@ -345,8 +352,9 @@ vertex to vertex, the metro reading of \Cref{ch:basecases}. Panel (b) reads the
 same picture as the helper-point flow network. Each hyperedge a route boards
 becomes its one-route gate $h_{\bullet}$ of \Cref{fig:hyper-gadget}, shown in that
 line's colour and placed on the route, and the thin black lines are the
-edge-disjoint Berge routes from $u$ to $v$ threading those gates. Lines on no
-$u$--$v$ route are faded. Two routes pass straight through the two hyperedges that
+edge-disjoint Berge routes from $u$ to $v$ threading those gates. A dotted leg ties
+each gate to the hyperedge's third member, the station that route does not use, and
+lines on no $u$--$v$ route are faded. Two routes pass straight through the two hyperedges that
 hold both $u$ and $v$, and two longer ones transfer at an intermediate station, so
 the checker reads $\lec(u, v) = 4$. A fifth route would have to reuse a gate.}
 \label{fig:hyper-gadget-example}
@@ -403,11 +411,11 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[scale=0.92, >=Stealth,
    faded/.style={metro, line width=2.2pt, opacity=0.24},
-   dmetro/.style={metro, line width=3.0pt,
-                  postaction={decorate, decoration={markings,
-                    mark=at position 0.57 with {\arrow{Stealth[length=2.8mm]}}}}},
+   dmetro/.style={metro, line width=3.0pt, line cap=round,
+                  -{Stealth[length=2.8mm]}, shorten >=3.2mm, shorten <=3.2mm},
    route/.style={metro, line width=3.4pt, line cap=round,
                  -{Stealth[length=3mm]}, shorten >=3.2mm, shorten <=3.2mm},
+   dotleg/.style={densely dotted, line width=1pt, opacity=0.7, shorten >=3mm},
    gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
                 inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
 \def\stations{%
@@ -474,14 +482,21 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
   \draw[route, metroH] (Sm) -- (Sl);
   \draw[route, metroE] (Sl) -- (Sd);
   \draw[route, metroD] (Sd) -- (Se);
-  % helper-point gates on the ridden rails, in the 2.6 style
-  \node[gate] at (7,5)     {$h_{\textcolor{metroB}{\bullet}}$};
-  \node[gate] at (6.2,3.4) {$h_{\textcolor{metroG}{\bullet}}$};
-  \node[gate] at (2,4)     {$h_{\textcolor{metroC}{\bullet}}$};
-  \node[gate] at (1,5)     {$h_{\textcolor{metroF}{\bullet}}$};
-  \node[gate] at (4,6)     {$h_{\textcolor{metroH}{\bullet}}$};
-  \node[gate] at (4,4)     {$h_{\textcolor{metroE}{\bullet}}$};
-  \node[gate] at (3,3)     {$h_{\textcolor{metroD}{\bullet}}$};
+  % dotted leg from each gate to the hyperedge's unused third member
+  \draw[dotleg, metroB] (7.35,5.35) -- (Sn);
+  \draw[dotleg, metroG] (4.84,3.47) -- (Sm);
+  \draw[dotleg, metroC] (1.5,4)     -- (Se);
+  \draw[dotleg, metroF] (0.65,5.35) -- (Sn);
+  \draw[dotleg, metroH] (4,5.5)     -- (Se);
+  \draw[dotleg, metroE] (4.35,4.35) -- (Sj);
+  \draw[dotleg, metroD] (2.84,2.53) -- (Sm);
+  \node[gate] at (7.35,5.35) {$h_{\textcolor{metroB}{\bullet}}$};
+  \node[gate] at (4.84,3.47) {$h_{\textcolor{metroG}{\bullet}}$};
+  \node[gate] at (1.5,4)     {$h_{\textcolor{metroC}{\bullet}}$};
+  \node[gate] at (0.65,5.35) {$h_{\textcolor{metroF}{\bullet}}$};
+  \node[gate] at (4,5.5)     {$h_{\textcolor{metroH}{\bullet}}$};
+  \node[gate] at (4.35,4.35) {$h_{\textcolor{metroE}{\bullet}}$};
+  \node[gate] at (2.84,2.53) {$h_{\textcolor{metroD}{\bullet}}$};
   \drawstops
   \node[font=\small] at (4,-1.6) {(b)};
 \end{scope}
@@ -491,9 +506,10 @@ of \Cref{fig:hyper-gadget-example} read directed. Panel (a) gives the whole dire
 hypergraph, every hyperedge a one-way line with its arrows pointing away from the
 tail station, so a route may join a line at its tail and ride it to a head. Panel
 (b) traces the routes from $v$ to $u$, drawing each hyperedge in bold only along the
-rail a route rides and marking its one-route gate $h_{\bullet}$, in that line's
-colour, the directed turnstile of \Cref{fig:dir-hyper-gadget}. Two edge-disjoint
-directed Berge routes from $v$ to $u$ survive. The long route
+rail a route rides and setting its one-route gate $h_{\bullet}$ beside that rail, in
+the line's colour, the directed turnstile of \Cref{fig:dir-hyper-gadget}. A dotted
+leg runs from each gate to the hyperedge's third member, the station the route does
+not visit. Two edge-disjoint directed Berge routes from $v$ to $u$ survive. The long route
 $v \to j \to c \to l \to u$ rides \textcolor{metroB}{nmj}, \textcolor{metroG}{mcj},
 \textcolor{metroC}{elc} and \textcolor{metroF}{nel} in turn, and the short route
 $v \to l \to d \to u$ rides \textcolor{metroH}{elm}, \textcolor{metroE}{ldj} and
