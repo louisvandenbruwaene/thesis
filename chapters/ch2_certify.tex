@@ -404,7 +404,7 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \label{fig:dir-hyper-gadget}
 \end{figure}
 
-\Cref{fig:dir-hyper-gadget-example} reads the same hypergraph directed, again in two panels. Panel (a) gives the whole hypergraph oriented, every hyperedge a one-way line whose arrows point away from its tail, so the middle-tailed lines fan out from their centre and the end-tailed ones run one way along their length. Panel (b) traces the routes from $v$ to $u$, the gate rule of \Cref{fig:dir-hyper-gadget}, drawing each hyperedge only along the rail a route actually rides and marking its one-route gate $h_{\bullet}$ in that line's colour, so the map stays a clean metro picture. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+\Cref{fig:dir-hyper-gadget-example} reads the same hypergraph directed, again in two panels. Panel (a) gives the whole hypergraph oriented, every hyperedge a one-way line whose arrows point away from its tail, so the middle-tailed lines fan out from their centre and the end-tailed ones run one way along their length. Panel (b) traces the routes from $v$ to $u$, the gate rule of \Cref{fig:dir-hyper-gadget}, keeping each ridden hyperedge's used rail in bold and threading a black arrow from the route's entry station through the one-route gate $h_{\bullet}$, set in a clear gap off the rails, to its exit, with a dotted leg to the hyperedge's third member. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
 
 \begin{figure}[htbp]
 \centering
@@ -416,6 +416,9 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
    route/.style={metro, line width=3.4pt, line cap=round,
                  -{Stealth[length=3mm]}, shorten >=3.2mm, shorten <=3.2mm},
    dotleg/.style={densely dotted, line width=1pt, opacity=0.7, shorten >=3mm},
+   flowarc/.style={line width=1.3pt, black!88, line cap=round,
+                   -{Stealth[length=2.6mm]}, shorten >=3mm, shorten <=3mm,
+                   preaction={draw, line width=3pt, white, shorten >=3mm, shorten <=3mm}},
    gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
                 inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
 \def\stations{%
@@ -473,30 +476,45 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
     \draw[faded, metroE] (Sl) -- (Sd);
     \draw[faded, metroE] (Sd) -- (Sj);
   \end{scope}
-  % route 1, v to u: m -> j -> c -> l -> e, riding nmj, mcj, elc, nel
-  \draw[route, metroB] (Sm) -- (Sj);
-  \draw[route, metroG] (Sj) -- (Sc);
-  \draw[route, metroC] (Sc) -- (Sl);
-  \draw[route, metroF] (Sl) -- (Se);
-  % route 2, v to u: m -> l -> d -> e, riding elm, ldj, edm
-  \draw[route, metroH] (Sm) -- (Sl);
-  \draw[route, metroE] (Sl) -- (Sd);
-  \draw[route, metroD] (Sd) -- (Se);
+  % used rails, bold in colour (the metro lines a route rides), no arrows
+  \draw[metro, metroB] (Sm) -- (Sj);
+  \draw[metro, metroG] (Sj) -- (Sc);
+  \draw[metro, metroC] (Sc) -- (Sl);
+  \draw[metro, metroF] (Sl) -- (Se);
+  \draw[metro, metroH] (Sm) -- (Sl);
+  \draw[metro, metroE] (Sl) -- (Sd);
+  \draw[metro, metroD] (Sd) -- (Se);
+  % helper points, placed in clear gaps off the rails
+  \coordinate (Gnmj) at (7.2,5.9);
+  \coordinate (Gmcj) at (4.3,2.0);
+  \coordinate (Gelc) at (1.0,4.2);
+  \coordinate (Gnel) at (0.7,5.3);
+  \coordinate (Gelm) at (4.3,5.5);
+  \coordinate (Gldj) at (5.2,4.2);
+  \coordinate (Gedm) at (2.3,2.85);
+  % black directed flows: route enters at the tail, passes the gate, leaves at the head
+  \draw[flowarc] (Sm) -- (Gnmj) -- (Sj);
+  \draw[flowarc] (Sj) -- (Gmcj) -- (Sc);
+  \draw[flowarc] (Sc) -- (Gelc) -- (Sl);
+  \draw[flowarc] (Sl) -- (Gnel) -- (Se);
+  \draw[flowarc] (Sm) -- (Gelm) -- (Sl);
+  \draw[flowarc] (Sl) -- (Gldj) -- (Sd);
+  \draw[flowarc] (Sd) -- (Gedm) -- (Se);
   % dotted leg from each gate to the hyperedge's unused third member
-  \draw[dotleg, metroB] (7.35,5.35) -- (Sn);
-  \draw[dotleg, metroG] (4.84,3.47) -- (Sm);
-  \draw[dotleg, metroC] (1.5,4)     -- (Se);
-  \draw[dotleg, metroF] (0.65,5.35) -- (Sn);
-  \draw[dotleg, metroH] (4,5.5)     -- (Se);
-  \draw[dotleg, metroE] (4.35,4.35) -- (Sj);
-  \draw[dotleg, metroD] (2.84,2.53) -- (Sm);
-  \node[gate] at (7.35,5.35) {$h_{\textcolor{metroB}{\bullet}}$};
-  \node[gate] at (4.84,3.47) {$h_{\textcolor{metroG}{\bullet}}$};
-  \node[gate] at (1.5,4)     {$h_{\textcolor{metroC}{\bullet}}$};
-  \node[gate] at (0.65,5.35) {$h_{\textcolor{metroF}{\bullet}}$};
-  \node[gate] at (4,5.5)     {$h_{\textcolor{metroH}{\bullet}}$};
-  \node[gate] at (4.35,4.35) {$h_{\textcolor{metroE}{\bullet}}$};
-  \node[gate] at (2.84,2.53) {$h_{\textcolor{metroD}{\bullet}}$};
+  \draw[dotleg, metroB] (Gnmj) -- (Sn);
+  \draw[dotleg, metroG] (Gmcj) -- (Sm);
+  \draw[dotleg, metroC] (Gelc) -- (Se);
+  \draw[dotleg, metroF] (Gnel) -- (Sn);
+  \draw[dotleg, metroH] (Gelm) -- (Se);
+  \draw[dotleg, metroE] (Gldj) -- (Sj);
+  \draw[dotleg, metroD] (Gedm) -- (Sm);
+  \node[gate] at (Gnmj) {$h_{\textcolor{metroB}{\bullet}}$};
+  \node[gate] at (Gmcj) {$h_{\textcolor{metroG}{\bullet}}$};
+  \node[gate] at (Gelc) {$h_{\textcolor{metroC}{\bullet}}$};
+  \node[gate] at (Gnel) {$h_{\textcolor{metroF}{\bullet}}$};
+  \node[gate] at (Gelm) {$h_{\textcolor{metroH}{\bullet}}$};
+  \node[gate] at (Gldj) {$h_{\textcolor{metroE}{\bullet}}$};
+  \node[gate] at (Gedm) {$h_{\textcolor{metroD}{\bullet}}$};
   \drawstops
   \node[font=\small] at (4,-1.6) {(b)};
 \end{scope}
@@ -505,11 +523,13 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 of \Cref{fig:hyper-gadget-example} read directed. Panel (a) gives the whole directed
 hypergraph, every hyperedge a one-way line with its arrows pointing away from the
 tail station, so a route may join a line at its tail and ride it to a head. Panel
-(b) traces the routes from $v$ to $u$, drawing each hyperedge in bold only along the
-rail a route rides and setting its one-route gate $h_{\bullet}$ beside that rail, in
-the line's colour, the directed turnstile of \Cref{fig:dir-hyper-gadget}. A dotted
-leg runs from each gate to the hyperedge's third member, the station the route does
-not visit. Two edge-disjoint directed Berge routes from $v$ to $u$ survive. The long route
+(b) traces the routes from $v$ to $u$. Each ridden hyperedge keeps its used rail in
+bold colour, and a black arrow runs from the route's entry station through the
+hyperedge's one-route gate $h_{\bullet}$ to its exit, the directed turnstile of
+\Cref{fig:dir-hyper-gadget}, with the gate set in a clear gap off the rails. A dotted
+leg in the line's colour ties each gate to the hyperedge's third member, the station
+the route does not visit. Two edge-disjoint directed Berge routes from $v$ to $u$
+survive. The long route
 $v \to j \to c \to l \to u$ rides \textcolor{metroB}{nmj}, \textcolor{metroG}{mcj},
 \textcolor{metroC}{elc} and \textcolor{metroF}{nel} in turn, and the short route
 $v \to l \to d \to u$ rides \textcolor{metroH}{elm}, \textcolor{metroE}{ldj} and
