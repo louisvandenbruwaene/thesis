@@ -302,17 +302,17 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
     \draw[metro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Sd);
     \draw[metro, metroA, opacity=0.28, line width=2.2pt] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[metro, metroB] (Sn) -- (Sm);
-    \draw[metro, metroB] (Sm) -- (Sj);
+    \draw[metro, metroB, opacity=0.28, line width=2.2pt] (Sm) -- (Sj);
     \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
     \draw[metro, metroC] (Sl) -- (Sc);
     \draw[metro, metroD] (Se) -- (Sd);
     \draw[metro, metroD] (Sd) -- (Sm);
     \draw[metro, metroF] (Sn) -- (Se);
-    \draw[metro, metroF] (Se) -- (Sl);
+    \draw[metro, metroF, opacity=0.28, line width=2.2pt] (Se) -- (Sl);
     \draw[metro, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
     \draw[metro, metroH] (Sl) -- (Sm);
     \draw[metro, metroG] (Sm) -- (Sc);
-    \draw[metro, metroG] (Sc) -- (Sj);
+    \draw[metro, metroG, opacity=0.28, line width=2.2pt] (Sc) -- (Sj);
     \draw[metro, metroE, opacity=0.28, line width=2.2pt] (Sl) -- (Sd);
     \draw[metro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sj);
   \end{scope}
@@ -396,60 +396,92 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \label{fig:dir-hyper-gadget}
 \end{figure}
 
-\Cref{fig:dir-hyper-gadget-example} orients the same hypergraph one way and traces the routes from $v$ to $u$. Each hyperedge now has one tail and two heads, and a route may enter it only at the tail and leave only at a head, the gate rule of \Cref{fig:dir-hyper-gadget}. Rather than redraw every hyperedge as a full directed star, the figure shows each one only along the rail a route actually rides, with the arrow marking the direction of travel, so the map stays a clean metro picture. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+\Cref{fig:dir-hyper-gadget-example} reads the same hypergraph directed, again in two panels. Panel (a) repeats the whole map with every hyperedge emphasized, the way \Cref{fig:hyper-gadget-example} draws it. Panel (b) orients each hyperedge, one tail and two heads, and traces the routes from $v$ to $u$, the gate rule of \Cref{fig:dir-hyper-gadget}. Rather than redraw every hyperedge as a full directed star, it shows each one only along the rail a route actually rides, with the arrow marking the direction of travel, so the map stays a clean metro picture. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.6\textwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[scale=0.92, >=Stealth,
    faded/.style={metro, line width=2.2pt, opacity=0.24},
    route/.style={metro, line width=3.4pt, line cap=round,
-                 -{Stealth[length=3mm]}, shorten >=2.6pt, shorten <=2.6pt}]
-\coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
-\coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
-\coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);
-% --- the whole directed hypergraph, faded, every rail drawn once ---
-\begin{scope}[on background layer]
-  \draw[faded, metroA] (Se) -- (Sa);
-  \draw[faded, metroA] (Sa) -- (Sd);
-  \draw[faded, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
-  \draw[faded, metroB] (Sn) -- (Sm);
-  \draw[faded, metroB] (Sm) -- (Sj);
-  \draw[faded, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
-  \draw[faded, metroC] (Sl) -- (Sc);
-  \draw[faded, metroD] (Se) -- (Sd);
-  \draw[faded, metroD] (Sd) -- (Sm);
-  \draw[faded, metroF] (Sn) -- (Se);
-  \draw[faded, metroF] (Se) -- (Sl);
-  \draw[faded, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
-  \draw[faded, metroH] (Sl) -- (Sm);
-  \draw[faded, metroG] (Sm) -- (Sc);
-  \draw[faded, metroG] (Sc) -- (Sj);
-  \draw[faded, metroE] (Sl) -- (Sd);
-  \draw[faded, metroE] (Sd) -- (Sj);
+                 -{Stealth[length=3mm]}, shorten >=3.2mm, shorten <=3.2mm}]
+\def\stations{%
+  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
+  \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
+  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
+\def\drawstops{%
+  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
+     {\node[metrostop] at (\id) {$\lab$};}}
+% --- panel (a): the whole hypergraph, every hyperedge emphasized ---
+\begin{scope}
+  \stations
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (Se) -- (Sa);
+    \draw[metro, metroA] (Sa) -- (Sd);
+    \draw[metro, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
+    \draw[metro, metroB] (Sn) -- (Sm);
+    \draw[metro, metroB] (Sm) -- (Sj);
+    \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
+    \draw[metro, metroC] (Sl) -- (Sc);
+    \draw[metro, metroD] (Se) -- (Sd);
+    \draw[metro, metroD] (Sd) -- (Sm);
+    \draw[metro, metroF] (Sn) -- (Se);
+    \draw[metro, metroF] (Se) -- (Sl);
+    \draw[metro, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
+    \draw[metro, metroH] (Sl) -- (Sm);
+    \draw[metro, metroG] (Sm) -- (Sc);
+    \draw[metro, metroG] (Sc) -- (Sj);
+    \draw[metro, metroE] (Sl) -- (Sd);
+    \draw[metro, metroE] (Sd) -- (Sj);
+  \end{scope}
+  \drawstops
+  \node[font=\small] at (4,-1.6) {(a)};
 \end{scope}
-% --- route 1, v to u: m -> j -> c -> l -> e, riding nmj, mcj, elc, nel ---
-\draw[route, metroB] (Sm) -- (Sj);
-\draw[route, metroG] (Sj) -- (Sc);
-\draw[route, metroC] (Sc) -- (Sl);
-\draw[route, metroF] (Sl) -- (Se);
-% --- route 2, v to u: m -> l -> d -> e, riding elm, ldj, edm ---
-\draw[route, metroH] (Sm) -- (Sl);
-\draw[route, metroE] (Sl) -- (Sd);
-\draw[route, metroD] (Sd) -- (Se);
-% --- stations ---
-\foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
-   {\node[metrostop] at (\id) {$\lab$};}
+% --- panel (b): the routes from v to u, only the ridden rails ---
+\begin{scope}[xshift=11cm]
+  \stations
+  \begin{scope}[on background layer]
+    \draw[faded, metroA] (Se) -- (Sa);
+    \draw[faded, metroA] (Sa) -- (Sd);
+    \draw[faded, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
+    \draw[faded, metroB] (Sn) -- (Sm);
+    \draw[faded, metroB] (Sm) -- (Sj);
+    \draw[faded, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
+    \draw[faded, metroC] (Sl) -- (Sc);
+    \draw[faded, metroD] (Se) -- (Sd);
+    \draw[faded, metroD] (Sd) -- (Sm);
+    \draw[faded, metroF] (Sn) -- (Se);
+    \draw[faded, metroF] (Se) -- (Sl);
+    \draw[faded, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
+    \draw[faded, metroH] (Sl) -- (Sm);
+    \draw[faded, metroG] (Sm) -- (Sc);
+    \draw[faded, metroG] (Sc) -- (Sj);
+    \draw[faded, metroE] (Sl) -- (Sd);
+    \draw[faded, metroE] (Sd) -- (Sj);
+  \end{scope}
+  % route 1, v to u: m -> j -> c -> l -> e, riding nmj, mcj, elc, nel
+  \draw[route, metroB] (Sm) -- (Sj);
+  \draw[route, metroG] (Sj) -- (Sc);
+  \draw[route, metroC] (Sc) -- (Sl);
+  \draw[route, metroF] (Sl) -- (Se);
+  % route 2, v to u: m -> l -> d -> e, riding elm, ldj, edm
+  \draw[route, metroH] (Sm) -- (Sl);
+  \draw[route, metroE] (Sl) -- (Sd);
+  \draw[route, metroD] (Sd) -- (Se);
+  \drawstops
+  \node[font=\small] at (4,-1.6) {(b)};
+\end{scope}
 \end{tikzpicture}}
 \caption[Directed Berge routes on a whole hypergraph]{The hypergraph
-of \Cref{fig:hyper-gadget-example} made directed and read for the routes from $v$ to
-$u$. Every hyperedge is left faded in its colour, and a route is traced only along
-the rails it actually rides, so a coloured line shows in bold exactly where a route
-boards that hyperedge and rides it to the next station. Two edge-disjoint directed
-Berge routes from $v$ to $u$ survive the orientation. The long route
-$v \to j \to c \to l \to u$ boards \textcolor{metroB}{nmj},
+of \Cref{fig:hyper-gadget-example} read directed. Panel (a) repeats the whole map
+with every hyperedge emphasized, one coloured line through its three members, the
+parallel \textcolor{metroA}{ead} a doubled track. Panel (b) orients each hyperedge,
+one tail and two heads, and traces the routes from $v$ to $u$, drawing a line in
+bold only along the rail a route actually rides and giving it an arrow for the
+direction of travel. Two edge-disjoint directed Berge routes from $v$ to $u$
+survive. The long route $v \to j \to c \to l \to u$ rides \textcolor{metroB}{nmj},
 \textcolor{metroG}{mcj}, \textcolor{metroC}{elc} and \textcolor{metroF}{nel} in turn,
-and the short route $v \to l \to d \to u$ boards \textcolor{metroH}{elm},
+and the short route $v \to l \to d \to u$ rides \textcolor{metroH}{elm},
 \textcolor{metroE}{ldj} and \textcolor{metroD}{edm}. They cross only at the
 interchange $l$, so they share no hyperedge, and the checker reads $\lec(v, u) = 2$,
 since $v$ can set out through only the two hyperedges it heads. Against the
