@@ -1660,9 +1660,15 @@ directed = middle vertex is the tail, author-confirmed). Replaced BOTH whole-hyp
 in ch2 with single-panel metro maps (the helper junction IS the gate, so map and flow network
 are one drawing, no more two-panel before/after):
   * fig:hyper-gadget-example (2.6, undirected): 8 stations, 8 colour Y-hyperedges meeting at
-    boxed gates named after the edge; the three spine spokes to hub e nudged into parallel lanes
-    (shared-track effect); checker reads lambda(e,l)=4 (e,l share elc,elm,nel + one longer route).
-    ldj helper placed at (5.2,5.2) (author left it unplaced).
+    boxed gates named after the edge; checker reads lambda(e,l)=4 (e,l share elc,elm,nel + one
+    longer route). ldj helper placed at (5,5) (author left it unplaced).
+  LABELLING CONFIRMED + REDRAWN (author flagged "looks awful"): the alphabetical a..o naming is
+  column-major (first coord x ascending 0..8, then second coord y ascending 0..8) -- which is
+  what I already had (verified: that order gives the shortest total spoke length, 70.9, vs 78+
+  for the others). So the labelling was right; the awfulness was my DRAWING. Replaced the bowed
+  parallel-lane spine rails with PLAIN STRAIGHT SPOKES (the helper boxes stack on the x=4 spine
+  and mask the lines passing behind them). Both figures and the undirected caption updated (no
+  more "parallel rails" prose).
   * fig:dir-hyper-gadget-example (2.8, directed): same layout, dmetro arrows tail->gate->two
     heads; checker reads lambda(d,e)=2 (orientation drops it from the undirected 4). Lead-ins +
     captions rewritten (no more u,v,c interchange / "max flow = 3" two-panel prose). Old layered

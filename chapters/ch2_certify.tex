@@ -253,33 +253,29 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \begin{tikzpicture}[scale=1.0,
    gate/.style={hnode, inner sep=1.5pt,
                 font=\fontsize{6.4}{7}\selectfont\bfseries}]
-% A 3-uniform hypergraph on eight stations a,c,d,e,j,l,m,n. Each of the eight
-% hyperedges is one coloured line meeting its three members at a helper junction,
-% drawn as a box named after the edge -- the gate of fig:hyper-gadget. Three lines
-% share the central spine (x=4) down to the hub e and one runs the upper spine to
-% j; on a shared stretch they are nudged into parallel lanes so they read as
-% separate rails rather than one smeared line, the metro-map shared-track effect.
+% A 3-uniform hypergraph on eight stations a,c,d,e,j,l,m,n, labelled by ascending
+% x then ascending y. Each of the eight hyperedges is one coloured line meeting its
+% three members at a helper junction, drawn as a box named after the edge -- the
+% gate of fig:hyper-gadget. Plain straight spokes; the four helper boxes stack up
+% the central spine x=4, and the hub e, on five of the eight hyperedges, is where
+% the most lines converge.
 \def\stationcoords{%
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (2,6);
   \coordinate (Se) at (4,0);  \coordinate (Sj) at (4,8);  \coordinate (Sl) at (6,2);
   \coordinate (Sm) at (6,6);  \coordinate (Sn) at (8,0);
   \coordinate (Head) at (1,1); \coordinate (Hnmj) at (8,4); \coordinate (Helc) at (4,1);
   \coordinate (Hedm) at (4,7); \coordinate (Hnel) at (6,1); \coordinate (Helm) at (4,3);
-  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5.2,5.2);
+  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5,5);
 }
 \def\hyperlines{%
-  \draw[metro, metroA] (Sa)--(Head); \draw[metro, metroA] (Head)--(Se); \draw[metro, metroA] (Head)--(Sd);
-  \draw[metro, metroB] (Sm)--(Hnmj); \draw[metro, metroB] (Hnmj)--(Sn); \draw[metro, metroB] (Hnmj)--(Sj);
-  \draw[metro, metroC] (Sl)--(Helc); \draw[metro, metroC] (Helc)--(Sc);
-     \draw[metro, metroC] (Se)--(3.62,0.5)--(Helc);                       % e--elc rail
-  \draw[metro, metroD] (Sd)--(Hedm); \draw[metro, metroD] (Hedm)--(Sm);
-     \draw[metro, metroD] (Se)--(4.42,0.5)--(4.42,6.5)--(Hedm);           % e--edm rail
-  \draw[metro, metroF] (Se)--(Hnel); \draw[metro, metroF] (Hnel)--(Sn); \draw[metro, metroF] (Hnel)--(Sl);
-  \draw[metro, metroH] (Sl)--(Helm); \draw[metro, metroH] (Helm)--(Sm);
-     \draw[metro, metroH] (Se)--(3.40,0.6)--(3.40,2.5)--(Helm);           % e--elm rail
-  \draw[metro, metroG] (Sc)--(Hmcj); \draw[metro, metroG] (Hmcj)--(Sm);
-     \draw[metro, metroG] (Sj)--(3.55,7.5)--(3.55,5.5)--(Hmcj);           % j--mcj rail
-  \draw[metro, metroE] (Sd)--(Hldj); \draw[metro, metroE] (Hldj)--(Sl); \draw[metro, metroE] (Hldj)--(Sj);
+  \draw[metro, metroA] (Head)--(Se); \draw[metro, metroA] (Head)--(Sa); \draw[metro, metroA] (Head)--(Sd);
+  \draw[metro, metroB] (Hnmj)--(Sn); \draw[metro, metroB] (Hnmj)--(Sm); \draw[metro, metroB] (Hnmj)--(Sj);
+  \draw[metro, metroC] (Helc)--(Se); \draw[metro, metroC] (Helc)--(Sl); \draw[metro, metroC] (Helc)--(Sc);
+  \draw[metro, metroD] (Hedm)--(Se); \draw[metro, metroD] (Hedm)--(Sd); \draw[metro, metroD] (Hedm)--(Sm);
+  \draw[metro, metroF] (Hnel)--(Se); \draw[metro, metroF] (Hnel)--(Sn); \draw[metro, metroF] (Hnel)--(Sl);
+  \draw[metro, metroH] (Helm)--(Se); \draw[metro, metroH] (Helm)--(Sl); \draw[metro, metroH] (Helm)--(Sm);
+  \draw[metro, metroG] (Hmcj)--(Sm); \draw[metro, metroG] (Hmcj)--(Sc); \draw[metro, metroG] (Hmcj)--(Sj);
+  \draw[metro, metroE] (Hldj)--(Sl); \draw[metro, metroE] (Hldj)--(Sd); \draw[metro, metroE] (Hldj)--(Sj);
 }
 \stationcoords
 \begin{scope}[on background layer] \hyperlines \end{scope}
@@ -297,9 +293,9 @@ the eight hyperedges is one coloured line threading its three members through a
 helper junction, boxed and named after the edge, so $\{e, a, d\}$ is the line
 \textsf{ead} and so on. Each box is the one-route gate of \Cref{fig:hyper-gadget},
 which is why the single drawing is both the hypergraph and the network the checker
-measures. The lines that share the central spine to the hub $e$ run side by side as
-parallel rails, the metro-map rendering of several hyperedges sharing a stretch of
-track. The pair $e, l$ lies on the three hyperedges $\{e,l,c\}$, $\{e,l,m\}$ and
+measures. The hub $e$, on five of the eight hyperedges, is where the most lines
+converge, and the four boxes stacked up the central spine are the gates that share
+it. The pair $e, l$ lies on the three hyperedges $\{e,l,c\}$, $\{e,l,m\}$ and
 $\{n,e,l\}$ and carries one longer route besides, four in all, so the checker reads
 $\lec(e, l) = 4$. A fifth would have to reuse a gate.}
 \label{fig:hyper-gadget-example}
@@ -360,28 +356,26 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
                 font=\fontsize{6.4}{7}\selectfont\bfseries}]
 % The hypergraph of fig:hyper-gadget-example, oriented one-way: the middle of each
 % hyperedge's three vertices is the tail, two arcs running from it through the gate
-% to the two heads. Same stations and helper boxes as the undirected figure; the
-% shared-spine rails now point toward their head (the hub e, or j for mcj).
+% to the two heads. Same stations and helper boxes as the undirected figure, plain
+% straight arcs with arrowheads added.
 \def\stationcoords{%
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (2,6);
   \coordinate (Se) at (4,0);  \coordinate (Sj) at (4,8);  \coordinate (Sl) at (6,2);
   \coordinate (Sm) at (6,6);  \coordinate (Sn) at (8,0);
   \coordinate (Head) at (1,1); \coordinate (Hnmj) at (8,4); \coordinate (Helc) at (4,1);
   \coordinate (Hedm) at (4,7); \coordinate (Hnel) at (6,1); \coordinate (Helm) at (4,3);
-  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5.2,5.2);
+  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5,5);
 }
 \def\dhyperlines{%
+  % middle of each edge string is the tail: ead->a, nmj->m, elc->l, edm->d,
+  % nel->e, elm->l, mcj->c, ldj->d. Arrows run tail -> gate -> each head.
   \draw[dmetro, metroA] (Sa)--(Head); \draw[dmetro, metroA] (Head)--(Se); \draw[dmetro, metroA] (Head)--(Sd);
   \draw[dmetro, metroB] (Sm)--(Hnmj); \draw[dmetro, metroB] (Hnmj)--(Sn); \draw[dmetro, metroB] (Hnmj)--(Sj);
-  \draw[dmetro, metroC] (Sl)--(Helc); \draw[dmetro, metroC] (Helc)--(Sc);
-     \draw[dmetro, metroC] (Helc)--(3.62,0.5)--(Se);
-  \draw[dmetro, metroD] (Sd)--(Hedm); \draw[dmetro, metroD] (Hedm)--(Sm);
-     \draw[dmetro, metroD] (Hedm)--(4.42,6.5)--(4.42,0.5)--(Se);
+  \draw[dmetro, metroC] (Sl)--(Helc); \draw[dmetro, metroC] (Helc)--(Se); \draw[dmetro, metroC] (Helc)--(Sc);
+  \draw[dmetro, metroD] (Sd)--(Hedm); \draw[dmetro, metroD] (Hedm)--(Se); \draw[dmetro, metroD] (Hedm)--(Sm);
   \draw[dmetro, metroF] (Se)--(Hnel); \draw[dmetro, metroF] (Hnel)--(Sn); \draw[dmetro, metroF] (Hnel)--(Sl);
-  \draw[dmetro, metroH] (Sl)--(Helm); \draw[dmetro, metroH] (Helm)--(Sm);
-     \draw[dmetro, metroH] (Helm)--(3.40,2.5)--(3.40,0.6)--(Se);
-  \draw[dmetro, metroG] (Sc)--(Hmcj); \draw[dmetro, metroG] (Hmcj)--(Sm);
-     \draw[dmetro, metroG] (Hmcj)--(3.55,5.5)--(3.55,7.5)--(Sj);
+  \draw[dmetro, metroH] (Sl)--(Helm); \draw[dmetro, metroH] (Helm)--(Se); \draw[dmetro, metroH] (Helm)--(Sm);
+  \draw[dmetro, metroG] (Sc)--(Hmcj); \draw[dmetro, metroG] (Hmcj)--(Sm); \draw[dmetro, metroG] (Hmcj)--(Sj);
   \draw[dmetro, metroE] (Sd)--(Hldj); \draw[dmetro, metroE] (Hldj)--(Sl); \draw[dmetro, metroE] (Hldj)--(Sj);
 }
 \stationcoords
