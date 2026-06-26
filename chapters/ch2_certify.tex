@@ -256,11 +256,6 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
                 preaction={draw, line width=3.0pt, white}},
    gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
                 inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
-% A 3-uniform hypergraph on eight stations, the source layout with x and y swapped.
-% Panel (a): each hyperedge as one coloured metro line through its three members,
-% vertex to vertex (no helper junction). Panel (b): the same map read as the gate
-% flow network for the pair u, v, with the helper point of each boarded hyperedge
-% drawn as a coloured gate h and the edge-disjoint u--v routes traced through them.
 \def\stations{%
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
   \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
@@ -268,18 +263,26 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \def\drawstops{%
   \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
      {\node[metrostop] at (\id) {$\lab$};}}
-% --- panel (a): the hypergraph as a metro map (edges only) ---
+% --- panel (a): the hypergraph, every hyperedge vertex to vertex ---
 \begin{scope}
   \stations
   \begin{scope}[on background layer]
-    \draw[metro, metroA] (Se)--(Sa)--(Sd);
-    \draw[metro, metroB] (Sn)--(Sm)--(Sj);
-    \draw[metro, metroC] (Sl)--(Se)--(Sc);
-    \draw[metro, metroD] (Se)--(Sd)--(Sm);
-    \draw[metro, metroF] (Sn)--(Sl)--(Se);
-    \draw[metro, metroH] (Se)--(Sl)--(Sm);
-    \draw[metro, metroG] (Sc)--(Sm)--(Sj);
-    \draw[metro, metroE] (Sl)--(Sd)--(Sj);
+    \draw[metro, metroA] (Se) -- (Sa);
+    \draw[metro, metroA] (Sa) -- (Sd);
+    \draw[metro, metroB] (Sn) -- (Sm);
+    \draw[metro, metroB] (Sm) -- (Sj);
+    \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
+    \draw[metro, metroC] (Sl) -- (Sc);
+    \draw[metro, metroD] (Se) -- (Sd);
+    \draw[metro, metroD] (Sd) -- (Sm);
+    \draw[metro, metroF] (Sn) -- (Se);
+    \draw[metro, metroF] (Se) -- (Sl);
+    \draw[metro, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
+    \draw[metro, metroH] (Sl) -- (Sm);
+    \draw[metro, metroG] (Sm) -- (Sc);
+    \draw[metro, metroG] (Sc) -- (Sj);
+    \draw[metro, metroE] (Sl) -- (Sd);
+    \draw[metro, metroE] (Sd) -- (Sj);
   \end{scope}
   \drawstops
   \node[font=\small] at (4,-1.4) {(a)};
@@ -287,26 +290,42 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 % --- panel (b): the helper-point flow network for the pair u, v ---
 \begin{scope}[xshift=11cm]
   \stations
-  \coordinate (Helc) at (1.49,3.49); \coordinate (Hmcj) at (4.57,3.43);
-  \coordinate (Hedm) at (3.46,3.62); \coordinate (Helm) at (2.54,6.38);
-  \coordinate (Hnel) at (0.50,6.00); \coordinate (Hnmj) at (3.27,7.81);
+  \coordinate (Helc) at (1.49,3.49);
+  \coordinate (Hmcj) at (4.57,3.43);
+  \coordinate (Hedm) at (3.46,3.62);
+  \coordinate (Helm) at (2.54,6.38);
+  \coordinate (Hnel) at (0.50,6.00);
+  \coordinate (Hnmj) at (3.27,7.81);
   \begin{scope}[on background layer]
-    \draw[metro, metroA, opacity=0.30, line width=2.2pt] (Se)--(Sa)--(Sd);
-    \draw[metro, metroB] (Sn)--(Sm)--(Sj);
-    \draw[metro, metroC] (Sl)--(Se)--(Sc);
-    \draw[metro, metroD] (Se)--(Sd)--(Sm);
-    \draw[metro, metroF] (Sn)--(Sl)--(Se);
-    \draw[metro, metroH] (Se)--(Sl)--(Sm);
-    \draw[metro, metroG] (Sc)--(Sm)--(Sj);
-    \draw[metro, metroE, opacity=0.30, line width=2.2pt] (Sl)--(Sd)--(Sj);
+    \draw[metro, metroA, opacity=0.28, line width=2.2pt] (Se) -- (Sa);
+    \draw[metro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Sd);
+    \draw[metro, metroB] (Sn) -- (Sm);
+    \draw[metro, metroB] (Sm) -- (Sj);
+    \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
+    \draw[metro, metroC] (Sl) -- (Sc);
+    \draw[metro, metroD] (Se) -- (Sd);
+    \draw[metro, metroD] (Sd) -- (Sm);
+    \draw[metro, metroF] (Sn) -- (Se);
+    \draw[metro, metroF] (Se) -- (Sl);
+    \draw[metro, metroH] ($(Se)+(-0.14,0.14)$) -- ($(Sl)+(-0.14,0.14)$);
+    \draw[metro, metroH] (Sl) -- (Sm);
+    \draw[metro, metroG] (Sm) -- (Sc);
+    \draw[metro, metroG] (Sc) -- (Sj);
+    \draw[metro, metroE, opacity=0.28, line width=2.2pt] (Sl) -- (Sd);
+    \draw[metro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sj);
   \end{scope}
-  % the four edge-disjoint Berge routes u -> v, each through one gate per line boarded
-  \draw[flow] (Se)--(Helc); \draw[flow] (Helc)--(Sc);
-  \draw[flow] (Sc)--(Hmcj); \draw[flow] (Hmcj)--(Sm);
-  \draw[flow] (Se)--(Hedm); \draw[flow] (Hedm)--(Sm);
-  \draw[flow] (Se)--(Helm); \draw[flow] (Helm)--(Sm);
-  \draw[flow] (Se)--(Hnel); \draw[flow] (Hnel)--(Sn);
-  \draw[flow] (Sn)--(Hnmj); \draw[flow] (Hnmj)--(Sm);
+  \draw[flow] (Se) -- (Helc);
+  \draw[flow] (Helc) -- (Sc);
+  \draw[flow] (Sc) -- (Hmcj);
+  \draw[flow] (Hmcj) -- (Sm);
+  \draw[flow] (Se) -- (Hedm);
+  \draw[flow] (Hedm) -- (Sm);
+  \draw[flow] (Se) -- (Helm);
+  \draw[flow] (Helm) -- (Sm);
+  \draw[flow] (Se) -- (Hnel);
+  \draw[flow] (Hnel) -- (Sn);
+  \draw[flow] (Sn) -- (Hnmj);
+  \draw[flow] (Hnmj) -- (Sm);
   \node[gate] at (Helc) {$h_{\textcolor{metroC}{\bullet}}$};
   \node[gate] at (Hmcj) {$h_{\textcolor{metroG}{\bullet}}$};
   \node[gate] at (Hedm) {$h_{\textcolor{metroD}{\bullet}}$};
@@ -387,10 +406,6 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
                 preaction={draw, -, line width=3.0pt, white}},
    gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
                 inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
-% The hypergraph of fig:hyper-gadget-example, oriented one-way (middle station is
-% the tail), x and y swapped. Panel (a): each hyperedge as a directed star, two
-% arcs tail->head, vertex to vertex. Panel (b): the gate flow network for u, v;
-% only one directed route survives, u -> [nel] -> l -> [elm] -> v.
 \def\stations{%
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
   \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
@@ -398,38 +413,57 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \def\drawstops{%
   \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
      {\node[metrostop] at (\id) {$\lab$};}}
-% --- panel (a): the directed hypergraph (middle station is the tail) ---
+% --- panel (a): the hypergraph, every hyperedge vertex to vertex ---
 \begin{scope}
   \stations
   \begin{scope}[on background layer]
-    \draw[dmetro, metroA] (Sa)--(Se); \draw[dmetro, metroA] (Sa)--(Sd);
-    \draw[dmetro, metroB] (Sm)--(Sn); \draw[dmetro, metroB] (Sm)--(Sj);
-    \draw[dmetro, metroC] (Sl)--(Se); \draw[dmetro, metroC] (Sl)--(Sc);
-    \draw[dmetro, metroD] (Sd)--(Se); \draw[dmetro, metroD] (Sd)--(Sm);
-    \draw[dmetro, metroF] (Se)--(Sn); \draw[dmetro, metroF] (Se)--(Sl);
-    \draw[dmetro, metroH] (Sl)--(Se); \draw[dmetro, metroH] (Sl)--(Sm);
-    \draw[dmetro, metroG] (Sc)--(Sm); \draw[dmetro, metroG] (Sc)--(Sj);
-    \draw[dmetro, metroE] (Sd)--(Sl); \draw[dmetro, metroE] (Sd)--(Sj);
+    \draw[dmetro, metroA] (Sa) -- (Se);
+    \draw[dmetro, metroA] (Sa) -- (Sd);
+    \draw[dmetro, metroB] (Sm) -- (Sn);
+    \draw[dmetro, metroB] (Sm) -- (Sj);
+    \draw[dmetro, metroC] ($(Sl)+(0.14,-0.14)$) -- ($(Se)+(0.14,-0.14)$);
+    \draw[dmetro, metroC] (Sl) -- (Sc);
+    \draw[dmetro, metroD] (Sd) -- (Se);
+    \draw[dmetro, metroD] (Sd) -- (Sm);
+    \draw[dmetro, metroF] (Se) -- (Sn);
+    \draw[dmetro, metroF] (Se) -- (Sl);
+    \draw[dmetro, metroH] ($(Sl)+(-0.14,0.14)$) -- ($(Se)+(-0.14,0.14)$);
+    \draw[dmetro, metroH] (Sl) -- (Sm);
+    \draw[dmetro, metroG] (Sc) -- (Sm);
+    \draw[dmetro, metroG] (Sc) -- (Sj);
+    \draw[dmetro, metroE] (Sd) -- (Sl);
+    \draw[dmetro, metroE] (Sd) -- (Sj);
   \end{scope}
   \drawstops
   \node[font=\small] at (4,-1.4) {(a)};
 \end{scope}
-% --- panel (b): the gate flow network; the lone directed route u -> v ---
+% --- panel (b): the helper-point flow network for the pair u, v ---
 \begin{scope}[xshift=11cm]
   \stations
-  \coordinate (Hnel) at (0.43,5.57); \coordinate (Helm) at (4.00,6.80);
+  \coordinate (Hnel) at (0.43,5.57);
+  \coordinate (Helm) at (4.00,6.80);
   \begin{scope}[on background layer]
-    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa)--(Se); \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa)--(Sd);
-    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm)--(Sn); \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm)--(Sj);
-    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl)--(Se); \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl)--(Sc);
-    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd)--(Se); \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd)--(Sm);
-    \draw[dmetro, metroF] (Se)--(Sn); \draw[dmetro, metroF] (Se)--(Sl);
-    \draw[dmetro, metroH] (Sl)--(Se); \draw[dmetro, metroH] (Sl)--(Sm);
-    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc)--(Sm); \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc)--(Sj);
-    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd)--(Sl); \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd)--(Sj);
+    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Se);
+    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa) -- (Sd);
+    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm) -- (Sn);
+    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm) -- (Sj);
+    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] ($(Sl)+(0.14,-0.14)$) -- ($(Se)+(0.14,-0.14)$);
+    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl) -- (Sc);
+    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd) -- (Se);
+    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd) -- (Sm);
+    \draw[dmetro, metroF] (Se) -- (Sn);
+    \draw[dmetro, metroF] (Se) -- (Sl);
+    \draw[dmetro, metroH] ($(Sl)+(-0.14,0.14)$) -- ($(Se)+(-0.14,0.14)$);
+    \draw[dmetro, metroH] (Sl) -- (Sm);
+    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc) -- (Sm);
+    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc) -- (Sj);
+    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sl);
+    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd) -- (Sj);
   \end{scope}
-  \draw[flowarc] (Se)--(Hnel); \draw[flowarc] (Hnel)--(Sl);
-  \draw[flowarc] (Sl)--(Helm); \draw[flowarc] (Helm)--(Sm);
+  \draw[flowarc] (Se) -- (Hnel);
+  \draw[flowarc] (Hnel) -- (Sl);
+  \draw[flowarc] (Sl) -- (Helm);
+  \draw[flowarc] (Helm) -- (Sm);
   \node[gate] at (Hnel) {$h_{\textcolor{metroF}{\bullet}}$};
   \node[gate] at (Helm) {$h_{\textcolor{metroH}{\bullet}}$};
   \drawstops
