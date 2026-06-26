@@ -245,59 +245,89 @@ The hypergraph is the one model that never used the multiplicity matrix, since i
 \label{fig:hyper-gadget}
 \end{figure}
 
-\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the idea to a whole hypergraph and folds the before and after into one picture. Each of the eight hyperedges is one coloured line that meets its three members at a helper junction, and that junction, boxed and named after the edge, is exactly the gate of \Cref{fig:hyper-gadget}. Read as a metro map the picture is the hypergraph; read as boxes that pass one route each it is the flow network, with no second diagram needed. Several lines share the central spine down to the hub $e$, where they run side by side as parallel coloured rails, the way a metro map separates lines along one stretch of track. Run on this hypergraph the checker reads $\lec(e, l) = 4$: the pair $e, l$ lies on the three common hyperedges $\{e,l,c\}$, $\{e,l,m\}$ and $\{n,e,l\}$ and carries a fourth, longer Berge route besides, while a fifth would have to reuse a gate.
+\Cref{fig:hyper-gadget} shows one hyperedge in isolation. \Cref{fig:hyper-gadget-example} carries the idea to a whole hypergraph in two panels. Panel (a) is the hypergraph drawn as a metro map: each of the eight hyperedges is one coloured line threading its three member stations, vertex to vertex, and a station on several hyperedges shows several coloured lines running through it. Panel (b) reads the same map as the flow network. For one pair of stations, $u$ and $v$, it adds the helper point of every hyperedge a route boards, drawn as a small gate $h_{\bullet}$ in that line's colour, and traces the edge-disjoint Berge routes between $u$ and $v$ as thin lines passing through those gates, with the lines no route uses faded back. The checker reads $\lec(u, v) = 4$: two routes run straight through the two hyperedges that contain both $u$ and $v$, and two longer ones change lines at an intermediate station, four in all, while a fifth would have to reuse a gate.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.60\textwidth}{!}{%
-\begin{tikzpicture}[scale=1.0,
-   gate/.style={hnode, inner sep=1.5pt,
-                font=\fontsize{6.4}{7}\selectfont\bfseries}]
-% A 3-uniform hypergraph on eight stations a,c,d,e,j,l,m,n, labelled by ascending
-% x then ascending y. Each of the eight hyperedges is one coloured line meeting its
-% three members at a helper junction, drawn as a box named after the edge -- the
-% gate of fig:hyper-gadget. Plain straight spokes; the four helper boxes stack up
-% the central spine x=4, and the hub e, on five of the eight hyperedges, is where
-% the most lines converge.
-\def\stationcoords{%
-  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (2,6);
-  \coordinate (Se) at (4,0);  \coordinate (Sj) at (4,8);  \coordinate (Sl) at (6,2);
-  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (8,0);
-  \coordinate (Head) at (1,1); \coordinate (Hnmj) at (8,4); \coordinate (Helc) at (4,1);
-  \coordinate (Hedm) at (4,7); \coordinate (Hnel) at (6,1); \coordinate (Helm) at (4,3);
-  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5,5);
-}
-\def\hyperlines{%
-  \draw[metro, metroA] (Head)--(Se); \draw[metro, metroA] (Head)--(Sa); \draw[metro, metroA] (Head)--(Sd);
-  \draw[metro, metroB] (Hnmj)--(Sn); \draw[metro, metroB] (Hnmj)--(Sm); \draw[metro, metroB] (Hnmj)--(Sj);
-  \draw[metro, metroC] (Helc)--(Se); \draw[metro, metroC] (Helc)--(Sl); \draw[metro, metroC] (Helc)--(Sc);
-  \draw[metro, metroD] (Hedm)--(Se); \draw[metro, metroD] (Hedm)--(Sd); \draw[metro, metroD] (Hedm)--(Sm);
-  \draw[metro, metroF] (Hnel)--(Se); \draw[metro, metroF] (Hnel)--(Sn); \draw[metro, metroF] (Hnel)--(Sl);
-  \draw[metro, metroH] (Helm)--(Se); \draw[metro, metroH] (Helm)--(Sl); \draw[metro, metroH] (Helm)--(Sm);
-  \draw[metro, metroG] (Hmcj)--(Sm); \draw[metro, metroG] (Hmcj)--(Sc); \draw[metro, metroG] (Hmcj)--(Sj);
-  \draw[metro, metroE] (Hldj)--(Sl); \draw[metro, metroE] (Hldj)--(Sd); \draw[metro, metroE] (Hldj)--(Sj);
-}
-\stationcoords
-\begin{scope}[on background layer] \hyperlines \end{scope}
-\foreach \id/\lab in {Sa/a,Sc/c,Sd/d,Se/e,Sj/j,Sl/l,Sm/m,Sn/n}
-   {\node[metrostop] at (\id) {$\lab$};}
-\node[gate] at (Head) {ead}; \node[gate] at (Hnmj) {nmj};
-\node[gate] at (Helc) {elc}; \node[gate] at (Hedm) {edm};
-\node[gate] at (Hnel) {nel}; \node[gate] at (Helm) {elm};
-\node[gate] at (Hmcj) {mcj}; \node[gate] at (Hldj) {ldj};
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[scale=0.92, >=Stealth,
+   metro/.append style={line width=3.0pt},
+   flow/.style={line width=1.2pt, black!88, line cap=round,
+                preaction={draw, line width=3.0pt, white}},
+   gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
+                inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
+% A 3-uniform hypergraph on eight stations, the source layout with x and y swapped.
+% Panel (a): each hyperedge as one coloured metro line through its three members,
+% vertex to vertex (no helper junction). Panel (b): the same map read as the gate
+% flow network for the pair u, v, with the helper point of each boarded hyperedge
+% drawn as a coloured gate h and the edge-disjoint u--v routes traced through them.
+\def\stations{%
+  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
+  \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
+  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
+\def\drawstops{%
+  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
+     {\node[metrostop] at (\id) {$\lab$};}}
+% --- panel (a): the hypergraph as a metro map (edges only) ---
+\begin{scope}
+  \stations
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (Se)--(Sa)--(Sd);
+    \draw[metro, metroB] (Sn)--(Sm)--(Sj);
+    \draw[metro, metroC] (Sl)--(Se)--(Sc);
+    \draw[metro, metroD] (Se)--(Sd)--(Sm);
+    \draw[metro, metroF] (Sn)--(Sl)--(Se);
+    \draw[metro, metroH] (Se)--(Sl)--(Sm);
+    \draw[metro, metroG] (Sc)--(Sm)--(Sj);
+    \draw[metro, metroE] (Sl)--(Sd)--(Sj);
+  \end{scope}
+  \drawstops
+  \node[font=\small] at (4,-1.4) {(a)};
+\end{scope}
+% --- panel (b): the helper-point flow network for the pair u, v ---
+\begin{scope}[xshift=11cm]
+  \stations
+  \coordinate (Helc) at (1.49,3.49); \coordinate (Hmcj) at (4.57,3.43);
+  \coordinate (Hedm) at (3.46,3.62); \coordinate (Helm) at (2.54,6.38);
+  \coordinate (Hnel) at (0.50,6.00); \coordinate (Hnmj) at (3.27,7.81);
+  \begin{scope}[on background layer]
+    \draw[metro, metroA, opacity=0.30, line width=2.2pt] (Se)--(Sa)--(Sd);
+    \draw[metro, metroB] (Sn)--(Sm)--(Sj);
+    \draw[metro, metroC] (Sl)--(Se)--(Sc);
+    \draw[metro, metroD] (Se)--(Sd)--(Sm);
+    \draw[metro, metroF] (Sn)--(Sl)--(Se);
+    \draw[metro, metroH] (Se)--(Sl)--(Sm);
+    \draw[metro, metroG] (Sc)--(Sm)--(Sj);
+    \draw[metro, metroE, opacity=0.30, line width=2.2pt] (Sl)--(Sd)--(Sj);
+  \end{scope}
+  % the four edge-disjoint Berge routes u -> v, each through one gate per line boarded
+  \draw[flow] (Se)--(Helc); \draw[flow] (Helc)--(Sc);
+  \draw[flow] (Sc)--(Hmcj); \draw[flow] (Hmcj)--(Sm);
+  \draw[flow] (Se)--(Hedm); \draw[flow] (Hedm)--(Sm);
+  \draw[flow] (Se)--(Helm); \draw[flow] (Helm)--(Sm);
+  \draw[flow] (Se)--(Hnel); \draw[flow] (Hnel)--(Sn);
+  \draw[flow] (Sn)--(Hnmj); \draw[flow] (Hnmj)--(Sm);
+  \node[gate] at (Helc) {$h_{\textcolor{metroC}{\bullet}}$};
+  \node[gate] at (Hmcj) {$h_{\textcolor{metroG}{\bullet}}$};
+  \node[gate] at (Hedm) {$h_{\textcolor{metroD}{\bullet}}$};
+  \node[gate] at (Helm) {$h_{\textcolor{metroH}{\bullet}}$};
+  \node[gate] at (Hnel) {$h_{\textcolor{metroF}{\bullet}}$};
+  \node[gate] at (Hnmj) {$h_{\textcolor{metroB}{\bullet}}$};
+  \drawstops
+  \node[font=\small] at (4,-1.4) {(b)};
+\end{scope}
 \end{tikzpicture}}
 \caption[The helper-point network on a whole hypergraph]{A $3$-uniform
-hypergraph on eight vertices, drawn as a metro map that is at the same time its
-helper-point flow network. The stations are $a, c, d, e, j, l, m, n$, and each of
-the eight hyperedges is one coloured line threading its three members through a
-helper junction, boxed and named after the edge, so $\{e, a, d\}$ is the line
-\textsf{ead} and so on. Each box is the one-route gate of \Cref{fig:hyper-gadget},
-which is why the single drawing is both the hypergraph and the network the checker
-measures. The hub $e$, on five of the eight hyperedges, is where the most lines
-converge, and the four boxes stacked up the central spine are the gates that share
-it. The pair $e, l$ lies on the three hyperedges $\{e,l,c\}$, $\{e,l,m\}$ and
-$\{n,e,l\}$ and carries one longer route besides, four in all, so the checker reads
-$\lec(e, l) = 4$. A fifth would have to reuse a gate.}
+hypergraph on eight stations, with the pair $u, v$ singled out. Panel (a) draws it
+as a metro map: every hyperedge is one coloured line threading its three members,
+vertex to vertex, the metro reading of \Cref{ch:basecases}. Panel (b) reads the
+same picture as the helper-point flow network. Each hyperedge a route boards
+becomes its one-route gate $h_{\bullet}$ of \Cref{fig:hyper-gadget}, shown in that
+line's colour and placed on the route, and the thin black lines are the
+edge-disjoint Berge routes from $u$ to $v$ threading those gates. Lines on no
+$u$--$v$ route are faded. Two routes pass straight through the two hyperedges that
+hold both $u$ and $v$, and two longer ones transfer at an intermediate station, so
+the checker reads $\lec(u, v) = 4$. A fifth route would have to reuse a gate.}
 \label{fig:hyper-gadget-example}
 \end{figure}
 One way to picture the helper point is the metro map of \Cref{ch:basecases}: each hyperedge is a metro line, its member vertices are the stations on it, and the helper is the line itself. Boarding at any station counts as taking that line. Because only one route may pass through the helper, only one train runs on the line at a time, so a second route must reach its destination without ever boarding it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that share no line, which is exactly what Berge edge-disjointness means.
@@ -345,57 +375,78 @@ A \emph{directed} hyperedge carries an orientation: it is a single \emph{tail} v
 \label{fig:dir-hyper-gadget}
 \end{figure}
 
-\Cref{fig:dir-hyper-gadget-example} orients the same hypergraph one-way. Each hyperedge keeps its colour but becomes a directed star: the middle of its three vertices is the tail, and two arcs run from that tail through the gate to the other two, the heads, so a route may enter only at a tail and leave only at a head. The boxes are now the directed turnstiles of \Cref{fig:dir-hyper-gadget}. Orientation costs connectivity, and the checker reads it off: where the undirected pair $e, l$ had four routes, the busiest directed pair $d, e$ has only two, $\lec(d, e) = 2$, because a route must now follow the arrows and most reverse transfers are forbidden. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top of the gates then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+\Cref{fig:dir-hyper-gadget-example} orients the same hypergraph one-way, again in two panels. In panel (a) each hyperedge keeps its colour but becomes a directed star: the middle of its three stations is the tail, and two arcs run from that tail to the other two, the heads, so a route may enter only at a tail and leave only at a head. Panel (b) reads it as the gate network and follows the same pair $u, v$ of \Cref{fig:hyper-gadget-example}. Orientation costs connectivity, and here it is dramatic: of the four undirected routes between $u$ and $v$ only one survives the arrows, $\lec(u, v) = 1$, since $u$ is the tail of a single hyperedge and every route must leave it that one way. The lone route boards two lines in turn, through the two directed gates $h_{\bullet}$. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top of the gates then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.60\textwidth}{!}{%
-\begin{tikzpicture}[scale=1.0,
-   dmetro/.style={metro, -{Stealth[length=2.6mm]}, shorten >=1.7mm, shorten <=1.2mm},
-   gate/.style={hnode, inner sep=1.5pt,
-                font=\fontsize{6.4}{7}\selectfont\bfseries}]
-% The hypergraph of fig:hyper-gadget-example, oriented one-way: the middle of each
-% hyperedge's three vertices is the tail, two arcs running from it through the gate
-% to the two heads. Same stations and helper boxes as the undirected figure, plain
-% straight arcs with arrowheads added.
-\def\stationcoords{%
-  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (2,6);
-  \coordinate (Se) at (4,0);  \coordinate (Sj) at (4,8);  \coordinate (Sl) at (6,2);
-  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (8,0);
-  \coordinate (Head) at (1,1); \coordinate (Hnmj) at (8,4); \coordinate (Helc) at (4,1);
-  \coordinate (Hedm) at (4,7); \coordinate (Hnel) at (6,1); \coordinate (Helm) at (4,3);
-  \coordinate (Hmcj) at (4,5); \coordinate (Hldj) at (5,5);
-}
-\def\dhyperlines{%
-  % middle of each edge string is the tail: ead->a, nmj->m, elc->l, edm->d,
-  % nel->e, elm->l, mcj->c, ldj->d. Arrows run tail -> gate -> each head.
-  \draw[dmetro, metroA] (Sa)--(Head); \draw[dmetro, metroA] (Head)--(Se); \draw[dmetro, metroA] (Head)--(Sd);
-  \draw[dmetro, metroB] (Sm)--(Hnmj); \draw[dmetro, metroB] (Hnmj)--(Sn); \draw[dmetro, metroB] (Hnmj)--(Sj);
-  \draw[dmetro, metroC] (Sl)--(Helc); \draw[dmetro, metroC] (Helc)--(Se); \draw[dmetro, metroC] (Helc)--(Sc);
-  \draw[dmetro, metroD] (Sd)--(Hedm); \draw[dmetro, metroD] (Hedm)--(Se); \draw[dmetro, metroD] (Hedm)--(Sm);
-  \draw[dmetro, metroF] (Se)--(Hnel); \draw[dmetro, metroF] (Hnel)--(Sn); \draw[dmetro, metroF] (Hnel)--(Sl);
-  \draw[dmetro, metroH] (Sl)--(Helm); \draw[dmetro, metroH] (Helm)--(Se); \draw[dmetro, metroH] (Helm)--(Sm);
-  \draw[dmetro, metroG] (Sc)--(Hmcj); \draw[dmetro, metroG] (Hmcj)--(Sm); \draw[dmetro, metroG] (Hmcj)--(Sj);
-  \draw[dmetro, metroE] (Sd)--(Hldj); \draw[dmetro, metroE] (Hldj)--(Sl); \draw[dmetro, metroE] (Hldj)--(Sj);
-}
-\stationcoords
-\begin{scope}[on background layer] \dhyperlines \end{scope}
-\foreach \id/\lab in {Sa/a,Sc/c,Sd/d,Se/e,Sj/j,Sl/l,Sm/m,Sn/n}
-   {\node[metrostop] at (\id) {$\lab$};}
-\node[gate] at (Head) {ead}; \node[gate] at (Hnmj) {nmj};
-\node[gate] at (Helc) {elc}; \node[gate] at (Hedm) {edm};
-\node[gate] at (Hnel) {nel}; \node[gate] at (Helm) {elm};
-\node[gate] at (Hmcj) {mcj}; \node[gate] at (Hldj) {ldj};
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[scale=0.92, >=Stealth,
+   dmetro/.style={metro, line width=3.0pt, -{Stealth[length=2.6mm]},
+                  shorten >=1.6mm, shorten <=1.2mm},
+   flowarc/.style={line width=1.2pt, black!88, line cap=round, -{Stealth[length=2.4mm]},
+                preaction={draw, -, line width=3.0pt, white}},
+   gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
+                inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
+% The hypergraph of fig:hyper-gadget-example, oriented one-way (middle station is
+% the tail), x and y swapped. Panel (a): each hyperedge as a directed star, two
+% arcs tail->head, vertex to vertex. Panel (b): the gate flow network for u, v;
+% only one directed route survives, u -> [nel] -> l -> [elm] -> v.
+\def\stations{%
+  \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
+  \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
+  \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
+\def\drawstops{%
+  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
+     {\node[metrostop] at (\id) {$\lab$};}}
+% --- panel (a): the directed hypergraph (middle station is the tail) ---
+\begin{scope}
+  \stations
+  \begin{scope}[on background layer]
+    \draw[dmetro, metroA] (Sa)--(Se); \draw[dmetro, metroA] (Sa)--(Sd);
+    \draw[dmetro, metroB] (Sm)--(Sn); \draw[dmetro, metroB] (Sm)--(Sj);
+    \draw[dmetro, metroC] (Sl)--(Se); \draw[dmetro, metroC] (Sl)--(Sc);
+    \draw[dmetro, metroD] (Sd)--(Se); \draw[dmetro, metroD] (Sd)--(Sm);
+    \draw[dmetro, metroF] (Se)--(Sn); \draw[dmetro, metroF] (Se)--(Sl);
+    \draw[dmetro, metroH] (Sl)--(Se); \draw[dmetro, metroH] (Sl)--(Sm);
+    \draw[dmetro, metroG] (Sc)--(Sm); \draw[dmetro, metroG] (Sc)--(Sj);
+    \draw[dmetro, metroE] (Sd)--(Sl); \draw[dmetro, metroE] (Sd)--(Sj);
+  \end{scope}
+  \drawstops
+  \node[font=\small] at (4,-1.4) {(a)};
+\end{scope}
+% --- panel (b): the gate flow network; the lone directed route u -> v ---
+\begin{scope}[xshift=11cm]
+  \stations
+  \coordinate (Hnel) at (0.43,5.57); \coordinate (Helm) at (4.00,6.80);
+  \begin{scope}[on background layer]
+    \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa)--(Se); \draw[dmetro, metroA, opacity=0.28, line width=2.2pt] (Sa)--(Sd);
+    \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm)--(Sn); \draw[dmetro, metroB, opacity=0.28, line width=2.2pt] (Sm)--(Sj);
+    \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl)--(Se); \draw[dmetro, metroC, opacity=0.28, line width=2.2pt] (Sl)--(Sc);
+    \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd)--(Se); \draw[dmetro, metroD, opacity=0.28, line width=2.2pt] (Sd)--(Sm);
+    \draw[dmetro, metroF] (Se)--(Sn); \draw[dmetro, metroF] (Se)--(Sl);
+    \draw[dmetro, metroH] (Sl)--(Se); \draw[dmetro, metroH] (Sl)--(Sm);
+    \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc)--(Sm); \draw[dmetro, metroG, opacity=0.28, line width=2.2pt] (Sc)--(Sj);
+    \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd)--(Sl); \draw[dmetro, metroE, opacity=0.28, line width=2.2pt] (Sd)--(Sj);
+  \end{scope}
+  \draw[flowarc] (Se)--(Hnel); \draw[flowarc] (Hnel)--(Sl);
+  \draw[flowarc] (Sl)--(Helm); \draw[flowarc] (Helm)--(Sm);
+  \node[gate] at (Hnel) {$h_{\textcolor{metroF}{\bullet}}$};
+  \node[gate] at (Helm) {$h_{\textcolor{metroH}{\bullet}}$};
+  \drawstops
+  \node[font=\small] at (4,-1.4) {(b)};
+\end{scope}
 \end{tikzpicture}}
 \caption[The directed helper-point network on a whole hypergraph]{The hypergraph
 of \Cref{fig:hyper-gadget-example} made directed, each hyperedge oriented so the
-middle of its three vertices is the tail. Every coloured line becomes a one-way
-star, two arcs running from the tail through the gate to the two heads, so a Berge
-route enters at a tail and leaves at a head, and the boxes are the directed
-turnstiles of \Cref{fig:dir-hyper-gadget}. The arrows forbid most of the reverse
-transfers the undirected map allowed, so connectivity drops. The busiest pair is
-now $d, e$ with two arc-disjoint directed routes, and the checker reads
-$\lec(d, e) = 2$, against the undirected four of \Cref{fig:hyper-gadget-example}.}
+middle of its three stations is the tail. Panel (a) draws every coloured line as a
+one-way star, two arcs running from the tail to the two heads, so a Berge route
+enters at a tail and leaves at a head. Panel (b) reads it as the gate network for
+the same pair $u, v$: each gate $h_{\bullet}$ is now the directed turnstile of
+\Cref{fig:dir-hyper-gadget}, and lines off the route are faded. The arrows forbid
+the reverse transfers the undirected map allowed, so connectivity drops sharply:
+only one directed route survives, $u$ boarding one line to an intermediate station
+and a second on to $v$, and the checker reads $\lec(u, v) = 1$, against the
+undirected four of \Cref{fig:hyper-gadget-example}.}
 \label{fig:dir-hyper-gadget-example}
 \end{figure}
 
