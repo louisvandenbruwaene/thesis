@@ -1,5 +1,15 @@
 # Directed arc problem, m = 3: the extremiser family and the attachment refutation
 
+> **SUPERSEDED 2026-06-30: this family is NOT the complete extremal set.** The
+> companion note's hypothesis (H) is FALSE (see section 0 of
+> [`directed_arc_m3_reduction.md`](directed_arc_m3_reduction.md)): there is a
+> second infinite family of extremisers (complete `A -> B` plus one head fanning
+> out to a tail and the rest of `B`) attaining `Q(n)` for every odd `n >= 9` with
+> a non-source of in-degree 2. So "the extremiser family" below is incomplete, and
+> the attachment refutation of the `+1` even case rested on (H) and no longer
+> applies. Kept for the record. Reproduce the refutation with
+> `python3 research_notes/scripts/h_counterexample.py`.
+
 Companion to [`directed_arc_m3_reduction.md`](directed_arc_m3_reduction.md).
 Describes exactly which digraphs attain the conjectured quadratic value, and
 refutes the residual `+1` even case from the min-degree reduction.

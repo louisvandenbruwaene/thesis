@@ -1,31 +1,79 @@
 # Directed arc problem, m = 3: reduction to a single hypothesis on sources
 
-> **NOT FOR THE THESIS OR THE PROGRAM.** This note is research scratch. Its
-> centrepiece (H) is OPEN, so the reduction does not yet prove anything new about
-> `conj:dir-arc`. Nothing here belongs in the thesis text or in
-> `erdos915_unified.py` unless and until (H) is fully proved and proof-checked.
-> The thesis already states `conj:dir-arc` as a conjecture with the existing
-> conditional results; keep it that way. The 2026-06-30 additions (sections 2.4,
-> 2.5) are verified lemmas and a NEGATIVE result, not a closure of (H).
+> **NOT FOR THE THESIS OR THE PROGRAM.** This note is research scratch.
+>
+> **STATUS 2026-06-30: (H) IS FALSE.** The centrepiece hypothesis (H) is REFUTED
+> by an explicit infinite family of extremisers (section 0 below), so this
+> reduction does NOT close `conj:dir-arc` and its characterisation claim is wrong.
+> Nothing here belongs in the thesis or in `erdos915_unified.py`. The thesis
+> already states `conj:dir-arc` as a conjecture with its own backward-arc framing,
+> and this refutation does not change any proved thesis content -- keep the thesis
+> as it is. The sections below are kept for the record, with (H) now marked FALSE.
 
 **Topic.** Proving the quadratic branch of `conj:dir-arc` for `m = 3`:
 `ell_3^dir(n) <= Q(n) := floor((n+1)^2/4)` for `n` in the quadratic regime
 (`n >= 9`, where `Q(n) > 3(n-1)`).
 
-**Bottom line.** Modulo finitely many seam base cases, this upper bound -- and
-the extremiser characterisation -- follow from one concrete structural
-hypothesis:
+**Bottom line (SUPERSEDED).** The original plan reduced the upper bound AND the
+extremiser characterisation to one structural hypothesis:
 
 > **(H)** Every `m = 3` extremiser contains a *source adjacent to every
 > non-source* (equivalently, its non-source set induces maximum in-degree `<= 1`).
 
-(H) is **OPEN**. Everything reducing to it is **PROVED / VERIFIED** below. This
-sidesteps the non-monotone "delete-and-compensate" exchange that stalls the
-backward-arc framing of the thesis (ch4, `app_proofs`).
+> **(H) is FALSE.** See section 0. So the reduction does not prove the upper bound,
+> and the extremisers are NOT only the augmented-bipartite family. The value
+> conjecture `ell_3^dir(n) = Q(n)` is UNHARMED (the new family attains `Q(n)` but
+> never exceeds it); what is refuted is the characterisation and the (H)-based
+> kill of the even case.
 
-Reproduce: `python3 research_notes/scripts/characterisation_checks.py`
-(arc partition, the Lemma, the conditional bound) and `attach_check.py`
-(the min-degree arithmetic).
+Reproduce: `python3 research_notes/scripts/h_counterexample.py` (the refutation),
+`characterisation_checks.py` (arc partition, the source lemma, the conditional
+bound), `attach_check.py` (the min-degree arithmetic).
+
+---
+
+## 0. (H) IS FALSE: an infinite family of non-augmented-bipartite extremisers
+
+Reproduce: `python3 research_notes/scripts/h_counterexample.py` (verified with a
+self-contained max-flow AND the thesis program's `max_edge_connectivity`).
+
+For every odd `n = 2k - 1` with `k >= 5` (so `n >= 9`, the quadratic regime), put
+`A = {0,...,k-2}` (size `k-1`), `B = {k-1,...,2k-2}` (size `k`), and take
+
+- the complete layer `A -> B` (every `a -> b`), `(k-1)k` arcs, and
+- one head vertex `beta0 in B` pointing to one tail `a0 in A` AND to every other
+  vertex of `B`, that is `beta0 -> a0` and `beta0 -> b` for all `b in B\{beta0}`,
+  which is `1 + (k-1) = k` more arcs.
+
+Total `(k-1)k + k = k^2 = Q(2k-1)`, and `lambda^max = 2` (FEASIBLE, checked two
+independent ways at `n = 9, 11, 13, 15, 17`). The single arc `beta0 -> a0` makes
+`a0` a non-source, after which both `a0` and `beta0` point to every other
+`B`-vertex, so each such `b` has IN-DEGREE 2 inside `R`. The sources are
+`A \ {a0}`, only `sigma = k - 2` of them, and NONE is adjacent to all of `R`
+(none reaches `a0` or `beta0`). So **(H) fails in both forms**, at the extremal
+arc count `Q(n)`, for every odd `n >= 9`.
+
+Concrete `n = 9` witness (`k = 5`): `A = {0,1,2,3}`, `B = {4,5,6,7,8}`,
+`beta0 = 5`, `a0 = 1`, with arcs `{0,1,2,3} x {4,5,6,7,8}` plus `5 -> 1,4,6,7,8`.
+The sources are `{0,2,3}`, the non-sources are `R = {1,4,5,6,7,8}`, and the
+`R`-vertices `4,6,7,8` each have in-degree 2.
+
+**Consequences.**
+- The characterisation "extremisers are exactly the augmented-bipartite family"
+  is FALSE: this family is a second, structurally distinct extremal family
+  (one fewer source, a head that fans out). `directed_arc_m3_extremisers.md`'s
+  completeness claim and its attachment refutation both rested on (H) and are
+  therefore void as a route to the even case.
+- The (H)-conditional bound 2.3 is still a correct CONDITIONAL (these graphs
+  simply violate its hypothesis: `a = k^2 > (n-sigma)(sigma+1) = k^2 - 1` here),
+  as are the complete-layer proposition 2.4.3 and the summed inequality 2.5.1.
+  What collapses is the claim that (H)'s hypothesis holds on extremisers.
+- The VALUE upper bound for odd `n >= 11` via the min-degree deletion of section 1
+  does NOT use (H) and is unaffected. The even case, which needed the
+  characterisation, is again open.
+
+Everything from section 1 on is kept for the record, now read in the light of
+section 0.
 
 ---
 
@@ -205,25 +253,33 @@ re-focuses the work on attack 1 (the exchange) in section 3.
 
 ## 3. Status and the open residue
 
-- PROVED: arc partition; source-neighbourhood Lemma; conditional bound + equality;
-  the min-degree reduction (odd from even by integrality); the `+1` forced
-  structure; self-similarity Lemma (L) and the complete-layer Proposition (2.4);
-  the summed-coupling inequality (star) (2.5.1).
-- OPEN, load-bearing: **(H)**. Proving it closes the value and the
-  characterisation at one stroke; with the attachment refutation made uniform
-  (`directed_arc_m3_extremisers.md`) and the seam bases, it settles `m = 3`.
-  2.4 narrows it: the complete-layer case is done, so (H) is now precisely the
-  claim that a source layer with GAPS cannot overpay for a denser `R`. 2.5.2 shows
-  the proof MUST use extremality (counting over all feasible `D` provably cannot
-  give (H)), so attack 1 (exchange) is the route, not a global count.
+- **(H) is FALSE (section 0).** The reduction does not close `conj:dir-arc`. What
+  remains correct:
+- PROVED (and still true, but they no longer combine into a proof of the bound,
+  since (H) does not hold): arc partition; source-neighbourhood Lemma; the
+  conditional bound 2.3 and its equality case (as a CONDITIONAL); the min-degree
+  reduction (odd from even by integrality); the `+1` forced structure;
+  self-similarity Lemma (L) and the complete-layer Proposition (2.4); the
+  summed-coupling inequality (star) (2.5.1).
+- OPEN, value: the upper bound `ell_3^dir(n) <= Q(n)` for odd `n >= 11` follows
+  from the min-degree deletion of section 1 WITHOUT (H), so it survives. The EVEN
+  case relied on the characterisation (= (H)) and is open again.
+- DEAD as stated: the characterisation "extremisers = augmented-bipartite" and the
+  attachment refutation of the even `+1` (`directed_arc_m3_extremisers.md`), both
+  of which assumed (H).
 - OPEN, finite: seam bases `ell_3^dir(9) = 25`, `ell_3^dir(10) = 30` (certifier /
   Gurobi -- analogue of the thesis's finite `n=7` multigraph facts).
 - `m >= 4`: redo the reduction (overshoot pattern differs) and expect the known
   odd-uniqueness hole (`rem:odd-step-roadmap`).
 
-### Concrete attacks on (H)
-1. Exchange argument: show a vertex `w in R` of internal in-degree `>= 2` always
-   permits an arc-count-preserving reshuffle toward more sources, so an
-   extremiser can be taken with `R` internally max-in-degree `<= 1`.
-2. Direct: prove an extremiser has `>= (n-1)/2` sources and that some source is
-   universal (the Lemma already controls each source's out-neighbourhood).
+### Where to go now that (H) is dead
+1. The right characterisation must include BOTH families (augmented-bipartite and
+   the section-0 fan-out family) and probably more. A correct invariant has to be
+   satisfied by both: both attain `Q(n)`, both have a complete `A -> B` layer on
+   SOME bipartition, both keep `e(R)` small relative to the layer. The clean common
+   feature is bipartite-like layering, not "R max in-degree <= 1".
+2. For the VALUE alone, the min-degree deletion (section 1) already gives odd
+   `n >= 11`; the even case needs a different kill than the (now void) attachment
+   argument. The thesis's own backward-arc framing (with `A` = sources, where there
+   is no back-arc) may be the more robust route after all.
+3. The seam bases via Gurobi are still needed and are independent of all this.

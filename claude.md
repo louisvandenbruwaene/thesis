@@ -1734,3 +1734,21 @@ Honest bottom line: (H) NOT closed. The non-monotone exchange (a hole s->x canno
 always be filled without manufacturing a 3rd route) remains the barrier the note
 already named; this session sharpened WHERE the barrier is and proved the counting
 route is a dead end, but did not break it.
+
+THIRD ROUND -- (H) IS FALSE (author: keep attacking it). Instead of trying to
+PROVE (H), I tested it directly: a fixed-arc-count search that MAXIMISES the max
+R-in-degree (h_violation_search.py) found, at n=9, a feasible 25-arc digraph
+(= Q(9)) with sigma=3 and an R-vertex of in-degree 2. Triple-verified feasible
+(the search's own max-flow, the thesis program's max_edge_connectivity, and a
+from-scratch Edmonds-Karp), and MAXIMAL (no arc addable). It then GENERALISES to
+an explicit INFINITE FAMILY: complete A->B (|A|=k-1,|B|=k) plus one head beta0
+pointing to one tail a0 and to the rest of B, giving k^2 = Q(2k-1) arcs, feasible
+(lambda^max=2), sigma=k-2, max R-in-degree 2, for EVERY odd n=2k-1>=9 (checked
+n=9..17 two independent ways). So (H) is FALSE, not merely open. The augmented-
+bipartite family is NOT the whole extremal set; the characterisation and the
+(H)-based attachment kill of the even case are void. The VALUE conjecture
+ell_3(n)=Q(n) is UNHARMED (the family attains Q(n), never exceeds it). Recorded in
+reduction-note section 0 + h_counterexample.py; directed_arc_m3_extremisers.md and
+the README banner marked SUPERSEDED. NOTE: with A=sources there is no back-arc, so
+this does NOT refute the thesis's own backward-arc lemma (which may take A=sources)
+-- no proved thesis content is affected, and nothing here goes in the thesis.

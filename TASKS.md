@@ -46,14 +46,21 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       REMAINING GAPS: (1) PROVE (H) [load-bearing; about sources, exchange-free];
       (2) make the attachment refutation uniform in k (Menger lemma); (3) seam bases
       ell_3(9)=25, ell_3(10)=30 via certifier; (4) m>=4 redo + odd-uniqueness hole.
-      PROGRESS 2026-06-30 (reduction note sections 2.4-2.5, all verified): self-
-      similarity Lemma (L) D[R] feasible so e(R)<=ell_3(|R|); the recursion alone
-      overshoots Q(n) by +8..+16, so the source coupling is essential; complete-layer
-      case of (H) PROVED (narrows (H) to the gapped-layer case); summed-coupling
-      inequality sum_R-arcs c(x,y)<=e(S,R). KEY: a<=(n-sigma)(sigma+1) FAILS for
-      non-extremal D even with sigma>=1, so (H) needs EXTREMALITY (no whole-digraph
-      count works) -- attack 1 (exchange) is the only route, and the unfillable-hole
-      non-monotonicity is the precise barrier.
+      *** UPDATE 2026-06-30: (H) IS FALSE. *** Do NOT keep trying to prove it. An
+      explicit infinite family refutes it (reduction-note section 0 +
+      h_counterexample.py): complete A->B (|A|=k-1,|B|=k) plus one head beta0 ->
+      a0 and -> rest of B gives a feasible Q(2k-1)-arc digraph with sigma=k-2 and
+      an R-vertex of in-degree 2, for every odd n>=9 (verified n=9..17). So the
+      augmented-bipartite characterisation is WRONG and the attachment kill of the
+      even case is void. The VALUE conjecture ell_3(n)=Q(n) is unaffected (family
+      attains but never exceeds Q(n)); the odd-n value via min-degree deletion
+      (section 1, no (H)) survives. NEXT: a correct characterisation must include
+      both families; the even case needs a new argument; the thesis's own
+      backward-arc framing (A=sources, no back-arc) may be the more robust route.
+      Earlier (now-recontextualised) progress: self-similarity Lemma (L) D[R]
+      feasible (still true); recursion alone overshoots Q(n) by +8..+16; complete-
+      layer Proposition (true conditional); summed-coupling sum_R-arcs c(x,y)<=
+      e(S,R) (true); a<=(n-sigma)(sigma+1) fails off the extremal set.
 - [ ] **Hypergraph vertex at $m=4$.** lem:incidence-rank drives $k_m^{(r)}=\ell_m^{(r)}$
       via Tutte/SPQR exactly where $\kappa\le2$. For $m=4$ it needs a 4-connectivity
       analogue of the triconnected decomposition. No early counterexample: $k_4^{(3)}(5)=6

@@ -24,27 +24,29 @@ worth keeping for whoever (AI or human) continues the work.
 
 ### Directed simple-digraph arc problem at `m = 3` (`conj:dir-arc`)
 A line of attack on the thesis's flagship open problem -- proving the quadratic
-branch of `conj:dir-arc` for `m >= 3`. It reframes the problem away from the
-stuck "no backward arc" exchange and reduces the whole `m = 3` quadratic upper
-bound to a single concrete hypothesis about sources.
+branch of `conj:dir-arc` for `m >= 3`. It reduced the whole `m = 3` quadratic
+upper bound to one hypothesis (H) about sources. **As of 2026-06-30, (H) is
+FALSE** (an explicit infinite family of extremisers refutes it), so the reduction
+does not close the problem. The VALUE conjecture is unharmed; the characterisation
+is wrong. Details and what survives are in section 0 of the reduction note.
 
 - [`directed_arc_m3_reduction.md`](directed_arc_m3_reduction.md) -- the
-  min-degree-deletion reduction (the `m=2` engine applied to `m=3`) and the
-  conditional structure theorem. **Reduces the upper bound to one hypothesis (H).**
-- [`directed_arc_m3_extremisers.md`](directed_arc_m3_extremisers.md) -- the full
-  extremiser family (not unique) and the attachment refutation that kills the
-  residual `+1` case once (H) is known.
+  min-degree-deletion reduction and the conditional structure theorem. Section 0
+  now records that **(H) is FALSE**; the rest is kept for the record.
+- [`directed_arc_m3_extremisers.md`](directed_arc_m3_extremisers.md) -- the
+  augmented-bipartite family and the attachment refutation, both SUPERSEDED: the
+  family is not the complete extremal set and the refutation rested on (H).
 
-Scripts: `attach_check.py` (arithmetic + single-cycle attachment),
-`attach_check_all_perms.py` (attachment over all extremiser types),
-`characterisation_checks.py` (arc partition, the source lemma, the conditional
-bound, family feasibility), `odd_extremiser_search.py` (a search probe; weak,
-see its note), `lemma_check.py` (section 2.4: the self-similarity lemma D[R]
-feasible, on the family and random feasible digraphs), `probe_overshoot.py`
-(section 2.4: the self-similarity recursion overshoots Q(n)),
-`coupling_inequality.py` (section 2.5: the summed-coupling inequality, and the
-negative result that the conditional bound fails off the extremal set so (H)
-needs extremality). The three 2026-06-30 scripts are self-contained.
+Scripts: `h_counterexample.py` (the (H) refutation: the `n=9` witness and the
+infinite family, self-contained + cross-checked against the program),
+`h_violation_search.py` (the fixed-arc-count search that maximised max R-in-degree
+and found the `n=9` violation), `attach_check.py`, `attach_check_all_perms.py`
+(now historical, the attachment refutation), `characterisation_checks.py` (arc
+partition, the source lemma, the conditional bound, family feasibility),
+`odd_extremiser_search.py` (a search probe; weak), `lemma_check.py` (the
+self-similarity lemma, still true), `probe_overshoot.py` (the recursion
+overshoots Q(n)), `coupling_inequality.py` (the summed-coupling inequality and the
+counting-is-insufficient result). The 2026-06-30 scripts are self-contained.
 
 ### Jan Goedgebeur's follow-up: the nauty pipeline and tabu search
 Cross-checks (not new mathematics) of the two P2 items from Jan's email, run
