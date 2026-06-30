@@ -1678,3 +1678,41 @@ are one drawing, no more two-panel before/after):
 
 NOT done in solve()/variant configs/figure grid (deliberately -- general stays a margin
 refinement, not a first-class 12-grid variant).
+
+## 2026-06-30 (Opus) -- pull + health check, then flagship directed-arc m=3 (H)
+
+Author asked to pull the thesis, check everything is alright, and start working.
+
+HEALTH CHECK (all green): local main == origin/main (0 ahead/0 behind; the only
+working change was a non-deterministic main.pdf rebuild, restored). Forced clean
+latexmk rebuild: 112 pp, 0 overfull, 0 undefined refs/cites. Program self-check:
+ALL CHECKS PASSED. Suite: 88 tests OK / 3 skip (~141s). (The build "failed exit 1"
+notification was a false alarm: the job's last command was `grep undefined`, which
+exits 1 when it finds zero matches -- zero undefined refs is the good outcome.)
+
+WORK: the TASKS.md flagship -- close the m=3 directed-arc quadratic upper bound,
+which research_notes/directed_arc_m3_reduction.md reduces to hypothesis (H): every
+extremiser's non-source set R has max in-degree <= 1. (H) is NOT closed this
+session (it is the thesis's central open gap; I did NOT fabricate a proof). I did
+add three unconditional, verified increments to that note (new section 2.4):
+- Lemma (L), self-similarity: a source has in-degree 0 so no path passes through
+  it, hence lambda_D(u,v) = lambda_{D[R]}(u,v) for u,v in R, so D[R] is itself
+  feasible and e(R) <= ell_3^dir(|R|). (Not previously stated in the note.)
+- The recursion from (L) alone OVERSHOOTS Q(n) by +8..+16 at n=9..15 (the argmax
+  takes a small dense inner R under a near-complete source layer, which feasibility
+  forbids). So the recursion and the source-neighbourhood coupling (2.2) must be
+  used together -- this pinpoints why (H) is the hard core, not an artefact.
+- Proposition (complete-layer): a feasible D with a source and a COMPLETE source
+  layer satisfies (H), giving a <= rho(sigma+1) <= Q(n). Proof: a source pointing
+  to w and to two R-in-neighbours of w breaks Lemma 2.2. This recovers the
+  augmented-bipartite extremisers' optimality with no exchange, and narrows (H) to
+  exactly the GAPPED-layer case (a missing arc s->x must not overpay for a denser R).
+Two SELF-CONTAINED verification scripts added (own capped max-flow, no dependence
+on the program they corroborate): research_notes/scripts/lemma_check.py (partition
++ (L) on augmented-bipartite k=3..8 and random feasible n=4..10, all OK) and
+research_notes/scripts/probe_overshoot.py (the overshoot table). Both pass.
+
+NO thesis .tex or program code touched (these are research-note increments, not
+yet thesis-grade closure). (H) general case remains open; honest next steps are in
+TASKS.md (exchange argument for the gapped-layer case; or the finite seam bases
+ell_3^dir(9)=25, ell_3^dir(10)=30 via Gurobi).

@@ -108,14 +108,70 @@ the extremisers to the augmented-bipartite family.**
 
 ---
 
+## 2.4 Self-similarity and the complete-layer case (PROVED, 2026-06-30)
+
+Two unconditional facts that locate (H) precisely. Reproduce with
+`research_notes/scripts/lemma_check.py` (partition, the lemma, the proposition)
+and the overshoot table below (`probe_overshoot.py`).
+
+### 2.4.1 Self-similarity lemma (PROVED)
+> **Lemma (L).** In any feasible `D`, the non-source set `R` induces a feasible
+> sub-digraph: `lambda^max(D[R]) <= 2`. Hence `e(R) <= ell_3^dir(|R|)`.
+
+*Proof.* A source has in-degree `0`, so it can never be an internal vertex of a
+directed path (an internal vertex carries an incoming path arc). Every directed
+`u`-`v` path with `u, v in R` therefore stays inside `R`, so
+`lambda_D(u, v) = lambda_{D[R]}(u, v)` for all `u, v in R`. Feasibility of `D`
+restricts to `D[R]`, and the arc bound is the definition of `ell_3^dir`. ∎
+Verified: `lambda(D[R]) <= 2` on the augmented-bipartite family `k = 3..8` and on
+many random maximal feasible digraphs (`lemma_check.py`, all OK).
+
+### 2.4.2 The recursion alone is not enough
+Lemma (L) yields the recursion
+`ell_3^dir(n) <= max_{sigma >= 1} [ sigma(n - sigma) + ell_3^dir(n - sigma) ]`
+(taking `sigma = |S| >= 1`; the source-free case is separate). It OVERSHOOTS `Q(n)`:
+
+| n | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|---|----|----|----|----|----|----|
+| recursion-only bound | 33 | 39 | 46 | 53 | 61 | 70 | 80 |
+| over `Q(n)` | +8 | +9 | +10 | +11 | +12 | +14 | +16 |
+
+The slack comes from the argmax choosing a SMALL dense inner `R` (a linear-regime
+extremiser) underneath a near-complete source layer. Feasibility forbids exactly
+that pairing, and that is what the source-neighbourhood coupling (2.2) controls.
+So the recursion and the coupling have to be used together. (H) is the assertion
+that the coupling wins.
+
+### 2.4.3 The complete-layer case (PROVED)
+> **Proposition.** If a feasible `D` has at least one source and a COMPLETE source
+> layer (every source points to every non-source), then (H) holds, hence
+> `a = sigma*rho + e(R) <= rho(sigma + 1) <= Q(n)`.
+
+*Proof.* Suppose some `w in R` had two `R`-in-neighbours `x, x'`. Take any source
+`s`. The complete layer gives `s -> w`, `s -> x`, `s -> x'`, so `w` has in-degree
+`2` inside `N^+(s)`, contradicting the source-neighbourhood Lemma (2.2). Hence `R`
+has maximum in-degree `<= 1` (that is (H)), so `e(R) <= rho` and
+`a <= sigma*rho + rho = rho(sigma + 1) <= max_sigma (n - sigma)(sigma + 1) = Q(n)`. ∎
+
+The augmented-bipartite extremisers have a complete layer, so this recovers their
+optimality with no exchange. The open case is an extremiser whose source layer has
+GAPS: a missing arc `s -> x` could in principle pay for an extra `R`-arc into some
+`w`. Showing the gaps can never overpay (`e(R) - rho <= sigma*rho - e(S, R)`) is
+exactly the full bound `a <= rho(sigma + 1)`, so it is equivalent to (H)'s core,
+not a way around it.
+
+---
+
 ## 3. Status and the open residue
 
 - PROVED: arc partition; source-neighbourhood Lemma; conditional bound + equality;
   the min-degree reduction (odd from even by integrality); the `+1` forced
-  structure.
+  structure; self-similarity Lemma (L) and the complete-layer Proposition (2.4).
 - OPEN, load-bearing: **(H)**. Proving it closes the value and the
   characterisation at one stroke; with the attachment refutation made uniform
   (`directed_arc_m3_extremisers.md`) and the seam bases, it settles `m = 3`.
+  2.4 narrows it: the complete-layer case is done, so (H) is now precisely the
+  claim that a source layer with GAPS cannot overpay for a denser `R`.
 - OPEN, finite: seam bases `ell_3^dir(9) = 25`, `ell_3^dir(10) = 30` (certifier /
   Gurobi -- analogue of the thesis's finite `n=7` multigraph facts).
 - `m >= 4`: redo the reduction (overshoot pattern differs) and expect the known
