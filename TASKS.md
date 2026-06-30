@@ -46,6 +46,14 @@ Verify any result with a Fable proof-check before it enters the text uncommented
       REMAINING GAPS: (1) PROVE (H) [load-bearing; about sources, exchange-free];
       (2) make the attachment refutation uniform in k (Menger lemma); (3) seam bases
       ell_3(9)=25, ell_3(10)=30 via certifier; (4) m>=4 redo + odd-uniqueness hole.
+      PROGRESS 2026-06-30 (reduction note sections 2.4-2.5, all verified): self-
+      similarity Lemma (L) D[R] feasible so e(R)<=ell_3(|R|); the recursion alone
+      overshoots Q(n) by +8..+16, so the source coupling is essential; complete-layer
+      case of (H) PROVED (narrows (H) to the gapped-layer case); summed-coupling
+      inequality sum_R-arcs c(x,y)<=e(S,R). KEY: a<=(n-sigma)(sigma+1) FAILS for
+      non-extremal D even with sigma>=1, so (H) needs EXTREMALITY (no whole-digraph
+      count works) -- attack 1 (exchange) is the only route, and the unfillable-hole
+      non-monotonicity is the precise barrier.
 - [ ] **Hypergraph vertex at $m=4$.** lem:incidence-rank drives $k_m^{(r)}=\ell_m^{(r)}$
       via Tutte/SPQR exactly where $\kappa\le2$. For $m=4$ it needs a 4-connectivity
       analogue of the triconnected decomposition. No early counterexample: $k_4^{(3)}(5)=6
