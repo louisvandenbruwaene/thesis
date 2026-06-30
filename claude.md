@@ -1716,3 +1716,21 @@ NO thesis .tex or program code touched (these are research-note increments, not
 yet thesis-grade closure). (H) general case remains open; honest next steps are in
 TASKS.md (exchange argument for the gapped-layer case; or the finite seam bases
 ell_3^dir(9)=25, ell_3^dir(10)=30 via Gurobi).
+
+SECOND ROUND (author chose "keep attacking (H)"): two more verified results added
+to the note (section 2.5), and a third self-contained script
+coupling_inequality.py (all pass):
+- (star) summed-coupling inequality: summing Lemma 2.2 over all sources gives
+  sum_{R-arcs} c(x,y) <= e(S,R), where c(x,y) = #common source in-neighbours of the
+  endpoints. Recovers (H) in the complete-layer case (c == sigma). 0 failures / 280.
+- KEY NEGATIVE RESULT: the conditional bound a <= (n-sigma)(sigma+1) FAILS for
+  non-extremal feasible digraphs even with sigma >= 1 (95/280; e.g. n=9 one source
+  a=21 > 16), because sigma counts only GLOBAL sources while D[R] can be a dense
+  linear-regime digraph with its own internal sources. So no "sum local constraints
+  over the whole digraph" count can prove (H): a proof MUST use extremality. This
+  rules out the counting route and re-focuses all future work on the exchange
+  (attack 1). Recorded in 2.5.2 and the status block.
+Honest bottom line: (H) NOT closed. The non-monotone exchange (a hole s->x cannot
+always be filled without manufacturing a 3rd route) remains the barrier the note
+already named; this session sharpened WHERE the barrier is and proved the counting
+route is a dead end, but did not break it.

@@ -129,7 +129,8 @@ many random maximal feasible digraphs (`lemma_check.py`, all OK).
 ### 2.4.2 The recursion alone is not enough
 Lemma (L) yields the recursion
 `ell_3^dir(n) <= max_{sigma >= 1} [ sigma(n - sigma) + ell_3^dir(n - sigma) ]`
-(taking `sigma = |S| >= 1`; the source-free case is separate). It OVERSHOOTS `Q(n)`:
+(taking `sigma = |S| >= 1`, with the source-free case handled separately). It
+OVERSHOOTS `Q(n)`:
 
 | n | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
 |---|---|----|----|----|----|----|----|
@@ -160,18 +161,53 @@ GAPS: a missing arc `s -> x` could in principle pay for an extra `R`-arc into so
 exactly the full bound `a <= rho(sigma + 1)`, so it is equivalent to (H)'s core,
 not a way around it.
 
+## 2.5 The summed coupling, and why counting alone cannot work (2026-06-30)
+
+Reproduce with `research_notes/scripts/coupling_inequality.py`.
+
+### 2.5.1 The summed-coupling inequality (PROVED)
+Summing the source-neighbourhood Lemma (2.2) over all sources gives one global
+inequality.
+> **(star)** `sum_{R-arcs (x,y)} c(x,y) <= e(S, R)`, where
+> `c(x,y) = #{ s in S : s -> x and s -> y }` is the number of common source
+> in-neighbours of the endpoints.
+
+*Proof.* For each source `s`, `D[N^+(s)]` has maximum in-degree `<= 1` (2.2), so it
+has at most `|N^+(s)|` arcs. An `R`-arc `(x,y)` lies inside `N^+(s)` exactly when
+`s -> x` and `s -> y`. Summing `#arcs(N^+(s)) <= |N^+(s)|` over `s` gives the left
+side as `sum_{R-arcs} c(x,y)` and the right side as `sum_s |N^+(s)| = e(S,R)`. ∎
+In the complete-layer case `c(x,y) = sigma` for every `R`-arc, so (star) becomes
+`sigma*e(R) <= sigma*rho`, i.e. `e(R) <= rho`, recovering 2.4.3. Verified: 0
+failures over 280 random feasible digraphs.
+
+### 2.5.2 Counting alone cannot prove (H) -- extremality is required (PROVED)
+The conditional bound `a <= (n - sigma)(sigma + 1)` is NOT a theorem about all
+feasible digraphs: it FAILS, even with `sigma >= 1`, on non-extremal `D` (95 of
+280 random feasible digraphs, e.g. `n = 9`, one source, `a = 21 > 16`). The reason
+is structural: `sigma` counts only the GLOBAL sources, but `D[R]` can itself be a
+dense linear-regime digraph carrying its own internal sources, so a single source
+plus a heavy `R` already overshoots `(n-sigma)(sigma+1)` while staying feasible and
+below `Q(n)`. Consequently NO inequality of the "sum local constraints over the
+whole digraph" type can give (H): any proof must use that `a` is MAXIMAL (an
+extremiser), which is exactly why every viable attack on (H) is an exchange or a
+deletion argument, never a pure count. This rules out a class of attempts and
+re-focuses the work on attack 1 (the exchange) in section 3.
+
 ---
 
 ## 3. Status and the open residue
 
 - PROVED: arc partition; source-neighbourhood Lemma; conditional bound + equality;
   the min-degree reduction (odd from even by integrality); the `+1` forced
-  structure; self-similarity Lemma (L) and the complete-layer Proposition (2.4).
+  structure; self-similarity Lemma (L) and the complete-layer Proposition (2.4);
+  the summed-coupling inequality (star) (2.5.1).
 - OPEN, load-bearing: **(H)**. Proving it closes the value and the
   characterisation at one stroke; with the attachment refutation made uniform
   (`directed_arc_m3_extremisers.md`) and the seam bases, it settles `m = 3`.
   2.4 narrows it: the complete-layer case is done, so (H) is now precisely the
-  claim that a source layer with GAPS cannot overpay for a denser `R`.
+  claim that a source layer with GAPS cannot overpay for a denser `R`. 2.5.2 shows
+  the proof MUST use extremality (counting over all feasible `D` provably cannot
+  give (H)), so attack 1 (exchange) is the route, not a global count.
 - OPEN, finite: seam bases `ell_3^dir(9) = 25`, `ell_3^dir(10) = 30` (certifier /
   Gurobi -- analogue of the thesis's finite `n=7` multigraph facts).
 - `m >= 4`: redo the reduction (overshoot pattern differs) and expect the known
