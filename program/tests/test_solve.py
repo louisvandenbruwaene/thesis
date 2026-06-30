@@ -24,7 +24,9 @@ class Solve(unittest.TestCase):
         self.assertEqual(r.value, 6)
 
     def test_discovery_returns_a_lower_bound(self):
-        r = solve(4, 2, directed=True, simple=True, exhaustive=False, max_seconds=3.0)
+        # verification stays on sa; tabu is the default for solving the problems
+        r = solve(4, 2, directed=True, simple=True, exhaustive=False,
+                  max_seconds=3.0, method="sa")
         self.assertEqual(r.bound, "lower")
         self.assertEqual(r.value, 6)
 
@@ -46,7 +48,8 @@ class Solve(unittest.TestCase):
         self.assertEqual(r.value, 4)
 
     def test_hypergraph_discovery(self):
-        r = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0)
+        r = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0,
+                  method="sa")
         self.assertEqual(r.bound, "lower")
         self.assertEqual(r.value, 3)
 

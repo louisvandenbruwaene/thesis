@@ -2093,9 +2093,14 @@ def solve(
     directed: bool = False, simple: bool = True,
     hypergraph: bool = False, r: int = 3,
     exhaustive: bool = False, separation: str = "edge",
-    max_seconds: float = 60.0, seed: int = 0, method: str = "sa",
+    max_seconds: float = 60.0, seed: int = 0, method: str = "tabu",
 ) -> SolveResult:
     """The single driver: prove the exact value, or discover a dense example.
+
+    Discovery defaults to ``method="tabu"``: tabu search is the stronger engine on
+    the harder directed problems and the one used to solve the problems in this
+    work.  Simulated annealing (``method="sa"``) is kept for the self-check and
+    verification, where the lighter engine is enough.
 
     Args:
         n, m: the vertices and the forbidden number of independent routes.
@@ -5416,8 +5421,9 @@ def _run_checks() -> int:
     check(f"solve exhaustive simple-directed n=4,m=2: {proved.value} ({proved.bound})",
           proved.proven and proved.value == 6)
     # Discovery finds the same 6 arcs as a lower bound within a short budget.
+    # The checks use sa (lighter); tabu is the default for actually solving.
     found = solve(4, 2, directed=True, simple=True, exhaustive=False,
-                  max_seconds=3.0)
+                  max_seconds=3.0, method="sa")
     check(f"solve discovery simple-directed n=4,m=2: {found.value} ({found.bound})",
           found.bound == "lower" and found.value == 6)
     # Exhaustive undirected by brute force: ell_2(5) = n-1 = 4 (a spanning tree).
@@ -5426,7 +5432,8 @@ def _run_checks() -> int:
     check(f"solve exhaustive simple-undirected n=5,m=2: {tree.value} ({tree.bound})",
           tree.proven and tree.value == 4)
     # Hypergraph discovery returns a feasible lower bound for the r=3, m=2 case.
-    hyper = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0)
+    hyper = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0,
+                  method="sa")
     check(f"solve discovery 3-uniform hypergraph n=7,m=2: {hyper.value} ({hyper.bound})",
           hyper.bound == "lower" and hyper.value == 3)
 

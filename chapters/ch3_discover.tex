@@ -165,7 +165,7 @@ The two engines rediscover the same values, but at very different speeds, and on
     \label{fig:sa-vs-tabu}
 \end{figure}
 
-This advantage comes at a cost the equal-time comparison already absorbs but is worth naming: each tabu step scans the whole neighbourhood, so it is far more expensive than the annealer's single random proposal, and tabu takes many fewer but better-aimed steps in the same wall-clock. Simulated annealing remains the program's default, because it reaches every value this thesis reports, the rediscovery of \Cref{tab:rediscovery} and the conjectural lower bounds alike, and because its independent restarts parallelise trivially across cores. Tabu is the stronger engine for the directed problems past the certified range, and it is the natural tool for any future attempt to push those lower bounds further by machine.
+This advantage comes at a cost the equal-time comparison already absorbs but is worth naming: each tabu step scans the whole neighbourhood, so it is far more expensive than the annealer's single random proposal, and tabu takes many fewer but better-aimed steps in the same wall-clock. Tabu search is therefore the program's default for solving the problems, reaching every value this thesis reports, the rediscovery of \Cref{tab:rediscovery} and the conjectural lower bounds alike, and reaching the harder directed optima past the certified range where the annealer plateaus. Simulated annealing is kept for the self-check and verification, where the small values fall at once, the lighter per-step cost is all that is needed, and its independent restarts parallelise trivially across cores.
 
 \section{The trichotomy: proved, certified, conjectured}
 \label{sec:trichotomy}
