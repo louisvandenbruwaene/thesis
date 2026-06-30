@@ -1,5 +1,13 @@
 # Directed arc problem, m = 3: reduction to a single hypothesis on sources
 
+> **NOT FOR THE THESIS OR THE PROGRAM.** This note is research scratch. Its
+> centrepiece (H) is OPEN, so the reduction does not yet prove anything new about
+> `conj:dir-arc`. Nothing here belongs in the thesis text or in
+> `erdos915_unified.py` unless and until (H) is fully proved and proof-checked.
+> The thesis already states `conj:dir-arc` as a conjecture with the existing
+> conditional results; keep it that way. The 2026-06-30 additions (sections 2.4,
+> 2.5) are verified lemmas and a NEGATIVE result, not a closure of (H).
+
 **Topic.** Proving the quadratic branch of `conj:dir-arc` for `m = 3`:
 `ell_3^dir(n) <= Q(n) := floor((n+1)^2/4)` for `n` in the quadratic regime
 (`n >= 9`, where `Q(n) > 3(n-1)`).

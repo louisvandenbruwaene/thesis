@@ -39,7 +39,12 @@ Scripts: `attach_check.py` (arithmetic + single-cycle attachment),
 `attach_check_all_perms.py` (attachment over all extremiser types),
 `characterisation_checks.py` (arc partition, the source lemma, the conditional
 bound, family feasibility), `odd_extremiser_search.py` (a search probe; weak,
-see its note).
+see its note), `lemma_check.py` (section 2.4: the self-similarity lemma D[R]
+feasible, on the family and random feasible digraphs), `probe_overshoot.py`
+(section 2.4: the self-similarity recursion overshoots Q(n)),
+`coupling_inequality.py` (section 2.5: the summed-coupling inequality, and the
+negative result that the conditional bound fails off the extremal set so (H)
+needs extremality). The three 2026-06-30 scripts are self-contained.
 
 ### Jan Goedgebeur's follow-up: the nauty pipeline and tabu search
 Cross-checks (not new mathematics) of the two P2 items from Jan's email, run
