@@ -202,3 +202,25 @@ Jan Goedgebeur (nauty author) confirmed our speedup and added these notes:
       spell check clean (British English, only names+technical+code flagged); ToC and
       figure placement fine (the 5 ch4 [p] floats are legit full-page grids). Also
       refreshed variant_bounds_m3/m6.png with the shortened plot title (author's note).
+
+## 2026-07-01 -- deferred figure polish (leftover from the A.5-A.8 pass)
+
+Done this session: fixed name placements in A.5-A.8 (offsets 1-2pt -> 3-4pt, moved
+the A.6 e_3 label off vertex 6, nudged A.7 z*); recoloured A.6 e_3 from black!35 to
+a full metroF grey so all three hyperedges read at equal weight; unified the ad-hoc
+FAINT-edge tints (attachment !20, ch1 bgarc !30, ch4 abk !35) to the canonical !40.
+Build clean, 116 pp, 0 overfull, 0 undefined.
+
+Left for another time (lower value / more disruptive):
+- Faint-edge WIDTHS still vary (0.5/0.6/0.7/0.8/0.9pt) even though the tint is now
+  uniform at !40. A clean fix is one canonical faint style (say gdirfaint) that
+  bgarc/abk/the attachment background all inherit, instead of per-figure widths.
+- fig:cut (ch2 ~730) highlights the two crossing arcs with full KULblauw1 (100%) +
+  "very thick", vs the !75 used for ordinary edges everywhere else. It reads as a
+  deliberate 2-tone highlight (gray = not counted, blue = counted), so it was left,
+  but if strict opacity uniformity is wanted, move it onto the route-highlight
+  convention (a saturated grA/grB colour) rather than raw 100% blue.
+- Deeper coherence question: the appendix uses tiny apx dots + side labels while the
+  body uses big gvertex circles with the name INSIDE. Both are defensible (metro-style
+  structure diagrams vs small named graphs), but if full body/appendix uniformity is
+  wanted, decide one convention.

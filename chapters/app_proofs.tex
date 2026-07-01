@@ -560,9 +560,9 @@ largest.
 \foreach \bnd in {13,0,-13}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
 \node[albl, text=KULblauw1!85] at (0,2.5) {$m-1$ copies $a\!\to\! b$};
 % the rest of the complete one-directional A -> B layer, faint
-\draw[aparc,KULblauw1!20,line width=0.6pt] (a)--(bp);
-\draw[aparc,KULblauw1!20,line width=0.6pt] (ap)--(b);
-\draw[aparc,KULblauw1!20,line width=0.6pt] (ap) to[bend right=8] (bp);
+\draw[aparc,KULblauw1!40,line width=0.6pt] (a)--(bp);
+\draw[aparc,KULblauw1!40,line width=0.6pt] (ap)--(b);
+\draw[aparc,KULblauw1!40,line width=0.6pt] (ap) to[bend right=8] (bp);
 % the new vertex v at bottom centre
 \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (0,-2.0) {};
 \node[apname,below=1pt] at (v) {$v$};
@@ -811,8 +811,8 @@ multigraph and even the \emph{value} step stalls. This is why
 % Both panels are centred on y = 0 so they sit at the same height.
 \begin{scope}
   \foreach \i in {1,...,7}{ \node[apx] (p\i) at (1.0*\i,-0.9) {}; }
-  \node[apname,below=1pt] at (p1) {$1$};
-  \node[apname,below=1pt] at (p7) {$7$};
+  \node[apname,below=3pt] at (p1) {$1$};
+  \node[apname,below=3pt] at (p7) {$7$};
   \foreach \i in {1,...,6}{
     \pgfmathtruncatemacro{\j}{\i+1}
     \draw[bd] (p\i) to[bend left=20] (p\j);
@@ -820,7 +820,7 @@ multigraph and even the \emph{value} step stalls. This is why
   }
   % new vertex v, attached with full multiplicity (bidirected) to ends 1 and 7
   \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (4.0,1.7) {};
-  \node[apname,above=1pt] at (v) {$v$};
+  \node[apname,above=3pt] at (v) {$v$};
   \draw[apredarc] (p1) to[bend right=9] (v);
   \draw[apredarc] (v) to[bend right=9] (p1);
   \draw[apredarc] (p7) to[bend left=9] (v);
@@ -971,11 +971,11 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
   \begin{scope}[on background layer]
     \draw[metro, metroA]  (1)--(2)--(3);   % e1 = {1,2,3}
     \draw[metro, metroB]  (3)--(4)--(5);   % e2 = {3,4,5}
-    \draw[metro, black!35] (4)--(6)--(5);  % e3 = {4,5,6}, off the path
+    \draw[metro, metroF] (4)--(6)--(5);  % e3 = {4,5,6}, off the path
   \end{scope}
   \node[apname, text=metroA]   at (0.55,1.05) {$e_1$};
   \node[apname, text=metroB]   at (2.75,1.05) {$e_2$};
-  \node[apname, text=black!55] at (5.35,1.05) {$e_3$};
+  \node[apname, text=metroF] at (6.05,1.3) {$e_3$};
   % Berge path 1 -e1- 3 -e2- 5: orange arrows along the baseline, clear of lines
   \draw[line width=2pt, vertexorange, -{Stealth[length=2.4mm]}] (1)--(3);
   \draw[line width=2pt, vertexorange, -{Stealth[length=2.4mm]}] (3)--(5);
@@ -1288,14 +1288,14 @@ most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
       ellipse, minimum width=3.3cm, minimum height=3.5cm] (L) at (5.4,0) {};
 \node[font=\small, vertexpurple] at (5.4,2.15) {leaf $L$ (3-connected)};
 % the shared cut pair a,b on the seam between the two blobs
-\node[apx] (a) at (2.7, 1.3) {};  \node[apname, above=2pt] at (a) {$a$};
-\node[apx] (b) at (2.7,-1.3) {};  \node[apname, below=2pt] at (b) {$b$};
+\node[apx] (a) at (2.7, 1.3) {};  \node[apname, above=3pt] at (a) {$a$};
+\node[apx] (b) at (2.7,-1.3) {};  \node[apname, below=3pt] at (b) {$b$};
 % virtual edge {a,b}: the leaf's single connection to the rest of G
 \draw[apdashed] (a)--(b);
 \node[apname, text=vertexred, fill=white, inner sep=1.5pt] at (2.7,0) {virtual $\{a,b\}$};
 % inside L: vertices and edges suggesting 3-connectivity, with a far node z*
 \node[apx] (z1) at (5.0, 1.0) {};
-\node[apx] (z2) at (6.5, 0.0) {};   \node[apname, right=2pt] at (z2) {$z^{*}$};
+\node[apx] (z2) at (6.3, 0.0) {};   \node[apname, right=4pt] at (z2) {$z^{*}$};
 \node[apx] (z3) at (5.0,-1.0) {};
 \draw[apgedge] (a)--(z1) (a)--(z2) (a)--(z3) (b)--(z1) (b)--(z2) (b)--(z3)
                (z1)--(z2) (z2)--(z3) (z1)--(z3);
@@ -1404,7 +1404,7 @@ every route is a single step and $\lec(a, b) = \deg_{\mathcal{G}^*}(b)
 %     matching the hypergraph panels of fig:three-models-directed.
 \begin{scope}[xshift=6.4cm]
   \node[apx] (t) at (1.5,0.9) {};
-  \node[apname, above=2pt] at (t) {tail};
+  \node[apname, above=4pt] at (t) {tail};
   \node[apx] (h1) at (0.3,-0.5) {};
   \node[apx] (h2) at (1.5,-0.65) {};
   \node[apx] (h3) at (2.7,-0.5) {};
