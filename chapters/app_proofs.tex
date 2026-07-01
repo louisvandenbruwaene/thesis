@@ -48,6 +48,20 @@ Every \emph{undirected} capacitated graph $G$ has a weighted tree $T$ on the sam
 
 Two features of the statement fix how far it reaches, and both are used below. Being a theorem about capacities, it applies verbatim to a simple graph (unit weights), to a multigraph (integer weights, the multiplicity $\mu$ as capacity), and, in the form of \Cref{thm:hyper-gomory-hu}, to the hyperedge-connectivity of a hypergraph. But it needs the cut function to be \emph{symmetric}, which forces $G$ to be undirected: a digraph has $\lec(u,v) \ne \lec(v,u)$ in general and admits no such tree, and the vertex-connectivity function fails symmetry for the same reason. So the Gomory--Hu tree is precisely the tool for the undirected edge problems, where it drives Mader's theorem and its multigraph and hypergraph cousins (\Cref{thm:mader,thm:multigraph-edge,prop:hyper-edge}) through one argument, and precisely the tool that vanishes once arcs turn one-way.
 
+\begin{primer}[Primer: why a Gomory--Hu tree exists]
+The theorem is far from obvious, so here is why such a tree can always be built, in enough detail that nothing is taken on faith. Everything rests on one property of cuts. For a set of vertices $S$ write $d(S)$ for the total capacity of the edges with exactly one endpoint in $S$, which is the capacity of the cut $(S, V \setminus S)$. The cut function is \emph{submodular}: for any two vertex sets $A$ and $B$,
+\[
+    d(A) + d(B) \;\ge\; d(A \cap B) + d(A \cup B).
+\]
+One checks this one edge at a time. An edge contributes to each side of the inequality according to where its two endpoints fall relative to $A$ and $B$, and a short case check over the possible placements shows its contribution on the right never exceeds its contribution on the left. The only edges that could contribute more on the right have one endpoint in $A \setminus B$ and the other in $B \setminus A$, and those contribute $0$ on the right and $2$ on the left, so the inequality only gains.
+
+Submodularity buys the single lemma the construction needs, the \emph{uncrossing} lemma: if $(S, V \setminus S)$ is any cut and $u, v$ lie on the same side of it, then some minimum $u$--$v$ cut keeps all of $S$ (or all of $V \setminus S$) on one side, that is, it does not cross $S$. The picture is that a cheapest $u$--$v$ cut which sliced through $S$ could be pushed clear of $S$ without ever gaining capacity, and submodularity is exactly the inequality guaranteeing the push is free.
+
+With that lemma the tree is built in $n - 1$ rounds, one minimum-cut computation each. Begin with the trivial tree, a single node holding all $n$ vertices. In each round pick a node of the current tree that still holds two or more vertices, choose two of its vertices $u$ and $v$, and compute a minimum $u$--$v$ cut in the graph in which every neighbouring tree node, itself already a bag of several vertices, is shrunk to one vertex placed on whichever side the cut assigns it. Split the chosen node along the two sides of the cut and join the two halves by a new tree edge weighted by the cut's capacity. The uncrossing lemma is what makes the shrinking legitimate, because it says the minimum $u$--$v$ cut can be chosen to respect every cut found in earlier rounds, so no earlier tree edge is spoiled. After $n - 1$ rounds every node holds a single vertex and $T$ is a weighted tree on $V$ with $n - 1$ edges.
+
+Two facts finish the argument, and they are exactly what the body uses. Each tree edge is by construction the capacity of an actual cut of $G$, so its weight is a genuine minimum $u$--$v$ cut value $\lec_G(u,v)$ for the pair it separates. And for any $u, v$ the value $\lec_G(u, v)$ equals the lightest edge on the $u$--$v$ path of $T$. One inequality holds because every tree edge on that path is itself a cut separating $u$ from $v$, so none can be lighter than the global minimum $u$--$v$ cut. The other holds because the lightest tree edge on the path is a genuine $u$--$v$ cut of exactly that weight. The reader who wants the uncrossing induction spelled out in full will find it in Gomory and Hu \cite{GomoryHu61}. The point here is only that the tree is an honest theorem, computed by $n - 1$ maximum-flow calls, and not a convenient fiction.
+\end{primer}
+
 The most basic constraint on local connectivity is local: a pair cannot have more independent routes than either endpoint has edges. The constructions below use it constantly.
 
 \begin{lemma}[Degree bound]\label{lem:degree-bound}
@@ -865,6 +879,8 @@ Build the helper-point network of \Cref{fig:hyper-gadget}: for each hyperedge $e
 Every $r$-uniform hypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$, its \emph{hypergraph Gomory--Hu tree}, such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path, and each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with $|\delta_\HH(S_t)| = c^*(t)$, where $\delta_\HH(S)$ is the set of hyperedges incident to both sides, that is, having at least one vertex in $S$ and at least one outside it.
 \end{theorem}
 
+This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedges straddling it, $|\delta_\HH(S)|$, in place of the edges. B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24} obtain the tree by the same uncrossing strategy sketched for the graph case above, applied now to the submodular hyperedge-cut function $|\delta_\HH(\cdot)|$. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $|\delta_\HH(S_t)| = c^*(t)$.
+
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
 \emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
 
@@ -898,12 +914,20 @@ Let $r \ge 3$, $n \ge r$, and $2 \le m$ with $m-1 \le \binom{n-2}{r-2}$. Then th
 The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multihypergraph. For the lower bound, fix a hub $h$ and let $V' = V \setminus \{h\}$. By \Cref{lem:sparse-hypergraph} applied with rank $r-1$ and degree ceiling $d = m-1$ on the $n-1$ vertices of $V'$, there is an $(r-1)$-uniform simple hypergraph $\mathcal{G}^*$ on $V'$ with maximum degree at most $m-1$ and exactly $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. Adding $h$ to each hyperedge produces distinct $r$-sets, so the result $\HH$ is simple, and every non-hub vertex $w$ lies in $\deg_{\mathcal{G}^*}(w) \le m-1$ hyperedges, which form a cut isolating $w$. By \Cref{thm:menger-hyper}, $\lec^{\max}_\HH \le m-1$.
 \end{proof}
 
+The sparse hypergraph the construction needs is a corollary of a classical partition theorem, which we state before using it.
+
+\begin{theorem}[Baranyai \cite{Baranyai75}]\label{thm:baranyai}
+If $r$ divides $n$, the $\binom{n}{r}$ distinct $r$-subsets of an $n$-element set can be partitioned into $\binom{n-1}{r-1}$ classes, each a \emph{perfect matching}, meaning a family of $n/r$ disjoint $r$-sets that together cover every vertex exactly once. More generally, for any prescribed class sizes $a_1 + \dots + a_t = \binom{n}{r}$, and with no divisibility assumed, the $r$-subsets can be partitioned into classes of exactly those sizes so that in the class of size $a_i$ every vertex lies in either $\floor{r a_i / n}$ or $\ceil{r a_i / n}$ of the sets, as evenly balanced as the size permits.
+\end{theorem}
+
+The first statement is the memorable one. When $r$ divides $n$ the complete $r$-uniform hypergraph, the one holding every $r$-set, comes apart into $\binom{n-1}{r-1}$ perfect matchings, the exact hypergraph analogue of splitting a regular bipartite graph into perfect matchings by K\"onig's theorem. The proof is an induction that keeps the partial partition as balanced as possible at every step, an integer-flow argument in the spirit of Hall's marriage theorem rather than an explicit construction, and its full form is in Baranyai \cite{Baranyai75}. We need only the general equitable form, and only its conclusion about degrees.
+
 \begin{lemma}[Sparse uniform hypergraphs exist]\label{lem:sparse-hypergraph}
 Let $r \ge 2$, $n \ge r$, and $0 \le d \le \binom{n-1}{r-1}$. There exists an $r$-uniform simple hypergraph on $n$ vertices with maximum degree at most $d$ and exactly $\floorfrac{dn}{r}$ hyperedges.
 \end{lemma}
 
 \begin{proof}
-Put $e := \floorfrac{dn}{r} \le \frac{n}{r}\binom{n-1}{r-1} = \binom{n}{r}$. By Baranyai's theorem on equitable partitions of the complete $r$-uniform hypergraph \cite{Baranyai75}, the $\binom{n}{r}$ possible $r$-sets split into two classes of sizes $e$ and $\binom{n}{r} - e$ such that within each class every vertex is covered either $\floor{re/n}$ or $\ceil{re/n}$ times. The class of size $e$ has maximum degree at most $\ceil{re/n} \le \lceil d \rceil = d$.
+Put $e := \floorfrac{dn}{r} \le \frac{n}{r}\binom{n-1}{r-1} = \binom{n}{r}$. Apply the equitable form of \Cref{thm:baranyai} with two classes, of sizes $e$ and $\binom{n}{r} - e$. Within each class every vertex is covered either $\floor{re/n}$ or $\ceil{re/n}$ times, so the class of size $e$ is a simple $r$-uniform hypergraph with $e = \floorfrac{dn}{r}$ hyperedges and maximum degree at most $\ceil{re/n} \le \lceil d \rceil = d$, the last step because $re/n \le r(dn/r)/n = d$ and $d$ is an integer.
 \end{proof}
 
 
@@ -1080,6 +1104,29 @@ spanning tree closes exactly one new cycle and raises the rank by one, so
 bounding the rank is the same as bounding how many independent cycles the
 graph can hold.
 
+\begin{primer}[Primer: global connectivity and the pieces of a graph]
+The lemma below speaks of a graph being $2$-connected or $3$-connected and of
+taking it apart at small separators. These are the global cousins of the local
+$\kap(u, v)$ from \Cref{ch:basecases}, so we fix the words once. A graph on more
+than $k$ vertices is \emph{$k$-connected} if it stays connected after the removal
+of any $k - 1$ vertices. By Menger this is the same as asking that every pair of
+vertices be joined by at least $k$ internally vertex-disjoint paths, so
+$k$-connected means $\kap(u, v) \ge k$ for all pairs at once, the uniform version
+of the local measure. Thus $2$-connected means no single vertex disconnects the
+graph, and $3$-connected means no two vertices do.
+
+Three named obstructions go with this. A \emph{cut vertex} is a vertex whose
+removal disconnects the graph, so a connected graph on at least three vertices is
+$2$-connected exactly when it has no cut vertex. A \emph{separating pair} is a set
+of two vertices whose removal disconnects the graph, the obstruction a
+$2$-connected graph must lack in order to be $3$-connected. Finally a \emph{block}
+is a maximal piece with no cut vertex of its own, hence either a single bridge edge
+or a maximal $2$-connected subgraph. Two blocks overlap in at most one vertex,
+always a cut vertex, and the blocks and cut vertices hang together in a tree, the
+\emph{block-cut tree}, with one node per block and one per cut vertex. Step 1 of
+the proof is precisely an induction over that tree.
+\end{primer}
+
 \begin{lemma}[Incidence rank lemma]\label{lem:incidence-rank}
 Let $G$ be a connected multigraph with vertex set $X \cup Z$ such that
 (i) $Z$ is independent, (ii) no edge incident to $Z$ is parallel to another
@@ -1173,18 +1220,42 @@ with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
 $|X| \le 1$ and every $z$ has degree at most $1$ by (i), absurd.
 
 Otherwise $G$ is $2$-connected but not $3$-connected, so it can be taken
-apart at its $2$-vertex separators. The classical triconnected
-decomposition (Tutte \cite{Tutte66}, Hopcroft--Tarjan
-\cite{HopcroftTarjan73}) does this in a canonical way, and
-\Cref{fig:tutte-leaf} sketches both its shape and the leaf at which the
-argument bites. It writes $G$ as a \emph{tree of pieces}, where each piece is
-one of three simple shapes: a cycle of length at least three, a \emph{bond}
-(two vertices joined by several parallel edges), or a $3$-connected simple
-graph on at least four vertices. Wherever the decomposition cuts $G$ at a
-separating pair it records the cut by adding a \emph{virtual edge} between
-those two vertices in each piece, a placeholder that stands in for the whole
-rest of the graph on the other side. Two properties are all the proof needs
-from this, and both are visible in the figure. First, a vertex of a piece
+apart at its $2$-vertex separators.
+
+\begin{primer}[Primer: the triconnected (SPQR) decomposition]
+A $2$-connected graph that is not $3$-connected must have a separating pair, and
+cutting along every such pair sorts any $2$-connected graph into a few standard
+shapes. This is a classical theorem of Tutte \cite{Tutte66}, made into a
+linear-time algorithm by Hopcroft and Tarjan \cite{HopcroftTarjan73}.
+
+\emph{Theorem (triconnected decomposition).} Every $2$-connected graph $G$ on at
+least three vertices decomposes into a \emph{tree of pieces}, unique up to
+relabelling, in which each piece is one of three kinds: a \emph{cycle} of length
+at least three (an $S$-piece, for \emph{series}), a \emph{bond}, meaning two
+vertices joined by three or more parallel edges (a $P$-piece, for \emph{parallel}),
+or a $3$-connected simple graph on at least four vertices (an $R$-piece, for
+\emph{rigid}). Two adjacent pieces share exactly one \emph{virtual edge}
+$\{a, b\}$, a placeholder that records a separating pair of $G$ at which the two
+pieces were split apart. The three initials $S$, $P$, $R$, together with $Q$ for a
+trivial single-edge piece, give the structure its usual name, the \emph{SPQR
+tree}.
+
+The tree is built by the recursion that also defines it. If $G$ is already a
+cycle, a bond, or $3$-connected, it is a single piece and the tree is one node.
+Otherwise choose a separating pair $\{a, b\}$, split $G$ into the parts that this
+pair separates, add the virtual edge $\{a, b\}$ to each part so the split is
+remembered, and recurse on the parts. Every split makes the parts strictly
+smaller, so the recursion halts, and Tutte's theorem is that the resulting
+collection of pieces does not depend on the order in which the separating pairs
+are taken. The one fact the proof draws from all this is that a virtual edge
+$\{a, b\}$ always stands for a genuine $a$--$b$ path through the rest of $G$, so an
+argument that must cross from $a$ to $b$ outside a given piece can always do so on
+the far side of that piece's virtual edge.
+\end{primer}
+
+The decomposition just stated is sketched in \Cref{fig:tutte-leaf}, which also
+marks the leaf at which the argument bites. Two properties are all the proof needs
+from it, and both are visible in the figure. First, a vertex of a piece
 that touches none of that piece's virtual edges belongs to that piece alone,
 so it keeps in $G$ exactly the degree it has in the piece. Second, for any
 virtual edge $\{a, b\}$ the part of $G$ on the far side of the cut contains a
@@ -1430,6 +1501,23 @@ so it witnesses the same ${\approx}\,(m-1)n^2/(4(r-1))$ lower bound.
 \section{The random threshold}
 
 The probabilistic ingredients are two Chernoff bounds, quoted in the form we use them.
+
+\begin{primer}[Primer: what a Chernoff bound says]
+Both proofs below need to say that a sum of many independent yes-or-no trials
+almost never lands far from its average. That is the content of a \emph{Chernoff
+bound}, and the intuition is worth stating even though we only quote the result.
+Let $X = X_1 + \dots + X_N$ count the successes among independent trials, with mean
+$\mu = \mathbb{E}[X]$. A Chernoff bound says the chance that $X$ overshoots $\mu$ by
+a factor $1 + \delta$, or undershoots it by a factor $1 - \delta$, decays
+\emph{exponentially} in $\mu$, not merely polynomially as Chebyshev's inequality
+would give. The mechanism is a single trick. Rather than bound $\Pr[X \ge a]$
+directly, bound $\Pr[e^{tX} \ge e^{ta}]$ by Markov's inequality for a parameter
+$t > 0$, use independence to factor $\mathbb{E}[e^{tX}] = \prod_i \mathbb{E}[e^{t
+X_i}]$ into a product over the trials, and then choose $t$ to make the resulting
+bound as small as possible. The exponential in the answer is exactly the $e^{tX}$
+that was fed through Markov. We quote the two tails in the shape the threshold
+proof consumes.
+\end{primer}
 
 \begin{theorem}[Chernoff bounds, see {\cite[Cor.~4.4, Thm.~4.4]{Mulzer18}}]\label{thm:chernoff}
 Let $X$ be a sum of independent $\{0,1\}$-valued random variables with mean $\mu$. For $\delta > 0$, $\Pr[X \ge (1+\delta)\mu] \le \exp\bigl(-\tfrac{\min(\delta, \delta^2)\,\mu}{4}\bigr)$, and for $\delta \in (0,1)$, $\Pr[X \le (1-\delta)\mu] \le \exp\bigl(-\tfrac{\delta^2 \mu}{2}\bigr)$.

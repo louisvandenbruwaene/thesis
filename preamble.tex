@@ -647,6 +647,23 @@ wis.kuleuven.be\\
 \expandafter\def\csname cardcol@OBSERVE\endcsname{roleObserve}
 \expandafter\def\csname cardcol@DRIVER\endcsname{roleDriver}
 
+% ============================================================================
+% PRIMER BOX: self-contained background on a standard tool, for a beginner.
+% Visually distinct from the formal theorem environments and from computernote
+% (which carries computational evidence): a soft green "learn this first" panel
+% that an expert may skip, matching the appendix's "how to read this" ethos.
+\newtcolorbox{primer}[1][Primer]{%
+    enhanced, breakable,
+    colback=roleProve!6,
+    colframe=roleProve!55,
+    coltitle=white,
+    colbacktitle=roleProve!72,
+    fonttitle=\bfseries,
+    title={#1},
+    left=2mm, right=2mm, top=1mm, bottom=1mm,
+    arc=2.5pt,
+}
+
 % inline monospace code token
 \newcommand{\code}[1]{{\ttfamily #1}}
 
