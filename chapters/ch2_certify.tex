@@ -134,7 +134,7 @@ The vertex-disjoint version follows the same idea after one construction: split 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=0.78,
-   sp/.style={circle, draw=KULblauw1, fill=KULblauw1!12, minimum size=5pt, inner sep=0pt},
+   sp/.style={gvertex, minimum size=5pt},
    capf/.style={-{Stealth[length=1.6mm]}, line width=1pt, black!40},
    capw/.style={-{Stealth[length=2mm]}, line width=1.8pt, vertexred},
    rxa/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexorange},
@@ -576,11 +576,11 @@ The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-e
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[scale=1.0, >=Stealth,
-   live/.style={circle, draw=KULblauw1, fill=KULblauw1!12, minimum size=5.5mm, inner sep=0pt},
-   dead/.style={circle, draw=vertexred, fill=vertexred!12, minimum size=5.5mm, inner sep=0pt},
-   bnd/.style={circle, draw=vertexorange, fill=vertexorange!16, minimum size=5.5mm, inner sep=0pt},
-   best/.style={circle, draw=vertexgreen!70!black, fill=vertexgreen!18, minimum size=5.5mm, inner sep=0pt},
-   br/.style={line width=1pt, KULblauw1!70}]
+   live/.style={gvertex, minimum size=5.5mm},
+   dead/.style={gvsink, minimum size=5.5mm},
+   bnd/.style={gvhub, minimum size=5.5mm},
+   best/.style={gvertex, draw=vertexgreen!70!black, fill=vertexgreen!18, minimum size=5.5mm},
+   br/.style={gline}]
   \node[live] (r) at (0,0) {};
   \node[live] (l) at (-2.2,-1.3) {};
   \node[live] (rr) at (2.2,-1.3) {};

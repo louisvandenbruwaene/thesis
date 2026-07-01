@@ -377,6 +377,63 @@
     greenedge/.append style={line cap=round},
 }
 
+% ============================================================================
+% CANONICAL THESIS GRAPH VOCABULARY
+% ============================================================================
+% One visual language for every graph in the thesis, body and appendix alike, so
+% the figures read as a family instead of each hand-rolling its own look. It is
+% grouped by the five kinds of drawing the thesis does: SIMPLE graphs, MULTI
+% graphs, DIRECTED graphs, CURVED connections, and the METRO-map hyperedges.
+% A figure may override the size for a dense diagram (e.g. gvertex, minimum
+% size=4.5mm), but the colour, stroke, fill, font, and shadow stay fixed so the
+% family stays coherent. Curves are never removed here: every bend lives in a
+% figure's own \draw ... to[bend ...], and the styles below fix only how a line
+% or arc looks, not whether it bends.
+\tikzset{
+  % ---- SIMPLE: the default blue vertex and the plain undirected edge ----
+  gvertex/.style={circle, draw=KULblauw1, fill=KULblauw1!15, line width=1pt,
+                  minimum size=6mm, inner sep=0pt, font=\small,
+                  drop shadow={shadow xshift=0.4pt, shadow yshift=-0.5pt,
+                               fill=black, opacity=0.18}},
+  gline/.style ={line width=1.3pt, KULblauw1!75, line cap=round},
+  gfaint/.style={line width=0.9pt, KULblauw1!40, line cap=round},
+  % semantic vertex colours: same size and stroke, the colour marks the role
+  gvhub/.style ={gvertex, draw=vertexorange, fill=vertexorange!18},
+  gvsink/.style={gvertex, draw=vertexred,    fill=vertexred!15},
+  gvcut/.style ={gvertex, draw=roleDiscover, fill=roleDiscover!20},
+  gvnew/.style ={gvertex, draw=vertexorange, fill=vertexorange!22},
+  % ---- MULTI: parallel edges are simple edges drawn with a bend (see CURVED) ---
+  gmulti/.style={gline},
+  % ---- DIRECTED: arcs carry a Stealth head; faint background and cut variants --
+  gdir/.style     ={-{Stealth[length=2.2mm]}, line width=1.1pt, KULblauw1, line cap=round},
+  gdirfaint/.style={-{Stealth[length=1.8mm]}, line width=0.8pt, KULblauw1!40, line cap=round},
+  gcut/.style     ={-{Stealth[length=2.2mm]}, line width=1.2pt, densely dashed, vertexred},
+  gcutedge/.style ={line width=1.2pt, densely dashed, vertexred},
+  % highlighted routes: three independent routes always read orange, green, purple
+  grA/.style={line width=2.6pt, vertexorange,        line cap=round},
+  grB/.style={line width=2.6pt, vertexgreen!70!black, line cap=round},
+  grC/.style={line width=2.6pt, vertexpurple,         line cap=round},
+  grAd/.style={grA, -{Stealth[length=2.8mm]}},
+  grBd/.style={grB, -{Stealth[length=2.8mm]}},
+  grCd/.style={grC, -{Stealth[length=2.8mm]}},
+  % ---- CURVED: the standard gentle bend for a parallel pair or a 2-cycle ----
+  gcurve/.style ={bend left=14},
+  gcurveR/.style={bend right=14},
+  % ---- METRO: hyperedges as metro lines. The metro, metrostop, and metroA..H
+  %      styles live in shared/tikz-styles.tex and are reused here unchanged, so
+  %      the hyperedge look is already shared across every figure that uses it. --
+  %
+  % Re-point the shared graph names the thesis body already uses (vertex,
+  % smallvertex, edge) onto the canonical look, so Chapter 2, Chapter 4, and any
+  % figure using them cohere with the rest without per-figure edits. This is
+  % thesis-local: the slides load shared/tikz-styles.tex directly and keep their
+  % own sizes. smallvertex holds its size and small font so multi-character split
+  % labels (v^in, v^out) still fit.
+  vertex/.style={gvertex},
+  smallvertex/.style={gvertex, minimum size=16pt, font=\scriptsize},
+  edge/.style={gline},
+}
+
 % Link appearance. hyperref (loaded by the class) otherwise draws a coloured box
 % around every cross-reference, citation, and table-of-contents entry, which is
 % distracting in print. Switch to coloured text with no boxes, using the dark

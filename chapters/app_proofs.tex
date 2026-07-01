@@ -11,15 +11,14 @@ This appendix holds the arguments deferred from the body: the ones that are eith
 % standard edge, aparc a directed arc, apredarc/apdashed forbidden objects.
 % ---------------------------------------------------------------------------
 \tikzset{
-  apx/.style={circle, draw=KULblauw1, fill=KULblauw1!15, minimum size=7pt,
-                inner sep=0pt, line width=1pt},
-  apxlab/.style={smallvertex},
+  apx/.style={gvertex, minimum size=7pt},
+  apxlab/.style={gvertex},
   apz/.style={hnode},
-  apgedge/.style={edge},
-  aptedge/.style={treeedge},
-  aparc/.style={arc},
-  apredarc/.style={redarc},
-  apdashed/.style={forbiddenedge},
+  apgedge/.style={gline},
+  aptedge/.style={line width=1.3pt, KULblauw3b, line cap=round},
+  aparc/.style={gdir},
+  apredarc/.style={gcut},
+  apdashed/.style={gcutedge},
   aplab/.style={edgelabel},
   aptw/.style={treeweight},
   % apname: a free-floating text label with NO white fill box, for vertex names
@@ -1488,7 +1487,7 @@ Fix an ordered pair $(u, v)$. A hyperedge $(T, H)$ with $u \in T$ and $v \in H$
 carries the one-step route $u \to v$ that enters at the tail $u$ and leaves at the
 head $v$. Distinct such hyperedges give routes that share no edge and no internal
 vertex, so if $k$ hyperedges had $u$ in their tail set and $v$ in their head set
-then $\lec(u, v) \ge k$ and $\kap(u, v) \ge k$; feasibility forces $k \le m-1$.
+then $\lec(u, v) \ge k$ and $\kap(u, v) \ge k$, so feasibility forces $k \le m-1$.
 Each hyperedge $(T, H)$ is counted by exactly the $|T|\,|H|$ ordered pairs $(u, v)$
 with $u \in T$ and $v \in H$, so summing the per-pair bound over all pairs gives
 $\sum_{(T,H)} |T|\,|H| \le (m-1)\,n(n-1)$. As $|T| + |H| = r$ with both parts at

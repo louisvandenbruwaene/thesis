@@ -6,9 +6,8 @@ To state the question precisely we need only a few ideas. A \emph{graph} $G$ is 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[scale=1.0,
-    mv/.style={circle, draw=KULblauw1, fill=KULblauw1!15, line width=1pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    me/.style={line width=1.3pt, KULblauw1!80}]
+    mv/.style={gvertex},
+    me/.style={gline}]
   \foreach \i in {0,...,4} {
     \pgfmathsetmacro{\ang}{90 + 72*\i}
     \coordinate (v\i) at (\ang:1.4);
@@ -37,13 +36,12 @@ the largest local edge-connectivity anywhere in $G$. A theorem of Menger \cite{M
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[scale=1.2,
-    mv/.style={circle, draw=KULblauw1, fill=KULblauw1!15, line width=1pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    me/.style={line width=1.0pt, KULblauw1!45},
-    rA/.style={line width=2.8pt, vertexorange, line cap=round},
-    rB/.style={line width=2.8pt, vertexgreen!70!black, line cap=round},
-    rC/.style={line width=2.8pt, vertexpurple, line cap=round},
-    cut/.style={vertexred, densely dashed, line width=1.3pt}]
+    mv/.style={gvertex},
+    me/.style={gfaint},
+    rA/.style={grA},
+    rB/.style={grB},
+    rC/.style={grC},
+    cut/.style={gcutedge}]
   \foreach \i in {0,...,4} {
     \pgfmathsetmacro{\ang}{90 + 72*\i}
     \coordinate (v\i) at (\ang:1.5);
@@ -106,12 +104,10 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two indepe
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    mv/.style={circle, draw=roleMeasure, fill=roleMeasure!15, line width=1pt,
-               minimum size=5.5mm, inner sep=0pt},
-    me/.style={line width=1.1pt, KULblauw1!80},
+    mv/.style={gvertex, minimum size=5.5mm},
+    me/.style={gline},
     ml/.style={metro, line width=2.8pt},
-    stn/.style={circle, draw=black!70, fill=white, line width=1pt,
-                minimum size=5mm, inner sep=0pt}]
+    stn/.style={metrostop, minimum size=5mm}]
 
   % (a) simple graph: K_3 triangle, single edges only
   \begin{scope}[shift={(0,0)}]
@@ -188,11 +184,9 @@ The second axis is the \emph{direction}, a third toggle independent of the other
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
-    mv/.style={circle, draw=roleMeasure, fill=roleMeasure!15, line width=1pt,
-               minimum size=5.5mm, inner sep=0pt},
-    stn/.style={circle, draw=black!70, fill=white, line width=1pt,
-                minimum size=5mm, inner sep=0pt},
-    darc/.style={-{Stealth[length=2.2mm]}, line width=1.3pt, KULblauw1},
+    mv/.style={gvertex, minimum size=5.5mm},
+    stn/.style={metrostop, minimum size=5mm},
+    darc/.style={gdir},
     hstar/.style={metro, line width=2.7pt, -{Stealth[length=2.8mm]},
                   shorten >=3.2mm, shorten <=2.4mm}]
 
@@ -281,18 +275,12 @@ The second axis is the \emph{direction}, a third toggle independent of the other
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.2,
-    mv/.style={circle, draw=KULblauw1, fill=KULblauw1!15,
-               line width=1pt, minimum size=6mm,
-               inner sep=0pt, font=\small},
-    me/.style={-{Stealth[length=2.3mm]}, line width=1.0pt,
-               KULblauw1!45, shorten >=3.5mm},
-    rA/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
-               vertexorange, shorten >=3.5mm},
-    rB/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
-               vertexgreen!70!black, shorten >=3.5mm},
-    rC/.style={-{Stealth[length=2.8mm]}, line width=2.8pt,
-               vertexpurple, shorten >=3.5mm},
-    cut/.style={vertexred, densely dashed, line width=1.4pt}
+    mv/.style={gvertex},
+    me/.style={gdirfaint, shorten >=3.5mm},
+    rA/.style={grAd, shorten >=3.5mm},
+    rB/.style={grBd, shorten >=3.5mm},
+    rC/.style={grCd, shorten >=3.5mm},
+    cut/.style={gcutedge}
 ]
 
 % K5 pentagon layout (angles: 90°, 162°, 234°, 306°, 18°)
@@ -384,12 +372,10 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.0,
-    mv/.style={circle, draw=roleMeasure, fill=roleMeasure!15, line width=1pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    cut/.style={circle, draw=roleDiscover, fill=roleDiscover!22, line width=1.2pt,
-               minimum size=6.5mm, inner sep=0pt, font=\small},
-    pA/.style={line width=1.7pt, roleDiscover},
-    pB/.style={line width=1.7pt, KULblauw1}]
+    mv/.style={gvertex},
+    cut/.style={gvcut, minimum size=6.5mm},
+    pA/.style={line width=1.7pt, roleDiscover, line cap=round},
+    pB/.style={line width=1.7pt, KULblauw1, line cap=round}]
   \node[mv]  (s) at (0,0)      {$s$};
   \node[mv]  (a) at (1.4,0.9)  {};
   \node[mv]  (c) at (1.4,-0.9) {};
@@ -459,12 +445,10 @@ At $m = 5$ the vertex problem genuinely diverges from the edge problem, visible 
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    mv/.style={circle, draw=KULblauw1, fill=KULblauw1!15, line width=1pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    newv/.style={circle, draw=vertexorange, fill=vertexorange!22, line width=1.2pt,
-               minimum size=6mm, inner sep=0pt, font=\small},
-    base/.style={line width=1.7pt, KULblauw1!80},
-    add/.style={line width=1.9pt, vertexorange},
+    mv/.style={gvertex},
+    newv/.style={gvnew},
+    base/.style={gline},
+    add/.style={gline, vertexorange, line width=1.6pt},
     addstep/.style={-{Stealth[length=3mm]}, line width=1pt, black!55}]
 
   % --- Step 1: the starting triangle K_3 on {1,2,3} ---
@@ -525,7 +509,8 @@ Split $V$ into parts $A$ and $B$ with $|A| = \floor{n/2}$ and $|B| = \ceil{n/2}$
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.0,
-    arc/.style={-{Stealth[length=1.7mm]}, line width=0.9pt, KULblauw1!60}]
+    smallleftvertex/.style={gvertex}, smallrightvertex/.style={gvsink},
+    arc/.style={gdirfaint}]
   \begin{scope}[on background layer]
     \node[draw=KULblauw1!25, fill=KULblauw1!6, rounded corners=10pt,
           fit={(0,-1.0) (0,3.5)}, inner sep=8pt, minimum width=12pt] {};
@@ -559,8 +544,9 @@ At $m = 2$ this construction is easiest to picture: the circulant layer is empty
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth,
-    arc/.style={-{Stealth[length=2mm]}, line width=1.0pt, KULblauw1!75},
-    carc/.style={-{Stealth[length=1.7mm]}, line width=1.0pt, vertexorange!80!black}]
+    hubvertex/.style={gvhub}, leftvertex/.style={gvertex},
+    arc/.style={gdir},
+    carc/.style={gdir, vertexorange!80!black}]
 
   % --- left panel: m = 2 (bidirected star, no circulant layer) ---
   \begin{scope}[shift={(-3.2,0)}, scale=0.92]
@@ -631,10 +617,11 @@ Take $A = \{a_1, \dots, a_5\}$ and $B = \{b_1, \dots, b_5\}$ with all $25$ arcs 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.05,
+    smallleftvertex/.style={gvertex}, smallrightvertex/.style={gvsink},
     bgarc/.style={-{Stealth[length=1.4mm]}, line width=0.5pt, KULblauw1!30},
-    directarc/.style={-{Stealth[length=2mm]}, line width=1.5pt, KULblauw1},
-    detourarc/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexgreen!75!black},
-    cycarc/.style={-{Stealth[length=1.8mm]}, line width=1.2pt, vertexorange!90!black}]
+    directarc/.style={grBd, KULblauw1},
+    detourarc/.style={grBd, vertexgreen!75!black},
+    cycarc/.style={-{Stealth[length=1.8mm]}, line width=1.2pt, vertexorange!90!black, line cap=round}]
   \foreach \i in {1,...,5} {
     \node[smallleftvertex]  (a\i) at (0, {2.4-1.05*(\i-1)}) {$a_{\i}$};
   }
