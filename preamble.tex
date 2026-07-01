@@ -405,7 +405,7 @@
   % ---- MULTI: parallel edges are simple edges drawn with a bend (see CURVED) ---
   gmulti/.style={gline},
   % ---- DIRECTED: arcs carry a Stealth head; faint background and cut variants --
-  gdir/.style     ={-{Stealth[length=2.2mm]}, line width=1.1pt, KULblauw1, line cap=round},
+  gdir/.style     ={-{Stealth[length=2.2mm]}, line width=1.1pt, KULblauw1!75, line cap=round},
   gdirfaint/.style={-{Stealth[length=1.8mm]}, line width=0.8pt, KULblauw1!40, line cap=round},
   gcut/.style     ={-{Stealth[length=2.2mm]}, line width=1.2pt, densely dashed, vertexred},
   gcutedge/.style ={line width=1.2pt, densely dashed, vertexred},
@@ -432,6 +432,7 @@
   vertex/.style={gvertex},
   smallvertex/.style={gvertex, minimum size=16pt, font=\scriptsize},
   edge/.style={gline},
+  arc/.style={gdir},
 }
 
 % Link appearance. hyperref (loaded by the class) otherwise draws a coloured box
