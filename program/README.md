@@ -65,7 +65,7 @@ From this `program/` directory:
 
 ```bash
 python erdos915_unified.py            # run the built-in invariant self-check
-python -m unittest discover -s tests  # run the full test suite (82 tests, stdlib only)
+python -m unittest discover -s tests  # run the full test suite (88 tests, stdlib only)
 python make_figures.py                # regenerate the figures in ../figures/
 ```
 
