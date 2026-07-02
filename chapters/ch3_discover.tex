@@ -2,7 +2,7 @@ The previous chapter proved what could be proved by looking at every graph of a 
 
 \section{The wall: how enumeration explodes}
 
-The brute force of \Cref{ch:certify} visits every graph of a given size. The trouble is how many that is. A simple undirected graph on $n$ vertices is a yes-or-no choice on each of the $\binom{n}{2}$ possible edges, so there are $2^{\binom{n}{2}}$ of them. A digraph chooses on each of the $n(n-1)$ ordered pairs, giving $2^{n(n-1)}$, and allowing multiplicities up to a cap $c$ raises the base from two to $c + 1$. These are not numbers that merely grow. They detonate. \Cref{fig:complexity} draws the growth on a logarithmic scale, and the message is the same in every panel: the count passes any reachable budget while $n$ is still in the single digits.
+The brute force of \Cref{ch:certify} visits every graph of a given size. The trouble is how many that is. A simple undirected graph on $n$ vertices is a yes-or-no choice on each of the $\binom{n}{2}$ possible edges, so there are $2^{\binom{n}{2}}$ of them. A digraph chooses on each of the $n(n-1)$ ordered pairs, giving $2^{n(n-1)}$, and allowing multiplicities up to a cap $c$ raises the base from two to $c + 1$. These are not numbers that merely grow. They detonate. \Cref{fig:complexity} draws the growth on a logarithmic scale, where each step up the axis multiplies the count tenfold, and the message is the same in every panel: the count passes any reachable budget while $n$ is still in the single digits.
 
 \begin{figure}[ht]
     \centering
@@ -15,13 +15,13 @@ Three readings of the figure matter for what follows. Adding vertices is the sha
 
 \section{The temperature search}
 
-We want, for fixed $n$ and $m$, a graph with as many edges as possible subject to $\lambda^{\max} \le m - 1$ (or $\kappa^{\max} \le m - 1$ for the vertex variants). The space of graphs on $n$ vertices is enormous and its feasible region is not convex: adding an edge can be harmless until, together with edges added long before, it suddenly creates a forbidden pair. A greedy walk that only ever accepts an improving move stalls at the first such collision, in a graph that is locally maximal but globally far from extremal.
+We want, for fixed $n$ and $m$, a graph with as many edges as possible subject to $\lambda^{\max} \le m - 1$ (or $\kappa^{\max} \le m - 1$ for the vertex variants). The space of graphs on $n$ vertices is enormous and its feasible region has no helpful shape: adding an edge can be harmless until, together with edges added long before, it suddenly creates a forbidden pair. A greedy walk that only ever accepts an improving move stalls at the first such collision, in a graph that is locally maximal but globally far from extremal.
 
 The classical method for this kind of landscape is \emph{simulated annealing}, named after the metallurgical process of cooling a heated material slowly so that its atoms settle into a low-energy crystal rather than a disordered glass. Applied to graphs, annealing escapes local optima by sometimes accepting a worsening move, and by accepting fewer of them as the run proceeds. Each graph $G$ is a state with energy
 \[
     E(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
 \]
-which rewards edges and penalises any excess connectivity. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly through infeasible graphs rather than being walled inside the feasible region, and we return below to why that freedom is worth having. A move toggles one adjacency. The Metropolis rule accepts an improving move always and a worsening move with probability $e^{-\Delta E / T}$, and the temperature $T$ falls geometrically. \Cref{alg:anneal} is the whole loop, the one place in this chapter where a body is worth showing, because the loop \emph{is} the method.
+which rewards edges and penalises any excess connectivity. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly through infeasible graphs rather than being walled inside the feasible region, and we return below to why that freedom is worth having. A move toggles one adjacency. The Metropolis rule accepts an improving move always and a worsening move only with probability $e^{-\Delta E / T}$, a chance that shrinks both as the move gets worse and as the temperature drops, and the temperature $T$ falls geometrically, multiplied by a fixed factor just below one at every step. \Cref{alg:anneal} is the whole loop, the one place in this chapter where a body is worth showing, because the loop \emph{is} the method.
 
 \begin{algorithm}[t]
 \caption{Temperature search for a dense feasible graph}\label{alg:anneal}

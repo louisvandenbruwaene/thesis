@@ -1853,3 +1853,21 @@ instead of 12 overlapping labels on the dense panels; gallery caption updated.
 VERIFY: builds clean throughout (116->118 pp, 0 overfull, 0 undefined); suite 88
 OK (only 1 skip now -- geng tests run since nauty is installed); self-check ALL
 PASSED earlier in the session. Everything committed and pushed to main.
+
+## 2026-07-02 (Fable, final) -- accessibility pass: no prior knowledge assumed
+
+Author: "is all the math accessible enough? Make sure i get it all first time
+around. No prior knowledge needed." Walked the text in reading order checking
+every symbol and term at FIRST use. Glossed, in place and in the author's voice:
+floor/ceiling brackets (at Mader's theorem), the binomial coefficient (K_5
+caption), digraph = directed graph, parity = even/odd of m(n-1), clique defined
+and "chordal scaffolds" -> "clique scaffolds" (term never recurs), mod-N
+wrap-around at the circulant construction, ln n / o(n) / the union bound
+unpacked at the threshold discussion, "relaxation" defined at the MILP,
+"not convex" -> "has no helpful shape", the Metropolis acceptance chance and
+geometric cooling spelled out, logarithmic scale = tenfold steps, Theta(n^2) ->
+"grows like n^2", pair-codegree -> plain counting phrase, cycle/acyclic glossed
+at prop:leonard-m2, "lexicographically smallest" -> "smallest in dictionary
+order", multiset, 2k-regular (both ch4 and roadmap), "cactus value" -> the
+multigraph value of thm:multigraph-edge, D(n,p) defined, semi-degree defined.
+Build clean, 118 pp, 0 overfull, 0 undefined. Fact (a) run still going.

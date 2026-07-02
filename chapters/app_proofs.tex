@@ -525,7 +525,8 @@ Let $m \ge 2$ and let $D_0$ be the one-directional complete bipartite
 multigraph with parts $A$ and $B$, $|A| = p \ge 2$, $|B| = q \ge 2$, and
 $\mu(a, b) = m - 1$ for every $a \in A$, $b \in B$, with no other arcs.
 Let $D$ be obtained from $D_0$ by adding one new vertex $v$ together with
-any multiset of arcs incident to $v$ (multiplicities at most $m-1$). If
+any multiset of arcs incident to $v$, a multiset because parallel copies are
+allowed (multiplicities at most $m-1$). If
 $\lec^{\max}_D \le m - 1$, then $d(v) \le (m-1)\max(p, q)$.
 \end{lemma}
 
@@ -829,8 +830,8 @@ full-multiplicity pure source or sink: $D = 2 \cdot B_{k+1,k}$ or
 $2 \cdot B_{k,k+1}$.
 
 \emph{Even levels} ($n = 2k \ge 10$): equality in the
-averaging step forces $2k$-regularity, hence $D - v$ extremal at $2k-1$ for
-\emph{every} $v$. Odd uniqueness one level down leaves $2 \cdot B_{k,k-1}$
+averaging step forces $2k$-regularity, every vertex at degree exactly $2k$,
+hence $D - v$ extremal at $2k-1$ for \emph{every} $v$. Odd uniqueness one level down leaves $2 \cdot B_{k,k-1}$
 or $2 \cdot B_{k-1,k}$, and \Cref{cor:attachment-equality} with
 $d(v) = 2k = 2\max(k-1, k)$, $q > p$, rebuilds exactly $2 \cdot B_{k,k}$.
 
@@ -1455,7 +1456,7 @@ The lower bound is \Cref{prop:hyper-vertex-lower} at $m = 3$.
 \label{rem:hyper-vertex-m3-scope}
 At $r = 2$ the theorem speaks of multigraphs under the hyperedge-as-gate
 convention, in which parallel edges are distinct one-step routes, giving
-the cactus value $2(n-1)$, complementing the body's convention for graphs,
+the multigraph value $2(n-1)$ of \Cref{thm:multigraph-edge}, complementing the body's convention for graphs,
 where parallel adjacencies count once. The proof of
 \Cref{lem:incidence-rank} leans on the triconnected decomposition exactly
 where $\kap \le 2$ lives. For $m = 4$, the analogous question asks for a rank
@@ -1656,7 +1657,7 @@ since $m / \ln n \to \infty$. By the degree bound (\Cref{lem:degree-bound}) $\le
 \end{proof}
 
 \begin{remark}[The vertex and directed analogues]\label{rem:threshold-analogues}
-Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in $D(n,p)$ the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are the theorems of Bollob\'as \cite{Bollobas84} for $G(n,p)$ and its directed analogue \cite{FriezeKaronski16}, which state that in this regime the global connectivities equal the minimum degree (respectively minimum semi-degree) with high probability, so $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
+Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in the random digraph $D(n,p)$, where each ordered pair's arc is tossed independently with probability $p$, the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are the theorems of Bollob\'as \cite{Bollobas84} for $G(n,p)$ and its directed analogue \cite{FriezeKaronski16}, which state that in this regime the global connectivities equal the minimum degree (respectively the minimum semi-degree, the smaller of a vertex's in- and out-degree) with high probability, so $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
 \end{remark}
 
 \section{Computational transcripts}
