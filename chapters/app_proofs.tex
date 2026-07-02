@@ -17,6 +17,7 @@ This appendix holds the arguments deferred from the body: the ones that are eith
   apgedge/.style={gline},
   aptedge/.style={line width=1.3pt, KULblauw3b, line cap=round},
   aparc/.style={gdir},
+  apfaint/.style={gdirfaint},
   apredarc/.style={gcut},
   apdashed/.style={gcutedge},
   aplab/.style={edgelabel},
@@ -560,9 +561,9 @@ largest.
 \foreach \bnd in {13,0,-13}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
 \node[albl, text=KULblauw1!85] at (0,2.5) {$m-1$ copies $a\!\to\! b$};
 % the rest of the complete one-directional A -> B layer, faint
-\draw[aparc,KULblauw1!40,line width=0.6pt] (a)--(bp);
-\draw[aparc,KULblauw1!40,line width=0.6pt] (ap)--(b);
-\draw[aparc,KULblauw1!40,line width=0.6pt] (ap) to[bend right=8] (bp);
+\draw[apfaint] (a)--(bp);
+\draw[apfaint] (ap)--(b);
+\draw[apfaint] (ap) to[bend right=8] (bp);
 % the new vertex v at bottom centre
 \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (0,-2.0) {};
 \node[apname,below=1pt] at (v) {$v$};
@@ -607,7 +608,9 @@ $A$, and out of $v$ to $B$, so that
 $d(v) = \mathrm{i}_A + \mathrm{i}_B + \mathrm{o}_A + \mathrm{o}_B$.
 Three route patterns are forbidden outright, because each adds an $m$-th
 arc-disjoint route on top of the $m-1$ parallel arcs of a bipartite pair:
-\begin{enumerate}
+% The cases below cite these as "Pattern (1)"--"pattern (3)", so this list
+% carries explicit numbers in place of the decorative global list icon.
+\begin{enumerate}[label=(\arabic*)]
 \item $\mu(a, v) \ge 1$ and $\mu(v, b) \ge 1$: the path $a \to v \to b$
       together with the $m-1$ arcs $a \to b$ gives $\lec(a, b) \ge m$.
 \item $\mu(a, v) \ge 1$ and $\mu(v, a') \ge 1$ with $a' \ne a$: the path

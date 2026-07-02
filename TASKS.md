@@ -211,10 +211,11 @@ a full metroF grey so all three hyperedges read at equal weight; unified the ad-
 FAINT-edge tints (attachment !20, ch1 bgarc !30, ch4 abk !35) to the canonical !40.
 Build clean, 116 pp, 0 overfull, 0 undefined.
 
+- [x] Faint-edge WIDTHS unified 2026-07-02: bgarc (ch1), abk (ch4) and the
+  attachment background (app_proofs, new apfaint alias) all inherit gdirfaint.
+  Rendered pages 21/65/90 checked visually, backgrounds still read as background.
+
 Left for another time (lower value / more disruptive):
-- Faint-edge WIDTHS still vary (0.5/0.6/0.7/0.8/0.9pt) even though the tint is now
-  uniform at !40. A clean fix is one canonical faint style (say gdirfaint) that
-  bgarc/abk/the attachment background all inherit, instead of per-figure widths.
 - fig:cut (ch2 ~730) highlights the two crossing arcs with full KULblauw1 (100%) +
   "very thick", vs the !75 used for ordinary edges everywhere else. It reads as a
   deliberate 2-tone highlight (gray = not counted, blue = counted), so it was left,

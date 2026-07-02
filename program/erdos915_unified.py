@@ -2085,7 +2085,11 @@ def _exhaustive_directed(
             witness.mu[a, b] = 1
     elif seed is not None:
         witness = seed                     # max equalled the seed construction
-    return best_count[0], witness, not timed_out[0]
+    # A completed search always reaches at least the seed's count, so the max
+    # below only matters on a timeout before any recorded leaf: there it lifts
+    # the reported lower bound from seed_value - 1 (the pruning incumbent) to
+    # the seed witness's own arc count, keeping value and witness consistent.
+    return max(best_count[0], seed_value), witness, not timed_out[0]
 
 
 def solve(
@@ -2458,13 +2462,16 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
     """
     ns = list(range(2, max_n + 1))
     hub = [m * (n - 1) for n in ns]                         # linear hub branch
-    bipartite = [(n * n) // 4 + (m - 2) * ((n + 1) // 2) for n in ns]  # quadratic branch
+    # Quadratic branch: the shifted-partition augmented bipartite count
+    # floor((n+m-2)^2/4) of const:augmented-bipartite (at m <= 3 it equals the
+    # balanced-partition count floor(n^2/4) + (m-2)ceil(n/2)).
+    bipartite = [((n + m - 2) ** 2) // 4 for n in ns]
     envelope = [directed_arc_lower_bound(n, m) for n in ns]  # their pointwise max
 
     plt.figure(figsize=(7, 4.3))
     plt.plot(ns, hub, "--", color=_KUL_DARK, label=r"hub branch $m(n-1)$")
     plt.plot(ns, bipartite, "--", color=_WARM,
-             label=r"bipartite branch $\lfloor n^2/4\rfloor+(m-2)\lceil n/2\rceil$")
+             label=r"bipartite branch $\lfloor (n+m-2)^2/4\rfloor$")
     plt.plot(ns, envelope, "-", color=_KUL_BLUE, linewidth=2.4, label="their maximum")
 
     # Mark the crossover: the first n at which the quadratic branch overtakes the

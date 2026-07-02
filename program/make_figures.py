@@ -293,8 +293,12 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         branches=[(matrix_ns, [min(m * (n - 1), n * (n - 1)) for n in matrix_ns],
                    "hub $m(n{-}1)$"),
+                  # Shifted-partition augmented bipartite floor((n+m-2)^2/4)
+                  # (the corrected conj:dir-arc branch; the old balanced count
+                  # floor(n^2/4)+(m-2)ceil(n/2) agrees at m<=3 but is smaller
+                  # at m>=4 and would sit below the conjecture curve at m=6).
                   (matrix_ns,
-                   [min(n * n // 4 + (m - 2) * ((n + 1) // 2), n * (n - 1))
+                   [min((n + m - 2) ** 2 // 4, n * (n - 1))
                     for n in matrix_ns], "bipartite")],
         exact=ex3, search=se3))
 

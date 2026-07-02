@@ -93,7 +93,9 @@ The energy of \Cref{alg:anneal} reads the binding connectivity $\lambda^{\max}(G
 
 \begin{proposition}[Monotonicity of the binding connectivity]\label{prop:monotone}
 Let $G$ be a graph or directed multigraph, and let $G'$ be obtained from $G$ by changing one adjacency by a single unit of multiplicity. Then
-\begin{enumerate}
+% The prose below cites these as "part (1)" and "part (2)", so this list
+% carries explicit numbers in place of the decorative global list icon.
+\begin{enumerate}[label=(\arabic*)]
     \item \textup{(monotonicity)} removing the unit cannot raise $\lambda^{\max}$, and adding it cannot lower $\lambda^{\max}$, and
     \item \textup{(unit step)} adding the unit raises $\lambda^{\max}$ by at most one.
 \end{enumerate}

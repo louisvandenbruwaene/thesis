@@ -1752,3 +1752,46 @@ reduction-note section 0 + h_counterexample.py; directed_arc_m3_extremisers.md a
 the README banner marked SUPERSEDED. NOTE: with A=sources there is no back-arc, so
 this does NOT refute the thesis's own backward-arc lemma (which may take A=sources)
 -- no proved thesis content is affected, and nothing here goes in the thesis.
+
+## 2026-07-02 (Fable) -- full review: proofs re-checked, two plot-code bugs fixed, list numbering restored
+
+Author asked for a full pass: mistakes, mathematical proofs, tikz/plot improvements,
+code audit. Baseline was green throughout (build 116 pp, 0 overfull, 0 undefined; 88
+tests OK / 3 expected skips; self-check ALL 55 CHECKS PASSED).
+
+PROOF CHECK (every statement of app_proofs A.1-A.8 re-derived independently, plus the
+chapter claims): ALL CORRECT. Highlights of what was actually re-verified rather than
+skimmed: the incidence rank lemma end to end (block-cut count, suppression preserving
+kappa, degree bookkeeping under (ii), SPQR leaf analysis incl. the one-virtual-edge
+path bound); thm-hyper-vertex-m2/m3 component sums; the attachment lemma case split
+and its equality corollary; thm:odd-step's averaging identity and the m<=4 window
+((m-3)k+1 <= k+1 < 2k+1); dir-arc m=2 induction remainder ((2k+1)k^2 = (2k-1)(k^2+k)+k);
+Mader slack identity 2|E| = m(n-1) - (S1+S2+S3); near-regular circulant parities;
+Baranyai two-class split with ceil(re/n) <= d; dir-hyper duality + general |T||H| >= r-1
+cap; Chernoff constants. No mathematical errors found anywhere.
+
+CODE AUDIT (checker core, MILP builder incl. validity of every strengthening row,
+annealer fast path exactness, tabu, B&B, both enumerators incl. the degree-gated
+prefix feasibility, canonical form incl. the C memcmp low-byte argument, C guards):
+sound. THREE genuine issues found and FIXED:
+ 1. STALE FORMULA (visible bug at m=6 only): plot_directed_crossover and the
+    make_figures panel-3 "bipartite" branch still used the pre-correction balanced
+    count floor(n^2/4)+(m-2)ceil(n/2); the 2026-06-15 conjecture correction fixed the
+    .tex but missed these two plot sites (they agree at m=3, which is why every test
+    and the shipped crossover figure hid it). Both now use floor((n+m-2)^2/4);
+    directed_crossover.png (legend) and variant_bounds_m6.png (branch line now rides
+    under the red conjecture curve instead of ~4 arcs below it) regenerated.
+ 2. LIST NUMBERING: the preamble's Petersen-icon enumerate label made BOTH of the
+    thesis's enumerates unnumbered, orphaning the prose references "Pattern (1)-(3)"
+    (lem:attachment proof) and "part (1)/(2)" (prop:monotone). Fixed locally with
+    [label=(\arabic*)] on those two lists; the decorative icon stays everywhere else.
+ 3. _exhaustive_directed: on a timeout before any recorded leaf it returned
+    seed_value-1 beside a seed witness of seed_value arcs; return now takes
+    max(best, seed_value). No shipped number affected (all reported runs completed).
+
+TIKZ: cleared the deferred faint-width item (TASKS.md): bgarc/abk/attachment
+background now inherit the canonical gdirfaint; affected pages rendered and checked.
+
+VERIFY: rebuild 116 pp, 0 overfull, 0 undefined refs/cites; suite 88 OK / 3 skips
+after the code edits; regenerated figures inspected (m6 grid consistent, crossover
+legend general-form, values at m=3 unchanged so variant_bounds_m3 left untouched).
