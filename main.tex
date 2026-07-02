@@ -40,7 +40,7 @@
 
 \chapter*{Foreword}
 \addcontentsline{toc}{chapter}{Foreword}
-This thesis studies how many edges or arcs a network can contain when no pair of vertices is allowed to have too many independent routes between them. The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. The work is told as a journey. It begins with the variants whose answers can be proved cleanly by hand, watches those proofs grow longer and more delicate as the model changes, and at the point where a single argument no longer suffices it turns to a unified program. That program stores all twelve variants in one common data structure, so a single piece of code serves them all. It measures connectivity exactly with a maximum-flow routine, the standard way to count the independent routes between two points. It runs a prover that sweeps every graph of a small fixed size and, when none beats a target, reports that sweep as a genuine upper-bound proof. And it runs a search that, like a hot metal cooling slowly into shape, settles random graphs toward the densest ones the rules allow.
+This thesis studies how many edges or arcs a network can contain when no pair of vertices is allowed to have too many independent routes between them. The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. The work is told as a journey. It begins with the variants whose answers can be proved cleanly by hand, watches those proofs grow longer and more delicate as the model changes, and at the point where a single argument no longer suffices it turns to a unified program. That program holds all twelve variants behind one common interface, so a single piece of code serves them all. It measures connectivity exactly with a maximum-flow routine, the standard way to count the independent routes between two points. It runs a prover that sweeps every graph of a small fixed size and, when none beats a target, reports that sweep as a genuine upper-bound proof. And it runs a search that, like hot metal cooling slowly into shape, settles random graphs toward the densest ones the rules allow.
 
 I am grateful to my supervisor, Prof.\ Stijn Cambie, and my daily advisor for their guidance, corrections, and mathematical feedback throughout the project. I thank my promotor, Prof.\ Jan Goedgebeur, whose suggestion of the \texttt{nauty} generation pipeline sharply accelerated the directed enumeration. I also thank the people who discussed early versions of the arguments, checked examples, or helped clarify the presentation. Above all I thank my girlfriend Sara, whose patience and encouragement carried me through the long stretches of this work. Any remaining mistakes are my own.
 
@@ -64,7 +64,7 @@ Mader proved that, for simple graphs and $n\ge m\ge2$,
 \]
 This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, and hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint), and the presence or absence of directions. Sampled random graphs $G(n,p)$ run alongside throughout as a lens on the typical case rather than as a separate model.
 
-The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the random-graph threshold $p^*=m/n$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-3$. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. The centerpiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a search guided by edge sensitivity, run as both simulated annealing and tabu search, discovers extremal graphs. The program rediscovers, each in its own variant, the double star (undirected multigraphs at $m=2$), the directed hub, the one-directional bipartite digraph, and the augmented-bipartite construction (the directed cases), certifies the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ for $n\le6$, and frames the remaining open problems on the directed frontier.
+The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the random-graph threshold $p^*=m/n$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-3$. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. The centrepiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a search guided by edge sensitivity, run as both simulated annealing and tabu search, discovers extremal graphs. The program rediscovers, each in its own variant, the double star (undirected multigraphs at $m=2$), the directed hub, the one-directional bipartite digraph, and the augmented-bipartite construction (the directed cases), certifies the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ for $n\le6$, and frames the remaining open problems on the directed frontier.
 
 The interplay then pays back in the other direction. The hypergraph vertex problem is settled completely at $m=2$ and $m=3$: $k_m^{(r)}(n)=\bigl\lfloor (m-1)(n-1)/(r-1) \bigr\rfloor$ for every uniformity $r$, the $m=3$ case through a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. On the directed side, an unconditional attachment lemma and a conditional odd-step theorem reduce the entire directed multigraph problem at $m=3$, value and extremal characterisation for all $n$, to two finite, machine-checkable statements about multigraphs on seven vertices, and directed hypergraphs receive their first bounds, quadratic in $n$.
 
@@ -72,6 +72,9 @@ The interplay then pays back in the other direction. The hypergraph vertex probl
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}
 \begin{tabular}{ll}
 GH & Gomory-Hu \\
+MILP & mixed-integer linear program \\
+SA & simulated annealing \\
+SPQR & the triconnected decomposition tree (series, parallel, rigid pieces) \\
 w.h.p. & with high probability \\
 \end{tabular}
 
@@ -82,6 +85,7 @@ $G=(V,E)$ & graph with vertex set $V$ and edge set $E$ \\
 $D=(V,A)$ & directed graph with vertex set $V$ and arc set $A$ \\
 $n$ & number of vertices \\
 $m$ & forbidden-connectivity parameter, with all local connectivities at most $m-1$ \\
+$r$ & hyperedge size (every hyperedge spans $r$ vertices) \\
 $\lambda_G(u,v)$ & maximum number of edge-disjoint $u$-$v$ paths \\
 $\lambda_G^{\max}$ & maximum local edge-connectivity over all vertex pairs \\
 $\kappa_G(u,v)$ & maximum number of internally vertex-disjoint $u$-$v$ paths \\
@@ -92,6 +96,9 @@ $k_m(n)$ & simple undirected vertex-disjoint extremal function \\
 $\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
 $L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
 $k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
+$\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform hypergraph edge- and vertex-disjoint extremal functions \\
+$M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$ \\
+$B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
 $\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
 $\sigma(e)$ & edge sensitivity $\lambda^{\max}(G)-\lambda^{\max}(G-e)$ \\
 $G(n,p)$ & binomial random graph

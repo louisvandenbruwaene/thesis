@@ -13,7 +13,7 @@ Two of the open directions are directed, and they share a structure worth statin
 
 \Cref{conj:dir-arc} is proved as a lower bound for all $m$, and it is a theorem at $m = 2$ by \Cref{thm:dir-arc-m2-exact}. Past $m = 2$ it sits squarely in the second regime of the trichotomy of \Cref{sec:trichotomy}: certified by exhaustion at the small sizes \code{solve} can close for $m = 3$, conjectured by the temperature search beyond, and never beaten anywhere the search reaches. What is missing is a general upper bound for $m \ge 3$, and the obstacle is structural rather than computational.
 
-The route to the upper bound is to show that an extremal digraph, once it is past the hub regime, must look like the augmented bipartite construction: its vertices split into a part $A$ and a part $B$ with every arc running $A \to B$, and $B$ thickened only mildly. Three structural facts, each proved in \Cref{app:proofs}, push in this direction. Out-neighbourhoods are mutually unreachable, second out-neighbourhoods are disjoint, and a complete $A \to B$ partition forces each vertex of $B$ to absorb at most $m - 2$ arcs from inside $B$. With the partition free to vary, the total arc count $|B|(|A| + m - 2) = |B|(n - |B| + m - 2)$ is maximised at $|B| = \ceil{(n+m-2)/2}$, which gives $\floor{(n+m-2)^2/4}$, precisely the conjectured upper bound.
+The route to the upper bound is to show that an extremal digraph, once it is past the hub regime, must look like the augmented bipartite construction: its vertices split into a part $A$ and a part $B$ with every arc running $A \to B$, and $B$ thickened only mildly. Three structural facts, each proved in \Cref{app:proofs}, push in this direction. At $m = 2$ out-neighbourhoods are mutually unreachable and second out-neighbourhoods are disjoint, and for every $m$ a complete $A \to B$ partition forces each vertex of $B$ to absorb at most $m - 2$ arcs from inside $B$. With the partition free to vary, the total arc count $|B|(|A| + m - 2) = |B|(n - |B| + m - 2)$ is maximised at $|B| = \ceil{(n+m-2)/2}$, which gives $\floor{(n+m-2)^2/4}$, precisely the conjectured upper bound.
 
 \begin{figure}[ht]
 \centering
@@ -92,9 +92,9 @@ A sharper route now bypasses that conjecture at $m = 3$, and the way it does so 
 
 \Cref{conj:min-degree} is thereby off the critical path for $m = 3$, replaced by two machine-checkable targets: a MILP infeasibility check for fact (a), and an exhaustive enumeration of degree-bounded multigraphs for fact (b). Both stay within memory but remain runtime-limited, and neither has closed yet.
 
-The linear branch turns out to be richer than the double star first suggested. Every doubled bidirected spanning tree is extremal, confirmed exhaustively at $n = 4$ and $5$, and several distinct extremisers tie at $24$ arcs for $n = 7$. Sifting and classifying them is precisely what the enumeration must do.
+The linear branch turns out to be richer than the double star first suggested. Every doubled bidirected spanning tree is extremal, confirmed exhaustively at $n = 4$ and $5$, and the saturated attachment lemma (\Cref{lem:saturated-attachment}) explains why: the doubled trees are exactly the closure of a single doubled edge under maximal attachment. Several distinct extremisers tie at $24$ arcs for $n = 7$, and sifting and classifying them is precisely what the enumeration must do.
 
-For $m \ge 4$ the conditional step still yields the value but uniqueness no longer propagates through odd levels, and for $m \ge 5$ even the value step stalls. These residual gaps are stated precisely among the open problems below. They are finite, identified targets rather than mysteries, and natural goals for the next round of certified computation.
+For $m \ge 4$ the conditional step still yields the value but uniqueness no longer propagates through odd levels, and for $m \ge 5$ even the value step stalls. These residual gaps are stated in full among the open problems below. They are finite, identified targets rather than mysteries, and natural goals for the next round of certified computation.
 
 \section{Two principal phenomena}
 

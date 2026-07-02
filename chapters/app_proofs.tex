@@ -721,7 +721,9 @@ some vertex must sit exactly on it, and deleting that one lands precisely on
 the even extremiser $(m-1)\cdot B_{k,k}$ of (ii). The attachment lemma then
 caps how much that vertex could have carried, below what the surplus
 requires, and the contradiction forces the surplus to vanish. We now make
-this precise. For the upper bound let $D$ on
+this precise.
+
+For the upper bound let $D$ on
 $n = 2k+1$ vertices have $\lec^{\max} \le m-1$ and
 $|A(D)| = (m-1)k(k+1) + j$ with $j \ge 1$. Deleting any vertex $v$ leaves a
 feasible multigraph on $2k$ vertices, so by (i)
@@ -817,27 +819,33 @@ multiplicity, one per choice of partner.
 the odd case no longer needs a minimum-degree statement, only the extremal
 \emph{characterisation} one level down, and for $m = 3$ that
 characterisation propagates along the same induction in both parities.
+
 \emph{Odd levels} ($n = 2k+1 \ge 9$): an extremiser has $|A| = 2k(k+1)$
 arcs and every degree at least $2k$ (deletion bound). All degrees
 $\ge 2k+1$ is impossible since $(2k+1)^2 > 4k(k+1) = \sum_v d(v)$, so some
 $d(v) = 2k$ exactly, $D - v$ is the even extremiser $2 \cdot B_{k,k}$, and
 \Cref{cor:attachment-equality} (the $p = q$ case) forces $v$ to rejoin as a
 full-multiplicity pure source or sink: $D = 2 \cdot B_{k+1,k}$ or
-$2 \cdot B_{k,k+1}$. \emph{Even levels} ($n = 2k \ge 10$): equality in the
+$2 \cdot B_{k,k+1}$.
+
+\emph{Even levels} ($n = 2k \ge 10$): equality in the
 averaging step forces $2k$-regularity, hence $D - v$ extremal at $2k-1$ for
 \emph{every} $v$. Odd uniqueness one level down leaves $2 \cdot B_{k,k-1}$
 or $2 \cdot B_{k-1,k}$, and \Cref{cor:attachment-equality} with
 $d(v) = 2k = 2\max(k-1, k)$, $q > p$, rebuilds exactly $2 \cdot B_{k,k}$.
+
 \emph{The seam at $n = 8$}: the same regularity argument runs from $n = 7$,
 where the branches tie at $24$ arcs and several extremisers coexist. On the
-linear branch the extremisers are richer than the double star alone: every
+linear branch the extremisers are richer than the double star alone. Every
 \emph{bidirected spanning tree at full multiplicity} $m-1$ is feasible with
-$2(n-1)(m-1)$ arcs (the only arcs crossing the bipartition under a tree
-edge are that edge's own $m-1$ copies, so every local connectivity is
-exactly $m-1$), and exhaustive enumeration
+$2(n-1)(m-1)$ arcs: deleting a tree edge splits the vertices in two, the
+only arcs from one side to the other are that edge's own $m-1$ copies, and
+the $m-1$ routes along the tree path meet that cut, so every local
+connectivity is exactly $m-1$ and the doubled trees are everywhere-saturated
+in the sense of \Cref{lem:saturated-attachment}. Exhaustive enumeration
 (\code{enumerate\_extremal\_directed\_multigraphs}) confirms that at
-$n = 4, 5$, $m = 3$ these doubled trees are the \emph{only} extremisers
-($2$ and $3$ of them, matching the tree shapes). A deleted vertex of the
+$n = 4, 5$, $m = 3$ these doubled trees are the \emph{only} extremisers,
+$2$ and $3$ of them, matching the tree shapes. A deleted vertex of the
 $8$-regular $D$ leaves a $24$-arc extremiser with maximum degree at most
 $8$: among doubled trees only the doubled path qualifies (tree degree
 $\le 2$), the double star (hub degree $24$) being excluded. The doubled path
@@ -848,29 +856,34 @@ would have to be, weight $4$ on each path end, closing the path into the
 doubled bidirected cycle $C_8$ with $\lec = 4 > 2$: the collapse the lemma
 rules out wholesale.
 So every deletion is bipartite-type, the attachment equality applies, and
-$D = 2 \cdot B_{4,4}$ again. The whole $m = 3$ problem therefore rests on
+$D = 2 \cdot B_{4,4}$ again.
+
+The whole $m = 3$ problem therefore rests on
 two finite integral statements about multigraphs with multiplicities in
 $\{0,1,2\}$:
-(a) $L_3^{\mathrm{dir}}(7) = 24$, equivalently $M^{*}(7) = 12$, and
-(b) every $24$-arc feasible multigraph on $7$ vertices with maximum degree
-at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled
-bidirected path $P_7$.
+\begin{itemize}
+    \item[(a)] $L_3^{\mathrm{dir}}(7) = 24$, equivalently $M^{*}(7) = 12$, and
+    \item[(b)] every $24$-arc feasible multigraph on $7$ vertices with maximum
+    degree at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled
+    bidirected path $P_7$.
+\end{itemize}
 Both targets sit at sizes the certifier and the enumerator can
-realistically reach with the strengthened relaxation now wired into
-\code{prove\_directed\_multigraph} (\code{use\_deletion\_cuts}: deletion
-bounds from the certified $M^{*}(5)$, $M^{*}(6)$ and the degree-pair
-inequality $d^{+}(s) + d^{-}(t) - w(s,t) \le n-1$, all proved valid), fact~(a)
-being the single feasibility query \code{prove\_integral\_arc\_bound(7, 3, 25)}
-and fact~(b) the run
-\code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24,
-max\_degree=8)}, the generation enumerator of \Cref{ch:certify}, which prunes
-with proved bounds only and is therefore a sound complete search at $n = 7$,
-where the in-house depth-first twin is not. Its $n = 6$ companion run
+realistically reach. Fact~(a) is the single feasibility query
+\code{prove\_integral\_arc\_bound(7, 3, 25)}, run with the strengthened
+relaxation now wired into \code{prove\_directed\_multigraph}
+(\code{use\_deletion\_cuts}: deletion bounds from the certified $M^{*}(5)$
+and $M^{*}(6)$ and the degree-pair inequality
+$d^{+}(s) + d^{-}(t) - w(s,t) \le n-1$, all proved valid). Fact~(b) is the
+run \code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3,
+24, max\_degree=8)} on the generation enumerator of \Cref{ch:certify}, which
+prunes with proved bounds only and is therefore a sound complete search at
+$n = 7$, where the in-house depth-first twin is not. Its $n = 6$ companion run
 (target $20$, maximum degree $8$) has completed and returns exactly one
 class, the doubled bidirected path $P_6$, exactly the pattern the seam
 argument uses one level up and the first of these finite computations to be
-machine-settled. For
-$m \ge 4$ one hole remains: at an odd extremal level the counting no longer
+machine-settled.
+
+For $m \ge 4$ one hole remains: at an odd extremal level the counting no longer
 forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ is
 arithmetically consistent once $k(m-3) \ge 1$), so the uniqueness statement
 does not yet propagate through odd levels, although the \emph{value} at odd
