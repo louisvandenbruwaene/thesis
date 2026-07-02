@@ -842,10 +842,12 @@ $2(n-1)(m-1)$ arcs: deleting a tree edge splits the vertices in two, the
 only arcs from one side to the other are that edge's own $m-1$ copies, and
 the $m-1$ routes along the tree path meet that cut, so every local
 connectivity is exactly $m-1$ and the doubled trees are everywhere-saturated
-in the sense of \Cref{lem:saturated-attachment}. Exhaustive enumeration
-(\code{enumerate\_extremal\_directed\_multigraphs}) confirms that at
-$n = 4, 5$, $m = 3$ these doubled trees are the \emph{only} extremisers,
-$2$ and $3$ of them, matching the tree shapes. A deleted vertex of the
+in the sense of \Cref{lem:saturated-attachment}. Exhaustive enumeration confirms that at $m = 3$ these doubled trees are the
+\emph{only} extremisers for $n = 4, 5, 6$ alike, with $2$, $3$, and $6$
+classes matching the tree shapes exactly: the in-house enumerator
+(\code{enumerate\_extremal\_directed\_multigraphs}) settles $n \le 5$, and
+the sound generation enumerator has now completed the uncapped $n = 6$
+classification as well. A deleted vertex of the
 $8$-regular $D$ leaves a $24$-arc extremiser with maximum degree at most
 $8$: among doubled trees only the doubled path qualifies (tree degree
 $\le 2$), the double star (hub degree $24$) being excluded. The doubled path
@@ -877,11 +879,22 @@ $d^{+}(s) + d^{-}(t) - w(s,t) \le n-1$, all proved valid). Fact~(b) is the
 run \code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3,
 24, max\_degree=8)} on the generation enumerator of \Cref{ch:certify}, which
 prunes with proved bounds only and is therefore a sound complete search at
-$n = 7$, where the in-house depth-first twin is not. Its $n = 6$ companion run
-(target $20$, maximum degree $8$) has completed and returns exactly one
-class, the doubled bidirected path $P_6$, exactly the pattern the seam
-argument uses one level up and the first of these finite computations to be
-machine-settled.
+$n = 7$, where the in-house depth-first twin is not. That run has now
+completed, in about seven hours across ten processor cores, and it returns
+exactly three isomorphism classes: $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, and
+the doubled bidirected path $P_7$, each re-verified by the exact checker.
+\emph{Fact~(b) is therefore settled by machine}, and the whole $m = 3$
+directed multigraph problem now rests on fact~(a) alone. The $n = 6$
+companion run (target $20$, maximum degree $8$) completed the same way and
+returns exactly one class, the doubled bidirected path $P_6$, the pattern
+the seam argument uses one level up. The uncapped $n = 6$ classification
+also pays directly into fact~(a): a hypothetical $25$-arc feasible
+multigraph on $7$ vertices has every degree at least $5$ by the deletion
+bound against $L_3^{\mathrm{dir}}(6) = 20$, and a vertex of degree exactly
+$5$ would delete to a $20$-arc extremiser on six vertices, a doubled tree,
+to which \Cref{lem:saturated-attachment} forbids any attachment of more
+than $4$ arcs. Any witness against fact~(a) therefore has minimum total
+degree at least $6$.
 
 For $m \ge 4$ one hole remains: at an odd extremal level the counting no longer
 forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ is

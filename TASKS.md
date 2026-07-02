@@ -30,30 +30,32 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
 ## MACHINE TARGETS (geng installed 2026-07-02 via brew; 10-core box)
 - [x] n=6, target 20, max_degree=8: DONE 2026-07-02, exactly 1 class, the
       doubled bidirected P_6 (352 s). Closes the input of fact (b)'s degree-4 case.
-- [ ] **Fact (b)**: n=7, target 24, max_degree=8 via
-      enumerate_extremal_directed_multigraphs_via_generation (sound at all n).
-      IN PROGRESS 2026-07-02 (~1-1.5 h expected on 10 cores). Expected classes:
-      2B(3,4), 2B(4,3), doubled P_7.
-- [ ] **Uncapped n=6, target 20** (no degree cap): would prove the n=6 extremal
-      set is exactly the 6 doubled spanning trees (currently known only n<=5)
-      and feed fact (a)'s d(v)=5 kill. QUEUED after fact (b).
-      `python -c "from erdos915_unified import enumerate_extremal_directed_multigraphs_via_generation as e; r=e(6,3,20); print(len(r)); [print(M) for M in r]"`
+- [x] **Fact (b) PROVED 2026-07-02**: n=7, target 24, max_degree=8 via the
+      sound generation enumerator, 25895 s on 10 cores: exactly 3 classes,
+      2B(3,4), 2B(4,3), doubled P_7, each re-verified by the exact checker.
+      Recorded in rem:odd-step-roadmap, ch2, ch4, contribution statement.
+- [x] **Uncapped n=6 PROVED 2026-07-02** (2187 s): exactly the 6 doubled
+      spanning trees. With the saturated attachment lemma this makes the
+      min-degree >= 6 bound on any fact-(a) witness unconditional (recorded
+      in rem:odd-step-roadmap).
 - [ ] **Fact (a) by machine**: uncapped n=7, target 25; EMPTY output = proof of
-      L_3^dir(7)=24 and the whole m=3 directed multigraph problem closes with
-      fact (b). Runtime unknown (no degree cap, prefix M*(j<=6) prunes only);
-      try after the queue above, kill if it thrashes.
+      L_3^dir(7)=24 and the whole m=3 directed multigraph problem CLOSES.
+      IN PROGRESS 2026-07-02 (launched after the n=6 run; runtime unknown,
+      log program/logs/geng_uncapped_20260702.log). Resume command:
       `python -c "from erdos915_unified import enumerate_extremal_directed_multigraphs_via_generation as e; r=e(7,3,25); print(len(r))"`
 - [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
       eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
       CBC cannot close it (measured 2026-06-16).
 
-## WRITE-UP QUEUE (after the runs above land)
-- [ ] Integrate the saturated attachment lemma into app_proofs (full proof in
-      research_notes/saturated_attachment_lemma.md), shorten the n=8 seam and
-      the fact (b) degree-4 case in rem:odd-step-roadmap, and record the n=6
-      cap-8 classification as completed rather than expected.
-- [ ] If fact (b) lands: update rem:odd-step-roadmap + ch4 open problems
-      (fact (b) machine-verified, only fact (a) open) + tab:summary status.
+## WRITE-UP QUEUE
+- [x] Saturated attachment lemma integrated (lem:saturated-attachment, A.30) and
+      the seam shortened; fact (b) + uncapped n=6 recorded across
+      rem:odd-step-roadmap, ch2, ch4, tab:summary caption, contribution
+      statement (all 2026-07-02).
+- [ ] If fact (a) lands (run above): upgrade conj status to THEOREM for the
+      m=3 directed multigraph problem across tab:summary, ch4 open problems,
+      rem:odd-step-roadmap, contribution statement, and the lay summary's
+      closing sentence.
 
 ## Deferred figure polish (from the A.5-A.8 pass; two items left deliberately)
 - [x] Faint-edge widths unified 2026-07-02 (bgarc/abk/attachment inherit gdirfaint).

@@ -1795,3 +1795,61 @@ background now inherit the canonical gdirfaint; affected pages rendered and chec
 VERIFY: rebuild 116 pp, 0 overfull, 0 undefined refs/cites; suite 88 OK / 3 skips
 after the code edits; regenerated figures inspected (m6 grid consistent, crossover
 legend general-form, values at m=3 unchanged so variant_bounds_m3 left untouched).
+
+
+## 2026-07-02 (Fable, continued) -- FACT (b) PROVED by machine; saturated attachment lemma; uncapped n=6 classified
+
+Author: keep going (tasks, figure cleanup esp. appendix, prove/disprove, improve text).
+
+MACHINE RESULTS (nauty installed via brew; sound geng enumerator, 10 cores):
+ 1. n=6 target 20 cap 8: exactly 1 class, doubled P_6 (352 s). Closes the June
+    cancellation.
+ 2. **FACT (b) PROVED**: n=7 target 24 cap 8, 25895 s: exactly 3 classes,
+    2B(3,4), 2B(4,3), doubled P_7 -- precisely the predicted set, each
+    re-verified with the exact checker (24 arcs, lambda=2, degree profiles,
+    canonical match against an independently built doubled P_7). The m=3
+    directed multigraph problem now rests on fact (a) alone.
+ 3. Uncapped n=6 target 20: exactly 6 classes in 2187 s = the 6 doubled
+    spanning trees (all verified bidirected/tree-support/mult-2/lambda=2;
+    5 degree sequences with the (1,1,1,2,2,3) pair distinguishing caterpillar
+    vs spider). NEW classification, previously known only n<=5.
+ 4. Fact (a) attempt LAUNCHED: uncapped n=7 target 25 (empty = L_3(7)=24 =
+    the whole m=3 problem closes). Running; resume command in TASKS.md.
+
+NEW LEMMA (proved + exhaustively verified + integrated as lem:saturated-attachment,
+A.30): attaching one vertex to any everywhere-saturated multigraph (doubled trees
+in particular) caps d(v) <= 2(m-1); equality = grow the tree by one full leaf.
+Verification: scripts/saturated_attachment_check.py (all 3^(2n) patterns over all
+nine doubled trees on 5-6 vertices; max feasible degree exactly 4; equality shapes
+exactly the n single-partner attachments). Consequences: the n=8 seam argument is
+now a one-liner (fig:seam-c8 kept as illustration), the doubled-tree closure is
+explained structurally, and with the uncapped n=6 classification any 25-arc witness
+against fact (a) has min degree >= 6 (recorded in rem:odd-step-roadmap; the d(v) in
+{6,7} residue needs a 19/18-arc near-extremal classification, see the research note).
+
+THESIS UPDATES: rem:odd-step-roadmap (fact (b) settled, sound-tool naming fixed --
+the DFS enumerator was cited for a job it is only sound for at n<=6), ch2
+generation section, ch4 body + open problems + tab:summary caption, contribution
+statement. research_notes/saturated_attachment_lemma.md + script; notes README
+indexed; TASKS.md rewritten per its delete-after-logging rule.
+
+TEXT PASS (author asked to improve explanations everywhere): fixed the garbled
+m>n sentence in ch1, centerpiece->centrepiece, "a hot metal"->"hot metal" (foreword
++ lay summary), Menger caption now explains why no 2-edge cut exists, honest
+phrasing for "one common data structure" (hypergraph is list-stored) and for the
+two m=2 structural props in ch4. Paragraph breaks at natural seams: ch1 direction
+axis, hypergraph intro, G(n,p) discussion; ch2 helper-point + scaling; ch3
+trichotomy colours; thm:odd-step proof; rem:odd-step-roadmap now five movements
+with the (a)/(b) facts as a labelled list. Abbreviations + symbols tables extended
+(MILP, SA, SPQR; r, hypergraph functions, M*(n), B_{p,q}). Word-tic clusters
+thinned (precisely/honest repeats). program/README test count 82->88.
+
+FIGURES (appendix pass): sub-captions ragged-right globally (fixes stretched
+justified text in narrow A.2/A.3 panels); star-hypertree hubs orange in ch1+A.6
+(A.6 caption already claimed orange -- caption/figure mismatch found and fixed);
+extremal gallery states uniform multiplicity once per panel ("all arcs x2/x3")
+instead of 12 overlapping labels on the dense panels; gallery caption updated.
+
+VERIFY: builds clean throughout (116->118 pp, 0 overfull, 0 undefined); suite 88
+OK (only 1 skip now -- geng tests run since nauty is installed); self-check ALL
+PASSED earlier in the session. Everything committed and pushed to main.

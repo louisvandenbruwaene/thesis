@@ -110,13 +110,16 @@ existing vertex, which generates exactly the doubled bidirected trees. QED
 
 4. **Toward fact (a) (L_3^dir(7) = 24).** In a hypothetical 25-arc feasible
    multigraph on 7 vertices, every degree is >= 25 - 20 = 5 (deletion), and a
-   degree-5 vertex would delete to a 20-arc extremiser on 6 vertices. IF the
-   full (uncapped) n = 6 classification is exactly the doubled trees, the
-   lemma gives d(v) <= 4 < 5, so min degree >= 6; the remaining cases d(v) in
-   {6, 7} delete to 19- and 18-arc feasible multigraphs, which are NOT
-   extremal, so closing fact (a) by hand along this route needs a
-   near-extremal (19/18-arc) classification at n = 6. Left open here; the
-   uncapped n = 6 enumeration run is the first step and is queued.
+   degree-5 vertex would delete to a 20-arc extremiser on 6 vertices. The
+   uncapped n = 6 classification COMPLETED 2026-07-02 (sound geng enumerator,
+   2187 s): exactly the 6 doubled spanning trees, nothing else. The lemma
+   then gives d(v) <= 4 < 5, so UNCONDITIONALLY a witness against fact (a)
+   has min total degree >= 6 (recorded in rem:odd-step-roadmap). The
+   remaining cases d(v) in {6, 7} delete to 19- and 18-arc feasible
+   multigraphs, which are not extremal, so finishing fact (a) by hand along
+   this route needs a near-extremal (19/18-arc) classification at n = 6.
+   The direct machine route (uncapped n = 7, target 25, empty = fact (a))
+   is running.
 
 ## Verification
 
