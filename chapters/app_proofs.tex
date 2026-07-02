@@ -741,6 +741,77 @@ $D - v$ has exactly $(m-1)k^2$ arcs. By (ii), $D - v = (m-1) \cdot B_{k,k}$, and
 contradiction. Hence $j \le 0$.
 \end{proof}
 
+The attachment lemma bounds the degree of a vertex glued onto the
+\emph{bipartite} extremiser. The linear branch has an exact analogue, worth
+stating once for the whole family it governs. Call a directed multigraph
+\emph{everywhere-saturated} at level $m$ when every ordered pair of distinct
+vertices has local connectivity exactly $m-1$. The doubled bidirected
+spanning trees at multiplicity $m-1$, the extremisers of the linear branch,
+are exactly such graphs: the $m-1$ routes between two vertices run along the
+doubled tree path, and cutting one doubled edge of that path is a cut of
+$m-1$ arcs.
+
+\begin{lemma}[Saturated attachment]\label{lem:saturated-attachment}
+Let $m \ge 2$ and let $D_0$ be a directed multigraph on at least two vertices
+with $\lec_{D_0}(x, y) = m-1$ for every ordered pair of distinct vertices.
+Let $D$ be obtained from $D_0$ by adding one new vertex $v$ together with any
+multiset of arcs incident to $v$. If $\lec^{\max}_D \le m-1$, then
+$d(v) \le 2(m-1)$. If $d(v) = 2(m-1)$, then every arc at $v$ joins $v$ to
+one single vertex $u$, with $\mu(v, u) = \mu(u, v) = m-1$, and $D$ is again
+everywhere-saturated.
+\end{lemma}
+
+\begin{proof}
+\emph{No mixed pair.} Suppose $v$ has an in-arc from $u$ and an out-arc to
+$w$ with $u \ne w$. By Menger and saturation $D_0$ carries $m-1$ pairwise
+arc-disjoint $u$-to-$w$ routes, and the route $u \to v \to w$ uses only arcs
+incident to $v$, so it is arc-disjoint from all of them and
+$\lec_D(u, w) \ge m$, a contradiction. Hence $v$ is a pure source, a pure
+sink, or every arc at $v$ touches one single vertex $u$.
+
+\emph{A pure source has $d(v) \le m-1$.} Let $t = \sum_x \mu(v, x)$ and fix
+$u$ with $\mu(v, u) \ge 1$. Any cut $(S, \bar S)$ with $v \in S$ and
+$u \in \bar S$ has capacity
+$\sum_{x \in \bar S} \mu(v, x) + e_{D_0}(S \setminus \{v\}, \bar S)$. If $S$
+contains a vertex $x$ of $D_0$, the second term is at least
+$\lec_{D_0}(x, u) = m-1$ and the first is at least $\mu(v, u)$. If
+$S = \{v\}$, the capacity is $t$. Every cut therefore has capacity at least
+$\mu(v, u) + \min\bigl(t - \mu(v, u),\ m-1\bigr)$, and by max-flow min-cut so
+does $\lec_D(v, u)$, which feasibility caps at $m-1$. Were
+$t - \mu(v, u) \ge m-1$, this would force $\mu(v, u) = 0$, a contradiction,
+so $t - \mu(v, u) < m-1$ and the bound reads $t \le m-1$.
+
+\emph{A pure sink has $d(v) \le m-1$.} Reverse every arc: the reverse of an
+everywhere-saturated multigraph is everywhere-saturated, a pure sink becomes
+a pure source, and the previous step applies.
+
+\emph{A single partner.} If every arc at $v$ touches one vertex $u$, then
+parallel arcs are already that many arc-disjoint one-step routes, so
+$\mu(v, u) \le m-1$ and $\mu(u, v) \le m-1$, giving $d(v) \le 2(m-1)$.
+
+\emph{Equality.} Since $2(m-1) > m-1$, a degree of $2(m-1)$ rules out the
+pure cases, so $v$ has a single partner at full multiplicity both ways. The
+result is feasible and again everywhere-saturated: a route through $v$ must
+enter and leave through $u$, so it adds nothing to any flow between old
+vertices, and $\lec_D(x, v) = \min\bigl(\lec_{D_0}(x, u), \mu(u, v)\bigr)
+= m-1$ for every old $x$, symmetrically for $\lec_D(v, x)$.
+\end{proof}
+
+\begin{remark}[The linear branch grows one leaf at a time]
+\label{rem:saturated-closure}
+The equality case of \Cref{lem:saturated-attachment} attaches a new leaf to
+an arbitrary vertex at full multiplicity, and that is the only attachment
+reaching $2(m-1)$. Iterating from a single doubled edge, itself
+everywhere-saturated on two vertices, generates exactly the doubled
+bidirected spanning trees, so the extremal family of the linear branch is
+closed under maximal attachment and grows one leaf at a time. The program
+confirms the lemma exhaustively at $m = 3$: over every doubled tree on five
+and six vertices and every one of the $3^{2n}$ possible attachment patterns,
+the densest feasible attachment has degree exactly $4 = 2(m-1)$, and the
+degree-$4$ patterns are precisely the single-partner attachments at full
+multiplicity, one per choice of partner.
+\end{remark}
+
 \begin{remark}[The $m = 3$ chain, sharpened]\label{rem:odd-step-roadmap}
 \Cref{thm:odd-step} removes \Cref{conj:min-degree} from the critical path:
 the odd case no longer needs a minimum-degree statement, only the extremal
@@ -769,13 +840,13 @@ $n = 4, 5$, $m = 3$ these doubled trees are the \emph{only} extremisers
 ($2$ and $3$ of them, matching the tree shapes). A deleted vertex of the
 $8$-regular $D$ leaves a $24$-arc extremiser with maximum degree at most
 $8$: among doubled trees only the doubled path qualifies (tree degree
-$\le 2$), the double star (hub degree $24$) being excluded. If $D - v$ were
-the doubled path $P_7$, the degree count would force $v$ to attach with
-weight $4$ to each path end, i.e.\ bidirected at full multiplicity, making
-$D$ the doubled bidirected cycle $C_8$, which is infeasible since the two
-doubled directions around the cycle give $\lec = 4 > 2$ between any pair.
-\Cref{fig:seam-c8} draws this collapse of the doubled path into the
-infeasible doubled cycle.
+$\le 2$), the double star (hub degree $24$) being excluded. The doubled path
+$P_7$ is everywhere-saturated, so \Cref{lem:saturated-attachment} caps any
+feasible attachment to it at $d(v) \le 2(m-1) = 4$, while $8$-regularity
+demands $d(v) = 8$. \Cref{fig:seam-c8} draws what a degree-$8$ attachment
+would have to be, weight $4$ on each path end, closing the path into the
+doubled bidirected cycle $C_8$ with $\lec = 4 > 2$: the collapse the lemma
+rules out wholesale.
 So every deletion is bipartite-type, the attachment equality applies, and
 $D = 2 \cdot B_{4,4}$ again. The whole $m = 3$ problem therefore rests on
 two finite integral statements about multigraphs with multiplicities in
@@ -790,7 +861,15 @@ realistically reach with the strengthened relaxation now wired into
 bounds from the certified $M^{*}(5)$, $M^{*}(6)$ and the degree-pair
 inequality $d^{+}(s) + d^{-}(t) - w(s,t) \le n-1$, all proved valid), fact~(a)
 being the single feasibility query \code{prove\_integral\_arc\_bound(7, 3, 25)}
-and fact~(b) the run \code{enumerate\_extremal\_directed\_multigraphs(7, 3, 24, max\_degree=8)}. For
+and fact~(b) the run
+\code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24,
+max\_degree=8)}, the generation enumerator of \Cref{ch:certify}, which prunes
+with proved bounds only and is therefore a sound complete search at $n = 7$,
+where the in-house depth-first twin is not. Its $n = 6$ companion run
+(target $20$, maximum degree $8$) has completed and returns exactly one
+class, the doubled bidirected path $P_6$, exactly the pattern the seam
+argument uses one level up and the first of these finite computations to be
+machine-settled. For
 $m \ge 4$ one hole remains: at an odd extremal level the counting no longer
 forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ is
 arithmetically consistent once $k(m-3) \ge 1$), so the uniqueness statement
@@ -1025,7 +1104,8 @@ $1\!-\!e_1\!-\!3\!-\!e_2\!-\!5$ alternating sides.}
 \centering
 \begin{tikzpicture}[
    stn/.style={metrostop, minimum size=5.5mm},
-   hub/.style={metrostop, minimum size=8mm, draw=black, line width=1.3pt}]
+   hub/.style={metrostop, minimum size=8mm, draw=vertexorange!90!black,
+               fill=vertexorange!45, line width=1.3pt}]
 % star hypertree: each hyperedge {h,u_i,w_i} is one metro line through the hub,
 % leaving radially to an inner station and bending to an outer one.
 \begin{scope}[on background layer]

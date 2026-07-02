@@ -3109,10 +3109,21 @@ def _draw_extremal_panel(ax, matrix, *, directed: bool, hub=None) -> None:
     single line (an arrowed line when ``directed``), and a higher multiplicity is
     shown by a small count label rather than parallel curves, so the picture
     stays legible.  Opposite arcs of a bidirected pair are bent apart.
+
+    Every named family the gallery draws is *uniform*: all its adjacencies carry
+    one and the same multiplicity.  Repeating that count on every arc buries the
+    structure under labels (worst on the bidirected ``K_4`` at multiplicity 3,
+    twelve labels over six crossing arcs), so a uniform multiplicity above one is
+    stated once in a corner note, and the per-arc labels are kept only for the
+    genuinely mixed case.
     """
     from matplotlib.patches import FancyArrowPatch
     n = len(matrix)
     pos = _circle_layout(n, hub)
+    mults = {int(matrix[i][j]) for i in range(n) for j in range(n)
+             if i != j and matrix[i][j] > 0}
+    uniform = mults.pop() if len(mults) == 1 else None
+    per_arc_labels = uniform is None
 
     def edge(i, j, rad, arrow):
         ax.add_patch(FancyArrowPatch(
@@ -3139,19 +3150,25 @@ def _draw_extremal_panel(ax, matrix, *, directed: bool, hub=None) -> None:
                     continue
                 rad = 0.16 if matrix[j][i] else 0.0
                 edge(i, j, rad, True)
-                mlabel(i, j, rad, matrix[i][j])
+                if per_arc_labels:
+                    mlabel(i, j, rad, matrix[i][j])
     else:
         for i in range(n):
             for j in range(i + 1, n):
                 if matrix[i][j] == 0:
                     continue
                 edge(i, j, 0.0, False)
-                mlabel(i, j, 0.0, matrix[i][j])
+                if per_arc_labels:
+                    mlabel(i, j, 0.0, matrix[i][j])
     for k, (x, y) in enumerate(pos):
         ax.scatter([x], [y], s=300, c="white", edgecolors=_KUL_BLUE,
                    linewidths=1.6, zorder=2)
         ax.text(x, y, str(k + 1), ha="center", va="center", fontsize=9,
                 zorder=3, color=_KUL_DARK)
+    if uniform is not None and uniform > 1:
+        word = "arcs" if directed else "edges"
+        ax.text(0.0, -1.34, f"all {word} $\\times{uniform}$", ha="center",
+                va="center", fontsize=9, color=_KUL_DARK)
     ax.set_xlim(-1.45, 1.45)
     ax.set_ylim(-1.45, 1.45)
 

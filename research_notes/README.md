@@ -48,6 +48,22 @@ self-similarity lemma, still true), `probe_overshoot.py` (the recursion
 overshoots Q(n)), `coupling_inequality.py` (the summed-coupling inequality and the
 counting-is-insufficient result). The 2026-06-30 scripts are self-contained.
 
+### Directed multigraph linear branch: the saturated attachment lemma
+A PROVED lemma (2026-07-02): attaching one vertex to any everywhere-saturated
+multigraph (in particular to any doubled bidirected tree at multiplicity m-1)
+caps the new degree at 2(m-1), with equality exactly when the attachment grows
+the tree by one full-multiplicity leaf. It is the linear-branch analogue of the
+thesis's lem:attachment (bipartite base), shortens the n=8 seam argument and
+the degree-4 case of fact (b), and reduces the d(v)=5 case of fact (a) to the
+uncapped n=6 classification.
+
+- [`saturated_attachment_lemma.md`](saturated_attachment_lemma.md) -- statement,
+  full proof, consequences, and what still blocks fact (a) along this route.
+
+Scripts: `saturated_attachment_check.py` (exhaustive verification on all nine
+doubled trees with 5 and 6 vertices at m=3; imports the thesis program for the
+capped feasibility predicate).
+
 ### Jan Goedgebeur's follow-up: the nauty pipeline and tabu search
 Cross-checks (not new mathematics) of the two P2 items from Jan's email, run
 once nauty became available locally. The geng+directg/watercluster2 pipeline

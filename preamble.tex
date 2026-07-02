@@ -90,6 +90,10 @@
 \captionsetup[sub]{
     font=footnotesize,
     labelfont={bf,color=KULblauw3b},
+    % Ragged right, not justified: sub-captions often sit in narrow boxes
+    % (half-width panels), where justification stretches short lines into
+    % wide word gaps around unbreakable math.
+    justification=raggedright,
     margin=4pt,
     skip=5pt,
 }
