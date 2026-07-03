@@ -1955,3 +1955,36 @@ clean; typo grep clean (hunspell not installed on this box; last full pass
 
 VERIFY: thesis latexmk exit 0, 0 overfull, 0 undefined/missing; lay summary
 pdflatex exit 0. Committed + pushed.
+
+## 2026-07-03 (Fable, round 3) -- MILP-jargon audit + real hunspell pass
+
+Author asked: is MILP etc. thoroughly explained, and install hunspell + spell check.
+
+MILP AUDIT. The ch2 core explanation was already thorough (linear + mixed-integer
+defined, variables in words, indicator table, McCormick spelled out, relaxation
+and gap glossed). Four residual jargon spots FIXED:
+- ch2 PROVE codecard used "MILP" four lines before the term's expansion ->
+  "the mixed-integer linear program written out below"; CBC/Gurobi now named as
+  solvers (free bundled / commercial) in the codecard AND the reproducibility
+  section, with pulp glossed as the write-once-run-anywhere library.
+- app_proofs transcript note "the branch count defeats it" assumed the reader
+  knows solvers branch -> spelled out (case-splitting the yes/no cut labels).
+- ch1 related work: "LP/ILP-based certification ... whose optimal dual is itself
+  the proof" -> acronym expanded, "optimal dual" replaced by the plain
+  certificate-of-optimality reading (short list of numbers checkable by
+  arithmetic). This is the one school the thesis claims as its own form, so it
+  could not stay jargon.
+- app_proofs: Edmonds--Karp glossed as a textbook maximum-flow routine run on
+  fractional capacities.
+Also: nontrivial -> non-trivial (ch1, matching ch3's usage).
+
+SPELL CHECK, REAL THIS TIME. brew install hunspell; en_GB.aff/dic fetched from
+LibreOffice/dictionaries into ~/Library/Spelling (verified colour/behaviour/
+optimise accepted). Full -t -l pass over main + all chapters + lay summary:
+every flag is a technical term, a surname, a TikZ token, or a code identifier.
+ONE American spelling found, "utilize", inside the KU Leuven copyright
+boilerplate on the disclaimer page -- left untouched (mandated faculty text).
+Post-edit re-check of the four edited files: clean.
+
+Build: latexmk exit 0, 0 overfull, 0 undefined. hunspell + en_GB now installed
+on this machine for future pre-submission passes.
