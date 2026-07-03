@@ -16,7 +16,7 @@ vertices in which no pair of vertices has ``m`` independent routes between them.
 "Independent" can mean edge-disjoint or internally vertex-disjoint; the object
 can be a simple graph, a multigraph, a digraph, or a hypergraph; and forbidding
 ``m`` routes is exactly the constraint that the largest *local* connectivity
-stays at or below ``m - 1``.  Sixteen concrete variants fall out of these
+stays at or below ``m - 1``.  Twelve concrete variants fall out of these
 choices, and this program treats all of them with one representation and one
 search.
 

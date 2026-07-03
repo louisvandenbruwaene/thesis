@@ -63,7 +63,7 @@ the largest local edge-connectivity anywhere in $G$. A theorem of Menger \cite{M
     \node[mv] at (\ang:1.5) {$\i$};
   }
 \end{tikzpicture}
-\caption{Menger's theorem on the graph of \Cref{fig:k5-example}. The pair $1,3$ carries no edge of its own, yet three routes still join them with no shared edge, $1$-$0$-$3$ (orange), $1$-$2$-$3$ (green), and $1$-$4$-$3$ (purple), each through a different middle vertex, so $\lec(1,3)=3$. The three edges meeting vertex $1$ (inside the red dashed ring) are a smallest set whose removal cuts every $1$-$3$ route, and no two edges can, because the three routes share no edge and so each removed edge breaks at most one of them. The cheapest cut therefore also has size three. The most independent routes a pair can muster always equals the cheapest cut between them, the fact every bound in this thesis leans on.}
+\caption{Menger's theorem on the graph of \Cref{fig:k5-example}. The pair $1,3$ carries no edge of its own, yet three routes still join them with no shared edge, $1$-$0$-$3$ (orange), $1$-$2$-$3$ (green), and $1$-$4$-$3$ (purple), each through a different middle vertex, so $\lec(1,3)=3$. The three edges meeting vertex $1$ (inside the red dashed ring) are a smallest set whose removal cuts every $1$-$3$ route, and no set of just two edges can cut them all, because the three routes share no edge, so each removed edge breaks at most one route and two removals leave one route intact. The cheapest cut therefore also has size three. The most independent routes a pair can muster always equals the cheapest cut between them, the fact every bound in this thesis leans on.}
 \label{fig:menger}
 \end{figure}
 

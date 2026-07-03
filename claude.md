@@ -1871,3 +1871,44 @@ at prop:leonard-m2, "lexicographically smallest" -> "smallest in dictionary
 order", multiset, 2k-regular (both ch4 and roadmap), "cactus value" -> the
 multigraph value of thm:multigraph-edge, D(n,p) defined, semi-degree defined.
 Build clean, 118 pp, 0 overfull, 0 undefined. Fact (a) run still going.
+
+## 2026-07-03 (Fable) -- full accessibility + correctness pass (author: "no big claims, small steps, make me proud")
+
+Read every chapter and the whole appendix end to end, re-deriving the mathematics
+rather than skimming. VERIFIED CORRECT (a sample of what was actually re-derived):
+Mader's Gomory-Hu double count and the extremal characterisation slack identity;
+the S-T divergence values at n=6..10; the m=2 directed induction arithmetic incl.
+the (2k+1)k^2 = (2k-1)(k^2+k)+k remainder; the 30-arc counterexample's 2-arc cut;
+the augmented-bipartite count floor((n+m-2)^2/4), the m<=3 partition tie and the
+m=4 divergence at n=12; the MILP indicator table, McCormick min pinning, and the
+scaling identity; the attachment lemma case split, odd-step averaging identity,
+saturated attachment cut analysis, incidence-rank component count
+q(r-1) <= 2(n-1)+2(1-C); Chernoff constants; duality + general-orientation bound.
+Machine state re-verified today: self-check ALL CHECKS PASSED, 88 unit tests OK
+(1 expected skip), build 118 pp / 0 overfull / 0 undefined. All thesis-cited code
+identifiers exist in erdos915_unified.py; solve() defaults method="tabu" matching
+ch3's claim; transcripts and rediscovery table match the text.
+
+SIX FIXES (all small, none touches any reported value):
+1. ch2: "directed double star" used BEFORE the term's definition (and for what is
+   really the bidirected star) -> "bidirected star (fig:bidirected-star)" in the
+   checker sanity check + reproducibility list.
+2. ch4: the ambiguous "The two formulas agree for m<=3" paragraph (read naturally,
+   it compared the multigraph and simple conjectures, which never agree past m=2)
+   rewritten to say what was meant: parallel copies make the balanced split optimal
+   for multigraphs, in-arcs inside B push the simple split to ceil((n+m-2)/2) at
+   m>=4, balanced=shifted count at m<=3, and the m-1 factor cancels in the n=7
+   crossing.
+3. app_proofs roadmap even level: "q>p" now names its p>q mirror (the corollary is
+   symmetric; the text looked one-sided).
+4. app_proofs: two remaining prose semicolons (attachment pattern list ->
+   sentences; orientation-models lead-in).
+5. ch1 fig:menger caption: "no two edges can" expanded to the full small-step
+   reading (each removed edge breaks at most one route).
+6. erdos915_unified.py module docstring said "Sixteen concrete variants" against
+   twelve everywhere else (incl. this file) -> Twelve. Configs counted: 12 + 12.
+
+OPERATIONAL: the fact (a) run (uncapped n=7 t25) did NOT survive the 2026-07-02
+session -- no process, no verdict, no log (geng_uncapped_20260702.log is the
+finished n=6 run). TASKS.md corrected from IN PROGRESS to NOT RUNNING with a
+detached (nohup) relaunch command and an honest budget hint.

@@ -534,9 +534,9 @@ The proof is a bookkeeping argument on the arcs at $v$, and \Cref{fig:attachment
 is its scaffold. Sort those arcs into the four classes $i_A, o_A, i_B, o_B$ of the
 figure, by direction and by which part they touch. Three combinations are
 impossible, because each completes an $m$-th arc-disjoint route between two old
-vertices on top of the $m-1$ parallel arcs they already share: an $i_A$ arc with
-an $o_B$ arc makes $a \to v \to b$; an $i_A$ arc with an $o_A$ arc to a
-\emph{different} source makes $a \to v \to a' \to b$; an $i_B$ arc with an $o_B$
+vertices on top of the $m-1$ parallel arcs they already share. An $i_A$ arc with
+an $o_B$ arc makes $a \to v \to b$. An $i_A$ arc with an $o_A$ arc to a
+\emph{different} source makes $a \to v \to a' \to b$. An $i_B$ arc with an $o_B$
 arc to a \emph{different} sink makes $a \to b \to v \to b'$. Forbidding these
 forces $v$ into one of a few rigid shapes, a pure sink touching a single source,
 a pure source touching a single sink, or a small mixed remnant, and in each shape
@@ -833,7 +833,9 @@ $2 \cdot B_{k,k+1}$.
 averaging step forces $2k$-regularity, every vertex at degree exactly $2k$,
 hence $D - v$ extremal at $2k-1$ for \emph{every} $v$. Odd uniqueness one level down leaves $2 \cdot B_{k,k-1}$
 or $2 \cdot B_{k-1,k}$, and \Cref{cor:attachment-equality} with
-$d(v) = 2k = 2\max(k-1, k)$, $q > p$, rebuilds exactly $2 \cdot B_{k,k}$.
+$d(v) = 2k = 2\max(k-1, k)$ (the $q > p$ case for $2 \cdot B_{k-1,k}$, its
+$p > q$ mirror for $2 \cdot B_{k,k-1}$) rebuilds exactly $2 \cdot B_{k,k}$
+either way.
 
 \emph{The seam at $n = 8$}: the same regularity argument runs from $n = 7$,
 where the branches tie at $24$ arcs and several extremisers coexist. On the
@@ -1545,7 +1547,7 @@ and the thin route never look alike.}
 The forward model is one of three ways to orient a Berge edge. In general a
 directed $r$-uniform hyperedge is a split of its $r$ vertices into a non-empty
 \emph{tail set} $T$ and a non-empty \emph{head set} $H$, a route entering at a
-tail and leaving at a head; the \emph{forward} model is $|T| = 1$, the
+tail and leaving at a head. The \emph{forward} model is $|T| = 1$, the
 \emph{backward} model is $|H| = 1$, and the \emph{general} model allows any split
 (genuinely mixed splits, both parts at least two, exist from $r \ge 4$). The next
 two results place all three. The first is that backward needs no separate study,

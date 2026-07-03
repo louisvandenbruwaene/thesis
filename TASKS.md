@@ -40,9 +40,12 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
       in rem:odd-step-roadmap).
 - [ ] **Fact (a) by machine**: uncapped n=7, target 25; EMPTY output = proof of
       L_3^dir(7)=24 and the whole m=3 directed multigraph problem CLOSES.
-      IN PROGRESS 2026-07-02 (launched after the n=6 run; runtime unknown,
-      log program/logs/geng_uncapped_20260702.log). Resume command:
-      `python -c "from erdos915_unified import enumerate_extremal_directed_multigraphs_via_generation as e; r=e(7,3,25); print(len(r))"`
+      NOT RUNNING as of 2026-07-03: the run launched 2026-07-02 did not survive
+      that session (no process, no verdict, no log file; geng_uncapped_20260702.log
+      is the finished n=6 run). Relaunch DETACHED so it outlives the session:
+      `cd program && nohup python -c "from erdos915_unified import enumerate_extremal_directed_multigraphs_via_generation as e; r=e(7,3,25); print(len(r)); [print(M) for M in r]" > logs/geng_a_n7_t25.log 2>&1 &`
+      Budget hint: fact (b) at the same size took ~7 h on 10 cores WITH the
+      degree-8 cap; this run has no cap, so expect substantially longer.
 - [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
       eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
       CBC cannot close it (measured 2026-06-16).
