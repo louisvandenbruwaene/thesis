@@ -1912,3 +1912,46 @@ OPERATIONAL: the fact (a) run (uncapped n=7 t25) did NOT survive the 2026-07-02
 session -- no process, no verdict, no log (geng_uncapped_20260702.log is the
 finished n=6 run). TASKS.md corrected from IN PROGRESS to NOT RUNNING with a
 detached (nohup) relaunch command and an honest budget hint.
+
+## 2026-07-03 (Fable, round 2) -- "nothing missing, spotless, code in big lines"
+
+Author brief: suggest-or-do anything still missing; thesis self-contained; code
+included at the WHAT level (we iterate this, calculate that), not loop mechanics.
+
+STALENESS FIXES (all predated the 2026-07-02 fact (b) proof):
+- ch4 limitations paragraph still said BOTH n=7 computations "have not yet
+  returned certificates", contradicting ch4's own fact (b) report two sections
+  earlier -> now: classification (b) done, value (a) the one outstanding
+  certificate.
+- main.tex Short Summary now says one of the two n=7 statements is already
+  verified (the Contribution Statement already did).
+- Root README "Where to continue": "Two finite n=7 facts" -> one remaining, with
+  the (b) result and the two routes to (a) stated; dropped the resolved
+  directg/watercluster2 follow-up.
+
+BIG-LINES METHOD DESCRIPTIONS ADDED (what is iterated and calculated):
+- ch2 generation section: the decoration spelled out (per support edge, every
+  ordered multiplicity pair except (0,0); monotonicity prune; canonical dedup;
+  independent supports across cores). Checked against _decorate_support_worker;
+  worded "along the way" since the code checks completed prefixes, not every
+  assignment.
+- ch4 orientation models: max_feasible_hyperedges described as the fig:prune
+  include-or-exclude search over candidate hyperedges, finished sweep = proof.
+- app_proofs fact (a) passage: prove_integral_arc_bound mechanism stated (cut
+  model, integer weights, fixed arc total, INFEASIBLE = proof) and the two
+  strengthening families now PROVED in place instead of "all proved valid":
+  deletion bounds via restriction-feasibility, degree-pair via the two-hop
+  route count with min(a,b) >= a+b-1 (derivation re-checked by hand).
+- app_proofs: "fractional hill-climb" glossed (nudge one weight, keep only
+  improving feasible changes).
+- ch2: graph6 glossed (compact one-line text encoding).
+
+SPOTLESS SWEEPS: w.h.p. removed from the abbreviations table (never used; GH,
+SA, MILP, SPQR all confirmed used); lay summary's "confirming one example"
+corrected to "one exhaustive computer check at that single size" (fact (a)
+confirms absence, not an example; summary rebuilt clean); doubled-word regex
+clean; typo grep clean (hunspell not installed on this box; last full pass
+2026-06-18 was clean and everything since has been read closely).
+
+VERIFY: thesis latexmk exit 0, 0 overfull, 0 undefined/missing; lay summary
+pdflatex exit 0. Committed + pushed.

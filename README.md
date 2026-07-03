@@ -67,8 +67,9 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
   to `A` would turn the directed-arc conjecture into a theorem for all `m ≥ 3`.
 - **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
-- **Two finite `n = 7` facts** that close the directed-multigraph problem at `m = 3`:
-  `L₃ᵈⁱʳ(7) = 24`, and the classification of its 24-arc extremisers. The enumerator
-  now streams canonical forms (RAM bounded by isomorphism-class count); the remaining
-  bottleneck is DFS time — see `TASKS.md` for the memory-capped run command and the
-  Jan Goedgebeur `geng`+`directg`/`watercluster2` generation-pipeline follow-up.
+- **One finite `n = 7` fact** that closes the directed-multigraph problem at `m = 3`:
+  the value `L₃ᵈⁱʳ(7) = 24` (fact (a)). Its companion, the classification of the
+  24-arc extremisers (fact (b)), is already proved by the sound `geng`-based
+  generation enumerator (~7 h on 10 cores; exactly `2B(3,4)`, `2B(4,3)`, and the
+  doubled path `P₇`). Fact (a) needs either the same enumerator uncapped at
+  target 25 (long run, command in `TASKS.md`) or the Gurobi MILP route.
