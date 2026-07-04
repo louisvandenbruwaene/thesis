@@ -1,14 +1,32 @@
 # Fact (a) by the delta-split route: L_3^dir(7) = 24
 
-Status 2026-07-04: route PROVED correct, inputs IN PROGRESS. The two finite
-classifications it needs (all feasible 6-vertex multigraphs with exactly 19
-and exactly 18 arcs) are running on this machine via the sound geng
-enumerator (log `program/logs/n6_near_extremal_20260704.log`). The
-attachment half is implemented and control-tested
-(`scripts/fact_a_attachment_check.py`). Nothing enters the thesis until the
-computation lands and is independently confirmed (the direct uncapped
-n = 7, target 25 run remains the independent check that subsumes this whole
-route).
+Status 2026-07-04, END OF DAY: **fact (a) is PROVED along this route.**
+L_3^dir(7) = 24, M*(7) = 12, and with facts (a) and (b) both settled the
+entire m = 3 directed multigraph chain of rem:odd-step-roadmap closes.
+
+The numbers, for the record:
+
+* Classification (sound geng enumerator, uncapped, 10 cores): exactly
+  **55** isomorphism classes of feasible 6-vertex multigraphs with 19 arcs
+  (2549 s) and **565** with 18 arcs (1576 s). Files
+  `program/logs/n6_t{19,18}_classes.npz`, log
+  `program/logs/n6_near_extremal_20260704.log`.
+* Cross-check: all 620 classes re-verified for arc count and feasibility by
+  BOTH the thesis checker and this note's independent Edmonds-Karp, 0
+  disagreements. The observed minimum degrees (>= 3 at 19 arcs, >= 2 at 18)
+  match the floors predicted below from L_3^dir(5) = 16.
+* Attachment check: in case A, 27 of 55 classes pass the degree floor and
+  286 attachment patterns survive the filters to reach the full all-pairs
+  max-flow, every one infeasible. In case B, 28 of 565 classes pass the
+  floor, 154 patterns reach the full check, every one infeasible. NO
+  SURVIVOR in either case, so no 25-arc feasible multigraph on 7 vertices
+  exists.
+
+Nothing enters the thesis yet, per the verification ladder: the direct
+uncapped n = 7, target 25 run (route 2, which shares only the enumerator
+core with route 1) was relaunched detached 2026-07-04 17:05, log
+`program/logs/geng_a_n7_t25.log`. Its EMPTY output is the independent
+confirmation that unlocks the thesis write-up.
 
 Everything below is at m = 3: multiplicities mu(x, y) on ordered pairs of
 distinct vertices, feasible means lambda^max <= 2. Note mu <= 2 is automatic

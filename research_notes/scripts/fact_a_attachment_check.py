@@ -207,7 +207,7 @@ def _crosscheck_classes(data, keys, dmin) -> None:
     """Every loaded class must be feasible with the right arc count, per BOTH
     this script's checker and the thesis program's."""
     sys.path.insert(0, "/Users/chief/Projects/thesis/program")
-    from erdos915_unified import Graph, Variant
+    from erdos915_unified import Graph, Variant, max_edge_connectivity
 
     target = 25 - dmin
     bad = 0
@@ -218,7 +218,7 @@ def _crosscheck_classes(data, keys, dmin) -> None:
         own = feasible(mu6, 6)
         g = Graph(6, Variant(directed=True, simple=False))
         g.mu = np.asarray(H, dtype=int)
-        prog = g.max_edge_connectivity() <= CAP
+        prog = max_edge_connectivity(g) <= CAP
         if arcs != target or not own or own != prog:
             bad += 1
             print(f"  CROSSCHECK FAIL {key}: arcs={arcs} own={own} prog={prog}")

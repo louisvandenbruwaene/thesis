@@ -16,16 +16,27 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
 - [ ] **Hypergraph vertex at m=4.** lem:incidence-rank needs a 4-connectivity
       analogue of the Tutte/SPQR decomposition. No early counterexample:
       k_4^(3)(5)=6 machine-checked.
-- [ ] **m>=4 odd-level uniqueness / m>=5 value step** (thm:odd-step,
-      rem:odd-step-roadmap): the counting no longer forces a low-degree vertex;
-      needs an arithmetic or structural input averaging lacks. The same hole
-      blocks a full linear-branch classification for general n (see
-      research_notes/saturated_attachment_lemma.md, item 3).
-- [ ] **Fact (a) by hand, delta>=6 core.** With the saturated attachment lemma
-      (PROVED 2026-07-02) and the uncapped n=6 classification (run below), a
-      25-arc feasible multigraph on 7 vertices has min degree >= 6; the d(v) in
-      {6,7} cases delete to 19/18-arc n=6 multigraphs, so the hand route needs a
-      near-extremal classification at n=6 (or the machine route below).
+- [x] **m=4 odd-level uniqueness / m=5 value step: CLOSED at research-note
+      level 2026-07-04** (research_notes/m4_odd_uniqueness_closed.md, machine
+      verification ALL CHECKS PASSED): deficiency-1 attachment corollary +
+      tight-pair analysis force a degree-3k vertex at odd levels, k >= 5.
+      Remaining: m=5 odd uniqueness (excess outgrows the min-degree count,
+      documented), m>=6 (needs deficiency-2 corollaries), the m=4 finite
+      bases (machine block below), and author review before any .tex entry.
+- [x] **Fact (a) PROVED 2026-07-04 (delta-split route).** The 19-arc (55
+      classes, 2549 s) and 18-arc (565 classes, 1576 s) n=6 classifications
+      completed (sound geng enumerator, npz in program/logs), and the
+      attachment check (research_notes/scripts/fact_a_attachment_check.py,
+      control-tested, both-checker crosscheck 0 failures) reports NO SURVIVOR
+      in either case: L_3^dir(7) = 24. AWAITING independent confirmation by
+      the direct run below before anything enters the .tex. Route + proofs:
+      research_notes/fact_a_delta_split.md.
+- [ ] **m=4 base facts** (new, from research_notes/m4_odd_uniqueness_closed.md,
+      which closes the m=4 odd-uniqueness hole for k >= 5 and the m=5 value
+      gap): (a4) L_4^dir(7) = 36 + the 36-arc extremal classification on 7
+      vertices; then n = 8, 9, 10 seam arguments. With those, the WHOLE m=4
+      problem closes like m=3. Gurobi or a long geng run at m=4 (16 states
+      per pair) required.
 
 ## MACHINE TARGETS (geng installed 2026-07-02 via brew; 10-core box)
 - [x] n=6, target 20, max_degree=8: DONE 2026-07-02, exactly 1 class, the
@@ -38,14 +49,14 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
       spanning trees. With the saturated attachment lemma this makes the
       min-degree >= 6 bound on any fact-(a) witness unconditional (recorded
       in rem:odd-step-roadmap).
-- [ ] **Fact (a) by machine**: uncapped n=7, target 25; EMPTY output = proof of
-      L_3^dir(7)=24 and the whole m=3 directed multigraph problem CLOSES.
-      NOT RUNNING as of 2026-07-03: the run launched 2026-07-02 did not survive
-      that session (no process, no verdict, no log file; geng_uncapped_20260702.log
-      is the finished n=6 run). Relaunch DETACHED so it outlives the session:
-      `cd program && nohup python -c "from erdos915_unified import enumerate_extremal_directed_multigraphs_via_generation as e; r=e(7,3,25); print(len(r)); [print(M) for M in r]" > logs/geng_a_n7_t25.log 2>&1 &`
-      Budget hint: fact (b) at the same size took ~7 h on 10 cores WITH the
-      degree-8 cap; this run has no cap, so expect substantially longer.
+- [ ] **Fact (a) by machine (now the CONFIRMATION run)**: uncapped n=7,
+      target 25; EMPTY output independently confirms the delta-split proof
+      above and unlocks the thesis write-up. RELAUNCHED 2026-07-04 17:05,
+      properly detached (nohup, main-guarded runner), PID 848, log
+      program/logs/geng_a_n7_t25.log. Diagnosis of the 2026-07-02 loss:
+      the parent died with the session and left orphaned idle workers
+      (killed 2026-07-04). Budget hint: fact (b) took ~7 h on 10 cores WITH
+      the degree-8 cap; this run has no cap, expect substantially longer.
 - [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
       eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
       CBC cannot close it (measured 2026-06-16).
