@@ -778,3 +778,24 @@ wis.kuleuven.be\\
   \draw[flow] (pro) -- (obs);
   \draw[flow] (dis) -- (obs);
 \end{tikzpicture}}
+
+% --- the variant tree: root -> model (3) -> direction (2) -> separation (2) --
+% Drawn twice, from the same coordinates, so the two figures are visibly one
+% shape: plain in ch1 (a map before anything is proved), tinted by the
+% trichotomy regime in ch4 (the same map, resolved). regimeProved/Conjectured/
+% Open reuse the exact blue/red/amber the data figures already use for proved
+% all-n / conjectured-with-certified-cases / open-lower-bound-only.
+\colorlet{regimeProved}{KULblauw1}
+\colorlet{regimeConjectured}{vertexred}
+\colorlet{regimeOpen}{vertexorange}
+\tikzset{
+  vtroot/.style={rectangle, rounded corners=3pt, draw=KULblauw3b, very thick,
+                 minimum width=26mm, minimum height=9mm, font=\sffamily\small\bfseries},
+  vtmodel/.style={rectangle, rounded corners=3pt, draw=KULblauw3b, thick,
+                  minimum width=20mm, minimum height=8mm, font=\sffamily\small},
+  vtdir/.style={rectangle, rounded corners=2.5pt, draw=KULblauw3b!70,
+                minimum width=19mm, minimum height=7mm, font=\scriptsize},
+  vtleaf/.style={rectangle, rounded corners=2pt, draw=KULblauw3b!70,
+                 minimum width=12mm, minimum height=6.5mm, font=\scriptsize},
+  vtedge/.style={KULblauw3b!55, line width=0.9pt},
+}
