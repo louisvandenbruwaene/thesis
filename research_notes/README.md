@@ -63,6 +63,24 @@ control-tested.
 Scripts: `fact_a_attachment_check.py` (self-contained capped Edmonds-Karp,
 `--selftest` controls, `--crosscheck` against the thesis checker).
 
+### Closing the m=4 odd-uniqueness hole (PROVED here, 2026-07-04)
+The counting hole of rem:odd-step-roadmap is closed for m=4 at every level
+n=2k+1, k>=5: a new deficiency-1 attachment corollary (exact structure of a
+vertex attached to (m-1)B_{p,q} one arc below the attachment-lemma cap) plus
+a tight-pair-deletion analysis force a vertex of degree exactly 3k, so
+value+uniqueness propagate at m=4 like at m=3, down to finite bases at
+n=7..10. The same corollary kills the m=5 value escape (j=1), so thm:odd-step
+extends to m=5 in value. m=5 uniqueness still leaks (excess outgrows the
+min-degree count), documented precisely.
+
+- [`m4_odd_uniqueness_closed.md`](m4_odd_uniqueness_closed.md) -- Lemma E
+  (even value free), Corollary D1 (deficiency-1 attachment), Lemma T (tight
+  pairs), Theorem U4, the m=4 chain consequence, the m=5 value result and its
+  honest residue.
+
+Scripts: `deficiency_attachment_check.py` (exhaustive corollary check at five
+(m;p,q) sets, all contradiction structures infeasible, counting identities).
+
 ### Directed multigraph linear branch: the saturated attachment lemma
 A PROVED lemma (2026-07-02): attaching one vertex to any everywhere-saturated
 multigraph (in particular to any doubled bidirected tree at multiplicity m-1)
