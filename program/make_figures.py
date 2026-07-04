@@ -179,7 +179,7 @@ def _reconcile_panel(panel: dict) -> dict:
     return panel
 
 
-def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
+def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_budget=4.0):
     """Build the twelve panels of the all-variant grid (row-major, model x col).
 
     ``m`` is the forbidden connectivity value shown in every panel.
@@ -200,6 +200,17 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
 
     Open panels (no construction is known) keep the raw search points wrapped in
     the certain band, since there the search is the only lower bound there is.
+    Because there is no construction to fall back on, these are exactly the
+    panels where ``search_budget`` cannot be cut for speed the way it safely can
+    be everywhere else: at ``search_budget=0.4`` the vertex-mode search on a
+    large matrix graph barely completes one move, so the RAW result actively
+    *degrades* with growing ``n`` (measured: n=6/10/14/16 gave 15/12/5/4 at
+    m=6), and the monotone running-max in :func:`_reconcile_panel` then freezes
+    the plotted curve at its early peak -- a flat line that looks like a
+    finding but is really budget starvation. ``open_search_budget`` (default 4s,
+    ~10x ``search_budget``) is used only for the four panels with
+    ``lb_fn=None`` (simple/multigraph undirected vertex when open, and the two
+    directed-hypergraph panels), where it is not optional.
     """
     panels = []
     # Uniform x-ranges for the search / construction curves.  The machine-PROVED
@@ -275,8 +286,8 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
             proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
             exact=ex2, search=se2))
     else:
-        se2 = searched(matrix_ns, None,
-                       directed=False, simple=True, separation="vertex")
+        se2 = _search_points(matrix_ns, m, open_search_budget,
+                             directed=False, simple=True, separation="vertex")
         band2 = _band(se2, tri_undirected, matrix_ns)
         panels.append(dict(
             title=f"undirected vertex, $m={m}$  (open)", ylabel="edges",
@@ -375,8 +386,8 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
             proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
             exact=ex10, search=se10))
     else:
-        se10 = searched(hyper_ns, None,
-                        hypergraph=True, r=3, directed=False, separation="vertex")
+        se10 = _search_points(hyper_ns, m, open_search_budget,
+                              hypergraph=True, r=3, directed=False, separation="vertex")
         panels.append(dict(
             title=f"undirected vertex, $m={m}$  (open)", ylabel="hyperedges",
             guess="search",
@@ -385,8 +396,8 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
     # (11) hypergraph directed arc -- OPEN (new directed Berge model).
     ex11 = _exact_points(range(2, 6), m, exact_budget,
                          hypergraph=True, r=3, directed=True, separation="edge")
-    se11 = searched(hyper_ns, None,
-                    hypergraph=True, r=3, directed=True, separation="edge")
+    se11 = _search_points(hyper_ns, m, open_search_budget,
+                          hypergraph=True, r=3, directed=True, separation="edge")
     panels.append(dict(
         title=f"directed arc, $m={m}$  (open, new model)", ylabel="hyperarcs",
         guess="search",
@@ -395,8 +406,8 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4):
     # (12) hypergraph directed vertex -- OPEN (new directed Berge model).
     ex12 = _exact_points(range(2, 6), m, exact_budget,
                          hypergraph=True, r=3, directed=True, separation="vertex")
-    se12 = searched(hyper_ns, None,
-                    hypergraph=True, r=3, directed=True, separation="vertex")
+    se12 = _search_points(hyper_ns, m, open_search_budget,
+                          hypergraph=True, r=3, directed=True, separation="vertex")
     panels.append(dict(
         title=f"directed vertex, $m={m}$  (open, new model)", ylabel="hyperarcs",
         guess="search",
