@@ -48,6 +48,21 @@ self-similarity lemma, still true), `probe_overshoot.py` (the recursion
 overshoots Q(n)), `coupling_inequality.py` (the summed-coupling inequality and the
 counting-is-insufficient result). The 2026-06-30 scripts are self-contained.
 
+### Fact (a) by the delta-split route (IN PROGRESS 2026-07-04)
+The last open statement of the m=3 directed multigraph problem, L_3^dir(7)=24,
+reduced to two finite 6-vertex classifications (all feasible multigraphs with
+exactly 19 and exactly 18 arcs) plus an attachment check. The route is proved
+correct in both directions (a survivor would BE a counterexample), the
+classifications are running, and the attachment half is implemented and
+control-tested.
+
+- [`fact_a_delta_split.md`](fact_a_delta_split.md) -- the delta-split lemma,
+  the mixed-pair filter lemma, the conditional theorem, and the verification
+  ladder.
+
+Scripts: `fact_a_attachment_check.py` (self-contained capped Edmonds-Karp,
+`--selftest` controls, `--crosscheck` against the thesis checker).
+
 ### Directed multigraph linear branch: the saturated attachment lemma
 A PROVED lemma (2026-07-02): attaching one vertex to any everywhere-saturated
 multigraph (in particular to any doubled bidirected tree at multiplicity m-1)
