@@ -198,19 +198,20 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
        only the two directed ones it used to cover, so the proved curves pass
        through their circles instead of floating above a jagged search tail.
 
-    Open panels (no construction is known) keep the raw search points wrapped in
-    the certain band, since there the search is the only lower bound there is.
-    Because there is no construction to fall back on, these are exactly the
-    panels where ``search_budget`` cannot be cut for speed the way it safely can
-    be everywhere else: at ``search_budget=0.4`` the vertex-mode search on a
-    large matrix graph barely completes one move, so the RAW result actively
-    *degrades* with growing ``n`` (measured: n=6/10/14/16 gave 15/12/5/4 at
-    m=6), and the monotone running-max in :func:`_reconcile_panel` then freezes
-    the plotted curve at its early peak -- a flat line that looks like a
-    finding but is really budget starvation. ``open_search_budget`` (default 4s,
-    ~10x ``search_budget``) is used only for the four panels with
-    ``lb_fn=None`` (simple/multigraph undirected vertex when open, and the two
-    directed-hypergraph panels), where it is not optional.
+    Open panels also get a verified construction planted, not only the proved
+    ones: the open undirected vertex panels get the proved EDGE value (Whitney,
+    kappa <= lambda, so the edge extremiser is vertex-feasible) and the two
+    directed-hypergraph panels get the proved bipartite family of
+    prop:dir-hyper-first.  This matters because at ``search_budget=0.4`` the
+    vertex-mode search on a large matrix graph barely completes one move, so
+    the RAW result actively *degrades* with growing ``n`` (measured:
+    n=6/10/14/16 gave 15/12/5/4 at m=6), and the monotone running-max in
+    :func:`_reconcile_panel` then freezes the plotted curve at its early peak,
+    a flat line that looks like a finding but is really budget starvation.
+    ``open_search_budget`` (default 4s, ~10x ``search_budget``) still gives
+    those panels a stronger walk, since the search can genuinely beat the
+    planted construction where the open problem is richer (it does at m=6,
+    n=9 on the undirected vertex panel).
     """
     panels = []
     # Uniform x-ranges for the search / construction curves.  The machine-PROVED
@@ -252,6 +253,18 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     def lb_hyper_edge(n):
         return min(hypergraph_edge(n, m, 3), math.comb(n, 3))
 
+    def lb_dir_hyper(n):
+        # The PROVED bipartite family of prop:dir-hyper-first at r = 3:
+        # alpha tails, and on the other n - alpha vertices a shared near-regular
+        # head graph of max degree m - 1 (realisable iff m - 1 <= n - alpha - 1),
+        # giving alpha * floor((m-1)(n-alpha)/2) single-step hyperarcs with
+        # lambda^max = kappa^max = m - 1.  Sound for BOTH separations, since
+        # every route in it is a single tail -> head step.
+        best = 0
+        for alpha in range(1, n - m + 1):
+            best = max(best, alpha * ((m - 1) * (n - alpha) // 2))
+        return min(best, n * math.comb(n - 1, 2))
+
     # Undirected vertex is proved for m<=4 (Leonard/Whitney), open for m>=5.
     vert_proved = (m <= 4)
     # Hypergraph vertex is proved for m<=3 (incidence-rank lemma, thm:hyper-vertex-m3).
@@ -288,6 +301,12 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     else:
         se2 = _search_points(matrix_ns, m, open_search_budget,
                              directed=False, simple=True, separation="vertex")
+        # Whitney: kappa <= lambda, so Mader's edge extremiser is vertex-feasible
+        # and the proved edge value is an honest lower bound on the open vertex
+        # panel too.  Without it the starved vertex-mode search freezes into a
+        # flat plateau at large n (the "cut off" look); the search may still beat
+        # the edge value where the vertex problem is genuinely richer.
+        se2 = _extend_lower_bounds(se2, lb_simple_edge, matrix_ns)
         band2 = _band(se2, tri_undirected, matrix_ns)
         panels.append(dict(
             title=f"undirected vertex, $m={m}$  (open)", ylabel="edges",
@@ -388,6 +407,11 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     else:
         se10 = _search_points(hyper_ns, m, open_search_budget,
                               hypergraph=True, r=3, directed=False, separation="vertex")
+        # Whitney again: the proved hyperedge value is a lower bound for the
+        # vertex separation (its extremiser is vertex-feasible).  The exact cap
+        # in _reconcile_panel corrects the small-n corner where the simple
+        # attainment condition m-1 <= n-2 has not kicked in yet.
+        se10 = _extend_lower_bounds(se10, lb_hyper_edge, hyper_ns)
         panels.append(dict(
             title=f"undirected vertex, $m={m}$  (open)", ylabel="hyperedges",
             guess="search",
@@ -398,6 +422,9 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                          hypergraph=True, r=3, directed=True, separation="edge")
     se11 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, separation="edge")
+    # The proved bipartite construction of prop:dir-hyper-first is the named
+    # lower bound here (the search alone slips below the quadratic at larger n).
+    se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         title=f"directed arc, $m={m}$  (open, new model)", ylabel="hyperarcs",
         guess="search",
@@ -408,6 +435,9 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                          hypergraph=True, r=3, directed=True, separation="vertex")
     se12 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, separation="vertex")
+    # Same construction: all its routes are single tail -> head steps, so it is
+    # feasible for the vertex separation at the same value.
+    se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         title=f"directed vertex, $m={m}$  (open, new model)", ylabel="hyperarcs",
         guess="search",

@@ -4061,16 +4061,16 @@
       "complete": true
     },
     "n=2_m=3": {
-      "extremal_value": 2,
+      "extremal_value": 1,
       "classes": [
         {
           "repr": [
             [
               0,
-              2
+              1
             ],
             [
-              2,
+              1,
               0
             ]
           ],
@@ -4081,16 +4081,16 @@
       "complete": true
     },
     "n=2_m=4": {
-      "extremal_value": 3,
+      "extremal_value": 1,
       "classes": [
         {
           "repr": [
             [
               0,
-              3
+              1
             ],
             [
-              3,
+              1,
               0
             ]
           ],
@@ -4128,23 +4128,23 @@
       "complete": true
     },
     "n=3_m=3": {
-      "extremal_value": 6,
+      "extremal_value": 3,
       "classes": [
         {
           "repr": [
             [
               0,
-              2,
-              2
+              1,
+              1
             ],
             [
-              2,
+              1,
               0,
-              2
+              1
             ],
             [
-              2,
-              2,
+              1,
+              1,
               0
             ]
           ],
@@ -4155,23 +4155,23 @@
       "complete": true
     },
     "n=3_m=4": {
-      "extremal_value": 9,
+      "extremal_value": 3,
       "classes": [
         {
           "repr": [
             [
               0,
-              3,
-              3
+              1,
+              1
             ],
             [
-              3,
+              1,
               0,
-              3
+              1
             ],
             [
-              3,
-              3,
+              1,
+              1,
               0
             ]
           ],
@@ -4247,7 +4247,7 @@
       "complete": true
     },
     "n=4_m=3": {
-      "extremal_value": 8,
+      "extremal_value": 4,
       "classes": [
         {
           "repr": [
@@ -4255,24 +4255,24 @@
               0,
               0,
               0,
-              2
+              1
             ],
             [
               0,
               0,
-              2,
-              2
+              1,
+              1
             ],
             [
               0,
-              2,
+              1,
               0,
-              2
+              1
             ],
             [
-              2,
-              2,
-              2,
+              1,
+              1,
+              1,
               0
             ]
           ],
@@ -4283,24 +4283,24 @@
             [
               0,
               0,
-              2,
-              2
+              1,
+              1
             ],
             [
               0,
               0,
-              2,
-              2
+              1,
+              1
             ],
             [
-              2,
-              2,
+              1,
+              1,
               0,
               0
             ],
             [
-              2,
-              2,
+              1,
+              1,
               0,
               0
             ]
@@ -4312,32 +4312,32 @@
       "complete": true
     },
     "n=4_m=4": {
-      "extremal_value": 18,
+      "extremal_value": 6,
       "classes": [
         {
           "repr": [
             [
               0,
-              3,
-              3,
-              3
+              1,
+              1,
+              1
             ],
             [
-              3,
+              1,
               0,
-              3,
-              3
+              1,
+              1
             ],
             [
-              3,
-              3,
+              1,
+              1,
               0,
-              3
+              1
             ],
             [
-              3,
-              3,
-              3,
+              1,
+              1,
+              1,
               0
             ]
           ],
@@ -4354,16 +4354,57 @@
       "complete": false
     },
     "n=5_m=3": {
-      "extremal_value": 12,
+      "extremal_value": 6,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=5_m=4": {
-      "extremal_value": 23,
-      "classes": [],
-      "total_labelled": 0,
-      "complete": false
+      "extremal_value": 8,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 15
+        }
+      ],
+      "total_labelled": 15,
+      "complete": true
     },
     "n=6_m=2": {
       "extremal_value": 5,
@@ -4372,13 +4413,13 @@
       "complete": false
     },
     "n=6_m=3": {
-      "extremal_value": 14,
+      "extremal_value": 7,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=6_m=4": {
-      "extremal_value": 27,
+      "extremal_value": 10,
       "classes": [],
       "total_labelled": 0,
       "complete": false
@@ -4453,19 +4494,87 @@
             ]
           ],
           "labelled_count": 7
+        },
+        {
+          "repr": [
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              0,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 210
         }
       ],
-      "total_labelled": 7,
+      "total_labelled": 217,
       "complete": false
     },
     "n=7_m=3": {
-      "extremal_value": 16,
+      "extremal_value": 9,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=7_m=4": {
-      "extremal_value": 36,
+      "extremal_value": 11,
       "classes": [],
       "total_labelled": 0,
       "complete": false
@@ -5892,16 +6001,16 @@
       "complete": true
     },
     "n=2_m=3": {
-      "extremal_value": 4,
+      "extremal_value": 2,
       "classes": [
         {
           "repr": [
             [
               0,
-              2
+              1
             ],
             [
-              2,
+              1,
               0
             ]
           ],
@@ -5912,16 +6021,16 @@
       "complete": true
     },
     "n=2_m=4": {
-      "extremal_value": 6,
+      "extremal_value": 2,
       "classes": [
         {
           "repr": [
             [
               0,
-              3
+              1
             ],
             [
-              3,
+              1,
               0
             ]
           ],
@@ -5959,23 +6068,23 @@
       "complete": true
     },
     "n=3_m=3": {
-      "extremal_value": 12,
+      "extremal_value": 6,
       "classes": [
         {
           "repr": [
             [
               0,
-              2,
-              2
+              1,
+              1
             ],
             [
-              2,
+              1,
               0,
-              2
+              1
             ],
             [
-              2,
-              2,
+              1,
+              1,
               0
             ]
           ],
@@ -5986,23 +6095,23 @@
       "complete": true
     },
     "n=3_m=4": {
-      "extremal_value": 18,
+      "extremal_value": 6,
       "classes": [
         {
           "repr": [
             [
               0,
-              3,
-              3
+              1,
+              1
             ],
             [
-              3,
+              1,
               0,
-              3
+              1
             ],
             [
-              3,
-              3,
+              1,
+              1,
               0
             ]
           ],
@@ -6019,38 +6128,68 @@
       "complete": false
     },
     "n=4_m=3": {
-      "extremal_value": 15,
-      "classes": [],
-      "total_labelled": 0,
-      "complete": false
-    },
-    "n=4_m=4": {
-      "extremal_value": 36,
+      "extremal_value": 9,
       "classes": [
         {
           "repr": [
             [
               0,
-              3,
-              3,
-              3
-            ],
-            [
-              3,
               0,
-              3,
-              3
+              1,
+              1
             ],
             [
-              3,
-              3,
+              1,
               0,
-              3
+              0,
+              1
             ],
             [
-              3,
-              3,
-              3,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              0
+            ]
+          ],
+          "labelled_count": 8
+        }
+      ],
+      "total_labelled": 8,
+      "complete": true
+    },
+    "n=4_m=4": {
+      "extremal_value": 12,
+      "classes": [
+        {
+          "repr": [
+            [
+              0,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
               0
             ]
           ],
@@ -6067,13 +6206,13 @@
       "complete": false
     },
     "n=5_m=3": {
-      "extremal_value": 17,
+      "extremal_value": 11,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=5_m=4": {
-      "extremal_value": 32,
+      "extremal_value": 16,
       "classes": [],
       "total_labelled": 0,
       "complete": false
@@ -6085,13 +6224,13 @@
       "complete": false
     },
     "n=6_m=3": {
-      "extremal_value": 22,
+      "extremal_value": 12,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=6_m=4": {
-      "extremal_value": 42,
+      "extremal_value": 18,
       "classes": [],
       "total_labelled": 0,
       "complete": false
@@ -6103,13 +6242,13 @@
       "complete": false
     },
     "n=7_m=3": {
-      "extremal_value": 24,
+      "extremal_value": 13,
       "classes": [],
       "total_labelled": 0,
       "complete": false
     },
     "n=7_m=4": {
-      "extremal_value": 32,
+      "extremal_value": 23,
       "classes": [],
       "total_labelled": 0,
       "complete": false

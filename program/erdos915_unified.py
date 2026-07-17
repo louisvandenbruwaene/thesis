@@ -3112,14 +3112,15 @@ def _draw_extremal_panel(ax, matrix, *, directed: bool, hub=None) -> None:
 
     Every named family the gallery draws is *uniform*: all its adjacencies carry
     one and the same multiplicity.  Repeating that count on every arc buries the
-    structure under labels (worst on the bidirected ``K_4`` at multiplicity 3,
-    twelve labels over six crossing arcs), so a uniform multiplicity above one is
-    stated once in a corner note, and the per-arc labels are kept only for the
-    genuinely mixed case.
+    structure under labels (worst on the bidirected ``K_4``, twelve labels over
+    six crossing arcs), so a uniform multiplicity above one is stated once in a
+    corner note, and the per-arc labels are kept only for the genuinely mixed
+    case.  ``hub`` may also be an explicit list of ``(x, y)`` positions, used
+    for the bipartite wall panel, where two columns read far better than a circle.
     """
     from matplotlib.patches import FancyArrowPatch
     n = len(matrix)
-    pos = _circle_layout(n, hub)
+    pos = hub if isinstance(hub, list) else _circle_layout(n, hub)
     mults = {int(matrix[i][j]) for i in range(n) for j in range(n)
              if i != j and matrix[i][j] > 0}
     uniform = mults.pop() if len(mults) == 1 else None
@@ -3216,9 +3217,9 @@ def plot_extremal_gallery(path: str | Path, *,
     """A gallery of the named extremal graphs, drawn at a large representative size.
 
     These are the structured extremisers the analysis identifies, not the
-    trivial small trees: the directed double and bidirected stars, the dense
-    bidirected complete graphs, the multigraph star at full multiplicity, and
-    the star hypertrees (drawn as metro maps). The program both builds these and,
+    trivial small trees: the directed double and bidirected stars, the doubled
+    bipartite wall, the dense bidirected complete graph, the multigraph star at
+    full multiplicity, and the star hypertrees (drawn as metro maps). The program both builds these and,
     at small ``n``, proves them optimal by the enumeration of
     :func:`gallery_extremal_graphs`. The ``gallery_json`` argument is accepted for
     backward compatibility and ignored.
@@ -3231,11 +3232,15 @@ def plot_extremal_gallery(path: str | Path, *,
         for j in range(4):
             if i != j:
                 bidir_k4.set_multiplicity(i, j, 1)
-    k4_mult3 = Graph(4, MULTI_DIRECTED)
-    for i in range(4):
-        for j in range(4):
-            if i != j:
-                k4_mult3.set_multiplicity(i, j, 3)
+    # 2.B_{3,4}: the doubled one-directional bipartite wall, one of the three
+    # proved 24-arc extremisers at n = 7, m = 3 (rem:odd-step-roadmap, fact (b)).
+    # It ties the double star at the crossover, so the gallery shows both branches.
+    bip_2b34 = Graph(7, MULTI_DIRECTED)
+    for a in range(3):
+        for b in range(3, 7):
+            bip_2b34.set_multiplicity(a, b, 2)
+    bip_pos = [(-0.85, 0.85), (-0.85, 0.0), (-0.85, -0.85),
+               (0.85, 1.05), (0.85, 0.35), (0.85, -0.35), (0.85, -1.05)]
     multi_star = Graph(9, MULTI_UNDIRECTED)   # undirected star, mult 2
     for i in range(1, 9):
         multi_star.set_multiplicity(0, i, 2)
@@ -3252,8 +3257,8 @@ def plot_extremal_gallery(path: str | Path, *,
          "multigraph undirected, edge\n$m=3$, $n=9$: star at multiplicity $2$ ($16$ edges)"),
         ("g", bidir_k4, True, None,
          "simple directed, arc\n$m=4$, $n=4$: bidirected $K_4$ ($12$ arcs)"),
-        ("g", k4_mult3, True, None,
-         "multigraph directed, vertex\n$m=4$, $n=4$: $K_4$ at multiplicity $3$"),
+        ("g", bip_2b34, True, bip_pos,
+         "multigraph directed, arc\n$m=3$, $n=7$: bipartite wall $2 \\cdot B_{3,4}$ ($24$ arcs)"),
         ("h", star_hypertree(10, 3), False, 0,
          "hypergraph, $r=3$\n$m=2$, $n=10$: star hypertree ($4$ hyperedges)"),
         ("h", star_hypertree(13, 4), False, 0,
@@ -5024,16 +5029,26 @@ def gallery_extremal_graphs(
     ``multi_directed_{edge,vertex}``,
     ``hyper_undirected_r{r}_{edge,vertex}``,
     ``hyper_directed_r{r}_{edge,vertex}``.
+
+    The two ``multi_*_vertex`` keys report the reduced SIMPLE problem, because
+    the thesis's vertex measure is blind to parallel copies and the variant
+    collapses onto the simple one (see the config comment below).
     """
+    # The two multi-vertex rows run on the SIMPLE variant: the checker's vertex
+    # mode gives every adjacency capacity one, so parallel copies never change
+    # kappa and a raw multigraph search would just fill every cell to m-1 for
+    # free (it once reported a "36-arc extremal K_4 at multiplicity 3").  The
+    # thesis reduces these variants to the simple ones (tab:summary), and the
+    # gallery must report the reduced problem, exactly as the variant grids do.
     matrix_configs: list[tuple[str, Variant, str]] = [
         ("simple_undirected_edge",   SIMPLE_UNDIRECTED, "edge"),
         ("simple_undirected_vertex", SIMPLE_UNDIRECTED, "vertex"),
         ("simple_directed_edge",     SIMPLE_DIRECTED,   "edge"),
         ("simple_directed_vertex",   SIMPLE_DIRECTED,   "vertex"),
         ("multi_undirected_edge",    MULTI_UNDIRECTED,  "edge"),
-        ("multi_undirected_vertex",  MULTI_UNDIRECTED,  "vertex"),
+        ("multi_undirected_vertex",  SIMPLE_UNDIRECTED, "vertex"),
         ("multi_directed_edge",      MULTI_DIRECTED,    "edge"),
-        ("multi_directed_vertex",    MULTI_DIRECTED,    "vertex"),
+        ("multi_directed_vertex",    SIMPLE_DIRECTED,   "vertex"),
     ]
     hyper_configs: list[tuple[str, bool, bool]] = [
         (f"hyper_undirected_r{r}_edge",   False, False),
