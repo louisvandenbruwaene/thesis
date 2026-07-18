@@ -74,6 +74,7 @@ which chapter's machinery you are reading. Each section keeps its own banner.
 # ==================================================================
 from __future__ import annotations
 
+import copy
 import json
 import math
 import pickle
@@ -3882,6 +3883,17 @@ def plot_edge_dist_grid(
 
 # --- 3-D BOUND SURFACE: cache solve() over (variant, n, m) grid; plot_variant_3d_surfaces draws it ---
 
+# The two multigraph vertex problems reduce exactly to the simple ones: vertex
+# mode is blind to parallel copies (see _split_capacity_matrix), so a multigraph
+# and its underlying simple graph have the same vertex connectivity.  We mirror
+# the simple-vertex surface into these keys rather than searching multigraphs,
+# whose degenerate free-parallel fills would report a lower bound far above the
+# true (simple) value and spike the plot.
+_SURFACE_ALIASED_VERTEX = {
+    "multi_undirected_vertex": "simple_undirected_vertex",
+    "multi_directed_vertex":   "simple_directed_vertex",
+}
+
 # 12 variant configs for the surface computation.
 _SURFACE_VARIANT_CONFIGS: list[dict] = [
     dict(key="simple_undirected_edge",   title="simple undirected edge",
@@ -3975,6 +3987,8 @@ def compute_surface_cache(
 
     for cfg in _SURFACE_VARIANT_CONFIGS:
         vkey = cfg["key"]
+        if vkey in _SURFACE_ALIASED_VERTEX:
+            continue  # filled by mirroring its simple counterpart, below
         if vkey not in cache:
             cache[vkey] = {}
         for n in ns:
@@ -4009,6 +4023,14 @@ def compute_surface_cache(
                 )
                 cache[vkey][sn][sm] = {"value": res.value, "bound": res.bound}
                 changed = True
+
+    # Mirror the simple-vertex surfaces into their multigraph aliases, so the two
+    # provably-equal problems show identical bars instead of two independent
+    # (and possibly degenerate) searches.
+    for multi_key, simple_key in _SURFACE_ALIASED_VERTEX.items():
+        if simple_key in cache and cache.get(multi_key) != cache[simple_key]:
+            cache[multi_key] = copy.deepcopy(cache[simple_key])
+            changed = True
 
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
