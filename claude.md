@@ -2244,3 +2244,74 @@ VERIFY: latexmk exit 0, 138 pp (unchanged), 0 overfull. Two underfull hboxes
 present are pre-existing (confirmed via git stash against the prior commit,
 unrelated to this edit -- one is a figure resizebox, one is near main.bbl).
 No program code touched, no test re-run needed.
+
+## 2026-07-31 (Sonnet, cont.) -- conj:multi-vertex REFUTED for all m>=5: clique chains
+
+Working task #1 from the queue (prove sum pi(u,v) >= (m-1)rank(G_0), which the
+thesis says would close conj:multi-vertex), the target inequality itself
+turned out FALSE. Direct construction: a single triangle grafted onto the
+thickened tree has cycle rank 1 and sum pi = 3 (each triangle edge has pi=1,
+the "long way round"), so the inequality (m-1)*1 <= 3 fails for every m>=5.
+Checked this actually beats the tree via the real feasibility checker, not
+just the sufficient-inequality proxy: built the multigraph directly
+(triangle at multiplicity m-2, rest of the tree at m-1) and confirmed with
+exceeds_bound(..., parallel_routes=True) that kappa^max stays exactly at
+m-1 while total multiplicity exceeds (m-1)(n-1) by exactly m-4, for every
+tested (m,n) with m>=5, n from m+2 up to n=30.
+
+Pushed further: does packing MULTIPLE disjoint triangles compound the gain?
+Yes, exactly linearly (k triangles -> k(m-4) excess), confirmed computationally
+for k up to 10. Then asked whether triangles are even the best local gadget:
+generalized to K_r blocks (thickened complete graphs on r vertices, the
+thesis's own existing "thickened complete graph" construction, but used as a
+repeated LOCAL block rather than the whole graph). Derived gain(r,m) =
+(r-1)(r-2)(m-1-r)/2 per block algebraically (matches numerics exactly, no
+rounding). The gain RATE per vertex used is maximized near r~m/2, not r=3,
+and scales like Theta(m^2) there (numerically: m=50 gives rate ~265 per
+vertex, roughly m^2/9). So for large m the correct construction uses
+half-m-sized cliques, not triangles, and the resulting lower bound is
+K_m^multi(n) >= (m-1)(n-1) + floor(n/r)*gain(r,m), giving
+K_m^multi(n)/n -> (m-1)+Theta(m^2) as n->infinity, a QUALITATIVELY different
+growth rate in m from the withdrawn conjecture's Theta(m).
+
+FEASIBILITY PROVED BY HAND (not just checked numerically), via a clean
+cut-vertex argument: every bridge/pendant edge in the chain-of-blocks graph is
+a genuine bridge (single edge, no alternate route between blocks), so no
+length->=2 path between two vertices of the SAME block can leave and return
+(would need to cross a bridge twice), hence pi(u,v)=r-2 exactly inside each
+K_r (standard Menger fact: K_r minus one edge has exactly r-2 internally-
+disjoint 2-paths, no more, since the other r-2 vertices are a matching-size
+cut). So kappa within a block = q+(r-2) = (m+1-r)+(r-2) = m-1 exactly, never
+over. Cross-block pairs are separated by a single cut vertex (a port), so
+kappa<=1 there, nowhere near the cap. This closes the construction as a
+genuine theorem, not just a numerically-checked family.
+
+VERIFIED TWO INDEPENDENT WAYS at a spread of (m,r,k): the thesis program's own
+exceeds_bound(separation="vertex", parallel_routes=True), AND a from-scratch
+max-flow on a hand-built vertex-split network using networkx
+(maximum_flow_value), sharing no code with the thesis checker. Both agree
+exactly (not just approximately) with the closed-form formula in every case,
+including m=15,r=8,k=2,n=21 (worst kappa=14=m-1) and m=20,r=11,k=2,n=27
+(worst kappa=19=m-1).
+
+THESIS CORRECTED (this conjecture was only added a few hours earlier in
+today's own phase-2 session, so this is same-day self-correction, not a
+lingering error): app_proofs.tex's conj:multi-vertex environment removed
+entirely (a false statement has no place in a numbered Conjecture, matching
+the honesty contract) and replaced with thm:clique-chain-vertex (full
+statement + proof, renders as Theorem A.56, page 114-115, visually verified
+clean). The "Two things stand out" lead-in paragraph, the sum-pi reduction
+paragraph, ch4_synthesis.tex's open-problems item, and main.tex's contribution
+statement sentence about this section were all rewritten to match. Program
+code untouched (exceeds_bound/parallel_routes were already there and correct,
+this was purely a mathematical-content finding, not a bug).
+
+Written up in research_notes/multi_vertex_clique_chains.md (full derivation +
+proof + the exact-optimal-r table + what remains open: whether same-size
+clique chains are actually optimal among ALL feasible multigraphs, which they
+are not known to be) with research_notes/scripts/multi_vertex_clique_check.py
+(both verification methods, asserts, reproducible).
+
+VERIFY: latexmk exit 0, 138 pp (unchanged), 0 overfull, 0 undefined refs/cites
+(thm:clique-chain-vertex resolves as A.56). No program code touched, no test
+suite re-run needed (no .py changes).

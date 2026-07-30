@@ -8,23 +8,34 @@ alt-convention, Case 2 tightness, S-T threshold, Leonard citation fix) are all l
 in claude.md and deleted here.
 
 ## OPEN — multigraph vertex, alternate convention (new section A.8)
-- [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** m=5 n=6,7 and m=6 n=5
-      would test conj:multi-vertex at the first sizes past the theta regime.
-      Command: max_multigraph_vertex_standard(n, m). RUNNING as of 2026-07-30
-      22:50, PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
-      (5,6),(5,7),(4,7) each capped at 5400s. Check for a printed verdict line
-      before relaunching.
-- [ ] **Prove sum_{uv} pi(u,v) >= (m-1) rank(G_0) for n >= m+2**, which closes
-      conj:multi-vertex in general (currently verified m<=4 only). Same shape
-      as lem:incidence-rank, so the triconnected decomposition is the tool to
-      try.
+- [x] **conj:multi-vertex REFUTED for all m>=5 (2026-07-31).** thm:clique-chain-vertex:
+      chaining thickened K_r blocks (r~m/2 optimal) through single bridge
+      vertices beats the thickened tree by an amount growing LINEARLY in n
+      (a single triangle already does it, gain=m-4 per triangle, for every
+      m>=5). True growth rate in m is Theta(m^2), not Theta(m). Proved by hand
+      (cut-vertex argument) + double-checked (program's exceeds_bound AND an
+      independent from-scratch networkx max-flow). research_notes/
+      multi_vertex_clique_chains.md. The m=5/m=6 tab:multi-vertex sweep below
+      is now secondary (still useful data, but no longer tests a live
+      conjecture) -- check its PID before relaunching.
+- [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** Command:
+      max_multigraph_vertex_standard(n, m). RUNNING as of 2026-07-30 22:50,
+      PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
+      (5,6),(5,7),(4,7) each capped at 5400s.
+- [ ] **New open problem (replaces the old one): is a same-size K_r chain
+      optimal, and what IS K_m^multi(n)?** thm:clique-chain-vertex is a lower
+      bound only. Mixed block sizes, multi-bridge connections, or a different
+      topology entirely are not ruled out. No upper bound attempted.
 
 ## OPEN — directed vertex problem at m >= 3
 - [ ] Genuinely open row, not a corollary of the arc case (Whitney's
       kappa<=lambda makes vertex-feasible the larger family). Exhaustive at
-      m=3 agrees with the arc value at every n reached. Wanted: the first
-      digraph where kappa < lambda on some pair AND that slack buys extra
-      arcs, or a proof it cannot.
+      m=3 agrees with the arc value at every n reached (n<=6). Single-arc-
+      addition to the arc-optimal witness finds no kappa<=2 survivor at
+      n=6..12 (2026-07-31, cheap check); a stronger remove-1-add-2 swap also
+      finds none at n=8,9,10 (slower, ~30 min total). Both are local-rigidity
+      evidence, not a proof. Wanted: the first digraph where kappa < lambda on
+      some pair AND that slack buys extra arcs, or a proof it cannot.
 
 ## OPEN PROOF TARGETS (genuine attempts; verify before anything enters the .tex)
 - [ ] **Directed-arc m=3 even case (flagship).** The min-degree-deletion engine

@@ -1887,17 +1887,37 @@ Exhaustive search over all multigraphs with multiplicities in $\{0, \dots, m-1\}
 \label{tab:multi-vertex}
 \end{table}
 
-Two things stand out. First, the problem is \emph{not} the edge problem in disguise: at $m = 5$, $n = 5$ the value is $19$ against the edge value $16$, so the separation axis genuinely buys something for multigraphs under this reading. Second, every case where it does so has $n \le m+1$, the same small-$n$ regime in which the complete graph is feasible for the simple problems, and in every computed case with $n \ge m+2$ the thickened tree is optimal. That suggests the following, and the evidence for it is thin, covering $m \le 4$ only.
+Two things stand out. First, the problem is \emph{not} the edge problem in disguise: at $m = 5$, $n = 5$ the value is $19$ against the edge value $16$, so the separation axis genuinely buys something for multigraphs under this reading. Second, the small-$n$ regime $n \le m+1$, where the complete graph is feasible for the simple problems too, is tempting to read as the \emph{only} place a cycle pays for itself, with the thickened tree optimal once $n \ge m+2$. It is not: a single triangle grafted anywhere onto the thickened tree already beats it, for every $m \ge 5$ and every such $n$, which the next theorem makes precise.
 
-\begin{conjecture}[The other convention, large $n$]\label{conj:multi-vertex}
-For all $n \ge m + 2$, $\;K_m^{\mathrm{multi}}(n) = (m-1)(n-1) = L_m(n)$, attained by any spanning tree at multiplicity $m-1$.
-\end{conjecture}
-
-\Cref{lem:multi-vertex-split} reduces this to a statement with no multiplicities in it at all. Since the total is $\sum_{uv \in E(G_0)} \mu(u,v) \le \sum_{uv \in E(G_0)} \bigl(m-1-\pi(u,v)\bigr)$, the bound $K_m^{\mathrm{multi}}(n) \le (m-1)(n-1)$ holds as soon as every connected simple graph $G_0$ on $n$ vertices with all $\pi \le m-1$ satisfies
+By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connected simple graph $G_0$ maximizes its total multiplicity by setting $\mu(u,v) = m-1-\pi(u,v)$ on every edge, giving total $(m-1)\,|E(G_0)| - \sum_{uv \in E(G_0)} \pi(u,v)$. Writing $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$, the thickened tree is beaten by any $G_0$ with
 \[
-    \sum_{uv \in E(G_0)} \pi(u,v) \;\ge\; (m-1)\,\mathrm{rank}(G_0),
+    \sum_{uv \in E(G_0)} \pi(u,v) \;<\; (m-1)\,\mathrm{rank}(G_0).
 \]
-with $\mathrm{rank}$ the cycle rank of \Cref{lem:incidence-rank}. The inequality says that the cycles a graph carries must pay for themselves, each independent cycle costing $m-1$ units of route capacity spread over the edges. It is exactly what fails in the theta regime: the theta graph at $m = 5$, $n = 5$ has cycle rank $3$ and $\sum \pi = 9$, short of the $12$ the inequality demands, which is the counting reason that construction wins there. Proving the inequality for $n \ge m+2$ is the open problem, and its resemblance to \Cref{lem:incidence-rank}, which also bounds a cycle rank under a local connectivity ceiling, suggests the triconnected decomposition is the tool to try.
+The obvious guess is that cycles must always pay for themselves against this bound, each independent cycle costing $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
+
+\begin{theorem}[Clique chains beat the thickened tree, for every $m \ge 5$]\label{thm:clique-chain-vertex}
+Fix $3 \le r \le m+1$ and set $q = m+1-r$, the multiplicity of a thickened $K_r$ that saturates the vertex ceiling on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). For $n \ge r$, partition $k = \lfloor n/r \rfloor$ disjoint $r$-vertex blocks out of the $n$ vertices, thicken each into a $K_r$ at multiplicity $q$, join a fixed vertex of each block to a fixed vertex of the next by a single edge at multiplicity $m-1$, and attach any leftover vertices as a pendant path at the same multiplicity. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
+\[
+    (m-1)(n-1) \;+\; \left\lfloor \frac{n}{r} \right\rfloor \cdot \mathrm{gain}(r,m),
+    \qquad
+    \mathrm{gain}(r,m) := \frac{(r-1)(r-2)(m-1-r)}{2}.
+\]
+\end{theorem}
+
+\begin{proof}
+Write $G_0$ for the underlying simple graph.
+
+\emph{Feasibility.} Every bridge and pendant edge of $G_0$ is a genuine bridge, since blocks are joined only by single edges with no alternate route, so no path of length $\ge 2$ between two vertices of the same block can leave it and return, which would cross a bridge edge twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally-disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or either endpoint on a bridge or pendant edge, the port vertex adjacent to $u$'s side (or to $v$'s side, if $u$ is itself that port) is a single cut vertex separating them, so $\kap_G(u,v) \le 1$.
+
+\emph{Count.} Only the $k$ blocks contribute to $\mathrm{rank}(G_0)$ or to $\sum \pi$, since bridges and pendant edges have $\pi = 0$ and lie in no cycle. Each $K_r$ has rank $(r-1)(r-2)/2$ and contributes $\binom{r}{2}(r-2)$ to the sum, since each of its $\binom{r}{2}$ edges has $\pi = r-2$. Substituting into $(m-1)(n-1+\mathrm{rank}(G_0)) - \sum \pi$,
+\[
+    (m-1)\Bigl[n-1+k\tfrac{(r-1)(r-2)}{2}\Bigr] - k\tfrac{r(r-1)(r-2)}{2}
+    \;=\; (m-1)(n-1) + k\,\mathrm{gain}(r,m),
+\]
+using $(m-1)\tfrac{(r-1)(r-2)}{2} - \tfrac{r(r-1)(r-2)}{2} = \tfrac{(r-1)(r-2)\bigl[(m-1)-r\bigr]}{2} = \mathrm{gain}(r,m)$.
+\end{proof}
+
+At $r = 3$, $\mathrm{gain}(3,m) = m-4$: zero at $m = 4$, matching the exhaustive finding that $m \le 4$ has no counterexample, and strictly positive for every $m \ge 5$. So the guess that the thickened tree is optimal once $n \ge m+2$ is false for every $m \ge 5$: it held only within the reach of the exhaustive table, $m \le 4$. Packing $k = \lfloor n/r \rfloor$ blocks instead of one multiplies the excess by $k$, so the gap over the thickened tree grows linearly in $n$, and optimizing $r$ widens it further. Treated as continuous, $\mathrm{gain}(r,m)/r$ peaks near $r \sim m/2$, where it is $\Theta(m^2)$, so $K_m^{\mathrm{multi}}(n)/n \to (m-1) + \Theta(m^2)$ as $n \to \infty$ at fixed large $m$, a different order in $m$ from the guess above. Whether same-size clique chains are optimal among all feasible multigraphs, and what the true value of $K_m^{\mathrm{multi}}(n)$ is, are open again rather than reduced to a single inequality about cycle rank.
 
 \section{The random threshold}
 
