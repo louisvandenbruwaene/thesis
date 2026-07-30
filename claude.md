@@ -2417,3 +2417,18 @@ as the natural next computation.
 VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 undefined refs/cites. Script
 runs clean in both modes. Background jobs untouched (fact (a) PID 79768,
 multi-vertex sweep PID 79194, both still alive).
+
+CONSISTENCY AUDIT after the above: swept every place that states the
+hypergraph vertex agreement or the multigraph vertex status, since three
+sessions have now edited overlapping claims. Found ONE stale spot:
+ch4_synthesis.tex's open-problems item still cited only k_4^(3)(5)=6 and
+called the eventual failure "the analogue of the m=5 graph divergence", an
+analogy that is now an actual theorem in this convention. Rewritten to carry
+the eleven-cell evidence and the r=2 boundary. Checked and found CORRECT
+(no edit needed): tab:summary's two multigraph vertex rows, which refer to
+the COLLAPSING convention of sec:parallel-convention and are untouched by the
+alternate-convention result; main.tex's "settled at m=2 and m=3" claim; ch2's
+description of the other convention as a new extremal problem; and the lay
+summary, whose two claims are the m<=3 hypergraph results and fact (a),
+neither affected. No dangling reference to the removed conj:multi-vertex
+(build reports 0 undefined).
