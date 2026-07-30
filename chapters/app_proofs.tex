@@ -467,10 +467,12 @@ The right-hand side is a downward parabola in $b$. Writing $s = n + m - 2$, it i
 This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. It is worth being exact about how much was assumed, because the count is often summarised as resting on the absence of backward arcs alone, and that summary is too generous. Four things were granted at once: that a partition $V = A \cup B$ exists at all, that every arc from $A$ to $B$ is present, that no arc lies inside $A$, and that no arc runs from $B$ back to $A$. Only the last of the four is the backward-arc condition. The first three describe the shape of the extremiser, and nothing proved so far forces an arbitrary extremal digraph to have that shape. The honest statement of the gap is therefore a structural one:
 
 \begin{conjecture}[The missing decomposition]\label{open:decomposition}
-Every extremal non-hub digraph $D$ with $\lec^{\max}_D \le m-1$ admits a partition $V(D) = A \cup B$ such that every arc from $A$ to $B$ is present, no arc lies inside $A$, and no arc runs from $B$ to $A$.
+Let $n$ be large enough that the quadratic branch of \Cref{conj:dir-arc} strictly exceeds the linear one, that is, $\floor{(n+m-2)^2/4} > m(n-1)$. Then every extremal digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ admits a partition $V(D) = A \cup B$ such that every arc from $A$ to $B$ is present, no arc lies inside $A$, and no arc runs from $B$ to $A$.
 \end{conjecture}
 
-Given \Cref{open:decomposition} the count above closes \Cref{conj:dir-arc} for $m \ge 3$. The backward-arc clause is the part where the natural delete-and-compensate exchange fails to be monotone, which is why it is the clause usually named, but the partition itself is not free either, and \Cref{ch:synthesis} states the position that way.
+The hypothesis on $n$ has to be there, and it is worth seeing why, because the obvious phrasing is too narrow. On the linear branch the extremisers are \emph{not} just the hub. At $m = 2$, every bidirected spanning tree is feasible and has exactly $2(n-1)$ arcs, since between two vertices the only route follows the unique tree path, so the whole extremal set on that branch is the set of bidirected trees. An exhaustive classification confirms it: at $n = 5$ and $n = 6$ there are exactly $3$ and $6$ extremal digraphs up to isomorphism, which are precisely the numbers of trees on $5$ and $6$ vertices, and none of them admits the decomposition. Excluding ``the hub'' would leave all the other trees behind, so the clean hypothesis is on the size rather than on the shape.
+
+Given \Cref{open:decomposition} the count above closes \Cref{conj:dir-arc} for $m \ge 3$. The backward-arc clause is the part where the natural delete-and-compensate exchange fails to be monotone, which is why it is the clause usually named, but the partition itself is not free either, and \Cref{ch:synthesis} states the position that way. Testing the conjecture by exhaustion is harder than it looks: the crossover sits at $n = 8$ for $m = 2$ and at $n = 9$ for $m = 3$, so every size an exhaustive sweep can reach at $m = 3$ still lies on the linear branch, where the statement says nothing. That is the practical reason this conjecture has resisted a computational probe rather than a proof.
 
 What can be proved without any of the four is the leading constant, and the argument is short enough to give in full. It also says something the conjecture does not: that every feasible digraph is within a lower-order number of arcs of being one-directional bipartite.
 
@@ -493,10 +495,13 @@ so the leading constant $\tfrac14$ of \Cref{conj:dir-arc} holds unconditionally,
 \]
 Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)\,n(n-1)$.
 
-\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$, and a digraph on $n$ vertices has at most $\binom{n}{2}$ digons. Combining with Step 1,
+\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$. Distinct digons use disjoint pairs of arcs, so twice the number of digons is at most $|A(D)|$, and that is exactly the slack Step 1 left over. Combining the two,
 \[
-    \sum_{x \in V} d^+(x)\,d^-(x) \;\le\; (m-1)\,n(n-1) + 2\binom{n}{2} \;=\; m\,n(n-1).
+    \sum_{x \in V} d^+(x)\,d^-(x)
+    \;\le\; \bigl[(m-1)\,n(n-1) - |A(D)|\bigr] + |A(D)|
+    \;=\; (m-1)\,n(n-1).
 \]
+This is the one inequality the whole section runs on, and it is worth reading in words: a vertex with a large in-degree \emph{and} a large out-degree is expensive, because it manufactures two-step routes for many pairs at once, and the budget for those routes is only quadratic in $n$.
 
 \emph{Step 3, the smaller half-degree is small on average.} Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy-Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$,
 \[
@@ -504,8 +509,8 @@ Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) 
     \sum_{x \in V} \min\bigl(d^+(x), d^-(x)\bigr)
     &\;\le\; \sum_{x \in V} \sqrt{d^+(x)\, d^-(x)}
     \;\le\; \sqrt{\,n \sum_{x \in V} d^+(x)\, d^-(x)\,} \\[2pt]
-    &\;\le\; \sqrt{\,n \cdot m\,n(n-1)\,}
-    \;=\; n\sqrt{m(n-1)}
+    &\;\le\; \sqrt{\,n \cdot (m-1)\,n(n-1)\,}
+    \;=\; n\sqrt{(m-1)(n-1)}
     \;\le\; \sqrt{m}\, n^{3/2}.
 \end{aligned}
 \]
@@ -515,7 +520,61 @@ Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) 
 The asymptotic statement follows because the augmented bipartite construction (\Cref{const:augmented-bipartite}) already gives $\ell_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4} = n^2/4 + O_m(n)$, and $n^{3/2}$ dominates $n$.
 \end{proof}
 
-The error term is honest rather than sharp: \Cref{conj:dir-arc} predicts a second-order term of size $(m-2)n/2$, which is smaller than $n^{3/2}$, so the proposition does not distinguish the conjectured formula from its near neighbours. What it does is remove the leading constant from the list of open questions and reduce the conjecture to the second-order term, which is where the structure of \Cref{open:decomposition} lives. A stability argument that improved $n^{3/2}$ to $O_m(n)$ would leave only a bounded discrepancy, and that is the natural next target on this route.
+The error term $n^{3/2}$ is larger than the $(m-2)n/2$ that \Cref{conj:dir-arc} predicts, so the proposition as it stands does not separate the conjectured formula from its near neighbours. It can be sharpened to the right order, and the extra idea is small enough to be worth giving, because it explains where the $\sqrt{n}$ was being wasted.
+
+Step 3 is lossy exactly when every vertex carries a middling degree. The Cauchy-Schwarz step is tight only if $d^+(x)d^-(x)$ is about $(m-1)n$ at every vertex, which forces every degree down to about $\sqrt{mn}$. But a digraph with $\Theta(n^2)$ arcs has average degree $\Theta(n)$, and at a vertex of large degree the constraint $d^+(x) d^-(x) \le (m-1)n$ bites much harder: with $d^+ + d^-$ of order $n$, the smaller of the two must be of order $m$ rather than $\sqrt{mn}$. The dense case and the tight case of Step 3 are therefore incompatible, and the way to exploit that is a dichotomy on the minimum degree, with vertex deletion to handle the sparse side.
+
+\begin{lemma}[Small side of a high-degree vertex]\label{lem:small-side}
+For any vertex $x$ of a digraph with total degree $d(x) = d^+(x) + d^-(x) > 0$,
+\[
+    \min\bigl(d^+(x), d^-(x)\bigr) \;\le\; \frac{2\,d^+(x)\,d^-(x)}{d(x)} .
+\]
+\end{lemma}
+
+\begin{proof}
+Write $\mu = \min(d^+(x), d^-(x))$ and $M = \max(d^+(x), d^-(x))$, so $\mu + M = d(x)$ and $\mu M = d^+(x)d^-(x)$. Since $\mu \le M$ we have $M \ge d(x)/2$, hence $d^+(x)d^-(x) = \mu M \ge \mu\, d(x)/2$, which rearranges to the claim.
+\end{proof}
+
+\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
+For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
+\[
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
+\]
+so for each fixed $m$,
+\[
+    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n),
+\]
+and both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally.
+\end{theorem}
+
+\begin{proof}
+Induction on $n$. For $n = 2$ a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4(m-1) \ge 5$, so the base holds. Let $n \ge 3$ and split on the minimum total degree.
+
+\emph{Case 1: some vertex $v$ has $d(v) < n/2$.} Since $d(v)$ is an integer, $d(v) \le \floor{n/2}$. By \Cref{lem:subdigraph-monotone} the digraph $D - v$ on $n-1$ vertices is still feasible, so the induction hypothesis applies to it and
+\[
+    |A(D)| \;\le\; \floorfrac{(n-1)^2}{4} + 4(m-1)(n-2) + \floorfrac{n}{2}
+    \;=\; \floorfrac{n^2}{4} + 4(m-1)(n-2),
+\]
+using \Cref{lem:floor-identity} for the last step, and this is below the claimed bound.
+
+\emph{Case 2: every vertex has $d(x) \ge n/2$.} By \Cref{lem:small-side} and Step 2 of \Cref{prop:dir-arc-stability},
+\[
+    \sum_{x \in V} \min\bigl(d^+(x), d^-(x)\bigr)
+    \;\le\; \sum_{x \in V} \frac{2\,d^+(x)\,d^-(x)}{d(x)}
+    \;\le\; \frac{4}{n}\sum_{x \in V} d^+(x)\,d^-(x)
+    \;\le\; \frac{4}{n}\,(m-1)\,n(n-1),
+\]
+which is $4(m-1)(n-1)$. Step 4 of \Cref{prop:dir-arc-stability} deletes exactly that many arcs and leaves at most $\floor{n^2/4}$, so the bound holds in this case too.
+
+For the two-sided asymptotic statement, \Cref{const:augmented-bipartite} gives
+\[
+    \ell_m^{\mathrm{dir}}(n) \;\ge\; \floorfrac{(n+m-2)^2}{4}
+    \;=\; \frac{n^2}{4} + \frac{(m-2)n}{2} + O_m(1),
+\]
+so the second-order term is linear in $n$ from both sides.
+\end{proof}
+
+What is left open is therefore a constant factor in one coefficient, not a shape. \Cref{conj:dir-arc} says the second-order coefficient is exactly $(m-2)/2$, and the theorem pins it between that and $4(m-1)$, a factor of roughly eight. Closing that gap is where the structure of \Cref{open:decomposition} lives, and the dichotomy above suggests where to push: Case 2 is the wasteful half, since it charges every vertex the worst case of \Cref{lem:small-side} even though in the conjectured extremiser the whole of one side has $\min(d^+, d^-) = 0$.
 
 \section{The directed multigraph problem at large \texorpdfstring{$n$}{n}}
 
@@ -1724,6 +1783,84 @@ so it witnesses the same ${\approx}\,(m-1)n^2/(4(r-1))$ lower bound.
 \end{proof}
 
 
+\section{The multigraph vertex problem under the other convention}\label{sec:multi-vertex-standard}
+
+\Cref{sec:parallel-convention} collapses parallel copies in vertex mode, which makes the two multigraph vertex variants restatements of their simple counterparts and is why they carry no theorem of their own. This section takes the other reading seriously, because under it the question is genuinely new, and records what can be proved and what the machine finds. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally vertex-disjoint $u$-$v$ routes, since a single edge is a path with no interior. Write $K_m^{\mathrm{multi}}(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$ under this reading.
+
+The first thing to notice is that the two kinds of route never interfere, which splits the measure cleanly in two.
+
+\begin{lemma}[Splitting the vertex measure]\label{lem:multi-vertex-split}
+Let $G$ be a multigraph with multiplicity function $\mu$ and underlying simple graph $G_0$. For any two vertices $u \ne v$, write $\pi(u,v)$ for the largest number of pairwise internally disjoint $u$-$v$ paths of length at least two in $G_0$. Then, under the convention above,
+\[
+    \kap_G(u,v) \;=\; \mu(u,v) \;+\; \pi(u,v).
+\]
+\end{lemma}
+
+\begin{proof}
+A parallel copy of $uv$ is a path with empty interior, so any two copies are internally disjoint from each other and from every longer route. A maximum family may therefore be assumed to contain all $\mu(u,v)$ copies, and what it can add to them is a family of pairwise internally disjoint routes of length at least two, whose interiors are disjoint sets of vertices. Since parallel copies are irrelevant to a route of length at least two, which is determined by its vertex sequence, the largest such family has size $\pi(u,v)$, computed in $G_0$.
+\end{proof}
+
+So feasibility says exactly that $\mu(u,v) \le m-1-\pi(u,v)$ on every edge, and that $\pi(u,v) \le m-1$ on every pair. At $m = 2$ this is already decisive.
+
+\begin{theorem}[The other convention at $m = 2$]\label{thm:multi-vertex-m2}
+$K_2^{\mathrm{multi}}(n) = n-1$, attained exactly by the spanning trees.
+\end{theorem}
+
+\begin{proof}
+By \Cref{lem:multi-vertex-split}, $\kap^{\max} \le 1$ forces $\mu(u,v) + \pi(u,v) \le 1$ on every edge. If $G_0$ contained a cycle, an edge $uv$ of that cycle would have $\mu(u,v) \ge 1$ and $\pi(u,v) \ge 1$ from the rest of the cycle, a contradiction, so $G_0$ is a forest and every multiplicity is one. A forest has at most $n-1$ edges, and a spanning tree attains it.
+\end{proof}
+
+For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+
+\begin{itemize}
+    \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
+    \item \emph{The thickened complete graph.} Give every edge of $K_n$ the same multiplicity $q$. Here $\pi(u,v) = n-2$, so feasibility asks $q \le m+1-n$, and the count is $\binom{n}{2}(m+1-n)$, positive only when $n \le m+1$.
+    \item \emph{The thickened theta.} Choose two \emph{poles} and join each of the $n-2$ remaining vertices to both of them at multiplicity $m-2$, then join the poles to each other at multiplicity $m+1-n$ when that is positive. A pole and a middle vertex have $\pi = 1$, two middle vertices have $\pi = 2$, and the two poles have $\pi = n-2$, so this is feasible exactly when $n \le m+1$, and it carries $2(n-2)(m-2) + \max(0,\, m+1-n)$ edges.
+\end{itemize}
+
+The theta family is the one that makes this problem genuinely different from the edge problem, and it was found by the search rather than by hand. Whenever it is feasible, which is to say for $n \le m+1$, it beats the thickened tree for every $m \ge 4$, and it is the extremiser in every such case the exhaustion has settled. Comparing the three counts, the tree leads once $n \ge m+2$, where the other two die for lack of route budget.
+
+Exhaustive search over all multigraphs with multiplicities in $\{0, \dots, m-1\}$, run under this convention, gives the values in \Cref{tab:multi-vertex}. The routine is \code{max\_multigraph\_vertex\_standard(n, m)}, which is the same include-or-exclude branch and bound as everywhere else in \Cref{ch:certify}, with the checker's vertex mode switched to the second convention by one flag, \code{parallel\_routes}, on \code{\_split\_capacity\_matrix}. Every value below was computed twice, once by that routine and once by a separately written script sharing no code with it, and on the fifteen cells both have finished they agree exactly.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ll|ccccccc}
+    & & $n=2$ & $3$ & $4$ & $5$ & $6$ & $7$ \\
+    \midrule
+    $m=2$ & value        & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+          & tree         & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+    \midrule
+    $m=3$ & value        & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
+          & tree         & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
+    \midrule
+    $m=4$ & value        &  & $6$ & $9$ & $12$ & $15$ &  \\
+          & tree         &  & $6$ & $9$ & $12$ & $15$ &  \\
+          & theta        &  & $6$ & $9$ & $12$ &  &  \\
+    \midrule
+    $m=5$ & value        &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
+          & tree         &  &  & $12$ & $16$ &  &  \\
+          & theta        &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
+    \midrule
+    $m=6$ & value        &  &  & $\mathbf{19}$ &  &  &  \\
+          & tree         &  &  & $15$ &  &  &  \\
+          & theta        &  &  & $\mathbf{19}$ &  &  &  \\
+\end{tabular}
+\caption{The multigraph vertex problem under the convention that parallel copies are distinct routes, computed exhaustively by \code{max\_multigraph\_vertex\_standard}. Entries in bold are the cases where the value exceeds the multigraph edge value $(m-1)(n-1)$, and there the thickened theta is the extremiser. A blank cell is a size not computed, or one where the construction in that row does not apply. Cells with $n \le m+1$ are the regime in which the theta and complete constructions are feasible at all.}
+\label{tab:multi-vertex}
+\end{table}
+
+Two things stand out. First, the problem is \emph{not} the edge problem in disguise: at $m = 5$, $n = 5$ the value is $19$ against the edge value $16$, so the separation axis genuinely buys something for multigraphs under this reading. Second, every case where it does so has $n \le m+1$, the same small-$n$ regime in which the complete graph is feasible for the simple problems, and in every computed case with $n \ge m+2$ the thickened tree is optimal. That suggests the following, and the evidence for it is thin, covering $m \le 4$ only.
+
+\begin{conjecture}[The other convention, large $n$]\label{conj:multi-vertex}
+For all $n \ge m + 2$, $\;K_m^{\mathrm{multi}}(n) = (m-1)(n-1) = L_m(n)$, attained by any spanning tree at multiplicity $m-1$.
+\end{conjecture}
+
+\Cref{lem:multi-vertex-split} reduces this to a statement with no multiplicities in it at all. Since the total is $\sum_{uv \in E(G_0)} \mu(u,v) \le \sum_{uv \in E(G_0)} \bigl(m-1-\pi(u,v)\bigr)$, the bound $K_m^{\mathrm{multi}}(n) \le (m-1)(n-1)$ holds as soon as every connected simple graph $G_0$ on $n$ vertices with all $\pi \le m-1$ satisfies
+\[
+    \sum_{uv \in E(G_0)} \pi(u,v) \;\ge\; (m-1)\,\mathrm{rank}(G_0),
+\]
+with $\mathrm{rank}$ the cycle rank of \Cref{lem:incidence-rank}. The inequality says that the cycles a graph carries must pay for themselves, each independent cycle costing $m-1$ units of route capacity spread over the edges. It is exactly what fails in the theta regime: the theta graph at $m = 5$, $n = 5$ has cycle rank $3$ and $\sum \pi = 9$, short of the $12$ the inequality demands, which is the counting reason that construction wins there. Proving the inequality for $n \ge m+2$ is the open problem, and its resemblance to \Cref{lem:incidence-rank}, which also bounds a cycle rank under a local connectivity ceiling, suggests the triconnected decomposition is the tool to try.
+
 \section{The random threshold}
 
 The probabilistic ingredients are two Chernoff bounds, quoted in the form we use them.
@@ -1801,4 +1938,4 @@ The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} 
 
 \section{How the program checks itself}
 
-The invariants are checked by the self-test at the foot of \texttt{erdos915\_unified.py}, run simply with \texttt{python erdos915\_unified.py}. It confirms the checker against the proven $m = 2$ values $2, 4, 6, 8$ and against the first three vertex base cases of \Cref{thm:dir-vertex-m2-exact}, the fast vertex-flow test against the exact checker it stands in for, the counting step and the bound of \Cref{prop:dir-arc-stability} on sampled feasible digraphs, the named constructions against their predicted sizes and connectivities, the Gomory--Hu shortcut against brute-force max-flow, the Berge connectivities of the hypergraph checker, the Monte Carlo appearance threshold and Whitney's inequality on every sample, the cut-counting optima for small $n$, the search reaching the certified optimum, and the driver returning the proven value or a feasible witness in each mode. Every check passes. A single companion script, \texttt{make\_figures.py}, regenerates every figure in the thesis from the same file, with the mapping listed in \texttt{program/README.md}.
+The invariants are checked by the self-test at the foot of \texttt{erdos915\_unified.py}, run simply with \texttt{python erdos915\_unified.py}. It confirms the checker against the proven $m = 2$ values $2, 4, 6, 8$ and against the first three vertex base cases of \Cref{thm:dir-vertex-m2-exact}, the fast vertex-flow test against the exact checker it stands in for, the counting step and both bounds of \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-error} on sampled feasible digraphs, including the high-degree case of the latter's proof, two values of the alternative-convention multigraph vertex problem of \Cref{sec:multi-vertex-standard} including the one that separates it from the edge problem, the named constructions against their predicted sizes and connectivities, the Gomory--Hu shortcut against brute-force max-flow, the Berge connectivities of the hypergraph checker, the Monte Carlo appearance threshold and Whitney's inequality on every sample, the cut-counting optima for small $n$, the search reaching the certified optimum, and the driver returning the proven value or a feasible witness in each mode. Every check passes. A single companion script, \texttt{make\_figures.py}, regenerates every figure in the thesis from the same file, with the mapping listed in \texttt{program/README.md}.

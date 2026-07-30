@@ -471,11 +471,13 @@ Here $k_m(n)$ denotes the vertex-disjoint extremal function, the counterpart of 
 Replacing edge-disjoint by internally vertex-disjoint routes changes nothing at first. Leonard proved that the edge and vertex problems give the same answer while $m$ stays small.
 
 \begin{theorem}[Leonard \cite{Leonard73BE}]\label{thm:leonard}
-For simple graphs and $m \le 4$,
+For simple graphs, all $n \ge m$ and $m \le 4$,
 \[
     k_m(n) = \ell_m(n) = \floorfrac{m(n-1)}{2}.
 \]
 \end{theorem}
+
+The hypothesis $n \ge m$ is the same one Mader's theorem carries, and it is not decoration. Below it the complete graph $K_n$ is itself feasible, since $\kap_{K_n}^{\max} = \lec_{K_n}^{\max} = n-1 \le m-1$, so the answer is the trivial $\binom{n}{2}$ and the formula overshoots it. At $n = 3$, $m = 4$ the formula gives $4$ where a graph on three vertices has only $3$ edges. Every closed form in this thesis carries the same caveat, stated or inherited from its constructions, and the figures cap each curve at the trivial maximum for exactly this reason.
 
 For $m \le 4$ the extremal graphs for the two problems coincide: Whitney's inequality $\kap \le \lec$ is tight where it matters and the harder vertex constraint costs nothing (\Cref{fig:divergence}, the three overlapping blue curves). One is tempted to expect this forever. It fails at the very next value, and the failure is sharp.
 
@@ -486,7 +488,7 @@ For simple graphs and all $n \ge 10$,
 \]
 \end{theorem}
 
-The restriction $n \ge 10$ is the range over which S{\o}rensen and Thomassen certify that $k_5(n)$ equals the formula. The formula itself already exceeds $\ell_5(n)$ for $n = 6$ (by one), for $n = 8$ (by one), and for all $n \ge 9$: at $n = 10$ the vertex formula gives $23$ and the edge formula gives $22$. At $n = 7$ both formulas coincidentally tie at $15$. For $n \le 9$ the true $k_5(n)$ must be determined by structural analysis rather than the formula, which is why the theorem's stated domain begins at $n = 10$.
+The restriction $n \ge 10$ is the range over which S{\o}rensen and Thomassen certify that $k_5(n)$ equals the formula. The formula itself already exceeds $\ell_5(n)$ for $n = 6$ (by one), for $n = 8$ (by one), and for all $n \ge 9$: at $n = 10$ the vertex formula gives $23$ and the edge formula gives $22$. At $n = 7$ both formulas coincidentally tie at $15$. For $n \le 9$ the true $k_5(n)$ must be determined by structural analysis rather than the formula, which is why the theorem's stated domain begins at $n = 10$. One caveat on this threshold, recorded rather than resolved: an external review of a late draft reported that the current Erd\H{o}s Problems entry states the result from $n = 13$ rather than $n = 10$. I have not been able to check that against the original paper, and nothing in this thesis depends on which of the two thresholds is correct, since $k_5$ enters only as the cited first divergence. A reader who needs the exact range should consult \cite{SorensenThomassen74} directly, and should treat $n \ge 13$ as the safe reading.
 
 At $m = 5$ the vertex problem genuinely diverges from the edge problem, visible in \Cref{fig:divergence} as the shaded gap that opens between the dashed blue and solid orange curves. The reason is structural. Leonard's method leans on the extremal graphs being assembled from cliques, vertex sets joined in all pairs, glued along shared cliques. A \emph{$k$-tree} is built up one vertex at a time: start from a complete graph on $k+1$ vertices, then again and again add a single new vertex and join it to all $k$ vertices of some clique of size $k$ that is already there. \Cref{fig:k-tree} grows a $2$-tree, hanging each new vertex on an edge already present. These clique scaffolds are exactly the building blocks the method uses. Through $m = 4$ those scaffolds are forced, and counting their edges gives the bound.
 
@@ -713,11 +715,13 @@ At $m = 2$ the inside of $B$ is empty and the construction reduces to \Cref{cons
 The two rival shapes invite a political picture. The hub is a single king through whom all traffic must pass, cheap to build but limited by the one throne. The bipartite family is a flat cabinet of ministers, each handling its own dossier with no central seat, and it scales quadratically. Which arrangement packs more arcs under the ceiling depends on $n$, and for $m \ge 3$ the cabinet overtakes the king once $n$ is large. This is the corrected shape, and it leads to the standing conjecture for the directed arc problem.
 
 \begin{conjecture}\label{conj:dir-arc}
-For simple digraphs and $m \ge 2$,
+For simple digraphs and all $n \ge m \ge 2$,
 \[
     \ell_m^{\mathrm{dir}}(n) = \max\!\left(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\right).
 \]
 \end{conjecture}
+
+The hypothesis $n \ge m$ is the one both constructions already carry, and it is needed for the same reason as in \Cref{thm:leonard}: below it the complete digraph is feasible and the answer is the trivial $n(n-1)$, which the formula exceeds. At $n = 3$, $m = 4$ the formula gives $8$ where three vertices carry only $6$ arcs. The exhaustive search confirms the value is $6$ there.
 
 For $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. For $m = 3$ the formula $\floor{(n+1)^2/4}$ equals $\floor{n^2/4} + \ceil{n/2}$, so the conjecture reduces to the previous formula for $m = 2$ and $m = 3$. For $m = 3$, $n = 10$ the second branch gives $\floor{121/4} = 30$, matching \Cref{rem:counterexample-m3}. For $m \ge 4$ the new formula and the old balanced-partition count $\floor{n^2/4} + (m-2)\ceil{n/2}$ no longer agree: the quadratic branches already differ (for $m = 4$ the new one is larger by exactly one at every even $n$), but the hub term $m(n-1)$ dominates both at small $n$, so the full conjectured value first overtakes the old one at $n = 12$ for $m = 4$. The construction of \Cref{const:augmented-bipartite} with the shifted partition witnesses the difference. The lower bound holds for all $m$, witnessed by \Cref{const:directed-hub} on the first branch and \Cref{const:augmented-bipartite} on the second. The upper bound is open, and \Cref{ch:synthesis} returns to it with what structural progress the machine and the hand can jointly supply.
 

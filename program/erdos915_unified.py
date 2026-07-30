@@ -886,7 +886,8 @@ def _pairs(obj):
 # the rare step where the search genuinely needs it (an infeasible proposal).
 # DEPENDENCIES: _pairs (above), _tiny_maxflow (Section ENUMERATE), _UNBOUNDED.
 
-def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
+def _split_capacity_matrix(graph: Graph,
+                           parallel_routes: bool = False) -> tuple[np.ndarray, int]:
     """The ``2n x 2n`` capacity matrix of the vertex-split network.
 
     The vertex-mode network as a plain matrix, consumed by both the exact measure
@@ -894,9 +895,18 @@ def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
     (:func:`exceeds_bound` via :func:`_tiny_maxflow`).  Vertex ``v`` becomes an
     in-copy ``2v`` and an out-copy ``2v+1`` joined by an internal arc of capacity
     one (so any route uses ``v`` at most once), and each adjacency ``u -> v``
-    becomes a capacity-one arc ``(2u+1) -> (2v)`` (parallel edges do NOT raise
-    vertex connectivity).  The caller uncaps the two endpoints' own in->out gates
-    so Menger counts internally disjoint routes (see :func:`exceeds_bound`).
+    becomes an arc ``(2u+1) -> (2v)``.  The caller uncaps the two endpoints' own
+    in->out gates so Menger counts internally disjoint routes (see
+    :func:`exceeds_bound`).
+
+    ``parallel_routes`` selects the counting convention for parallel copies, the
+    choice discussed at length in the thesis (sec:parallel-convention).  The
+    default False caps every adjacency at one, so a bundle of parallel edges is a
+    single direct route and a multigraph measures as its underlying simple graph:
+    that is the convention the twelve variants use.  Setting it True gives the
+    adjacency capacity ``mu(u,v)``, so ``q`` parallel copies count as ``q``
+    internally disjoint routes, which is the alternative convention explored in
+    sec:multi-vertex-standard.
     """
     n = graph.num_vertices
     size = 2 * n
@@ -906,11 +916,59 @@ def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
     for u in range(n):
         for v in range(n):
             if u != v and graph.mu[u, v] > 0:
-                cap[2 * u + 1, 2 * v] = 1     # adjacency u -> v, capacity one
+                cap[2 * u + 1, 2 * v] = (int(graph.mu[u, v]) if parallel_routes
+                                         else 1)
     return cap, size
 
 
-def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
+def max_multigraph_vertex_standard(n: int, m: int,
+                                   deadline: float | None = None) -> tuple[int, Graph | None, bool]:
+    """Exhaustive maximum for the multigraph vertex problem, OTHER convention.
+
+    Maximises the total multiplicity of an undirected multigraph on ``n``
+    vertices subject to ``kappa^max <= m - 1`` when parallel copies are counted
+    as distinct internally vertex-disjoint routes.  Every multiplicity is capped
+    at ``m - 1`` because ``m`` parallel copies already exceed the ceiling on
+    their own.  Branch and bound over the pairs in a fixed order, trying the
+    largest multiplicity first, pruning on feasibility (which is monotone) and
+    on the incumbent.  Returns ``(best_total, witness, completed)``.
+    """
+    pairs = list(combinations(range(n), 2))
+    cap = m - 1
+    graph = Graph(n, MULTI_UNDIRECTED)
+    best = [0, None]
+    timed_out = [False]
+
+    def feasible() -> bool:
+        return not exceeds_bound(graph, m - 1, separation="vertex",
+                                 parallel_routes=True)
+
+    def recurse(i: int, total: int) -> None:
+        if deadline is not None and time.time() > deadline:
+            timed_out[0] = True
+            return
+        if total + cap * (len(pairs) - i) <= best[0]:
+            return
+        if i == len(pairs):
+            if total > best[0]:
+                best[0] = total
+                best[1] = graph.copy()
+            return
+        u, v = pairs[i]
+        for q in range(cap, -1, -1):
+            graph.set_multiplicity(u, v, q)
+            if q == 0 or feasible():
+                recurse(i + 1, total + q)
+            if timed_out[0]:
+                break
+        graph.set_multiplicity(u, v, 0)
+
+    recurse(0, 0)
+    return best[0], best[1], not timed_out[0]
+
+
+def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge",
+                  parallel_routes: bool = False) -> bool:
     """``True`` iff ``lambda^max(G) > k`` (edge) or ``kappa^max(G) > k`` (vertex).
 
     Equivalent to ``max_connectivity(graph, vertex_split=(separation=='vertex')) > k``
@@ -918,6 +976,10 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     paths, and the pair loop stops at the first violating pair.  On an infeasible
     graph this typically returns after a single pair.  The pair set is exactly the
     one :func:`max_connectivity` iterates, so the predicate matches it pair for pair.
+
+    ``parallel_routes`` is passed through to :func:`_split_capacity_matrix` and
+    only affects vertex mode: it selects the convention in which parallel copies
+    are distinct routes, used by :func:`max_multigraph_vertex_standard`.
     """
     n = graph.num_vertices
     if separation == "edge":
@@ -931,7 +993,7 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
                 return True
         return False
     if separation == "vertex":
-        cap, size = _split_capacity_matrix(graph)
+        cap, size = _split_capacity_matrix(graph, parallel_routes)
         for s, t in _pairs(graph):
             # Uncap the endpoints' own in->out gates so Menger counts INTERNAL
             # routes (mirrors local_connectivity's vertex mode); flow leaves s's
@@ -5586,14 +5648,33 @@ def _run_checks() -> int:
             _sg.mu[_a, _b] = 0
         _dout = [int(_sg.mu[x].sum()) for x in range(_sn)]
         _din = [int(_sg.mu[:, x].sum()) for x in range(_sn)]
-        if sum(_dout[x] * _din[x] for x in range(_sn)) > _sm * _sn * (_sn - 1):
+        # The sharp form of the counting step: (m-1) n(n-1), not m n(n-1).
+        if sum(_dout[x] * _din[x] for x in range(_sn)) > (_sm - 1) * _sn * (_sn - 1):
             _count_ok = False
         _slack = ((_sn * _sn) // 4 + math.sqrt(_sm) * _sn ** 1.5
                   - int(_sg.mu.sum()))
         _worst_slack = _slack if _worst_slack is None else min(_worst_slack, _slack)
-    check("prop:dir-arc-stability: two-step count and bound hold on 120 "
+        # thm:dir-arc-linear-error, the O_m(n) bound.
+        if int(_sg.mu.sum()) > (_sn * _sn) // 4 + 4 * (_sm - 1) * (_sn - 1):
+            _count_ok = False
+        # Case 2 of its proof: min total degree >= n/2 forces the linear bound
+        # on the sum of the smaller half-degrees.
+        if min(_dout[x] + _din[x] for x in range(_sn)) >= _sn / 2:
+            if (sum(min(_dout[x], _din[x]) for x in range(_sn))
+                    > 4 * (_sm - 1) * (_sn - 1)):
+                _count_ok = False
+    check("prop:dir-arc-stability and thm:dir-arc-linear-error hold on 120 "
           f"sampled feasible digraphs (tightest slack {_worst_slack:.1f})",
           _count_ok and _worst_slack >= 0)
+    # sec:multi-vertex-standard: the OTHER counting convention is a different
+    # problem, and the theta construction beats the thickened tree at m=5, n=4.
+    _mv4, _, _mv4_done = max_multigraph_vertex_standard(4, 3)
+    _mv5, _, _mv5_done = max_multigraph_vertex_standard(4, 5)
+    check(f"multigraph vertex, other convention: K_3(4) = {_mv4} = (m-1)(n-1)",
+          _mv4_done and _mv4 == 6)
+    check(f"multigraph vertex, other convention: K_5(4) = {_mv5} > 12, the "
+          "multigraph edge value, so the two problems differ",
+          _mv5_done and _mv5 == 14)
     # Exhaustive undirected by brute force: ell_2(5) = n-1 = 4 (a spanning tree).
     tree = solve(5, 2, directed=False, simple=True, exhaustive=True,
                  max_seconds=30.0)

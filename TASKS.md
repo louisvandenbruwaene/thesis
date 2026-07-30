@@ -4,7 +4,36 @@ Status: TODO | IN PROGRESS | BLOCKED(by) | AWAITING AUTHOR | DONE→delete after
 Completed 2026-06 blocks (SA-vs-tabu, parallel geng, conj:min-degree numerics, review
 fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and deleted here.
 
-## REVIEW FIXES 2026-07-30 (external review; all landed, see claude.md for the audit)
+## REVIEW FIXES 2026-07-30 (Stijn Cambie's review, run through ChatGPT; all landed)
+## PHASE 2 2026-07-30 (three new results, see claude.md)
+- [x] **Error term sharpened to O_m(n)**: thm:dir-arc-linear-error gives
+      |A| <= floor(n^2/4) + 4(m-1)(n-1) for all n, m, so ell_m^dir(n) =
+      n^2/4 + Theta_m(n) with no structural hypothesis. Only a factor ~8 in the
+      second-order coefficient is now open. Next: Case 2 of the proof charges
+      every vertex the worst case of lem:small-side, while the conjectured
+      extremiser has min(d+,d-) = 0 on a whole side. Exploiting that would cut
+      the constant.
+- [x] **Multigraph vertex, other convention** (new section A.8). m=2 proved;
+      the thickened THETA (two poles, middles at multiplicity m-2) beats the
+      thickened tree whenever n <= m+1 and m >= 4, so the problem is NOT the
+      multigraph edge problem. conj:multi-vertex now claims the tree only for
+      n >= m+2, verified m <= 4 only. Reduced to sum pi >= (m-1) rank(G_0).
+- [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** m=5 n=6,7 and m=6
+      n=5 would test conj:multi-vertex at the first sizes past the theta
+      regime. Command: max_multigraph_vertex_standard(n, m). m=3 n=7 took
+      ~13 min, so m=5 n=6 is plausible overnight.
+- [ ] **Prove sum_{uv} pi(u,v) >= (m-1) rank(G_0) for n >= m+2**, which closes
+      conj:multi-vertex. Same shape as lem:incidence-rank, so the triconnected
+      decomposition is the tool to try.
+- [x] **open:decomposition restated**: the linear-branch extremisers at m=2 are
+      ALL bidirected spanning trees (3 classes at n=5, 6 at n=6, the tree
+      counts), not just the hub, so the hypothesis is now on n being past the
+      branch crossover rather than on the shape. Note the crossover is n=8 at
+      m=2 and n=9 at m=3, so no exhaustive sweep at m=3 can test it.
+- [x] **Two missing hypotheses found and fixed**: thm:leonard and conj:dir-arc
+      were false as stated at n < m (formula exceeds the trivial maximum).
+      Both now carry n >= m, as thm:mader already did.
+
 - [x] **Whitney direction was inverted** in the proof of thm:dir-vertex-m2-exact
       (app_proofs) and in the ch1/ch4 prose. arc-feasible SUBSET vertex-feasible,
       so an arc upper bound does not restrict the vertex problem. Theorem is
@@ -23,14 +52,12 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
       corollary of the arc case. Exhaustive at m=3 agrees with the arc value at
       every n reached. Wanted: the first digraph where kappa < lambda on some
       pair AND that slack buys arcs, or a proof it cannot.
-- [ ] **Multigraph vertex under the standard convention** (parallel copies as
-      distinct one-step routes) is a new extremal problem; this thesis uses the
-      collapsing convention and counts adjacencies (sec:parallel-convention).
-      Wanted: exact values at m=3, small n, and a structural conjecture.
-- [ ] **Sorensen-Thomassen range**: the thesis says k_5(n) = floor(8n/3) - 3 for
-      n >= 10 with a worked justification in ch1. An external review claims the
-      current Erdos Problems record says n >= 13. NOT resolvable from here (the
-      paper is paywalled and erdosproblems.com 403s). CHECK AGAINST THE PAPER.
+- [x] **Multigraph vertex under the standard convention: DONE in phase 2**,
+      new appendix section A.8. See the phase-2 block above for what is left.
+- [x] **Sorensen-Thomassen range: AUTHOR'S CALL, recorded not resolved.** The
+      thesis keeps n >= 10 with its worked justification, and ch1 now records
+      that an external review reports n >= 13 and that nothing here depends on
+      which is right. Author declined to check the paywalled paper.
 
 ## OPEN PROOF TARGETS (genuine attempts; verify before anything enters the .tex)
 - [ ] **Directed-arc m=3 even case (flagship).** The min-degree-deletion engine

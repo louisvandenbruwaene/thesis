@@ -2082,3 +2082,85 @@ TASKS.md as the one item needing the original paper.
 
 VERIFY: 90 unit tests OK (was 88, +2 for the vertex flow predicate), self-check
 ALL CHECKS PASSED including the new vertex base cases and the stability bound.
+
+## 2026-07-30 (Opus, phase 2) -- the promotor's list closed, three new results
+
+Author clarified that the ChatGPT review WAS Stijn Cambie's feedback (he ran the
+draft through it), so the promotor's concerns and the review list are the same
+list. Author asked to attempt three of the review's research suggestions and to
+keep auditing for mistakes.
+
+**AUDIT FOUND TWO MORE ERRORS, mine and the review's alike missed them.** Both
+are missing hypotheses that make a stated result literally false at small n:
+ - thm:leonard was "for simple graphs and m <= 4, k_m(n) = floor(m(n-1)/2)" with
+   NO n condition. At n=3, m=4 the formula gives 4 where a 3-vertex graph has 3
+   edges. Exhaustive check confirms the value is 3. Mader's theorem in the same
+   chapter carries "n >= m"; Leonard's had lost it. Fixed, with the reason
+   spelled out (below n = m the complete graph is itself feasible).
+ - conj:dir-arc had the same hole: at n=3, m=4 it predicts 8 where 6 arcs exist.
+   Exhaustive check confirms 6. Both constructions it cites already say n >= m.
+   Fixed in ch1, ch3 and the tab:summary caption.
+The figures had been capped at the trivial maximum since 2026-06-13, so the
+plots were right and the text was wrong. That is the kind of inconsistency an
+audit catches and a reader does not.
+
+**RESULT 1: the error term sharpened from O(n^{3/2}) to O_m(n).** This goes past
+what the review suggested. Two additions to prop:dir-arc-stability:
+ - Step 2 tightened from m n(n-1) to (m-1) n(n-1). The digon diagonal is at most
+   |A| (distinct digons use disjoint arc pairs) and Step 1 leaves exactly |A| of
+   slack, so the two cancel. Machine-checked tight (slack 0 attained).
+ - lem:small-side: min(d+,d-) <= 2 d+ d- / deg, since max >= deg/2. So a vertex
+   of LARGE degree has a SMALL smaller-side, which is exactly the case where the
+   Cauchy-Schwarz of Step 3 is lossy. Dichotomy: min degree >= n/2 gives
+   sum min <= 4(m-1)(n-1) directly; otherwise delete a vertex of degree
+   <= floor(n/2) and induct, closing exactly via lem:floor-identity.
+ => thm:dir-arc-linear-error: |A| <= floor(n^2/4) + 4(m-1)(n-1) for all n, m,
+ so ell_m^dir(n) = n^2/4 + Theta_m(n) unconditionally. The conjecture's
+ second-order coefficient is (m-2)/2; this pins it below 4(m-1), a factor of
+ about 8. Verified: 4000 random feasible digraphs for the counting steps, 1356
+ min-degree->=n/2 samples for Case 2, 0 violations, and the self-test carries
+ both bounds plus the Case 2 inequality.
+
+**RESULT 2: the multigraph vertex problem under the other convention (new
+section A.8), and my first conjecture about it was REFUTED by the data.**
+ - lem:multi-vertex-split: kappa(u,v) = mu(u,v) + pi(u,v), where pi counts
+   internally disjoint routes of length >= 2. Parallel copies and longer routes
+   never interfere.
+ - thm:multi-vertex-m2: K_2(n) = n-1, exactly the spanning trees (proved).
+ - I first conjectured K_m(n) = (m-1)(n-1) for n >= m-1 on the m=2,3 data. The
+   exhaustion then returned 14 at m=5,n=4 and 19 at m=5,n=5 against the tree's
+   12 and 16. REFUTED. The extremiser is a THICKENED THETA: two poles, the n-2
+   middles joined to both at multiplicity m-2, poles joined at m+1-n. Feasible
+   iff n <= m+1, and it beats the tree there for every m >= 4.
+ - So the problem is genuinely NOT the multigraph edge problem, which the m <= 4
+   data alone would have suggested. Restated as conj:multi-vertex for n >= m+2
+   only, flagged as verified for m <= 4. Reduction to
+   sum pi >= (m-1) rank(G_0) given, and the theta graph is exactly its
+   counterexample in the small-n regime (rank 3, sum pi 9, needs 12).
+ - Program: max_multigraph_vertex_standard + a parallel_routes flag on
+   _split_capacity_matrix / exceeds_bound. Cross-validated against an
+   independent script on 15 cells, 0 mismatches, and the program is faster.
+
+**RESULT 3: the review's third suggestion is misdirected, and testing it fixed
+my own conjecture.** ChatGPT proposed classifying m=3 extremisers at n=6,7,8 to
+test whether they admit the A->B partition. But at m=3 the quadratic branch only
+overtakes the linear one at n=9, so n=6,7,8 are all hub-regime and cannot test
+the hypothesis at all. Ran the classification at m=2 instead, where the
+crossover is n=8: at n=5 and n=6 there are exactly 3 and 6 extremal digraphs up
+to isomorphism, which are the numbers of TREES on 5 and 6 vertices. So the
+linear-branch extremal set is all bidirected spanning trees, not just the hub,
+and open:decomposition's "extremal non-hub digraph" was too narrow a hypothesis.
+Restated with a condition on n (past the branch crossover) instead of on shape.
+
+ACKNOWLEDGMENT: author asked to credit Stijn Cambie for the review and to say
+something about cross-model review. Added to the foreword and a paragraph to the
+Contribution Statement: a model that helped write an argument is a poor reviewer
+of it, a cold second model reads each sentence as a standalone claim, the value
+came from the disagreement, and most of what it raised was wrong and had to be
+checked against the source first.
+
+S-T RANGE: left at n >= 10 per the author, with a recorded note that an external
+review claims n >= 13 and that nothing here depends on which is right.
+
+VERIFY: build 136 pp, 0 overfull, 0 undefined refs/cites; 90 tests OK; self-check
+ALL CHECKS PASSED including the new entries; hunspell en_GB clean.
