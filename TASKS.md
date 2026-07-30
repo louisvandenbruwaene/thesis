@@ -106,12 +106,14 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
       in rem:odd-step-roadmap).
 - [ ] **Fact (a) by machine (now the CONFIRMATION run)**: uncapped n=7,
       target 25; EMPTY output independently confirms the delta-split proof
-      above and unlocks the thesis write-up. RELAUNCHED 2026-07-04 17:05,
-      properly detached (nohup, main-guarded runner), PID 848, log
-      program/logs/geng_a_n7_t25.log. Diagnosis of the 2026-07-02 loss:
-      the parent died with the session and left orphaned idle workers
-      (killed 2026-07-04). Budget hint: fact (b) took ~7 h on 10 cores WITH
-      the degree-8 cap; this run has no cap, expect substantially longer.
+      above and unlocks the thesis write-up. STATUS 2026-07-30: the 2026-07-04
+      relaunch DIED. Its log ends at a BrokenProcessPool warning, after which
+      it fell back to sequential and never produced a verdict, and no process
+      survives. RELAUNCHED 2026-07-30 23:10, log
+      program/logs/geng_a_n7_t25_20260730.log, runner in the scratchpad
+      (main-guarded, nohup, unbuffered). Budget hint: fact (b) took ~7 h on 10
+      cores WITH the degree-8 cap; this run has no cap, so expect substantially
+      longer, and check the log rather than assuming it is still alive.
 - [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
       eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
       CBC cannot close it (measured 2026-06-16).
