@@ -2315,3 +2315,41 @@ are not known to be) with research_notes/scripts/multi_vertex_clique_check.py
 VERIFY: latexmk exit 0, 138 pp (unchanged), 0 overfull, 0 undefined refs/cites
 (thm:clique-chain-vertex resolves as A.56). No program code touched, no test
 suite re-run needed (no .py changes).
+
+## 2026-07-31 (Opus) -- verified the Sonnet session, found and fixed a hypothesis gap
+
+Author switched models and asked to check the previous session's work before
+resuming. Re-verified the central claim (the conj:multi-vertex refutation)
+with a THIRD implementation written from scratch -- own Edmonds-Karp on a
+hand-built split network, no thesis program, no networkx, no scipy. The
+refutation holds. The smallest witness is fully hand-checkable and now stated
+in the thesis: m=5, n=7 (the very first size the withdrawn conjecture covered),
+a triangle at multiplicity 3 plus a four-edge pendant path at multiplicity 4,
+total 25 against the conjectured maximum 24, with kappa^max exactly 4.
+
+FOUND A REAL GAP in the new theorem's hypothesis range. thm:clique-chain-vertex
+was stated for 3 <= r <= m+1, but at r = m+1 the block multiplicity q = m+1-r
+drops to ZERO, so the blocks carry no edges and the underlying graph falls
+apart into isolated vertices. The proof's count substitutes
+|E(G_0)| = n-1+rank(G_0), which assumes connectivity, so the proof is invalid
+at that endpoint. (The final formula happens to survive the degeneracy by an
+algebraic accident -- the rank and sum-pi errors cancel exactly -- which is
+precisely the kind of coincidence that hides a broken proof, so this was worth
+catching.) Fixed: hypothesis tightened to 3 <= r <= m, giving q >= 1, and the
+proof now says explicitly where that hypothesis is used and what goes wrong
+without it. Nothing is lost, since a positive gain needs r <= m-2 anyway.
+Research note and verification script updated to match (the script's assert
+now enforces q >= 1 rather than q >= 0, so the degenerate case can no longer
+be fed to it silently).
+
+Also verified, and confirmed correct as written: the gain formula
+gain(r,m) = (r-1)(r-2)(m-1-r)/2 (re-derived independently from the direct edge
+count, matches), the r=3 specialisation m-4 (zero at m=4, matching the
+exhaustive table's no-counterexample finding, positive from m=5), the
+Theta(m^2) growth-rate claim (continuous optimum at r ~ m/2 gives rate
+~ m^2/8; exact integer optima track it), and the Case 2 tightness argument
+from the previous session.
+
+VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 undefined refs/cites. Script
+re-run after the range fix, all checks pass. Background jobs untouched and
+still alive (fact (a) confirmation PID 79768, multi-vertex sweep PID 79194).

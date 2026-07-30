@@ -12,10 +12,18 @@ amount that is *linear in n*, not a bounded correction. The true value of
 
 ## 1. The construction
 
-Fix `3 <= r <= m+1`. A **`K_r`-block** is a clique on `r` vertices with every
-edge at multiplicity `q = m + 1 - r` (this is exactly the thesis's own
+Fix `3 <= r <= m`. A **`K_r`-block** is a clique on `r` vertices with every
+edge at multiplicity `q = m + 1 - r >= 1` (this is exactly the thesis's own
 "thickened complete graph" construction, `sec:multi-vertex-standard`, applied
 locally to `r` vertices rather than to all of `n`).
+
+*(Range note: `r <= m` rather than `r <= m+1`, so that `q >= 1` and every block
+edge is actually present. At `r = m+1` we would get `q = 0`, the blocks would
+carry no edges, and the underlying graph would fall apart into isolated
+vertices, breaking the connectivity that the count `|E| = n-1+rank` assumes.
+The final formula happens to survive that degeneracy by an algebraic accident,
+but the proof does not, so the hypothesis excludes it. Nothing is lost: a
+positive gain needs `r <= m-2` anyway.)*
 
 **Chain construction.** Partition (as many as possible of) the `n` vertices
 into `k = floor(n/r)` disjoint `K_r`-blocks `B_1, ..., B_k`. Fix a *port*

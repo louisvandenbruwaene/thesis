@@ -38,7 +38,7 @@ def build_clique_chain(n, m, r, k):
     leftover vertices as a pendant path."""
     assert r * k <= n
     q = m + 1 - r
-    assert q >= 0, "r too large for this m (need r <= m+1)"
+    assert q >= 1, "r too large for this m (need r <= m so blocks are non-empty)"
     g = Graph(n, MULTI_UNDIRECTED)
     for i in range(k):
         base = r * i
@@ -110,7 +110,7 @@ def main():
     print("\nexact-optimal-r table (gain rate per vertex used):")
     for m in [5, 10, 20, 30, 50]:
         best_r, best_rate = None, -1
-        for r in range(3, m + 2):
+        for r in range(3, m + 1):
             rate = gain(r, m) / r
             if rate > best_rate:
                 best_rate, best_r = rate, r
