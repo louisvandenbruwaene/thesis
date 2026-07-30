@@ -590,11 +590,11 @@ def main() -> None:
     # appendix figure (fig:threshold-3d) after the Figure 4.2 threshold story was
     # removed from the body on 2026-06-20.
     # --------------------------------------------------------------
+    # No p_values: each panel sweeps in units of its own threshold, since the
+    # graph and hypergraph models do not share a density scale.
     plot_conn_threshold_3d(
         path=FIGURES / "threshold_3d.png",
-        n=12, m=3,
-        p_values=[i / 10.0 for i in range(1, 10)],
-        samples=150, seed=7)
+        n=12, m=3, samples=150, seed=7)
     print("wrote threshold_3d.png")
 
     # NOTE: the 2-D random-sampling threshold figures (degree_threshold,

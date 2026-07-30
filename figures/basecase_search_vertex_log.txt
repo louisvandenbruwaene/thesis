@@ -1,0 +1,14 @@
+Exhaustive search over all simple digraphs with kappa^max <= 1 (directed, m=2).
+Branch and bound; reported max arc count = k_2^dir(n) = max(2(n-1), floor(n^2/4)).
+
+  n=2:  max= 2,  formula= 2,  proved (complete),  nodes=5,             0.0s
+  n=3:  max= 4,  formula= 4,  proved (complete),  nodes=22,            0.0s
+  n=4:  max= 6,  formula= 6,  proved (complete),  nodes=537,           0.0s
+  n=5:  max= 8,  formula= 8,  proved (complete),  nodes=17823,         1.1s
+  n=6:  max=10,  formula=10,  proved (complete),  nodes=788101,       77.0s
+  n=7:  max=12,  formula=12,  proved (complete),  nodes=45122129,   3124.8s
+
+Same driver, same prunes, same sizes as the arc run above. Only the
+inner test changes, from arc-disjoint to internally vertex-disjoint.
+The two separations agree at every base case, which is what the
+vertex induction needs and what Whitney's inequality cannot supply.

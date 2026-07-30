@@ -1988,3 +1988,97 @@ Post-edit re-check of the four edited files: clean.
 
 Build: latexmk exit 0, 0 overfull, 0 undefined. hunspell + en_GB now installed
 on this machine for future pre-submission passes.
+
+## 2026-07-30 (Opus) -- external-review audit: one real proof error, five overclaims
+
+Author brought an external (ChatGPT) review of the PDF and asked whether it or my
+earlier sign-off was right. Answer: neither. The review found ONE genuine
+mathematical error and several genuine overclaims, and it also over-diagnosed
+(demanded rows be deleted that are fine, and its top "doable improvement",
+L_3^dir(7)=24, is already proved in research_notes). Verified every claim against
+the source before acting. Author then asked for all of it fixed.
+
+**THE REAL ERROR (found, verified, FIXED).** app_proofs proof of
+thm:dir-vertex-m2-exact read "By Whitney kappa <= lambda, every digraph feasible
+for the vertex problem is feasible for the arc problem, so k_2 <= ell_2". That is
+backwards. kappa <= lambda gives {lambda^max <= m-1} SUBSET {kappa^max <= m-1}, so
+the VERTEX-feasible family is the larger one and k_m >= ell_m: an arc upper bound
+says nothing about the vertex problem. Same inversion in the ch1 lead-in and in
+ch4 ("it will follow from the arc case the moment the backward-arc lemma is
+supplied" -- it will not). Notably rem:threshold-analogues had the direction RIGHT
+all along, so this was a local slip, not a misunderstanding.
+  THE THEOREM IS STILL TRUE, and the repair is cheap: kappa is deletion-monotone
+  for exactly the reason lambda is (lem:subdigraph-monotone now states both), so
+  the n>=8 induction and both parity computations transfer verbatim; only the base
+  cases n<=7 had to be re-run under the vertex test. They were, three independent
+  ways (a scratch vertex-split max-flow, a scratch Menger-by-hand bitmask version,
+  and the thesis program itself), all returning 2,4,6,8,10,12 = M(n). New
+  rem:whitney-direction spells out the trap, the proof is rewritten in two halves,
+  and figures/basecase_search_vertex_log.txt is the transcript beside the arc one.
+
+**PROGRAM.** _exhaustive_directed's vertex branch called max_vertex_connectivity on
+the WHOLE graph per node (that is why the vertex base cases had never been run) and
+deliberately refused to seed the vertex search. Both fixed: new
+_vertex_flow_at_least (the vertex twin of _arc_flow_at_least, on the split network)
+makes the vertex branch incremental like the edge branch, and the seed is now valid
+in both separations BY Whitney in the correct direction (arc-feasible implies
+vertex-feasible, so an arc construction is an honest vertex lower bound -- the old
+comment claiming otherwise was the same inversion in the code). Differential-tested
+0 mismatches / 225,296 (pair, k) checks against the exact checker.
+
+**FIVE OVERCLAIMS FIXED** (all confirmed against the source first):
+1. Multigraph vertex rows: the collapsing convention makes the EDGE count
+   unbounded (pile on parallel copies forever). New sec:parallel-convention says
+   the objective counts adjacencies, notes that the other convention gives a
+   genuinely new problem (and that lem:incidence-rank uses it), tab:summary rows
+   relabelled "convention" not "proved".
+2. Hypergraph vertex separation is a hybrid (no shared hyperedge AND no shared
+   interior vertex). It was only implicit in ch1. Now defined at first use, with
+   why both halves are needed.
+3. "The whole m>=3 upper bound rests on one missing lemma" hid four hypotheses.
+   Now open:decomposition states all four; ch4/README/open-problems match.
+4. The scaling identity L_m = (m-1)M*(n) was displayed unconditionally before the
+   integrality observation that earns the reverse direction. Now the inequality is
+   general and the equality is stated as conditional on an integral optimum
+   (verified for n<=6). "L_3(7)=24, equivalently M*(7)=12" was one-directional;
+   corrected, and it is the INTEGRAL program that is asked.
+5. prop:dir-hyper-general claimed forward and general share a leading constant.
+   They share two bounds a factor of 4 apart, which fixes the order only. Fixed in
+   the proposition and in ch4's orientation section ("the moment n exceeds r the
+   gap is gone" is computational evidence, now labelled as such).
+
+**THRESHOLD SCALE (code bug, not just a caption).** tab:summary claimed p*=m/n
+"applies uniformly across all models" and plot_conn_threshold_3d drew the m/n line
+on a 3-uniform HYPERGRAPH panel. Wrong scale: a vertex lies in p*C(n-1,r-1)
+hyperedges, so p* = m/C(n-1,r-1) = Theta(m/n^(r-1)); at r=3,n=8 that is 3/21, not
+3/8. The figure now sweeps each panel in units of its OWN p* and titles each with
+it; new rem:threshold-scope does the arithmetic; ch1 and both captions corrected.
+
+**NEW RESULT (from the review, author must decide on acknowledgment).**
+prop:dir-arc-stability: for any simple digraph with lambda^max <= m-1,
+|A| <= floor(n^2/4) + sqrt(m) n^{3/2}, and deleting that many arcs leaves a
+one-directional bipartite digraph. Proof: the direct arc plus the two-step detours
+through distinct midpoints are automatically arc-disjoint, so summing the
+per-pair cap bounds sum_x d+(x)d-(x) <= m n(n-1) (the digon diagonal costs the
++1 in m); Cauchy-Schwarz then bounds sum_x min(d+,d-) by sqrt(m) n^{3/2}; deleting
+each vertex's smaller side leaves only source-like -> sink-like arcs. Hence
+ell_m^dir(n) = n^2/4 + O_m(n^{3/2}) UNCONDITIONALLY -- the first upper bound in the
+thesis for m>=3 with no structural hypothesis, and it fixes conj:dir-arc's leading
+constant 1/4. Every step machine-checked (0 violations / 3000 sampled feasible
+digraphs) and a check is in the self-test. The error term is honest not sharp:
+the conjecture's second-order term (m-2)n/2 is smaller than n^{3/2}, so sharpening
+to O_m(n) is the natural next target. Added to the contribution statement.
+
+**BIBLIOGRAPHY (two confirmed wrong, one unresolved).** Leonard "On a conjecture
+of Bollobas and Erdos" is Period. Math. Hungar. 3 (1973) 281-284, NOT 2(1-4)
+191-194 (1972); key renamed Leonard73BE, DOI added. Ref [19] Bollobas 1984 TAMS
+286 is the GIANT-COMPONENT paper and cannot support "kappa = delta whp"; replaced
+by Bollobas, Random Graphs (2nd ed.) Ch. 7 plus Bollobas-Thomason 1985 for the
+hitting-time form. NOT RESOLVED: the review says Sorensen-Thomassen holds for
+n >= 13 where the thesis says n >= 10. Could not verify either way (paywalled,
+erdosproblems.com 403s). ch1's own justification of n >= 10 is internally sound
+(its five arithmetic claims all check out), so it was LEFT ALONE and flagged in
+TASKS.md as the one item needing the original paper.
+
+VERIFY: 90 unit tests OK (was 88, +2 for the vertex flow predicate), self-check
+ALL CHECKS PASSED including the new vertex base cases and the stability bound.

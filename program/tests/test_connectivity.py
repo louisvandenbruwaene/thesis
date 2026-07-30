@@ -10,6 +10,7 @@ from erdos915_unified import (
     NETWORKX_AVAILABLE,
     SIMPLE_DIRECTED,
     SIMPLE_UNDIRECTED,
+    _vertex_flow_at_least,
     exceeds_bound,
     local_edge_connectivity,
     local_vertex_connectivity,
@@ -107,6 +108,40 @@ class VertexConnectivity(unittest.TestCase):
         for _ in range(40):
             g = sample_random_graph(12, 0.3, False, rng)
             self.assertLessEqual(max_vertex_connectivity(g), max_edge_connectivity(g))
+
+
+class VertexFlowPredicate(unittest.TestCase):
+    """``_vertex_flow_at_least`` is the exhaustive search's inner vertex test.
+
+    It must agree with the exact checker it replaces on every (pair, k), or the
+    base cases of the directed vertex theorem would rest on a faster wrong test.
+    """
+
+    def test_matches_the_exact_checker(self):
+        rng = random.Random(17)
+        for _ in range(150):
+            n = rng.randint(2, 6)
+            g = Graph(n, SIMPLE_DIRECTED)
+            out = [set() for _ in range(n)]
+            for a in range(n):
+                for b in range(n):
+                    if a != b and rng.random() < 0.35:
+                        g.mu[a, b] = 1
+                        out[a].add(b)
+            for s in range(n):
+                for t in range(n):
+                    if s == t:
+                        continue
+                    exact = local_vertex_connectivity(g, s, t)
+                    for k in range(1, 5):
+                        self.assertEqual(_vertex_flow_at_least(out, n, s, t, k),
+                                         exact >= k)
+
+    def test_a_direct_arc_is_one_route_with_no_interior(self):
+        # s -> t plus the detour s -> x -> t: two internally disjoint routes.
+        out = [{1, 2}, set(), {1}, set()]
+        self.assertTrue(_vertex_flow_at_least(out, 4, 0, 1, 2))
+        self.assertFalse(_vertex_flow_at_least(out, 4, 0, 1, 3))
 
 
 @unittest.skipUnless(NETWORKX_AVAILABLE, "Gomory-Hu trees need the optional networkx")

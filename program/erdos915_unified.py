@@ -1995,8 +1995,50 @@ def _arc_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
     return True
 
 
+def _vertex_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
+                          k: int) -> bool:
+    """True if there are at least ``k`` internally vertex-disjoint ``s``-``t`` paths.
+
+    The vertex twin of :func:`_arc_flow_at_least`, and the same Ford--Fulkerson
+    loop, run on the split network instead of the plain one: every vertex ``x``
+    becomes an entry copy ``2x`` and an exit copy ``2x+1`` joined by a single
+    unit-capacity arc, so a path may pass through ``x`` at most once.  The two
+    endpoints keep an uncapped gate, since a route is allowed to start at ``s``
+    and finish at ``t``.  A direct arc ``s -> t`` therefore counts as one route
+    with no interior, exactly as the thesis's separation axis intends.
+    """
+    cap: dict[tuple[int, int], int] = {}
+    for x in range(n):
+        cap[(2 * x, 2 * x + 1)] = k if (x == s or x == t) else 1
+    for a in range(n):
+        for b in out_adj[a]:
+            cap[(2 * a + 1, 2 * b)] = 1
+    source, sink = 2 * s + 1, 2 * t
+    for _ in range(k):
+        prev = {source: source}
+        stack = [source]
+        while stack:
+            x = stack.pop()
+            if x == sink:
+                break
+            for y in range(2 * n):
+                if y not in prev and cap.get((x, y), 0) > 0:
+                    prev[y] = x
+                    stack.append(y)
+        if sink not in prev:
+            return False
+        node = sink
+        while node != source:
+            p = prev[node]
+            cap[(p, node)] -= 1
+            cap[(node, p)] = cap.get((node, p), 0) + 1
+            node = p
+    return True
+
+
 def _exhaustive_directed(
     n: int, m: int, separation: str, deadline: float,
+    stats: dict[str, int] | None = None,
 ) -> tuple[int, Graph | None, bool]:
     """Prove the simple directed maximum by a pruned exhaustive search.
 
@@ -2006,22 +2048,25 @@ def _exhaustive_directed(
     enumeration cannot.  Feasibility is monotone, so the include branch adds an
     arc only when the digraph is still feasible (an infeasible prefix can never be
     rescued by adding more arcs), and the bound prune drops a subtree once even
-    taking every remaining arc could not beat the best found.  For the edge
-    separation the feasibility test asks directly whether the new arc created
-    ``m`` arc-disjoint paths for any pair it could affect (those reaching its tail
-    or reachable from its head); the rarer vertex separation falls back to the
-    exact checker.  Returns ``(max_count, witness, completed)``; ``completed`` is
+    taking every remaining arc could not beat the best found.  Both separations
+    use the same incremental feasibility test: a new arc can only lift the
+    connectivity of a pair whose source reaches its tail and whose sink is
+    reachable from its head, so only those pairs are re-measured, with
+    :func:`_arc_flow_at_least` or :func:`_vertex_flow_at_least` according to the
+    separation.  Returns ``(max_count, witness, completed)``; ``completed`` is
     False if the time budget ran out first, leaving the value a lower bound.
+    Pass ``stats`` to receive the number of search-tree nodes visited.
     """
     pairs = [(u, v) for u in range(n) for v in range(n) if u != v]
     total = len(pairs)
     out: list[set[int]] = [set() for _ in range(n)]
     inc: list[set[int]] = [set() for _ in range(n)]
     # Seed the best at one below a known construction so the bound prune bites
-    # immediately; the search still records an actual witness when it ties it.
-    # Only the edge constructions are guaranteed feasible here, so seed the
-    # vertex search at zero to avoid over-pruning a genuinely smaller optimum.
-    seed = _directed_witness(n, m, simple=True) if separation == "edge" else None
+    # immediately, and the search still records an actual witness when it ties it.
+    # The same seed is valid in both separations: by Whitney's inequality
+    # kappa <= lambda, a digraph feasible for the arc problem is feasible for the
+    # vertex problem too, so an arc construction is an honest vertex lower bound.
+    seed = _directed_witness(n, m, simple=True)
     seed_value = seed.edge_count() if seed is not None else 0
     best_count = [max(0, seed_value - 1)]
     best_arcs: list[tuple[int, int]] = []
@@ -2045,20 +2090,19 @@ def _exhaustive_directed(
                     seen.add(y); stack.append(y)
         return seen
 
+    flow_at_least = (_arc_flow_at_least if separation == "edge"
+                     else _vertex_flow_at_least)
+
     def feasible_after(u: int, v: int) -> bool:
-        if separation == "edge":
-            for s in reaches_to(u):
-                for t in reaches_from(v):
-                    if s != t and _arc_flow_at_least(out, n, s, t, m):
-                        return False       # this pair reached m disjoint paths
-            return True
-        graph = Graph(n, SIMPLE_DIRECTED)  # vertex case: lean on the checker
-        for a in range(n):
-            for b in out[a]:
-                graph.mu[a, b] = 1
-        return max_vertex_connectivity(graph) <= m - 1
+        for s in reaches_to(u):
+            for t in reaches_from(v):
+                if s != t and flow_at_least(out, n, s, t, m):
+                    return False           # this pair reached m disjoint paths
+        return True
 
     def recurse(idx: int, count: int) -> None:
+        if stats is not None:
+            stats["nodes"] = stats.get("nodes", 0) + 1
         if time.time() > deadline:
             timed_out[0] = True
             return
@@ -4144,16 +4188,24 @@ def plot_conn_threshold_3d(
     samples: int = 400,
     seed: int = 7,
 ) -> None:
-    """3-D bar chart of the lambda_max distribution over p, for three representative variants.
+    """3-D bar chart of the lambda_max distribution over density, for three variants.
 
-    x = p (edge probability), y = lambda_max value, z = fraction of samples.
-    Shows the threshold shift at p* = m/n clearly: the distribution moves from
-    low connectivity to high connectivity as p crosses the threshold.
+    x = density in units of that model's OWN threshold, y = lambda_max value,
+    z = fraction of samples.  Each panel is swept in units of its own p*, and the
+    threshold line sits at 1 in all three, because the models do NOT share a
+    density scale.  The threshold is where a vertex's expected degree reaches m,
+    which for a graph is p*(n-1) = m, giving p* = m/n, but for an r-uniform
+    binomial hypergraph is p*C(n-1, r-1) = m, giving p* = m/C(n-1, r-1) =
+    Theta(m/n^(r-1)).  Plotting the hypergraph panel against m/n would put the
+    line in the wrong place by a factor of order n^(r-2).  Only the graph panels
+    are covered by thm:gnp-threshold; the hypergraph panel is an observation.
+
     Three panels: undirected edge (uses ``n``), directed arc (uses ``n``),
-    hypergraph edge (uses min(n, 10) to keep flow computation fast).
+    hypergraph edge (uses min(n, 8) to keep flow computation fast).
     """
-    if p_values is None:
-        p_values = [i / 20.0 for i in range(1, 20)]  # 0.05, 0.10, ..., 0.95
+    # Sweep in units of the model's own threshold, so all three panels are
+    # directly comparable and each transition is visible where it actually is.
+    ratios = ([i / 5.0 for i in range(1, 20)] if p_values is None else None)
 
     rng = random.Random(seed)
     # Hypergraph flow computation scales poorly: cap n at 8 for that panel.
@@ -4161,11 +4213,16 @@ def plot_conn_threshold_3d(
 
     variants_3d = [
         dict(label="undirected edge", directed=False, separation="edge",
-             hypergraph=False, panel_n=n),
+             hypergraph=False, panel_n=n, p_star=m / n,
+             star_text=f"$m/n = {m}/{n}$"),
         dict(label="directed arc",    directed=True,  separation="edge",
-             hypergraph=False, panel_n=n),
+             hypergraph=False, panel_n=n, p_star=m / n,
+             star_text=f"$m/n = {m}/{n}$"),
         dict(label=f"hypergraph edge ($r=3$, $n={n_hyper}$)", directed=False,
-             separation="edge", hypergraph=True, panel_n=n_hyper),
+             separation="edge", hypergraph=True, panel_n=n_hyper,
+             p_star=m / math.comb(n_hyper - 1, 2),
+             star_text=(fr"$m/\binom{{{n_hyper}-1}}{{2}} = "
+                        fr"{m}/{math.comb(n_hyper - 1, 2)}$")),
     ]
 
     fig = plt.figure(figsize=(18, 6))
@@ -4173,11 +4230,14 @@ def plot_conn_threshold_3d(
     for panel_idx, vdesc in enumerate(variants_3d):
         ax = fig.add_subplot(1, 3, panel_idx + 1, projection="3d")
         panel_n = vdesc["panel_n"]
+        p_star = vdesc["p_star"]
+        panel_ps = (p_values if p_values is not None
+                    else [min(1.0, r * p_star) for r in ratios])
 
         all_conn_vals: list[int] = []
         dist_by_p: list[tuple[float, list[int]]] = []
 
-        for p in p_values:
+        for p in panel_ps:
             conn_list: list[int] = []
             for _ in range(samples):
                 if vdesc["hypergraph"]:
@@ -4201,37 +4261,39 @@ def plot_conn_threshold_3d(
         lo, hi = 0, max(all_conn_vals)
         levels = list(range(lo, hi + 1))
 
-        for p, conn_list in dist_by_p:
+        # x is the density in units of this panel's own threshold.
+        xs = [p / p_star for p, _ in dist_by_p]
+        width = 0.9 * min((b - a) for a, b in zip(xs, xs[1:])) if len(xs) > 1 else 0.1
+        for x, (_, conn_list) in zip(xs, dist_by_p):
             total = len(conn_list)
             for lv in levels:
                 frac = conn_list.count(lv) / total
                 if frac > 0:
-                    ax.bar3d(p - 0.02, lv - 0.4, 0, 0.04, 0.8, frac,
+                    ax.bar3d(x - width / 2, lv - 0.4, 0, width, 0.8, frac,
                              color=_KUL_BLUE, alpha=0.7, shade=True)
 
-        # Threshold line at p* = m/panel_n
-        p_star = m / panel_n
+        # The threshold sits at 1 in these units, by construction.
         for lv in levels:
-            ax.plot([p_star, p_star], [lv - 0.4, lv + 0.4], [0, 0],
+            ax.plot([1.0, 1.0], [lv - 0.4, lv + 0.4], [0, 0],
                     color=_WARM, linewidth=0.5, alpha=0.4)
         zmax = max(conn_list.count(lv) / len(conn_list)
                    for _, conn_list in dist_by_p
                    for lv in levels
                    if conn_list.count(lv) > 0)
-        ax.plot([p_star, p_star], [lo, hi], [zmax * 0.9, zmax * 0.9],
-                color=_WARM, linewidth=2.5, linestyle="--",
-                label=f"$p^* = m/n = {m}/{panel_n}$")
+        ax.plot([1.0, 1.0], [lo, hi], [zmax * 0.9, zmax * 0.9],
+                color=_WARM, linewidth=2.5, linestyle="--", label="$p / p^* = 1$")
 
-        ax.set_title(vdesc["label"], fontsize=10)
-        ax.set_xlabel("$p$", fontsize=9)
+        ax.set_title(f"{vdesc['label']}\n$p^* = $ {vdesc['star_text']}", fontsize=9)
+        ax.set_xlabel("$p / p^*$", fontsize=9)
         ax.set_ylabel(r"$\lambda^{\max}$", fontsize=9)
         ax.set_zlabel("fraction", fontsize=9)
         ax.tick_params(labelsize=7)
 
     fig.suptitle(
-        fr"Distribution of $\lambda^{{\max}}$ vs edge density $p$ in $G({n}, p)$, "
-        fr"$m = {m}$ (threshold at $p^* = m/n$)",
-        fontsize=12,
+        fr"Distribution of $\lambda^{{\max}}$ against density, $m = {m}$, each model "
+        fr"in units of its own threshold $p^*$ (the density at which a vertex's "
+        fr"expected degree reaches $m$)",
+        fontsize=11,
     )
     _save(path, tight=False)
 
@@ -5487,6 +5549,51 @@ def _run_checks() -> int:
                   max_seconds=3.0, method="sa")
     check(f"solve discovery simple-directed n=4,m=2: {found.value} ({found.bound})",
           found.bound == "lower" and found.value == 6)
+    # The VERTEX separation is a separate question, not a corollary of the arc
+    # one: Whitney's kappa <= lambda makes the vertex-feasible family the LARGER
+    # of the two, so an arc upper bound does not restrict it.  thm:dir-vertex-m2
+    # needs its own base cases, and these are the first three of them.
+    for base_n, base_value in ((3, 4), (4, 6), (5, 8)):
+        v_value, _, v_done = _exhaustive_directed(base_n, 2, "vertex",
+                                                  time.time() + 120.0)
+        check(f"exhaustive simple-directed VERTEX n={base_n},m=2: {v_value}",
+              v_done and v_value == base_value)
+    # The vertex flow helper must agree with the exact checker it stands in for.
+    _vg = Graph(4, SIMPLE_DIRECTED)
+    for _a, _b in ((0, 1), (0, 2), (1, 3), (2, 3)):
+        _vg.mu[_a, _b] = 1
+    _vout = [{_b for _b in range(4) if _vg.mu[_a, _b]} for _a in range(4)]
+    check("vertex flow helper agrees with the exact checker on a theta digraph",
+          _vertex_flow_at_least(_vout, 4, 0, 3, 2)
+          and not _vertex_flow_at_least(_vout, 4, 0, 3, 3)
+          and local_connectivity(_vg, 0, 3, vertex_split=True) == 2)
+    # prop:dir-arc-stability, the unconditional quadratic bound.  Both the
+    # load-bearing counting step (sum of d+ d- capped by m n(n-1)) and the bound
+    # it yields are checked on sampled feasible digraphs.
+    _rng = random.Random(3)
+    _worst_slack = None
+    _count_ok = True
+    for _ in range(120):
+        _sn, _sm = _rng.randint(3, 7), _rng.randint(2, 4)
+        _sg = Graph(_sn, SIMPLE_DIRECTED)
+        for _a in range(_sn):
+            for _b in range(_sn):
+                if _a != _b and _rng.random() < 0.6:
+                    _sg.mu[_a, _b] = 1
+        while max_edge_connectivity(_sg) > _sm - 1:   # prune down to feasible
+            _present = [(a, b) for a in range(_sn) for b in range(_sn) if _sg.mu[a, b]]
+            _a, _b = _rng.choice(_present)
+            _sg.mu[_a, _b] = 0
+        _dout = [int(_sg.mu[x].sum()) for x in range(_sn)]
+        _din = [int(_sg.mu[:, x].sum()) for x in range(_sn)]
+        if sum(_dout[x] * _din[x] for x in range(_sn)) > _sm * _sn * (_sn - 1):
+            _count_ok = False
+        _slack = ((_sn * _sn) // 4 + math.sqrt(_sm) * _sn ** 1.5
+                  - int(_sg.mu.sum()))
+        _worst_slack = _slack if _worst_slack is None else min(_worst_slack, _slack)
+    check("prop:dir-arc-stability: two-step count and bound hold on 120 "
+          f"sampled feasible digraphs (tightest slack {_worst_slack:.1f})",
+          _count_ok and _worst_slack >= 0)
     # Exhaustive undirected by brute force: ell_2(5) = n-1 = 4 (a spanning tree).
     tree = solve(5, 2, directed=False, simple=True, exhaustive=True,
                  max_seconds=30.0)

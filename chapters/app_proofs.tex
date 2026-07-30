@@ -299,7 +299,13 @@ A simple digraph with $\lec^{\max} \le 1$ contains no three vertices $x, y, z$ w
 \end{lemma}
 
 \begin{lemma}[Deletion monotonicity]\label{lem:subdigraph-monotone}
-Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ together with all arcs incident to it. For any digraph $D$ and vertex $v_0$, $\lec^{\max}(D - v_0) \le \lec^{\max}(D)$, since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$.
+Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ together with all arcs incident to it. For any digraph $D$ and vertex $v_0$,
+\[
+    \lec^{\max}(D - v_0) \le \lec^{\max}(D)
+    \qquad\text{and}\qquad
+    \kap^{\max}(D - v_0) \le \kap^{\max}(D),
+\]
+since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates one, and it cannot make two surviving routes share anything they did not share before.
 \end{lemma}
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
@@ -332,13 +338,47 @@ The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for eve
 
 Two remarks on the shape of this proof. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. The proof is long not because it is deep but because the two regimes of $M(n)$ must be carried through the arithmetic separately, and that bookkeeping is precisely what \Cref{ch:certify} hands to the machine at the base cases.
 
+\begin{remark}[Which way Whitney runs]\label{rem:whitney-direction}
+It is worth pausing on the direction of Whitney's inequality before using it, because the tempting reading is the wrong one. From $\kap_D(u,v) \le \lec_D(u,v)$ for every pair it follows that $\kap^{\max}_D \le \lec^{\max}_D$, hence that
+\[
+    \{D : \lec^{\max}_D \le m-1\} \;\subseteq\; \{D : \kap^{\max}_D \le m-1\}.
+\]
+Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem, and not the other way round. The vertex-feasible family is the larger of the two, so the inequality between the extremal numbers it hands over for free is
+\[
+    k_m^{\mathrm{dir}}(n) \;\ge\; \ell_m^{\mathrm{dir}}(n),
+\]
+and an upper bound for the arc problem says nothing at all about the vertex problem. The gap is not vacuous: two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$, so there really are digraphs in the difference of the two families. What Whitney gives is therefore exactly one thing, that an arc construction is an honest vertex \emph{lower} bound, and the vertex upper bound has to be earned separately. The proof below earns it, and \Cref{ch:synthesis} keeps the same discipline for $m \ge 3$, where the vertex problem stays open even though the arc conjecture is stated.
+\end{remark}
+
 \begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}]
-By Whitney's inequality $\kappa^{\max} \le \lambda^{\max}$, every digraph feasible for the vertex problem is feasible for the arc problem, so $k_2^{\mathrm{dir}}(n) \le \ell_2^{\mathrm{dir}}(n)$. Conversely the hub and one-directional bipartite constructions have $\kappa^{\max} = 1$, so they are feasible for the vertex problem and give the matching lower bound. Hence $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n) = \max(2(n-1), \floor{n^2/4})$.
+Write $M(n) = \max(2(n-1), \floor{n^2/4})$ as before.
+
+\emph{Lower bound.} The directed hub and the one-directional bipartite construction both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem. Hence $k_2^{\mathrm{dir}}(n) \ge M(n)$.
+
+\emph{Upper bound.} We show by strong induction on $n$ that $\kap^{\max}_D \le 1$ forces $|A(D)| \le M(n)$. The induction is the one that proved \Cref{thm:dir-arc-m2-exact}, and every step of it survives the change of separation, because the only two properties of the ceiling that argument uses are that it is inherited by vertex deletion and that it holds at the base sizes.
+
+The base cases $2 \le n \le 7$ are settled by the same pruned exhaustive search of \Cref{ch:certify}, run with the vertex feasibility test in place of the arc one. It walks every simple digraph with $\kap^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is reproduced in \Cref{sec:transcripts} beside the arc one.
+
+For the inductive step $n \ge 8$, let $D$ be a simple digraph on $n$ vertices with $\kap^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ of minimum total degree, so $d(v_0) \le 2a/n$ by averaging. By \Cref{lem:subdigraph-monotone}, which holds for $\kap$ exactly as it does for $\lec$, the digraph $D - v_0$ on $n - 1 \ge 7$ vertices again satisfies $\kap^{\max} \le 1$, so the induction hypothesis gives $a - d(v_0) \le M(n-1) = \floor{(n-1)^2/4}$. From here the two parity computations are verbatim those of \Cref{thm:dir-arc-m2-exact}: they use only the two displayed inequalities and the integrality of $a$, no property of the separation. They yield $a \le \floor{n^2/4} \le M(n)$, completing the induction.
+
+Hence $k_2^{\mathrm{dir}}(n) = M(n) = \ell_2^{\mathrm{dir}}(n)$. The two problems have the same answer at $m = 2$, but this is a computed coincidence of the two searches meeting at every base size, not a formal consequence of Whitney's inequality.
 \end{proof}
+
+\begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
+The proof above transfers the $m = 2$ induction but nothing more, and for $m \ge 3$ the vertex problem is genuinely separate: the arc conjecture, and the decomposition of \Cref{open:decomposition} that would prove it, both concern the smaller family and leave $k_m^{\mathrm{dir}}(n)$ untouched. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
+\[
+\begin{array}{r|ccccc}
+    n & 2 & 3 & 4 & 5 & 6 \\ \hline
+    \ell_3^{\mathrm{dir}}(n) & 2 & 6 & 9 & 12 & 15 \\
+    k_3^{\mathrm{dir}}(n)    & 2 & 6 & 9 & 12 & 15
+\end{array}
+\]
+with every entry proved complete, so the two separations agree at every size the exhaustion reaches, and from $n = 3$ onwards both match the conjectured $\max(m(n-1), \floor{(n+m-2)^2/4})$. At $n = 2$ the conjecture's formula gives $3$ where only $2$ arcs exist at all, the usual degeneracy of the formula below $n = m$. Agreement over five sizes is evidence and not a proof, and the natural next question is structural rather than numerical: to separate the two problems one needs a digraph where some pair carries strictly more arc-disjoint routes than internally disjoint ones \emph{and} where that slack pays for extra arcs. The two demands pull against each other, which is perhaps why no small example does both.
+\end{remark}
 
 \section{Structural propositions on the directed frontier}
 
-These are the proved ingredients of the reduction discussed in \Cref{ch:synthesis}. The upper bound for $m \ge 3$ is conditional only on the backward-arc lemma stated there.
+These are the proved ingredients of the reduction discussed in \Cref{ch:synthesis}. The section ends with what the reduction still assumes, stated as \Cref{open:decomposition}, and with the one quadratic bound that assumes nothing, \Cref{prop:dir-arc-stability}.
 
 \begin{proposition}[Mutually unreachable out-neighbourhoods]\label{prop:mutual-unreachability}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le 1$. For any vertex $u$ and distinct out-neighbours $v, w$ of $u$, there is no directed path from $v$ to $w$ in $D - u$.
@@ -424,7 +464,58 @@ The right-hand side is a downward parabola in $b$. Writing $s = n + m - 2$, it i
 \[
    \max_{b} \; b\,(s-b) \;=\; \floorfrac{s^2}{4} \;=\; \floorfrac{(n+m-2)^2}{4}.
 \]
-This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. The only thing assumed beyond feasibility was that $B$ sends nothing back to $A$, so that single no-back-arc hypothesis is exactly the gap between this bound and an unconditional proof.
+This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. It is worth being exact about how much was assumed, because the count is often summarised as resting on the absence of backward arcs alone, and that summary is too generous. Four things were granted at once: that a partition $V = A \cup B$ exists at all, that every arc from $A$ to $B$ is present, that no arc lies inside $A$, and that no arc runs from $B$ back to $A$. Only the last of the four is the backward-arc condition. The first three describe the shape of the extremiser, and nothing proved so far forces an arbitrary extremal digraph to have that shape. The honest statement of the gap is therefore a structural one:
+
+\begin{conjecture}[The missing decomposition]\label{open:decomposition}
+Every extremal non-hub digraph $D$ with $\lec^{\max}_D \le m-1$ admits a partition $V(D) = A \cup B$ such that every arc from $A$ to $B$ is present, no arc lies inside $A$, and no arc runs from $B$ to $A$.
+\end{conjecture}
+
+Given \Cref{open:decomposition} the count above closes \Cref{conj:dir-arc} for $m \ge 3$. The backward-arc clause is the part where the natural delete-and-compensate exchange fails to be monotone, which is why it is the clause usually named, but the partition itself is not free either, and \Cref{ch:synthesis} states the position that way.
+
+What can be proved without any of the four is the leading constant, and the argument is short enough to give in full. It also says something the conjecture does not: that every feasible digraph is within a lower-order number of arcs of being one-directional bipartite.
+
+\begin{proposition}[Unconditional quadratic bound and stability]\label{prop:dir-arc-stability}
+Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. Then
+\[
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; \sqrt{m}\, n^{3/2}.
+\]
+Moreover $D$ can be made one-directional bipartite, meaning every remaining arc runs from one part to the other and none returns, by deleting at most $\sqrt{m}\, n^{3/2}$ arcs. Consequently, for each fixed $m$,
+\[
+    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; O_m\!\left(n^{3/2}\right),
+\]
+so the leading constant $\tfrac14$ of \Cref{conj:dir-arc} holds unconditionally, with no hypothesis on the structure of the extremiser.
+\end{proposition}
+
+\begin{proof}
+\emph{Step 1, a budget on two-step routes.} Fix an ordered pair $(u,v)$ with $u \ne v$, and let $p_2(u,v)$ count the vertices $x$ with both $u \to x$ and $x \to v$ present. Such an $x$ is automatically distinct from $u$ and from $v$, since $D$ has no loops, so each one gives a genuine two-step route $u \to x \to v$. Two of these routes with different midpoints $x \ne x'$ share no arc, since the first uses $(u,x)$ and $(x,v)$ and the second uses $(u,x')$ and $(x',v)$, and neither uses the arc $(u,v)$, which has no midpoint at all. So the direct arc, when present, together with all the two-step routes, is a family of pairwise arc-disjoint $u$-to-$v$ routes, and feasibility caps its size:
+\[
+    \mathbf{1}_{(u,v) \in A(D)} + p_2(u,v) \;\le\; \lec_D(u,v) \;\le\; m-1 .
+\]
+Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)\,n(n-1)$.
+
+\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$, and a digraph on $n$ vertices has at most $\binom{n}{2}$ digons. Combining with Step 1,
+\[
+    \sum_{x \in V} d^+(x)\,d^-(x) \;\le\; (m-1)\,n(n-1) + 2\binom{n}{2} \;=\; m\,n(n-1).
+\]
+
+\emph{Step 3, the smaller half-degree is small on average.} Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy-Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$,
+\[
+\begin{aligned}
+    \sum_{x \in V} \min\bigl(d^+(x), d^-(x)\bigr)
+    &\;\le\; \sum_{x \in V} \sqrt{d^+(x)\, d^-(x)}
+    \;\le\; \sqrt{\,n \sum_{x \in V} d^+(x)\, d^-(x)\,} \\[2pt]
+    &\;\le\; \sqrt{\,n \cdot m\,n(n-1)\,}
+    \;=\; n\sqrt{m(n-1)}
+    \;\le\; \sqrt{m}\, n^{3/2}.
+\end{aligned}
+\]
+
+\emph{Step 4, deleting the smaller half of every vertex.} Call $x$ \emph{source-like} if $d^+(x) \ge d^-(x)$ and \emph{sink-like} otherwise, and write $S$ and $T$ for the two classes, so $V = S \cup T$. Delete every in-arc of a source-like vertex and every out-arc of a sink-like vertex. A source-like $x$ loses $d^-(x) = \min(d^+(x), d^-(x))$ arcs and a sink-like $x$ loses $d^+(x) = \min(d^+(x), d^-(x))$ arcs, so the number of deleted arcs is at most $\sum_x \min(d^+(x), d^-(x))$, which Step 3 bounds by $\sqrt{m}\,n^{3/2}$. An arc $(a,b)$ survives only if $a$ is not sink-like and $b$ is not source-like, that is, only if $a \in S$ and $b \in T$. So what remains runs entirely from $S$ to $T$, which is the one-directional bipartite shape, and it has at most $|S|\,|T| \le \floor{n^2/4}$ arcs. Adding the two counts gives the bound.
+
+The asymptotic statement follows because the augmented bipartite construction (\Cref{const:augmented-bipartite}) already gives $\ell_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4} = n^2/4 + O_m(n)$, and $n^{3/2}$ dominates $n$.
+\end{proof}
+
+The error term is honest rather than sharp: \Cref{conj:dir-arc} predicts a second-order term of size $(m-2)n/2$, which is smaller than $n^{3/2}$, so the proposition does not distinguish the conjectured formula from its near neighbours. What it does is remove the leading constant from the list of open questions and reduce the conjecture to the second-order term, which is where the structure of \Cref{open:decomposition} lives. A stability argument that improved $n^{3/2}$ to $O_m(n)$ would leave only a bounded discrepancy, and that is the natural next target on this route.
 
 \section{The directed multigraph problem at large \texorpdfstring{$n$}{n}}
 
@@ -867,7 +958,7 @@ The whole $m = 3$ problem therefore rests on
 two finite integral statements about multigraphs with multiplicities in
 $\{0,1,2\}$:
 \begin{itemize}
-    \item[(a)] $L_3^{\mathrm{dir}}(7) = 24$, equivalently $M^{*}(7) = 12$, and
+    \item[(a)] $L_3^{\mathrm{dir}}(7) = 24$, which $M^{*}(7) = 12$ would imply but which is not implied by it in reverse, so it is posed to the integral program directly, and
     \item[(b)] every $24$-arc feasible multigraph on $7$ vertices with maximum
     degree at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled
     bidirected path $P_7$.
@@ -1061,9 +1152,12 @@ observation, the one the rest of this section rests on and which
 \emph{incidence graph} of a
 hypergraph $\HH$: one node per vertex, one node per hyperedge, an edge when
 the vertex lies in the hyperedge. A Berge path with distinct hyperedges is
-exactly a path of $I(\HH)$ between two vertex-class nodes, hyperedge-disjoint
-Berge paths use disjoint hyperedge-nodes, and internally vertex-disjoint ones
-use disjoint interior vertex-nodes. Hence
+exactly a path of $I(\HH)$ between two vertex-class nodes. The interior of such
+a path consists of both kinds of node, the hyperedges it rides and the vertices
+where it changes hyperedge, so two paths of $I(\HH)$ are internally disjoint in
+the ordinary graph sense exactly when the two Berge routes share neither a
+hyperedge nor an intermediate vertex. That is precisely the separation fixed in
+\Cref{ch:basecases}, and it is the reason both halves were required there. Hence
 \[
     \kap_\HH(u, v) \;=\; \kap_{I(\HH)}(u, v),
 \]
@@ -1603,8 +1697,17 @@ $m-1$ internally vertex-disjoint, directed Berge routes, then
 \]
 the same bound as the forward model of \Cref{prop:dir-hyper-first}. The forward
 construction of that proposition is itself a set of general hyperedges, so the
-general value is quadratic in $n$ with the same leading constant.
+general value obeys the same upper bound and inherits the same quadratic lower
+bound, and in particular is $\Theta(n^2)$.
 \end{proposition}
+
+The two models are therefore trapped between the same pair of bounds, which
+differ by a factor of $4$. That is enough to fix the \emph{order} of both values
+and not enough to fix either leading constant, so it does not follow that the
+forward and general models agree asymptotically, only that any disagreement
+between them lives inside that factor. Determining
+$\lim_{n \to \infty} \mathrm{ex}(n)/n^2$ for even one of the two, and then asking
+whether the two limits coincide, is the open question \Cref{ch:synthesis} records.
 
 \begin{proof}
 Fix an ordered pair $(u, v)$. A hyperedge $(T, H)$ with $u \in T$ and $v \in H$
@@ -1671,10 +1774,18 @@ since $m / \ln n \to \infty$. By the degree bound (\Cref{lem:degree-bound}) $\le
 \end{proof}
 
 \begin{remark}[The vertex and directed analogues]\label{rem:threshold-analogues}
-Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in the random digraph $D(n,p)$, where each ordered pair's arc is tossed independently with probability $p$, the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are the theorems of Bollob\'as \cite{Bollobas84} for $G(n,p)$ and its directed analogue \cite{FriezeKaronski16}, which state that in this regime the global connectivities equal the minimum degree (respectively the minimum semi-degree, the smaller of a vertex's in- and out-degree) with high probability, so $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
+Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in the random digraph $D(n,p)$, where each ordered pair's arc is tossed independently with probability $p$, the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are the theorems of Bollob\'as \cite[Ch.~7]{BollobasRandomGraphs} for $G(n,p)$, in hitting-time form due to Bollob\'as and Thomason \cite{BollobasThomason85}, and its directed analogue \cite{FriezeKaronski16}, which state that in this regime the global connectivities equal the minimum degree (respectively the minimum semi-degree, the smaller of a vertex's in- and out-degree) with high probability, so $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
 \end{remark}
 
-\section{Computational transcripts}
+\begin{remark}[How far the threshold reaches, and where it stops]\label{rem:threshold-scope}
+\Cref{thm:gnp-threshold} is a statement about $G(n,p)$, and \Cref{rem:threshold-analogues} carries it to the vertex separation and to the directed model $D(n,p)$. It does not reach the hypergraph models, and the reason is a change of scale rather than a gap in the argument. The threshold sits where a vertex's expected degree reaches $m$, since below that the degree bound caps every local connectivity and above it the extremal bound forces a high pair. In $G(n,p)$ a vertex has expected degree $p(n-1)$, so the balance point is $p^* = m/n$ as stated. In the binomial $r$-uniform hypergraph, where each of the $\binom{n}{r}$ possible hyperedges is included independently with probability $p$, a vertex lies in an expected $p\binom{n-1}{r-1}$ hyperedges, so the balance point is
+\[
+    p^* \;=\; \frac{m}{\binom{n-1}{r-1}} \;=\; \Theta\!\left(\frac{m}{n^{r-1}}\right),
+\]
+which for $r \ge 3$ is smaller than $m/n$ by a factor of order $n^{r-2}$. Reading $m/n$ as the hypergraph threshold would therefore place the transition far above where it happens: at $r = 3$ and $n = 8$, for instance, $m/n$ is $3/8$ while $m/\binom{7}{2}$ is $3/21$, and by the former density the sampled hypergraph is long past the transition. \Cref{fig:threshold-3d} accordingly sweeps each model in units of its own $p^*$ rather than a shared $p$. A second limit of scope is worth repeating here: the theorem assumes $m/\ln n \to \infty$, so any picture at a fixed small $m$ illustrates the shape of the transition without being an instance of the theorem.
+\end{remark}
+
+\section{Computational transcripts}\label{sec:transcripts}
 
 The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source accompanies the document as a single self-contained file, \texttt{erdos915\_unified.py} in the \texttt{program/} directory. Its core runs on \texttt{numpy} and \texttt{scipy} alone, the certifier adds \texttt{pulp}, and \texttt{matplotlib} and \texttt{networkx} are optional and used only for the figures. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
 
@@ -1684,6 +1795,10 @@ The cut-counting optimisation closes the gap up to $n = 5$ inside a short budget
 
 \lstinputlisting[style=pythonkul, language={}, caption={Exhaustive-search output for the base cases $2 \le n \le 7$: the maximum arc count equals $M(n) = 2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_log.txt}
 
+The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}.
+
+\lstinputlisting[style=pythonkul, language={}, caption={The same search run with the internally vertex-disjoint feasibility test, settling the base cases of \Cref{thm:dir-vertex-m2-exact}: the maximum arc count is again $2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_vertex_log.txt}
+
 \section{How the program checks itself}
 
-The invariants are checked by the self-test at the foot of \texttt{erdos915\_unified.py}, run simply with \texttt{python erdos915\_unified.py}. It confirms the checker against the proven $m = 2$ values $2, 4, 6, 8$, the named constructions against their predicted sizes and connectivities, the Gomory--Hu shortcut against brute-force max-flow, the Berge connectivities of the hypergraph checker, the Monte Carlo appearance threshold and Whitney's inequality on every sample, the cut-counting optima for small $n$, the search reaching the certified optimum, and the driver returning the proven value or a feasible witness in each mode. Every check passes. A single companion script, \texttt{make\_figures.py}, regenerates every figure in the thesis from the same file, with the mapping listed in \texttt{program/README.md}.
+The invariants are checked by the self-test at the foot of \texttt{erdos915\_unified.py}, run simply with \texttt{python erdos915\_unified.py}. It confirms the checker against the proven $m = 2$ values $2, 4, 6, 8$ and against the first three vertex base cases of \Cref{thm:dir-vertex-m2-exact}, the fast vertex-flow test against the exact checker it stands in for, the counting step and the bound of \Cref{prop:dir-arc-stability} on sampled feasible digraphs, the named constructions against their predicted sizes and connectivities, the Gomory--Hu shortcut against brute-force max-flow, the Berge connectivities of the hypergraph checker, the Monte Carlo appearance threshold and Whitney's inequality on every sample, the cut-counting optima for small $n$, the search reaching the certified optimum, and the driver returning the proven value or a feasible witness in each mode. Every check passes. A single companion script, \texttt{make\_figures.py}, regenerates every figure in the thesis from the same file, with the mapping listed in \texttt{program/README.md}.

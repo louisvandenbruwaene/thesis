@@ -63,8 +63,15 @@ rests on a hand proof or a cited theorem; computations are supporting evidence.
 The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
 "Open problems")** and tracked in **`TASKS.md`**. The headline targets:
 
-- **The backward-arc lemma** — proving an extremal non-hub digraph has no arc from `B`
-  to `A` would turn the directed-arc conjecture into a theorem for all `m ≥ 3`.
+- **The extremal decomposition** — proving an extremal non-hub digraph splits as `A ∪ B`
+  with `A → B` complete, no arc inside `A`, and no arc from `B` back to `A` would turn
+  the directed-arc conjecture into a theorem for all `m ≥ 3`. The backward-arc clause is
+  the hardest quarter of it, not the whole. Unconditionally the leading constant is
+  already settled: `ℓₘᵈⁱʳ(n) = n²/4 + O(n^{3/2})`.
+- **The directed *vertex* problem at `m ≥ 3`** — a separate question, not a corollary of
+  the arc one. Whitney's `κ ≤ λ` makes the vertex-feasible family the larger of the two,
+  so an arc upper bound does not restrict it. Proved equal at `m = 2` only by re-running
+  the induction and its base cases under the vertex test.
 - **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
 - **One finite `n = 7` fact** that closes the directed-multigraph problem at `m = 3`:

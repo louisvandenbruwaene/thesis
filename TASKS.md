@@ -4,6 +4,34 @@ Status: TODO | IN PROGRESS | BLOCKED(by) | AWAITING AUTHOR | DONE→delete after
 Completed 2026-06 blocks (SA-vs-tabu, parallel geng, conj:min-degree numerics, review
 fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and deleted here.
 
+## REVIEW FIXES 2026-07-30 (external review; all landed, see claude.md for the audit)
+- [x] **Whitney direction was inverted** in the proof of thm:dir-vertex-m2-exact
+      (app_proofs) and in the ch1/ch4 prose. arc-feasible SUBSET vertex-feasible,
+      so an arc upper bound does not restrict the vertex problem. Theorem is
+      TRUE: the induction transfers (kappa is deletion-monotone) and the base
+      cases n<=7 were re-run under the vertex test, giving 2,4,6,8,10,12 again.
+      New rem:whitney-direction, new transcript, program vertex path made fast.
+- [x] **prop:dir-arc-stability added**: |A| <= floor(n^2/4) + sqrt(m) n^{3/2}
+      unconditionally, so ell_m^dir(n) = n^2/4 + O_m(n^{3/2}) with NO structural
+      hypothesis. Came out of the external review, so the author must decide on
+      an acknowledgment line. Sharpening the error to O_m(n) is the natural next
+      target and would leave only a bounded discrepancy from conj:dir-arc.
+- [x] The "one missing lemma" framing was too generous: the count assumed four
+      things, now stated as open:decomposition (partition exists, A->B complete,
+      nothing inside A, nothing back to A).
+- [ ] **Directed VERTEX problem at m >= 3 is a genuinely open row**, not a
+      corollary of the arc case. Exhaustive at m=3 agrees with the arc value at
+      every n reached. Wanted: the first digraph where kappa < lambda on some
+      pair AND that slack buys arcs, or a proof it cannot.
+- [ ] **Multigraph vertex under the standard convention** (parallel copies as
+      distinct one-step routes) is a new extremal problem; this thesis uses the
+      collapsing convention and counts adjacencies (sec:parallel-convention).
+      Wanted: exact values at m=3, small n, and a structural conjecture.
+- [ ] **Sorensen-Thomassen range**: the thesis says k_5(n) = floor(8n/3) - 3 for
+      n >= 10 with a worked justification in ch1. An external review claims the
+      current Erdos Problems record says n >= 13. NOT resolvable from here (the
+      paper is paywalled and erdosproblems.com 403s). CHECK AGAINST THE PAPER.
+
 ## OPEN PROOF TARGETS (genuine attempts; verify before anything enters the .tex)
 - [ ] **Directed-arc m=3 even case (flagship).** The min-degree-deletion engine
       gives the quadratic bound at odd n (given the even level below); the even
