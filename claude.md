@@ -2164,3 +2164,42 @@ review claims n >= 13 and that nothing here depends on which is right.
 
 VERIFY: build 136 pp, 0 overfull, 0 undefined refs/cites; 90 tests OK; self-check
 ALL CHECKS PASSED including the new entries; hunspell en_GB clean.
+
+## 2026-07-30 (Sonnet) -- S-T threshold resolved via erdosproblems.com, and a real citation mismatch found
+
+Author asked to work the open-problem queue while the fact (a) confirmation run and
+the m=5/m=6 multi-vertex sweep keep going in the background (both left untouched;
+machine load was 25-30 on 10 cores, so no new heavy compute was launched).
+
+**S-T RANGE RESOLVED.** The n>=10 vs n>=13 question, previously left as the
+author's call because the primary paper is paywalled, is now settled without
+needing the paywalled paper: erdosproblems.com (Thomas Bloom's maintained Erdos
+Problems database, already cited in this thesis as \cite{ErdosProblems}) states
+directly, quoting Sorensen-Thomassen: "proved that k_5(n) = floor(8n/3) - 3 for
+n >= 13." Fetched via plain curl (WebFetch hit a Cloudflare 403 the tool couldn't
+get past; curl worked fine, ordinary public page, nothing paywalled or
+authenticated). thm:sorensen-thomassen and its surrounding paragraph updated to
+n>=13, citing \cite{ErdosProblems} for the number and stating plainly that this
+corrects the thesis's own earlier n>=10.
+
+**REAL CITATION MISMATCH FOUND while on the same page.** erdosproblems.com lists
+THREE separate Leonard papers under separate keys: Le72 ("proved l_m(n)=k_m(n) for
+2<=m<=4 and the l_5 parity formulas"), Le73 ("disproved this conjecture for m=5,
+giving an explicit counterexample with 57 vertices and 141 edges"), Le73b ("proved
+l_6(n)=3n-2"). This thesis's thm:leonard (the m<=4 equality) and the ch1 lineage
+paragraph both cited \cite{Leonard73BE}, whose TITLE is "On a Conjecture of
+Bollobas and Erdos" -- that title is unmistakably Le73, the DISPROOF paper, not
+the m<=4 equality paper. The correct entry was sitting unused in ref.bib all
+along as Leonard72b ("On Graphs with at Most Four Line-Disjoint Paths Connecting
+any Two Vertices", JCTB 13:242-250, 1972), whose title is exactly Le72's claim.
+Both citations swapped to \cite{Leonard72b}. Leonard73BE (correct bibliographic
+data, fixed earlier today) was not orphaned: it is the right citation for
+Leonard's own 57-vertex/141-edge counterexample, which the thesis discussed
+without ever citing -- added one sentence crediting it right where the m=5
+divergence is introduced, so the entry now supports a claim it actually makes.
+(Leonard73, "Graphs with 6-Ways", Canadian J. Math 25:687-692, plausibly matches
+Le73b's ell_6(n)=3n-2 but is not currently cited by any claim in this thesis;
+left alone, not urgent.)
+
+VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 underfull, 0 undefined refs/cites.
+Program untouched, no test re-run needed.
