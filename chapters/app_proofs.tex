@@ -1768,6 +1768,38 @@ between them lives inside that factor. Determining
 $\lim_{n \to \infty} \mathrm{ex}(n)/n^2$ for even one of the two, and then asking
 whether the two limits coincide, is the open question \Cref{ch:synthesis} records.
 
+It is worth saying which end of that gap is the likely culprit, because the two
+bounds are not equally crude and the analogy with the simple digraph case is
+informative. The upper bound charges each hyperedge to the ordered tail-head
+pairs it occupies and then allows all $n(n-1)$ ordered pairs to be used to
+capacity. The construction uses only the $\alpha(n-\alpha) \le n^2/4$ pairs that
+run from the tail class to the head class, and leaves the pairs inside each
+class, and those running backwards, entirely idle. The factor of four is exactly
+that difference, $n^2$ against $n^2/4$, and it is the same difference that
+appears in the simple directed problem, where \Cref{const:augmented-bipartite}
+also uses only a one-directional bipartite pattern. There, \Cref{thm:dir-arc-linear-error}
+now proves that the bipartite pattern is right to first order, that no
+arrangement recovers the idle pairs. If that phenomenon is a feature of
+directedness rather than of graphs specifically, then it is the upper bound here
+that should come down by a factor of four, not the construction that should
+climb, which suggests the following.
+
+\begin{conjecture}[The directed hypergraph constant]\label{conj:dir-hyper-constant}
+For fixed $r \ge 3$ and $m \ge 2$, the maximum number of hyperedges of a directed
+$r$-uniform hypergraph on $n$ vertices with $\lec^{\max} \le m-1$ is
+$\bigl(1+o(1)\bigr)\,(m-1)n^2 / \bigl(4(r-1)\bigr)$, so the bipartite
+construction of \Cref{prop:dir-hyper-first} is asymptotically optimal.
+\end{conjecture}
+
+The proof of \Cref{thm:dir-arc-linear-error} does not transfer directly, and the
+place it breaks is worth recording for anyone who takes this up. There, two-step
+routes through distinct midpoints were automatically arc-disjoint. Here a single
+hyperedge carries $r-1$ heads at once, so two two-step routes with different
+midpoints can enter through the very same hyperedge, and the family of two-step
+routes is no longer automatically edge-disjoint. Recovering a packing of them,
+or replacing the count by one that tolerates the sharing, is the technical step
+this conjecture waits on.
+
 \begin{proof}
 Fix an ordered pair $(u, v)$. A hyperedge $(T, H)$ with $u \in T$ and $v \in H$
 carries the one-step route $u \to v$ that enters at the tail $u$ and leaves at the
