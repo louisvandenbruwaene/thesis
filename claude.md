@@ -2203,3 +2203,44 @@ left alone, not urgent.)
 
 VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 underfull, 0 undefined refs/cites.
 Program untouched, no test re-run needed.
+
+## 2026-07-30 (Sonnet, cont.) -- Case 2 of thm:dir-arc-linear-error proved tight (negative result)
+
+Attempted the concrete idea TASKS.md flagged: cut Case 2's constant (currently
+4(m-1), conjectured target (m-2)/2, factor ~8 gap) by exploiting that the
+conjectured extremiser has min(d+,d-)=0 on a whole side, since Case 2 "charges
+every vertex the worst case" of lem:small-side. Reformulated exactly what Case
+2's proof is allowed to use (the aggregate budget sum d+(x)d-(x) <=
+(m-1)n(n-1) plus the per-vertex floor d(x)>=n/2) as a resource-allocation
+relaxation, and proved via a concavity/exchange (smoothing) argument that the
+true maximum of sum min(d+,d-) under those two facts alone is attained by
+CONCENTRATING the budget on ~16(m-1) vertices (a constant, not growing with n)
+at d+=d-=n/4 each, with the rest at 0 -- and that this bang-bang maximum
+equals 4(m-1)(n-1) asymptotically, exactly the theorem's existing constant.
+Verified independently with a constrained nonlinear solver (SLSQP, multi-start)
+across several (n,m): agreement to 1e-13 relative error.
+
+So the idea does NOT work: the "vertices with min=0" intuition is already
+baked into the tight point of the CURRENT proof's own relaxation (lem:small-
+side is tight iff d+=d-, the floor substitution d(x)->n/2 is tight iff
+d(x)=n/2, both hold simultaneously only at d+=d-=n/4, exactly where the
+bang-bang optimum sits), so summing the crude per-vertex bound loses nothing.
+Closing the gap needs a genuinely independent second inequality (candidate:
+interference among the O(m) expensive near-balanced vertices themselves, not
+attempted), not a sharper reading of the existing one.
+
+Wrote this up as a full proof (concentration lemma + tight-point coincidence)
+in research_notes/case2_tightness.md, with research_notes/scripts/
+case2_tightness_check.py (self-contained, numpy+scipy, verifies the bang-bang
+closed form against an independent solver). Folded a condensed version into
+app_proofs.tex as new rem:case2-tight right after thm:dir-arc-linear-error's
+proof, replacing the old "the dichotomy above suggests where to push" hint
+(which pointed at exactly the idea now ruled out) with the actual result, so a
+future reader or session does not re-attempt the same dead end. Style matches
+the existing rem:min-degree-obstruction (a full proved-negative-result remark,
+not just a footnote).
+
+VERIFY: latexmk exit 0, 138 pp (unchanged), 0 overfull. Two underfull hboxes
+present are pre-existing (confirmed via git stash against the prior commit,
+unrelated to this edit -- one is a figure resizebox, one is near main.bbl).
+No program code touched, no test re-run needed.

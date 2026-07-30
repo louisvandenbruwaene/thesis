@@ -2,62 +2,29 @@
 
 Status: TODO | IN PROGRESS | BLOCKED(by) | AWAITING AUTHOR | DONE→delete after logging
 Completed 2026-06 blocks (SA-vs-tabu, parallel geng, conj:min-degree numerics, review
-fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and deleted here.
+fixes, C extension, Jan follow-up, P2 polish) and the 2026-07-30 review-fix/phase-2
+batch (Whitney inversion, five overclaims, error term to O_m(n), multigraph vertex
+alt-convention, Case 2 tightness, S-T threshold, Leonard citation fix) are all logged
+in claude.md and deleted here.
 
-## REVIEW FIXES 2026-07-30 (Stijn Cambie's review, run through ChatGPT; all landed)
-## PHASE 2 2026-07-30 (three new results, see claude.md)
-- [x] **Error term sharpened to O_m(n)**: thm:dir-arc-linear-error gives
-      |A| <= floor(n^2/4) + 4(m-1)(n-1) for all n, m, so ell_m^dir(n) =
-      n^2/4 + Theta_m(n) with no structural hypothesis. Only a factor ~8 in the
-      second-order coefficient is now open. Next: Case 2 of the proof charges
-      every vertex the worst case of lem:small-side, while the conjectured
-      extremiser has min(d+,d-) = 0 on a whole side. Exploiting that would cut
-      the constant.
-- [x] **Multigraph vertex, other convention** (new section A.8). m=2 proved;
-      the thickened THETA (two poles, middles at multiplicity m-2) beats the
-      thickened tree whenever n <= m+1 and m >= 4, so the problem is NOT the
-      multigraph edge problem. conj:multi-vertex now claims the tree only for
-      n >= m+2, verified m <= 4 only. Reduced to sum pi >= (m-1) rank(G_0).
-- [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** m=5 n=6,7 and m=6
-      n=5 would test conj:multi-vertex at the first sizes past the theta
-      regime. Command: max_multigraph_vertex_standard(n, m). m=3 n=7 took
-      ~13 min, so m=5 n=6 is plausible overnight.
+## OPEN — multigraph vertex, alternate convention (new section A.8)
+- [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** m=5 n=6,7 and m=6 n=5
+      would test conj:multi-vertex at the first sizes past the theta regime.
+      Command: max_multigraph_vertex_standard(n, m). RUNNING as of 2026-07-30
+      22:50, PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
+      (5,6),(5,7),(4,7) each capped at 5400s. Check for a printed verdict line
+      before relaunching.
 - [ ] **Prove sum_{uv} pi(u,v) >= (m-1) rank(G_0) for n >= m+2**, which closes
-      conj:multi-vertex. Same shape as lem:incidence-rank, so the triconnected
-      decomposition is the tool to try.
-- [x] **open:decomposition restated**: the linear-branch extremisers at m=2 are
-      ALL bidirected spanning trees (3 classes at n=5, 6 at n=6, the tree
-      counts), not just the hub, so the hypothesis is now on n being past the
-      branch crossover rather than on the shape. Note the crossover is n=8 at
-      m=2 and n=9 at m=3, so no exhaustive sweep at m=3 can test it.
-- [x] **Two missing hypotheses found and fixed**: thm:leonard and conj:dir-arc
-      were false as stated at n < m (formula exceeds the trivial maximum).
-      Both now carry n >= m, as thm:mader already did.
+      conj:multi-vertex in general (currently verified m<=4 only). Same shape
+      as lem:incidence-rank, so the triconnected decomposition is the tool to
+      try.
 
-- [x] **Whitney direction was inverted** in the proof of thm:dir-vertex-m2-exact
-      (app_proofs) and in the ch1/ch4 prose. arc-feasible SUBSET vertex-feasible,
-      so an arc upper bound does not restrict the vertex problem. Theorem is
-      TRUE: the induction transfers (kappa is deletion-monotone) and the base
-      cases n<=7 were re-run under the vertex test, giving 2,4,6,8,10,12 again.
-      New rem:whitney-direction, new transcript, program vertex path made fast.
-- [x] **prop:dir-arc-stability added**: |A| <= floor(n^2/4) + sqrt(m) n^{3/2}
-      unconditionally, so ell_m^dir(n) = n^2/4 + O_m(n^{3/2}) with NO structural
-      hypothesis. Came out of the external review, so the author must decide on
-      an acknowledgment line. Sharpening the error to O_m(n) is the natural next
-      target and would leave only a bounded discrepancy from conj:dir-arc.
-- [x] The "one missing lemma" framing was too generous: the count assumed four
-      things, now stated as open:decomposition (partition exists, A->B complete,
-      nothing inside A, nothing back to A).
-- [ ] **Directed VERTEX problem at m >= 3 is a genuinely open row**, not a
-      corollary of the arc case. Exhaustive at m=3 agrees with the arc value at
-      every n reached. Wanted: the first digraph where kappa < lambda on some
-      pair AND that slack buys arcs, or a proof it cannot.
-- [x] **Multigraph vertex under the standard convention: DONE in phase 2**,
-      new appendix section A.8. See the phase-2 block above for what is left.
-- [x] **Sorensen-Thomassen range: AUTHOR'S CALL, recorded not resolved.** The
-      thesis keeps n >= 10 with its worked justification, and ch1 now records
-      that an external review reports n >= 13 and that nothing here depends on
-      which is right. Author declined to check the paywalled paper.
+## OPEN — directed vertex problem at m >= 3
+- [ ] Genuinely open row, not a corollary of the arc case (Whitney's
+      kappa<=lambda makes vertex-feasible the larger family). Exhaustive at
+      m=3 agrees with the arc value at every n reached. Wanted: the first
+      digraph where kappa < lambda on some pair AND that slack buys extra
+      arcs, or a proof it cannot.
 
 ## OPEN PROOF TARGETS (genuine attempts; verify before anything enters the .tex)
 - [ ] **Directed-arc m=3 even case (flagship).** The min-degree-deletion engine
@@ -71,67 +38,39 @@ fixes, C extension, Jan follow-up, P2 polish) are logged in claude.md and delete
 - [ ] **Hypergraph vertex at m=4.** lem:incidence-rank needs a 4-connectivity
       analogue of the Tutte/SPQR decomposition. No early counterexample:
       k_4^(3)(5)=6 machine-checked.
-- [x] **m=4 odd-level uniqueness / m=5 value step: CLOSED at research-note
-      level 2026-07-04** (research_notes/m4_odd_uniqueness_closed.md, machine
-      verification ALL CHECKS PASSED): deficiency-1 attachment corollary +
-      tight-pair analysis force a degree-3k vertex at odd levels, k >= 5.
-      Remaining: m=5 odd uniqueness (excess outgrows the min-degree count,
-      documented), m>=6 (needs deficiency-2 corollaries), the m=4 finite
-      bases (machine block below), and author review before any .tex entry.
-- [x] **Fact (a) PROVED 2026-07-04 (delta-split route).** The 19-arc (55
-      classes, 2549 s) and 18-arc (565 classes, 1576 s) n=6 classifications
-      completed (sound geng enumerator, npz in program/logs), and the
-      attachment check (research_notes/scripts/fact_a_attachment_check.py,
-      control-tested, both-checker crosscheck 0 failures) reports NO SURVIVOR
-      in either case: L_3^dir(7) = 24. AWAITING independent confirmation by
-      the direct run below before anything enters the .tex. Route + proofs:
-      research_notes/fact_a_delta_split.md.
-- [ ] **m=4 base facts** (new, from research_notes/m4_odd_uniqueness_closed.md,
-      which closes the m=4 odd-uniqueness hole for k >= 5 and the m=5 value
-      gap): (a4) L_4^dir(7) = 36 + the 36-arc extremal classification on 7
-      vertices; then n = 8, 9, 10 seam arguments. With those, the WHOLE m=4
-      problem closes like m=3. Gurobi or a long geng run at m=4 (16 states
-      per pair) required.
+- [ ] **m=4 base facts** (research_notes/m4_odd_uniqueness_closed.md closes
+      the m=4 odd-uniqueness hole for k >= 5 and the m=5 value gap): (a4)
+      L_4^dir(7) = 36 + the 36-arc extremal classification on 7 vertices; then
+      n = 8, 9, 10 seam arguments. With those, the WHOLE m=4 problem closes
+      like m=3. Gurobi or a long geng run at m=4 (16 states per pair)
+      required. DEFERRED while the machine is busy with the fact (a)
+      confirmation run below and the multi-vertex sweep above.
 
 ## MACHINE TARGETS (geng installed 2026-07-02 via brew; 10-core box)
-- [x] n=6, target 20, max_degree=8: DONE 2026-07-02, exactly 1 class, the
-      doubled bidirected P_6 (352 s). Closes the input of fact (b)'s degree-4 case.
-- [x] **Fact (b) PROVED 2026-07-02**: n=7, target 24, max_degree=8 via the
-      sound generation enumerator, 25895 s on 10 cores: exactly 3 classes,
-      2B(3,4), 2B(4,3), doubled P_7, each re-verified by the exact checker.
-      Recorded in rem:odd-step-roadmap, ch2, ch4, contribution statement.
-- [x] **Uncapped n=6 PROVED 2026-07-02** (2187 s): exactly the 6 doubled
-      spanning trees. With the saturated attachment lemma this makes the
-      min-degree >= 6 bound on any fact-(a) witness unconditional (recorded
-      in rem:odd-step-roadmap).
-- [ ] **Fact (a) by machine (now the CONFIRMATION run)**: uncapped n=7,
-      target 25; EMPTY output independently confirms the delta-split proof
-      above and unlocks the thesis write-up. STATUS 2026-07-30: the 2026-07-04
-      relaunch DIED. Its log ends at a BrokenProcessPool warning, after which
-      it fell back to sequential and never produced a verdict, and no process
-      survives. RELAUNCHED 2026-07-30 23:10, log
-      program/logs/geng_a_n7_t25_20260730.log, runner in the scratchpad
-      (main-guarded, nohup, unbuffered). Budget hint: fact (b) took ~7 h on 10
-      cores WITH the degree-8 cap; this run has no cap, so expect substantially
-      longer, and check the log rather than assuming it is still alive.
+- [ ] **Fact (a) confirmation run: RUNNING as of 2026-07-30 23:10** (relaunch
+      of the 2026-07-04 attempt, which died silently after a BrokenProcessPool
+      warning with no verdict). Uncapped n=7, target 25; EMPTY output
+      independently confirms the delta-split hand proof (below) and unlocks
+      the thesis write-up. Log: program/logs/geng_a_n7_t25_20260730.log
+      (only prints a START line until it finishes; check `ps` for the live
+      process, not just the log, before assuming it died). Budget hint: fact
+      (b) took ~7h on 10 cores WITH the degree-8 cap; this run has no cap, so
+      expect substantially longer.
 - [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
       eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
       CBC cannot close it (measured 2026-06-16).
+- Fact (a) already has a hand proof (delta-split route, both n=6
+  classifications done, attachment check reports NO SURVIVOR): L_3^dir(7)=24.
+  research_notes/fact_a_delta_split.md. AWAITING the machine confirmation run
+  above before anything enters the .tex.
 
 ## WRITE-UP QUEUE
-- [x] Saturated attachment lemma integrated (lem:saturated-attachment, A.30) and
-      the seam shortened; fact (b) + uncapped n=6 recorded across
-      rem:odd-step-roadmap, ch2, ch4, tab:summary caption, contribution
-      statement (all 2026-07-02).
 - [ ] If fact (a) lands (run above): upgrade conj status to THEOREM for the
       m=3 directed multigraph problem across tab:summary, ch4 open problems,
       rem:odd-step-roadmap, contribution statement, and the lay summary's
       closing sentence.
 
-## Deferred figure polish (from the A.5-A.8 pass; two items left deliberately)
-- [x] Faint-edge widths unified 2026-07-02 (bgarc/abk/attachment inherit gdirfaint).
-- [x] Sub-captions ragged-right; star-hypertree hubs orange (caption said orange);
-      gallery multiplicities stated once per panel (2026-07-02).
+## Deferred figure polish (two items left deliberately, author's call)
 - fig:cut (ch2) keeps its deliberate two-tone highlight (gray=not counted,
   blue=counted); revisit only if strict opacity uniformity is wanted.
 - Body vs appendix vertex convention (big labelled circles vs small dots with

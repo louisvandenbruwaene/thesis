@@ -114,6 +114,24 @@ Scripts: `nauty_pipeline.py` (counts / extremal / timing / multigraph hybrid),
 `tabu_vs_sa.py` (tabu vs simulated annealing benchmark). Both import the thesis
 program; the pipeline also needs nauty on PATH.
 
+### Case 2 of thm:dir-arc-linear-error is already tight (PROVED negative result, 2026-07-30)
+The remark after `thm:dir-arc-linear-error` suggests that Case 2's constant
+`4(m-1)` might be cuttable towards the conjectured `(m-2)/2` by exploiting that
+the conjectured extremiser has `min(d+,d-)=0` on a whole side. This note proves
+that specific idea does not work: Case 2's bound is the exact maximum
+extractable from the one inequality it uses (the aggregate two-step-route
+budget plus the per-vertex degree floor), via a concentration/exchange
+argument. Closing the gap needs a genuinely new inequality, not a sharper use
+of the existing one; a candidate direction (interference among the `O(m)`
+near-balanced vertices themselves) is named but not attempted.
+
+- [`case2_tightness.md`](case2_tightness.md) -- the reformulation, the
+  concentration lemma, the exact asymptotic match to `4(m-1)(n-1)`, and what
+  it rules out.
+
+Scripts: `case2_tightness_check.py` (closed-form bang-bang value vs. an
+independent nonlinear solver; self-contained, numpy + scipy only).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal
