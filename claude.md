@@ -2353,3 +2353,67 @@ from the previous session.
 VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 undefined refs/cites. Script
 re-run after the range fix, all checks pass. Background jobs untouched and
 still alive (fact (a) confirmation PID 79768, multi-vertex sweep PID 79194).
+
+## 2026-07-31 (Opus) -- hypergraph vertex at m=4: no counterexample, but the formula's boundary is now PROVED
+
+Task #4 from the queue. Applied the lesson from the multigraph result: TEST
+the target statement before investing in proving it.
+
+FIRST, THE ARITHMETIC THAT MAKES THE TEST EXACT. For a connected incidence
+graph with b hyperedges of size r on n vertices, rank(I) = b(r-1) - n + 1, so
+rank > (m-2)(n-1) holds exactly when b > (m-1)(n-1)/(r-1). "One hyperedge past
+the formula" and "rank past the conjectured bound" are therefore the SAME
+condition, so searching for one extra hyperedge is a direct test of the
+missing 4-connectivity rank bound rather than a proxy for it.
+
+FINDING 1 (PROVED): the general formula k_m^(r)(n) = floor((m-1)(n-1)/(r-1))
+cannot hold for all m and r. rem:hyper-vertex-m3-scope already observed that
+r=2 "speaks of multigraphs under the hyperedge-as-gate convention", but only
+in one direction. The identification runs BOTH ways: at r=2 the hypergraph
+vertex measure equals mu(u,v)+pi(u,v), i.e. lem:multi-vertex-split, because
+the mu parallel copies are pairwise edge-disjoint with empty interiors, and
+any two internally-vertex-disjoint paths of length >=2 are AUTOMATICALLY
+edge-disjoint (a shared edge would force a shared interior vertex), so the
+hyperedge-disjointness requirement bites only among the length-one routes,
+which is exactly what makes parallel copies count separately. Hence
+k_m^(2)(n) = K_m^multi(n), and yesterday's thm:clique-chain-vertex applies
+verbatim: the formula fails at r=2 for every m>=5 and every n>=3, by a margin
+growing linearly in n. This also explains tab:multi-vertex's own bold entries
+(14 at m=5,n=4 and 19 at m=5,n=5 against the formula's 12 and 16) -- the
+thesis was already displaying this failure without connecting it to the
+hypergraph row. So the live question is not "is the formula true for all m,r"
+(it is not) but "does r>=3 postpone the failure past m=4", which puts m=4
+right at the boundary.
+
+FINDING 2 (VERIFIED, no counterexample): at m=4 the formula survives
+exhaustive checking of BOTH halves (target attained, target+1 infeasible) at
+ELEVEN (n,r) pairs: (4,3),(5,3),(5,4),(6,4),(6,5),(7,5),(7,6),(8,6),(8,7),
+(9,7),(9,8). Previously only the single cell k_4^(3)(5)=6 was known. Still
+evidence, not proof.
+
+METHOD + CROSS-VALIDATION: research_notes/scripts/hyper_vertex_m4_search.py,
+written from scratch (standard library only, own Edmonds-Karp, own
+incidence-graph model, no dependence on the thesis program it corroborates).
+DFS over multisets of r-sets with monotone feasibility pruning plus a codegree
+filter. Run at r=2 it independently reproduces tab:multi-vertex including the
+m=5 failure, and the witness it returns at m=5,n=5 is a triangle at
+multiplicity 3 with two pendant edges at multiplicity 4 -- precisely the
+clique-chain shape, rediscovered from a completely different search space
+without being told to look for it. That is a third independent confirmation
+of thm:clique-chain-vertex.
+
+THESIS: rem:hyper-vertex-m3-scope rewritten. It previously cited the SIMPLE
+graph case (m=5, Sorensen-Thomassen, a different convention) as the warning
+that the pattern must fail eventually. It now states the sharper same-
+convention fact (r=2 fails at exactly m=5, provably, for all n>=3), records
+the eleven-cell m=4 evidence, and says plainly that this is evidence rather
+than proof with the 4-connectivity rank bound still missing.
+
+STILL OPEN + LAUNCHED: where the formula first breaks for r>=3. A search at
+m=5,6 for r=3,4,5 was started but did not return within the session (the
+looser codegree cap at higher m widens the space sharply). Logged in TASKS.md
+as the natural next computation.
+
+VERIFY: latexmk exit 0, 138 pp, 0 overfull, 0 undefined refs/cites. Script
+runs clean in both modes. Background jobs untouched (fact (a) PID 79768,
+multi-vertex sweep PID 79194, both still alive).

@@ -1634,11 +1634,29 @@ where parallel adjacencies count once. The proof of
 \Cref{lem:incidence-rank} leans on the triconnected decomposition exactly
 where $\kap \le 2$ lives. For $m = 4$, the analogous question asks for a rank
 bound relative to $\kap \le 3$, where no comparably clean decomposition
-exists, and the graph case ($m = 5$, S{\o}rensen--Thomassen) warns that the
-pattern $k_m^{(r)} = \ell_m^{(r)}$ must fail eventually. Exhaustive
-computation confirms $k_4^{(3)}(5) = 6 = \floor{3 \cdot 4 / 2}$, so the
-agreement survives at least one step beyond the theorem, and where it first
-breaks for $r \ge 3$ is open.
+exists. That the pattern $k_m^{(r)} = \ell_m^{(r)}$ must fail eventually is
+not merely an analogy with the graph case ($m = 5$,
+S{\o}rensen-Thomassen), which is stated for simple graphs under the body's
+convention. It already fails inside this convention, at $r = 2$. The
+identification in the first sentence of this remark runs both ways: the
+$r = 2$ case of the present problem \emph{is} the multigraph vertex problem
+of \Cref{sec:multi-vertex-standard}, since a route there is a family of
+edge-disjoint and internally disjoint paths, which is exactly
+\Cref{lem:multi-vertex-split}. So \Cref{thm:clique-chain-vertex} applies to
+it, and the value exceeds $\floor{(m-1)(n-1)/(r-1)} = (m-1)(n-1)$ for every
+$m \ge 5$ and every $n \ge 3$, by a margin that grows with $n$. The
+formula is therefore not a candidate for all $m$ and $r$ together, and the
+live question is only whether $r \ge 3$ postpones the failure past $m = 4$.
+
+For $m = 4$ it does not fail anywhere within reach. An exhaustive search over
+$r$-uniform multihypergraphs confirms both halves of the value, that
+$\floor{3(n-1)/(r-1)}$ is attained and that one more hyperedge is infeasible,
+at $(n,r) = (4,3)$, $(5,3)$, $(5,4)$, $(6,4)$, $(6,5)$, $(7,5)$, $(7,6)$,
+$(8,6)$, $(8,7)$, $(9,7)$ and $(9,8)$. That is a wider net than the single
+cell $k_4^{(3)}(5) = 6$, and it is evidence rather than proof: the missing
+ingredient remains the $4$-connectivity rank bound, and the $r = 2$ failure at
+$m = 5$ shows the surrounding claim has a genuine boundary rather than
+extending indefinitely.
 \end{remark}
 
 \begin{proposition}[Directed hypergraphs: first bounds]\label{prop:dir-hyper-first}

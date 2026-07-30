@@ -47,8 +47,19 @@ in claude.md and deleted here.
       backward-arc framing may be the more robust route. Seam bases
       ell_3(9)=25, ell_3(10)=30 still need a solver (Gurobi).
 - [ ] **Hypergraph vertex at m=4.** lem:incidence-rank needs a 4-connectivity
-      analogue of the Tutte/SPQR decomposition. No early counterexample:
-      k_4^(3)(5)=6 machine-checked.
+      analogue of the Tutte/SPQR decomposition. STATUS 2026-07-31: no
+      counterexample at m=4 across ELEVEN (n,r) pairs, both halves exhaustive
+      (was: the single cell k_4^(3)(5)=6). But the surrounding formula is now
+      PROVED to have a boundary: at r=2 this problem IS the multigraph vertex
+      problem, so thm:clique-chain-vertex breaks it for every m>=5, n>=3.
+      So m=4 sits right at the edge. research_notes/hyper_vertex_m4.md.
+- [ ] **Where does the formula first break for r >= 3?** The r=2 answer is
+      m=5 exactly. A search at m=5,6 for r=3,4,5 was launched 2026-07-31 but
+      did not return within the session (the looser codegree cap at higher m
+      widens the space sharply). Natural next computation; needs either a
+      longer run on a quiet machine or a better-pruned search.
+      Command: research_notes/scripts/hyper_vertex_m4_search.py (edit the
+      case list) or the same DFS with symmetry reduction added.
 - [ ] **m=4 base facts** (research_notes/m4_odd_uniqueness_closed.md closes
       the m=4 odd-uniqueness hole for k >= 5 and the m=5 value gap): (a4)
       L_4^dir(7) = 36 + the 36-arc extremal classification on 7 vertices; then

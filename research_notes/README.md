@@ -152,6 +152,25 @@ Scripts: `multi_vertex_clique_check.py` (builds the chain, checks feasibility
 via the thesis program's `exceeds_bound` AND a from-scratch networkx max-flow,
 confirms the exact gain formula; self-contained modulo importing the program).
 
+### The hypergraph vertex problem at m = 4 (2026-07-31)
+Two findings. **PROVED:** the general formula
+`k_m^(r)(n) = floor((m-1)(n-1)/(r-1))` cannot hold for all `m` and `r`, because
+at `r = 2` this problem *is* the multigraph vertex problem of
+`sec:multi-vertex-standard` (the measures coincide, proved), so
+`thm:clique-chain-vertex` breaks it there for every `m >= 5` and `n >= 3`.
+The live question is only whether `r >= 3` postpones the failure past `m = 4`.
+**VERIFIED (no counterexample):** at `m = 4` the formula survives exhaustive
+checking at eleven `(n,r)` pairs, both halves, far beyond the single
+previously-known cell `k_4^(3)(5) = 6`.
+
+- [`hyper_vertex_m4.md`](hyper_vertex_m4.md) -- the `r = 2` identification and
+  its proof, the exact rank/hyperedge-count equivalence that makes the search
+  a direct test of the missing bound, the `m = 4` table, and what is open.
+
+Scripts: `hyper_vertex_m4_search.py` (self-contained, standard library only;
+no-argument run does the `m = 4` sweep, `... 2` does the `r = 2` cross-check
+which re-derives the clique-chain witness from a different search space).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal
