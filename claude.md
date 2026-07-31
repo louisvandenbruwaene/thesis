@@ -2614,3 +2614,44 @@ conj:dir-arc at n=2 for m=3 and n=2,3 for m=4). Those hypotheses were added
 only yesterday, so this is the first sweep that has actually tested them.
 
 VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.
+
+## 2026-07-31 (Opus) -- gurobi_handoff/ for the promotor, and a fragility fix in Appendix C
+
+Author asked for a single folder his promotor at KU Leuven can run, since
+Gurobi is the realistic route to fact (a) and the local uncapped enumeration
+has now been going 13.5 h (about 58 CPU-hours across 10 workers) with no
+verdict and no way to estimate one.
+
+gurobi_handoff/ contains erdos915_unified.py (unmodified copy), check_setup.py,
+run_fact_a.py, run_fact_a4.py, README.md, requirements.txt. Also zipped at
+gurobi_handoff.zip for sending. Design decisions worth recording:
+- check_setup.py runs in seconds and re-proves L_3^dir(4): FEASIBLE at 12,
+  INFEASIBLE at 13. A wrong answer there means the install is broken rather
+  than the mathematics, which is a much better thing to learn in five seconds
+  than five hours in. It also reports the Gurobi licence state explicitly.
+- run_fact_a.py passes use_gurobi=True on purpose, so it fails loudly instead
+  of silently falling back to CBC and running forever. A friendly pre-flight
+  guard catches the no-Gurobi case and points at check_setup rather than
+  dumping a traceback at a promotor.
+- The README states all three verdicts and what each means, including that
+  FEASIBLE would contradict the hand proof and should be sent back rather than
+  assumed to be an error.
+- Verified self-contained by copying to a scratch directory and running there.
+
+FIXED A REAL BUG IN THE PROGRAM'S ERROR MESSAGE: _pick_solver told the user to
+"install gurobipy", but this path is PuLP's GUROBI_CMD, which shells out to
+gurobi_cl and does not need gurobipy at all. Corrected to name gurobi_cl.
+
+THAT EDIT THEN EXPOSED THE FRAGILITY I HAD FLAGGED WHEN BUILDING APPENDIX C.
+Adding two lines to erdos915_unified.py shifted every hardcoded linerange below
+the edit, so eight of the ten listings would have printed the right code under
+the wrong heading, silently. Rather than hand-patch, added
+program/sync_code_appendix.py, which recomputes the boundaries from the
+program's own section banners and either checks (non-zero exit if stale) or
+rewrites them. Ran it, rebuilt, and re-verified completeness: all thirteen
+files still print in full, final line numbers matching true lengths, 0 overfull.
+RUN THIS AFTER ANY EDIT TO erdos915_unified.py.
+
+VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites. Handoff
+folder exercised end to end (correct verdicts on both known cases, clean
+failure on the missing-Gurobi path).

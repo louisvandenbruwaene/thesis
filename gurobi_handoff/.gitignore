@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.lp
+*.mps
+*.sol
+fact_a_result.txt
+fact_a4_result.txt
