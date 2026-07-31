@@ -2547,3 +2547,41 @@ small-n arithmetic from that passage, which dated from when the threshold was
 n>=10.
 
 VERIFY: latexmk exit 0, 281 pp, 0 overfull, 0 undefined.
+
+## 2026-07-31 (Opus) -- the overnight sweep beat my own theorem; construction strengthened
+
+The m=5/m=6 multigraph-vertex sweep (PID 79194, launched by an earlier
+session) finished. Values: m=3 n=7 = 12 exact (= tree), m=4 n=6 = 15 exact
+(= tree), m=6 n=5 = 26 exact (theta, > tree 20), and three that hit their time
+cap as lower bounds: m=5 n=6 >= 24, m=4 n=7 >= 18, and m=5 n=7 >= 28.
+
+That last one is the interesting one, because n=7 = m+2 at m=5 is exactly the
+regime the withdrawn conjecture covered, and 28 is well past the tree's 24.
+More to the point it is past MY OWN construction: thm:clique-chain-vertex as
+written this morning gives only 26 there. So the theorem I added today was
+true but visibly not the best available.
+
+FOUND THE IMPROVEMENT. The chain joined DISJOINT K_r blocks with bridge edges,
+which fits floor(n/r) blocks because every bridge spends a whole vertex on the
+join and nothing else. Letting all the blocks SHARE a single common vertex
+instead fits floor((n-1)/(r-1)) blocks, strictly more, with the identical
+per-block gain and an identical feasibility argument (the shared vertex is a
+cut vertex, so a route between two vertices of one block still cannot leave
+and return). At m=5,n=7 the bouquet gives 27 against the chain's 26; at
+m=10,r=6,n=11 it gives 150 against 120. Verified across seven (m,r,k)
+settings, both by the program's checker and by the independent networkx
+max-flow, formula matching exactly every time.
+
+Theorem restated in the bouquet form (same label, retitled "Thickened cliques
+beat the thickened tree"), proof adjusted (the cut-vertex argument is if
+anything simpler), and the surrounding text now states plainly that even the
+bouquet is NOT the exact value, citing the 28-vs-27 gap. ch4 and the
+contribution statement updated to match. Research note and verification script
+updated, with the chain recorded as superseded rather than deleted so the
+reasoning is traceable.
+
+The Theta(m^2) growth claim is unaffected: the gain per vertex is now
+gain(r,m)/(r-1) rather than /r, which improves the constant and leaves the
+order alone.
+
+VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.

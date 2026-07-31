@@ -32,27 +32,24 @@ def gain(r, m):
     return (r - 1) * (r - 2) * (m - 1 - r) // 2
 
 
-def build_clique_chain(n, m, r, k):
-    """k disjoint K_r blocks (multiplicity m+1-r within each), chained by
-    single bridge edges (multiplicity m-1) through one port vertex per block,
-    leftover vertices as a pendant path."""
-    assert r * k <= n
+def build_clique_bouquet(n, m, r, k):
+    """k copies of K_r ALL SHARING vertex 0 and otherwise disjoint, every edge
+    at multiplicity m+1-r, leftover vertices as a pendant path at m-1.
+
+    Sharing a vertex rather than bridging is what makes k as large as
+    floor((n-1)/(r-1)) instead of floor(n/r): a bridge would spend a whole
+    vertex on the join alone."""
+    assert k * (r - 1) + 1 <= n
     q = m + 1 - r
     assert q >= 1, "r too large for this m (need r <= m so blocks are non-empty)"
     g = Graph(n, MULTI_UNDIRECTED)
     for i in range(k):
-        base = r * i
-        verts = list(range(base, base + r))
-        for a in range(r):
-            for b in range(a + 1, r):
+        verts = [0] + [1 + i * (r - 1) + j for j in range(r - 1)]
+        for a in range(len(verts)):
+            for b in range(a + 1, len(verts)):
                 g.set_multiplicity(verts[a], verts[b], q)
-        if i > 0:
-            g.set_multiplicity(r * (i - 1), base, m - 1)
-    cursor = r * (k - 1) if k > 0 else None
-    for v in range(r * k, n):
-        if cursor is None:
-            cursor = v
-            continue
+    cursor = 0
+    for v in range(k * (r - 1) + 1, n):
         g.set_multiplicity(cursor, v, m - 1)
         cursor = v
     return g
@@ -85,12 +82,12 @@ def independent_worst_kappa(g):
 
 
 def main():
-    cases = [(5, 3, 1), (5, 3, 5), (6, 3, 3), (8, 3, 5),
-              (10, 6, 1), (10, 6, 3), (15, 8, 2), (20, 11, 2)]
+    cases = [(5, 3, 1), (5, 3, 3), (6, 3, 3), (8, 3, 4),
+              (10, 6, 1), (10, 6, 2), (15, 8, 2), (20, 11, 2)]
     print("formula check: K(n,m,r) == (m-1)(n-1) + floor(n/r)*gain(r,m)")
     for m, r, k in cases:
-        n = r * k + 5
-        g = build_clique_chain(n, m, r, k)
+        n = k * (r - 1) + 1 + 4
+        g = build_clique_bouquet(n, m, r, k)
         total = int(g.mu.sum() // 2)
         predicted = (m - 1) * (n - 1) + k * gain(r, m)
         feasible_program = not exceeds_bound(g, m - 1, separation="vertex",
@@ -117,7 +114,7 @@ def main():
         print(f"  m={m:3d}: best r*={best_r:3d}  gain(r*)={gain(best_r, m):6d}"
               f"  rate={best_rate:8.2f}")
 
-    print("\nALL CHECKS PASSED: conj:multi-vertex is refuted for every m >= 5.")
+    print("\nALL CHECKS PASSED: conj:multi-vertex is refuted for every m >= 5.\n(Note: this construction is a lower bound of the right order, NOT the exact\nvalue. At m=5,n=7 it gives 27 and an unfinished exhaustive search found 28.)")
 
 
 if __name__ == "__main__":

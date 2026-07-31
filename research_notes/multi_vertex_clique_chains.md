@@ -25,12 +25,18 @@ The final formula happens to survive that degeneracy by an algebraic accident,
 but the proof does not, so the hypothesis excludes it. Nothing is lost: a
 positive gain needs `r <= m-2` anyway.)*
 
-**Chain construction.** Partition (as many as possible of) the `n` vertices
-into `k = floor(n/r)` disjoint `K_r`-blocks `B_1, ..., B_k`. Fix a *port*
-vertex `p_i` in each block `B_i` (any vertex will do; take the first).
-Connect `p_i` to `p_{i+1}` by a single edge at multiplicity `m - 1`, for
-`i = 1, ..., k-1`. Attach the `n - rk` leftover vertices as a pendant path off
-`p_k`, each edge again at multiplicity `m - 1`. This is a simple generalization
+**Bouquet construction (2026-07-31 revision).** Take `k` copies of `K_r` that
+all share ONE common vertex and are otherwise disjoint, thicken every edge to
+multiplicity `q`, and attach leftover vertices as a pendant path at `m-1`.
+Since the shared vertex is reused by every block, `k` may be as large as
+`floor((n-1)/(r-1))`.
+
+*(Superseded: an earlier version of this note chained DISJOINT blocks through
+single bridge edges, which fits only `floor(n/r)` blocks because each bridge
+spends a whole vertex on the join. Sharing a vertex strictly dominates it: at
+`m=10, r=6, n=11` the bouquet carries 150 against the chain's 120. The gain
+per block, `gain(r,m)`, is the same in both; only the number of blocks that
+fit changes.)* This is a simple generalization
 of the thesis's own "thickened tree", replacing some of the tree's edges with
 `K_r`-blocks wherever a block fits.
 
@@ -40,7 +46,7 @@ Let `gain(r, m) := (r-1)(r-2)(m-1-r)/2` (an integer, since `(r-1)(r-2)` is
 always even). The chain construction's total multiplicity is *exactly*
 
 ```
-K(n, m, r) = (m-1)(n-1) + floor(n/r) * gain(r, m).
+K(n, m, r) = (m-1)(n-1) + k * gain(r, m),   k <= floor((n-1)/(r-1)).
 ```
 
 **Derivation.** By `lem:multi-vertex-split` (already in the thesis),
@@ -135,9 +141,11 @@ This is a new, proved *lower bound*
 gives a valid bound; optimizing `r` gives the best one this family offers).
 It is **not** known to be tight:
 
-- Whether same-size clique chains are optimal among *all* feasible
-  multigraphs is open. Mixed block sizes, blocks connected by more than one
-  bridge, or a fundamentally different topology are not ruled out.
+- **This is NOT the exact value.** The exhaustive branch and bound, stopped by
+  its time limit, already found 28 at `m=5, n=7` where the bouquet gives 27.
+  So a better construction exists and is not yet identified. Mixed block
+  sizes, several shared vertices, or a different topology entirely are all
+  still open.
 - The exact optimal `r*(m)` has no closed form derived here beyond the
   asymptotic `r* ~ m/2`; the table above is exact integer optimization, not
   a closed-form theorem.
