@@ -13,6 +13,7 @@ from erdos915_unified import (
     enumerate_extremal_directed_multigraphs_via_generation as _gen_enum,
     _decorate_support_worker,
     _canonical_form,
+    PULP_AVAILABLE,
 )
 
 
@@ -35,6 +36,9 @@ class Solve(unittest.TestCase):
         self.assertTrue(r.proven)
         self.assertEqual(r.value, 4)  # a spanning tree on 5 vertices
 
+    @unittest.skipUnless(PULP_AVAILABLE,
+                         "solve() proves this one through the MILP certifier, "
+                         "which needs the optional pulp")
     def test_directed_multigraph_is_proved(self):
         r = solve(4, 3, directed=True, simple=False, exhaustive=True, max_seconds=120.0)
         self.assertTrue(r.proven)

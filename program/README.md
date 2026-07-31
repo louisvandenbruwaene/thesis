@@ -56,8 +56,11 @@ sound, generation-based directed-multigraph enumerator that follows J. Goedgebeu
 parallel across processor cores (each support is independent), which is what makes
 the open `n = 7` classification practical on a multi-core machine; pass
 `parallel=False` for a single-process run. Everything else, including the
-self-test, the figures, and the test suite, runs without `geng`; the one unit test
-that exercises it skips automatically when `geng` is not on `PATH`.
+self-test, the figures, and the test suite, runs without `geng`. Every test that
+needs an optional dependency skips itself cleanly when that dependency is absent,
+`geng` for the generation pipeline, `pulp` for the MILP certifier and `networkx`
+for the Gomory-Hu view, so a minimal `numpy` plus `scipy` install runs the suite
+green rather than reporting failures for tools it was never asked to have.
 
 ## How to run
 

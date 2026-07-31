@@ -2432,3 +2432,35 @@ description of the other convention as a new extremal problem; and the lay
 summary, whose two claims are the m<=3 hypergraph results and fact (a),
 neither affected. No dangling reference to the removed conj:multi-vertex
 (build reports 0 undefined).
+
+## 2026-07-31 (Opus) -- repo health check caught a reproducibility-claim bug in the test suite
+
+Ran the full suite as a closing health check (no program code had been touched
+all session, so this was meant to be a formality). It was not: 90 tests,
+1 ERROR on the MINIMAL CORE install.
+
+test_solve.test_directed_multigraph_is_proved calls solve(4,3,directed=True,
+simple=False,exhaustive=True), which routes through prove_directed_multigraph
+and therefore needs pulp. test_certify.py guards the certifier tests with
+@skipUnless(PULP_AVAILABLE, ...) but test_solve.py never imported that flag,
+so on a numpy+scipy-only machine this test ERRORED instead of skipping.
+
+That matters more than a normal flaky test, because ch2's reproducibility
+section and program/README both advertise numpy+scipy as sufficient for the
+core. A reader following that advice, on exactly the configuration the thesis
+recommends, would run the suite and be told it FAILED. The claim and the
+artefact disagreed.
+
+Fixed with the existing pattern: imported PULP_AVAILABLE into test_solve.py
+and added @skipUnless to that one method, with a reason line naming why
+solve() needs pulp for this particular case (it proves the directed multigraph
+value through the MILP certifier). Verified in BOTH environments, which is the
+point: system python3 (no pulp) now reports OK with a clean skip, and the
+venv (with pulp) still actually runs the test and passes it, so the guard
+hides nothing where the dependency exists.
+
+Full suite on the minimal core: 90 tests, OK, 6 skipped (was 5 skipped +
+1 error). README's optional-dependency sentence generalised from geng alone to
+all three optional tools (geng, pulp, networkx), stating that a minimal
+install runs the suite green rather than reporting failures for tools it was
+never asked to have.
