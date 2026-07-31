@@ -132,7 +132,7 @@ near-balanced vertices themselves) is named but not attempted.
 Scripts: `case2_tightness_check.py` (closed-form bang-bang value vs. an
 independent nonlinear solver; self-contained, numpy + scipy only).
 
-### conj:multi-vertex REFUTED for all m >= 5: clique chains (PROVED, 2026-07-31)
+### conj:multi-vertex REFUTED for all m >= 5 (PROVED, 2026-07-31)
 The thesis's own conjecture (added hours earlier the same day) that a
 thickened tree becomes optimal for the multigraph vertex problem under the
 alternate convention once `n >= m+2` is false for every `m >= 5`. Chaining
@@ -145,8 +145,8 @@ independent ways. Folded into the thesis as `thm:clique-chain-vertex`
 
 - [`multi_vertex_clique_chains.md`](multi_vertex_clique_chains.md) -- the
   construction, the exact multiplicity formula, the feasibility proof, the
-  exact-optimal-r table, and what is still open (whether same-size clique
-  chains are optimal among all feasible multigraphs).
+  exact-optimal-r table, and what is still open (the exact value, since the
+  construction is known not to be optimal).
 
 Scripts: `multi_vertex_clique_check.py` (builds the chain, checks feasibility
 via the thesis program's `exceeds_bound` AND a from-scratch networkx max-flow,

@@ -1,168 +1,137 @@
-# conj:multi-vertex is FALSE for every m >= 5: clique-chain construction (2026-07-31)
+# conj:multi-vertex is FALSE for every m >= 5 (2026-07-31)
 
-**Status: PROVED (refutation + new lower bound).** `conj:multi-vertex`
-(app_proofs.tex, `sec:multi-vertex-standard`) claims `K_m^multi(n) =
-(m-1)(n-1)` for all `n >= m+2`, i.e. that the thickened tree is optimal past
-the small-n regime where the thickened theta wins. This is false for every
-`m >= 5`: chaining disjoint `K_r` cliques (thickened at the per-block-optimal
-multiplicity) through single bridge vertices beats the thickened tree by an
-amount that is *linear in n*, not a bounded correction. The true value of
-`K_m^multi(n)` grows like `Theta(n m^2)` as `n -> infinity` for large fixed
-`m`, not `Theta(n m)` as the withdrawn conjecture assumed.
+**Status: PROVED (refutation + a lower bound of the right order, NOT the exact
+value).** `conj:multi-vertex` claimed `K_m^multi(n) = (m-1)(n-1)` for all
+`n >= m+2`, i.e. that the thickened spanning tree is optimal once past the
+small-`n` regime where the thickened theta wins. It is false for every
+`m >= 5`. Thickened cliques glued at a shared vertex beat the tree by an amount
+*linear in n*, so the excess is not a bounded correction, and the growth rate
+in `m` is `Theta(m^2)` rather than the `Theta(m)` the tree gives.
 
-## 1. The construction
+The construction below is **not** claimed to be optimal. See section 6.
 
-Fix `3 <= r <= m`. A **`K_r`-block** is a clique on `r` vertices with every
-edge at multiplicity `q = m + 1 - r >= 1` (this is exactly the thesis's own
-"thickened complete graph" construction, `sec:multi-vertex-standard`, applied
-locally to `r` vertices rather than to all of `n`).
+## 1. The construction (bouquet form)
 
-*(Range note: `r <= m` rather than `r <= m+1`, so that `q >= 1` and every block
-edge is actually present. At `r = m+1` we would get `q = 0`, the blocks would
-carry no edges, and the underlying graph would fall apart into isolated
-vertices, breaking the connectivity that the count `|E| = n-1+rank` assumes.
-The final formula happens to survive that degeneracy by an algebraic accident,
-but the proof does not, so the hypothesis excludes it. Nothing is lost: a
-positive gain needs `r <= m-2` anyway.)*
+Fix `3 <= r <= m` and set `q = m + 1 - r >= 1`. A **`K_r`-block** is a clique
+on `r` vertices with every edge at multiplicity `q`, which is exactly the
+thesis's own "thickened complete graph", applied locally to `r` vertices rather
+than to all of `n`.
 
-**Bouquet construction (2026-07-31 revision).** Take `k` copies of `K_r` that
-all share ONE common vertex and are otherwise disjoint, thicken every edge to
-multiplicity `q`, and attach leftover vertices as a pendant path at `m-1`.
-Since the shared vertex is reused by every block, `k` may be as large as
-`floor((n-1)/(r-1))`.
+**Bouquet.** Take `k` copies of `K_r` that all share ONE common vertex and are
+otherwise disjoint, and attach any leftover vertices as a pendant path at
+multiplicity `m-1`. Because the shared vertex is reused by every block,
 
-*(Superseded: an earlier version of this note chained DISJOINT blocks through
-single bridge edges, which fits only `floor(n/r)` blocks because each bridge
-spends a whole vertex on the join. Sharing a vertex strictly dominates it: at
-`m=10, r=6, n=11` the bouquet carries 150 against the chain's 120. The gain
-per block, `gain(r,m)`, is the same in both; only the number of blocks that
-fit changes.)* This is a simple generalization
-of the thesis's own "thickened tree", replacing some of the tree's edges with
-`K_r`-blocks wherever a block fits.
+```
+k  may be as large as  floor((n-1)/(r-1)).
+```
+
+*Range note.* `r <= m`, not `r <= m+1`, so that `q >= 1` and every block edge is
+actually present. At `r = m+1` we would get `q = 0`, the blocks would carry no
+edges, and the graph would fall into isolated vertices, breaking the
+connectivity that the count `|E| = n-1+rank` assumes. The formula survives that
+degeneracy by an algebraic accident but the proof does not. Nothing is lost: a
+positive gain needs `r <= m-2` anyway.
+
+*Superseded variant.* An earlier version of this note used disjoint blocks
+joined by single **bridge edges**. That fits only `floor(n/r)` blocks, because
+each bridge spends a whole vertex on the join and nothing else, and it is
+strictly dominated: at `m=10, r=6, n=11` the bouquet carries 150 against the
+chain's 120. The per-block gain is identical in the two; only the number of
+blocks that fit changes. Kept here because the thesis's git history refers to
+the chain form.
 
 ## 2. Exact multiplicity count
 
-Let `gain(r, m) := (r-1)(r-2)(m-1-r)/2` (an integer, since `(r-1)(r-2)` is
-always even). The chain construction's total multiplicity is *exactly*
+With `gain(r, m) := (r-1)(r-2)(m-1-r)/2` (an integer, since `(r-1)(r-2)` is
+even), the total multiplicity is exactly
 
 ```
-K(n, m, r) = (m-1)(n-1) + k * gain(r, m),   k <= floor((n-1)/(r-1)).
+K(n, m, r, k) = (m-1)(n-1) + k * gain(r, m),      k <= floor((n-1)/(r-1)).
 ```
 
-**Derivation.** By `lem:multi-vertex-split` (already in the thesis),
-`kappa_G(u,v) = mu(u,v) + pi(u,v)` splits cleanly, so a feasible multigraph on
-top of a fixed simple graph `G_0` maximizes total multiplicity by setting
-`mu(u,v) = m - 1 - pi(u,v)` on every edge, giving total multiplicity
-`(m-1)|E(G_0)| - sum_e pi(e)`. With `|E(G_0)| = n - 1 + rank(G_0)` (connected),
-this is `(m-1)(n-1) + (m-1) rank(G_0) - sum_e pi(e)`.
+**Derivation.** By `lem:multi-vertex-split`, `kappa_G(u,v) = mu(u,v) + pi(u,v)`
+splits cleanly, so on a fixed connected simple graph `G_0` the maximum total
+multiplicity is `(m-1)|E(G_0)| - sum_e pi(e)`, attained by setting
+`mu = m-1-pi` on every edge. With `|E(G_0)| = n - 1 + rank(G_0)` this is
+`(m-1)(n-1) + (m-1)rank(G_0) - sum_e pi(e)`.
 
-For the chain: only the `k` cliques contribute rank (bridges and pendant
-edges are bridges, rank 0 each), each `K_r` contributing rank
-`C(r,2) - r + 1 = (r-1)(r-2)/2`, so `rank(G_0) = k(r-1)(r-2)/2`. Only clique
-edges have nonzero `pi` (bridges have `pi = 0`, proved below), and inside a
-`K_r`, every edge `uv` has `pi(u,v) = r - 2` exactly: `K_r` minus the edge `uv`
-still connects `u,v` through each of the other `r-2` vertices (`r-2` pairwise
-internally-disjoint 2-paths), and by Menger this is the maximum, since
-removing those same `r-2` vertices is a cut of that size and no smaller cut
-works (any single remaining common neighbor still connects them). So
-`sum_e pi(e) = k * C(r,2) * (r-2) = k * r(r-1)(r-2)/2`. Substituting,
+Only the `k` blocks contribute: pendant edges are bridges, so they have
+`pi = 0` and lie in no cycle. Each `K_r` has rank `(r-1)(r-2)/2`, and each of
+its `C(r,2)` edges has `pi = r-2` exactly (see section 3), so
+`sum_e pi(e) = k * C(r,2) * (r-2)`. Substituting,
 
 ```
-K(n,m,r) = (m-1)(n-1) + (m-1) k (r-1)(r-2)/2 - k r(r-1)(r-2)/2
-         = (m-1)(n-1) + k (r-1)(r-2)[(m-1) - r]/2
-         = (m-1)(n-1) + k * gain(r, m).
+(m-1)(n-1) + (m-1)k(r-1)(r-2)/2 - k*r(r-1)(r-2)/2
+  = (m-1)(n-1) + k(r-1)(r-2)[(m-1) - r]/2
+  = (m-1)(n-1) + k*gain(r,m).
 ```
-
-This matches the definition of `gain` and confirms the formula, independent
-of the numerical check below.
 
 ## 3. Feasibility, proved by hand
 
-Two claims cover every pair.
+**Inside a block.** For an edge `uv` of a block, `K_r` minus `uv` joins `u,v`
+through each of the other `r-2` block vertices, giving `r-2` pairwise
+internally-disjoint two-step routes, and by Menger no more, since those same
+`r-2` vertices form a cut of that size. No route of length `>= 2` can leave the
+block and return: the only way out is the shared vertex, and a simple path
+cannot pass through it twice. So `pi(u,v) = r-2` exactly and
+`kappa_G(u,v) = q + (r-2) = (m+1-r) + (r-2) = m-1`, exactly at the cap and
+never over.
 
-**Within a block.** For `u, v` in the same block `B_i` (an edge, multiplicity
-`q`), `kappa_G(u,v) = q + pi(u,v)`. Any path of length >= 2 between `u,v` not
-using edge `uv` cannot leave `B_i`: leaving would require crossing a bridge
-edge, and a simple path cannot use a bridge edge twice (once out, once back),
-so it would have to end outside `B_i`, contradicting that it returns to `v`
-inside `B_i`. Hence all such paths stay inside `K_r`, where `pi(u,v) = r - 2`
-exactly (Section 2). So `kappa_G(u,v) = (m+1-r) + (r-2) = m - 1`, exactly at
-the cap, never over.
+**Everything else.** For `u, v` in different blocks the shared vertex alone
+separates them, and for a pair touching the pendant path a single path vertex
+does, so `kappa_G(u,v) <= 1`, far below the cap. The binding constraint is
+therefore always inside a block, which both computational checks confirm: the
+reported worst pair is always a block edge.
 
-**Across blocks, or touching a bridge/pendant edge.** Every bridge and pendant
-edge is a genuine graph bridge (its removal disconnects the graph, since the
-chain-of-blocks structure has no other route between consecutive blocks), so
-both of its endpoints are cut vertices. For `u` in `B_i` and `v` in `B_j`
-(`i != j`), removing the port vertex adjacent to `u`'s side (or `v`'s side, if
-`u` itself is that port) disconnects `u` from `v` with a single vertex, so
-`pi(u,v) <= 1` and `mu(u,v) = 0` (no edge between different blocks unless one
-is literally the bridge pair), giving `kappa_G(u,v) <= 1 \ll m - 1`. The same
-argument bounds any pair touching the pendant path. So the binding constraint
-is always inside a block, confirmed by both computational checks below (the
-reported worst pair is always an edge of the first block).
+## 4. Why it refutes the conjecture
 
-## 4. Where this refutes the conjecture
+At `r = 3`, `gain(3,m) = m-4`. That is `0` at `m = 4`, consistent with the
+thesis's exhaustive table finding no counterexample there, and strictly
+positive for every `m >= 5`. So a single triangle glued onto a thickened tree
+already beats `(m-1)(n-1)`, for every `m >= 5` and every `n >= 3`. Taking `k`
+maximal multiplies the excess by `floor((n-1)/2)`, so the gap grows linearly
+in `n`.
 
-`gain(r, m) = (r-1)(r-2)(m-1-r)/2`. At `r = 3` (the simplest block, a
-triangle): `gain(3, m) = m - 4`. This is `0` at `m = 4` (consistent with the
-thesis's own finding that `m <= 4` has no counterexample: a triangle buys
-nothing there) and **strictly positive for every `m >= 5`**. So a single
-triangle, glued onto a thickened tree anywhere, already beats
-`(m-1)(n-1)` by `m - 4` for every `m >= 5`, refuting `conj:multi-vertex` as a
-universal statement for `n >= m+2`. Packing `k = floor(n/3)` disjoint triangles
-instead of one multiplies the gain by `k`, so the excess over the conjectured
-value grows *linearly in n*, not as a bounded correction.
+Smallest hand-checkable witness: `m=5, n=7` (the first size the conjecture
+covered). A triangle at multiplicity 3 plus a four-edge pendant path at
+multiplicity 4 gives `3*3 + 4*4 = 25` against the conjectured 24.
 
-## 5. The true growth rate: Theta(n m^2), not Theta(n m)
+## 5. Growth rate: Theta(m^2), not Theta(m)
 
-`gain(r,m)` is *not* maximized at `r = 3` once `m` is large enough: treating
-`r` as continuous, `gain(r,m)/r` (the gain rate per vertex used) has a maximum
-near `r ~ m/2`, where `gain(r,m)/r = Theta(m^2)`. Concretely (exact integer
-optimum, `scripts/multi_vertex_clique_check.py`):
+The gain per vertex used is `gain(r,m)/(r-1)`, which as a continuous function
+peaks near `r ~ (m+1)/2` at `Theta(m^2)`. Exact integer optima
+(`scripts/multi_vertex_clique_check.py`):
 
 | m  | best r | gain per block | gain rate per vertex |
-|----|--------|-----------------|-----------------------|
-| 5  | 3      | 1               | 0.33                  |
-| 10 | 6      | 30              | 5.00                  |
-| 20 | 11     | 360             | 32.73                 |
-| 30 | 16     | 1365            | 85.31                 |
-| 50 | 26     | 6900            | 265.38                |
+|----|--------|----------------|----------------------|
+| 5  | 3      | 1              | 0.33                 |
+| 10 | 6      | 30             | 5.00                 |
+| 20 | 11     | 360            | 32.73                |
+| 30 | 16     | 1365           | 85.31                |
+| 50 | 26     | 6900           | 265.38               |
 
-So for `n -> infinity` at fixed large `m`, `K_m^multi(n) / n -> (m-1) +
-Theta(m^2)`, i.e. the leading behaviour in `m` is quadratic, not linear. This
-is a *qualitatively* different growth rate from what `conj:multi-vertex`
-(and the surrounding prose, which reads the `m <= 4` data as suggesting the
-tree wins past `n = m+2`) assumed.
+So `K_m^multi(n)/n -> (m-1) + Theta(m^2)`, a different order in `m` from the
+withdrawn conjecture.
 
-## 6. What is still open
+## 6. What is open (the bouquet is NOT optimal)
 
-This is a new, proved *lower bound*
-`K_m^multi(n) >= (m-1)(n-1) + floor(n/r*) * gain(r*, m)` (any fixed `r`
-gives a valid bound; optimizing `r` gives the best one this family offers).
-It is **not** known to be tight:
-
-- **This is NOT the exact value.** The exhaustive branch and bound, stopped by
-  its time limit, already found 28 at `m=5, n=7` where the bouquet gives 27.
-  So a better construction exists and is not yet identified. Mixed block
-  sizes, several shared vertices, or a different topology entirely are all
-  still open.
-- The exact optimal `r*(m)` has no closed form derived here beyond the
-  asymptotic `r* ~ m/2`; the table above is exact integer optimization, not
-  a closed-form theorem.
-- No matching upper bound is attempted. The true value of `K_m^multi(n)`
-  for `n >= m+2` is now a genuinely open problem again, not (as the
-  withdrawn conjecture claimed) a settled one modulo a single inequality.
+The exhaustive branch and bound, stopped by its time limit rather than
+finishing, found a feasible multigraph with **28** at `m=5, n=7`, where the
+bouquet gives **27** and the tree gives 24. So a better construction exists and
+has not been identified. Mixed block sizes, several shared vertices, or a
+different topology entirely are all still open, and no upper bound has been
+attempted. What sections 1 to 5 establish is a lower bound of the right order
+in both `n` and `m`, not the extremal number.
 
 ## Verification
 
-Two independent implementations agree exactly on every tested case (never
-just close, always the same integer):
-- `erdos915_unified.py`'s own `exceeds_bound(..., separation="vertex",
-  parallel_routes=True)` (the thesis's exact checker for this convention).
-- A from-scratch max-flow on a hand-built vertex-split network using
-  `networkx.maximum_flow_value`, sharing no code with the thesis program.
+`scripts/multi_vertex_clique_check.py` builds the bouquet, confirms the exact
+formula, and checks feasibility **two independent ways**: the thesis program's
+own `exceeds_bound(..., parallel_routes=True)`, and a from-scratch max-flow on
+a hand-built vertex-split network via `networkx`, sharing no code with the
+checker being tested. Both agree exactly on every case.
 
-`scripts/multi_vertex_clique_check.py` builds the chain construction, checks
-feasibility both ways, and confirms the exact formula `K(n,m,r) =
-(m-1)(n-1) + floor(n/r) gain(r,m)` at a spread of `(m, r, k, n)`, plus the
-exact-optimal-`r` table above.
+A third, fully independent confirmation arrived from a different direction: the
+incidence-graph search in [`hyper_vertex_m4.md`](hyper_vertex_m4.md), run at
+`r = 2`, rediscovers this construction without being told to look for it, since
+`r = 2` of that problem *is* this problem.
