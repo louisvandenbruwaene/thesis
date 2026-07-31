@@ -2585,3 +2585,32 @@ gain(r,m)/(r-1) rather than /r, which improves the constant and leaves the
 order alone.
 
 VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.
+
+## 2026-07-31 (Opus) -- audit part 2: a stale summary-table cell, and the audit's own dependency bug
+
+CROSS-CHAPTER SWEEP found one stale cell. tab:summary (ch4) still printed the
+Sorensen-Thomassen threshold as n>=10, the value corrected to n>=13 in ch1
+this morning. Exactly the failure mode this repo keeps hitting: a number fixed
+in one place and left behind in another (the conj:dir-arc correction missed
+three sites for weeks in June). Fixed, and pointed at the new
+rem:threshold-convention so the cell carries the caveat too. Swept for any
+other surviving "n >= 10": none.
+
+AUDIT SCRIPT hit the same missing-pulp bug I had just fixed in the test suite,
+in its own way: audit_closed_forms.py calls solve() on the directed multigraph
+row, which routes into the MILP prover, so under the system python it died
+partway with an ImportError. Relaunched under the venv interpreter. Worth
+recording because it is the second time today that the "core needs only numpy
+and scipy" claim collided with something that quietly needs pulp, which
+suggests the boundary is thinner than the docs imply.
+
+AUDIT RESULTS SO FAR (seven sections completed before the crash): 46 cells in
+exact agreement, 0 mismatches inside any stated hypothesis range, and 10
+mismatches OUTSIDE the stated ranges. That last number is the useful one: it
+is the evidence that the n >= m hypotheses on thm:mader, thm:leonard and
+conj:dir-arc are load-bearing rather than decorative, since the formulas
+genuinely do fail below them (thm:mader at n=2,3 for m=4 and n=2,3,4 for m=5;
+conj:dir-arc at n=2 for m=3 and n=2,3 for m=4). Those hypotheses were added
+only yesterday, so this is the first sweep that has actually tested them.
+
+VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.
