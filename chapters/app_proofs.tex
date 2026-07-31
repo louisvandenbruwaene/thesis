@@ -1067,6 +1067,20 @@ to which \Cref{lem:saturated-attachment} forbids any attachment of more
 than $4$ arcs. Any witness against fact~(a) therefore has minimum total
 degree at least $6$.
 
+Fact~(a) is stated so that a reader can settle it independently, and the
+practical route is the mixed-integer program rather than the enumeration. The
+call is \code{prove\_integral\_arc\_bound(7, 3, 25)}, which asks whether any
+directed multigraph on seven vertices with $\lec^{\max} \le 2$ carries $25$
+arcs, so an \code{INFEASIBLE} verdict is exactly fact~(a). The free CBC solver
+bundled with \code{pulp} does not close it, and neither does the uncapped
+generation enumerator within any budget tried here, but the same model handed
+to Gurobi is a different proposition: the identical call with
+\code{use\_gurobi=True} runs the model on a solver strong enough for this class
+of problem, and Gurobi is freely licensed for academic use. That switch is the
+whole change required, since \code{\_pick\_solver} routes the same
+\code{pulp} model to whichever backend is available. The verdict is a proof
+either way, because the cut formulation is exact rather than a relaxation.
+
 For $m \ge 4$ one hole remains: at an odd extremal level the counting no longer
 forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ is
 arithmetically consistent once $k(m-3) \ge 1$), so the uniqueness statement

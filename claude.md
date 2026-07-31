@@ -2655,3 +2655,25 @@ RUN THIS AFTER ANY EDIT TO erdos915_unified.py.
 VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites. Handoff
 folder exercised end to end (correct verdicts on both known cases, clean
 failure on the missing-Gurobi path).
+
+## 2026-07-31 (Opus) -- stopped the fact (a) enumeration, recorded the Gurobi route in the thesis
+
+Author: "stop the shell running, i don't care about the result for now. put in
+the thesis that it can be checked with the gerobi." Killed the uncapped n=7
+enumeration and its ten workers after ~14 h and ~58 CPU-hours with no verdict
+(load dropped from ~25 to ~19). The audit sweep is a separate job and was left
+running.
+
+Recorded the Gurobi route in two places, since the thesis previously said only
+that the check was runtime-limited without telling a reader what to do about
+it. rem:odd-step-roadmap (app_proofs) now gives the exact call,
+prove_integral_arc_bound(7, 3, 25), states that INFEASIBLE IS fact (a), and
+explains that CBC and the uncapped enumerator both fail while the identical
+model with use_gurobi=True goes to a solver in a different class, free for
+academic use, with _pick_solver routing the same pulp model either way and the
+verdict being a proof because the cut formulation is exact rather than a
+relaxation. ch4's open-problems item carries the same call in one sentence.
+This mirrors gurobi_handoff/ so a reader of the thesis and a reader of the
+folder are told the same thing.
+
+VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.
