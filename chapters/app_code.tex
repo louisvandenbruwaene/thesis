@@ -1,0 +1,136 @@
+Every number in this thesis that was not proved by hand came out of the program printed here, and this appendix prints all of it, with nothing summarised away. The point is that a reader who doubts a computed value can find the exact lines that produced it, rather than taking a description of them on trust.
+
+There is no need to read this front to back. It is laid out so that you can jump to whichever part you want to check. The listing is broken into the same four movements as the thesis itself, because the program is organised that way on purpose: it defines the objects, then measures them, then proves things about them, then searches for examples and draws the results. Each part below opens with a short account of what it does and which chapter it belongs to, and every listing carries line numbers so that a reference like ``line 1412'' has one unambiguous meaning. Where a line of code was too long for the page it is wrapped, and the continuation is marked with a $\hookrightarrow$ arrow rather than being silently cut.
+
+Four files make up the whole of it. The main program, \code{erdos915\_unified.py}, is the one the chapters discuss throughout and the only one that computes a reported result. \code{make\_figures.py} redraws every picture in the thesis by calling into that program, so a figure can never drift away from the numbers behind it. \code{\_erdos\_fast.c} is a small optional accelerator: it speeds up two inner loops and changes no answer, and the program runs correctly without it. The \code{tests/} directory holds the suite that checks all of the above.
+
+\section{The main program}\label{app:code-main}
+
+\subsection{How the file opens}
+
+The program begins by saying what it is for, then imports what it needs and fixes a few constants. Two decisions made here shape everything after. The first is that the heavy scientific libraries are optional: only \code{numpy} and \code{scipy} are required, and \code{matplotlib}, \code{networkx} and \code{pulp} are each wrapped so that the file still loads without them, with the features that need them disabled rather than the whole program failing. The second is that every import is hoisted to the top, so there is one place to look to see what the program depends on.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1,
+  linerange={1-183}]{program/erdos915_unified.py}
+
+\subsection{The objects: graphs, hypergraphs, and the values we already know}
+
+This part corresponds to \Cref{ch:basecases}. It defines what a graph is for the purposes of this thesis, which is a single square table of numbers: entry $(u,v)$ records how many parallel connections run from $u$ to $v$. That one table covers all eight of the matrix variants at once, because a \code{Variant} record says whether the graph is directed and whether it is simple, and those two switches are the only difference between them. Hypergraphs need a different shape, so they are stored as a list of the sets of vertices each hyperedge joins.
+
+After the objects come the closed-form values the thesis proves or conjectures, each written as a small function whose docstring records whether it is proved, conjectured, or a bound only. Then come the named constructions, the specific graphs that achieve those values, so that a claimed bound can always be met with a concrete example rather than an existence argument.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=184,
+  linerange={184-754}]{program/erdos915_unified.py}
+
+\subsection{Measuring, and proving}
+
+This part corresponds to \Cref{ch:certify}. Measuring comes first. The question ``how many independent routes join these two vertices'' is answered exactly, by turning it into a maximum-flow problem and solving that, which is Menger's theorem used as an algorithm. The same routine answers all four versions of the question, because whether routes must avoid shared edges or shared intermediate vertices is controlled by one flag that decides how the flow network is built, and hypergraphs are handled by giving each hyperedge a gate of its own.
+
+Proving comes second and is a different kind of work. To show that no graph of a given size can beat a bound, it is not enough to fail to find one. The program instead writes the whole question as a single optimisation problem whose variables describe an arbitrary graph and whose constraints say that every pair of vertices admits a small cut. If that problem has no solution, no such graph exists, and that is a proof rather than an absence of evidence.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=755,
+  linerange={755-1266}]{program/erdos915_unified.py}
+
+\subsection{Searching}
+
+This part corresponds to \Cref{ch:discover}. Where proving is out of reach, the program looks for good examples instead. It starts from a graph, repeatedly makes a small random change, and keeps the change if it helps. Keeping only improvements gets stuck in the first decent shape it finds, so early on it also accepts some changes that make things worse, and it does this less and less as it goes, in the manner of hot metal cooling into an ordered state. A second engine, tabu search, walks the same landscape with a different rule: it always takes the best available move but refuses to revisit recent positions, which is what stops it circling.
+
+Two ideas make this fast enough to be useful. The search is told which edges are load-bearing, so that it changes those rather than wasting moves on edges that carry nothing. And it almost never measures connectivity fully: adding one connection can raise the count by at most one and removing one can never raise it at all, so most steps can be settled by arithmetic on a bound the search already carries, with an exact measurement only when the answer is genuinely in doubt. This part ends with \code{solve}, the single entry point that either proves or searches depending on one argument.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1267,
+  linerange={1267-2308}]{program/erdos915_unified.py}
+
+\subsection{The random model}
+
+Here begins the material behind \Cref{ch:synthesis}. This first piece builds random graphs and measures them, which is how the thesis looks at the typical case rather than the extreme one. Each of the six models gets its own sampler, and the multigraph samplers use a two-stage rule: decide whether a pair is connected at all, then decide how many parallel copies it gets, which recovers the ordinary random graph when the second stage is switched off.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=2309,
+  linerange={2309-2546}]{program/erdos915_unified.py}
+
+\subsection{Drawing the figures}
+
+Every picture in the thesis is produced by the routines below, from the same data structures the rest of the program uses. They are collected here rather than in the figure script next door so that a plot and the computation behind it stay in one file.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=2547,
+  linerange={2547-3466}]{program/erdos915_unified.py}
+
+\subsection{Walking the whole space}
+
+At small sizes it is possible to visit every graph there is and record what it looks like, which is what these routines do. The result is the distribution behind the landscape figures, and, more importantly, a way to confirm a claimed maximum by exhaustion rather than by search. The three-dimensional surfaces are built on the same idea, run across a grid of sizes and route limits and cached so that the sweep is paid for once.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=3467,
+  linerange={3467-4362}]{program/erdos915_unified.py}
+
+\subsection{The open variants}
+
+These routines exist to attack the questions the thesis leaves open. They measure the hypergraph vertex problem, work with fractional weightings where the integer problem is out of reach, and provide the exhaustive maximisers used to test conjectures at the sizes where testing is still possible. Several results in \Cref{app:proofs} were found, or in two cases refuted, by running exactly these functions.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4363,
+  linerange={4363-4911}]{program/erdos915_unified.py}
+
+\subsection{The gallery}
+
+Given a size and a route limit, these routines find every extremal graph there is, up to relabelling, and count the symmetries of each. Deciding when two graphs are the same graph drawn differently is done by trying all relabellings and keeping the smallest resulting table, which is slow in principle but perfectly quick at the sizes involved.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4912,
+  linerange={4912-5446}]{program/erdos915_unified.py}
+
+\subsection{The self-check}
+
+The file ends with a suite of checks that runs when the program is executed directly. It re-derives known values, tests each construction against its predicted size and connectivity, confirms the fast routines agree with the slow ones they stand in for, and verifies the bounds proved in \Cref{app:proofs} on sampled graphs. It prints a line per check and fails loudly rather than quietly if any of them stops holding, which is what makes it useful as a regression test after an edit.
+
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=5447,
+  linerange={5447-5733}]{program/erdos915_unified.py}
+
+\section{The figure script}\label{app:code-figures}
+
+This is the only script that writes image files. It imports the main program and calls its plotting routines, so it holds no mathematics of its own. Keeping it separate means the figures can be regenerated in one command without running anything else, and every random choice it makes is seeded, so running it twice produces identical files.
+
+\lstinputlisting[style=sourcelisting, language=Python,
+  firstnumber=1]{program/make_figures.py}
+
+\section{The C accelerator}\label{app:code-c}
+
+Two operations dominate the running time at the sizes the searches reach: deciding whether a pair of vertices already has too many independent routes, and reducing a graph to a standard form so that two drawings of the same graph can be recognised as equal. Both are rewritten here in C, which is compiled separately and loaded if it is present.
+
+Nothing depends on it. Every function below has a pure Python counterpart in the main program, the two are tested against each other, and if the compiled library is missing the program simply uses the Python version. The size limits in the code are deliberate: the fixed-size buffers are safe only up to the stated number of vertices, and above it the program falls back rather than risking a buffer it cannot hold.
+
+\lstinputlisting[style=sourcelisting, language=C,
+  firstnumber=1]{program/_erdos_fast.c}
+
+\section{The test suite}\label{app:code-tests}
+
+The suite checks the program against facts established independently of it: closed forms proved by hand, constructions whose size and connectivity are known in advance, and small cases where an exhaustive walk gives the answer outright. Several tests compare two routines that are supposed to agree, such as a fast path against the slow one it replaces, which is what catches an optimisation that changes an answer. Tests needing an optional library skip themselves when it is absent, so the suite passes on a minimal installation rather than reporting failures for tools it was never given.
+
+\subsection{Shared setup}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/__init__.py}
+
+\subsection{The graph model}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_model.py}
+
+\subsection{The closed-form bounds}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_bounds.py}
+
+\subsection{The named constructions}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_constructions.py}
+
+\subsection{The connectivity checker}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_connectivity.py}
+
+\subsection{Hypergraphs}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_hypergraph.py}
+
+\subsection{Edge sensitivity}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_sensitivity.py}
+
+\subsection{The search}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_search.py}
+
+\subsection{The prover}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_certify.py}
+
+\subsection{The random model}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_montecarlo.py}
+
+\subsection{The solver}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_solve.py}

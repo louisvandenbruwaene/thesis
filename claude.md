@@ -2464,3 +2464,48 @@ Full suite on the minimal core: 90 tests, OK, 6 skipped (was 5 skipped +
 all three optional tools (geng, pulp, networkx), stating that a minimal
 install runs the suite green rather than reporting failures for tools it was
 never asked to have.
+
+## 2026-07-31 (Opus) -- new Appendix C: the complete source code
+
+Author asked for all the code in the paper as another appendix, readable, with
+no lines running off the page, and with the surrounding explanation written
+plainly (explicitly NOT flagged as simplified, so a reader is not made to feel
+talked down to).
+
+SCOPE: measured the real cost first rather than guessing. A test document at
+\scriptsize with breaklines gives ~73 code lines per page, so all 7541 lines
+(erdos915_unified.py 5733, make_figures.py 627, _erdos_fast.c 139, tests/ 1042)
+come to ~104 pages of listing. Put the options to the author with real page
+counts since it roughly doubles the document; author chose ALL of it. Final
+build is 281 pages, so the appendix came to 143 including its prose and
+headings.
+
+STRUCTURE: the appendix follows the program's own internal chapter banners,
+which already mirror the thesis chapters, so a reader can jump to the part they
+want instead of scrolling a 100-page wall. Split into: how the file opens
+(1-183), the objects (184-754), measuring and proving (755-1266), searching
+(1267-2308), the random model (2309-2546), the figures (2547-3466), walking the
+whole space (3467-4362), the open variants (4363-4911), the gallery
+(4912-5446), the self-check (5447-5733), then the figure script, the C helper,
+and each test file. Every part opens with a few sentences of plain explanation
+of what it does and which chapter it belongs to. Boundaries were checked to
+land on blank lines before the banners.
+
+PREAMBLE: added three missing literate mappings (o-double-acute from Erdos, and
+the en and em dashes) which appear in the source files and would otherwise abort
+the build under utf8 inputenc. New `sourcelisting` style derived from
+pythonkul: \scriptsize, no background tint (kinder to a printer over 143
+pages), no frame since line numbers already mark the left edge.
+
+VERIFICATION (the "no lines out of bounds" requirement, checked properly rather
+than assumed): latexmk exit 0, 281 pp, ZERO overfull hboxes, no undefined refs,
+no missing characters. Then an end-to-end completeness check, because zero
+overfull only proves nothing exceeds the margin, not that nothing was dropped:
+extracted the appendix text and confirmed the final printed line number equals
+the true file length for all THIRTEEN files (5733, 627, 139, and each test file
+from 16 to 198). Two false alarms along the way, both artefacts of pdftotext
+rather than the PDF: listings inserts inter-token spacing, and breakatwhitespace
+=false lets a wrap fall mid-identifier, so naive substring matching against the
+extracted text fails on lines that are in fact fully present. Pages rendered to
+PNG and inspected: highlighting, line numbers and the hookrightarrow wrap marker
+all correct.

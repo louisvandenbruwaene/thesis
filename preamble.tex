@@ -642,9 +642,26 @@ wis.kuleuven.be\\
         {σ}{{$\sigma$}}1 {λ}{{$\lambda$}}1 {κ}{{$\kappa$}}1 {μ}{{$\mu$}}1
         {α}{{$\alpha$}}1 {Λ}{{$\Lambda$}}1 {→}{{$\rightarrow$}}1
         {≤}{{$\leq$}}1 {≥}{{$\geq$}}1 {≠}{{$\neq$}}1 {×}{{$\times$}}1
-        {∈}{{$\in$}}1 {∞}{{$\infty$}}1 {·}{{$\cdot$}}1,
+        {∈}{{$\in$}}1 {∞}{{$\infty$}}1 {·}{{$\cdot$}}1
+        {ő}{{\H{o}}}1 {—}{{---}}1 {–}{{--}}1,
 }
 \lstset{style=pythonkul}
+
+% The complete-source appendix prints several thousand lines, so it uses a
+% tighter variant of the same style: smaller type, no background tint (kinder
+% to a printer over that many pages), and no frame, since the line numbers
+% already mark the left edge. Everything else, including the line-breaking
+% and the character mappings above, is inherited by restating it here.
+\lstdefinestyle{sourcelisting}{%
+    style=pythonkul,
+    basicstyle=\ttfamily\scriptsize,
+    backgroundcolor=\color{white},
+    frame=none,
+    xleftmargin=2.6em,
+    numbersep=6pt,
+    aboveskip=0.6\baselineskip,
+    belowskip=0.4\baselineskip,
+}
 
 % Let cleveref name the new float types.
 \crefname{algocf}{Algorithm}{Algorithms}
