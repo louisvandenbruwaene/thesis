@@ -2509,3 +2509,41 @@ rather than the PDF: listings inserts inter-token spacing, and breakatwhitespace
 extracted text fails on lines that are in fact fully present. Pages rendered to
 PNG and inspected: highlighting, line numbers and the hookrightarrow wrap marker
 all correct.
+
+## 2026-07-31 (Opus) -- full-thesis audit, part 1: a convention trap in the cited S-T constant
+
+Author asked for a complete re-check of every statement. Set up five audit
+threads (closed forms by machine, m<=4 extrapolations, degenerate hypothesis
+endpoints, citations, cross-chapter consistency). First real finding came out
+of the citation thread.
+
+CONVENTION MISMATCH (author decision needed, recorded not silently fixed).
+Cross-checking the bibliography against erdosproblems.com showed the database
+states every result in the OPPOSITE convention to this thesis: it gives the
+minimum number of edges that FORCES an m-connected pair, where the thesis
+gives the maximum that AVOIDS one. Those differ by exactly one, confirmed on
+all six entries both sources state (k_2(n)=n vs n-1, k_3(2n)=3n-1 vs 3n-2,
+k_4(n)=2n-1 vs 2n-2, l_5(2n)=5n-2 vs 5n-3, l_6(n)=3n-2 vs 3n-3, and the
+Bollobas-Erdos conjecture as 1+C(m,2)n vs C(m,2)n). The thesis's own
+convention is machine-confirmed: exhaustive search gives k_3(4)=4, k_3(5)=6,
+k_4(5)=8, exactly floor(m(n-1)/2), i.e. the database's values minus one.
+
+CONSEQUENCE: yesterday I took the n>=13 threshold for thm:sorensen-thomassen
+from that database but did NOT notice the FORMULA needs the same shift. The
+database's k_5(n)=floor(8n/3)-3 corresponds to floor(8n/3)-4 in this thesis's
+convention, yet the thesis prints -3. So the stated constant is probably one
+too high. It is NOT a mistake I introduced (the -3 predates today) but it is
+one I walked past while editing the same sentence.
+
+Both -3 and -4 satisfy k_5 >= l_5, which Whitney forces, so the thesis's own
+arithmetic cannot decide between them and only the original paper can. Did NOT
+silently change a cited external theorem. Instead added
+rem:threshold-convention, which lays out the shift with all six examples and
+the machine-verified values, says plainly that the printed constant is the
+database figure carried over unadjusted, and notes that nothing in the thesis
+depends on which is right since k_5 enters only as the cited first divergence.
+Flagged in TASKS.md as needing the paper. Also dropped the now-vestigial
+small-n arithmetic from that passage, which dated from when the threshold was
+n>=10.
+
+VERIFY: latexmk exit 0, 281 pp, 0 overfull, 0 undefined.

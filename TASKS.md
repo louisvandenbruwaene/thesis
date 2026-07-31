@@ -27,6 +27,21 @@ in claude.md and deleted here.
       bound only. Mixed block sizes, multi-bridge connections, or a different
       topology entirely are not ruled out. No upper bound attempted.
 
+## AUTHOR DECISION NEEDED — the Sorensen-Thomassen constant
+- [ ] **thm:sorensen-thomassen may be off by one; needs the original paper.**
+      The thesis defines k_m/l_m as the MAXIMUM with no m-connected pair.
+      erdosproblems.com states everything as the MINIMUM that FORCES one,
+      which is one more. Verified on six shared entries (k_2, k_3, k_4, l_5,
+      l_6, and the conjecture form), and the thesis convention is confirmed by
+      exhaustive search (k_3(4)=4, k_3(5)=6, k_4(5)=8). Under that shift the
+      database's k_5(n)=floor(8n/3)-3 becomes floor(8n/3)-4 here, but the
+      thesis prints -3, i.e. the database figure unadjusted. BOTH candidates
+      satisfy k_5 >= l_5, so internal arithmetic cannot decide it. Recorded
+      as rem:threshold-convention rather than silently changed, since it is a
+      cited external result. Nothing in the thesis depends on which is right.
+      Resolve by reading SorensenThomassen74 directly and noting ITS
+      convention.
+
 ## OPEN — directed vertex problem at m >= 3
 - [ ] Genuinely open row, not a corollary of the arc case (Whitney's
       kappa<=lambda makes vertex-feasible the larger family). Exhaustive at
