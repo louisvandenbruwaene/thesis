@@ -118,7 +118,7 @@ Open Problems. `make_figures.py` writes every figure below.
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (Ch.4) |
 | `figures/conn_dist_m6.png` | per-graph connectivity distributions, all variants (App. B) |
 | `figures/threshold_3d.png` | the threshold across densities, three variants (App. B) |
-| `figures/trace_*.png` | per-variant search traces (App. B) |
+| `figures/trace_*.png` | per-variant search traces (App. B, all five included) |
 
 The solver transcripts in the appendix (`figures/certificate_log.txt`,
 `figures/basecase_search_log.txt`) were produced by `solve(...)` on the directed

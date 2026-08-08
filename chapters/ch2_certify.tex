@@ -100,7 +100,7 @@ def _assign(self, u, v, value):
 \end{lstlisting}
 
 \section{The connectivity checker built on maximum flow}
-The whole question reduces to a flow computation. A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity. Menger's theorem says the most edge-disjoint $u$--$v$ paths a graph offers equals its smallest $u$--$v$ cut, the fewest links whose removal severs every route between the two. The max-flow / min-cut theorem says that smallest cut is exactly the value of a maximum flow, once each multiplicity $\mu(u,v)$ is read as the capacity of the link $u \to v$. So the route count we are after is just a maximum-flow value: measure the flow and you have measured the connectivity. The routine that runs this flow and reports the route count is the connectivity \emph{checker}. It is the single most important routine in the program: it is the only place graph theory meets computation, and every later claim about connectivity passes through it. Because the search of \Cref{ch:discover} calls it by the million on tiny graphs, the program ships an optional compiled C helper that runs this same flow (named later in this chapter's reproducibility section). It is a speed-up only: it returns the identical value the pure-Python checker does, verified against it, so no number in the thesis depends on whether the helper is built.
+The whole question reduces to a flow computation. A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity. Menger's theorem says the most edge-disjoint $u$--$v$ paths a graph offers equals its smallest $u$--$v$ cut, the fewest links whose removal severs every route between the two. The max-flow / min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that smallest cut is exactly the value of a maximum flow, once each multiplicity $\mu(u,v)$ is read as the capacity of the link $u \to v$. So the route count we are after is just a maximum-flow value: measure the flow and you have measured the connectivity. The routine that runs this flow and reports the route count is the connectivity \emph{checker}. It is the single most important routine in the program: it is the only place graph theory meets computation, and every later claim about connectivity passes through it. Because the search of \Cref{ch:discover} calls it by the million on tiny graphs, the program ships an optional compiled C helper that runs this same flow (named later in this chapter's reproducibility section). It is a speed-up only: it returns the identical value the pure-Python checker does, verified against it, so no number in the thesis depends on whether the helper is built.
 
 \codecard{local\_edge\_connectivity(G, s, t) $\to \mathbb{N}$}{MEASURE}
 {a graph $G$ and an ordered pair $(s,t)$}
@@ -282,16 +282,20 @@ Counting routes between two vertices is then the very same maximum flow as befor
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
   \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
   \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
+% Every station carries its own letter, since the captions name hyperedges and
+% routes by those letters.  The chosen pair also carries its role name, u or v,
+% in blue just outside the station.
 \def\drawstops{%
-  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
-     {\node[metrostop] at (\id) {$\lab$};}}
+  \foreach \id/\lab in {Sa/a,Sc/c,Sd/d,Se/e,Sj/j,Sl/l,Sm/m,Sn/n}
+     {\node[metrostop] at (\id) {$\lab$};}
+  \node[font=\small\bfseries, text=KULblauw1] at ($(Se)+(-0.62,0.52)$) {$u$};
+  \node[font=\small\bfseries, text=KULblauw1] at ($(Sm)+(0.62,0.52)$) {$v$};}
 % --- panel (a): the hypergraph, every hyperedge vertex to vertex ---
 \begin{scope}
   \stations
   \begin{scope}[on background layer]
     \draw[metro, metroA] (Se) -- (Sa);
     \draw[metro, metroA] (Sa) -- (Sd);
-    \draw[metro, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[metro, metroB] (Sn) -- (Sm);
     \draw[metro, metroB] (Sm) -- (Sj);
     \draw[metro, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
@@ -322,7 +326,6 @@ Counting routes between two vertices is then the very same maximum flow as befor
   \begin{scope}[on background layer]
     \draw[faded, metroA] (Se) -- (Sa);
     \draw[faded, metroA] (Sa) -- (Sd);
-    \draw[faded, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[faded, metroB] (Sn) -- (Sm);
     \draw[faded, metroB] (Sm) -- (Sj);
     \draw[faded, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
@@ -437,7 +440,7 @@ if hypergraph.directed:
 \label{fig:dir-hyper-gadget}
 \end{figure}
 
-\Cref{fig:dir-hyper-gadget-example} reads the same hypergraph directed, again in two panels. Panel (a) gives the whole hypergraph oriented, every hyperedge a one-way line whose arrows point away from its tail, so the middle-tailed lines fan out from their centre and the end-tailed ones run one way along their length. Panel (b) traces the routes from $v$ to $u$, the gate rule of \Cref{fig:dir-hyper-gadget}, fading every hyperedge rail to the background and threading a black arrow from the route's entry station through the one-route gate $h_{\bullet}$, set in a clear gap off the rails, to its exit, with a dotted leg to the hyperedge's third member. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out through only the two hyperedges it heads, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
+\Cref{fig:dir-hyper-gadget-example} reads the same hypergraph directed, again in two panels. Panel (a) gives the whole hypergraph oriented, every hyperedge a one-way line whose arrows point away from its tail, so the middle-tailed lines fan out from their centre and the end-tailed ones run one way along their length. Panel (b) traces the routes from $v$ to $u$, the gate rule of \Cref{fig:dir-hyper-gadget}, fading every hyperedge rail to the background and threading a black arrow from the route's entry station through the one-route gate $h_{\bullet}$, set in a clear gap off the rails, to its exit, with a dotted leg to the hyperedge's third member. Orientation costs connectivity. Of the four undirected routes between $u$ and $v$ only two survive the arrows, $\lec(v, u) = 2$, because $v$ can set out only through the two hyperedges of which it is the tail, and the two survivors cross at the interchange $l$ so they share no hyperedge. The same vertex-splitting trick of \Cref{fig:vertex-split} laid on top then counts internally vertex-disjoint directed routes, so this one construction measures all four hypergraph variants and \code{solve} reaches every one of the twelve problems through a single checker.
 
 \begin{figure}[htbp]
 \centering
@@ -456,17 +459,20 @@ if hypergraph.directed:
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
   \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
   \coordinate (Sm) at (6,6);  \coordinate (Sn) at (0,8);}
+% Every station carries its own letter, since the captions name hyperedges and
+% routes by those letters.  The chosen pair also carries its role name, u or v,
+% in blue just outside the station.
 \def\drawstops{%
-  \foreach \id/\lab in {Sa/,Sc/,Sd/,Se/u,Sj/,Sl/,Sm/v,Sn/}
-     {\node[metrostop] at (\id) {$\lab$};}}
+  \foreach \id/\lab in {Sa/a,Sc/c,Sd/d,Se/e,Sj/j,Sl/l,Sm/m,Sn/n}
+     {\node[metrostop] at (\id) {$\lab$};}
+  \node[font=\small\bfseries, text=KULblauw1] at ($(Se)+(-0.62,0.52)$) {$u$};
+  \node[font=\small\bfseries, text=KULblauw1] at ($(Sm)+(0.62,0.52)$) {$v$};}
 % --- panel (a): the whole directed hypergraph, arrows point away from each tail ---
 \begin{scope}
   \stations
   \begin{scope}[on background layer]
     \draw[dmetro, metroA] (Sa) -- (Se);
     \draw[dmetro, metroA] (Sa) -- (Sd);
-    \draw[dmetro, metroA] ($(Sa)+(-0.18,-0.25)$) -- ($(Se)+(-0.18,0)$);
-    \draw[dmetro, metroA] ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[dmetro, metroB] (Sm) -- (Sn);
     \draw[dmetro, metroB] (Sm) -- (Sj);
     \draw[dmetro, metroC] (Sc) -- (Sl);
@@ -491,7 +497,6 @@ if hypergraph.directed:
   \begin{scope}[on background layer]
     \draw[faded, metroA] (Se) -- (Sa);
     \draw[faded, metroA] (Sa) -- (Sd);
-    \draw[faded, metroA] ($(Se)+(-0.18,0)$) -- ($(Sa)+(-0.18,-0.25)$) -- ($(Sd)+(0.06,-0.17)$);
     \draw[faded, metroB] (Sn) -- (Sm);
     \draw[faded, metroB] (Sm) -- (Sj);
     \draw[faded, metroC] ($(Se)+(0.14,-0.14)$) -- ($(Sl)+(0.14,-0.14)$);
@@ -545,8 +550,16 @@ if hypergraph.directed:
 \end{tikzpicture}}
 \caption[Directed Berge routes on a whole hypergraph]{The hypergraph
 of \Cref{fig:hyper-gadget-example} read directed. Panel (a) gives the whole directed
-hypergraph, every hyperedge a one-way line with its arrows pointing away from the
-tail station, so a route may join a line at its tail and ride it to a head. Panel
+hypergraph, every hyperedge a one-way line whose arrows all run \emph{away} from
+its tail station, so a route may join a line at its tail and ride it to a head.
+Because the map keeps each hyperedge on the track it already occupied, a line
+whose tail is an end station is oriented along its own length rather than fanned
+out as the star of \Cref{fig:dir-hyper-convention}, so both renderings appear here.
+One rule reads either of them off the picture: the tail of a coloured line is the
+single station of that line into which none of its arrows points, and the other
+$r-1$ stations are its heads. Applied here it gives the eight tail-and-heads
+splits $a \to ed$, $m \to nj$, $c \to le$, $d \to em$, $l \to en$, $m \to le$,
+$j \to cm$ and $l \to dj$. Panel
 (b) traces the routes from $v$ to $u$. Every hyperedge rail is faded to the
 background, and a black arrow runs from the route's entry station through the
 hyperedge's one-route gate $h_{\bullet}$ to its exit, the directed turnstile of
@@ -558,8 +571,8 @@ $v \to j \to c \to l \to u$ rides \textcolor{metroB}{nmj}, \textcolor{metroG}{mc
 \textcolor{metroC}{elc} and \textcolor{metroF}{nel} in turn, and the short route
 $v \to l \to d \to u$ rides \textcolor{metroH}{elm}, \textcolor{metroE}{ldj} and
 \textcolor{metroD}{edm}. They cross only at the interchange $l$, so they share no
-hyperedge, and the checker reads $\lec(v, u) = 2$, since $v$ can set out through only
-the two hyperedges it heads. Against the undirected four of
+hyperedge, and the checker reads $\lec(v, u) = 2$, since $v$ can set out only through
+the two hyperedges of which it is the tail. Against the undirected four of
 \Cref{fig:hyper-gadget-example}, the arrows have halved the count.}
 \label{fig:dir-hyper-gadget-example}
 \end{figure}
@@ -631,7 +644,7 @@ The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-e
 
 Here \code{solve} changes its implementation without changing its interface. For a simple digraph it runs this branch and bound in place of the blind walk, still with the connectivity checker as the feasibility test, and so reaches the base cases $n \le 7$ that blind enumeration cannot. The booleans alone decide which of the two it uses, and the caller never asks.
 
-Run on the directed $m = 2$ problem \code{solve} returns the complete sequence $2, 4, 6, 8, 10, 12$ for $n = 2, \dots, 7$, each proved complete at its size. The densest digraph it finds at each $n$ is exactly the extremal shape \Cref{ch:basecases} named, the bidirected star (the hub) below the crossover at $n = 7$ and the one-directional bipartite digraph above it, so the search confirms not just the values but the winning constructions. These are exactly the base cases the induction requires, and with them the long proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather than on anything done by hand. The exhaustive-search transcript is in \Cref{app:proofs}.
+Run on the directed $m = 2$ problem \code{solve} returns the complete sequence $2, 4, 6, 8, 10, 12$ for $n = 2, \dots, 7$, each proved complete at its size. The densest digraph it finds at each $n$ is exactly the extremal shape \Cref{ch:basecases} named, the bidirected star (the hub) at every $n < 7$ and, at the crossover $n = 7$ itself, a graph of the tying value $12$ that both the hub and the one-directional bipartite digraph attain. The sweep stops there, so the bipartite side of the crossover is witnessed by the construction and the checker rather than by this search (\Cref{ch:discover} records that the cooled walk in fact stalls on the hub at $n = 8$). Within its range the search therefore confirms not just the values but the winning construction. These are exactly the base cases the induction requires, and with them the long proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather than on anything done by hand. The exhaustive-search transcript is in \Cref{app:proofs}.
 
 \section{Generating the directed cases faster}
 The $m = 3$ directed multigraph result reduces, through \Cref{rem:odd-step-roadmap}, to a handful of finite statements about multigraphs on six and seven vertices, and proving them means listing every such multigraph up to a renaming of its vertices. The program does this in two independent ways, on purpose: when two different methods return the same list, that agreement is itself a check.
@@ -695,7 +708,7 @@ so that one solve settles infinitely many values. This is exactly what happens a
     \draw[->, arc, color=gray!50, dashed] (B2) -- node[right, font=\scriptsize, color=gray!60]{$0$} (C2);
     \node[above, font=\footnotesize\itshape] at (3.3, 1.8) {weight matrix ($M^*$)};
 \end{tikzpicture}
-\caption{The scaling step for $m = 3$. Dividing each multiplicity by $m - 1 = 2$ maps the integer multigraph (left) to a weight matrix with all values in $[0, 1]$ and max-flow at most one between every pair (right). The double arc $A \to B$ (multiplicity $2$) becomes weight $1$, the single arc $A \to C$ (multiplicity $1$) becomes weight $\tfrac{1}{2}$, and the absent arc $B \to C$ (multiplicity $0$, shown dashed) stays absent. Crucially, $m$ drops out on the right, so a single optimisation over all weight matrices pins $L_m^{\mathrm{dir}}(n) = (m-1)\,M^*(n)$ for every $m$ simultaneously.}
+\caption{The scaling step for $m = 3$. Dividing each multiplicity by $m - 1 = 2$ maps the integer multigraph (left) to a weight matrix with all values in $[0, 1]$ and max-flow at most one between every pair (right). The double arc $A \to B$ (multiplicity $2$) becomes weight $1$, the single arc $A \to C$ (multiplicity $1$) becomes weight $\tfrac{1}{2}$, and the absent arc $B \to C$ (multiplicity $0$, shown dashed) stays absent. Crucially, $m$ drops out on the right, so a single optimisation over all weight matrices bounds $L_m^{\mathrm{dir}}(n) \le (m-1)\,M^*(n)$ for every $m$ simultaneously. The reverse inequality is not automatic and needs the optimum to be attained by a $\{0,1\}$ matrix, which is a verified property of the optima at $n \le 6$ rather than a theorem about all $n$, as the text above sets out.}
 \label{fig:scaling-reduction}
 \end{figure}
 
@@ -814,10 +827,10 @@ Reproducibility is not the same as certification, and it is worth stating plainl
 
 First, the exhaustive searches are self-certifying in a way the optimisations are not. A finished include-or-exclude sweep has visited a superset of the objects it needed to visit, and the two prunes are proved sound in \Cref{ch:discover}, so its verdict depends on no solver and no floating-point arithmetic, only on the checker. Where a value in this thesis is called \emph{proved}, that is usually the reason.
 
-Second, every reported connectivity is exact and integral. The checker is a single integer maximum flow, so no value in the thesis is a rounded floating-point quantity. The one place real numbers enter is the fractional optimisation of \Cref{thm:dir-multi-small}, and there the reported optimum is a $\{0,1\}$ matrix, which is checked exactly.
+Second, every reported connectivity is exact and integral. The checker is a single integer maximum flow, so no extremal value in the thesis is a rounded floating-point quantity. Real numbers enter in exactly two places, and neither carries a reported extremal value on its own. The first is the fractional optimisation of \Cref{thm:dir-multi-small}, where the reported optimum is a $\{0,1\}$ matrix and is checked exactly. The second is the fractional hill-climb behind \Cref{rem:min-degree-obstruction}, which runs a floating-point maximum flow and is reported as numerical evidence for a conjecture, never as a value.
 
 Third, the load-bearing computations are run twice, by implementations that share no code. The base cases of \Cref{thm:dir-arc-m2-exact} and \Cref{thm:dir-vertex-m2-exact} were each confirmed by the program and by separately written checkers, agreeing on every size. The values of \Cref{sec:multi-vertex-standard} were computed by the program's routine and by an independent script, agreeing on every cell. Fact (b) of \Cref{rem:odd-step-roadmap} was produced by the generation enumerator and re-verified graph by graph with the exact checker. Two implementations agreeing is not a proof, but it is the practical guard against the failure mode a certificate would catch, namely a correct method with a wrong program.
 
 Fourth, the self-test at the foot of the file is a standing regression check on every invariant the text quotes, and it is run after every change to the program.
 
-What this does not amount to is a formally checkable certificate of the kind a SAT solver can emit, such as a resolution proof a small independent verifier could replay. For the one result here that rests on a solver's infeasibility verdict rather than on an exhaustion, fact (a) of \Cref{rem:odd-step-roadmap}, that would be the right standard to aim at, and it is recorded among the open problems rather than claimed.
+What this does not amount to is a formally checkable certificate of the kind a SAT solver can emit, such as a resolution proof a small independent verifier could replay. For the one claim here that \emph{would} rest on a solver's infeasibility verdict rather than on an exhaustion, fact (a) of \Cref{rem:odd-step-roadmap}, that would be the right standard to aim at. Fact (a) is not settled either way at present, so nothing in this thesis currently rests on such a verdict, and it is recorded among the open problems rather than claimed.

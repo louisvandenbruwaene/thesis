@@ -4275,18 +4275,24 @@ def plot_conn_threshold_3d(
     # Hypergraph flow computation scales poorly: cap n at 8 for that panel.
     n_hyper = min(n, 8)
 
+    # The hypergraph threshold is m / C(n-1, r-1) with r = 3.  Write the binomial
+    # with its arguments already evaluated: matplotlib's mathtext lays out
+    # "\binom{8-1}{2}" so that the "-1" reads as a superscript on the 8, which
+    # renders as a garbled binomial rather than "7 choose 2".
+    hyper_top = n_hyper - 1
+    hyper_pstar = math.comb(hyper_top, 2)
     variants_3d = [
-        dict(label="undirected edge", directed=False, separation="edge",
+        dict(label=f"undirected edge ($n={n}$)", directed=False, separation="edge",
              hypergraph=False, panel_n=n, p_star=m / n,
              star_text=f"$m/n = {m}/{n}$"),
-        dict(label="directed arc",    directed=True,  separation="edge",
+        dict(label=f"directed arc ($n={n}$)",    directed=True,  separation="edge",
              hypergraph=False, panel_n=n, p_star=m / n,
              star_text=f"$m/n = {m}/{n}$"),
         dict(label=f"hypergraph edge ($r=3$, $n={n_hyper}$)", directed=False,
              separation="edge", hypergraph=True, panel_n=n_hyper,
-             p_star=m / math.comb(n_hyper - 1, 2),
-             star_text=(fr"$m/\binom{{{n_hyper}-1}}{{2}} = "
-                        fr"{m}/{math.comb(n_hyper - 1, 2)}$")),
+             p_star=m / hyper_pstar,
+             star_text=(fr"$m/\binom{{{hyper_top}}}{{2}} = "
+                        fr"{m}/{hyper_pstar}$")),
     ]
 
     fig = plt.figure(figsize=(18, 6))

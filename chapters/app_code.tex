@@ -59,28 +59,28 @@ Every picture in the thesis is produced by the routines below, from the same dat
 At small sizes it is possible to visit every graph there is and record what it looks like, which is what these routines do. The result is the distribution behind the landscape figures, and, more importantly, a way to confirm a claimed maximum by exhaustion rather than by search. The three-dimensional surfaces are built on the same idea, run across a grid of sizes and route limits and cached so that the sweep is paid for once.
 
 \lstinputlisting[style=sourcelisting, language=Python, firstnumber=3469,
-  linerange={3469-4364}]{program/erdos915_unified.py}
+  linerange={3469-4370}]{program/erdos915_unified.py}
 
 \subsection{The open variants}
 
 These routines exist to attack the questions the thesis leaves open. They measure the hypergraph vertex problem, work with fractional weightings where the integer problem is out of reach, and provide the exhaustive maximisers used to test conjectures at the sizes where testing is still possible. Several results in \Cref{app:proofs} were found, or in two cases refuted, by running exactly these functions.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4365,
-  linerange={4365-4913}]{program/erdos915_unified.py}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4371,
+  linerange={4371-4919}]{program/erdos915_unified.py}
 
 \subsection{The gallery}
 
 Given a size and a route limit, these routines find every extremal graph there is, up to relabelling, and count the symmetries of each. Deciding when two graphs are the same graph drawn differently is done by trying all relabellings and keeping the smallest resulting table, which is slow in principle but perfectly quick at the sizes involved.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4914,
-  linerange={4914-5448}]{program/erdos915_unified.py}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4920,
+  linerange={4920-5454}]{program/erdos915_unified.py}
 
 \subsection{The self-check}
 
 The file ends with a suite of checks that runs when the program is executed directly. It re-derives known values, tests each construction against its predicted size and connectivity, confirms the fast routines agree with the slow ones they stand in for, and verifies the bounds proved in \Cref{app:proofs} on sampled graphs. It prints a line per check and fails loudly rather than quietly if any of them stops holding, which is what makes it useful as a regression test after an edit.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=5449,
-  linerange={5449-5735}]{program/erdos915_unified.py}
+\lstinputlisting[style=sourcelisting, language=Python, firstnumber=5455,
+  linerange={5455-5741}]{program/erdos915_unified.py}
 
 \section{The figure script}\label{app:code-figures}
 

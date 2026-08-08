@@ -30,7 +30,9 @@ The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine
 
 \section{Search traces across the variants}\label{app:traces}
 
-\Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The two runs below repeat that experiment for two further, deliberately dissimilar variants, one undirected and simple, one directed and multigraph, to show the behaviour is the same across the family rather than special to one case. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In both the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
+\Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The five runs below repeat that experiment across the family. The first four cover every combination of the two matrix models, simple and multigraph, with the two directions, and the fifth changes the separation, so that the behaviour can be seen not to be special to one case. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In every one the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
+
+The last of the five is the one worth comparing against the others. It runs the same directed multigraph problem under the \emph{vertex} separation rather than the arc one, and the stricter test is visible in the trace: the walk spends a markedly larger share of its steps on the infeasible side of the boundary before the cooling pulls it back, which is what a harder constraint looks like from inside the search.
 
 \begin{figure}[htbp]
     \centering
@@ -44,6 +46,27 @@ The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine
     \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n5_m3.png}
     \caption{Search trace for the multigraph directed arc problem at $n = 5$, $m = 3$. File \code{trace\_multi\_directed\_n5\_m3.png}.}
     \label{fig:trace-multi-directed}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.74\textwidth]{figures/trace_simple_directed_n5_m3.png}
+    \caption{Search trace for the simple directed arc problem at $n = 5$, $m = 3$. File \code{trace\_simple\_directed\_n5\_m3.png}.}
+    \label{fig:trace-simple-directed}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.74\textwidth]{figures/trace_multi_undirected_n5_m3.png}
+    \caption{Search trace for the multigraph undirected edge problem at $n = 5$, $m = 3$. File \code{trace\_multi\_undirected\_n5\_m3.png}.}
+    \label{fig:trace-multi-undirected}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n4_m3_vertex.png}
+    \caption{Search trace for the multigraph directed problem at $n = 4$, $m = 3$ under the \emph{vertex} separation, so the horizontal axis is $\kap^{\max}$ rather than $\lec^{\max}$. Compared with the arc runs above, the walk lingers much longer in the infeasible region before the cooling drives it back, the stricter separation seen from inside the search. File \code{trace\_multi\_directed\_n4\_m3\_vertex.png}.}
+    \label{fig:trace-multi-directed-vertex}
 \end{figure}
 
 \section{The variant landscape at \texorpdfstring{$m = 6$}{m = 6} and in three dimensions}\label{app:m6}
