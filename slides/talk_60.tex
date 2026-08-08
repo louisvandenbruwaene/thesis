@@ -112,7 +112,7 @@
 \toprule
 Multigraphs, edge-disjoint & $L_m(n)=(m-1)(n-1)$ \\
 Simple graphs, vertex-disjoint at $m=2$ & $k_2(n)=n-1$, exactly the trees \\
-Simple graphs, $m\le4$ & $k_m(n)=\ell_m(n)=\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (Leonard)} \\
+Simple graphs, $m\le4$, $n\ge m$ & $k_m(n)=\ell_m(n)=\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (Leonard)} \\
 Hypergraphs, edge-disjoint & $\ell_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}$ \\
 Random graphs & threshold $p^{*}=m/n$ \\
 \bottomrule
@@ -219,7 +219,7 @@ Random graphs & threshold $p^{*}=m/n$ \\
 \centering
 \includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{sa_vs_tabu_convergence.pdf}
 
-\vspace{8pt}
+\vspace{4pt}
 {\scriptsize
 \begin{tabular}{@{}lllrrr@{}}
 \toprule
@@ -231,9 +231,8 @@ directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
 \bottomrule
 \end{tabular}}
 
-\vspace{6pt}
-{\footnotesize\color{black!60} Tabu takes fewer, better-aimed steps and assembles the structured extremiser the cooled walk cannot reach in budget.}
-\vfill
+\vspace{2pt}
+{\footnotesize\color{black!60} Tabu takes fewer, better-aimed steps and assembles the structured extremiser the cooled walk cannot reach in budget. Only $9$ is proved (Mader); $18$ and $24$ are best known, not yet proved.}
 \end{frame}
 
 \begin{frame}{Validation by rediscovery}
@@ -337,7 +336,7 @@ $4$ & $4$ & $4$ & $4$ & $8$ \\
 
 \vspace{16pt}
 \begin{minipage}{0.84\textwidth}
-{\footnotesize\color{black!60} Backward equals forward by arc reversal, and the general model obeys the same cap. The general model is strictly denser only while vertices are scarce, $n\approx r$. Once $n$ exceeds $r$ the computed gap closes, so the orientation axis collapses and Problem 915 stays a twelve-variant question.}
+{\footnotesize\color{black!60} Backward equals forward by arc reversal, and the general model obeys the same cap. The general model is strictly denser only while vertices are scarce, $n\approx r$. Once $n$ exceeds $r$ the computed gap closes, so the orientation axis appears to collapse (computational evidence, not proved) and Problem 915 stays a twelve-variant question.}
 \end{minipage}
 \vfill
 \end{frame}

@@ -2,7 +2,7 @@ This appendix collects the supplementary figures that the program produces but t
 
 \section{A gallery of extremal graphs}\label{app:gallery-extremal}
 
-The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine of the named families the body argues about, each at a deliberately large representative size rather than at the smallest case, so the structure is visible. These are the special, structured extremisers, not the trivial small trees: the directed double star and bidirected star (hub at the centre, with arcs in both directions to every leaf), the doubled bipartite wall $2 \cdot B_{3,4}$ that ties the double star at the crossover, the dense bidirected complete graph, the multigraph star at full multiplicity, and the star hypertrees, the last drawn as metro maps in which each hyperedge is one coloured line through its members. The program builds every one of these directly and, at the small sizes the enumeration reaches, also proves them optimal rather than merely feasible, so the gallery is the analysis made concrete at a size a reader can take in.
+The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine of the named families the body argues about, each at a deliberately large representative size rather than at the smallest case, so the structure is visible. These are the special, structured extremisers, not the trivial small trees: the bidirected star (the simple hub, arcs both ways to every leaf), the directed double star (its multigraph analogue, hub arcs at full multiplicity $m-1$, which ties $2 \cdot B_{3,4}$ at the crossover), the doubled bipartite wall $2 \cdot B_{3,4}$ itself, the dense bidirected complete graph, the multigraph star (the \emph{undirected} multigraph analogue, hub edges at full multiplicity $m-1$), and the star hypertrees, the last drawn as metro maps in which each hyperedge is one coloured line through its members. The program builds every one of these directly and, at the small sizes the enumeration reaches, also proves them optimal rather than merely feasible, so the gallery is the analysis made concrete at a size a reader can take in.
 
 \begin{figure}[htbp]
     \centering
@@ -20,8 +20,11 @@ The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine
     crossover $n = 7$, the largest size at which the linear star still ties the
     one-directional wall before the wall overtakes it. The bipartite wall
     $2 \cdot B_{3,4}$ is drawn at that same size to show the other side of the
-    tie, matching the double star at $24$ arcs as one of the three families the
-    $n = 7$ classification of \Cref{rem:odd-step-roadmap} identifies. The final panel is the
+    tie. It also carries $24$ arcs, matching the double star's count, and it is
+    one of the three families the $n = 7$ classification of
+    \Cref{rem:odd-step-roadmap} identifies, together with $2 \cdot B_{4,3}$ and
+    the doubled bidirected path $P_7$ (the double star itself is not among
+    them, since its hub degree exceeds that classification's degree cap). The final panel is the
     directed-hypergraph analogue, a tail-to-heads star, shown for the one variant
     whose exact value is still open (\Cref{prop:dir-hyper-first}).
     File \code{extremal\_graphs\_gallery.png}.}

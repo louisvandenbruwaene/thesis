@@ -112,7 +112,7 @@ For $m \ge 4$ the conditional step still yields the value but uniqueness no long
 
 Across all the variation, two phenomena stand out as the ones a first guess would not have predicted.
 
-The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 3$ pulling strictly above $\ell_5(n)$, and beyond it the vertex problem becomes genuinely hard and has stayed open since 1974.
+The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 3$ pulling strictly above $\ell_5(n)$ (\Cref{rem:threshold-convention}), and beyond it the vertex problem becomes genuinely hard and has stayed open since 1974.
 
 The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling: $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. Place all $n$ vertices into two equal parts $A$ and $B$ and draw every arc from $A$ to $B$, one direction only. The result has $\floor{n^2/4}$ arcs, quadratic in $n$, yet $\lambda^{\max} = 1$: every pair has at most one arc-disjoint route, because every route must cross the $A$-to-$B$ wall exactly once and no arc crosses the other way to offer a second path. A graph whose arc count grows like $n^2$ can sit at connectivity one, something no undirected graph can do past a handful of vertices.
 
