@@ -53,7 +53,7 @@ The theorem is far from obvious, so here is why such a tree can always be built,
 \[
     d(A) + d(B) \;\ge\; d(A \cap B) + d(A \cup B).
 \]
-One checks this one edge at a time. An edge contributes to each side of the inequality according to where its two endpoints fall relative to $A$ and $B$, and a short case check over the possible placements shows its contribution on the right never exceeds its contribution on the left. The only edges that could contribute more on the right have one endpoint in $A \setminus B$ and the other in $B \setminus A$, and those contribute $0$ on the right and $2$ on the left, so the inequality only gains.
+One checks this one edge at a time. An edge contributes to each side of the inequality according to where its two endpoints fall relative to $A$ and $B$, and a short case check over the possible placements shows its contribution on the right never exceeds its contribution on the left. The edges that could have gone the other way, contributing more on the left than the right, are exactly those with one endpoint in $A \setminus B$ and the other in $B \setminus A$: those contribute $2$ on the left and $0$ on the right, so the inequality only gains.
 
 Submodularity buys the single lemma the construction needs, the \emph{uncrossing} lemma: if $(S, V \setminus S)$ is any cut and $u, v$ lie on the same side of it, then some minimum $u$--$v$ cut keeps all of $S$ (or all of $V \setminus S$) on one side, that is, it does not cross $S$. The picture is that a cheapest $u$--$v$ cut which sliced through $S$ could be pushed clear of $S$ without ever gaining capacity, and submodularity is exactly the inequality guaranteeing the push is free.
 
@@ -259,7 +259,7 @@ For all $n \ge m \ge 2$ the graph $H_{m,n}$ has $\floorfrac{m(n-1)}{2}$ edges an
 \end{theorem}
 
 \begin{proof}
-The edge count is $(n-1) + \floorfrac{(m-2)(n-1)}{2} = \floorfrac{m(n-1)}{2}$, since $(m-2)(n-1)$ and $m(n-1)$ have the same parity. For the connectivity, any two distinct vertices include at least one spoke vertex $v_i$, whose total degree is $1 + (m-2) = m-1$. \Cref{lem:degree-bound} then gives $\lec(u,v) \le m-1$. When $(m-1) \mid (n-1)$, choosing the spoke graph as $k$ disjoint cliques $K_{m-1}$ recovers \Cref{const:shared-clique}, so the hub-and-spokes family genuinely generalises the shared-clique one.
+The edge count is $(n-1) + \floorfrac{(m-2)(n-1)}{2} = \floorfrac{m(n-1)}{2}$, since $(m-2)(n-1)$ and $m(n-1)$ have the same parity. For the connectivity, any two distinct vertices include at least one spoke vertex $v_i$, whose total degree is at most $1 + (m-2) = m-1$. \Cref{lem:degree-bound} then gives $\lec(u,v) \le m-1$. When $(m-1) \mid (n-1)$, choosing the spoke graph as $k$ disjoint cliques $K_{m-1}$ recovers \Cref{const:shared-clique}, so the hub-and-spokes family genuinely generalises the shared-clique one.
 \end{proof}
 
 Together the upper bound and \Cref{thm:extremal-existence} prove \Cref{thm:mader}. The proof also reveals which graphs are extremal: equality forces both inequalities in the chain to be tight.
@@ -269,7 +269,7 @@ Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{
 \end{theorem}
 
 \begin{proof}
-Write the chain of the upper-bound proof as three nonnegative slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
+Write the chain of the upper-bound proof as three nonnegative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
 \end{proof}
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
@@ -333,7 +333,7 @@ For odd $n = 2k+1$ with $k \ge 4$, the same simplification gives $\floor{(n-1)^2
 \[
 \frac{n}{n-2}\,\floorfrac{(n-1)^2}{4} \;=\; \frac{(2k+1)k^2}{2k-1} \;=\; k(k+1) + \frac{k}{2k-1}.
 \]
-The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 1$, so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction.
+The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 2$ (the induction here is already past the base cases, so $k \ge 4$), so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction.
 \end{proof}
 
 Two remarks on the shape of this proof. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. The proof is long not because it is deep but because the two regimes of $M(n)$ must be carried through the arithmetic separately, and that bookkeeping is precisely what \Cref{ch:certify} hands to the machine at the base cases.
@@ -449,7 +449,7 @@ A common out-neighbour $w \ne u$ would give the two arc-disjoint routes $u \to v
 \end{proof}
 
 \begin{proposition}[Two-hop budget on bipartite partitions]\label{prop:two-hop-bipartite}
-Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with every arc from $A$ to $B$ present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
+Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
 \end{proposition}
 
 \begin{proof}
@@ -971,11 +971,53 @@ degree-$4$ patterns are precisely the single-partner attachments at full
 multiplicity, one per choice of partner.
 \end{remark}
 
+The odd step runs even level to odd level. Closing the induction also needs
+the reverse direction, and that direction turns out to need less: no
+uniqueness one level down, only the value, and no restriction on $m$.
+
+\begin{theorem}[The even step, unconditional]\label{thm:even-step}
+Fix $k \ge 2$ and $m \ge 2$, and suppose
+$L_m^{\mathrm{dir}}(2k-1) = (m-1)(k-1)k$.
+Then $L_m^{\mathrm{dir}}(2k) = (m-1)k^2$, and every directed multigraph
+attaining it is $(m-1)k$-regular in total degree, with $D - v$ attaining
+the odd value $(m-1)(k-1)k$ for \emph{every} vertex $v$.
+\end{theorem}
+
+\begin{proof}
+The lower bound is $(m-1) \cdot B_{k,k}$, which attains $(m-1)k^2$ arcs. For
+the upper bound let $D$ be any feasible directed multigraph on $n = 2k$
+vertices, $\lec^{\max}_D \le m-1$, with $|A(D)| = (m-1)k^2 + j$ for some
+integer $j$. By \Cref{lem:subdigraph-monotone}, deleting any vertex $v$
+leaves a feasible multigraph on $2k-1$ vertices, so
+$|A(D-v)| \le L_m^{\mathrm{dir}}(2k-1) = (m-1)(k-1)k$, giving
+\[
+d(v) \;=\; |A(D)| - |A(D-v)| \;\ge\; (m-1)k^2 + j - (m-1)(k-1)k
+\;=\; (m-1)k + j
+\]
+for every vertex $v$. Summing over all $2k$ vertices,
+\[
+2\bigl[(m-1)k^2 + j\bigr] \;=\; \sum_v d(v) \;\ge\; 2k\bigl[(m-1)k + j\bigr]
+\;=\; 2(m-1)k^2 + 2kj,
+\]
+which rearranges to $j(k-1) \le 0$. Since $k \ge 2$, this forces $j \le 0$:
+no feasible digraph on $2k$ vertices exceeds $(m-1)k^2$ arcs, so
+$L_m^{\mathrm{dir}}(2k) = (m-1)k^2$ exactly.
+
+Now let $D$ attain this value, so $j = 0$. The degree bound above reads
+$d(v) \ge (m-1)k$ for every $v$, while $\sum_v d(v) = 2(m-1)k^2$ is exactly
+$2k$ copies of that same floor. A sum of $2k$ terms, each at least
+$(m-1)k$, totalling exactly $2k \cdot (m-1)k$, forces every term to equal
+$(m-1)k$: $D$ is $(m-1)k$-regular. Deleting any $v$ then leaves exactly
+$(m-1)k^2 - (m-1)k = (m-1)(k-1)k$ arcs, the odd value one level down, for
+every $v$.
+\end{proof}
+
 \begin{remark}[The $m = 3$ chain, sharpened]\label{rem:odd-step-roadmap}
-\Cref{thm:odd-step} removes \Cref{conj:min-degree} from the critical path:
-the odd case no longer needs a minimum-degree statement, only the extremal
-\emph{characterisation} one level down, and for $m = 3$ that
-characterisation propagates along the same induction in both parities.
+\Cref{thm:odd-step} and \Cref{thm:even-step} together remove
+\Cref{conj:min-degree} from the critical path: the odd case no longer
+needs a minimum-degree statement, only the extremal \emph{characterisation}
+one level down, and for $m = 3$ that characterisation propagates along the
+same induction in both parities.
 
 \emph{Odd levels} ($n = 2k+1 \ge 9$): an extremiser has $|A| = 2k(k+1)$
 arcs and every degree at least $2k$ (deletion bound). All degrees
@@ -985,13 +1027,13 @@ $d(v) = 2k$ exactly, $D - v$ is the even extremiser $2 \cdot B_{k,k}$, and
 full-multiplicity pure source or sink: $D = 2 \cdot B_{k+1,k}$ or
 $2 \cdot B_{k,k+1}$.
 
-\emph{Even levels} ($n = 2k \ge 10$): equality in the
-averaging step forces $2k$-regularity, every vertex at degree exactly $2k$,
-hence $D - v$ extremal at $2k-1$ for \emph{every} $v$. Odd uniqueness one level down leaves $2 \cdot B_{k,k-1}$
-or $2 \cdot B_{k-1,k}$, and \Cref{cor:attachment-equality} with
-$d(v) = 2k = 2\max(k-1, k)$ (the $q > p$ case for $2 \cdot B_{k-1,k}$, its
-$p > q$ mirror for $2 \cdot B_{k,k-1}$) rebuilds exactly $2 \cdot B_{k,k}$
-either way.
+\emph{Even levels} ($n = 2k \ge 10$): \Cref{thm:even-step}, fed the odd
+value one level down, gives $2k$-regularity, every vertex at degree exactly
+$2k$, and $D - v$ extremal at $2k-1$ for \emph{every} $v$. Odd uniqueness
+one level down leaves $2 \cdot B_{k,k-1}$ or $2 \cdot B_{k-1,k}$, and
+\Cref{cor:attachment-equality} with $d(v) = 2k = 2\max(k-1, k)$ (the
+$q > p$ case for $2 \cdot B_{k-1,k}$, its $p > q$ mirror for
+$2 \cdot B_{k,k-1}$) rebuilds exactly $2 \cdot B_{k,k}$ either way.
 
 \emph{The seam at $n = 8$}: the same regularity argument runs from $n = 7$,
 where the branches tie at $24$ arcs and several extremisers coexist. On the

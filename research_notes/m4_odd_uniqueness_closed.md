@@ -31,9 +31,18 @@ feasible multigraph on 2k-1 vertices, so every degree satisfies
 d(v) >= A - L(2k-1) = (m-1)k + j. But the average degree is
 2A/(2k) = (m-1)k + j/k, and j <= j/k forces j(k-1) <= 0, so j = 0. QED
 
-(This step is implicit in the thesis's m = 3 chain. It is stated here
-because it makes the induction bookkeeping below clean: odd value at 2k-1
-gives even value at 2k with no further input.)
+(Update 2026-08-09: this step was flagged here as "implicit in the thesis's
+m = 3 chain" but was never actually ported into app_proofs.tex, so the
+thesis's own even-levels paragraph asserted its conclusion without proof.
+A full audit re-deriving every proof in app_proofs.tex from scratch caught
+this as a genuine gap. Fixed: Lemma E is now in the thesis verbatim, stated
+generally for all m (not just m = 3), extended with the regularity and
+per-vertex-reduction consequence the roadmap's even-levels paragraph
+actually needs (every vertex hits the degree floor exactly, not just some
+vertex, so every single-vertex deletion lands on an odd-level extremiser),
+as Theorem thm:even-step right before rem:odd-step-roadmap. The rest of
+this note, sections 2 onward (Corollary D1, Theorem U4, the full m = 4
+closure), is still research only and not in the thesis.)
 
 ## 2. The deficiency-1 attachment corollary
 
