@@ -84,7 +84,7 @@ import statistics
 import subprocess
 import time
 import warnings
-from collections import deque
+from collections import Counter, deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from itertools import combinations, combinations_with_replacement, permutations, product
@@ -173,11 +173,20 @@ try:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt  # noqa: E402  (after backend selection)
     from matplotlib.ticker import MaxNLocator  # noqa: E402  (integer-only axis ticks)
+    from matplotlib.colors import PowerNorm  # noqa: E402
+    from matplotlib.gridspec import GridSpec  # noqa: E402
+    from matplotlib.patches import FancyArrowPatch, Patch  # noqa: E402
+    from matplotlib.transforms import blended_transform_factory  # noqa: E402
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' projection)
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     plt = None
     MaxNLocator = None
+    PowerNorm = None
+    GridSpec = None
+    FancyArrowPatch = None
+    Patch = None
+    blended_transform_factory = None
     MATPLOTLIB_AVAILABLE = False
 
 
@@ -2828,10 +2837,6 @@ def plot_search_trace(result: SearchResult, path: str | Path,
     - ``edge_label``: y-axis label (default "arcs"; use "edges" for undirected).
     - ``title``: figure suptitle.
     """
-    from collections import Counter
-    from matplotlib.colors import PowerNorm
-    from matplotlib.transforms import blended_transform_factory
-    from matplotlib.gridspec import GridSpec
 
     steps = [record.step for record in result.history]
     temperature = [record.temperature for record in result.history]
@@ -2965,7 +2970,6 @@ def draw_graph_with_sensitivity(
     to override the numeric labels.  ``show_sigma`` is accepted for backward
     compatibility and ignored (sigma is always shown).
     """
-    from matplotlib.patches import FancyArrowPatch
 
     sensitivities = sensitivity_map(graph)
     if layout is None:
@@ -3117,7 +3121,6 @@ def _save(path: str | Path, *, tight: bool = True) -> None:
     ``tight=False`` skips ``tight_layout`` for the 3-D figures, where it
     misbehaves with the projected axes (they manage their own spacing).
     """
-    import warnings
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     if tight:
         # tight_layout can warn when figures contain colorbars or shared axes;
@@ -3227,7 +3230,6 @@ def _draw_extremal_panel(ax, matrix, *, directed: bool, hub=None) -> None:
     case.  ``hub`` may also be an explicit list of ``(x, y)`` positions, used
     for the bipartite wall panel, where two columns read far better than a circle.
     """
-    from matplotlib.patches import FancyArrowPatch
     n = len(matrix)
     pos = hub if isinstance(hub, list) else _circle_layout(n, hub)
     mults = {int(matrix[i][j]) for i in range(n) for j in range(n)
@@ -3291,7 +3293,6 @@ def _draw_hyper_panel(ax, hyperedges, n, *, directed: bool, hub=None) -> None:
     """Draw a hypergraph extremiser as a metro map: vertices on a circle (or a
     hub at the centre), each hyperedge a thick coloured line through its members
     when undirected, or a fan of coloured arrows from its tail when directed."""
-    from matplotlib.patches import FancyArrowPatch
     pos = _circle_layout(n, hub)
     for idx, he in enumerate(hyperedges):
         col = _GALLERY_METRO[idx % len(_GALLERY_METRO)]
@@ -3594,7 +3595,6 @@ def enumerate_pair_connectivities(
     smaller than the raw observation list (a few dozen entries per variant), so
     it pickles compactly even though the sweep itself enumerates every graph.
     """
-    from collections import Counter
     table: Counter = Counter()
 
     def record(obj):
@@ -4227,7 +4227,6 @@ def plot_variant_3d_surfaces(
                       fontsize=11, fontweight="bold", color=_KUL_DARK)
 
     # Manual legend patches
-    from matplotlib.patches import Patch
     legend_elems = [
         Patch(facecolor=_KUL_BLUE, alpha=0.85, label="exact (proved)"),
         Patch(facecolor=_VIOLET,   alpha=0.65, label="lower bound (search)"),
@@ -4379,7 +4378,6 @@ def max_hyper_vertex_connectivity(hypergraph: Hypergraph) -> int:
 def _hyper_codegree_ok(edges, bound: int) -> bool:
     """Necessary feasibility filter: two vertices in > ``bound`` common
     hyperedges already carry that many one-step disjoint Berge routes."""
-    from collections import Counter
 
     codegree: Counter = Counter()
     for edge in edges:
