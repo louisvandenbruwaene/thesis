@@ -2032,35 +2032,35 @@ def _random_hypergraph_search(
     return best_count, (best_h if best_h is not None else Hypergraph(n, directed=directed))
 
 
-def _arc_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
-                       k: int) -> bool:
-    """True if there are at least ``k`` arc-disjoint ``s``-``t`` paths.
+def _flow_at_least(cap: dict[tuple[int, int], int], num_nodes: int,
+                    source: int, sink: int, k: int) -> bool:
+    """True if ``k`` rounds of Ford--Fulkerson find an augmenting path each time.
 
-    A plain Ford--Fulkerson with unit capacities: find an augmenting path in the
-    residual (forward arcs and the reverse arcs left by earlier augmentations),
-    augment, and repeat at most ``k`` times.  Used as the inner feasibility test
-    of the exhaustive digraph search, where the question is only whether the
-    local connectivity has reached the forbidden value ``m`` (so ``k = m``).
+    The shared engine behind :func:`_arc_flow_at_least` and
+    :func:`_vertex_flow_at_least`, which differ only in how they build ``cap``
+    (the plain arc network versus the vertex-split network) and in what
+    ``source``/``sink``/``num_nodes`` mean for that network. Each round finds
+    any augmenting path in the residual (forward arcs and the reverse arcs
+    left by earlier augmentations) by DFS and pushes one unit of flow along
+    it; the first round with no path means fewer than ``k`` disjoint routes
+    exist. Mutates ``cap`` in place as the residual network, so callers pass
+    a freshly built dict.
     """
-    cap: dict[tuple[int, int], int] = {}
-    for a in range(n):
-        for b in out_adj[a]:
-            cap[(a, b)] = 1
     for _ in range(k):
-        prev = {s: s}
-        stack = [s]                       # DFS for any residual augmenting path
+        prev = {source: source}
+        stack = [source]                  # DFS for any residual augmenting path
         while stack:
             x = stack.pop()
-            if x == t:
+            if x == sink:
                 break
-            for y in range(n):
+            for y in range(num_nodes):
                 if y not in prev and cap.get((x, y), 0) > 0:
                     prev[y] = x
                     stack.append(y)
-        if t not in prev:
+        if sink not in prev:
             return False                  # no further path: fewer than k exist
-        node = t                          # walk back, pushing one unit of flow
-        while node != s:
+        node = sink                       # walk back, pushing one unit of flow
+        while node != source:
             p = prev[node]
             cap[(p, node)] -= 1
             cap[(node, p)] = cap.get((node, p), 0) + 1
@@ -2068,17 +2068,34 @@ def _arc_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
     return True
 
 
+def _arc_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
+                       k: int) -> bool:
+    """True if there are at least ``k`` arc-disjoint ``s``-``t`` paths.
+
+    Builds the plain unit-capacity arc network and hands it to
+    :func:`_flow_at_least`. Used as the inner feasibility test of the
+    exhaustive digraph search, where the question is only whether the
+    local connectivity has reached the forbidden value ``m`` (so ``k = m``).
+    """
+    cap: dict[tuple[int, int], int] = {}
+    for a in range(n):
+        for b in out_adj[a]:
+            cap[(a, b)] = 1
+    return _flow_at_least(cap, n, s, t, k)
+
+
 def _vertex_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
                           k: int) -> bool:
     """True if there are at least ``k`` internally vertex-disjoint ``s``-``t`` paths.
 
-    The vertex twin of :func:`_arc_flow_at_least`, and the same Ford--Fulkerson
-    loop, run on the split network instead of the plain one: every vertex ``x``
-    becomes an entry copy ``2x`` and an exit copy ``2x+1`` joined by a single
-    unit-capacity arc, so a path may pass through ``x`` at most once.  The two
-    endpoints keep an uncapped gate, since a route is allowed to start at ``s``
-    and finish at ``t``.  A direct arc ``s -> t`` therefore counts as one route
-    with no interior, exactly as the thesis's separation axis intends.
+    The vertex twin of :func:`_arc_flow_at_least`: builds the split network
+    instead of the plain one, every vertex ``x`` becoming an entry copy
+    ``2x`` and an exit copy ``2x+1`` joined by a single unit-capacity arc so
+    a path may pass through ``x`` at most once, with the two endpoints
+    keeping an uncapped gate since a route is allowed to start at ``s`` and
+    finish at ``t`` (a direct arc ``s -> t`` therefore counts as one route
+    with no interior, exactly as the thesis's separation axis intends), and
+    hands that network to the same :func:`_flow_at_least` engine.
     """
     cap: dict[tuple[int, int], int] = {}
     for x in range(n):
@@ -2086,27 +2103,7 @@ def _vertex_flow_at_least(out_adj: list[set[int]], n: int, s: int, t: int,
     for a in range(n):
         for b in out_adj[a]:
             cap[(2 * a + 1, 2 * b)] = 1
-    source, sink = 2 * s + 1, 2 * t
-    for _ in range(k):
-        prev = {source: source}
-        stack = [source]
-        while stack:
-            x = stack.pop()
-            if x == sink:
-                break
-            for y in range(2 * n):
-                if y not in prev and cap.get((x, y), 0) > 0:
-                    prev[y] = x
-                    stack.append(y)
-        if sink not in prev:
-            return False
-        node = sink
-        while node != source:
-            p = prev[node]
-            cap[(p, node)] -= 1
-            cap[(node, p)] = cap.get((node, p), 0) + 1
-            node = p
-    return True
+    return _flow_at_least(cap, 2 * n, 2 * s + 1, 2 * t, k)
 
 
 def _exhaustive_directed(
