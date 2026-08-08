@@ -1,35 +1,61 @@
-# Defence slides
+# Slides
 
-A short, visual Beamer deck for the thesis defence of *Erdős Problem 915, from
-Proof to Search*. It reuses the thesis house style (`../shared/colors.tex` and
-`../shared/tikz-styles.tex`) and pulls a few plots from `../figures/`.
+Three Beamer decks for *Erdős Problem 915, from Proof to Search*. All of them
+reuse the thesis house style (`../shared/colors.tex` and
+`../shared/tikz-styles.tex`) so the colours and the graph vocabulary match the
+document.
+
+| File | Length | Frames | Character |
+|---|---|---|---|
+| `talk_10.tex` | 10 minutes | 10 | figure-led, one frame per minute |
+| `talk_60.tex` | 1 hour | 42 | figure-led, seven parts plus backup |
+| `slides.tex` | flexible | 20 | the older narrative deck, metaphor-led |
 
 ## Build
 
 ```bash
 cd slides
-latexmk -pdf slides.tex
+latexmk -pdf talk_10.tex     # the ten-minute version
+latexmk -pdf talk_60.tex     # the hour version
+latexmk -pdf slides.tex      # the older narrative deck
 ```
 
-The built deck is `slides.pdf`.
+## The two figure-led decks
 
-## Structure (the red wire)
+`talk_10.tex` and `talk_60.tex` share one theme file, `thesis-beamer.tex`, which
+holds the Beamer theme, the notation shorthands, the twelve-variant table, and
+four frame builders (`\figframe`, `\figframetall`, `\figframewide`,
+`\sectionframe`). Editing a deck usually means adding one `\figframe` line.
+
+Both decks obey one rule: **every picture is a figure the thesis already
+produced**, taken from `../figures/`. Neither deck draws a figure of its own,
+and neither needs `make_figures.py` to be re-run. Text is deliberately thin, one
+title and one reading line per figure.
+
+The hour version uses all 21 figure files plus `rediscovery_table.tex`. The
+ten-minute version uses five of them, chosen to carry the argument on their own:
 
 1. Title
-2. A hard problem is a wall (around, through, over)
-3. Three ways past the wall: proof, calculation, approximation
-4. The road of a research problem
-5. Problem 915, precisely (graph, connectivity, the rule, Mader)
-6. What is it good for (the methods outlive the result)
-7. One question, twelve variants
-8. Edge routes versus vertex routes (the k versus l divergence)
-9. What fell, and how hard
-10. How the machine works (annealing vs tabu, Python vs C)
-11. Results on the directed frontier
-12. The whole landscape (the twelve-variant table)
-13. What is left, and why it matters
+2. The question, and Mader's theorem
+3. `edge_vertex_divergence.png` — the edge and vertex problems part at *m* = 5
+4. `directed_crossover.png` — one-way traffic buys a quadratic
+5. `complexity_growth.png` — why a machine is needed
+6. `temperature_trace.png` — what the machine does
+7. `variant_bounds_m3.png` — all twelve variants at once
+8. The twelve-variant status table
+9. Three new results
+10. What is left
 
-After the closing slide there are backup slides, one per topic, to dive deeper
-during the question round: the directed arc conjecture, the hypergraph vertex
-problem, the n=7 reduction, the Gomory-Hu storage trick, and a values
-cheat-sheet.
+The hour version expands the same spine into seven parts (the question, the
+twelve variants, the hand proofs, the directed turn, why a machine, discovery,
+the landscape and the results), then closes with backup frames for the question
+round: the connectivity distribution at *m* = 6, the three remaining search
+traces, the orientation-model table, and the multigraph vertex table.
+
+## Tables
+
+The tables in the two figure-led decks are the thesis tables with their cross
+references replaced by short words, so they read on a slide. They are
+`tab:summary` (twelve variants), `tab:sa-vs-tabu`, `tab:orientation`,
+`tab:multi-vertex`, and the rediscovery table, which is `\input` straight from
+`../figures/rediscovery_table.tex`.

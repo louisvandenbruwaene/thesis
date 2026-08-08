@@ -28,3 +28,13 @@ program/_erdos_fast.so
 
 # macOS
 .DS_Store
+
+# Beamer build products for the talk decks
+slides/talk_*.aux
+slides/talk_*.log
+slides/talk_*.nav
+slides/talk_*.out
+slides/talk_*.snm
+slides/talk_*.toc
+slides/talk_*.fls
+slides/talk_*.fdb_latexmk

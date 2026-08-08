@@ -1,0 +1,105 @@
+% ============================================================================
+%  TEN-MINUTE TALK
+%  Erdos Problem 915, from Proof to Search
+%  Louis Vandenbruwaene, KU Leuven, Master of Mathematics
+%
+%  Build:  cd slides && latexmk -pdf talk_10.tex
+%
+%  Figure-led by design: every picture is a figure already produced for the
+%  thesis and stored in ../figures/.  No figure is drawn here.
+%  Ten frames, roughly one minute each.
+% ============================================================================
+\documentclass[aspectratio=1610,11pt]{beamer}
+\input{thesis-beamer.tex}
+
+\begin{document}
+
+% --- 1 -----------------------------------------------------------------------
+\titleframe{Ten-minute version}
+
+% --- 2 -----------------------------------------------------------------------
+\begin{frame}{The question}
+\vfill
+\centering
+{\large How many edges can a graph on $n$ vertices carry}\\[2pt]
+{\large if \emph{no} pair of vertices has $m$ edge-disjoint paths?}
+
+\vspace{16pt}
+{\color{KULblauw3b}\Large $\displaystyle \ell_m(n)=\max\bigl\{\,|E(G)| \;:\; |V(G)|=n,\ \lmax_G\le m-1\,\bigr\}$}
+
+\vspace{18pt}
+\begin{minipage}{0.62\textwidth}
+\centering
+{\color{black!45}\small Mader settled it for simple graphs, $n\ge m$:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle \ell_m(n)=\floorfrac{m(n-1)}{2}$}
+\end{minipage}
+
+\vspace{18pt}
+{\footnotesize\color{black!60} This thesis moves that question along three axes: model, direction, separation. Twelve variants.}
+\vfill
+\end{frame}
+
+% --- 3 -----------------------------------------------------------------------
+\figframe{Surprise one: edge and vertex routes part company}
+  {edge_vertex_divergence.png}
+  {Identical through $m=4$. At $m=5$ the vertex value pulls above the edge value, and past $m=5$ it has been open since 1974.}
+
+% --- 4 -----------------------------------------------------------------------
+\figframe{Surprise two: one-way traffic buys a quadratic}
+  {directed_crossover.png}
+  {Undirected graphs are stuck at $\Theta(n)$ edges. A digraph reaches $\Theta(n^2)$ arcs at the same connectivity ceiling. The two branches cross at $n=9$ when $m=3$.}
+
+% --- 5 -----------------------------------------------------------------------
+\figframewide{Why a machine: enumeration detonates}
+  {complexity_growth.png}
+  {Checking every graph passes any reachable budget while $n$ is still in single digits. The directed cases, exactly the open ones, go first.}
+
+% --- 6 -----------------------------------------------------------------------
+\figframe{What the machine does: cool a random graph into shape}
+  {temperature_trace.png}
+  {Every visited graph, coloured by step. Hot: it strays above the ceiling. Cool: it settles onto the densest feasible graph, here the proved optimum of $12$ arcs.}
+
+% --- 7 -----------------------------------------------------------------------
+\figframetall{All twelve variants at once}
+  {variant_bounds_m3.png}
+  {Blue proved for all $n$, red conjectured, yellow interpolated. Squares proved exactly, circles are lower bounds.}
+
+% --- 8 -----------------------------------------------------------------------
+\begin{frame}{Where each variant stands}
+\vfill
+\centering
+\twelvetable
+\vfill
+\end{frame}
+
+% --- 9 -----------------------------------------------------------------------
+\begin{frame}{What is new here}
+\vfill
+\begin{itemize}\setlength{\itemsep}{14pt}
+  \item[\color{KULblauw1}\textbf{1}] \textbf{Hypergraph vertex problem, settled at $m=2$ and $m=3$}\\
+        {\small\color{black!60} for every uniformity $r$ and every $n$, with $k_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}$, by a new rank bound on incidence graphs}
+  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: an unconditional quadratic bound}\\
+        {\small\color{black!60} $|A| \le \floorfrac{n^2}{4} + 4(m-1)(n-1)$, so the leading constant and the order of the next term are theorems, not conjectures}
+  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs at $m=3$ reduced to one finite check}\\
+        {\small\color{black!60} the whole infinite family collapses onto two statements about seven vertices, one of which the program has already verified}
+\end{itemize}
+\vfill
+\end{frame}
+
+% --- 10 ----------------------------------------------------------------------
+\begin{frame}{What is left}
+\vfill
+\begin{itemize}\setlength{\itemsep}{12pt}
+  \item {\color{stOpen}$\blacksquare$} The undirected \emph{vertex} problem at $m\ge6$, open since 1974
+  \item {\color{stConj}$\blacksquare$} The structural decomposition that would turn the directed conjecture into a theorem
+  \item {\color{stConj}$\blacksquare$} One finite computation, $L_3^{\mathrm{dir}}(7)=24$, which a stronger solver closes
+\end{itemize}
+
+\vspace{22pt}
+\centering
+{\color{black!55}\small The search proposes a lower bound. A proof or a finished exhaustion disposes the upper bound.}\\[3pt]
+{\color{black!55}\small Only when the two meet is a value called settled.}
+\vfill
+\end{frame}
+
+\end{document}

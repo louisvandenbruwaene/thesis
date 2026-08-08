@@ -1,0 +1,378 @@
+% ============================================================================
+%  ONE-HOUR TALK
+%  Erdos Problem 915, from Proof to Search
+%  Louis Vandenbruwaene, KU Leuven, Master of Mathematics
+%
+%  Build:  cd slides && latexmk -pdf talk_60.tex
+%
+%  Figure-led by design: every picture is a figure already produced for the
+%  thesis and stored in ../figures/.  No figure is drawn here.  The tables are
+%  the thesis tables, with cross-references replaced by short words.
+%  Seven sections, roughly eight minutes each.
+% ============================================================================
+\documentclass[aspectratio=1610,11pt]{beamer}
+\input{thesis-beamer.tex}
+
+\begin{document}
+
+% ============================================================================
+\titleframe{One-hour version}
+
+\begin{frame}{The road}
+\vfill
+\begin{itemize}\setlength{\itemsep}{9pt}
+  \item[\color{KULblauw1}\textbf{1}] The question, and the one theorem it starts from
+  \item[\color{KULblauw1}\textbf{2}] Three axes, twelve variants
+  \item[\color{KULblauw1}\textbf{3}] What falls to a hand proof
+  \item[\color{KULblauw1}\textbf{4}] The directed turn, where the hand proof stops
+  \item[\color{KULblauw1}\textbf{5}] Why a machine, and what it is allowed to claim
+  \item[\color{KULblauw1}\textbf{6}] Discovery: cooling and tabu
+  \item[\color{KULblauw1}\textbf{7}] The landscape, the results, and what is left
+\end{itemize}
+\vfill
+\end{frame}
+
+% ============================================================================
+\sectionframe{Part 1}{The question}
+
+\begin{frame}{\Erdos{} Problem 915}
+\vfill
+\centering
+{\large How many edges can a graph on $n$ vertices carry}\\[2pt]
+{\large if \emph{no} pair of vertices has $m$ edge-disjoint paths?}
+
+\vspace{14pt}
+{\color{KULblauw3b}\Large $\displaystyle \ell_m(n)=\max\bigl\{\,|E(G)| \;:\; |V(G)|=n,\ \lmax_G\le m-1\,\bigr\}$}
+
+\vspace{16pt}
+\begin{minipage}{0.66\textwidth}
+\centering
+{\color{black!45}\small Mader, for simple graphs and $n\ge m$:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle \ell_m(n)=\floorfrac{m(n-1)}{2}$}
+\end{minipage}
+
+\vspace{16pt}
+{\footnotesize\color{black!60} Posed by Bollob\'{a}s and \Erdos. Menger turns ``many routes'' into ``costly cut'', and the whole thesis is built on that one exchange.}
+\vfill
+\end{frame}
+
+\figframetall{What an extremal graph looks like}
+  {extremal_graphs_gallery.png}
+  {The named families, each sitting exactly on its variant's ceiling.}
+
+% ============================================================================
+\sectionframe{Part 2}{Three axes, twelve variants}
+
+\begin{frame}{The three axes}
+\vfill
+\begin{columns}[T]
+\begin{column}{0.33\textwidth}
+  {\color{KULblauw1}\bfseries\large Model}\\[8pt]
+  {\small simple graph}\\
+  {\small multigraph}\\
+  {\small $r$-uniform hypergraph}\\[10pt]
+  {\scriptsize\color{black!55} arity and multiplicity, two independent toggles}
+\end{column}
+\begin{column}{0.33\textwidth}
+  {\color{KULblauw1}\bfseries\large Direction}\\[8pt]
+  {\small undirected}\\
+  {\small directed}\\[10pt]
+  {\scriptsize\color{black!55} direction breaks the degree symmetry that caps the undirected answer}
+\end{column}
+\begin{column}{0.33\textwidth}
+  {\color{KULblauw1}\bfseries\large Separation}\\[8pt]
+  {\small edge-disjoint, $\lmax$}\\
+  {\small internally vertex-disjoint, $\kmax$}\\[10pt]
+  {\scriptsize\color{black!55} Whitney: $\kap\le\lec$, so the vertex-feasible family is the \emph{larger} one}
+\end{column}
+\end{columns}
+
+\vspace{22pt}
+\centering
+{\color{KULblauw3b}\large $3 \times 2 \times 2 = 12$ versions of one question}
+\vfill
+\end{frame}
+
+\figframetall{Twelve variants at $m=3$}
+  {variant_bounds_m3.png}
+  {Blue proved for all $n$, red conjectured, yellow interpolated. Squares proved exactly, circles are lower bounds.}
+
+\figframetall{The same twelve at $m=6$}
+  {variant_bounds_m6.png}
+  {Raising the threshold moves the curves, not the regime. The undirected vertex panels have now gone open.}
+
+% ============================================================================
+\sectionframe{Part 3}{What falls to a hand proof}
+
+\begin{frame}{The short proofs}
+\vfill
+\centering
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Multigraphs, edge-disjoint & $L_m(n)=(m-1)(n-1)$ \\
+Simple graphs, vertex-disjoint at $m=2$ & $k_2(n)=n-1$, exactly the trees \\
+Simple graphs, $m\le4$ & $k_m(n)=\ell_m(n)=\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (Leonard)} \\
+Hypergraphs, edge-disjoint & $\ell_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}$ \\
+Random graphs & threshold $p^{*}=m/n$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{18pt}
+{\footnotesize\color{black!60} One argument serves the first and the fourth: charge every edge to the Gomory--Hu tree, a summary of all $\binom{n}{2}$ connectivities in $n-1$ numbers.}
+\vfill
+\end{frame}
+
+\figframe{The first divergence, at $m=5$}
+  {edge_vertex_divergence.png}
+  {Edge and vertex agree through $m=4$. At $m=5$ they part, and beyond it the vertex problem has stood open since 1974.}
+
+\figframe{The same split, visible in random graphs}
+  {edge_vertex_sampling.png}
+  {$G(16,p)$ at three densities. The vertex distribution never sits right of the edge one, which is Whitney across a whole population, and the gap closes as the graph fills in.}
+
+\figframewide{Where the forbidden pair appears}
+  {threshold_3d.png}
+  {Each model swept in units of its \emph{own} threshold, since a hypergraph vertex sits in $\binom{n-1}{r-1}$ hyperedges and so lives on a different density scale entirely.}
+
+% ============================================================================
+\sectionframe{Part 4}{The directed turn}
+
+\figframe{Linear king against quadratic cabinet}
+  {directed_crossover.png}
+  {The hub spends its arcs on one centre and grows linearly. The one-directional bipartite wall grows quadratically and takes the lead at $n=9$ when $m=3$.}
+
+\begin{frame}{The directed conjecture, and what is unconditional}
+\vfill
+\centering
+{\color{black!45}\small Conjectured value, lower bound proved for all $m$:}\\[6pt]
+{\color{stConj}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\max\Bigl(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\Bigr)$}
+
+\vspace{20pt}
+{\color{black!45}\small Proved here with no hypothesis on the extremal shape:}\\[6pt]
+{\color{KULblauw1}\large $\displaystyle |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1)$}\\[8pt]
+{\color{black!45}\small and therefore}\\[6pt]
+{\color{KULblauw1}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\frac{n^2}{4}+\Theta_m(n)$}
+
+\vspace{16pt}
+\begin{minipage}{0.86\textwidth}
+{\footnotesize\color{black!60} Leading constant and order of the second term: both now theorems. What is left is one coefficient, $(m-2)/2$ conjectured against $4(m-1)$ proved.}
+\end{minipage}
+\vfill
+\end{frame}
+
+% ============================================================================
+\sectionframe{Part 5}{Why a machine}
+
+\figframewide{Enumeration detonates}
+  {complexity_growth.png}
+  {A simple graph offers $2^{E}$ candidates, a multigraph $m^{E}$. Every curve passes a generous budget while $n$ is in single digits, and the directed cases go first.}
+
+\begin{frame}{Three jobs, kept apart}
+\vfill
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+  {\color{KULblauw1}\bfseries\large MEASURE}\\[8pt]
+  {\small One integer maximum flow, on one multiplicity matrix, for all twelve variants.}\\[8pt]
+  {\scriptsize\color{black!55} What it reports about a given graph is a fact.}
+\end{column}
+\begin{column}{0.32\textwidth}
+  {\color{stProved}\bfseries\large PROVE}\\[8pt]
+  {\small Exhaust every graph of a fixed size, or run the cut-counting program.}\\[8pt]
+  {\scriptsize\color{black!55} A finished sweep is an upper bound with the standing of a hand proof.}
+\end{column}
+\begin{column}{0.32\textwidth}
+  {\color{stOpen}\bfseries\large DISCOVER}\\[8pt]
+  {\small Cool a random graph, or climb greedily with a tabu list.}\\[8pt]
+  {\scriptsize\color{black!55} Only ever exhibits a graph. Lower bounds only. Never a proof.}
+\end{column}
+\end{columns}
+
+\vspace{24pt}
+\centering
+{\color{black!55}\small The honesty contract: the search proposes a lower bound, a proof or a finished exhaustion disposes the upper bound,}\\
+{\color{black!55}\small and only when the two meet is a value called settled.}
+\vfill
+\end{frame}
+
+\figframe{The dial the search turns}
+  {sensitivity_mixed.png}
+  {Edge sensitivity $\sigma(e)=\lmax(G)-\lmax(G-e)$. Both $s\to a$ and $s\to b$ carry three parallel arcs, yet only $b$ is load-bearing. Multiplicity is not the same as carrying weight.}
+
+% ============================================================================
+\sectionframe{Part 6}{Discovery}
+
+\figframe{One cooling run}
+  {temperature_trace.png}
+  {Every visited graph by connectivity and size, coloured by step. Hot it strays above the ceiling and picks up arcs it may not keep, cool it is driven back onto the proved optimum.}
+
+\figframe{The same behaviour, undirected and simple}
+  {trace_simple_undirected_n7_m3.png}
+  {Simple undirected, $n=7$, $m=3$.}
+
+\figframe{And under the stricter separation}
+  {trace_multi_directed_n4_m3_vertex.png}
+  {Directed multigraph, $n=4$, $m=3$, vertex-disjoint. The walk lingers far longer on the infeasible side, which is what a harder constraint looks like from inside the search.}
+
+\begin{frame}{Cooling against tabu}
+\vfill
+\centering
+\includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{sa_vs_tabu_convergence.pdf}
+
+\vspace{8pt}
+{\scriptsize
+\begin{tabular}{@{}lllrrr@{}}
+\toprule
+Variant & $n$ & $m$ & target & SA in $6$\,s & tabu in $6$\,s \\
+\midrule
+simple undirected   & 7 & 3 & $9$  & $9$  & $9$ \\
+simple directed     & 7 & 3 & $18$ & $16$ & $\mathbf{18}$ \\
+directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
+\bottomrule
+\end{tabular}}
+
+\vspace{6pt}
+{\footnotesize\color{black!60} Tabu takes fewer, better-aimed steps and assembles the structured extremiser the cooled walk cannot reach in budget.}
+\vfill
+\end{frame}
+
+\begin{frame}{Validation by rediscovery}
+\vfill
+\centering
+{\scriptsize\input{../figures/rediscovery_table.tex}}
+
+\vspace{14pt}
+{\footnotesize\color{black!60} Pointed at the cases already settled and told only to pack in edges, the search returns the named constructions: the spanning tree, the thickened star, the double star, the bidirected star, and the hub-bipartite tie at $n=7$.}
+\vfill
+\end{frame}
+
+% ============================================================================
+\sectionframe{Part 7}{The landscape, and what is left}
+
+\figframetall{Every graph at small $n$, and the frontier}
+  {scatter_lambda_edges.png}
+  {One point per graph. The blue staircase is the extremal envelope, and the theorems forbid everything above it.}
+
+\figframetall{Inside each graph, pair by pair}
+  {pair_conn_dist.png}
+  {High-connectivity pairs are rare even inside the graphs that have one.}
+
+\figframetall{The same graphs, by sheer size}
+  {edges_dist.png}
+  {The dotted line marks the densest low-connectivity graph. It sits far out in the sparse tail.}
+
+\figframetall{The whole study as one surface}
+  {variant_surface_3d.png}
+  {Blue is machine-proved, purple is a search lower bound.}
+
+\begin{frame}{Where each variant stands}
+\vfill
+\centering
+\twelvetable
+\vfill
+\end{frame}
+
+\begin{frame}{Three new results}
+\vfill
+\begin{itemize}\setlength{\itemsep}{13pt}
+  \item[\color{KULblauw1}\textbf{1}] \textbf{The hypergraph vertex problem, settled at $m=2$ and $m=3$}\\
+        {\small\color{black!60} for every uniformity $r$ and every $n$: $k_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}=\ell_m^{(r)}(n)$. The $m=3$ case rests on a new rank bound for incidence graphs, proved through Tutte's triconnected decomposition.}
+  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$, unconditionally}\\
+        {\small\color{black!60} no assumption about the extremal shape, which is what every earlier route to this bound needed. Leaves only a constant factor of about eight in one coefficient.}
+  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs at $m=3$, reduced to seven vertices}\\
+        {\small\color{black!60} an attachment lemma and an odd-step theorem collapse the whole infinite family onto two finite statements, one of them already verified by the program.}
+\end{itemize}
+\vfill
+\end{frame}
+
+\begin{frame}{What is left}
+\vfill
+\begin{itemize}\setlength{\itemsep}{11pt}
+  \item {\color{stOpen}$\blacksquare$} \textbf{The undirected vertex problem at $m\ge6$}, open since 1974, extremal structure genuinely unknown
+  \item {\color{stConj}$\blacksquare$} \textbf{The missing decomposition}: that an extremal non-hub digraph splits as $A\cup B$ with every arc from $A$ to $B$, none inside $A$, none coming back. Four hypotheses, of which the backward arc is the hardest.
+  \item {\color{stConj}$\blacksquare$} \textbf{The directed vertex problem at $m\ge3$}, which Whitney's inequality pointedly does \emph{not} hand over with the arc case
+  \item {\color{stConj}$\blacksquare$} \textbf{One finite computation}: $L_3^{\mathrm{dir}}(7)=24$, where the free solver times out and a stronger one should close it
+\end{itemize}
+
+\vspace{18pt}
+\centering
+{\color{black!55}\small The map is filled in where honest mathematics could fill it,}\\
+{\color{black!55}\small and where it could not, the blanks are marked precisely.}
+\vfill
+\end{frame}
+
+% ============================================================================
+\sectionframe{Backup}{Further figures for the question round}
+
+\figframetall{The distribution at a higher threshold}
+  {conn_dist_m6.png}
+  {At $m=6$ the feasibility boundary sits out past the bulk of the distribution.}
+
+\figframe{Trace: directed multigraph}
+  {trace_multi_directed_n5_m3.png}
+  {Directed multigraph, $n=5$, $m=3$.}
+
+\figframe{Trace: simple directed}
+  {trace_simple_directed_n5_m3.png}
+  {Simple directed, $n=5$, $m=3$.}
+
+\figframe{Trace: multigraph undirected}
+  {trace_multi_undirected_n5_m3.png}
+  {Multigraph undirected, $n=5$, $m=3$.}
+
+\begin{frame}{Orientation models for the directed hypergraph}
+\vfill
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ccccc}
+\toprule
+$r$ & $m$ & $n$ & forward & general \\
+\midrule
+$3$ & $3$ & $3$ & $3$ & $4$ \\
+$3$ & $3$ & $4$ & $8$ & $8$ \\
+$4$ & $3$ & $4$ & $4$ & $6$ \\
+$4$ & $4$ & $4$ & $4$ & $8$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{16pt}
+\begin{minipage}{0.84\textwidth}
+{\footnotesize\color{black!60} Backward equals forward by arc reversal, and the general model obeys the same cap. The general model is strictly denser only while vertices are scarce, $n\approx r$. Once $n$ exceeds $r$ the computed gap closes, so the orientation axis collapses and Problem 915 stays a twelve-variant question.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{The multigraph vertex problem, other convention}
+\vfill
+\centering
+{\scriptsize
+\begin{tabular}{ll|cccccc}
+    & & $n=2$ & $3$ & $4$ & $5$ & $6$ & $7$ \\
+    \midrule
+    $m=2$ & value & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+          & tree  & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
+    \midrule
+    $m=3$ & value & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
+          & tree  & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
+    \midrule
+    $m=4$ & value &  & $6$ & $9$ & $12$ & $15$ &  \\
+          & tree  &  & $6$ & $9$ & $12$ & $15$ &  \\
+          & theta &  & $6$ & $9$ & $12$ &  &  \\
+    \midrule
+    $m=5$ & value &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
+          & tree  &  &  & $12$ & $16$ &  &  \\
+          & theta &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
+    \midrule
+    $m=6$ & value &  &  & $\mathbf{19}$ &  &  &  \\
+          & tree  &  &  & $15$ &  &  &  \\
+          & theta &  &  & $\mathbf{19}$ &  &  &  \\
+\end{tabular}}
+
+\vspace{14pt}
+\begin{minipage}{0.84\textwidth}
+{\footnotesize\color{black!60} Reading parallel copies as distinct routes makes this a genuinely new problem. Bold entries beat the multigraph edge value. The natural guess, that a thickened tree wins once $n\ge m+2$, is false for every $m\ge5$: a bouquet of thickened cliques sharing one vertex beats it by a margin growing linearly in $n$.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\end{document}

@@ -1,0 +1,202 @@
+% ============================================================================
+%  Shared Beamer theme for the two figure-led talks
+%  (talk_10.tex, the ten-minute version, and talk_60.tex, the hour version)
+%
+%  Same house style as the thesis: it inputs ../shared/colors.tex and
+%  ../shared/tikz-styles.tex, so colours and graph styles have one source.
+%  Every picture in both decks is a figure file already produced for the
+%  thesis and living in ../figures/.  Nothing here draws a new figure.
+% ============================================================================
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc,arrows.meta,positioning,backgrounds,fit,shadows}
+
+\input{../shared/colors.tex}
+\input{../shared/tikz-styles.tex}
+\graphicspath{{../figures/}{../}}
+
+% ---- status colours, matching the thesis trichotomy ------------------------
+\colorlet{stProved}{KULblauw1}
+\colorlet{stConj}{vertexred}
+\colorlet{stOpen}{vertexorange}
+
+% ---- notation shorthands, matching the thesis ------------------------------
+\newcommand{\Erdos}{Erd\H{o}s}
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+\newcommand{\floorfrac}[2]{\left\lfloor \frac{#1}{#2}\right\rfloor}
+\newcommand{\lmax}{\lambda^{\max}}
+\newcommand{\kmax}{\kappa^{\max}}
+\newcommand{\lec}{\lambda}
+\newcommand{\kap}{\kappa}
+\newcommand{\code}[1]{{\ttfamily\small #1}}
+
+% a small coloured status chip, used in the twelve-variant table
+\newcommand{\chip}[2]{\tikz[baseline=-0.55ex]{\node[rounded corners=2pt,
+   fill=#1,text=white,inner xsep=4pt,inner ysep=1.5pt,
+   font=\tiny\bfseries]{#2};}}
+
+% ============================================================================
+%  THEME
+% ============================================================================
+\setbeamertemplate{navigation symbols}{}
+\usefonttheme{professionalfonts}
+
+\setbeamercolor{structure}{fg=KULblauw1}
+\setbeamercolor{frametitle}{fg=KULblauw3b}
+\setbeamercolor{title}{fg=KULblauw3b}
+\setbeamercolor{normal text}{fg=black!88}
+\setbeamercolor{itemize item}{fg=KULblauw1}
+\setbeamerfont{frametitle}{series=\bfseries,size=\large}
+\setbeamerfont{title}{series=\bfseries}
+\setbeamertemplate{itemize item}{\small\raise0.5pt\hbox{\textbullet}}
+
+\setbeamertemplate{frametitle}{%
+  \vskip4pt%
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.9cm,rightskip=0.9cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vskip2pt%
+  \hspace*{0.9cm}{\color{KULblauw3a}\rule{0.82\paperwidth}{1.1pt}}%
+  \vskip1pt%
+}
+
+\setbeamertemplate{footline}{%
+  \hbox{%
+    \begin{beamercolorbox}[wd=0.72\paperwidth,ht=2.4ex,dp=1.2ex,leftskip=0.9cm]{}%
+      {\scriptsize\color{black!45}\Erdos{} Problem 915}%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=0.28\paperwidth,ht=2.4ex,dp=1.2ex,rightskip=0.9cm]{}%
+      \hfill{\scriptsize\color{black!45}\insertframenumber\,/\,\inserttotalframenumber}%
+    \end{beamercolorbox}%
+  }%
+}
+
+\setbeamersize{text margin left=0.9cm,text margin right=0.9cm}
+
+% ============================================================================
+%  FRAME BUILDERS
+%  Both decks are figures and tables with a title and one line underneath, so
+%  the two commands below are what almost every frame uses.
+% ============================================================================
+
+% \figframe{frame title}{figure file}{one-line reading}
+\newcommand{\figframe}[3]{%
+  \begin{frame}{#1}
+    \vfill
+    \centering
+    \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{#2}
+
+    \vspace{3pt}
+    {\footnotesize\color{black!60} #3}
+    \vfill
+  \end{frame}%
+}
+
+% \figframetall{...}: for the multi-panel grids (twelve small panels, or the
+% gallery), which are close to square and need every millimetre of height to
+% stay legible.  Its third argument must be a SHORT single line.
+\newcommand{\figframetall}[3]{%
+  \begin{frame}{#1}
+    \vspace{-2pt}
+    \centering
+    \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{#2}
+
+    \vspace{1pt}
+    {\scriptsize\color{black!60} #3}
+  \end{frame}%
+}
+
+% \figframewide{...}: for the very wide panels (ratio above 2), which need the
+% full width and no height cap to stay legible.
+\newcommand{\figframewide}[3]{%
+  \begin{frame}{#1}
+    \vfill
+    \centering
+    \includegraphics[width=\textwidth]{#2}
+
+    \vspace{6pt}
+    {\footnotesize\color{black!60} #3}
+    \vfill
+  \end{frame}%
+}
+
+% a plain section divider
+\newcommand{\sectionframe}[2]{%
+  \begin{frame}[plain]
+    \vfill
+    \hspace*{1.2cm}\begin{minipage}{0.82\textwidth}
+      {\color{black!35}\small #1}\\[8pt]
+      {\color{KULblauw3b}\LARGE\bfseries #2}
+    \end{minipage}
+    \vfill
+  \end{frame}%
+}
+
+% the title frame, shared by both decks
+\newcommand{\titleframe}[1]{%
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+  \begin{scope}[shift={($(current page.north east)+(-1.7,-1.5)$)},scale=0.55,opacity=0.16]
+    \foreach \i in {0,...,6}{\coordinate (d\i) at ({51.43*\i}:1.4);}
+    \foreach \i in {0,...,6}{\foreach \j in {0,...,6}{\draw[KULblauw1,line width=0.9pt] (d\i)--(d\j);}}
+    \foreach \i in {0,...,6}{\fill[KULblauw3b] (d\i) circle (3.2pt);}
+  \end{scope}
+\end{tikzpicture}
+
+\vspace{1.9cm}
+\hspace*{0.5cm}\begin{minipage}{0.9\textwidth}
+  {\color{black!40}\large EXTREMAL GRAPH THEORY}\\[10pt]
+  {\color{KULblauw3b}\fontsize{36}{40}\selectfont\bfseries \Erdos{} Problem 915}\\[8pt]
+  {\color{KULblauw1}\Large From Proof to Search}\\[4pt]
+  {\color{black!45}\small #1}
+
+  \vspace{1.4cm}
+  {\large\bfseries Louis Vandenbruwaene}\\[3pt]
+  {\small\color{black!70}Supervisor: Prof.\ Stijn Cambie \qquad Promotor: Prof.\ Jan Goedgebeur}\\[2pt]
+  {\small\color{black!70}KU Leuven, Master of Mathematics}
+\end{minipage}
+
+\begin{tikzpicture}[remember picture,overlay]
+  \node[anchor=south east] at ($(current page.south east)+(-0.8,0.5)$)
+    {\includegraphics[height=1.0cm]{LogoKULeuven.png}};
+\end{tikzpicture}
+\end{frame}%
+}
+
+% ============================================================================
+%  THE TWELVE-VARIANT TABLE
+%  The content of tab:summary in the thesis, set for a slide: the cross
+%  references are replaced by short words and the status column by a chip.
+% ============================================================================
+\newcommand{\twelvetable}{%
+\renewcommand{\arraystretch}{1.18}
+\scriptsize
+\begin{tabular}{@{}llll@{}}
+\toprule
+Separation & Model & Value & Status \\
+\midrule
+\multicolumn{4}{@{}l}{\color{KULblauw1}\bfseries Undirected} \\
+edge   & simple & $\floorfrac{m(n-1)}{2}$ & \chip{stProved}{PROVED} Mader \\
+edge   & multi  & $(m-1)(n-1)$            & \chip{stProved}{PROVED} \\
+edge   & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ & \chip{stProved}{PROVED} Gomory--Hu \\
+vertex & simple & $\floorfrac{m(n-1)}{2}$ $(m\le4)$, $\floor{8n/3}-3$ $(m=5)$ & \chip{stProved}{CITED} open $m\ge6$ \\
+vertex & multi  & adjacency count, so the simple value & convention \\
+vertex & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ $(m\le3)$ & \chip{stProved}{PROVED} $m\le3$, open $m\ge4$ \\
+\midrule
+\multicolumn{4}{@{}l}{\color{KULblauw1}\bfseries Directed} \\
+arc    & simple & $\max\bigl(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\bigr)$ & \chip{stProved}{PROVED} $m=2$, \chip{stConj}{CONJ} $m\ge3$ \\
+arc    & multi  & $(m-1)\max\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr)$ & \chip{stProved}{PROVED} $n\le6$, \chip{stConj}{COND} $m=3$ \\
+arc    & hyper  & quadratic in $n$, exact value open & \chip{stOpen}{LOWER BD.} \\
+vertex & simple & as the arc row & \chip{stProved}{PROVED} $m=2$, \chip{stConj}{CONJ} $m\ge3$ \\
+vertex & multi  & adjacency count, so the simple value & convention \\
+vertex & hyper  & quadratic in $n$, exact value open & \chip{stOpen}{LOWER BD.} \\
+\bottomrule
+\end{tabular}%
+}
