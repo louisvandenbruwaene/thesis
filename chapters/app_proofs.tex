@@ -269,7 +269,7 @@ Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{
 \end{theorem}
 
 \begin{proof}
-Write the chain of the upper-bound proof as three nonnegative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
+Write the chain of the upper-bound proof as three nonnegative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$. Substituting $|E_1| = (n-1) - S_3$ into the first identity turns it into $\sum_e \dist_T(e) = 2|E| - (n-1) + S_2 + S_3$, and equating this with the second identity gives $2|E| - (n-1) + S_2 + S_3 = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
 \end{proof}
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
@@ -495,7 +495,7 @@ so the leading constant $\tfrac14$ of \Cref{conj:dir-arc} holds unconditionally,
 \]
 Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)\,n(n-1)$.
 
-\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$. Distinct digons use disjoint pairs of arcs, so twice the number of digons is at most $|A(D)|$, and that is exactly the slack Step 1 left over. Combining the two,
+\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included: fixing a vertex $x$, a walk $u \to x \to v$ is nothing more than an independent choice of an in-neighbour $u$ of $x$ and an out-neighbour $v$ of $x$, so $x$ is the midpoint of exactly $d^-(x)\,d^+(x)$ such walks. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$, since a digon on the pair $\{u,x\}$ is counted once as a closed walk based at $u$ and once as a closed walk based at $x$. Distinct digons use disjoint pairs of arcs, so twice the number of digons is at most $|A(D)|$, and that is exactly the slack Step 1 left over: removing the diagonal terms from the all-pairs sum turns Step 1's bound $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)n(n-1)$ into $\sum_x d^+(x)d^-(x) \le (m-1)n(n-1) - |A(D)| + (\text{twice the digon count})$, and bounding that digon term by $|A(D)|$ cancels the $-|A(D)|$ exactly, leaving the inequality below. Combining the two,
 \[
     \sum_{x \in V} d^+(x)\,d^-(x)
     \;\le\; \bigl[(m-1)\,n(n-1) - |A(D)|\bigr] + |A(D)|
@@ -890,12 +890,17 @@ degree is
 \frac{2|A(D)|}{2k+1} \;=\; (m-1)k + j + \frac{(m-1)k - (2k-1)j}{2k+1},
 \]
 by direct computation. If $(m-1)k - (2k-1)j < 0$ the average lies below the
-minimum, a contradiction. Otherwise the correction term is nonnegative and,
+minimum, a contradiction, because an average can never fall below the least
+of the values it averages, and every $d(v)$ was just shown to be at least
+$(m-1)k + j$. Otherwise the correction term is nonnegative and,
 because $m \le 4$ and $j \ge 1$, strictly below one:
 $(m-1)k - (2k-1)j \le (m-3)k + 1 \le k + 1 < 2k + 1$. The average therefore
 lies in $[(m-1)k + j,\ (m-1)k + j + 1)$ while every degree is at least
-$(m-1)k + j$, so some vertex $v$ has $d(v) = (m-1)k + j$ exactly, and
-$D - v$ has exactly $(m-1)k^2$ arcs. By (ii), $D - v = (m-1) \cdot B_{k,k}$, and
+$(m-1)k + j$, so some vertex $v$ has $d(v) = (m-1)k + j$ exactly: were every
+degree at least $(m-1)k + j + 1$ instead, the average would itself be at
+least $(m-1)k + j + 1$, outside the range just established, so at least one
+vertex must sit exactly on the floor. That vertex's deletion,
+$D - v$, has exactly $(m-1)k^2$ arcs. By (ii), $D - v = (m-1) \cdot B_{k,k}$, and
 \Cref{lem:attachment} caps $d(v) \le (m-1)k < (m-1)k + j$, the final
 contradiction. Hence $j \le 0$.
 \end{proof}
@@ -1230,7 +1235,7 @@ This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts
    \;=\; \sum_{t} |\delta_\HH(S_t)|.
 \]
 
-\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $|\delta_\HH(S_t)| = c^*(t)$, and each weight $c^*(t)$ is a local connectivity $\lec_\HH$ of its endpoints, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t |\delta_\HH(S_t)| = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
+\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $|\delta_\HH(S_t)| = c^*(t)$. Moreover $c^*(t)$ is itself a local connectivity $\lec_\HH$ of $t$'s two endpoints: since those endpoints are adjacent in $T^*$, the $u$--$v$ tree path between them is the single edge $t$, so the path-minimum reading of \Cref{thm:hyper-gomory-hu} gives $\lec_\HH$ of that pair exactly $c^*(t)$, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t |\delta_\HH(S_t)| = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
 \[
    (r-1)\,|E(\HH)| \;\le\; (m-1)(n-1),
 \]
@@ -1479,17 +1484,24 @@ exist. Step~1 handles a cut vertex by arguing block by block. Steps~2 and~3
 remove a degree-two $Z$-vertex or $X$-vertex without changing the bound.
 What survives is $2$-connected with minimum degree at least three, and
 Step~4 shows that such a graph already violates the connectivity ceiling
-(iv), so it never arises. \emph{Base $|V| \le 2$.} A single vertex lies in
-$X$ by (iii), and $0 \le |X| - 1$. On two vertices, (i)--(iii) force both
-into $X$, parallel edges are internally disjoint paths, so (iv) caps the
-multiplicity at $2$ and $\mathrm{rank} \le 1 = |X| - 1$.
+(iv), so it never arises. \emph{Base $|V| \le 2$.} A single vertex has degree $0$, too little for the
+degree-at-least-$2$ floor (iii) imposes on a $Z$-vertex, so it cannot lie in
+$Z$ and must lie in $X$, giving $0 \le |X| - 1$. On two vertices the same
+reasoning applies to either one: a vertex in $Z$ could reach only the other
+vertex, and (ii) forbids that single edge from being parallel to another, so
+it would have degree at most $1$, again short of (iii). Hence (i)--(iii)
+force both vertices into $X$. Parallel edges between them are internally
+disjoint paths (each has empty interior, so no two can share an interior
+vertex), so (iv) caps the multiplicity at $2$ and $\mathrm{rank} \le 1 = |X| - 1$.
 
 \emph{Step 1: a cut vertex.} Suppose $G$ has a cut vertex, so it is not yet
 $2$-connected. Break it into its \emph{blocks} $B_1, \dots, B_c$ with
 $c \ge 2$, a block being a maximal piece with no cut vertex of its own, that
 is, either a single bridge edge or a maximal $2$-connected subgraph. Two
 blocks meet in at most one vertex, and any shared vertex is a cut vertex of
-$G$. No cycle can pass through two different blocks, so the cycle rank adds
+$G$. No cycle can pass through two different blocks: since two blocks share
+at most one vertex, a cycle straddling both would have to visit that shared
+vertex twice, which a simple cycle cannot do. So the cycle rank adds
 up over blocks, $\mathrm{rank}(G) = \sum_i \mathrm{rank}(B_i)$, and it is
 enough to bound each $\mathrm{rank}(B_i)$ by $|X \cap B_i| - 1$ and sum.
 
@@ -1507,9 +1519,14 @@ $X$-vertex once for every block it lies in,
 \sum_i |X \cap B_i| = |X| + \sum_{x \in X\,\mathrm{cut}} (b(x) - 1).
 \]
 The number of blocks satisfies the block--cut tree identity
-$c = 1 + \sum_{v\,\mathrm{cut}} (b(v) - 1)$, which holds because the blocks
-and cut vertices form a tree in which each cut vertex $v$ is joined to the
-$b(v)$ blocks that contain it. Subtracting this count of blocks from the
+$c = 1 + \sum_{v\,\mathrm{cut}} (b(v) - 1)$. This follows from counting the
+edges of the block-cut tree two ways. That tree has $c$ block-nodes and one
+node per cut vertex, so being a tree its edge count is one less than its
+total number of nodes, $c + \#\{\text{cut vertices}\} - 1$. The same edge
+count also equals $\sum_{v\,\mathrm{cut}} b(v)$, since each cut vertex $v$ is
+joined in the tree to exactly the $b(v)$ blocks that contain it. Equating the
+two expressions for the edge count and solving for $c$ gives the identity.
+Subtracting this count of blocks from the
 previous display and separating the cut vertices into their $X$- and
 $Z$-parts leaves
 \[
@@ -1551,11 +1568,15 @@ $\mathrm{rank}(G) - 1 \le (|X| - 1) - 1$, that is $\mathrm{rank}(G) \le |X| - 1$
 with $|V| \ge 3$ and every degree at least $3$. First, $G$ is simple: a
 parallel class lies inside $X$ by (ii), and if $\mu(x, x') \ge 2$ then a
 third internally disjoint route exists: walk from $x$ to any third vertex
-$w$ inside $G - x'$, then from $w$ to $x'$ inside $G - x$. The concatenation
+$w$ inside $G - x'$, then from $w$ to $x'$ inside $G - x$, both walks
+available because deleting a single vertex from a $2$-connected graph leaves
+it connected, exactly as already used in Step~3. The concatenation
 visits $x$ only first and $x'$ only last, so it contains an $x$--$x'$ path
 with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
 (iv). If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
-$|X| \le 1$ and every $z$ has degree at most $1$ by (i), absurd.
+two vertices of $X$ would violate the ceiling $\kap(x, x') \le 2$ that (iv)
+imposes on every pair drawn from $X$, forcing $|X| \le 1$, and then every $z$
+has degree at most $1$ by (i), absurd.
 
 Otherwise $G$ is $2$-connected but not $3$-connected, so it can be taken
 apart at its $2$-vertex separators.
@@ -1732,7 +1753,10 @@ constructions with $\max_{1 \le \alpha \le n-1}\ \alpha \floorfrac{(m-1)(n-\alph
 Upper bound: a hyperedge with tail $u$ serves the $r-1$ ordered pairs
 $(u, h)$, $h$ a head. If some ordered pair $(u, v)$ were served by $m$
 distinct hyperedges, those would be $m$ arc-disjoint one-step routes, so
-each ordered pair is served at most $m-1$ times and
+each ordered pair is served at most $m-1$ times. Summing that cap over all
+$n(n-1)$ ordered pairs counts every hyperedge once for each of its $r-1$
+tail-head pairs, so the sum is $(r-1)|E|$ on one side and at most
+$(m-1)n(n-1)$ on the other, giving
 $(r-1)|E| \le (m-1) n(n-1)$. Lower bound: split $V$ into tails $A$,
 $|A| = \alpha$, and heads $B$. By \Cref{lem:sparse-hypergraph} there is a
 simple $(r-1)$-uniform hypergraph $\mathcal{G}^*$ on $B$ with maximum degree
