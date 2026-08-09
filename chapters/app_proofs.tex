@@ -1200,7 +1200,7 @@ For a hypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disj
 \end{theorem}
 
 \begin{proof}
-Build the helper-point network of \Cref{fig:hyper-gadget}: for each hyperedge $e$ a helper arc $e^- \to e^+$ of capacity one, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. We match the two sides by translating in each direction.
+Build the helper-point network of \Cref{fig:hyper-gadget}: for each hyperedge $e$ a helper arc $e^- \to e^+$ of capacity one, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. The proof matches the number of disjoint Berge paths to the size of a minimum cut by translating between Berge-path language and flow language in each direction: a family of hyperedge-disjoint Berge paths becomes a family of arc-disjoint flow paths, and conversely a flow becomes a family of Berge paths, as the next two paragraphs spell out in turn.
 
 \emph{Berge paths become flow.} A Berge path $u, e_1, v_1, \dots, e_k, v$ becomes the directed walk $u \to e_1^- \to e_1^+ \to v_1 \to \cdots \to v$, crossing one helper arc per hyperedge it uses. The $e_i$ along a single Berge path are distinct, and two hyperedge-disjoint Berge paths share no hyperedge at all, so they use disjoint sets of helper arcs and translate to \emph{arc-disjoint} flow paths, paths that share no arc, each carrying one unit of flow.
 
