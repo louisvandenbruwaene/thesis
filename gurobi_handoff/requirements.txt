@@ -1,3 +1,0 @@
-numpy
-scipy
-pulp<4
