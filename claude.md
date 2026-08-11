@@ -2677,3 +2677,66 @@ This mirrors gurobi_handoff/ so a reader of the thesis and a reader of the
 folder are told the same thing.
 
 VERIFY: latexmk exit 0, 283 pp, 0 overfull, 0 undefined refs/cites.
+
+## 2026-08-11 (Sonnet) -- the directed multigraph problem CLOSED: an external
+## proof checked, verified three independent ways, and integrated in full
+
+Stijn showed the author `directed_multigraph_extremal_revised.pdf`, a ChatGPT-authored
+proof claiming L_m^dir(n) = (m-1)*max(2(n-1), floor(n^2/4)) for ALL n>=2, m>=2 (the
+directed MULTIGRAPH arc problem, arcs counted with multiplicity -- NOT the simple-digraph
+conj:dir-arc, a separate still-open problem). This is exactly the flagship result Result 3
+chased for months (attachment lemma, thm:odd-step restricted to m in {3,4}, fact (a)/(b)
+at n=7, the Gurobi handoff), so it demanded real scrutiny before touching anything.
+
+CHECKED BY HAND, line by line: the "reachability-preserving spanning subgraph" argument
+(SCC decomposition + one in-arborescence + one out-arborescence per component, contract to
+a DAG, thin to its transitive reduction, Mantel's theorem on the triangle-free result,
+discrete convexity gives the max at an endpoint) is CORRECT. No errors found anywhere.
+
+VERIFIED THREE INDEPENDENT WAYS against cases the thesis had never previously computed
+(m=4,5 at n=5,6 -- exactly the m>=5 regime where the thesis's OWN thm:odd-step has a
+documented gap): the thesis's exhaustive branch-and-bound solver (n=5 m=4 -> 24=3*8, n=5
+m=5 -> 32=4*8, n=6 m=4 -> 30=3*10, all exact), and the MILP certifier (same three cases,
+FEASIBLE/INFEASIBLE exactly at target/target+1). All three code paths agree with the hand
+proof and with each other.
+
+INTEGRATED into the thesis as thm:dir-multi-full (chapters/app_proofs.tex, new section
+"The directed multigraph problem, solved in full"), written at the same explanatory pace
+as the rest of the thesis (a new worked example + fig:skeleton-example, a 3-SCC digraph
+walked through all three construction steps) since the author found the PDF's own proof
+"way too fast to understand." SUPERSEDED AND REMOVED: lem:attachment (+ its figure),
+cor:attachment-equality, thm:odd-step, thm:even-step, rem:odd-step-roadmap,
+conj:min-degree, rem:min-degree-obstruction, prop:min-degree-m2, lem:scaling-reduction,
+prop:dir-multi-even, fig:seam-c8. KEPT: lem:saturated-attachment + rem:saturated-closure
+(linear-branch extremal-graph UNIQUENESS, genuinely separate from the value and not implied
+by the new proof, reframed as bonus "beyond the value" content) and the n=7 machine
+classification (renamed rem:n7-classification, now a standalone fact about which graphs
+attain 24 arcs, not a step in proving that 24 is the value). Also directly closes fact (a)
+(L_3^dir(7)=24) BY HAND as a 3-line corollary (cor:dir-multi-n7), no Gurobi needed.
+
+Propagated the upgrade from conjecture/conditional to THEOREM across: tab:summary (row now
+"proved, all n and m", the "cond." status marker dropped from the caption since no row
+uses it any more), ch4's directed-frontier section and open-problems list (the fact-(a)
+computation item and the fact-(a)-pseudo-Boolean-certificate item both removed as moot; the
+uniqueness-beyond-the-linear-branch item rewritten to reflect what's actually still open),
+ch2's "Generating the directed cases faster" / scaling-reduction / certification-standards
+sections (reframed as independent confirmation of a now-proved theorem, not the route to
+it), main.tex's contribution statement, and the lay summary's closing paragraph (rewritten
+in plain language, no more "one computer verdict... is the main question the thesis leaves
+open" -- there is no computer verdict needed any more). TASKS.md's flagship item, the fact
+(a) confirmation run, and the "m=4 base facts" item (which was independently chasing
+L_4^dir(7)=36 by the same seam machinery) are all marked resolved: thm:dir-multi-full gives
+every one of those numbers directly, for every m, with no size limit and no solver. Added a
+new Mantel07 bib entry (Wiskundige Opgaven, 1907), the first use of Mantel's theorem in
+this thesis.
+
+VERIFY: full sweep for dangling \Cref/\ref to every removed label across chapters/*.tex,
+main.tex, popularising_summary.tex -- zero remaining. latexmk clean rebuild (full -C purge
+first): 285 pp, 0 overfull, 0 undefined refs/cites (one transient overfull from the new
+figure's natural TikZ width exceeding \textwidth, fixed with \resizebox{\textwidth}{!}{},
+matching this file's existing convention for wide two-panel figures). Rendered the new
+theorem/lemma/construction/figure/corollary pages (pp 95-99) to PNG and inspected visually:
+clean typesetting, the two-panel skeleton figure has no overlaps, arrows correctly
+directed, cross-references resolve. gurobi_handoff/ and its .zip are now vestigial (the
+whole point was getting a promotor's Gurobi licence onto fact (a), which is now a hand
+proof) -- left in place, not deleted, flagged for the author's own call.

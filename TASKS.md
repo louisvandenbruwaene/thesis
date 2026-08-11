@@ -52,15 +52,33 @@ in claude.md and deleted here.
       evidence, not a proof. Wanted: the first digraph where kappa < lambda on
       some pair AND that slack buys extra arcs, or a proof it cannot.
 
-## OPEN PROOF TARGETS (genuine attempts; verify before anything enters the .tex)
-- [ ] **Directed-arc m=3 even case (flagship).** The min-degree-deletion engine
-      gives the quadratic bound at odd n (given the even level below); the even
-      case overshoots by +1 and hypothesis (H) that would kill it is FALSE
-      (2026-06-30, explicit infinite family; research_notes section 0). The value
-      conjecture ell_3(n)=Q(n) is unharmed. A correct odd-extremiser
-      characterisation must include both known families; the thesis's own
-      backward-arc framing may be the more robust route. Seam bases
-      ell_3(9)=25, ell_3(10)=30 still need a solver (Gurobi).
+## RESOLVED 2026-08-11: the directed MULTIGRAPH arc problem is now a closed theorem
+Stijn showed the author `directed_multigraph_extremal_revised.pdf` (a ChatGPT-produced
+proof), for the DIRECTED MULTIGRAPH problem (L_m^dir(n), arcs counted with multiplicity;
+NOT the simple-digraph conj:dir-arc below, which is a different, still-open problem).
+Checked by hand line by line (no errors found) and cross-validated three independent
+ways against the thesis's own tools at cases never previously computed (m=4,5 at n=5,6):
+the thesis's exhaustive B&B solver, the MILP certifier, and the hand proof all agree
+exactly with (m-1)*M(n). Integrated into the thesis as thm:dir-multi-full
+(chapters/app_proofs.tex): a "reachability-preserving spanning subgraph" (never more than
+M(n) arcs, built from strongly connected components + an in/out-arborescence per
+component + Mantel's theorem on the condensation) whose deletion is guaranteed to drop
+every pairwise connectivity by exactly one, so peeling off m-1 of them proves the bound
+for EVERY n and EVERY m at once, no parity split, no minimum-degree conjecture. This
+SUPERSEDES: lem:attachment, cor:attachment-equality, thm:odd-step, thm:even-step,
+rem:odd-step-roadmap, conj:min-degree, rem:min-degree-obstruction, prop:min-degree-m2,
+lem:scaling-reduction, prop:dir-multi-even (all removed from app_proofs.tex). KEPT:
+lem:saturated-attachment/rem:saturated-closure (linear-branch uniqueness, genuinely
+separate from the value and not implied by the new proof) and the n=7 machine
+classification (now rem:n7-classification, a standalone fact, not a step in the proof).
+Also closes fact (a) (L_3^dir(7)=24) BY HAND, so the items below that were chasing it by
+computation are now moot:
+
+- [x] ~~Directed-arc m=3 even case (flagship)~~ — superseded, see above. The
+      delta-split hand-proof route in research_notes/fact_a_delta_split.md and the
+      "seam bases ell_3(9)=25, ell_3(10)=30 need Gurobi" line are no longer needed:
+      thm:dir-multi-full gives L_3^dir(9)=(3-1)*20=40, L_3^dir(10)=(3-1)*25=50, etc.
+      directly, for every n, no solver.
 - [ ] **Hypergraph vertex at m=4.** lem:incidence-rank needs a 4-connectivity
       analogue of the Tutte/SPQR decomposition. STATUS 2026-07-31: no
       counterexample at m=4 across ELEVEN (n,r) pairs, both halves exhaustive
@@ -75,37 +93,27 @@ in claude.md and deleted here.
       longer run on a quiet machine or a better-pruned search.
       Command: research_notes/scripts/hyper_vertex_m4_search.py (edit the
       case list) or the same DFS with symmetry reduction added.
-- [ ] **m=4 base facts** (research_notes/m4_odd_uniqueness_closed.md closes
-      the m=4 odd-uniqueness hole for k >= 5 and the m=5 value gap): (a4)
-      L_4^dir(7) = 36 + the 36-arc extremal classification on 7 vertices; then
-      n = 8, 9, 10 seam arguments. With those, the WHOLE m=4 problem closes
-      like m=3. Gurobi or a long geng run at m=4 (16 states per pair)
-      required. DEFERRED while the machine is busy with the fact (a)
-      confirmation run below and the multi-vertex sweep above.
+- [x] ~~m=4 base facts~~ — moot. thm:dir-multi-full gives L_4^dir(7) =
+      (4-1)*M(7) = 3*12 = 36 directly (matching the target this item was
+      chasing by computation), and the n=8,9,10 seam arguments it planned are
+      unnecessary: the general theorem covers every n at m=4 (and every other
+      m) with the same three-line proof. research_notes/
+      m4_odd_uniqueness_closed.md is now historical, not a dependency.
 
 ## MACHINE TARGETS (geng installed 2026-07-02 via brew; 10-core box)
-- [ ] **Fact (a) confirmation run: RUNNING as of 2026-07-30 23:10** (relaunch
-      of the 2026-07-04 attempt, which died silently after a BrokenProcessPool
-      warning with no verdict). Uncapped n=7, target 25; EMPTY output
-      independently confirms the delta-split hand proof (below) and unlocks
-      the thesis write-up. Log: program/logs/geng_a_n7_t25_20260730.log
-      (only prints a START line until it finishes; check `ps` for the live
-      process, not just the log, before assuming it died). Budget hint: fact
-      (b) took ~7h on 10 cores WITH the degree-8 cap; this run has no cap, so
-      expect substantially longer.
-- [ ] Fact (a) by MILP stays the Gurobi route (KU Leuven academic licence over
-      eduroam; prove_integral_arc_bound(7,3,25, use_gurobi=True) INFEASIBLE).
-      CBC cannot close it (measured 2026-06-16).
-- Fact (a) already has a hand proof (delta-split route, both n=6
-  classifications done, attachment check reports NO SURVIVOR): L_3^dir(7)=24.
-  research_notes/fact_a_delta_split.md. AWAITING the machine confirmation run
-  above before anything enters the .tex.
+No fact (a) confirmation run needed any more (was: geng_a_n7_t25, an uncapped
+n=7 search for a 25-arc witness; last attempt died silently, no process
+running as of 2026-08-11 per `ps`). thm:dir-multi-full proves L_3^dir(7)=24 by
+hand, superseding both this run and the delta-split route in
+research_notes/fact_a_delta_split.md (that note is now historical). The n=7
+generation-enumeration run (fact (b), the extremal-graph CLASSIFICATION, a
+genuinely separate question from the value) already completed successfully
+and its result is in the thesis as rem:n7-classification.
 
 ## WRITE-UP QUEUE
-- [ ] If fact (a) lands (run above): upgrade conj status to THEOREM for the
-      m=3 directed multigraph problem across tab:summary, ch4 open problems,
-      rem:odd-step-roadmap, contribution statement, and the lay summary's
-      closing sentence.
+- [x] Directed multigraph arc problem upgraded from conjecture/conditional to
+      THEOREM across tab:summary, ch4 open problems, the contribution
+      statement, and the lay summary's closing sentence (2026-08-11).
 
 ## Deferred figure polish (two items left deliberately, author's call)
 - fig:cut (ch2) keeps its deliberate two-tone highlight (gray=not counted,

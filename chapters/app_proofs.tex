@@ -570,21 +570,11 @@ One might hope to cut Case 2's constant using the observation that in the conjec
 At a vertex with $d(x) = s \ge n/2$, achieving $\min(d^+(x), d^-(x)) = t$ costs $d^+(x)\,d^-(x) = t(s-t)$ at least, cheapest at $s = n/2$, giving the cost function $c(t) = t(n/2 - t)$ on $t \in [0, n/4]$. Since $c$ is concave with $c(0) = 0$, for any two vertices with values $0 < a \le b$ strictly below the cap, shifting mass from $a$ to $b$ preserves $a + b$ while lowering $c(a) + c(b)$, because $c'$ is decreasing. Repeating this exchange shows that the true maximum of $\sum_x t_x$ under a shared budget $Q$ is attained by concentrating the budget on as few vertices as the cap allows, each at $t_x = n/4$, and the rest at $t_x = 0$, exactly the qualitative picture the conjectured extremiser suggests, and it already gives $4Q/n = 4(m-1)(n-1)$ once the number of vertices at the cap is below $n$. The crude per-vertex bound loses nothing because it is tight at exactly the same point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both conditions hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the vertex profile the true optimum concentrates on, so nothing is lost there. Cutting the constant therefore needs a second, independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
 \end{remark}
 
-\section{The directed multigraph problem at large \texorpdfstring{$n$}{n}}
+\section{The directed multigraph problem, solved in full}
 
-The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ (\Cref{thm:dir-multi-small}). This section records what is known beyond, where the one-directional bipartite construction takes over. Throughout, the scaling reduction of \Cref{ch:certify} is used in the following form.
+The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section just below, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. It is natural to hope the same trick settles the multigraph case at every $m$ too, and for a long while it very nearly does: dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one, and deleting a vertex of least weighted degree from that weighting drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
-\begin{lemma}[Scaling reduction]\label{lem:scaling-reduction}
-Let $D$ be a directed multigraph with $\mu(u,v) \le m-1$ on every ordered pair and $\lec^{\max}(D) \le m-1$. Then $w := \mu/(m-1)$ takes values in $[0,1]$, satisfies $\mathrm{maxflow}(s,t;w) \le 1$ for all $s \ne t$, and $|A(D)| = (m-1)\sum_{u \ne v} w(u,v)$.
-\end{lemma}
-
-\begin{proof}
-Set $w = \mu/(m-1)$. Every multiplicity obeys $0 \le \mu(u,v) \le m-1$, so each $w(u,v)$ lies in $[0,1]$. Dividing every capacity by the constant $m-1$ divides every flow value by $m-1$, and by \Cref{thm:menger} the maximum flow under the capacities $\mu$ is $\lec_D(s,t) \le m-1$, so under $w$ it is at most $1$. For the arc count, recall that the number of arcs is the total multiplicity, $|A(D)| = \sum_{u \ne v} \mu(u,v)$, since each parallel copy is one arc. Substituting $\mu = (m-1)w$,
-\[
-   |A(D)| \;=\; \sum_{u \ne v} \mu(u,v) \;=\; \sum_{u \ne v} (m-1)\,w(u,v) \;=\; (m-1)\sum_{u \ne v} w(u,v),
-\]
-which is the claimed identity.
-\end{proof}
+This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every pair's connectivity by exactly one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
 \begin{lemma}[Arithmetic identity]\label{lem:floor-identity}
 For all $n \ge 2$, $\floorfrac{(n-1)^2}{4} + \floor{n/2} = \floorfrac{n^2}{4}$.
@@ -594,314 +584,159 @@ For all $n \ge 2$, $\floorfrac{(n-1)^2}{4} + \floor{n/2} = \floorfrac{n^2}{4}$.
 For $n = 2k$ the left side is $k(k-1) + k = k^2$, and for $n = 2k+1$ it is $k^2 + k = k(k+1)$. Both match the right side.
 \end{proof}
 
-\begin{proposition}[Bipartite upper bound for even $n \ge 8$, conditional]\label{prop:dir-multi-even}
-Let $n = 2k \ge 8$ be even. Suppose every fractional weighting $w'$ on $n-1$ vertices with values in $[0,1]$ and all pairwise maximum flows at most one has total weight at most $\floorfrac{(n-1)^2}{4}$. Then every directed multigraph $D$ on $n$ vertices with $\lec^{\max}(D) \le m-1$ satisfies $|A(D)| \le (m-1)\floorfrac{n^2}{4}$.
-\end{proposition}
-
-\begin{proof}
-By \Cref{lem:scaling-reduction} the arc count is $|A(D)| = (m-1)M$ with $M := \sum_{u \ne v} w(u,v)$, so it suffices to bound $M \le \floor{n^2/4}$ for the scaled weighting $w$, all of whose pairwise maximum flows are at most $1$.
-
-\emph{Averaging.} Give each vertex its weighted total degree $d(v) = \sum_u \bigl(w(u,v) + w(v,u)\bigr)$. Summing over all vertices counts the weight of each ordered pair exactly twice, once at its tail and once at its head, so $\sum_v d(v) = 2M$, and some vertex $v_0$ has $d(v_0) \le 2M/n$.
-
-\emph{Deletion.} The number $d(v_0)$ is exactly the total weight carried by pairs touching $v_0$, so deleting $v_0$ leaves a weighting on $n-1$ vertices of total $M - d(v_0)$. Removing a vertex cannot raise any maximum flow, so that restricted weighting still has all pairwise flows at most $1$, and the hypothesis applies to it:
+\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
+For all $n \ge 2$ and $m \ge 2$,
 \[
-   M - d(v_0) \;\le\; \floorfrac{(n-1)^2}{4} \;=\; \floorfrac{(2k-1)^2}{4} \;=\; k(k-1),
+    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
 \]
-the last step because $(2k-1)^2/4 = k^2 - k + \tfrac14$ floors to $k(k-1)$.
-
-\emph{Combining.} Since $n = 2k$ we have $d(v_0) \le 2M/n = M/k$, hence
-\[
-   M - \frac{M}{k} \;\le\; M - d(v_0) \;\le\; k(k-1),
-   \qquad\text{that is}\qquad
-   M\cdot\frac{k-1}{k} \;\le\; k(k-1).
-\]
-Dividing by $(k-1)/k > 0$ gives $M \le k^2 = \floor{n^2/4}$, and multiplying back by $m-1$ gives $|A(D)| \le (m-1)\floor{n^2/4}$.
-\end{proof}
-
-The small cases $n \in \{4, 6\}$ genuinely do not satisfy the conclusion, and must not: there $2(n-1) > \floor{n^2/4}$ and the double star beats the bipartite weighting, which is why the certified values of \Cref{thm:dir-multi-small} sit on the linear branch. For odd $n$ the same deletion gives $M \le k(k+1) + \frac{k}{2k-1}$, an overshoot of less than one that integrality no longer absorbs, because fractional weights need not have integer totals. The induction would close if some vertex always had weighted degree at most $(m-1)k$ before scaling, which is the missing minimum-degree statement.
-
-\begin{conjecture}[Minimum-degree lemma for odd $n$]\label{conj:min-degree}
-In any directed multigraph $D$ on $n = 2k+1$ vertices ($k \ge 3$) with $\lec^{\max}(D) \le m-1$ and $m \ge 3$, some vertex has total degree $d(v) \le (m-1)k$, counting arcs with multiplicity.
-\end{conjecture}
-
-At $m = 2$ the statement is a proposition rather than a conjecture, through a reduction that also settles the whole multigraph problem at $m = 2$.
-
-\begin{proposition}[Parallel-arc elimination at $m = 2$]\label{prop:parallel-arc-m2}
-A directed multigraph with $\lec^{\max} \le 1$ has no parallel arcs, since two parallel arcs are already two arc-disjoint routes. Hence it is a simple digraph.
-\end{proposition}
-
-\begin{theorem}[Directed multigraphs at $m = 2$]\label{thm:dir-multi-m2}
-For all $n \ge 2$, $L_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n) = \max\bigl(2(n-1), \floorfrac{n^2}{4}\bigr)$.
 \end{theorem}
 
-\begin{proof}
-Immediate from \Cref{prop:parallel-arc-m2} and \Cref{thm:dir-arc-m2-exact}.
-\end{proof}
+\subsection{The lower bound: thickening}
 
-\begin{proposition}[Minimum degree at $m = 2$, odd $n$]\label{prop:min-degree-m2}
-In any directed multigraph on $n = 2k+1 \ge 7$ vertices with $\lec^{\max} \le 1$, some vertex has $d(v) \le k$.
-\end{proposition}
+The lower bound is short, and it is worth isolating the one idea that makes it short: multiplying every arc's multiplicity by a fixed integer multiplies every cut's capacity, and hence every pairwise connectivity, by that same integer.
 
-\begin{proof}
-By \Cref{prop:parallel-arc-m2,thm:dir-arc-m2-exact}, $|A(D)| \le \max\bigl(2(n-1), \floor{n^2/4}\bigr) = \floor{n^2/4} = k(k+1)$, the maximum being the quadratic branch because $n \ge 7$. The average total degree is $\frac{2k(k+1)}{2k+1} < k+1$, and some integer degree is at most $k$. The hypothesis $n \ge 7$ is needed: on the linear branch the statement can fail, as the bidirected star on three vertices has minimum total degree $2 > 1$.
-\end{proof}
-
-For $m \ge 3$ the two extreme regimes of \Cref{conj:min-degree} are settled. In the \emph{purely saturated} regime, where every multiplicity is $0$ or $m-1$, the scaled weighting is the indicator of a simple digraph with $\lec^{\max} \le 1$, its degrees are integers, and the argument of \Cref{prop:min-degree-m2} applies verbatim after multiplying back by $m-1$. In the \emph{all-unsaturated} simple regime at $n = 7$, $m = 3$, the program certifies by a cut-counting infeasibility that no simple digraph satisfies all two-hop inequalities with every total degree at least $7$. The open case is the \emph{mixed} regime, where some multiplicity lies strictly between $0$ and $m-1$: there the scaled degrees are genuinely fractional, the averaging bound $\frac{2k(k+1)}{2k+1}$ lands strictly between $k$ and $k+1$, and no integrality rescues it. This is the single identified gap that separates the certified values of \Cref{thm:dir-multi-small} from the full conjecture
-\[
-L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,\max\!\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr),
-\]
-whose lower bound is unconditional: the double star realises $2(n-1)(m-1)$ and the one-directional bipartite multigraph, every arc at multiplicity $m-1$, realises $(m-1)\floor{n^2/4}$ with $\lec^{\max} = m-1$.
-
-\begin{remark}[Why the mixed regime resists, and its kinship with the back-arc gap]\label{rem:min-degree-obstruction}
-Two facts explain why the mixed regime is genuinely hard rather than merely unfinished, and both are worth recording so the conjecture is not mistaken for a routine averaging exercise.
-
-First, averaging alone cannot close it, even granted the strongest input available. Work in the scaled weighting $w = \mu/(m-1)$ of \Cref{lem:scaling-reduction}, with total weight $M = \sum_{u \ne v} w(u,v)$ and weighted total degree $d(v)$, so the conjecture asks for a vertex with $d(v) \le k$. Granting the fractional even bound that drives \Cref{prop:dir-multi-even}, the odd deletion already gives $M \le k(k+1) + \frac{k}{2k-1} = \frac{(2k+1)k^2}{2k-1}$. Since the minimum degree never exceeds the average $\frac{2M}{2k+1}$,
-\[
-   \min_v d(v) \;\le\; \frac{2M}{2k+1} \;\le\; \frac{2k^2}{2k-1} \;=\; k + \frac{k}{2k-1} \;<\; k+1.
-\]
-In the saturated and $m = 2$ regimes the degrees are integers, so this rounds down to $k$ and the conjecture follows, exactly as in \Cref{prop:min-degree-m2}. In the mixed regime $d(v)$ is genuinely fractional and the leftover $\frac{k}{2k-1}$ cannot be rounded away. The obstruction is not the particular bound chosen. To force $\min_v d(v) \le k$ by averaging one would need $M \le k^2 + \tfrac{k}{2}$, yet the one-directional bipartite weighting with $|A| = k$ and $|B| = k+1$ already carries $M = k(k+1) = k^2 + k$, so no averaging argument can finish for any $m$. Closing the gap needs a structural step that exhibits a specific low-degree vertex, which is precisely what \Cref{lem:attachment} supplies at $m = 3$ in order to \emph{bypass} the conjecture rather than prove it.
-
-Second, the conjecture is tight, and the natural way to break it fails for a reason that ties this gap to the back-arc obstruction of \Cref{conj:dir-arc}. At the bipartite extremiser the minimum degree is exactly $k$, attained on the $B$ side. The obvious attempt to raise it bolts a little backward weight onto the saturated bipartite point, sending $w(b, a_0) = \epsilon$ from every $b \in B$ to one fixed source $a_0 \in A$, which would lift each $B$-degree to $k + \epsilon$. It is infeasible for every $\epsilon > 0$. With the forward layer at full weight the backward arcs open the recirculating routes $a \to b \to a_0 \to b'$, so the flow from a source $a \ne a_0$ to a sink $b'$ rises to $1 + k\epsilon > 1$. A single backward arc laid on a saturated forward layer manufactures an extra route, the same mechanism that keeps the upper bound of \Cref{conj:dir-arc} open and the reason the bipartite extremisers are locally rigid under the searches of \Cref{ch:discover}. The minimum-degree gap and the back-arc gap are two faces of one obstruction. A systematic fractional hill-climb (\code{fractional\_search}), a search that repeatedly nudges one weight at a time and keeps a change only when the objective improves while every pairwise flow stays at most one, run with three initialisation types and eight seeds each at $n = 9$, $11$, and $13$, finds no feasible weighting with minimum weighted degree above $k$, confirming the bipartite point's rigidity for $k = 4$, $5$, and $6$. Feasibility of a fractional weighting is checked by \code{fractional\_flows\_feasible}, which calls \code{\_float\_maxflow\_value}, a textbook maximum-flow routine (Edmonds--Karp \cite{EdmondsKarp72}) run directly on the fractional capacities, since scipy's \code{csgraph} max-flow accepts only integer capacities.
-\end{remark}
-
-\begin{lemma}[Attachment lemma]\label{lem:attachment}
-Let $m \ge 2$ and let $D_0$ be the one-directional complete bipartite
-multigraph with parts $A$ and $B$, $|A| = p \ge 2$, $|B| = q \ge 2$, and
-$\mu(a, b) = m - 1$ for every $a \in A$, $b \in B$, with no other arcs.
-Let $D$ be obtained from $D_0$ by adding one new vertex $v$ together with
-any multiset of arcs incident to $v$, a multiset because parallel copies are
-allowed (multiplicities at most $m-1$). If
-$\lec^{\max}_D \le m - 1$, then $d(v) \le (m-1)\max(p, q)$.
+\begin{lemma}[Thickening]\label{lem:thickening}
+Let $D_0$ be a directed multigraph and $k \ge 1$ an integer. Write $k \cdot D_0$ for the multigraph obtained by multiplying every multiplicity $\mu(u,v)$ by $k$. Then $\lec_{k \cdot D_0}(u,v) = k \cdot \lec_{D_0}(u,v)$ for every ordered pair $u \ne v$, and $|A(k \cdot D_0)| = k\,|A(D_0)|$.
 \end{lemma}
 
-The proof is a bookkeeping argument on the arcs at $v$, and \Cref{fig:attachment}
-is its scaffold. Sort those arcs into the four classes $i_A, o_A, i_B, o_B$ of the
-figure, by direction and by which part they touch. Three combinations are
-impossible, because each completes an $m$-th arc-disjoint route between two old
-vertices on top of the $m-1$ parallel arcs they already share. An $i_A$ arc with
-an $o_B$ arc makes $a \to v \to b$. An $i_A$ arc with an $o_A$ arc to a
-\emph{different} source makes $a \to v \to a' \to b$. An $i_B$ arc with an $o_B$
-arc to a \emph{different} sink makes $a \to b \to v \to b'$. Forbidding these
-forces $v$ into one of a few rigid shapes, a pure sink touching a single source,
-a pure source touching a single sink, or a small mixed remnant, and in each shape
-a count of two-step routes through $v$ caps its degree. The three cases below are
-exactly those shapes, and the bound $(m-1)\max(p,q)$ is whichever of them is
-largest.
+\begin{proof}
+By \Cref{thm:menger}, $\lec_{D_0}(u,v)$ equals the minimum capacity, over all $u$--$v$ cuts, of the total multiplicity crossing that cut. Multiplying every multiplicity by $k$ multiplies the capacity of \emph{every} cut by $k$ at once, so it multiplies the minimum over all cuts by $k$ as well, which is precisely $\lec_{k \cdot D_0}(u,v) = k \cdot \lec_{D_0}(u,v)$. The arc count scales by $k$ because every one of its summands, each multiplicity, does.
+\end{proof}
+
+\begin{construction}[Thickened tree and thickened bipartite digraph]\label{const:dir-multi-lower}
+For $m \ge 2$, take any spanning tree $T$ of $K_n$ and give every edge multiplicity $m-1$ in each direction. Between two vertices, $T$ offers only its one tree path, so this is $m-1$ copies of the $m=2$ bidirected tree of \Cref{thm:dir-arc-m2-exact}, feasible at $\lec^{\max} = 1$ there, and \Cref{lem:thickening} with $k=m-1$ gives $\lec^{\max} = m-1$ here and an arc count of $2(n-1)(m-1)$. Alternatively, take the one-directional complete bipartite digraph of \Cref{const:bipartite} (balanced parts $A,B$ with $|A|=\floor{n/2}$, $|B|=\ceil{n/2}$, feasible at $\lec^{\max}=1$) and give every arc multiplicity $m-1$: the same lemma gives $\lec^{\max} = m-1$ and $(m-1)\floor{n^2/4}$ arcs.
+\end{construction}
+
+Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n) \ge (m-1)M(n)$ for every $n$ and $m$, which is the lower bound half of \Cref{thm:dir-multi-full}. The rest of this section proves the matching upper bound.
+
+\subsection{The upper bound: a reachability skeleton}
+
+It helps to first ask what a single vertex deletion actually buys at $m=2$: removing a vertex can only remove routes passing through it, so no pair's connectivity ever rises, and the whole $m=2$ induction rests on that one guarantee together with an averaging bound on how much one well-chosen vertex carries. The multigraph problem at a general $m$ wants the same two ingredients, a deletion that is guaranteed to lower every connectivity, paired with a bound on how much it removes, but there the natural analogue of ``one vertex'' breaks down: once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is ever guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead: one general enough to always exist, sparse enough to bound, and specific enough that removing it is guaranteed to lower every pairwise connectivity by exactly one.
+
+\begin{definition}[Reachability skeleton]\label{def:reach-skeleton}
+Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using at most one copy of each arc it uses (no parallel copies, even if $D$ has them), is a \emph{reachability skeleton} of $D$ if, for every pair of vertices $u \ne v$, $u$ reaches $v$ by some directed path in $R$ exactly when $u$ reaches $v$ by some directed path in $D$.
+\end{definition}
+
+A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular every parallel copy of every arc. It is a caricature of $D$: thin, but faithful on the one question connectivity actually depends on. The next two lemmas turn that faithfulness into the whole induction. The first says a reachability skeleton always exists and is never too big. The second says deleting it always lowers every connectivity by exactly one.
+
+\begin{lemma}[A sparse reachability skeleton always exists]\label{lem:reach-skeleton}
+Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
+\end{lemma}
+
+Building $R$ takes three steps: handle the traffic \emph{inside} each strongly connected piece of $D$, handle the traffic \emph{between} pieces, then count. A \emph{strongly connected component} (an SCC) is a maximal set of vertices any two of which reach each other, and every directed multigraph partitions uniquely into its SCCs, since mutual reachability is an equivalence relation. \Cref{fig:skeleton-example} carries one small running example through all three steps, and it is worth glancing at now, before the general argument, since every object named below appears in it concretely.
+
+\emph{Step 1: inside each component.} Fix one SCC of order $n_i \ge 1$ and pick any vertex $r$ inside it as a root. Since $r$ reaches every vertex of the component, a standard fact about digraphs gives a spanning \emph{out-arborescence}: a tree of $n_i - 1$ arcs of $D$, every one pointing away from $r$, along which $r$ alone reaches every other vertex of the component (grow it one hop at a time, always available since the component is strongly connected). Symmetrically, because every vertex of the component reaches $r$, there is a spanning \emph{in-arborescence} of $n_i - 1$ arcs, every one pointing toward $r$, along which every vertex reaches $r$. Taking both trees together, any two vertices $u, v$ of the component are joined by the route $u \to r \to v$, first the in-arborescence, then the out-arborescence, so the $2(n_i - 1)$ arcs of the two trees alone reconstruct \emph{every} reachability relation inside this one component.
+
+\emph{Step 2: between components.} Contract each SCC to a single point and, between two contracted points, keep one arc whenever $D$ has at least one arc from the first component to the second (dropping any further parallel arcs between the same two components at this stage). Call the result $Q_0$, a digraph on $q$ points, one per component. Two different SCCs can never reach each other in both directions, since that would make them one strongly connected component after all, so $Q_0$ has no directed cycle: it is a DAG (a directed acyclic graph). Reachability between two different components of $D$ is, by this very construction, exactly reachability between the two corresponding points of $Q_0$. Thin $Q_0$ down to an \emph{inclusion-minimal} spanning subdigraph $Q \subseteq Q_0$ that still has the same reachability relation, deleting one arc at a time for as long as some arc is redundant, which must stop since $Q_0$ has only finitely many arcs.
+
+The reason to thin $Q_0$ down to $Q$ is that $Q$'s \emph{underlying undirected graph}, meaning $Q$ with the arrows erased, has no triangle, and this deserves seeing directly. Suppose three points $x, y, z$ of $Q$ were pairwise joined by some arc of $Q$. Since $Q \subseteq Q_0$ and $Q_0$ has no cycle, $Q$ has none either, so between any two of $x,y,z$ the arc runs in only one direction, never both. Three points pairwise joined with a consistent direction on each pair admit only one pattern, up to relabelling: a linear order, say $x \to y$, $y \to z$, and $x \to z$. But then $x \to z$ is redundant, since $x$ already reaches $z$ via $y$, so deleting it would leave the reachability relation of $Q$ unchanged, contradicting that $Q$ is inclusion-minimal. So no three points of $Q$ can be pairwise joined at all: that is triangle-freeness of the underlying graph.
+
+A triangle-free graph on $q$ vertices has at most $\floor{q^2/4}$ edges, Mantel's theorem \cite{Mantel07}, the $r = 2$ case of the more general theorem of Tur\'an \cite{Turan41}. Applied to $Q$,
+\[
+    |A(Q)| \;\le\; \floorfrac{q^2}{4}.
+\]
+
+\emph{Step 3: assembling $R$ and counting.} Build $R$ from the two arborescences of Step 1 inside every SCC, together with one witness arc of $D$ for every arc of $Q$ (some arc of $D$ realises it, by the very definition of $Q_0$). By Step 1, every pair inside one component reaches each other in $R$ exactly as in $D$. By Step 2, and because within-component reachability is already secured, every pair in two different components reaches each other in $R$ exactly as in $D$ too: to travel from $u$ to $v$ across the components $Q$'s path visits, reach each witness arc's tail inside its own component (Step 1), cross the witness arc, and repeat. Since $R \subseteq D$ throughout, $R$ can never certify a reachability $D$ does not already have, so $R$ is a genuine reachability skeleton. Writing $n_1, \dots, n_q$ for the SCC orders, so $\sum_i n_i = n$, its arc count is
+\[
+    |A(R)| \;=\; \sum_{i=1}^{q} 2(n_i - 1) \;+\; |A(Q)| \;\le\; 2(n-q) \;+\; \floorfrac{q^2}{4} \;=:\; f(q).
+\]
+
+It remains to bound $f(q)$ over the range $1 \le q \le n$ that the number of components can actually take. Its increments are
+\[
+    f(q+1) - f(q) \;=\; -2 \;+\; \floorfrac{q+1}{2},
+\]
+using the identity $\floor{(q+1)^2/4} - \floor{q^2/4} = \floor{(q+1)/2}$, checked directly on the four residues of $q$ modulo $4$, and $\floor{(q+1)/2}$ never decreases as $q$ grows. So the increments of $f$ themselves never decrease: $f$ may fall for a while and then rise, one single valley, but it can never fall, rise, and fall again. A function shaped like one valley always attains its largest value at one of the two ends of its domain, since any interior point is flanked by a point at least as low on its falling side and a point at least as high on its rising side, so no interior point can beat both ends at once. Hence
+\[
+    f(q) \;\le\; \max\bigl(f(1),\,f(n)\bigr) \qquad \text{for } 1 \le q \le n.
+\]
+At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ every component is a single vertex, so $f(n) = 0 + \floor{n^2/4}$. Hence $f(q) \le \max\bigl(2(n-1), \floor{n^2/4}\bigr) = M(n)$ for every $q$ in range, which is the lemma.
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=1.0,
-   albl/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}]
-% Parts A (left column) and B (right column). The representatives a, b carry
-% the (m-1) bundle; a', b' sit directly below them, faint, so the reader sees
-% each part is a set. v is glued on at the bottom centre, joined only to the
-% representatives, so its four arc classes read cleanly.
-\node[apx] (a)  at (-2.7, 1.7) {};   \node[apname,left=3pt]  at (a) {$a$};
-\node[apx] (b)  at ( 2.7, 1.7) {};   \node[apname,right=3pt] at (b) {$b$};
-\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (ap) at (-2.7,0.5) {};
-\node[apx,fill=KULblauw1!8,draw=KULblauw1!40] (bp) at ( 2.7,0.5) {};
-\node[apname, text=KULblauw1!65, left=3pt]  at (ap) {$A$};
-\node[apname, text=KULblauw1!65, right=3pt] at (bp) {$B$};
-% the m-1 parallel a->b bundle (the multiplicity) along the top
-\foreach \bnd in {13,0,-13}{ \draw[aparc] (a) to[bend left=\bnd] (b); }
-\node[albl, text=KULblauw1!85] at (0,2.5) {$m-1$ copies $a\!\to\! b$};
-% the rest of the complete one-directional A -> B layer, faint
-\draw[apfaint] (a)--(bp);
-\draw[apfaint] (ap)--(b);
-\draw[apfaint] (ap) to[bend right=8] (bp);
-% the new vertex v at bottom centre
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (0,-2.0) {};
-\node[apname,below=1pt] at (v) {$v$};
-% v's four arc classes.  i_A and o_B (red) are the two legs that together make
-% the forbidden route a -> v -> b, drawn as the inner V through v.  o_A (green)
-% and i_B (purple) are the other two classes, swung wide so nothing overlaps.
-\draw[apredarc] (a) to[bend left=7] (v);
-\node[albl, text=vertexred] at (-0.95,-0.35) {$i_A$};
-\draw[apredarc] (v) to[bend left=7] (b);
-\node[albl, text=vertexred] at (0.95,-0.35) {$o_B$};
-\draw[aparc,vertexgreen!72!black,line width=1.1pt] (v) to[bend right=30] (a);
-\node[albl, text=vertexgreen!58!black] at (-2.15,-1.15) {$o_A$};
-\draw[aparc,vertexpurple,line width=1.1pt] (b) to[bend left=30] (v);
-\node[albl, text=vertexpurple] at (2.15,-1.15) {$i_B$};
-% name the forbidden route under v
-\node[albl, text=vertexred, align=center] at (0,-2.95)
-  {$a\to v\to b$ would be an $m$-th $a$--$b$ route (forbidden)};
-\end{tikzpicture}
-\caption[Attachment-lemma setup]{The attachment lemma
-(\Cref{lem:attachment}): a new vertex $v$ is glued onto $(m-1)\cdot B_{p,q}$,
-the one-directional complete bipartite multigraph in which every $a\in A$ sends
-$m-1$ parallel arcs to every $b\in B$ (the bundle along the top, faint for the
-pairs other than $a,b$). The arcs at $v$ fall into four classes by direction and
-side: $i_A$ into $v$ from $A$, $o_A$ out of $v$ to $A$, $i_B$ into $v$ from $B$,
-and $o_B$ out of $v$ to $B$. The two red legs $i_A$ and $o_B$ are drawn together
-because they are the worst case: the route $a\!\to\! v\!\to\! b$ laid on top of
-the $m-1$ existing $a\!\to\! b$ arcs is an $m$-th arc-disjoint $a$--$b$ route, so
-$\lec(a,b)\ge m$, which feasibility forbids. Ruling this out, with two siblings
-like it, caps $d(v)\le(m-1)\max(p,q)$.}
-\label{fig:attachment}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[apx/.append style={minimum size=9pt}]
+% ---- left panel: D, three bidirected SCCs A={a1,a2}, B={b1,b2}, C={c1,c2},
+% joined a2->b1, b2->c1, and the redundant direct arc a1->c2 bent well below
+% everything so it never crosses the other arcs.
+\begin{scope}
+  \node[apx] (a1) at (0,1)     {}; \node[apname,left=2pt]  at (a1) {$a_1$};
+  \node[apx] (a2) at (0,-1)    {}; \node[apname,left=2pt]  at (a2) {$a_2$};
+  \node[apx] (b1) at (2.6,1)   {}; \node[apname,above=2pt] at (b1) {$b_1$};
+  \node[apx] (b2) at (2.6,-1)  {}; \node[apname,below=2pt] at (b2) {$b_2$};
+  \node[apx] (c1) at (5.2,1)   {}; \node[apname,above=2pt] at (c1) {$c_1$};
+  \node[apx] (c2) at (5.2,-1)  {}; \node[apname,right=2pt] at (c2) {$c_2$};
+  \draw[aparc] (a1) to[bend left=14]  (a2);
+  \draw[aparc] (a2) to[bend left=14]  (a1);
+  \draw[aparc] (b1) to[bend left=14]  (b2);
+  \draw[aparc] (b2) to[bend left=14]  (b1);
+  \draw[aparc] (c1) to[bend left=14]  (c2);
+  \draw[aparc] (c2) to[bend left=14]  (c1);
+  \draw[aparc] (a2) to[bend left=8] (b1);
+  \draw[aparc] (b2) to[bend left=8] (c1);
+  \draw[apfaint] (a1) to[bend right=55] (c2);
+  \node[apname, text=black!55] at (2.6,-2.35) {redundant: $a_1$ already reaches $c_2$ via $a_2,b_1,b_2,c_1$};
+  \node[font=\small] at (2.6,2.0) {$D$};
+\end{scope}
+% ---- arrow between panels ----
+\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b] (6.6,0) -- (7.9,0);
+\node[font=\scriptsize, align=center, text=KULblauw3b] at (7.25,0.5) {drop the\\redundant arc};
+% ---- right panel: R, same six vertices, same six internal arcs, only the
+% two witness arcs a2->b1 and b2->c1 survive between components.
+\begin{scope}[xshift=9.6cm]
+  \node[apx] (ra1) at (0,1)     {}; \node[apname,left=2pt]  at (ra1) {$a_1$};
+  \node[apx] (ra2) at (0,-1)    {}; \node[apname,left=2pt]  at (ra2) {$a_2$};
+  \node[apx] (rb1) at (2.6,1)   {}; \node[apname,above=2pt] at (rb1) {$b_1$};
+  \node[apx] (rb2) at (2.6,-1)  {}; \node[apname,below=2pt] at (rb2) {$b_2$};
+  \node[apx] (rc1) at (5.2,1)   {}; \node[apname,above=2pt] at (rc1) {$c_1$};
+  \node[apx] (rc2) at (5.2,-1)  {}; \node[apname,right=2pt] at (rc2) {$c_2$};
+  \draw[aparc] (ra1) to[bend left=14]  (ra2);
+  \draw[aparc] (ra2) to[bend left=14]  (ra1);
+  \draw[aparc] (rb1) to[bend left=14]  (rb2);
+  \draw[aparc] (rb2) to[bend left=14]  (rb1);
+  \draw[aparc] (rc1) to[bend left=14]  (rc2);
+  \draw[aparc] (rc2) to[bend left=14]  (rc1);
+  \draw[aparc] (ra2) to[bend left=8] (rb1);
+  \draw[aparc] (rb2) to[bend left=8] (rc1);
+  \node[font=\small] at (2.6,2.0) {$R$};
+\end{scope}
+\end{tikzpicture}}
+\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, with all three arcs $A \to B$, $B \to C$, $A \to C$ present, exactly the transitively-closed triangle the proof rules out of the thinned $Q$: the arc $A \to C$ is redundant, since $A$ already reaches $C$ via $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$, and the underlying graph of $Q$, a path on three points, is triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the two component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
+\label{fig:skeleton-example}
 \end{figure}
 
+\begin{lemma}[Deleting a skeleton lowers every connectivity by one]\label{lem:reach-delete}
+Let $D$ be a directed multigraph with $\lec^{\max}(D) \le k$ for some $k \ge 1$, and let $R$ be a reachability skeleton of $D$. Write $D - R$ for the multigraph obtained by deleting, from each multiplicity $\mu(u,v)$, the one copy (if any) that $R$ uses on that pair. Then $\lec^{\max}(D - R) \le k - 1$.
+\end{lemma}
+
 \begin{proof}
-The strategy is to sort the arcs at the new vertex $v$ into four groups by
-their direction and which side they touch, rule out the combinations that
-would manufacture an $m$-th route between two old vertices, and then bound
-whatever survives. Write $\mathrm{i}_A = \sum_{a} \mu(a, v)$,
-$\mathrm{i}_B = \sum_{b} \mu(b, v)$,
-$\mathrm{o}_A = \sum_{a} \mu(v, a)$, $\mathrm{o}_B = \sum_{b} \mu(v, b)$ for
-the total multiplicities into $v$ from $A$, into $v$ from $B$, out of $v$ to
-$A$, and out of $v$ to $B$, so that
-$d(v) = \mathrm{i}_A + \mathrm{i}_B + \mathrm{o}_A + \mathrm{o}_B$.
-Three route patterns are forbidden outright, because each adds an $m$-th
-arc-disjoint route on top of the $m-1$ parallel arcs of a bipartite pair:
-% The cases below cite these as "Pattern (1)"--"pattern (3)", so this list
-% carries explicit numbers in place of the decorative global list icon.
-\begin{enumerate}[label=(\arabic*)]
-\item $\mu(a, v) \ge 1$ and $\mu(v, b) \ge 1$: the path $a \to v \to b$
-      together with the $m-1$ arcs $a \to b$ gives $\lec(a, b) \ge m$.
-\item $\mu(a, v) \ge 1$ and $\mu(v, a') \ge 1$ with $a' \ne a$: the path
-      $a \to v \to a' \to b$ (any $b \in B$) gives $\lec(a, b) \ge m$.
-\item $\mu(b, v) \ge 1$ and $\mu(v, b') \ge 1$ with $b' \ne b$: the path
-      $a \to b \to v \to b'$ (any $a \in A$) gives $\lec(a, b') \ge m$.
-\end{enumerate}
-Each bound below rests on one principle. The local connectivity
-$\lec(s, t)$ is at least the number of pairwise arc-disjoint $s$-to-$t$
-routes we can exhibit, because any such family of routes is an integral flow
-from $s$ to $t$. Feasibility says $\lec \le m-1$, so the moment we can name
-$m$ arc-disjoint routes between two vertices we have a contradiction.
-
-\emph{Case I: $\mathrm{i}_A \ge 1$.} Some arc enters $v$ from a vertex
-$a \in A$. Pattern (1) then forces $\mathrm{o}_B = 0$, because any arc
-$v \to b$ would complete the route $a \to v \to b$, an $m$-th route on the
-pair $(a, b)$ laid on top of its $m-1$ parallel arcs.
-
-Suppose first that $\mathrm{o}_A \ge 1$, so $v$ also sends an arc to some
-vertex of $A$. Pattern (2) makes this rigid: an arc into $v$ from $a$ and an
-arc out of $v$ to a different $a' \ne a$ would give the route
-$a \to v \to a' \to b$ for any $b$, again an $m$-th route. So every arc
-between $v$ and $A$, in either direction, must touch one single vertex
-$a^*$. Counting arc-disjoint routes from $a^*$ to $v$, there are the
-$\mu(a^*, v)$ direct arcs, and for each $b \in B$ the two-step route
-$a^* \to b \to v$, which can be run $\min(\mu(a^*, b), \mu(b, v))$ times on
-disjoint arcs. Different $b$ use different arcs, and none reuse a direct arc,
-so
-\[
-\lec(a^*, v) \;\ge\; \mu(a^*, v) + \sum_b \min(\mu(a^*, b), \mu(b, v))
- \;=\; \mu(a^*, v) + \mathrm{i}_B,
-\]
-the last equality because $\mu(a^*, b) = m-1$ is at least $\mu(b, v)$, so
-each minimum is $\mu(b, v)$ and the sum is $\mathrm{i}_B$. Feasibility caps
-the left side at $m-1$, so $\mu(a^*, v) + \mathrm{i}_B \le m-1$. Every arc at
-$v$ now touches either $a^*$ or $B$, so
-$d(v) = \mu(a^*, v) + \mathrm{i}_B + \mu(v, a^*)$, and with the first two
-summing to at most $m-1$ and the last at most $m-1$ we get
-$d(v) \le 2(m-1)$.
-
-Suppose instead $\mathrm{o}_A = 0$. With $\mathrm{o}_B = 0$ already, $v$ is
-now a pure sink. The same two-step count applies to \emph{every} $a \in A$ at
-once, giving $\lec(a, v) \ge \mu(a, v) + \mathrm{i}_B$, hence
-$\mu(a, v) \le (m-1) - \mathrm{i}_B$ for each of the $p$ vertices of $A$.
-Summing over $A$ bounds the in-flow from $A$ by
-$\mathrm{i}_A \le p(m-1) - p\,\mathrm{i}_B$, so
-\[
-d(v) = \mathrm{i}_A + \mathrm{i}_B \le p(m-1) - (p-1)\,\mathrm{i}_B \le p(m-1),
-\]
-the final step because $(p-1)\,\mathrm{i}_B \ge 0$.
-
-\emph{Case II: $\mathrm{i}_A = 0$ and $\mathrm{o}_B \ge 1$.} This is Case I
-read backwards. Reversing every arc turns $(m-1) \cdot B_{p,q}$ into
-$(m-1) \cdot B_{q,p}$, swaps in-arcs with out-arcs, and sends pattern (2) to
-pattern (3), so the same argument applies with the roles of $A$ and $B$
-exchanged. It yields either $d(v) \le 2(m-1)$, or $v$ is a pure source for
-which $\lec(v, b) \ge \mu(v, b) + \mathrm{o}_A \le m-1$ holds for every $b$,
-and summing over the $q$ vertices of $B$ gives
-$d(v) \le q(m-1) - (q-1)\,\mathrm{o}_A \le q(m-1)$.
-
-\emph{Case III: $\mathrm{i}_A = \mathrm{o}_B = 0$.} Now $v$ receives nothing
-from $A$ and sends nothing to $B$, so its only arcs are the $\mathrm{i}_B$
-in-arcs from $B$ and the $\mathrm{o}_A$ out-arcs to $A$. For any $a \in A$
-the two-step routes $a \to b \to v$ over all $b$ give
-$\lec(a, v) \ge \mathrm{i}_B$, so $\mathrm{i}_B \le m-1$, and for any
-$b \in B$ the routes $v \to a \to b$ over all $a$ give
-$\lec(v, b) \ge \mathrm{o}_A$, so $\mathrm{o}_A \le m-1$. Hence
-$d(v) = \mathrm{i}_B + \mathrm{o}_A \le 2(m-1)$.
-
-Every case bounds $d(v)$ by either $2(m-1)$ or $\max(p, q)(m-1)$. Since
-$p, q \ge 2$ we have $2(m-1) \le (m-1)\max(p, q)$, so in all cases
-$d(v) \le (m-1)\max(p, q)$.
+Fix an ordered pair $u \ne v$ and suppose $D - R$ carries $t \ge 1$ pairwise arc-disjoint $u$--$v$ paths. These use arcs of $D - R$ and hence of $D$, since $D - R \subseteq D$, so $u$ reaches $v$ in $D$. Because $R$ is a reachability skeleton, $u$ then also reaches $v$ in $R$: some directed path $P$ from $u$ to $v$ uses only arcs of $R$. Every arc of $R$ has been subtracted out of $D - R$, so $P$ shares no arc with any of the $t$ paths already found inside $D - R$. Together, $P$ and those $t$ paths are $t+1$ pairwise arc-disjoint $u$--$v$ paths in $D$, so $t + 1 \le \lec_D(u,v) \le k$, that is, $t \le k-1$. Pairs with $t=0$ trivially satisfy $t \le k-1$ once $k \ge 1$, so this holds for every pair, giving $\lec^{\max}(D-R) \le k-1$.
 \end{proof}
 
-\begin{corollary}[Attachment equality]\label{cor:attachment-equality}
-In the setting of \Cref{lem:attachment} with $\max(p, q) \ge 3$, suppose
-$d(v) = (m-1)\max(p, q)$. If $q > p$, then $v$ is a pure source with
-$\mu(v, b) = m - 1$ for every $b \in B$, so $D = (m-1) \cdot B_{p+1, q}$
-with $v$ joining the source side. If $p > q$, then $v$ is symmetrically a pure sink at
-full multiplicity, and if $p = q$, it is one of the two.
+\begin{proof}[Proof of \Cref{thm:dir-multi-full}]
+The lower bound is \Cref{const:dir-multi-lower}. For the upper bound, fix $n$ and prove by induction on $k = m-1 \ge 0$ that every directed multigraph $D$ on $n$ vertices with $\lec^{\max}(D) \le k$ has $|A(D)| \le k\,M(n)$. At $k=0$, every pair has $\lec_D(u,v) \le 0$, so no arc $(u,v)$ can even be present, since a single arc is already one route, and $|A(D)| = 0 = 0 \cdot M(n)$.
+
+For $k \ge 1$, take $D$ with $\lec^{\max}(D) \le k$ and let $R$ be a reachability skeleton, which exists with $|A(R)| \le M(n)$ by \Cref{lem:reach-skeleton}. By \Cref{lem:reach-delete}, $D - R$ has $\lec^{\max}(D-R) \le k-1$, and it is again a directed multigraph on the same $n$ vertices, so the induction hypothesis gives $|A(D-R)| \le (k-1)M(n)$. Since $R$ uses at most one copy of each arc it touches, the arcs of $D$ split exactly into those of $R$ and those left in $D-R$, so
+\[
+    |A(D)| \;=\; |A(R)| \;+\; |A(D-R)| \;\le\; M(n) \;+\; (k-1)M(n) \;=\; k\,M(n).
+\]
+Taking $k = m-1$ gives $L_m^{\mathrm{dir}}(n) \le (m-1)M(n)$, matching the lower bound.
+\end{proof}
+
+Nothing above depended on $m$ or on the parity of $n$: the same three-step construction of $R$ and the same one-line deletion bound run identically at every level. In particular, the induction closes exactly the finite computation the rest of this appendix once needed help to settle.
+
+\begin{corollary}\label{cor:dir-multi-n7}
+$L_3^{\mathrm{dir}}(7) = 24$.
 \end{corollary}
 
 \begin{proof}
-Rerun the cases of \Cref{lem:attachment}. The mixed cases cap $d(v)$ at
-$2(m-1) < (m-1)\max(p,q)$. The pure-sink case gives
-$d(v) \le p(m-1) - (p-1)\mathrm{i}_B$, which reaches $(m-1)\max(p,q)$ only
-when $p \ge q$, $\mathrm{i}_B = 0$ and every $\mu(a, v) = m-1$. The
-pure-source case symmetrically forces $\mathrm{o}_A = 0$ and every
-$\mu(v, b) = m-1$ when $q \ge p$. Feasibility of the resulting digraph is
-the bipartite construction itself.
+$M(7) = \max(12,12) = 12$, so \Cref{thm:dir-multi-full} at $m=3$, $n=7$ gives $L_3^{\mathrm{dir}}(7) = 2 \cdot 12 = 24$. Concretely, the induction peels two reachability skeletons off any $7$-vertex witness in turn, each of at most $M(7) = 12$ arcs by \Cref{lem:reach-skeleton}, first lowering $\lec^{\max}$ from $2$ to $1$ and then from $1$ to $0$: $24 = 12 + 12$ spends the whole budget twice over, with nothing left for a third pass. This is a proof by hand of the one statement Chapters~\ref{ch:certify} and~\ref{ch:synthesis} once recorded as an outstanding computation, resting on the mixed-integer program \code{prove\_integral\_arc\_bound(7, 3, 25)} reaching its time limit on the bundled CBC solver. Given more time, or the stronger Gurobi solver, the same program now confirms the proof directly: the call returns \code{INFEASIBLE} rather than timing out, agreeing with the argument above.
 \end{proof}
 
-\begin{theorem}[Conditional odd step, $m \in \{3,4\}$]\label{thm:odd-step}
-Fix $k \ge 4$ and $m \in \{3, 4\}$, and assume
-(i) $L_m^{\mathrm{dir}}(2k) = (m-1)k^2$, and
-(ii) every directed multigraph attaining it is the one-directional complete
-bipartite multigraph $(m-1) \cdot B_{k,k}$.
-Then $L_m^{\mathrm{dir}}(2k+1) = (m-1)k(k+1)$.
-\end{theorem}
+\begin{corollary}[The $m=2$ case collapses to the simple digraph]\label{thm:dir-multi-m2}
+At $m=2$ (so $k=1$), \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, matching \Cref{thm:dir-arc-m2-exact} exactly, and this is not a coincidence. A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints, so at $m=2$ the multigraph problem and the simple digraph problem are literally the same problem. \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case, rather than needing it as a separate input.
+\end{corollary}
 
-\begin{proof}
-The lower bound is $(m-1) \cdot B_{k, k+1}$. The upper bound is a counting
-squeeze. If the arc count were even one over the target, then deleting any
-single vertex would still leave a feasible multigraph on $2k$ vertices,
-which by (i) cannot exceed $(m-1)k^2$, so every vertex would have to carry a
-large degree. Yet the average degree is only barely above that floor, so
-some vertex must sit exactly on it, and deleting that one lands precisely on
-the even extremiser $(m-1)\cdot B_{k,k}$ of (ii). The attachment lemma then
-caps how much that vertex could have carried, below what the surplus
-requires, and the contradiction forces the surplus to vanish. We now make
-this precise.
-
-For the upper bound let $D$ on
-$n = 2k+1$ vertices have $\lec^{\max} \le m-1$ and
-$|A(D)| = (m-1)k(k+1) + j$ with $j \ge 1$. Deleting any vertex $v$ leaves a
-feasible multigraph on $2k$ vertices, so by (i)
-$d(v) \ge |A(D)| - (m-1)k^2 = (m-1)k + j$ for \emph{every} $v$. The average
-degree is
-\[
-\frac{2|A(D)|}{2k+1} \;=\; (m-1)k + j + \frac{(m-1)k - (2k-1)j}{2k+1},
-\]
-by direct computation. If $(m-1)k - (2k-1)j < 0$ the average lies below the
-minimum, a contradiction, because an average can never fall below the least
-of the values it averages, and every $d(v)$ was just shown to be at least
-$(m-1)k + j$. Otherwise the correction term is nonnegative and,
-because $m \le 4$ and $j \ge 1$, strictly below one:
-$(m-1)k - (2k-1)j \le (m-3)k + 1 \le k + 1 < 2k + 1$. The average therefore
-lies in $[(m-1)k + j,\ (m-1)k + j + 1)$ while every degree is at least
-$(m-1)k + j$, so some vertex $v$ has $d(v) = (m-1)k + j$ exactly: were every
-degree at least $(m-1)k + j + 1$ instead, the average would itself be at
-least $(m-1)k + j + 1$, outside the range just established, so at least one
-vertex must sit exactly on the floor. That vertex's deletion,
-$D - v$, has exactly $(m-1)k^2$ arcs. By (ii), $D - v = (m-1) \cdot B_{k,k}$, and
-\Cref{lem:attachment} caps $d(v) \le (m-1)k < (m-1)k + j$, the final
-contradiction. Hence $j \le 0$.
-\end{proof}
-
-The attachment lemma bounds the degree of a vertex glued onto the
-\emph{bipartite} extremiser. The linear branch has an exact analogue, worth
-stating once for the whole family it governs. Call a directed multigraph
-\emph{everywhere-saturated} at level $m$ when every ordered pair of distinct
-vertices has local connectivity exactly $m-1$. The doubled bidirected
-spanning trees at multiplicity $m-1$, the extremisers of the linear branch,
-are exactly such graphs: the $m-1$ routes between two vertices run along the
-doubled tree path, and cutting one doubled edge of that path is a cut of
-$m-1$ arcs.
+\Cref{thm:dir-multi-full} settles the value at every $n$ and $m$, but a value is not a full description of the extremal digraphs, and on the linear branch a companion fact about \emph{which} multigraphs attain it is worth recording, because it comes almost for free and it is genuinely more than the value alone gives. Call a directed multigraph \emph{everywhere-saturated} at level $m$ when every ordered pair of distinct vertices has local connectivity exactly $m-1$. The doubled bidirected spanning trees at multiplicity $m-1$, the extremisers of the linear branch, are exactly such graphs: the $m-1$ routes between two vertices run along the doubled tree path, and cutting one doubled edge of that path is a cut of $m-1$ arcs.
 
 \begin{lemma}[Saturated attachment]\label{lem:saturated-attachment}
 Let $m \ge 2$ and let $D_0$ be a directed multigraph on at least two vertices
@@ -964,225 +799,9 @@ degree-$4$ patterns are precisely the single-partner attachments at full
 multiplicity, one per choice of partner.
 \end{remark}
 
-The odd step runs even level to odd level. Closing the induction also needs
-the reverse direction, and that direction turns out to need less: no
-uniqueness one level down, only the value, and no restriction on $m$.
-
-\begin{theorem}[The even step, unconditional]\label{thm:even-step}
-Fix $k \ge 2$ and $m \ge 2$, and suppose
-$L_m^{\mathrm{dir}}(2k-1) = (m-1)(k-1)k$.
-Then $L_m^{\mathrm{dir}}(2k) = (m-1)k^2$, and every directed multigraph
-attaining it is $(m-1)k$-regular in total degree, with $D - v$ attaining
-the odd value $(m-1)(k-1)k$ for \emph{every} vertex $v$.
-\end{theorem}
-
-\begin{proof}
-The lower bound is $(m-1) \cdot B_{k,k}$, which attains $(m-1)k^2$ arcs. For
-the upper bound let $D$ be any feasible directed multigraph on $n = 2k$
-vertices, $\lec^{\max}_D \le m-1$, with $|A(D)| = (m-1)k^2 + j$ for some
-integer $j$. By \Cref{lem:subdigraph-monotone}, deleting any vertex $v$
-leaves a feasible multigraph on $2k-1$ vertices, so
-$|A(D-v)| \le L_m^{\mathrm{dir}}(2k-1) = (m-1)(k-1)k$, giving
-\[
-d(v) \;=\; |A(D)| - |A(D-v)| \;\ge\; (m-1)k^2 + j - (m-1)(k-1)k
-\;=\; (m-1)k + j
-\]
-for every vertex $v$. Summing over all $2k$ vertices,
-\[
-2\bigl[(m-1)k^2 + j\bigr] \;=\; \sum_v d(v) \;\ge\; 2k\bigl[(m-1)k + j\bigr]
-\;=\; 2(m-1)k^2 + 2kj,
-\]
-which rearranges to $j(k-1) \le 0$. Since $k \ge 2$, this forces $j \le 0$:
-no feasible digraph on $2k$ vertices exceeds $(m-1)k^2$ arcs, so
-$L_m^{\mathrm{dir}}(2k) = (m-1)k^2$ exactly.
-
-Now let $D$ attain this value, so $j = 0$. The degree bound above reads
-$d(v) \ge (m-1)k$ for every $v$, while $\sum_v d(v) = 2(m-1)k^2$ is exactly
-$2k$ copies of that same floor. A sum of $2k$ terms, each at least
-$(m-1)k$, totalling exactly $2k \cdot (m-1)k$, forces every term to equal
-$(m-1)k$: $D$ is $(m-1)k$-regular. Deleting any $v$ then leaves exactly
-$(m-1)k^2 - (m-1)k = (m-1)(k-1)k$ arcs, the odd value one level down, for
-every $v$.
-\end{proof}
-
-\begin{remark}[The $m = 3$ chain, sharpened]\label{rem:odd-step-roadmap}
-\Cref{thm:odd-step} and \Cref{thm:even-step} together remove
-\Cref{conj:min-degree} from the critical path: the odd case no longer
-needs a minimum-degree statement, only the extremal \emph{characterisation}
-one level down, and for $m = 3$ that characterisation propagates along the
-same induction in both parities.
-
-\emph{Odd levels} ($n = 2k+1 \ge 9$): an extremiser has $|A| = 2k(k+1)$
-arcs and every degree at least $2k$ (deletion bound). All degrees
-$\ge 2k+1$ is impossible since $(2k+1)^2 > 4k(k+1) = \sum_v d(v)$, so some
-$d(v) = 2k$ exactly, $D - v$ is the even extremiser $2 \cdot B_{k,k}$, and
-\Cref{cor:attachment-equality} (the $p = q$ case) forces $v$ to rejoin as a
-full-multiplicity pure source or sink: $D = 2 \cdot B_{k+1,k}$ or
-$2 \cdot B_{k,k+1}$.
-
-\emph{Even levels} ($n = 2k \ge 10$): \Cref{thm:even-step}, fed the odd
-value one level down, gives $2k$-regularity, every vertex at degree exactly
-$2k$, and $D - v$ extremal at $2k-1$ for \emph{every} $v$. Odd uniqueness
-one level down leaves $2 \cdot B_{k,k-1}$ or $2 \cdot B_{k-1,k}$, and
-\Cref{cor:attachment-equality} with $d(v) = 2k = 2\max(k-1, k)$ (the
-$q > p$ case for $2 \cdot B_{k-1,k}$, its $p > q$ mirror for
-$2 \cdot B_{k,k-1}$) rebuilds exactly $2 \cdot B_{k,k}$ either way.
-
-\emph{The seam at $n = 8$}: the same regularity argument runs from $n = 7$,
-where the branches tie at $24$ arcs and several extremisers coexist. On the
-linear branch the extremisers are richer than the double star alone. Every
-\emph{bidirected spanning tree at full multiplicity} $m-1$ is feasible with
-$2(n-1)(m-1)$ arcs: deleting a tree edge splits the vertices in two, the
-only arcs from one side to the other are that edge's own $m-1$ copies, and
-the $m-1$ routes along the tree path meet that cut, so every local
-connectivity is exactly $m-1$ and the doubled trees are everywhere-saturated
-in the sense of \Cref{lem:saturated-attachment}. Exhaustive enumeration confirms that at $m = 3$ these doubled trees are the
-\emph{only} extremisers for $n = 4, 5, 6$ alike, with $2$, $3$, and $6$
-classes matching the tree shapes exactly: the in-house enumerator
-(\code{enumerate\_extremal\_directed\_multigraphs}) settles $n \le 5$, and
-the sound generation enumerator has now completed the uncapped $n = 6$
-classification as well. A deleted vertex of the
-$8$-regular $D$ leaves a $24$-arc extremiser with maximum degree at most
-$8$: among doubled trees only the doubled path qualifies (tree degree
-$\le 2$), the double star (hub degree $24$) being excluded. The doubled path
-$P_7$ is everywhere-saturated, so \Cref{lem:saturated-attachment} caps any
-feasible attachment to it at $d(v) \le 2(m-1) = 4$, while $8$-regularity
-demands $d(v) = 8$. \Cref{fig:seam-c8} draws what a degree-$8$ attachment
-would have to be, weight $4$ on each path end, closing the path into the
-doubled bidirected cycle $C_8$ with $\lec = 4 > 2$: the collapse the lemma
-rules out wholesale.
-So every deletion is bipartite-type, the attachment equality applies, and
-$D = 2 \cdot B_{4,4}$ again.
-
-The whole $m = 3$ problem therefore rests on
-two finite integral statements about multigraphs with multiplicities in
-$\{0,1,2\}$:
-\begin{itemize}
-    \item[(a)] $L_3^{\mathrm{dir}}(7) = 24$, which $M^{*}(7) = 12$ would imply but which is not implied by it in reverse, so it is posed to the integral program directly, and
-    \item[(b)] every $24$-arc feasible multigraph on $7$ vertices with maximum
-    degree at most $8$ is $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, or the doubled
-    bidirected path $P_7$.
-\end{itemize}
-Both targets sit at sizes the certifier and the enumerator can
-realistically reach. Fact~(a) is the single feasibility query
-\code{prove\_integral\_arc\_bound(7, 3, 25)}: the cut-counting model of
-\Cref{ch:certify} with the weights read as integer multiplicities and the
-maximisation replaced by the fixed arc total $25$, so that an INFEASIBLE
-verdict is a proof that no $25$-arc feasible multigraph on seven vertices
-exists. The model is run with two extra families of rows
-(\code{use\_deletion\_cuts}), and each is a valid inequality, satisfied by
-every feasible weighting, so adding them speeds the solver without ever
-excluding a witness. The deletion bounds say that restricting a feasible
-weighting to any five or six of the seven vertices leaves a feasible
-weighting, whose total is therefore capped by the certified $M^{*}(5)$ or
-$M^{*}(6)$. The degree-pair inequality
-$d^{+}(s) + d^{-}(t) - w(s,t) \le n-1$ holds for every ordered pair because
-the direct arc and the two-step detours are arc-disjoint routes, so
-$\mathrm{maxflow}(s,t) \ge w(s,t) + \sum_x \min\bigl(w(s,x), w(x,t)\bigr)
-\ge d^{+}(s) + d^{-}(t) - w(s,t) - (n-2)$, the last step using
-$\min(a,b) \ge a + b - 1$ for weights in $[0,1]$, and feasibility caps the
-left side at one. Fact~(b) is the
-run \code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3,
-24, max\_degree=8)} on the generation enumerator of \Cref{ch:certify}, which
-prunes with proved bounds only and is therefore a sound complete search at
-$n = 7$, where the in-house depth-first twin is not. That run has now
-completed, in about seven hours across ten processor cores, and it returns
-exactly three isomorphism classes: $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, and
-the doubled bidirected path $P_7$, each re-verified by the exact checker.
-\emph{Fact~(b) is therefore settled by machine}, and the whole $m = 3$
-directed multigraph problem now rests on fact~(a) alone. The $n = 6$
-companion run (target $20$, maximum degree $8$) completed the same way and
-returns exactly one class, the doubled bidirected path $P_6$, the pattern
-the seam argument uses one level up. The uncapped $n = 6$ classification
-also pays directly into fact~(a): a hypothetical $25$-arc feasible
-multigraph on $7$ vertices has every degree at least $5$ by the deletion
-bound against $L_3^{\mathrm{dir}}(6) = 20$, and a vertex of degree exactly
-$5$ would delete to a $20$-arc extremiser on six vertices, a doubled tree,
-to which \Cref{lem:saturated-attachment} forbids any attachment of more
-than $4$ arcs. Any witness against fact~(a) therefore has minimum total
-degree at least $6$.
-
-Fact~(a) is stated so that a reader can settle it independently, and the
-practical route is the mixed-integer program rather than the enumeration. The
-call is \code{prove\_integral\_arc\_bound(7, 3, 25)}, which asks whether any
-directed multigraph on seven vertices with $\lec^{\max} \le 2$ carries $25$
-arcs, so an \code{INFEASIBLE} verdict is exactly fact~(a). The free CBC solver
-bundled with \code{pulp} does not close it, and neither does the uncapped
-generation enumerator within any budget tried here, but the same model handed
-to Gurobi is a different proposition: the identical call with
-\code{use\_gurobi=True} runs the model on a solver strong enough for this class
-of problem, and Gurobi is freely licensed for academic use. That switch is the
-whole change required, since \code{\_pick\_solver} routes the same
-\code{pulp} model to whichever backend is available. The verdict is a proof
-either way, because the cut formulation is exact rather than a relaxation.
-
-For $m \ge 4$ one hole remains: at an odd extremal level the counting no longer
-forces a vertex of degree $(m-1)k$ (all degrees $\ge (m-1)k + 1$ is
-arithmetically consistent once $k(m-3) \ge 1$), so the uniqueness statement
-does not yet propagate through odd levels, although the \emph{value} at odd
-levels follows from even uniqueness whenever that is available. For
-$m \ge 5$ the same escape climbs one level: a hypothetical extremiser
-carrying $j \ge 1$ surplus arcs could have \emph{every} degree strictly
-above the deletion bound (all degrees $\ge (m-1)k + j + 1$ is consistent
-exactly when $(2k-1)j \le (m-1)k - 2k - 1$, which admits $j = 1$ once
-$m \ge 5$), so no vertex deletion is forced to land on an extremal
-multigraph and even the \emph{value} step stalls. This is why
-\Cref{thm:odd-step} is stated for $m \in \{3, 4\}$.
+\begin{remark}[Which multigraphs attain $24$ arcs at $n=7$]\label{rem:n7-classification}
+\Cref{lem:saturated-attachment} identifies the whole extremal family of the linear branch, but \Cref{cor:dir-multi-n7}'s value alone does not say which digraphs attain $24$ arcs at $n=7$, $m=3$, the size where the linear and quadratic branches of $M(n)$ tie ($M(7)=\max(12,12)=12$). That finer question was settled separately, by machine, before the value itself had a proof by hand: the sound generation enumerator of \Cref{ch:certify} (\code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24, max\_degree=8)}, which prunes only with proved bounds and is therefore complete at every $n$) ran for about seven hours across ten processor cores and returned exactly three isomorphism classes: the two bipartite shapes $2 \cdot B_{3,4}$ and $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$, the one non-star tree whose maximum degree ($2$) is compatible with an $8$-regular graph one vertex up. Each of the three was re-verified by the exact checker. This is a genuine complement to \Cref{cor:dir-multi-n7}, not a step on the way to it: the reachability-skeleton induction proves the value $24$ without ever needing to know which graphs attain it, and this classification answers the separate question of which ones do, at this one size.
 \end{remark}
-
-\begin{figure}[htbp]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[apx/.append style={minimum size=10pt},
-   bd/.style={aparc, line width=1.0pt}]
-% ---- left: doubled bidirected path P_7, v forced onto the two ends ----
-% Both panels are centred on y = 0 so they sit at the same height.
-\begin{scope}
-  \foreach \i in {1,...,7}{ \node[apx] (p\i) at (1.0*\i,-0.9) {}; }
-  \node[apname,below=3pt] at (p1) {$1$};
-  \node[apname,below=3pt] at (p7) {$7$};
-  \foreach \i in {1,...,6}{
-    \pgfmathtruncatemacro{\j}{\i+1}
-    \draw[bd] (p\i) to[bend left=20] (p\j);
-    \draw[bd] (p\j) to[bend left=20] (p\i);
-  }
-  % new vertex v, attached with full multiplicity (bidirected) to ends 1 and 7
-  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] (v) at (4.0,1.7) {};
-  \node[apname,above=3pt] at (v) {$v$};
-  \draw[apredarc] (p1) to[bend right=9] (v);
-  \draw[apredarc] (v) to[bend right=9] (p1);
-  \draw[apredarc] (p7) to[bend left=9] (v);
-  \draw[apredarc] (v) to[bend left=9] (p7);
-  \node[font=\small] at (4.0,-2.0) {doubled bidirected path $P_7$};
-\end{scope}
-% ---- arrow at the shared centre height ----
-\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b] (8.1,0.0) -- (9.4,0.0);
-% ---- right: the closed doubled bidirected C_8 (infeasible) ----
-\begin{scope}[xshift=11.7cm]
-  \foreach \i in {0,...,7}{ \node[apx] (c\i) at ({45*\i+90}:1.5) {}; }
-  \node[apx,fill=vertexorange,draw=vertexorange,minimum size=11pt] at ({90}:1.5) {};
-  \foreach \i in {0,...,7}{
-    \pgfmathtruncatemacro{\j}{mod(\i+1,8)}
-    \draw[bd] (c\i) to[bend left=12] (c\j);
-    \draw[bd] (c\j) to[bend left=12] (c\i);
-  }
-  \node[font=\small] at (0,-2.0) {doubled bidirected $C_8$};
-  \node[apname, text=vertexred, fill=white, inner sep=1.5pt] at (0,0) {$\lec=4>2$};
-\end{scope}
-\end{tikzpicture}}
-\caption[The $n=8$ seam]{The seam argument of
-\Cref{rem:odd-step-roadmap}. A degree count forces a deleted vertex of the
-$8$-regular extremiser $D$ to leave the doubled bidirected path $P_7$ (left,
-each path edge a pair of opposing arcs). To reach degree $8$ the new vertex
-$v$ must attach with full multiplicity to the two \emph{ends} $1$ and $7$
-(red), bidirected. That closes the path into the doubled bidirected cycle
-$C_8$ (right), which is \emph{infeasible}: the two directions around the
-cycle give two arc-disjoint routes each way, so $\lec=4>2$ between any pair.
-The contradiction rules out the path branch, forcing every deletion to be
-bipartite-type and hence $D=2\cdot B_{4,4}$.}
-\label{fig:seam-c8}
-\end{figure}
-
 
 \section{The hypergraph bounds}
 
