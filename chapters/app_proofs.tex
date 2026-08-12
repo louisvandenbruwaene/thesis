@@ -1679,8 +1679,11 @@ The lower bound is \Cref{prop:dir-hyper-first}, whose bipartite family has
     \max_{\alpha} \ \alpha \floorfrac{(m-1)(n-\alpha)}{r-1}
     \;=\; \frac{(m-1)n^2}{4(r-1)} - O_{m,r}(n)
 \]
-hyperedges, the maximum taken at $\alpha = \floor{n/2}$, and which is feasible for both
-separations at once, since it is $\lec$-feasible and $\kap \le \lec$. Upper and
+hyperedges, where the balanced split $\alpha = \floor{n/2}$ already attains the
+right-hand side on its own, and which is feasible for both separations at once,
+since it is $\lec$-feasible and $\kap \le \lec$. (The integer maximum is
+occasionally taken a little off balance, since the floor can favour an
+unbalanced split by a unit or two, but never by enough to move the $n^2$ term.) Upper and
 lower bound agree in their $n^2$ term, which is the asymptotic claim.
 \end{proof}
 
