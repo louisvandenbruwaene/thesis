@@ -2886,3 +2886,37 @@ two_step_budget_check.py passes, latexmk exit 0, 290 pp, 0 overfull, 0 undefined
 refs/cites, all three slide decks rebuild. Numeric spot-checks by hand: the clique-bouquet
 counts (27, 25, 150 vs 120), every cell of the theta/tree/complete comparison in
 tab:multi-vertex, and the m=4 first-divergence at n=12 for conj:dir-arc.
+
+## 2026-08-12 (Opus, final) -- the closed-form sweep, run to completion for the first time
+
+audit_closed_forms.py had never finished: at BUDGET=90.0 it exhausted a 50-minute wall
+clock, and the only previous attempt (2026-07-31) crashed partway on the missing-pulp
+bug. Reran at BUDGET=6.0 under the venv with PYTHONPATH set (the script derives its
+import path from __file__, so a copy elsewhere cannot find the program).
+
+FIRST RUN: 99 cells, 2 mismatches IN RANGE, which is the column that must be empty:
+prop:hyper-edge at n=3 m=3 r=3 and n=4 m=3 r=4, formula 2 against true 1 in both.
+
+DIAGNOSIS: the script's fault, not the thesis's. solve() in hypergraph mode enumerates
+SIMPLE hypergraphs (_brute_force_hypergraph walks each candidate hyperedge present or
+absent, never repeated), while prop:hyper-edge states that a simple hypergraph attains
+the floor only when m-1 <= C(n-2,r-2) and otherwise a MULTIhypergraph does. At both
+cells that condition fails by exactly one (m-1=2 against C=1), and two parallel copies
+of the single r-set attain the formula with lambda=2=m-1. thm:hyper-vertex-m3 carries
+the same attainment caveat and is equally precise. The vertex rows were unaffected
+because hyper_vertex_feasible_exists uses combinations_with_replacement, so it DOES
+allow repeats; that asymmetry between two routines of the same program is the whole
+explanation for why only the edge row lit up.
+
+FIXED IN THE SCRIPT (not the thesis): those cells are now gated in-range on
+m-1 <= C(n-2,r-2), the trap is written into the docstring so the next run does not
+re-raise it, and the directed-multigraph block was repointed from the superseded
+thm:dir-multi-small to thm:dir-multi-full (verified the two formulas agree on every
+cell exhaustion reaches, since the branches tie at n=7 and the quadratic one leads only
+from n=8).
+
+SECOND RUN, CLEAN: 99 cells, 0 mismatches in range, 12 out of range. All twelve are the
+intended output, the evidence that the n >= m hypotheses on thm:mader, thm:leonard and
+conj:dir-arc and the simple-attainment condition on prop:hyper-edge are load-bearing
+rather than decorative. Elapsed 1284s. Every closed form the thesis states now agrees
+with exhaustive computation at every size within reach.
