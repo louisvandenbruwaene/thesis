@@ -2920,3 +2920,48 @@ intended output, the evidence that the n >= m hypotheses on thm:mader, thm:leona
 conj:dir-arc and the simple-attainment condition on prop:hyper-edge are load-bearing
 rather than decorative. Elapsed 1284s. Every closed form the thesis states now agrees
 with exhaustive computation at every size within reach.
+
+## 2026-08-12 (Opus) -- full proof-check of the appendix, at the author's request
+
+Author lifted the standing "do not re-verify the author-verified pages" rule and asked
+for the appendix proofs to be checked. Re-derived every original argument independently
+rather than reading along. **NO MATHEMATICAL ERRORS FOUND.** What was actually
+recomputed, section by section:
+
+- A.2 Mader in full: lem:dist-1-count, lem:sum-dist, the Gomory-Hu double count
+  (an edge crosses exactly the tree cuts on its endpoints' tree path), the upper bound
+  2|E| <= m(n-1), both lower-bound constructions incl. the identity
+  (n-1) + floor((m-2)(n-1)/2) = floor(m(n-1)/2), lem:near-regular's circulant plus
+  near-perfect matching (checked the matching distance (N+1)/2 cannot collide with the
+  circulant distances 1..(r-1)/2, which needs exactly r <= N-1), and thm:extremal-char's
+  slack identity 2|E| = m(n-1) - (S1+S2+S3) re-derived line by line.
+- A.3 directed arc m=2: lem:two-hop-arc, thm:directed-upper's arc split
+  (n-1)+(n-1)+(m-2)(n-1) = m(n-1), and both parities of the induction. The odd case's
+  remainder is exactly right: (2k+1)k^2 = (2k-1)(k^2+k) + k, so the bound is
+  k(k+1) + k/(2k-1) and integrality closes the last fraction. The m=2 vertex twin
+  transfers legitimately, since the argument uses only deletion monotonicity (which
+  lem:subdigraph-monotone states for kappa too) and the re-run base cases.
+- A.4 structural: prop:mutual-unreachability (and the D-u restriction really is needed),
+  prop:disjoint-second-nbhd, prop:two-hop-bipartite, and the partition count
+  b(n+m-2-b) maximised at floor((n+m-2)^2/4).
+- A.7 lem:incidence-rank, the hardest proof in the thesis, checked in full. Step 1's
+  block-cut count collapses correctly to |X|-1-sum_{z cut}(b(z)-1). Step 2 must precede
+  Step 3 (that is what leaves a Z-neighbour at degree >= 2 after Step 3 removes an edge)
+  and it does. Step 4's simplicity argument works because the concatenated walk avoids
+  the edge {x,x'} on BOTH halves, so any path extracted from it has an interior vertex.
+  The R-leaf argument turns on a point worth stating: at most ONE of the three
+  internally disjoint paths can use the virtual edge (two would put a or b interior to
+  both), so a and b are either shared endpoints or interior to that single path, and the
+  far-side substitution therefore preserves disjointness. Then |V(L)| >= 4 with
+  |X n V(L)| <= 1 leaves a Z-vertex off {a,b} of degree <= 1. Sound.
+- A.7 thm:hyper-vertex-m3's component count rq-(n+q)+C <= n-C, i.e.
+  q(r-1) <= 2(n-1)+2(1-C); thm:hyper-vertex-m2's forest equivalence.
+- A.6 lem:sparse-hypergraph (uses (n/r)C(n-1,r-1) = C(n,r) and ceil(re/n) <= d) and
+  thm:simple-hyper-edge, which is what my own thm:dir-hyper-constant leans on downstream.
+- A.10 cor:chernoff-degree ((1+delta_0)mu = mu/c <= m) and both cases of
+  thm:gnp-threshold, incl. that the c>1 display really is exp(-(c-1)^2 m(n-1)/(4c)).
+
+Everything above is the author's own or classical and all of it holds. The only
+corrections this session made to appendix MATHEMATICS were to my own new text (the
+alpha = floor(n/2) overprecision), which is the honest summary: the pre-existing proofs
+were right, and the errors were in prose ABOUT them.
