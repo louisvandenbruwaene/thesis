@@ -66,17 +66,24 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
 - **The extremal decomposition** — proving an extremal non-hub digraph splits as `A ∪ B`
   with `A → B` complete, no arc inside `A`, and no arc from `B` back to `A` would turn
   the directed-arc conjecture into a theorem for all `m ≥ 3`. The backward-arc clause is
-  the hardest quarter of it, not the whole. Unconditionally the leading constant is
-  already settled: `ℓₘᵈⁱʳ(n) = n²/4 + O(n^{3/2})`.
+  the hardest quarter of it, not the whole. Unconditionally the leading constant and the
+  order of the term after it are already settled: `ℓₘᵈⁱʳ(n) = n²/4 + Θₘ(n)`, so what the
+  decomposition is needed for is the coefficient of that linear term.
 - **The directed *vertex* problem at `m ≥ 3`** — a separate question, not a corollary of
   the arc one. Whitney's `κ ≤ λ` makes the vertex-feasible family the larger of the two,
   so an arc upper bound does not restrict it. Proved equal at `m = 2` only by re-running
-  the induction and its base cases under the vertex test.
+  the induction and its base cases under the vertex test. Unconditionally
+  `kₘᵈⁱʳ(n) = n²/4 + Θₘ(n)`, so what is open is the linear coefficient and whether the
+  two values agree exactly.
 - **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
-- **One finite `n = 7` fact** that closes the directed-multigraph problem at `m = 3`:
-  the value `L₃ᵈⁱʳ(7) = 24` (fact (a)). Its companion, the classification of the
-  24-arc extremisers (fact (b)), is already proved by the sound `geng`-based
-  generation enumerator (~7 h on 10 cores; exactly `2B(3,4)`, `2B(4,3)`, and the
-  doubled path `P₇`). Fact (a) needs either the same enumerator uncapped at
-  target 25 (long run, command in `TASKS.md`) or the Gurobi MILP route.
+- **The exact value of `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
+  convention that parallel copies are distinct routes. The order is `Θ(m²n)` from both
+  sides, and a bouquet of thickened cliques is the best construction known, but it is
+  not optimal: at `m = 5`, `n = 7` it gives 27 where a search has found 28.
+- **Whether the *general* orientation model of the directed hypergraph shares the
+  leading constant** `(m-1)n²/(4(r-1))`, now proved for the forward and backward models.
+
+The directed multigraph problem is closed: `Lₘᵈⁱʳ(n) = (m-1)·max(2(n-1), ⌊n²/4⌋)` for
+every `n` and `m`, which also settles by hand the finite `n = 7` fact
+(`L₃ᵈⁱʳ(7) = 24`) that earlier drafts left to a solver.

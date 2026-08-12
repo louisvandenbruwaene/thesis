@@ -171,6 +171,32 @@ Scripts: `hyper_vertex_m4_search.py` (self-contained, standard library only;
 no-argument run does the `m = 4` sweep, `... 2` does the `r = 2` cross-check
 which re-derives the clique-chain witness from a different search space).
 
+### The two-step budget, and three results it unlocks (2026-08-12)
+**PROVED, all three now in the thesis.** Isolating what
+`thm:dir-arc-linear-error` actually uses (one cap on one family of routes, then
+only degree counting) turns it into a lemma about any digraph obeying that cap
+(`lem:two-step-budget`), and three different arguments supply the cap.
+(1) The route family is internally vertex-disjoint as well as arc-disjoint, so
+the **directed vertex** problem gets `k_m^dir(n) = n^2/4 + Theta_m(n)`
+unconditionally, a row the thesis had listed as untouched by the arc case.
+(2) The **directed hypergraph** constant is settled,
+`(1+o(1))(m-1)n^2/(4(r-1))` under both separations, closing
+`conj:dir-hyper-constant`: the named obstacle is paid rather than removed, at a
+factor `r-1` that lands in the linear error term while a second, unrelated
+factor `r-1` divides the leading one. (3) The **multigraph vertex** problem
+gets its first upper bound, `K_m^multi(n) <= (m-1)k_m(n) < 2(m-1)^2 n`, via
+Mader's density theorem, which turns the section's unearned claim that the
+bouquet has "the right order" into a theorem, `Theta(m^2 n)`.
+
+- [`two_step_budget.md`](two_step_budget.md) -- the three derivations, why the
+  vertex transfer is legitimate when Whitney runs the wrong way, why the two
+  factors of `r-1` are different factors, and what is still open (the general
+  orientation model, the constants, the exact values).
+
+Scripts: `two_step_budget_check.py` (self-contained, standard library only;
+checks all three route families against `kappa` rather than `lambda`, and
+reproves `k_3(4)=4`, `k_3(5)=6`, `k_4(5)=8` from scratch).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal

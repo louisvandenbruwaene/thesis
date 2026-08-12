@@ -25,7 +25,13 @@ in claude.md and deleted here.
 - [ ] **New open problem (replaces the old one): is a same-size K_r chain
       optimal, and what IS K_m^multi(n)?** thm:clique-chain-vertex is a lower
       bound only. Mixed block sizes, multi-bridge connections, or a different
-      topology entirely are not ruled out. No upper bound attempted.
+      topology entirely are not ruled out. UPDATE 2026-08-12: an upper bound
+      now exists, prop:multi-vertex-upper, K_m^multi(n) <= (m-1)k_m(n) <
+      2(m-1)^2 n, so the ORDER is settled at Theta(m^2 n) and the section's
+      earlier "lower bound of the right order" claim is now earned rather than
+      assumed. What is left is a constant factor of about 16 and the extremal
+      structure. To improve it, attack the first inequality: it charges every
+      edge the full m-1 and throws away the -sum(pi) correction entirely.
 
 ## AUTHOR DECISION NEEDED — the Sorensen-Thomassen constant
 - [ ] **thm:sorensen-thomassen may be off by one; needs the original paper.**
@@ -43,6 +49,14 @@ in claude.md and deleted here.
       convention.
 
 ## OPEN — directed vertex problem at m >= 3
+- [x] **Leading constant and second-order ORDER settled 2026-08-12**
+      (thm:dir-vertex-linear-error): k_m^dir(n) = n^2/4 + Theta_m(n)
+      unconditionally, so this row now sits exactly where the arc row does, and
+      the two agree to first order. NOT a transfer of the arc bound, which
+      would be illegitimate: the route family that prop:dir-arc-stability
+      counts (direct arc plus two-step detours) has empty and distinct-singleton
+      interiors, so it is internally vertex-disjoint and can be counted against
+      kappa directly. What remains open is below.
 - [ ] Genuinely open row, not a corollary of the arc case (Whitney's
       kappa<=lambda makes vertex-feasible the larger family). Exhaustive at
       m=3 agrees with the arc value at every n reached (n<=6). Single-arc-
@@ -109,6 +123,28 @@ research_notes/fact_a_delta_split.md (that note is now historical). The n=7
 generation-enumeration run (fact (b), the extremal-graph CLASSIFICATION, a
 genuinely separate question from the value) already completed successfully
 and its result is in the thesis as rem:n7-classification.
+
+## RESOLVED 2026-08-12: the directed hypergraph leading constant
+conj:dir-hyper-constant is now thm:dir-hyper-constant: the maximum is
+(1+o(1))(m-1)n^2/(4(r-1)) for fixed r and m, under the edge- AND the
+vertex-disjoint separation, so the bipartite construction of prop:dir-hyper-first
+is asymptotically optimal and TWO of the twelve rows change status. The named
+obstacle (a hyperedge carries r-1 heads, so two-step routes through different
+midpoints need not be disjoint) is not removed but paid: a matching argument
+thins the family at a cost of r-1, which lands only in the LINEAR error term of
+lem:two-step-budget, while a second and unrelated factor r-1 divides the leading
+term when the auxiliary one-step shadow digraph is traded back for hyperedges.
+Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
+(m-1)n(n-1)/(r-1) is smaller until n is around 16(m-1)(r-1)/3.
+- [ ] **Does the GENERAL orientation model share the constant?** The proof uses
+      the single tail twice, for entering and for leaving hyperedges. With
+      several tails, two routes may LEAVE through one shared hyperedge and
+      Step 2 needs a second matching, on a family whose conflicts run both
+      ways. A greedy independent set in the conflict graph looks like it gives
+      C = O(r)(m-1), which would suffice, but this was NOT worked out and is
+      not claimed. See research_notes/two_step_budget.md.
+- [ ] **Exact values at finite n** for the directed hypergraph, both
+      separations. The constant is settled, the value is not.
 
 ## WRITE-UP QUEUE
 - [x] Directed multigraph arc problem upgraded from conjecture/conditional to

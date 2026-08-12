@@ -2740,3 +2740,83 @@ clean typesetting, the two-panel skeleton figure has no overlaps, arrows correct
 directed, cross-references resolve. gurobi_handoff/ and its .zip are now vestigial (the
 whole point was getting a promotor's Gurobi licence onto fact (a), which is now a hand
 proof) -- left in place, not deleted, flagged for the author's own call.
+
+## 2026-08-12 (Opus) -- audit of the new flagship, then three open problems closed
+
+Author asked for a mistake-check plus an attempt at the open problems by proof.
+
+**AUDIT OF thm:dir-multi-full (the 2026-08-11 external proof): CORRECT.** Re-derived
+it independently before touching anything, since it is the least-vetted material in the
+thesis and supersedes months of work. The reachability-skeleton argument holds: deleting
+a subgraph that preserves reachability drops every positive lambda by at least one (the
+skeleton's u-v path is arc-disjoint from any packing surviving in D-R), the skeleton
+costs 2(n-q) + floor(q^2/4) via SCC arborescences plus a triangle-free condensation, and
+that is discretely convex in q so it maxes at an endpoint, giving exactly M(n). Values
+check against every computed cell (n=4..7 at m=3 give 12,16,20,24). One cosmetic
+imprecision only, not worth an edit: the arc count is written with "=" where the two
+arborescences of one SCC can share an arc (a 3-cycle rooted anywhere does), so it is
+really "<=", which is the direction the proof needs anyway.
+
+**ONE REAL MISTAKE FOUND (an overclaim, now repaired by proving the missing half).**
+sec:multi-vertex-standard asserted that thm:clique-chain-vertex is "a lower bound of the
+right order in both n and m" and wrote K_m^multi(n)/n -> (m-1) + Theta(m^2) as an
+asymptotic equality. There was no upper bound anywhere in the section, so neither claim
+was earned. Both are now true, see result 3.
+
+**THE COMMON ENGINE.** prop:dir-arc-stability and thm:dir-arc-linear-error use
+feasibility exactly once, in Step 1, to cap ONE family of routes; everything after is
+degree arithmetic. Promoting that cap from a deduction to a hypothesis gives
+lem:two-step-budget (a C-budgeted simple digraph has <= floor(n^2/4) + 4C(n-1) arcs; the
+only extra check is that the hypothesis passes to induced subdigraphs, which is trivial).
+Three different arguments supply the cap, and each is a new thesis result:
+
+1. **thm:dir-vertex-linear-error: k_m^dir(n) = n^2/4 + Theta_m(n), unconditional.** The
+   direct arc has empty interior and the two-step detours have distinct singleton
+   interiors, so Step 1's family is internally vertex-disjoint too and can be counted
+   against kappa. This is NOT the illegitimate transfer the thesis rightly keeps warning
+   about (an arc upper bound says nothing over the larger vertex-feasible family): what
+   transfers is the CONSTRUCTION, not the bound. The row ch4 listed as untouched by the
+   arc case now has the same status as the arc row.
+2. **thm:dir-hyper-constant: conj:dir-hyper-constant PROVED**, and for BOTH separations
+   at once, so two of the twelve rows change. |E| <= (m-1)floor(n^2/4)/(r-1) +
+   4(m-1)^2(n-1), matching prop:dir-hyper-first's bipartite construction asymptotically.
+   The thesis had named the obstacle precisely (a hyperedge carries r-1 heads, so
+   two-step routes through different midpoints need not be edge-disjoint) and waited for
+   it to be removed. It is not removed, it is PAID: a matching argument on the bipartite
+   graph of targets-versus-hyperedges-at-u thins the family at a cost of exactly r-1
+   (an unmatched target has all its hyperedges matched, each holding <= r-1 targets).
+   That factor inflates only C, hence only the LINEAR error term, never the n^2/4, while
+   a second and unrelated factor r-1 divides the leading term in the codegree count
+   (r-1)|E| = sum cod <= (m-1)|A(R)| over the one-step shadow R. Both steps hold against
+   kappa, which is why the vertex row falls out too. NOT covered: the general
+   orientation model (the single tail is used twice), flagged in TASKS.md.
+3. **prop:multi-vertex-upper: K_m^multi(n) <= (m-1)k_m(n) < 2(m-1)^2 n**, so
+   K_m^multi(n) = Theta(m^2 n) and the overclaim above becomes a theorem. Route: the
+   underlying simple graph of a feasible multigraph is itself feasible for the SIMPLE
+   vertex problem (kappa_{G_0} = 1 + pi <= mu + pi on edges, = pi off them), then Mader's
+   density theorem. The first inequality is the informative half, tight at m = 2, and it
+   ties the least understood of the twelve variants to the oldest.
+
+VERIFICATION (all before writing any .tex): research_notes/scripts/two_step_budget_check.py,
+self-contained, own Edmonds-Karp, no import of the program. Step 1 and Step 2 of the
+hypergraph theorem asserted against kappa over 3000 random hypergraphs and every ordered
+pair, with 4553 pairs ATTAINING the (r-1) factor with equality, so neither step is slack
+that could have been tightened; the vertex route family over 3000 random digraphs; the
+multigraph bound on all nine cells of tab:multi-vertex, with k_3(4)=4, k_3(5)=6, k_4(5)=8
+reproved from scratch (they match ch1's own machine-verified convention check). Separately
+a full-chain run on GROWN FEASIBLE hypergraphs verified every link end to end, and the
+final bound was checked against max_feasible_hyperedges at twelve (n,r,m) cells.
+Mader's theorem statement and its bibliographic data were both web-verified before citing
+(Abh. Math. Semin. Univ. Hambg. 37 (1972) 86-97, doi 10.1007/BF02993903), new entry Mader72.
+
+PROPAGATED: tab:summary (four rows: both directed hypergraph rows now carry a proved
+leading constant, both directed simple rows now state n^2/4 + Theta_m(n)), ch4's
+directed-frontier paragraph, the orientation-models paragraph, three open-problem items,
+and main.tex's contribution statement (a new paragraph for the three, framed around the
+budget lemma). Note the two hypergraph upper bounds do NOT dominate one another and both
+are kept: prop:dir-hyper-first is smaller until n is around 16(m-1)(r-1)/3.
+
+VERIFY: latexmk exit 0, 289 pp (was 285), 0 overfull, 0 undefined refs/cites. New pages
+rendered to PNG and read: A.27/A.28 (budget lemma and vertex theorem), A.54/A.55 (shadow
+and hypergraph theorem), A.59 (multigraph upper bound), all clean, all cross-references
+resolving. No program code touched, so no suite re-run needed.
