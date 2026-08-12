@@ -33,8 +33,33 @@ class Bounds(unittest.TestCase):
             simple_undirected_vertex_le4(10, 5)
 
     def test_vertex_m5(self):
+        # Sorensen-Thomassen Theorem 4 covers n >= 6 apart from n = 7 and 12.
         for n in range(6, 20):
-            self.assertEqual(simple_undirected_vertex_m5(n), (8 * n) // 3 - 3)
+            if n in (7, 12):
+                continue
+            self.assertEqual(simple_undirected_vertex_m5(n), (8 * n) // 3 - 4)
+
+    def test_vertex_m5_matches_the_papers_own_values(self):
+        # Every value Sorensen-Thomassen state explicitly, converted.  Their
+        # f_5 counts the least edge total that FORCES a 5-rail, one more than
+        # k_5 here, so each entry below is their printed figure minus one.
+        for n, f5 in {7: 16, 12: 28, 13: 31, 14: 34, 15: 37}.items():
+            self.assertEqual(simple_undirected_vertex_m5(n), f5 - 1, f"n={n}")
+
+    def test_vertex_m5_undetermined_below_six(self):
+        for n in (2, 3, 4, 5):
+            with self.assertRaises(ValueError):
+                simple_undirected_vertex_m5(n)
+
+    def test_vertex_m5_diverges_from_the_edge_value_at_fourteen(self):
+        # The paper proves f_5(n) = floor(5(n-1)/2) + 1 throughout 6 <= n <= 13,
+        # so the two problems agree there and first come apart at n = 14.
+        for n in range(6, 14):
+            self.assertEqual(simple_undirected_vertex_m5(n),
+                             simple_undirected_edge(n, 5), f"n={n}")
+        for n in range(14, 40):
+            self.assertGreater(simple_undirected_vertex_m5(n),
+                               simple_undirected_edge(n, 5), f"n={n}")
 
     def test_directed_arc_m2_branches_and_crossover(self):
         self.assertEqual(directed_arc_m2(4), 6)   # linear hub branch wins

@@ -106,7 +106,7 @@ It is worth naming what the closure removed, because the shape of the difficulty
 
 Across all the variation, two phenomena stand out as the ones a first guess would not have predicted.
 
-The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 3$ pulling strictly above $\ell_5(n)$ (\Cref{rem:threshold-convention}), and beyond it the vertex problem becomes genuinely hard and has stayed open since 1974.
+The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 4$ pulling strictly above $\ell_5(n)$ from $n = 14$ onwards (\Cref{thm:sorensen-thomassen}, and \Cref{rem:threshold-convention} for the counting convention that fixes the constant). The separation is genuinely a fact about $m$ rather than about $n$: at $m = 5$ the two values still agree at every size up to $n = 13$ and only then come apart, and beyond $m = 5$ the vertex problem becomes genuinely hard and has stayed open since 1974.
 
 The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling: $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. Place all $n$ vertices into two equal parts $A$ and $B$ and draw every arc from $A$ to $B$, one direction only. The result has $\floor{n^2/4}$ arcs, quadratic in $n$, yet $\lambda^{\max} = 1$: every pair has at most one arc-disjoint route, because every route must cross the $A$-to-$B$ wall exactly once and no arc crosses the other way to offer a second path. A graph whose arc count grows like $n^2$ can sit at connectivity one, something no undirected graph can do past a handful of vertices.
 
@@ -221,7 +221,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
         edge   & simple & $\floor{m(n-1)/2}$ & proved (Mader) \\
         edge   & multi  & $(m-1)(n-1)$ & proved \\
         edge   & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ & proved (cited, Gomory-Hu) \\
-        vertex & simple & $\floor{m(n-1)/2}$ ($m\le4$), $\floor{8n/3}-3$ ($m=5$, $n\ge13$, see \Cref{rem:threshold-convention}) & cited, open $m\ge6$ \\
+        vertex & simple & $\floor{m(n-1)/2}$ ($m\le4$), $\floor{8n/3}-4$ ($m=5$, $n\ge6$, $n\ne7,12$, see \Cref{rem:threshold-convention}) & cited, open $m\ge6$ \\
         vertex & multi  & adjacency count, so the simple value $\floor{m(n-1)/2}$ ($m\le4$) & convention (\Cref{sec:parallel-convention}) \\
         vertex & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ ($m\le3$), $\ge$ that for all $m$ & proved $m\le3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}), open $m\ge4$ \\
         \midrule

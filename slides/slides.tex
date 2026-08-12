@@ -326,8 +326,8 @@
   \begin{column}{0.42\textwidth}
     {\color{black!70}$\lambda$: edge-disjoint. \;$\kappa$: vertex-disjoint.}\\[14pt]
     \chip{stProved}{$m\le 4$}\; same answer (Leonard).\\[12pt]
-    \chip{stConj}{$m=5$}\; first gap:\; $k_5(n)=\floor{\tfrac{8n}{3}}-3$\\
-    \hspace*{1.05cm}{\scriptsize\color{black!55}(S\o{}rensen-Thomassen, $n\ge13$).}\\[12pt]
+    \chip{stConj}{$m=5$}\; first gap:\; $k_5(n)=\floor{\tfrac{8n}{3}}-4$\\
+    \hspace*{1.05cm}{\scriptsize\color{black!55}(S\o{}rensen-Thomassen, above $\ell_5$ from $n=14$).}\\[12pt]
     \chip{stOpen}{$m\ge 6$}\; open since 1974.
   \end{column}
 \end{columns}
@@ -457,7 +457,7 @@
   edge   & simple & $\floor{m(n-1)/2}$ & {\color{stProved}proved (Mader)}\\
   edge   & multi  & $(m-1)(n-1)$ & {\color{stProved}proved}\\
   edge   & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ & {\color{stProved}proved (Gomory-Hu)}\\
-  vertex & simple & $\floor{m(n-1)/2}$ \;($m\le4$),\; $\floor{8n/3}-3$ \;($m{=}5$, $n\ge13$) & {\color{stConj}cited,} {\color{stOpen}open $m\ge6$}\\
+  vertex & simple & $\floor{m(n-1)/2}$ \;($m\le4$),\; $\floor{8n/3}-4$ \;($m{=}5$, $n\ge6$, $n\ne7,12$) & {\color{stConj}cited,} {\color{stOpen}open $m\ge6$}\\
   vertex & multi  & adjacency count, so the simple value & {\color{black!60}convention}\\
   vertex & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ \;($m\le3$) & {\color{stProved}proved $m\le3$,} {\color{stOpen}open $m\ge4$}\\
   \midrule
@@ -651,7 +651,7 @@ $\lambda(u,v)$ is the lightest edge on the tree path, and $\lmax$ is the heavies
   multigraph edge, $L_m(n)$ & $(m-1)(n-1)$ \\
   hypergraph edge, $\ell_m^{(r)}(n)$ & $\floor{(m-1)(n-1)/(r-1)}$ \\
   simple vertex, $k_m(n)$ \;($m\le4$) & $\floor{m(n-1)/2}$ \\
-  simple vertex, $k_5(n)$ \;($n\ge13$) & $\floor{8n/3}-3$ \\
+  simple vertex, $k_5(n)$ \;($n\ne7,12$) & $\floor{8n/3}-4$ \\
   hypergraph vertex, $m\le3$ & $\floor{(m-1)(n-1)/(r-1)}$ \\
   \midrule
   directed simple, $m=2$ \;(arc and vertex) & $\max(2(n-1),\floor{n^2/4})$ \\

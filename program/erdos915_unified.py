@@ -389,8 +389,21 @@ def simple_undirected_vertex_le4(n: int, m: int) -> int:
 
 
 def simple_undirected_vertex_m5(n: int) -> int:
-    """``k_5(n) = floor(8n/3) - 3`` for large ``n``.  Cited (Sorensen-Thomassen)."""
-    return (8 * n) // 3 - 3
+    """``k_5(n) = floor(8n/3) - 4`` for ``n >= 6``, ``n != 7``, ``n != 12``.
+
+    Cited (Sorensen-Thomassen, Theorem 4).  Their paper counts the least edge
+    total that FORCES a 5-rail and prints ``floor(8n/3) - 3``; this thesis
+    counts the largest that avoids one, which is exactly one less.  The two
+    sizes the closed form misses are given there separately, and below n = 6
+    the formula is not claimed at all.
+    """
+    if n < 6:
+        raise ValueError("k_5(n) is only determined for n >= 6")
+    if n == 7:
+        return 15
+    if n == 12:
+        return 27
+    return (8 * n) // 3 - 4
 
 
 def directed_arc_m2(n: int) -> int:
@@ -2632,15 +2645,19 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
         plt.plot(ns, vals, "-", color=color, linewidth=1.8, alpha=0.9,
                  label=f"$m={m_val}$: edge $=$ vertex")
 
-    # m=5: edge and vertex (same starting point, diverge from n=6 onwards)
-    edge5 = [simple_undirected_edge(n, 5) for n in ns]
-    vert5 = [simple_undirected_vertex_m5(n) for n in ns]
-    plt.plot(ns, edge5, "--", color=_KUL_BLUE, linewidth=2.4,
+    # m=5: edge and vertex.  Sorensen-Thomassen only determine k_5 from n = 6,
+    # so the vertex curve starts there rather than at n_start.  The two agree
+    # for every n <= 13 and first come apart at n = 14, which is what the
+    # shading marks.
+    ns5 = [n for n in ns if n >= 6]
+    edge5 = [simple_undirected_edge(n, 5) for n in ns5]
+    vert5 = [simple_undirected_vertex_m5(n) for n in ns5]
+    plt.plot(ns5, edge5, "--", color=_KUL_BLUE, linewidth=2.4,
              label=r"$m=5$: edge $\ell_5(n)=\lfloor 5(n-1)/2\rfloor$")
-    plt.plot(ns, vert5, "-",  color=_WARM,     linewidth=2.4,
-             label=r"$m=5$: vertex $k_5(n)=\lfloor 8n/3\rfloor-3$")
+    plt.plot(ns5, vert5, "-",  color=_WARM,     linewidth=2.4,
+             label=r"$m=5$: vertex $k_5(n)=\lfloor 8n/3\rfloor-4$")
     # shade only where the gap is positive
-    plt.fill_between(ns, edge5, vert5, where=[v > e for v, e in zip(vert5, edge5)],
+    plt.fill_between(ns5, edge5, vert5, where=[v > e for v, e in zip(vert5, edge5)],
                      alpha=0.15, color=_WARM)
 
     plt.xlabel("number of vertices $n$")

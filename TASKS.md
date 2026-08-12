@@ -33,20 +33,23 @@ in claude.md and deleted here.
       structure. To improve it, attack the first inequality: it charges every
       edge the full m-1 and throws away the -sum(pi) correction entirely.
 
-## AUTHOR DECISION NEEDED — the Sorensen-Thomassen constant
-- [ ] **thm:sorensen-thomassen may be off by one; needs the original paper.**
-      The thesis defines k_m/l_m as the MAXIMUM with no m-connected pair.
-      erdosproblems.com states everything as the MINIMUM that FORCES one,
-      which is one more. Verified on six shared entries (k_2, k_3, k_4, l_5,
-      l_6, and the conjecture form), and the thesis convention is confirmed by
-      exhaustive search (k_3(4)=4, k_3(5)=6, k_4(5)=8). Under that shift the
-      database's k_5(n)=floor(8n/3)-3 becomes floor(8n/3)-4 here, but the
-      thesis prints -3, i.e. the database figure unadjusted. BOTH candidates
-      satisfy k_5 >= l_5, so internal arithmetic cannot decide it. Recorded
-      as rem:threshold-convention rather than silently changed, since it is a
-      cited external result. Nothing in the thesis depends on which is right.
-      Resolve by reading SorensenThomassen74 directly and noting ITS
-      convention.
+## RESOLVED 2026-08-13: the Sorensen-Thomassen constant
+The author obtained the paper (JCTB 17(2) 1974, 143-159, sorensen.pdf, gitignored
+as it is copyrighted). Both open questions are settled from the primary source.
+- CONVENTION. p.143 defines f_k(n) as "the least integer r so that every graph
+  with n vertices and r or more edges contains a k-rail", i.e. the FORCING
+  convention, one more than this thesis's k_m(n). So the thesis value is
+  floor(8n/3) - 4, not the -3 the database prints. Applied.
+- RANGE. Theorem 4 (p.158) covers n >= 6 except n = 7 and n = 12, not the
+  n >= 13 the database records (that is just the clean tail). The two exceptional
+  values are given in the paper: f_5(7)=16 and f_5(12)=28, i.e. k_5(7)=15 and
+  k_5(12)=27 here. Applied.
+- DIVERGENCE POINT. The paper proves f_5(n) = floor(5(n-1)/2) + 1 throughout
+  6 <= n <= 13, which in this thesis's convention is exactly l_5(n). So the edge
+  and vertex problems AGREE up to n = 13 and first separate at n = 14. The old
+  text claimed n >= 13 by comparing a forcing k_5 against an avoiding l_5, a
+  half-converted comparison. Note that k_5 > l_5 is invariant under the shift
+  (both sides move by one), so no internal check can catch this. Applied.
 
 ## OPEN — directed vertex problem at m >= 3
 - [x] **Leading constant and second-order ORDER settled 2026-08-12**
