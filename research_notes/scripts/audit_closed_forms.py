@@ -12,9 +12,20 @@ below them, and one range endpoint (r <= m on thm:clique-chain-vertex) was
 wrong until 2026-07-31. A hypothesis with no cell outside it that fails is a
 hypothesis nobody has tested.
 
+One trap, since this sweep cried wolf about it on 2026-08-12. `solve` in
+hypergraph mode enumerates SIMPLE hypergraphs: every candidate hyperedge is
+present or absent, never repeated. prop:hyper-edge's floor is attained by a
+simple hypergraph only when m-1 <= C(n-2,r-2), and otherwise by a MULTI
+hypergraph this sweep cannot build, so comparing the formula against the
+simple optimum below that threshold reports a mismatch where the thesis is
+right (it says exactly this, and n=3 m=3 r=3 is the smallest case). Those
+cells are now recorded out of range. Before believing any future mismatch,
+check which family the routine behind it actually searches.
+
 Run from program/:  python3 ../research_notes/scripts/audit_closed_forms.py
 """
 
+import math
 import os
 import sys
 import time
@@ -113,8 +124,18 @@ def main():
                             max_seconds=BUDGET)
                 if res.bound != "exact":
                     continue
+                # solve() enumerates SIMPLE hypergraphs (each candidate edge is
+                # present or absent), but prop:hyper-edge states the bound is
+                # attained by a simple hypergraph only when m-1 <= C(n-2,r-2);
+                # otherwise it takes a multihypergraph, which this sweep cannot
+                # build.  So the equality is in range only under that condition.
+                # Below it the formula is still a valid upper bound, and the
+                # cell is recorded out of range rather than as a mismatch.
+                simple_attains = (m - 1) <= math.comb(n - 2, r - 2)
                 record("prop:hyper-edge", f"n={n} m={m} r={r}",
-                       ((m - 1) * (n - 1)) // (r - 1), res.value, True)
+                       ((m - 1) * (n - 1)) // (r - 1), res.value, simple_attains,
+                       "" if simple_attains
+                       else "simple cannot attain here, multi needed")
 
     print("\nthm:hyper-vertex-m2 / m3  k_m^(r)(n) = floor((m-1)(n-1)/(r-1))")
     for m in (2, 3):
