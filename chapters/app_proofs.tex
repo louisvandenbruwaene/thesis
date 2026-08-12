@@ -257,7 +257,28 @@ Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{
 \end{theorem}
 
 \begin{proof}
-Write the chain of the upper-bound proof as three non-negative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$. Substituting $|E_1| = (n-1) - S_3$ into the first identity turns it into $\sum_e \dist_T(e) = 2|E| - (n-1) + S_2 + S_3$, and equating this with the second identity gives $2|E| - (n-1) + S_2 + S_3 = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
+Write the chain of the upper-bound proof as three non-negative integer slacks, one for each inequality it uses:
+\[
+    S_1 = (m-1)(n-1) - \sum_t c(t),
+    \qquad
+    S_2 = \sum_{e :\, \dist_T(e) \ge 2} \bigl(\dist_T(e) - 2\bigr),
+    \qquad
+    S_3 = (n-1) - |E_1| .
+\]
+In words, $S_1$ counts tree weights below $m-1$, $S_2$ counts edges beyond tree distance two, and $S_3$ counts tree edges that support no edge of $G$. Retracing the proof gives two expressions for the same quantity,
+\[
+    \sum_e \dist_T(e) \;=\; 2|E| - |E_1| + S_2
+    \qquad\text{and}\qquad
+    \sum_e \dist_T(e) \;=\; \sum_t c(t) \;=\; (m-1)(n-1) - S_1 .
+\]
+Substituting $|E_1| = (n-1) - S_3$ into the first and equating it with the second,
+\[
+\begin{aligned}
+    2|E| - (n-1) + S_2 + S_3 &\;=\; (m-1)(n-1) - S_1, \\[2pt]
+    \text{so}\qquad 2|E| &\;=\; m(n-1) - (S_1 + S_2 + S_3).
+\end{aligned}
+\]
+The whole characterisation reads off that last identity. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
 \end{proof}
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
@@ -483,13 +504,35 @@ so the leading constant $\tfrac14$ of \Cref{conj:dir-arc} holds unconditionally,
 \]
 Summing over all $n(n-1)$ ordered pairs gives $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)\,n(n-1)$.
 
-\emph{Step 2, from pairs to degrees.} Counting directed walks of length two by their midpoint, $\sum_{u,v} p_2(u,v) = \sum_{x} d^-(x)\,d^+(x)$, where this sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included: fixing a vertex $x$, a walk $u \to x \to v$ is nothing more than an independent choice of an in-neighbour $u$ of $x$ and an out-neighbour $v$ of $x$, so $x$ is the midpoint of exactly $d^-(x)\,d^+(x)$ such walks. The diagonal terms count the closed walks $u \to x \to u$, that is, twice the number of digons of $D$, since a digon on the pair $\{u,x\}$ is counted once as a closed walk based at $u$ and once as a closed walk based at $x$. Distinct digons use disjoint pairs of arcs, so twice the number of digons is at most $|A(D)|$, and that is exactly the slack Step 1 left over: removing the diagonal terms from the all-pairs sum turns Step 1's bound $|A(D)| + \sum_{u \ne v} p_2(u,v) \le (m-1)n(n-1)$ into $\sum_x d^+(x)d^-(x) \le (m-1)n(n-1) - |A(D)| + (\text{twice the digon count})$, and bounding that digon term by $|A(D)|$ cancels the $-|A(D)|$ exactly, leaving the inequality below. Combining the two,
+\emph{Step 2, from pairs to degrees.} Write $\Delta$ for the number of digons of $D$, meaning the pairs of vertices carrying an arc in each direction. Three small facts turn Step 1 into a statement about degrees alone.
+
+\emph{(2a) Walks of length two, counted by their midpoint.}
 \[
-    \sum_{x \in V} d^+(x)\,d^-(x)
-    \;\le\; \bigl[(m-1)\,n(n-1) - |A(D)|\bigr] + |A(D)|
-    \;=\; (m-1)\,n(n-1).
+    \sum_{u,\,v \in V} p_2(u,v) \;=\; \sum_{x \in V} d^-(x)\,d^+(x),
 \]
-This is the one inequality the whole section runs on, and it is worth reading in words: a vertex with a large in-degree \emph{and} a large out-degree is expensive, because it manufactures two-step routes for many pairs at once, and the budget for those routes is only quadratic in $n$.
+where the left-hand sum runs over \emph{all} ordered pairs, the diagonal $u = v$ included. Fixing a vertex $x$, a walk $u \to x \to v$ is nothing more than an independent choice of an in-neighbour $u$ of $x$ and an out-neighbour $v$ of $x$, so $x$ is the midpoint of exactly $d^-(x)\,d^+(x)$ of them.
+
+\emph{(2b) What the diagonal counts.} A diagonal term $p_2(u,u)$ counts the closed walks $u \to x \to u$, and each digon contributes two such walks, one based at each of its endpoints. Hence
+\[
+    \sum_{u \in V} p_2(u,u) \;=\; 2\Delta .
+\]
+
+\emph{(2c) Digons are few.} Distinct digons use disjoint pairs of arcs, so $2\Delta \le |A(D)|$.
+
+Splitting the all-pairs sum of (2a) along its diagonal and feeding in Step 1 now gives the inequality the rest of the argument runs on:
+\[
+\begin{aligned}
+    \sum_{x \in V} d^+(x)\,d^-(x)
+      &\;=\; \sum_{u \ne v} p_2(u,v) \;+\; 2\Delta
+      &&\text{by (2a) and (2b),} \\[2pt]
+      &\;\le\; \bigl[(m-1)\,n(n-1) - |A(D)|\bigr] \;+\; 2\Delta
+      &&\text{by Step 1,} \\[2pt]
+      &\;\le\; \bigl[(m-1)\,n(n-1) - |A(D)|\bigr] \;+\; |A(D)|
+      &&\text{by (2c),} \\[2pt]
+      &\;=\; (m-1)\,n(n-1).
+\end{aligned}
+\]
+The point of the last two lines is that the digon term is absorbed exactly by the slack Step 1 left behind, so nothing is given away in passing from pairs to degrees. It is worth reading the conclusion in words: a vertex with a large in-degree \emph{and} a large out-degree is expensive, because it manufactures two-step routes for many pairs at once, and the budget for those routes is only quadratic in $n$.
 
 \emph{Step 3, the smaller half-degree is small on average.} Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy-Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$,
 \[
@@ -567,7 +610,22 @@ What is left open is therefore a constant factor in one coefficient, not a shape
 \begin{remark}[Case 2 cannot be sharpened without a new inequality]\label{rem:case2-tight}
 One might hope to cut Case 2's constant using the observation that in the conjectured extremiser, one whole side has $\min(d^+, d^-) = 0$, so summing \Cref{lem:small-side}'s worst case at every vertex looks wasteful. It is not: Case 2's bound is already the exact maximum obtainable from the two facts it uses, the budget $\sum_x d^+(x)\,d^-(x) \le (m-1)n(n-1)$ of Step 2 in \Cref{prop:dir-arc-stability} and the floor $d(x) \ge n/2$, and no cleverer use of those two facts alone can do better.
 
-At a vertex with $d(x) = s \ge n/2$, achieving $\min(d^+(x), d^-(x)) = t$ costs $d^+(x)\,d^-(x) = t(s-t)$ at least, cheapest at $s = n/2$, giving the cost function $c(t) = t(n/2 - t)$ on $t \in [0, n/4]$. Since $c$ is concave with $c(0) = 0$, for any two vertices with values $0 < a \le b$ strictly below the cap, shifting mass from $a$ to $b$ preserves $a + b$ while lowering $c(a) + c(b)$, because $c'$ is decreasing. Repeating this exchange shows that the true maximum of $\sum_x t_x$ under a shared budget $Q$ is attained by concentrating the budget on as few vertices as the cap allows, each at $t_x = n/4$, and the rest at $t_x = 0$, exactly the qualitative picture the conjectured extremiser suggests, and it already gives $4Q/n = 4(m-1)(n-1)$ once the number of vertices at the cap is below $n$. The crude per-vertex bound loses nothing because it is tight at exactly the same point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both conditions hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the vertex profile the true optimum concentrates on, so nothing is lost there. Cutting the constant therefore needs a second, independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
+Think of the budget as money and of $t_x = \min(d^+(x), d^-(x))$ as what each vertex buys with it. At a vertex with $d(x) = s \ge n/2$, buying $t$ costs
+\[
+    d^+(x)\,d^-(x) \;=\; t\,(s - t) \;\ge\; t\Bigl(\frac{n}{2} - t\Bigr) \;=:\; c(t),
+    \qquad t \in \Bigl[0, \frac{n}{4}\Bigr],
+\]
+the cheapest case being $s = n/2$, and the cap $t \le n/4$ coming from $t \le s/2$. Now $c$ is concave with $c(0) = 0$, so its slope is decreasing and buying in bulk is cheaper per unit than spreading the purchase out. Concretely, given two vertices holding $0 < a \le b$ strictly below the cap, shifting one unit from $a$ to $b$ leaves $a + b$ unchanged and lowers $c(a) + c(b)$. Repeating that exchange pushes every $t_x$ to one of the two ends, so under a shared budget $Q$ the true maximum of $\sum_x t_x$ puts as many vertices as the budget allows at the cap $t_x = n/4$ and the rest at $t_x = 0$. That is exactly the qualitative picture the conjectured extremiser suggests, and since $c(n/4) = n^2/16$ it already gives
+\[
+    \sum_{x \in V} t_x
+    \;\le\; \underbrace{\frac{Q}{n^2/16}}_{\text{vertices at the cap}}
+            \cdot \underbrace{\frac{n}{4}}_{\text{each buying}}
+    \;=\; \frac{4Q}{n}
+    \;=\; 4(m-1)(n-1)
+\]
+once the number of vertices at the cap is below $n$, which is Case 2's constant unchanged.
+
+The crude per-vertex bound therefore loses nothing, and the reason is that its two sources of slack close at that very point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the vertex profile the true optimum concentrates on. Cutting the constant therefore needs a second and independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
 \end{remark}
 
 \subsection{What that proof actually used}\label{sec:two-step-budget}

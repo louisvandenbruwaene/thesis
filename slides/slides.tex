@@ -326,7 +326,8 @@
   \begin{column}{0.42\textwidth}
     {\color{black!70}$\lambda$: edge-disjoint. \;$\kappa$: vertex-disjoint.}\\[14pt]
     \chip{stProved}{$m\le 4$}\; same answer (Leonard).\\[12pt]
-    \chip{stConj}{$m=5$}\; first gap:\; $k_5(n)=\floor{\tfrac{8n}{3}}-3$.\\[12pt]
+    \chip{stConj}{$m=5$}\; first gap:\; $k_5(n)=\floor{\tfrac{8n}{3}}-3$\\
+    \hspace*{1.05cm}{\scriptsize\color{black!55}(S\o{}rensen-Thomassen, $n\ge13$).}\\[12pt]
     \chip{stOpen}{$m\ge 6$}\; open since 1974.
   \end{column}
 \end{columns}
@@ -341,33 +342,36 @@
 \begin{tikzpicture}[scale=0.95,
    seg/.style={rounded corners=4pt,minimum height=0.95cm,text=white,
                font=\footnotesize\bfseries,align=center,inner sep=2pt},
-   chip/.style={rounded corners=2pt,fill=white,font=\scriptsize,text=black!82,
+   chip/.style={rounded corners=2pt,fill=white,font=\tiny,text=black!82,
                 inner xsep=4pt,inner ysep=2.5pt,line width=0.9pt}]
   % --- the difficulty spectrum: one continuous bar in four colours ---
+  % Bands 2 and 3 both have a proved leading term. They differ in whether a
+  % candidate exact formula exists.  Nothing appears in two bands.
   \node[seg,fill=stProved, minimum width=3.25cm] at (-5.15,2.55) {Proved\\by hand};
-  \node[seg,fill=stMachine,minimum width=3.15cm] at (-1.70,2.55) {Certified\\by machine};
-  \node[seg,fill=stConj,   minimum width=3.15cm] at ( 1.70,2.55) {Conjecture\\+ lower bound};
+  \node[seg,fill=stConj,   minimum width=3.15cm] at (-1.70,2.55) {Exact value\\conjectured};
+  \node[seg,fill=stMachine,minimum width=3.15cm] at ( 1.70,2.55) {Leading term\\only};
   \node[seg,fill=stOpen,   minimum width=3.25cm] at ( 5.15,2.55) {Open};
 
   % --- the variants placed under their status, as light chips ---
-  \node[chip,draw=stProved]  at (-5.15,1.30) {undirected edge};
-  \node[chip,draw=stProved]  at (-5.15,0.65) {multigraph vertex};
-  \node[chip,draw=stProved]  at (-5.15,0.00) {directed $m=2$};
+  \node[chip,draw=stProved]  at (-5.15, 1.30) {undirected edge, all models};
+  \node[chip,draw=stProved]  at (-5.15, 0.65) {multigraph vertex (convention)};
+  \node[chip,draw=stProved]  at (-5.15, 0.00) {hypergraph vertex $m\!\le\!3$};
+  \node[chip,draw=stProved]  at (-5.15,-0.65) {directed multigraph arc};
+  \node[chip,draw=stProved]  at (-5.15,-1.30) {directed simple, $m\!=\!2$};
 
-  \node[chip,draw=stMachine] at (-1.70,1.30) {directed multigraph $n\!\le\!6$};
-  \node[chip,draw=stMachine] at (-1.70,0.65) {hypergraph vertex $m\!\le\!3$};
+  \node[chip,draw=stConj]    at (-1.70, 1.30) {directed arc $m\!\ge\!3$};
+  \node[chip,draw=stConj]    at (-1.70, 0.65) {directed vertex $m\!\ge\!3$};
 
-  \node[chip,draw=stConj]    at ( 1.70,1.30) {directed arc $m\!\ge\!3$};
-  \node[chip,draw=stConj]    at ( 1.70,0.65) {directed vertex $m\!\ge\!3$};
+  \node[chip,draw=stMachine] at ( 1.70, 1.30) {directed hyper, arc};
+  \node[chip,draw=stMachine] at ( 1.70, 0.65) {directed hyper, vertex};
 
-  \node[chip,draw=stOpen]    at ( 5.15,1.30) {vertex-disjoint $m\!\ge\!6$};
-  \node[chip,draw=stOpen]    at ( 5.15,0.65) {hypergraph vertex $m\!\ge\!4$};
-  \node[chip,draw=stOpen]    at ( 5.15,0.00) {directed hypergraph};
+  \node[chip,draw=stOpen]    at ( 5.15, 1.30) {vertex-disjoint $m\!\ge\!6$};
+  \node[chip,draw=stOpen]    at ( 5.15, 0.65) {hypergraph vertex $m\!\ge\!4$};
 
   % --- easier to harder ---
-  \draw[-{Stealth[length=3mm]},line width=1.6pt,black!30] (-6.8,-0.85) -- (6.8,-0.85);
-  \node[font=\scriptsize\color{black!55},anchor=west] at (-6.8,-1.25) {easier};
-  \node[font=\scriptsize\color{black!55},anchor=east] at (6.8,-1.25)  {harder};
+  \draw[-{Stealth[length=3mm]},line width=1.6pt,black!30] (-6.8,-2.05) -- (6.8,-2.05);
+  \node[font=\scriptsize\color{black!55},anchor=west] at (-6.8,-2.45) {easier};
+  \node[font=\scriptsize\color{black!55},anchor=east] at (6.8,-2.45)  {harder};
 \end{tikzpicture}
 \vfill
 \end{frame}
@@ -416,22 +420,24 @@
 \begin{frame}{New results: hypergraph vertex and directed arcs}
 \vfill
 \begin{columns}[c,onlytextwidth]
-  \begin{column}{0.5\textwidth}\centering
+  \begin{column}{0.46\textwidth}\centering
     \includegraphics[width=\linewidth]{directed_crossover.png}\\[4pt]
     {\scriptsize\color{black!60}The quadratic family overtakes near $n=9$.}
   \end{column}
-  \begin{column}{0.46\textwidth}
-    {\large\bfseries\color{KULblauw3b}Two genuine advances}
+  \begin{column}{0.5\textwidth}
+    {\large\bfseries\color{KULblauw3b}Four genuine advances}
 
-    \vspace{14pt}
-    \chip{stProved}{solved}\\[5pt]
-    {\bfseries Hypergraph vertex} \,($m\le 3$)
+    \vspace{10pt}
+    \footnotesize
+    \setlength{\abovedisplayskip}{2pt}\setlength{\belowdisplayskip}{8pt}
+    \chip{stProved}{solved}\; {\bfseries Hypergraph vertex}, $m\le 3$
     \[k_m^{(r)}(n)=\floor{\tfrac{(m-1)(n-1)}{r-1}}\]
-
-    \vspace{8pt}
-    \chip{stMachine}{reduced}\\[5pt]
-    {\bfseries Directed multigraph} \,($m=3$)
-    \[\text{all } n \;\longrightarrow\; \text{two checks at } n{=}7\]
+    \chip{stProved}{solved}\; {\bfseries Directed multigraph}, all $n$ and $m$
+    \[L_m^{\mathrm{dir}}(n)=(m-1)\max\bigl(2(n-1),\floor{\tfrac{n^2}{4}}\bigr)\]
+    \chip{stMachine}{leading term}\; {\bfseries Directed simple}, both
+    \[\ell_m^{\mathrm{dir}}(n)=k_m^{\mathrm{dir}}(n)=\tfrac{n^2}{4}+\Theta_m(n)\]
+    \chip{stMachine}{leading term}\; {\bfseries Directed hypergraph}, both
+    \[(1+o(1))\,\tfrac{(m-1)n^2}{4(r-1)}\]
   \end{column}
 \end{columns}
 \vfill
@@ -442,6 +448,7 @@
 % ----------------------------------------------------------------------------
 \begin{frame}{The whole landscape}
 \centering\renewcommand{\arraystretch}{1.12}\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lll l@{}}
   \toprule
   Separation & Model & Value & Status \\
@@ -450,22 +457,23 @@
   edge   & simple & $\floor{m(n-1)/2}$ & {\color{stProved}proved (Mader)}\\
   edge   & multi  & $(m-1)(n-1)$ & {\color{stProved}proved}\\
   edge   & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ & {\color{stProved}proved (Gomory-Hu)}\\
-  vertex & simple & $\floor{m(n-1)/2}$ \;($m\le4$),\; $\floor{8n/3}-3$ \;($m{=}5$) & {\color{stConj}cited,} {\color{stOpen}open $m\ge6$}\\
-  vertex & multi  & parallel edges do not help & {\color{stProved}proved}\\
+  vertex & simple & $\floor{m(n-1)/2}$ \;($m\le4$),\; $\floor{8n/3}-3$ \;($m{=}5$, $n\ge13$) & {\color{stConj}cited,} {\color{stOpen}open $m\ge6$}\\
+  vertex & multi  & adjacency count, so the simple value & {\color{black!60}convention}\\
   vertex & hyper  & $\floor{(m-1)(n-1)/(r-1)}$ \;($m\le3$) & {\color{stProved}proved $m\le3$,} {\color{stOpen}open $m\ge4$}\\
   \midrule
   \multicolumn{4}{@{}l}{\color{KULblauw3b}\bfseries Directed}\\
-  arc    & simple & $\max(2(n-1),\floor{n^2/4})$ \;($m{=}2$) & {\color{stProved}proved,} {\color{stConj}conj.\ $m\ge3$}\\
-  arc    & multi  & $(m-1)\max(2(n-1),\floor{n^2/4})$ & {\color{stMachine}proved $n\le6$,} {\color{stConj}cond.\ $m{=}3$}\\
-  arc    & hyper  & quadratic in $n$, exact value open & {\color{stOpen}lower bound}\\
-  vertex & simple & $\max(2(n-1),\floor{n^2/4})$ \;($m{=}2$) & {\color{stProved}proved,} {\color{stConj}conj.\ $m\ge3$}\\
-  vertex & multi  & reduces to simple digraph & {\color{stProved}proved}\\
-  vertex & hyper  & quadratic in $n$, exact value open & {\color{stOpen}lower bound}\\
+  arc    & simple & $\max(2(n-1),\floor{n^2/4})$ \;($m{=}2$),\; $n^2/4+\Theta_m(n)$ \;(all $m$) & {\color{stProved}proved,} {\color{stConj}conj.\ $m\ge3$}\\
+  arc    & multi  & $(m-1)\max(2(n-1),\floor{n^2/4})$ & {\color{stProved}proved, every $n$ and $m$}\\
+  arc    & hyper  & $(1+o(1))(m-1)n^2/(4(r-1))$ & {\color{stMachine}leading term,} {\color{stOpen}value open}\\
+  vertex & simple & $\max(2(n-1),\floor{n^2/4})$ \;($m{=}2$),\; $n^2/4+\Theta_m(n)$ \;(all $m$) & {\color{stProved}proved separately,} {\color{stConj}conj.\ $m\ge3$}\\
+  vertex & multi  & adjacency count, so the simple digraph value & {\color{black!60}convention}\\
+  vertex & hyper  & $(1+o(1))(m-1)n^2/(4(r-1))$ & {\color{stMachine}leading term,} {\color{stOpen}value open}\\
   \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 
 \vspace{0.2cm}
-{\scriptsize \chip{stProved}{proved}\; \chip{stMachine}{certified}\;
+{\scriptsize \chip{stProved}{proved}\; \chip{stMachine}{leading term}\;
 \chip{stConj}{conjecture}\; \chip{stOpen}{open}}
 \end{frame}
 
@@ -477,11 +485,12 @@
 \begin{columns}[t,onlytextwidth]
   \begin{column}{0.5\textwidth}
     {\large\bfseries\color{KULblauw1}Open problems}
-    \begin{itemize}\itemsep10pt
-      \item the backward-arc lemma
-      \item the linear coefficient, one-way
+    \begin{itemize}\itemsep8pt
+      \item the structural decomposition, of which the backward arc is the hardest quarter
+      \item the linear coefficient, one-way, arc and vertex alike
       \item vertex-disjoint, $m\ge6$
       \item hypergraph vertex, $m\ge4$
+      \item the exact directed hypergraph value at finite $n$
     \end{itemize}
   \end{column}
   \begin{column}{0.5\textwidth}
@@ -545,8 +554,10 @@
 
 \vspace{0.3cm}
 At $m=2$ the value $\max(2(n-1),\floor{n^2/4})$ is proved (the two constructions tie at $n=7$).
-For $m\ge3$ the conjecture adds the augmented-bipartite family. The missing piece is the
-{\bfseries backward-arc lemma} for the matching upper bound.
+For $m\ge3$ the conjecture adds the augmented-bipartite family, and the leading term
+$n^2/4+\Theta_m(n)$ is now proved unconditionally, so only the linear coefficient is at stake.
+Pinning it needs a {\bfseries structural decomposition} $V=A\cup B$, complete forwards, empty
+inside $A$, nothing coming back, of which the backward-arc clause is the hardest quarter.
 \end{frame}
 
 % --- B2: hypergraph vertex / incidence rank ---
@@ -577,27 +588,33 @@ For $m\ge3$ the conjecture adds the augmented-bipartite family. The missing piec
 \end{columns}
 \end{frame}
 
-% --- B3: the n=7 reduction ---
-\begin{frame}{Backup: collapsing an infinite family to two checks}
+% --- B3: how the directed multigraph problem closed ---
+\begin{frame}{Backup: peeling a directed multigraph apart}
 \vfill
 \centering
-\begin{tikzpicture}[node distance=0.7cm,
+\begin{tikzpicture}[node distance=0.55cm,
    stp/.style={rounded corners=4pt,draw=KULblauw1,fill=KULblauw1!8,
-               font=\footnotesize,align=center,inner sep=7pt,minimum height=1.1cm},
+               font=\scriptsize,align=center,inner sep=6pt,minimum height=1.1cm},
    ar/.style={-{Stealth[length=3mm]},line width=1.4pt,KULblauw3b}]
-  \node[stp] (a) {Attachment\\lemma};
-  \node[stp,right=of a] (b) {Odd-step\\theorem};
-  \node[stp,right=of b] (c) {Induction\\over all $n$};
-  \node[stp,right=of c,fill=vertexorange!12,draw=vertexorange!85!black] (d) {Two checks\\on $n=7$};
+  \node[stp] (a) {Strongly connected\\components};
+  \node[stp,right=of a] (b) {An in- and an out-\\arborescence in each};
+  \node[stp,right=of b] (c) {Mantel on the\\condensation};
+  \node[stp,right=of c,fill=vertexgreen!12,draw=vertexgreen!70!black] (d) {Peel it off,\\$m-1$ times};
   \draw[ar] (a)--(b); \draw[ar] (b)--(c); \draw[ar] (c)--(d);
 \end{tikzpicture}
 \vfill
-The two remaining facts (multiplicities in $\{0,1,2\}$):
+\begin{minipage}{0.92\textwidth}
+A {\bfseries reachability skeleton} is a spanning subgraph that on its own reproduces every
+reachability relation the digraph has. Two facts close the problem:
 \begin{itemize}\itemsep4pt
-  \item[(a)] $L_3^{\mathrm{dir}}(7)=24$;
-  \item[(b)] the only $24$-arc extremisers are $2B_{3,4}$, $2B_{4,3}$, and the doubled path $P_7$.
+  \item[(1)] one always exists with at most $M(n)=\max(2(n-1),\floor{n^2/4})$ arcs;
+  \item[(2)] deleting one lowers \emph{every} pairwise connectivity by exactly one.
 \end{itemize}
-{\scriptsize\color{black!60}The wall here is runtime, not structure.}
+\vspace{4pt}
+So $m-1$ peels account for every arc: $L_m^{\mathrm{dir}}(n)=(m-1)M(n)$, for every $n$ and every
+$m$. No parity split, no auxiliary conjecture, no size limit, and $L_3^{\mathrm{dir}}(7)=24$
+falls out in three lines.
+\end{minipage}
 \vfill
 \end{frame}
 
@@ -625,7 +642,7 @@ $\lambda(u,v)$ is the lightest edge on the tree path, and $\lmax$ is the heavies
 % --- B5: values cheat-sheet ---
 \begin{frame}{Backup: values at a glance}
 \vfill
-\centering\renewcommand{\arraystretch}{1.25}
+\centering\renewcommand{\arraystretch}{1.15}\small
 \begin{tabular}{@{}ll@{}}
   \toprule
   Object & Extremal value \\
@@ -634,9 +651,14 @@ $\lambda(u,v)$ is the lightest edge on the tree path, and $\lmax$ is the heavies
   multigraph edge, $L_m(n)$ & $(m-1)(n-1)$ \\
   hypergraph edge, $\ell_m^{(r)}(n)$ & $\floor{(m-1)(n-1)/(r-1)}$ \\
   simple vertex, $k_m(n)$ \;($m\le4$) & $\floor{m(n-1)/2}$ \\
-  simple vertex, $k_5(n)$ & $\floor{8n/3}-3$ \\
-  directed arc, $m=2$ & $\max(2(n-1),\floor{n^2/4})$ \\
+  simple vertex, $k_5(n)$ \;($n\ge13$) & $\floor{8n/3}-3$ \\
   hypergraph vertex, $m\le3$ & $\floor{(m-1)(n-1)/(r-1)}$ \\
+  \midrule
+  directed simple, $m=2$ \;(arc and vertex) & $\max(2(n-1),\floor{n^2/4})$ \\
+  directed multigraph arc, every $m$ & $(m-1)\max(2(n-1),\floor{n^2/4})$ \\
+  directed simple, every $m$ \;(arc and vertex) & $n^2/4+\Theta_m(n)$ \\
+  directed hypergraph, both separations & $(1+o(1))(m-1)n^2/\bigl(4(r-1)\bigr)$ \\
+  \midrule
   random-graph threshold & $p^\ast=m/n$ \\
   \bottomrule
 \end{tabular}

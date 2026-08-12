@@ -43,7 +43,7 @@ ten-minute version uses five of them, chosen to carry the argument on their own:
 6. `temperature_trace.png` — what the machine does
 7. `variant_bounds_m3.png` — all twelve variants at once
 8. The twelve-variant status table
-9. Three new results
+9. What is new here
 10. What is left
 
 The hour version expands the same spine into seven parts (the question, the
@@ -59,3 +59,10 @@ references replaced by short words, so they read on a slide. They are
 `tab:summary` (twelve variants), `tab:sa-vs-tabu`, `tab:orientation`,
 `tab:multi-vertex`, and the rediscovery table, which is `\input` straight from
 `../figures/rediscovery_table.tex`.
+
+`\twelvetable` lives in `thesis-beamer.tex`, not in either deck, so it must be
+kept in step with `tab:summary` in `chapters/ch4_synthesis.tex` by hand. Its
+four status chips are PROVED, CITED, CONJ, and LEADING TERM, the last being the
+amber case where the `n^2` term is a theorem but the exact value is not. The
+older `slides.tex` carries its own copy of the same table and needs the same
+check.
