@@ -2999,3 +2999,86 @@ stability to the linear error term anyway:
 Both now separate the two currencies explicitly: within O_m(n) in SIZE, and a wall after
 deleting O(sqrt(m) n^{3/2}) in SHAPE. ch4 L77 and app_proofs L472 already had it right,
 which is what made the slip visible.
+
+## 2026-08-13 (Opus) -- the presentations were stale, the body was not; plus four buried derivations
+
+Author asked to check that intro, presentations and conclusions are up to date with the
+current results, and to improve the readability of the mathematics.
+
+**THE BODY WAS ALREADY CURRENT.** Swept main.tex, ch1-ch4 and app_proofs for every phrase
+tied to the superseded machinery ("two checks", "attachment lemma", "odd-step",
+"conj:min-degree", "fact (a)/(b)", "n <= 6"): the August audits had propagated both
+closures properly. Three small inconsistencies survived, below, but no stale result claim.
+
+**THE PRESENTATIONS HAD NOT BEEN SWEPT.** This is the finding worth recording, because the
+2026-08-12 audit says it fixed "three SLIDE decks" and it did fix their prose, but it did
+not touch the tables.
+- `slides/thesis-beamer.tex`'s `\twelvetable` is `\input` by BOTH figure-led decks and
+  lives in neither, so nobody editing talk_10 or talk_60 ever sees it. It still read
+  "PROVED $n\le6$, COND $m=3$" for the directed multigraph arc row and "LOWER BD." for both
+  directed hypergraph rows. talk_10 therefore contradicted itself inside one deck: frame 10
+  says "the exact values behind the leading terms now settled" while frame 8's table denies
+  the leading terms are settled at all. Rewritten against tab:summary; the directed simple
+  rows now carry the $m=2$ value AND the unconditional $n^2/4+\Theta_m(n)$; a fourth chip
+  LEADING TERM covers the amber case. `\resizebox` + a legend line, since two values per row
+  pushed it 42pt past the slide.
+- `slides/slides.tex` (the older narrative deck) was the stalest artefact in the repo. Its
+  backup frame B3 diagrammed "Attachment lemma -> Odd-step theorem -> Induction over all n
+  -> Two checks on n=7" and listed facts (a) and (b) as the remaining work. Every link in
+  that chain is deleted from app_proofs.tex. Replaced with the reachability-skeleton
+  argument (SCC -> in/out arborescences -> Mantel on the condensation -> peel $m-1$ times).
+  Also: the status spectrum (directed multigraph was under "certified by machine $n\le6$",
+  directed hypergraph under "open"), the results frame (advertised the reduction to two
+  n=7 checks), the landscape table, the open problems (named the backward-arc lemma as THE
+  missing piece rather than one quarter of open:decomposition), and the cheat sheet.
+- Retitled talk_60's "Three new results" frame, which listed four, and folded
+  thm:dir-vertex-linear-error into its item 2 rather than adding a fifth to an already
+  overfull frame. That frame's 21.5pt vbox overflow was pre-existing and is now gone.
+
+**THREE INCONSISTENCIES IN THE INTRO AND CONCLUSION.**
+1. main.tex: "Three further results come from isolating what the quadratic bound above
+   actually uses (lem:two-step-budget)", then describes two. prop:multi-vertex-upper is
+   NOT one of them: its proof runs through the underlying simple graph and Mader's density
+   theorem and never touches the budget lemma. app_proofs' own lead-in already said "two",
+   so the count was wrong in exactly one place, and so was the sentence assigning the
+   reviewer's debt to "these three". Corrected, with a clause saying explicitly that the
+   multigraph bound reaches its conclusion by an unrelated route.
+2. ch4 tab:functions listed the directed vertex row's Prove column as "reduces to the arc
+   problem above". That is the Whitney inversion the thesis spends two chapters warning
+   against, sitting in a summary table. It is `_exhaustive_directed` re-run under the
+   vertex test via `_vertex_flow_at_least` (both verified present in the program).
+3. tab:summary's caption and its lead-in still defined "Certified" as a status, though no
+   row has used it since thm:dir-multi-full retired the category. Both now say so.
+   Also added the $n\ge13$ qualifier to the Short Summary's S-T value, which ch1 and
+   tab:summary carry but the abstract did not.
+
+**READABILITY: four multi-step calculations moved out of running prose.** Chosen by
+scanning for lines above 400 characters carrying 12 or more relational operators inside
+inline math, which found exactly these.
+- Step 2 of prop:dir-arc-stability, the densest passage in the thesis: a four-term digon
+  cancellation performed inside a single sentence ("removing the diagonal terms turns
+  Step 1's bound X into Y, and bounding that digon term by |A(D)| cancels the -|A(D)|
+  exactly"). Now three labelled facts (2a) walks-by-midpoint, (2b) what the diagonal
+  counts, (2c) digons are few, then a four-line chain with the reason on each line.
+- thm:extremal-char's slack identity: five inline equations chained in prose, now the
+  three slacks displayed together, the two expressions for sum dist_T(e) displayed side by
+  side, and the substitution shown.
+- ch1's m=2 induction sketch, which matters because it is where a reader first meets the
+  thesis's central argument: the averaging, the inductive bound and the rearrangement
+  a(1-2/n) <= ... are now three displays instead of one 1900-character paragraph.
+- rem:case2-tight's concavity-and-exchange argument: cost function c(t) displayed, and the
+  conclusion given with underbraces naming the two factors (vertices at the cap, each
+  buying n/4). Arithmetic re-checked: c(n/4)=n^2/16, so 16Q/n^2 vertices at n/4 each gives
+  4Q/n = 4(m-1)(n-1), matching the constant already claimed.
+No mathematical content changed in any of the four. Costs two pages, 290 -> 292.
+
+VERIFY: latexmk exit 0, 292 pp, 0 overfull, 0 undefined refs/cites. Lay summary and all
+three decks rebuild clean (slides.tex keeps 3 pre-existing hbox overfulls at its frames
+S4/S5/S7, all before the first line I touched). Four rewritten pages rendered to PNG and
+read. Slide frames 8 (talk_10), 9, 11, 12, 18 and 20 (slides) rendered and inspected, two
+layout collisions found and fixed that way (chips overlapping between bands 3 and 4, and a
+cramped results column). Program untouched, so no suite re-run.
+
+NOTE FOR FUTURE SESSIONS: `\twelvetable` in slides/thesis-beamer.tex and the landscape
+table in slides/slides.tex are two hand-maintained copies of ch4's tab:summary. Nothing
+links them, and a build never complains. Recorded in slides/README.md.
