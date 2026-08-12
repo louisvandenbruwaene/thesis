@@ -2965,3 +2965,37 @@ Everything above is the author's own or classical and all of it holds. The only
 corrections this session made to appendix MATHEMATICS were to my own new text (the
 alpha = floor(n/2) overprecision), which is the honest summary: the pre-existing proofs
 were right, and the errors were in prose ABOUT them.
+
+## 2026-08-12 (Opus) -- proof-check of chapters 1 to 4
+
+Same treatment as the appendix, at the author's request. VERIFIED CORRECT, re-derived
+rather than skimmed: thm:multigraph-edge (the Gomory-Hu charging argument, which needs
+only dist_T >= 1 and so loses the factor two Mader's simple-graph count gains);
+prop:leonard-m2; const:bipartite; const:directed-hub (the circulant needs m <= n or its
+layers would wrap onto themselves, and the hypothesis supplies exactly that);
+const:augmented-bipartite in full; conj:dir-arc's arithmetic (m=3 reduction, the m=4
+"larger by exactly one at every even n", the first overtake at n=12, the n=3 m=4
+degeneracy); thm:leonard's and thm:sorensen-thomassen's hypotheses and values
+(k_5(13)=31 > 30); thm:gnp-threshold's statement against the A.10 proof; ch2's MILP
+(all four rows of tab:crossing-cases recomputed, plus the exactness argument and the
+validity of the two-hop and degree-sorting rows); prop:monotone; ch3's complexity
+counts (incl. that direction multiplies cells by 3 for the 3-uniform hypergraph, since
+n*C(n-1,2) / C(n,3) = 3); tab:orientation, all four cells reproduced by
+max_feasible_hyperedges with exact=True (the general r=3 n=4 cell needs ~121s, so a
+120s budget reports it as a lower bound and the caption's "proved equal" claim is
+nonetheless correct).
+
+ONE REAL ERROR FOUND, subtle, and it is a conflation of two different error terms.
+prop:dir-arc-stability proves TWO things: an arc count n^2/4 + sqrt(m) n^{3/2}, and a
+STABILITY statement, that deleting at most sqrt(m) n^{3/2} arcs leaves a one-directional
+bipartite digraph. thm:dir-arc-linear-error then improves the COUNT to
+n^2/4 + 4(m-1)(n-1). It does NOT improve the stability statement, and cannot as written:
+its Case 1 deletes a VERTEX and recurses, so the arcs at the deleted vertices are never
+accounted for as deletions from the original digraph. Two places quietly upgraded the
+stability to the linear error term anyway:
+ - main.tex contribution statement: "and deleting a comparable number of arcs always
+   leaves a one-way bipartite graph", sitting directly after the 4(m-1)(n-1) count.
+ - ch4 phenomena: "every feasible digraph is within O_m(n) arcs of being one".
+Both now separate the two currencies explicitly: within O_m(n) in SIZE, and a wall after
+deleting O(sqrt(m) n^{3/2}) in SHAPE. ch4 L77 and app_proofs L472 already had it right,
+which is what made the slip visible.
