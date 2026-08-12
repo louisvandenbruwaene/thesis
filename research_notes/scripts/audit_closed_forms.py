@@ -107,14 +107,19 @@ def main():
             stated = max(m * (n - 1), ((n + m - 2) ** 2) // 4)
             record("conj:dir-arc", f"n={n} m={m}", stated, v, n >= m)
 
-    print("\nthm:dir-multi-small  L_m^dir(n) = 2(n-1)(m-1) for n <= 6")
+    # thm:dir-multi-small (the n <= 6 linear branch) was superseded on
+    # 2026-08-11 by thm:dir-multi-full, which holds for every n and every m, so
+    # the sweep checks the general formula.  The two agree wherever exhaustion
+    # reaches: the branches tie at n = 7 and the quadratic one leads only from
+    # n = 8, which is past the enumerable range.
+    print("\nthm:dir-multi-full  L_m^dir(n) = (m-1) max(2(n-1), floor(n^2/4))")
     for m in (2, 3):
         for n in range(2, 6):
             v = matrix_value(n, m, directed=True, simple=False)
             if v is None:
                 continue
-            record("thm:dir-multi-small", f"n={n} m={m}",
-                   2 * (n - 1) * (m - 1), v, n <= 6)
+            record("thm:dir-multi-full", f"n={n} m={m}",
+                   (m - 1) * max(2 * (n - 1), (n * n) // 4), v, True)
 
     print("\nprop:hyper-edge  l_m^(r)(n) = floor((m-1)(n-1)/(r-1))")
     for r in (3, 4):
