@@ -3082,3 +3082,54 @@ cramped results column). Program untouched, so no suite re-run.
 NOTE FOR FUTURE SESSIONS: `\twelvetable` in slides/thesis-beamer.tex and the landscape
 table in slides/slides.tex are two hand-maintained copies of ch4's tab:summary. Nothing
 links them, and a build never complains. Recorded in slides/README.md.
+
+## 2026-08-13 (Opus) -- the Sorensen-Thomassen item closed from the primary source
+
+The author obtained the paper (JCTB 17(2) 1974, 143-159). It had been treated as
+paywalled since 2026-07-30; it is not free, but the block on the earlier attempt was
+ScienceDirect's bot-detection rather than the paywall, which is worth distinguishing.
+The file is gitignored (copyrighted Elsevier PDF, do not commit it).
+
+THREE errors, of which only the first was suspected.
+1. CONVENTION. p.143: "we define f_k(n) as the least integer r so that every graph with
+   n vertices and r or more edges contains a k-rail". Forcing convention, one more than
+   this thesis's k_m(n). So the value here is floor(8n/3) - 4. The Erdos Problems
+   database was faithful to its own stated definition all along and the figure was
+   carried across unconverted.
+2. RANGE. Theorem 4 (p.158) is "for n >= 6, n != 7, n != 12", not n >= 13. The database
+   records only the clean tail. The paper gives the two exceptions, f_5(7) = 16 and
+   f_5(12) = 28, hence k_5(7) = 15 and k_5(12) = 27 here. The closed form predicts 14
+   and 28 at those sizes, so both are real holes.
+3. DIVERGENCE POINT, the one nobody was looking for. The paper proves
+   f_5(n) = floor(5(n-1)/2) + 1 throughout 6 <= n <= 13, i.e. exactly l_5(n) in this
+   convention. The edge and vertex problems therefore AGREE up to n = 13 and first
+   separate at n = 14. ch1 and ch4 had claimed the separation from n >= 13, derived by
+   comparing a forcing k_5 (31) against an avoiding l_5 (30), which is precisely the
+   half-converted comparison rem:threshold-convention itself declared certainly wrong.
+
+WHY IT SURVIVED, worth remembering: k_5 > l_5 is INVARIANT under the convention shift,
+because both functions move by one. Any quantity built from their difference is
+convention-blind, so no internal consistency check could have fired. It only becomes
+visible when one side is evaluated in each convention, which is what the remark's own
+worked example did without noticing.
+
+Independent confirmation before writing anything: the corrected function reproduces all
+five values the paper states explicitly (n = 7, 12, 13, 14, 15) as f_5 - 1, and
+reproduces agree-through-13 / diverge-from-14 exactly.
+
+PROPAGATED: thm:sorensen-thomassen, rem:threshold-convention (rewritten from an open
+caveat into a resolved note quoting the paper's definition), ch1's divergence-figure
+caption and lineage paragraph, ch4's phenomena section and tab:summary, main.tex's Short
+Summary, both slide tables, the slides cheat sheet, ref.bib.
+
+PROGRAM: simple_undirected_vertex_m5 had the unconverted formula and no range guard.
+Fixed, with the two exceptions and a ValueError below n = 6. plot_edge_vertex_divergence
+called it from n = 4, outside the determined range; the m=5 curves now start at n = 6 and
+the regenerated figure shows them coinciding to n = 13 and parting at n = 14 rather than
+separating immediately. The old test asserted the old formula; replaced by four (formula
+with exceptions, the paper's own five values, the sub-6 guard, the divergence structure).
+Suite 90 -> 93 all pass, self-check ALL CHECKS PASSED, Appendix C re-synced,
+program/README test count updated.
+
+VERIFY: 292 pp, 0 overfull, 0 undefined refs, three decks clean, theorem page rendered
+and read.
