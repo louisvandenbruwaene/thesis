@@ -424,11 +424,13 @@ def hypergraph_edge(n: int, m: int, r: int) -> int:
 
 
 def directed_multigraph_arc(n: int, m: int) -> int:
-    """``L_m^dir(n) = 2(n-1)(m-1)``.  Proved for ``n <= 6`` (by counting cuts).
+    """``L_m^dir(n) = (m-1) max(2(n-1), floor(n^2/4))``.  Proved, all n and m.
 
-    Conjectured to continue to hold while the double star dominates the
-    one-directional bipartite branch (small ``n``); for larger ``n`` the
-    quadratic branch takes over.
+    The double star dominates the one-directional bipartite branch up to the
+    crossover at ``n = 7``, where the two tie; past it the quadratic branch
+    takes over.  Proved outright by ``thm:dir-multi-full`` (peel one sparse
+    reachability-preserving subgraph per unit of ``m-1``), which superseded the
+    earlier route that was certified only for ``n <= 6`` by counting cuts.
     """
     double_star_branch = 2 * (n - 1) * (m - 1)
     bipartite_branch = (m - 1) * ((n * n) // 4)

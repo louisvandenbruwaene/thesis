@@ -100,7 +100,7 @@ A separate, narrower question survives this closure: not the arc count of an ext
 
 The linear branch turns out to be richer than the double star first suggested. Every doubled bidirected spanning tree is extremal, confirmed exhaustively at $n = 4$ and $5$, and the saturated attachment lemma (\Cref{lem:saturated-attachment}) explains why: attaching one further vertex to an already-saturated doubled tree can add at most $2(m-1)$ arcs, and equality holds exactly when the new vertex becomes a new bidirected leaf. So building up from a single doubled edge one such leaf at a time, in every possible order, generates exactly the doubled bidirected trees and nothing denser, which is what it means to say the doubled trees are the closure of a single doubled edge under maximal attachment. Several distinct extremisers tie at $24$ arcs for $n = 7$, and sifting and classifying them is precisely what the enumeration must do.
 
-For $m \ge 4$ the conditional step still yields the value but uniqueness no longer propagates through odd levels, and for $m \ge 5$ even the value step stalls. These residual gaps are stated in full among the open problems below. They are finite, identified targets rather than mysteries, and natural goals for the next round of certified computation.
+It is worth naming what the closure removed, because the shape of the difficulty was misleading for a long time. The vertex-deletion route degraded as $m$ grew, yielding the value but not uniqueness at $m \ge 4$ and stalling on the value itself at $m \ge 5$, which made those look like harder regimes of the problem. They are not. That was a limitation of one method, and the reachability skeleton simply does not have it, treating every $m$ alike. The one question that genuinely survives is the uniqueness one above, stated in full among the open problems below: a finite, identified target rather than a mystery, and a natural goal for the next round of certified computation.
 
 \section{Two principal phenomena}
 
@@ -152,7 +152,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
 
 \section{Summary of the twelve variants}
 
-\Cref{tab:summary} records the status of all twelve structural variants. Each entry is marked by how it is known: proved by hand here or in \Cref{app:proofs}, cited to the literature, certified by the cut-counting optimisation for the stated sizes, or conjectured with a proved lower bound. The distinction is the honesty contract of \Cref{ch:certify} carried through to the summary. \Cref{fig:variant-tree-status} shows the same distinction as a picture before the table spells out every case.
+\Cref{tab:summary} records the status of all twelve structural variants. Each entry is marked by how it is known: proved by hand here or in \Cref{app:proofs}, cited to the literature, certified by the cut-counting optimisation for the stated sizes, conjectured with a proved lower bound, or, for the two rows where only the leading term is settled, proved asymptotically. The distinction is the honesty contract of \Cref{ch:certify} carried through to the summary. \Cref{fig:variant-tree-status} shows the same distinction as a picture before the table spells out every case.
 
 \begin{figure}[t]
 \centering
@@ -183,7 +183,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
   \node[vtleaf, fill=regimeConjectured!16] (l3)  at (3.6,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l4)  at (4.8,0)  {edge};
   \node[vtleaf, fill=regimeProved!16]      (l5)  at (6.0,0)  {vertex};
-  \node[vtleaf, fill=regimeConjectured!16] (l6)  at (7.2,0)  {edge};
+  \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
   \node[vtleaf, fill=regimeConjectured!16] (l7)  at (8.4,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l8)  at (9.6,0)  {edge};
   \node[vtleaf, fill=regimeProved!16]      (l9)  at (10.8,0) {vertex};
@@ -200,10 +200,10 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
   \node[vtleaf, fill=regimeConjectured!16, minimum width=8mm] (leg2) at (0,-2.1) {};
   \node[anchor=west, font=\scriptsize] at (0.9,-2.1) {conjectured, matching certified small $n$};
   \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (0,-2.9) {};
-  \node[anchor=west, font=\scriptsize] at (0.9,-2.9) {open, lower bound only};
+  \node[anchor=west, font=\scriptsize] at (0.9,-2.9) {leading constant proved, exact value open};
 \end{tikzpicture}%
 }
-\caption{The same branching as \Cref{fig:variant-tree}, now with every leaf resolved by the trichotomy of \Cref{sec:trichotomy}: blue is proved for all $n$, red is a conjectured formula backed by certified small cases and a matching search, and amber is open with only a lower bound known. Colour marks the status at general $m$, the harder regime this thesis mostly studies, and hides $m$-dependent exceptions and one convention that \Cref{tab:summary} states precisely. Every red leaf is a proved theorem at $m = 2$ and becomes conjectured only at $m \ge 3$, the directed edge leaves by \Cref{thm:dir-arc-m2-exact} and the directed vertex leaves by the separate \Cref{thm:dir-vertex-m2-exact}, which does not follow from it. Three blue leaves are proved only up to a finite $m$: the undirected vertex problem for simple graphs and for multigraphs ($m \le 4$) and for hypergraphs ($m \le 3$), open beyond. The two multigraph vertex leaves inherit whatever their simple counterparts have, because the counting convention of \Cref{sec:parallel-convention} makes those two questions the same question.}
+\caption{The same branching as \Cref{fig:variant-tree}, now with every leaf resolved by the trichotomy of \Cref{sec:trichotomy}: blue is proved for all $n$, red is a conjectured formula backed by certified small cases and a matching search, and amber is a variant whose leading term is proved but whose exact value is unknown. Colour marks the status at general $m$, the harder regime this thesis mostly studies, and hides $m$-dependent exceptions and one convention that \Cref{tab:summary} states precisely. The one branch whose two leaves disagree is the directed multigraph: its edge leaf is blue by \Cref{thm:dir-multi-full}, proved for every $n$ and $m$, while its vertex leaf takes the red of the simple digraph it inherits, so that parent node is drawn in the weaker of the two colours. Every red leaf is a proved theorem at $m = 2$ and becomes conjectured only at $m \ge 3$, the directed edge leaf by \Cref{thm:dir-arc-m2-exact} and the directed vertex leaves by the separate \Cref{thm:dir-vertex-m2-exact}, which does not follow from it. Three blue leaves are proved only up to a finite $m$: the undirected vertex problem for simple graphs and for multigraphs ($m \le 4$) and for hypergraphs ($m \le 3$), open beyond. The two multigraph vertex leaves inherit whatever their simple counterparts have, because the counting convention of \Cref{sec:parallel-convention} makes those two questions the same question.}
 \label{fig:variant-tree-status}
 \end{figure}
 
@@ -235,7 +235,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
         \bottomrule
     \end{tabular}%
     }
-    \caption{The twelve structural variants of Problem 915 and their status. Every simple-graph closed form here is stated for $n \ge m$, the hypothesis \Cref{thm:mader}, \Cref{thm:leonard} and \Cref{conj:dir-arc} carry: below it the complete graph or digraph is itself feasible and the answer is the trivial maximum, which the formulas exceed. ``Certified'' means proved by the cut-counting optimisation for the stated sizes. ``conj.''\ means a conjecture with a proved matching lower bound. ``lower bd.''\ means only a proved lower bound is known, with the exact value open. ``Convention'' marks the two rows whose value is fixed by the counting convention of \Cref{sec:parallel-convention} rather than by a theorem. The appearance threshold $p^* = m/n$ of \Cref{thm:gnp-threshold} is deliberately not a column here: it is proved for $G(n,p)$, extends to the vertex and directed analogues by \Cref{rem:threshold-analogues}, and does \emph{not} transfer to the hypergraph models, whose natural density scale is different (\Cref{rem:threshold-scope}).}
+    \caption{The twelve structural variants of Problem 915 and their status. Every simple-graph closed form here is stated for $n \ge m$, the hypothesis \Cref{thm:mader}, \Cref{thm:leonard} and \Cref{conj:dir-arc} carry: below it the complete graph or digraph is itself feasible and the answer is the trivial maximum, which the formulas exceed. ``Certified'' means proved by the cut-counting optimisation for the stated sizes. ``conj.''\ means a conjecture with a proved matching lower bound. ``Leading constant proved'' means the $n^2$ term of the value is a theorem while the exact value is open, which is the strongest thing known about the two directed hypergraph rows. ``Convention'' marks the two rows whose value is fixed by the counting convention of \Cref{sec:parallel-convention} rather than by a theorem. The appearance threshold $p^* = m/n$ of \Cref{thm:gnp-threshold} is deliberately not a column here: it is proved for $G(n,p)$, extends to the vertex and directed analogues by \Cref{rem:threshold-analogues}, and does \emph{not} transfer to the hypergraph models, whose natural density scale is different (\Cref{rem:threshold-scope}).}
     \label{tab:summary}
 \end{table}
 
@@ -257,7 +257,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
         Directed hyper (arc and vertex) & \code{hyper\_\allowbreak connectivity} & \code{max\_feasible\_\allowbreak hyperedges}: a pruned branch-and-bound & \code{search\_for\_\allowbreak dense\_graph} \\
         \bottomrule
     \end{tabularx}
-    \caption{The machinery of \Cref{ch:certify,ch:discover} indexed by variant family rather than by function name. This is the cross-reference from a variant to the routine that handles it; the routine's own signature, inputs, and outputs are in its \code{codecard} box.}
+    \caption{The machinery of \Cref{ch:certify,ch:discover} indexed by variant family rather than by function name. This is the cross-reference from a variant to the routine that handles it. The routine's own signature, inputs, and outputs are in its \code{codecard} box.}
     \label{tab:functions}
 \end{table}
 
@@ -290,7 +290,7 @@ $4$ & $4$ & $4$ & $4$ & $8$ \\
 
 The program turned a per-case craft into a uniform pipeline. Before it, each variant came with its own one-off computation and its own hand argument. After it, one representation holds every variant, one exact checker measures connectivity, one certifier proves small-case upper bounds, and one cooled search discovers extremisers and the lower bounds they witness. The rediscovery of \Cref{ch:discover} is the evidence that the pipeline is faithful: pointed at solved cases, it returns the solved answers.
 
-Its limits are as clear as its reach, and stating them is part of the honesty the thesis insists on. The search proves no upper bounds. It only ever exhibits graphs. The certifier proves upper bounds, but only for a fixed size, and the directed multigraph encoding closes unconditionally only up to $n = 6$; past there, the value is settled instead by the hand proof of \Cref{app:proofs}, and the certifier's role at $n = 7$ is an independent check rather than the source of the result. The generation enumerator's classification at $n = 7$ (\Cref{rem:n7-classification}) stands on its own as a machine-verified fact about which multigraphs attain the value. No amount of either replaces the genuinely structural gaps the thesis leaves open: the decomposition of \Cref{open:decomposition} that would turn \Cref{conj:dir-arc} into a theorem, of which the backward-arc clause is the hardest part but not the whole, the directed vertex problem at $m \ge 3$, which Whitney's inequality pointedly does not hand over with the arc case, and the undirected vertex-disjoint problem at $m \ge 6$, which has resisted for half a century and which the program can probe but not crack.
+Its limits are as clear as its reach, and stating them is part of the honesty the thesis insists on. The search proves no upper bounds. It only ever exhibits graphs. The certifier proves upper bounds, but only for a fixed size, and the directed multigraph encoding closes unconditionally only up to $n = 6$. Past there the value is settled instead by the hand proof of \Cref{app:proofs}, and the certifier contributed nothing at $n = 7$, where it exhausted its time limit without a verdict. The generation enumerator's classification at $n = 7$ (\Cref{rem:n7-classification}) stands on its own as a machine-verified fact about which multigraphs attain the value. No amount of either replaces the genuinely structural gaps the thesis leaves open: the decomposition of \Cref{open:decomposition} that would turn \Cref{conj:dir-arc} into a theorem, of which the backward-arc clause is the hardest part but not the whole, the directed vertex problem at $m \ge 3$, which Whitney's inequality pointedly does not hand over with the arc case, and the undirected vertex-disjoint problem at $m \ge 6$, which has resisted for half a century and which the program can probe but not crack.
 
 \section{Open problems}
 

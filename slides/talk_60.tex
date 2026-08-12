@@ -278,8 +278,10 @@ directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
         {\small\color{black!60} for every uniformity $r$ and every $n$: $k_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}=\ell_m^{(r)}(n)$. The $m=3$ case rests on a new rank bound for incidence graphs, proved through Tutte's triconnected decomposition.}
   \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$, unconditionally}\\
         {\small\color{black!60} no assumption about the extremal shape, which is what every earlier route to this bound needed. Leaves only a constant factor of about eight in one coefficient.}
-  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs at $m=3$, reduced to seven vertices}\\
-        {\small\color{black!60} an attachment lemma and step theorems for both parities collapse the whole infinite family onto two finite statements, one of them already verified by the program.}
+  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs, solved outright: $L_m^{\mathrm{dir}}(n)=(m-1)\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$}\\
+        {\small\color{black!60} every $n$ and every $m$, by peeling off one sparse reachability-preserving subgraph per unit of $m-1$. No parity split, no auxiliary conjecture, and the finite $n=7$ fact this problem once needed a solver for now follows in three lines.}
+  \item[\color{KULblauw1}\textbf{4}] \textbf{One-way hyperedge networks: the leading term settled}\\
+        {\small\color{black!60} $(1+o(1))(m-1)n^2/\bigl(4(r-1)\bigr)$, for edge- and vertex-disjoint routes alike, so the bipartite construction is asymptotically optimal.}
 \end{itemize}
 \vfill
 \end{frame}
@@ -289,8 +291,8 @@ directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
 \begin{itemize}\setlength{\itemsep}{11pt}
   \item {\color{stOpen}$\blacksquare$} \textbf{The undirected vertex problem at $m\ge6$}, open since 1974, extremal structure genuinely unknown
   \item {\color{stConj}$\blacksquare$} \textbf{The missing decomposition}: that an extremal non-hub digraph splits as $A\cup B$ with every arc from $A$ to $B$, none inside $A$, none coming back. Four hypotheses, of which the backward arc is the hardest.
-  \item {\color{stConj}$\blacksquare$} \textbf{The directed vertex problem at $m\ge3$}, which Whitney's inequality pointedly does \emph{not} hand over with the arc case
-  \item {\color{stConj}$\blacksquare$} \textbf{One finite computation}: $L_3^{\mathrm{dir}}(7)=24$, where the free solver times out and a stronger one should close it
+  \item {\color{stConj}$\blacksquare$} \textbf{The directed vertex problem at $m\ge3$}, which Whitney's inequality pointedly does \emph{not} hand over with the arc case. Its leading term is settled all the same, by borrowing the route family rather than the bound
+  \item {\color{stConj}$\blacksquare$} \textbf{The exact values} behind the settled leading terms: the linear coefficient one-way, and the hyperedge value at finite $n$
 \end{itemize}
 
 \vspace{18pt}

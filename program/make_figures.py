@@ -366,14 +366,14 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
             guess="search",
             band=_band(se2, tri_undirected, matrix_ns), exact=ex2, search=se2))
 
-    # (7) multigraph directed arc -- certified (cut-counting) then conjectured.
+    # (7) multigraph directed arc -- proved for all n and m (thm:dir-multi-full).
     ex7 = _exact_points(range(3, 6), m, 10.0,
                         directed=True, simple=False, separation="edge")
     se7 = searched(matrix_ns, lb_multi_dir,
                    directed=True, simple=False, separation="edge")
     panels.append(dict(
-        title=f"directed arc, $m={m}$  (multigraph, certified)", ylabel="arcs",
-        conj=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
+        title=f"directed arc, $m={m}$  (multigraph, proved)", ylabel="arcs",
+        proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
     # (8) multigraph directed vertex -- conjectured (reduces to simple digraph).

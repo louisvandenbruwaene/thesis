@@ -32,7 +32,7 @@ This appendix holds the arguments deferred from the body: the ones that are eith
 
 \section{Menger, Gomory--Hu, and the degree bound}
 
-The two classical theorems below are the foundation of everything the thesis measures, and we state them at the level of generality at which the program actually applies them. A \emph{capacitated graph}, or \emph{weighted graph}, is a graph, directed or not, carrying a nonnegative capacity $c(e)$ on each edge or arc. A plain graph is read as the \emph{unit-capacity} case $c \equiv 1$, and a multigraph as the integer-capacity case, one unit per parallel copy. A \emph{flow} from $u$ to $v$ sends units along edges without exceeding any capacity, and the \emph{capacity of a cut} is the total capacity of the edges crossing it. Both theorems below are theorems about capacitated graphs, and the thesis uses them mostly at unit and integer capacities, where the maximum flow is exactly the connectivity $\lec$.
+The two classical theorems below are the foundation of everything the thesis measures, and we state them at the level of generality at which the program actually applies them. A \emph{capacitated graph}, or \emph{weighted graph}, is a graph, directed or not, carrying a non-negative capacity $c(e)$ on each edge or arc. A plain graph is read as the \emph{unit-capacity} case $c \equiv 1$, and a multigraph as the integer-capacity case, one unit per parallel copy. A \emph{flow} from $u$ to $v$ sends units along edges without exceeding any capacity, and the \emph{capacity of a cut} is the total capacity of the edges crossing it. Both theorems below are theorems about capacitated graphs, and the thesis uses them mostly at unit and integer capacities, where the maximum flow is exactly the connectivity $\lec$.
 
 \begin{theorem}[Menger, as max-flow min-cut \cite{Menger27}]\label{thm:menger}
 In any capacitated digraph, and for distinct vertices $u, v$, the maximum flow from $u$ to $v$ equals the minimum capacity of a cut separating $u$ from $v$. At unit capacities this is the combinatorial statement we cite throughout: the maximum number of pairwise edge-disjoint $u$--$v$ paths equals the minimum number of edges whose removal separates them,
@@ -257,7 +257,7 @@ Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{
 \end{theorem}
 
 \begin{proof}
-Write the chain of the upper-bound proof as three nonnegative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$. Substituting $|E_1| = (n-1) - S_3$ into the first identity turns it into $\sum_e \dist_T(e) = 2|E| - (n-1) + S_2 + S_3$, and equating this with the second identity gives $2|E| - (n-1) + S_2 + S_3 = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
+Write the chain of the upper-bound proof as three non-negative integer slacks. The first, $S_1 = (m-1)(n-1) - \sum_t c(t)$, counts tree weights below $m-1$. The second, $S_2 = \sum_{e :\, \dist_T(e) \ge 2} (\dist_T(e) - 2)$, counts edges beyond tree distance two. The third, $S_3 = (n-1) - |E_1|$, counts tree edges that support no edge of $G$. Retracing the proof, $\sum_e \dist_T(e) = 2|E| - |E_1| + S_2$ and $\sum_e \dist_T(e) = \sum_t c(t) = (m-1)(n-1) - S_1$. Substituting $|E_1| = (n-1) - S_3$ into the first identity turns it into $\sum_e \dist_T(e) = 2|E| - (n-1) + S_2 + S_3$, and equating this with the second identity gives $2|E| - (n-1) + S_2 + S_3 = (m-1)(n-1) - S_1$, so altogether $2|E| = m(n-1) - (S_1 + S_2 + S_3)$. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
 \end{proof}
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
@@ -773,8 +773,28 @@ $L_3^{\mathrm{dir}}(7) = 24$.
 \end{corollary}
 
 \begin{proof}
-$M(7) = \max(12,12) = 12$, so \Cref{thm:dir-multi-full} at $m=3$, $n=7$ gives $L_3^{\mathrm{dir}}(7) = 2 \cdot 12 = 24$. Concretely, the induction peels two reachability skeletons off any $7$-vertex witness in turn, each of at most $M(7) = 12$ arcs by \Cref{lem:reach-skeleton}, first lowering $\lec^{\max}$ from $2$ to $1$ and then from $1$ to $0$: $24 = 12 + 12$ spends the whole budget twice over, with nothing left for a third pass. This is a proof by hand of the one statement Chapters~\ref{ch:certify} and~\ref{ch:synthesis} once recorded as an outstanding computation, resting on the mixed-integer program \code{prove\_integral\_arc\_bound(7, 3, 25)} reaching its time limit on the bundled CBC solver. Given more time, or the stronger Gurobi solver, the same program now confirms the proof directly: the call returns \code{INFEASIBLE} rather than timing out, agreeing with the argument above.
+$M(7) = \max(12,12) = 12$, so \Cref{thm:dir-multi-full} at $m=3$, $n=7$ gives $L_3^{\mathrm{dir}}(7) = 2 \cdot 12 = 24$. Concretely, the induction peels two reachability skeletons off any $7$-vertex witness in turn, each of at most $M(7) = 12$ arcs by \Cref{lem:reach-skeleton}, first lowering $\lec^{\max}$ from $2$ to $1$ and then from $1$ to $0$: $24 = 12 + 12$ spends the whole budget twice over, with nothing left for a third pass. This is a proof by hand of the one statement Chapters~\ref{ch:certify} and~\ref{ch:synthesis} once recorded as an outstanding computation. That computation was the mixed-integer program \code{prove\_integral\_arc\_bound(7, 3, 25)}, whose \code{INFEASIBLE} verdict would have settled the same fact, and which never returned one: it reached its time limit on the bundled CBC solver, and a fourteen-hour uncapped enumeration was stopped without a verdict. It was never run on a stronger solver, and it no longer needs to be. The honest summary is that the machine route to this fact was abandoned unfinished and the hand proof above replaced it, rather than the two confirming each other.
 \end{proof}
+
+\begin{corollary}[The fractional relaxation is integral]\label{cor:mstar-integral}
+For every $n \ge 2$, the $m$-free optimum $M^{*}(n)$ of \Cref{ch:certify} equals $M(n)$, and it is attained by a $\{0,1\}$ weight matrix. Consequently the scaling identity
+\[
+    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M^{*}(n)
+\]
+holds for every $n$ and every $m \ge 2$, with no hypothesis on the optimum.
+\end{corollary}
+
+\begin{proof}
+For $M^{*}(n) \ge M(n)$, both constructions of \Cref{const:dir-multi-lower} at multiplicity one are $\{0,1\}$ matrices with all pairwise maximum flows equal to one, of total weight $2(n-1)$ and $\floor{n^2/4}$ respectively.
+
+For the reverse, note first that the optimum is attained at a \emph{rational} matrix. A weight matrix is feasible exactly when, for each ordered pair, some cut separating that pair has capacity at most one, so the feasible region is the union, over the finitely many ways of choosing one cut per pair, of the bounded rational polytopes cut out by those choices together with $0 \le w \le 1$. A linear objective over a bounded rational polytope attains its maximum at a rational vertex, and $M^{*}(n)$ is the largest of finitely many such maxima.
+
+So let $w$ be a feasible rational optimum and let $q$ be a common denominator of its entries. Then $q\,w$ has integer entries, and multiplying every weight by $q$ multiplies every cut capacity by $q$ and hence every maximum flow by $q$, exactly as in \Cref{lem:thickening}. So $q\,w$ is a directed multigraph with $\lec^{\max} \le q$, that is, feasible at $m - 1 = q$, and \Cref{thm:dir-multi-full} bounds its arc count by $q\,M(n)$. Dividing by $q$ gives $M^{*}(n) = \sum_{u \ne v} w(u,v) \le M(n)$.
+
+The identity follows because \Cref{thm:dir-multi-full} gives $L_m^{\mathrm{dir}}(n) = (m-1)M(n)$.
+\end{proof}
+
+This settles the integrality question \Cref{ch:certify} raises when it introduces $M^{*}(n)$, namely whether the heaviest fractional weight matrix is always a $\{0,1\}$ one. It is, and the reason is worth noting because it is backwards from the usual direction of such arguments. Nothing here inspects the fractional problem at all. An integral theorem, proved for every $m$ at once, is strong enough to be applied to the scaled-up matrix $q\,w$, and the fractional statement falls out of the integral one rather than the other way round. That is only possible because \Cref{thm:dir-multi-full} holds at every $m$, however large, so no denominator is out of reach.
 
 \begin{corollary}[The $m=2$ case collapses to the simple digraph]\label{thm:dir-multi-m2}
 At $m=2$ (so $k=1$), \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, matching \Cref{thm:dir-arc-m2-exact} exactly, and this is not a coincidence. A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints, so at $m=2$ the multigraph problem and the simple digraph problem are literally the same problem. \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case, rather than needing it as a separate input.
@@ -1562,8 +1582,8 @@ The obstacle to running the argument of \Cref{thm:dir-arc-linear-error} here is
 real and worth naming before it is disposed of, because the way around it is not
 to remove it. There, two-step routes through distinct midpoints were
 automatically arc-disjoint. Here a single hyperedge carries $r-1$ heads at once,
-so two two-step routes with different midpoints may enter through the very same
-hyperedge, and the family of two-step routes is not edge-disjoint at all. The
+so a pair of two-step routes with different midpoints may enter through the very
+same hyperedge, and the family of two-step routes is not edge-disjoint at all. The
 resolution is to accept the loss. A packing can always be extracted from that
 family at a cost of a factor $r-1$, and that factor turns out to be free, because
 of where it lands. The route count does not bound the hyperedges directly. It
@@ -1748,7 +1768,7 @@ Exhaustive search over all multigraphs with multiplicities in $\{0, \dots, m-1\}
 
 Two things stand out. First, the problem is \emph{not} the edge problem in disguise: at $m = 5$, $n = 5$ the value is $19$ against the edge value $16$, so the separation axis genuinely buys something for multigraphs under this reading. Second, the small-$n$ regime $n \le m+1$, where the complete graph is feasible for the simple problems too, is tempting to read as the \emph{only} place a cycle pays for itself, with the thickened tree optimal once $n \ge m+2$. It is not: a single triangle grafted anywhere onto the thickened tree already beats it, for every $m \ge 5$ and every such $n$, which the next theorem makes precise.
 
-By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connected simple graph $G_0$ maximizes its total multiplicity by setting $\mu(u,v) = m-1-\pi(u,v)$ on every edge, giving total $(m-1)\,|E(G_0)| - \sum_{uv \in E(G_0)} \pi(u,v)$. Writing $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$, the thickened tree is beaten by any $G_0$ with
+By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connected simple graph $G_0$ maximises its total multiplicity by setting $\mu(u,v) = m-1-\pi(u,v)$ on every edge, giving total $(m-1)\,|E(G_0)| - \sum_{uv \in E(G_0)} \pi(u,v)$. Writing $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$, the thickened tree is beaten by any $G_0$ with
 \[
     \sum_{uv \in E(G_0)} \pi(u,v) \;<\; (m-1)\,\mathrm{rank}(G_0).
 \]
