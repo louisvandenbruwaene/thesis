@@ -1,6 +1,6 @@
 The journey set out from one clean theorem and followed it across twelve variants, proving what proved cleanly, building a machine where the proofs ran out, certifying the small cases the machine could close, and using the search to discover the dense graphs the proofs had singled out and to point at the ones still open. This closing chapter draws the threads together. It maps the directed frontier, where proof and certificate both still fall short of the full answer, names the two genuine surprises the landscape contains, gathers the twelve answers into one picture, and says plainly what the program changed and where it stops.
 
-\section{The directed frontier and the single open lemma}
+\section{The directed frontier and the missing decomposition}
 
 Two of the open directions are directed, and they share a structure worth stating exactly rather than hiding. The directed arc problem is a race between two constructions on different scales. The directed hub (\Cref{const:directed-hub}) reaches $m(n-1)$ arcs and grows linearly. The augmented bipartite construction (\Cref{const:augmented-bipartite}) packs $\floor{(n+m-2)^2/4}$ arcs and grows quadratically. Which leads depends on $n$, and the two cross at an order linear in $m$, near $n = 9$ at the $m = 3$ of \Cref{fig:crossover}. \Cref{conj:dir-arc} asserts that together they are the whole story.
 
