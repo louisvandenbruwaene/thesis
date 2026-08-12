@@ -2820,3 +2820,69 @@ VERIFY: latexmk exit 0, 289 pp (was 285), 0 overfull, 0 undefined refs/cites. Ne
 rendered to PNG and read: A.27/A.28 (budget lemma and vertex theorem), A.54/A.55 (shadow
 and hypergraph theorem), A.59 (multigraph upper bound), all clean, all cross-references
 resolving. No program code touched, so no suite re-run needed.
+
+## 2026-08-12 (Opus, cont.) -- full-thesis consistency audit after the two closures
+
+Author: integrate directly, keep going until nothing is left. Swept the whole document.
+
+**HONESTY VIOLATION, three places, the most serious finding.** The appendix corollary,
+ch2's scaling section, and ch2's certification-standards section each claimed the n=7
+MILP had confirmed L_3^dir(7)=24, one in the present tense ("the call returns
+INFEASIBLE"). It never ran to completion: CBC timed out, the uncapped enumeration was
+killed after ~14 h, and it was never rerun on a stronger solver (the gurobi_handoff
+folder was deleted as vestigial the same day). A fourth spot in ch4 said the certifier's
+role at n=7 was "an independent check rather than the source of the result", which
+implies a verdict that does not exist. All four now say plainly that the machine route
+was abandoned unfinished and the hand proof replaced it. This is exactly the failure the
+thesis's own honesty contract exists to prevent, so it is worth recording loudly.
+
+**STALE-BY-CONTRADICTION (yesterday's deletions left prose behind that resolves as no
+reference, so the build never complained):**
+- main.tex SHORT SUMMARY (the abstract) still sold the deleted attachment lemma and
+  conditional odd-step theorem plus "two finite machine-checkable statements". Rewritten.
+- ch4 closed the directed-multigraph section with "for m>=5 even the value step stalls",
+  three paragraphs after stating the theorem holds for every m. It was a limitation of
+  the abandoned method; reframed as such.
+- ch3's trichotomy put the directed multigraph in the CONJECTURED regime and cited the
+  deleted conj:min-degree. Moved to the first regime in both the regime list and the
+  paragraph; the certificates are now described as an independent check on a theorem.
+- ch3 twice said no upper bound is known for the directed arc problem at m>=3. One has
+  existed since 2026-07-30 (thm:dir-arc-linear-error); it is merely too loose at n<=12
+  to check a search against, which is what the sentences meant.
+- fig:variant-tree-status coloured the multigraph directed EDGE leaf red; tab:summary's
+  caption defined "lower bd." which no row used any more after this morning.
+- **The generated figures disagreed with the text**: make_figures panel (7) still drew
+  the directed multigraph as a red conjecture curve titled "(multigraph, certified)".
+  Changed to proved=, retitled, and BOTH grids regenerated (m=3 and m=6). Verified the
+  panel now reads "(multigraph, proved)" with a blue curve and the search circles on it,
+  and that no other panel drifted.
+- program docstring for directed_multigraph_arc still said "Proved for n <= 6.
+  Conjectured to continue". It is printed verbatim in Appendix C, so sync_code_appendix
+  had to be rerun (it caught 8 shifted lineranges, exactly the fragility it was built for).
+- Three SLIDE decks promised "two finite n=7 checks" and a solver that would close them.
+
+**NEW RESULT out of the audit: cor:mstar-integral.** ch2 states as open whether the
+fractional optimum M*(n) is always attained by a {0,1} matrix. It is. The feasible region
+is a finite union of bounded rational polytopes (one cut choice per pair), so the optimum
+is rational; scaling a rational optimum by its denominator q gives an integral multigraph
+feasible at m-1=q, and thm:dir-multi-full applies at EVERY m, so no denominator is out of
+reach. Hence M*(n)=M(n) and the scaling identity L_m^dir(n)=(m-1)M*(n) is unconditional.
+Worth noting the direction: an integral theorem settles a fractional question, not the
+other way round, which is only possible because the theorem has no ceiling in m.
+
+**STRUCTURE / CLEANLINESS:** the directed hypergraph material (prop:dir-hyper-first
+through the new thm:dir-hyper-constant) sat inside the section titled "The hypergraph
+VERTEX problem"; given its own section A.8. The appendix's "How to read this appendix"
+guide named three load-bearing sections when there are six; rewritten. Two symbols used
+throughout (M(n), K_m^multi(n)) were missing from the symbol table. One unreferenced
+figure (fig:scaling-reduction) now has a pointer. Four prose semicolons against the
+thesis's own convention, two American spellings (maximizes, nonnegative), one doubled
+word ("two two-step"). ch1's two "the upper bound is open" statements refined to say what
+is and is not open. Contribution statement now records that the three new results inherit
+the external reviewer's counting idea.
+
+**VERIFIED:** 90 unit tests OK, program self-check ALL CHECKS PASSED, Appendix C in step,
+two_step_budget_check.py passes, latexmk exit 0, 290 pp, 0 overfull, 0 undefined
+refs/cites, all three slide decks rebuild. Numeric spot-checks by hand: the clique-bouquet
+counts (27, 25, 150 vs 120), every cell of the theta/tree/complete comparison in
+tab:multi-vertex, and the m=4 first-divergence at n=12 for conj:dir-arc.
