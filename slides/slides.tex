@@ -196,6 +196,9 @@
 \begin{frame}{The road of a research problem}
 \vfill
 \centering
+% The road runs to x = 11.8 plus its right-hand label, which is wider than the
+% text block, so the whole picture is scaled to fit rather than clipped.
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[scale=0.95,
    stop/.style={circle,fill=KULblauw1,text=white,font=\scriptsize\bfseries,
                 inner sep=0pt,minimum size=19pt,draw=white,line width=1.2pt},
@@ -212,7 +215,8 @@
   \node[stop] (m5) at (7.6,2.6) {5}; \node[lab,above=5pt of m5] {Proving};
   \node[stop] (m6) at (9.6,0.7) {6}; \node[lab,below=5pt of m6] {Implementing};
   \node[stop] (m7) at (11.8,1.3){7}; \node[lab,right=6pt of m7] {Efficiency};
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \vfill
 \begin{center}\color{black!70}The slides ahead follow this road.\end{center}
 \vfill
@@ -234,9 +238,13 @@
       \draw[edge] (v0)--(v1); \draw[edge] (v0)--(v2); \draw[edge] (v0)--(v3);
       \draw[edge] (v1)--(v2); \draw[edge] (v1)--(v4);
       \draw[edge] (v2)--(v3); \draw[edge] (v2)--(v4); \draw[edge] (v3)--(v4);
-      \node[font=\scriptsize\color{black!60}] at (0,-1.55)
-        {$K_5$ minus 2 edges: $8=\ell_4(5)$ edges};
     \end{tikzpicture}
+
+    % The caption sits outside the picture: inside it, "every node/.style=
+    % {transform shape}" scaled this line by 1.35 as well and pushed the
+    % column past the text block.
+    \vspace{4pt}
+    {\scriptsize\color{black!60} $K_5$ minus 2 edges: $8=\ell_4(5)$ edges}
   \end{column}
   \begin{column}{0.58\textwidth}
     A graph: \;$n$ vertices, \;$E$ edges.\\[10pt]
@@ -285,6 +293,9 @@
 \begin{frame}{One question, twelve variants}
 \vfill
 \centering
+% Spans the axis labels on the left to the "= 12" box on the right, a shade
+% wider than the text block, so it is scaled to fit.
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
    ax/.style={font=\footnotesize\bfseries,text=KULblauw3b,anchor=east},
    opt/.style={rounded corners=3pt,draw=KULblauw1,fill=KULblauw1!8,
@@ -309,7 +320,8 @@
 
   \node[draw=vertexorange!85!black,line width=1.3pt,fill=vertexorange!10,rounded corners=5pt,
         font=\bfseries,text=vertexorange!55!black,inner sep=8pt] at (6.3,0) {$=\;12$};
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \vfill
 \begin{center}\color{black!70}Mader's theorem is one corner. The other eleven are the journey.\end{center}
 \vfill
