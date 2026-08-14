@@ -39,3 +39,7 @@ slides/talk_*.toc
 slides/talk_*.fls
 slides/talk_*.fdb_latexmk
 sorensen.pdf
+
+# author working files and third-party PDFs, kept locally only
+current status thesis.rtf
+directed_multigraph_extremal_revised.pdf
