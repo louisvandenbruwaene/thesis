@@ -37,7 +37,7 @@ the largest local edge-connectivity anywhere in $G$. A theorem of Menger \cite{M
 \centering
 \begin{tikzpicture}[scale=1.2,
     mv/.style={gvertex},
-    me/.style={gfaint},
+    me/.style={gline},
     rA/.style={grA},
     rB/.style={grB},
     rC/.style={grC},
@@ -212,9 +212,9 @@ A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+
     \node[mv] (g2) at (210:0.78) {};
     \node[mv] (g3) at (330:0.78) {};
     % g1 -> g2: a triple of parallel arcs, fanned outward and well spaced
-    \draw[darc] (g1) to[bend right=8]  (g2);
-    \draw[darc] (g1) to[bend right=20] (g2);
-    \draw[darc] (g1) to[bend right=32] (g2);
+    \draw[darc] (g1) to[bend left=22]  (g2);
+    \draw[darc] (g1) to[bend right=0] (g2);
+    \draw[darc] (g1) to[bend right=22] (g2);
     % g2 <-> g3: opposite arcs (bidirected)
     \draw[darc] (g2) to[bend right=12] (g3);
     \draw[darc] (g3) to[bend right=12] (g2);
