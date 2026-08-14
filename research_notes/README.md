@@ -245,6 +245,28 @@ Scripts: `multi_vertex_blocks.py` (needs nauty's `geng` and networkx; sweeps all
 `2`-connected blocks, solves the knapsack, and cross-checks every cell the thesis
 program can prove exhaustively).
 
+### Extremal uniqueness on the quadratic branch (PROVED for n >= 2m, 2026-08-14)
+`thm:dir-multi-full` settles the directed multigraph VALUE for every `n` and `m`,
+and ch4 recorded the uniqueness question as untouched by it, since the
+reachability-skeleton proof "never needs to know which digraph it is peeling
+apart". That is true of the proof read forwards. Read BACKWARDS from equality the
+same construction is rigid: the skeleton count is uniquely maximised at one value
+of the component number, forcing the extremiser to be ACYCLIC, and the
+triangle-freeness used only to apply Mantel's bound becomes Mantel's EQUALITY
+case, pinning the skeleton to a balanced complete bipartite graph. A new
+observation, that inclusion-minimality also makes the skeleton SHALLOW (no
+directed path of three arcs), closes it: for `n >= max(8, 2m)` the extremiser is
+unique, the balanced one-directional complete bipartite digraph at multiplicity
+`m-1`.
+
+- [`quadratic_branch_uniqueness.md`](quadratic_branch_uniqueness.md) -- the
+  reframing, the shallowness lemma, the proof chain, the exact regularity that
+  equality also forces, and the open range `n < 2m`.
+
+Scripts: `quadratic_branch_uniqueness.py` (self-contained, standard library only;
+enumerates extremisers outright using acyclicity plus exact regularity plus the
+monotone-feasibility prune).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal

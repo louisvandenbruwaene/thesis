@@ -925,6 +925,60 @@ multiplicity, one per choice of partner.
 \Cref{lem:saturated-attachment} identifies the whole extremal family of the linear branch, but \Cref{cor:dir-multi-n7}'s value alone does not say which digraphs attain $24$ arcs at $n=7$, $m=3$, the size where the linear and quadratic branches of $M(n)$ tie ($M(7)=\max(12,12)=12$). That finer question was settled separately, by machine, before the value itself had a proof by hand: the sound generation enumerator of \Cref{ch:certify} (\code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24, max\_degree=8)}, which prunes only with proved bounds and is therefore complete at every $n$) ran for about seven hours across ten processor cores and returned exactly three isomorphism classes: the two bipartite shapes $2 \cdot B_{3,4}$ and $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$, the one non-star tree whose maximum degree ($2$) is compatible with an $8$-regular graph one vertex up. Each of the three was re-verified by the exact checker. This is a genuine complement to \Cref{cor:dir-multi-n7}, not a step on the way to it: the reachability-skeleton induction proves the value $24$ without ever needing to know which graphs attain it, and this classification answers the separate question of which ones do, at this one size.
 \end{remark}
 
+\subsection{Uniqueness on the quadratic branch}\label{sec:quadratic-uniqueness}
+
+The classification above is one finite data point, and the linear branch is settled by \Cref{lem:saturated-attachment}, so what is missing is the quadratic branch at a general $n$. The reachability-skeleton proof looks unpromising for this, since it is designed never to need to know which multigraph it is taking apart. But that indifference is only in the direction of the \emph{bound}. Run backwards, from the assumption that the bound is met exactly, the same construction is unexpectedly rigid: it pins down the number of strongly connected components, then the shape of the skeleton, and finally the multigraph.
+
+Two consequences of equality do the work, and both come from reading the count of \Cref{lem:reach-skeleton} as an equation rather than an inequality.
+
+\begin{lemma}[What equality forces]\label{lem:equality-forces}
+Let $n \ge 8$, so that $\floor{n^2/4} > 2(n-1)$ and $M(n) = \floor{n^2/4}$, and let $D$ be a directed multigraph on $n$ vertices with $\lec^{\max}_D \le m-1$ and $|A(D)| = (m-1)\floor{n^2/4}$. Then
+\begin{enumerate}[label=(\arabic*)]
+    \item $D$ is acyclic, and
+    \item $D$ has a reachability skeleton $R$ whose underlying undirected graph is exactly the balanced complete bipartite graph $K_{\ceil{n/2},\floor{n/2}}$, so $R$ is an acyclic orientation of it.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+The proof of \Cref{thm:dir-multi-full} peels reachability skeletons $R_1, \dots, R_{m-1}$, each deletion dropping every pairwise connectivity by exactly one, so that after $m-1$ peels no arc survives and $|A(D)| = \sum_i |A(R_i)|$. Each $|A(R_i)| \le M(n)$, so equality in the hypothesis forces $|A(R_i)| = M(n)$ for every $i$, and in particular for $R := R_1$.
+
+Now read the count of \Cref{lem:reach-skeleton} backwards. It gives $|A(R)| \le f(q) := 2(n-q) + \floor{q^2/4}$, where $q$ is the number of strongly connected components of $D$, so $f(q) \ge \floor{n^2/4} = f(n)$. The increments $f(q+1) - f(q) = -2 + \floor{(q+1)/2}$ are non-decreasing, so $f$ is convex, and $f(n) - f(n-1) = -2 + \floor{n/2} \ge 2$ for $n \ge 8$. A convex function that is strictly increasing at its right endpoint cannot equal its endpoint value anywhere earlier, since it would then have to be constant on the whole stretch in between. Hence $q = n$: every strongly connected component is a single vertex, which is (1).
+
+With $q = n$ the two arborescences of Step 1 of that proof are empty, so $R$ consists of the witness arcs of $Q$ alone and $|A(Q)| = \floor{n^2/4}$. The underlying undirected graph of $Q$ is triangle-free, proved there from the inclusion-minimality of $Q$. A triangle-free graph on $n$ vertices with $\floor{n^2/4}$ edges meets Mantel's bound \cite{Mantel07} with equality, and the extremal graph for Mantel's theorem is unique: it is $K_{\ceil{n/2},\floor{n/2}}$. That is (2), and $R$ is acyclic because $D$ is.
+\end{proof}
+
+The next lemma is where the skeleton's minimality, which had only been used to make it small, is used to make it \emph{shallow}. It costs nothing and it is what makes the theorem work.
+
+\begin{lemma}[A minimal bipartite skeleton has no long path]\label{lem:skeleton-shallow}
+Let $R$ be as in \Cref{lem:equality-forces}, with parts $A$ and $B$. Then $R$ contains no directed path with three arcs.
+\end{lemma}
+
+\begin{proof}
+Suppose $u \to v \to w \to x$ were such a path. A path in a bipartite graph alternates sides, so $u$ and $x$ lie on opposite sides, and since $R$'s underlying graph is the \emph{complete} bipartite graph, $R$ contains an arc between them. It cannot be $x \to u$, which would close a directed cycle against the path, and $D$ is acyclic. So $u \to x$ lies in $R$. But then deleting $u \to x$ from $R$ changes no reachability, since $u$ still reaches $x$ along the path, contradicting the inclusion-minimality of $Q$.
+\end{proof}
+
+\begin{theorem}[Uniqueness on the quadratic branch]\label{thm:dir-multi-uniqueness}
+Let $m \ge 2$ and $n \ge \max(8,\, 2m)$ with $n$ on the quadratic branch. If $D$ is a directed multigraph on $n$ vertices with $\lec^{\max}_D \le m-1$ and $|A(D)| = L_m^{\mathrm{dir}}(n) = (m-1)\floor{n^2/4}$, then
+\[
+    D \;=\; (m-1) \cdot B_{\ceil{n/2},\,\floor{n/2}} ,
+\]
+the one-directional complete bipartite digraph on a balanced bipartition, every arc at multiplicity exactly $m-1$. The extremiser is therefore unique up to relabelling and the choice of which side is the larger.
+\end{theorem}
+
+\begin{proof}
+Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \ge \beta = |B| = \floor{n/2}$.
+
+\emph{Step 1: $R$ has no directed path with two arcs.} Suppose $a \to b \to a'$ with $a, a' \in A$ and $b \in B$. If $a$ had an incoming arc $b_0 \to a$ in $R$, then $b_0 \to a \to b \to a'$ would be a path with three arcs, which \Cref{lem:skeleton-shallow} forbids. So $a$ has no incoming arc in $R$, and since $R$'s underlying graph is complete bipartite, $a \to b''$ for \emph{every} $b'' \in B$. Symmetrically $a'$ has no outgoing arc, so $b'' \to a'$ for every $b'' \in B$. The $\beta$ routes $a \to b'' \to a'$, one through each $b'' \in B$, use pairwise distinct arcs, and each of their arcs is present in $D$ because $R \subseteq D$. Hence $\lec_D(a,a') \ge \beta = \floor{n/2} \ge m$, against feasibility. The case of a path $b \to a \to b'$ with middle vertex in $A$ is identical with the sides exchanged and gives $\lec_D(b,b') \ge \alpha \ge \beta \ge m$, equally impossible. This is the one step that uses $n \ge 2m$.
+
+\emph{Step 2: $R$ is one-directional.} By Step 1 no vertex of $R$ has both an incoming and an outgoing arc, so every vertex is a source or a sink. Fix $a \in A$; it is adjacent in $R$ to every vertex of $B$, so it is not isolated. If $a$ is a source then every $b \in B$ has an incoming arc, hence is a sink, hence has no outgoing arc, so every arc at every $b$ runs into it: all arcs of $R$ run from $A$ to $B$. If instead $a$ is a sink the same argument gives all arcs from $B$ to $A$. Relabelling the two sides, assume $R = B_{\alpha,\beta}$, all arcs from $A$ to $B$.
+
+\emph{Step 3: $D$ has no arc outside $R$.} $R$ has the same reachability as $D$, and in a one-directional bipartite digraph the only ordered pairs joined by a directed path are the pairs $(a,b) \in A \times B$, each by the single arc $a \to b$. So if $D$ had an arc $(u,x)$, then $u$ reaches $x$ in $R$, forcing $(u,x) \in A \times B$, and $R$ already contains that arc. Hence $D$ and $R$ use exactly the same $\alpha\beta = \floor{n^2/4}$ ordered pairs.
+
+\emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the ceiling. Hence $D = (m-1) \cdot B_{\alpha,\beta}$, and $\alpha\beta = \floor{n^2/4}$ forces the bipartition to be balanced.
+\end{proof}
+
+Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. What can be said is that nothing in the argument suggests a real boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, the regularity just mentioned is worth recording on its own, since it is what makes that enumeration finite in practice: deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$, and for even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack, so every vertex has degree exactly $(m-1)n/2$. Third, the shape of the argument is worth noticing. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
+
 \section{The hypergraph bounds}
 
 The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem from the recent literature.

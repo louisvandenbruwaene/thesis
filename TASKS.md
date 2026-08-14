@@ -69,6 +69,32 @@ as it is copyrighted). Both open questions are settled from the primary source.
   half-converted comparison. Note that k_5 > l_5 is invariant under the shift
   (both sides move by one), so no internal check can catch this. Applied.
 
+## RESOLVED 2026-08-14: uniqueness on the QUADRATIC branch (thm:dir-multi-uniqueness)
+ch4 had listed this as open because thm:dir-multi-full "is silent on it by
+design, since it never needs to know which digraph it is peeling apart". True of
+the proof read FORWARDS; read BACKWARDS from equality it is rigid.
+- f(q) = 2(n-q)+floor(q^2/4) is UNIQUELY maximised at q=n on the quadratic
+  branch (convex, and f(n)-f(n-1) = -2+floor(n/2) >= 2 for n >= 8), so equality
+  forces every SCC to be a single vertex: the extremiser is ACYCLIC.
+- The skeleton's triangle-freeness, previously used only to apply Mantel's
+  BOUND, becomes at equality Mantel's EQUALITY CASE: the skeleton is an acyclic
+  orientation of K_{ceil(n/2),floor(n/2)}.
+- NEW STEP (lem:skeleton-shallow): inclusion-minimality also makes the skeleton
+  SHALLOW, no directed path of three arcs. A 3-arc path has its ends on opposite
+  sides, the complete bipartite graph supplies an arc between them, acyclicity
+  fixes its direction, and that arc is then redundant.
+- Chain: no 3-arc path => a 2-arc path forces a source and a sink => a fan of
+  floor(n/2) arc-disjoint routes => contradiction once floor(n/2) >= m => no
+  2-arc path => one-directional => no room for any other arc => every
+  multiplicity exactly m-1. So D = (m-1)B for n >= max(8, 2m).
+- Equality ALSO forces exact regularity (degree (m-1)n/2 for even n), which with
+  acyclicity makes an exhaustive enumeration finite; it finds a unique
+  extremiser at every size reached. research_notes/quadratic_branch_uniqueness.md
+- [ ] STILL OPEN: the range n < 2m. Step 1 is the only place n >= 2m is used;
+      below it a source-to-sink fan of floor(n/2) routes is affordable, so a
+      different contradiction is needed. Enumeration finds no other extremiser
+      there, so the hypothesis looks like an artefact of the argument.
+
 ## OPEN — directed vertex problem at m >= 3
 - [x] **Leading constant and second-order ORDER settled 2026-08-12**
       (thm:dir-vertex-linear-error): k_m^dir(n) = n^2/4 + Theta_m(n)
