@@ -48,7 +48,7 @@ Every \emph{undirected} capacitated graph $G$ has a weighted tree $T$ on the sam
 
 Two features of the statement fix how far it reaches, and both are used below. Being a theorem about capacities, it applies verbatim to a simple graph (unit weights), to a multigraph (integer weights, the multiplicity $\mu$ as capacity), and, in the form of \Cref{thm:hyper-gomory-hu}, to the hyperedge-connectivity of a hypergraph. But it needs the cut function to be \emph{symmetric}, which forces $G$ to be undirected: a digraph has $\lec(u,v) \ne \lec(v,u)$ in general and admits no such tree, and the vertex-connectivity function fails symmetry for the same reason. So the Gomory--Hu tree is precisely the tool for the undirected edge problems, where it drives Mader's theorem and its multigraph and hypergraph cousins (\Cref{thm:mader,thm:multigraph-edge,prop:hyper-edge}) through one argument, and precisely the tool that vanishes once arcs turn one-way.
 
-Existence rests on one property of cuts: writing $d(S)$ for the capacity of the cut $(S, V \setminus S)$, $d$ is \emph{submodular}, $d(A) + d(B) \ge d(A \cap B) + d(A \cup B)$ for any vertex sets $A, B$, which is exactly the inequality that lets a cheapest $u$--$v$ cut crossing some other set $S$ be traded for one that does not, without ever losing capacity. Building the tree is then $n-1$ rounds of one minimum-cut computation each, each round splitting one bag of the current tree along a fresh minimum cut, with that trading property (the \emph{uncrossing} lemma) guaranteeing no earlier round's cut is ever spoiled by a later one. The full construction, uncrossing induction included, is in Gomory and Hu's original paper \cite{GomoryHu61}.
+Existence rests on a single property of cuts. Write $d(S)$ for the capacity of the cut $(S, V \setminus S)$. This function is \emph{submodular}, meaning that $d(A) + d(B) \ge d(A \cap B) + d(A \cup B)$ for any two vertex sets $A$ and $B$. That is exactly the inequality which lets a cheapest $u$--$v$ cut crossing some other set $S$ be traded for one that does not, without ever losing capacity. Building the tree is then $n-1$ rounds of one minimum-cut computation each, each round splitting one bag of the current tree along a fresh minimum cut, with that trading property (the \emph{uncrossing} lemma) guaranteeing no earlier round's cut is ever spoiled by a later one. The full construction, uncrossing induction included, is in Gomory and Hu's original paper \cite{GomoryHu61}.
 
 The most basic constraint on local connectivity is local: a pair cannot have more independent routes than either endpoint has edges. The constructions below use it constantly.
 
@@ -144,6 +144,8 @@ Let $G$ carry \emph{unit capacities}, so that each weight $c(t)$ of a Gomory--Hu
 \]
 This is the form used for Mader's theorem, where $G$ is a simple graph and so unit-capacitated by default.
 \end{lemma}
+
+In words: the total weight of the tree equals the sum, over the edges of $G$, of how many tree edges each one straddles. An edge of $G$ is counted once for every tree cut that separates its endpoints, and $\dist_T(e)$ is precisely that count.
 
 \begin{proof}
 By \Cref{thm:gomory-hu} each tree edge $t$ induces a cut of $G$ of capacity $c(t)$, so $c(t) = \sum_{e \in E(G)} \mathbf{1}_{e \text{ crosses } t}$. Exchanging the order of summation,
@@ -373,12 +375,14 @@ Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ t
 since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates one, and it cannot make two surviving routes share anything they did not share before.
 \end{lemma}
 
+In words: deleting a vertex can never manufacture independent routes. Every route surviving in $D - v_0$ was already a route in $D$, so no pair comes out of the deletion better connected than it went in. This single guarantee is what every vertex-deletion induction in this section rests on, and it holds for both separations alike.
+
 \begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
 Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \ge \floor{n^2/4}$ exactly for $n \le 7$, with equality at $n = 7$, so $M(n) = 2(n-1)$ for $n \le 7$ and $M(n) = \floor{n^2/4}$ for $n \ge 7$. The lower bound $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ is witnessed by the directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}).
 
 For the upper bound we show by strong induction on $n$ that $\lec^{\max}_D \le 1$ forces $|A(D)| \le M(n)$.
 
-\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, which walks every simple digraph with $\lec^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is reproduced below, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}. The two smallest are also immediate by hand, as a check on the machine rather than a separate argument: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the rest form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. The point of the theorem is precisely that $n = 4, 5, 6, 7$ are \emph{not} immediate by hand, which is what makes handing the case-check to the program the right move.
+\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, which walks every simple digraph with $\lec^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is reproduced below, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}. The two smallest are also immediate by hand, as a check on the machine rather than as a separate argument. At $n = 2$ there are at most $2$ arcs. At $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. The point of the theorem is precisely that $n = 4, 5, 6, 7$ are \emph{not} immediate by hand, which is what makes handing the case-check to the program the right move.
 
 \emph{Inductive step $n \ge 8$.} Let $D$ be a simple digraph on $n$ vertices with $\lec^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ minimising the total degree $d(v) = d^+(v) + d^-(v)$. Since $\sum_v d(v) = 2a$, averaging gives $d(v_0) \le 2a/n$. By \Cref{lem:subdigraph-monotone} the digraph $D - v_0$ on $n-1 \ge 7$ vertices satisfies the induction hypothesis, so $a - d(v_0) \le M(n-1) = \floorfrac{(n-1)^2}{4}$. Combining,
 \[
@@ -517,6 +521,8 @@ A common out-neighbour $w \ne u$ would give the two arc-disjoint routes $u \to v
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
 \end{proposition}
 
+In words: once every arc from $A$ to $B$ is present, a vertex of $B$ can afford very few in-arcs from inside $B$. Each such arc creates a fresh two-step detour on top of the direct arc that every vertex of $A$ already has, and the ceiling allows only $m-2$ of them.
+
 \begin{proof}
 Fix $a \in A$ and $b \in B$, and let $b'_1, \dots, b'_d$ be the in-neighbours of $b$ inside $B$, where $d = \deg^-_B(b)$. The direct arc $a \to b$ together with the two-step detours $a \to b'_i \to b$ are $1 + d$ arc-disjoint $a$-to-$b$ routes, all present because $A \to B$ is complete. Feasibility forces $1 + d \le m - 1$, so $d \le m - 2$, and summing over $B$ bounds the internal arcs by $(m-2)|B|$.
 \end{proof}
@@ -634,6 +640,8 @@ so for each fixed $m$,
 and both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally.
 \end{theorem}
 
+In words: a feasible one-way simple graph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the truth of the matter, and the only thing still in question is how large the linear correction is. Nothing here assumes anything whatever about the shape of $D$.
+
 \begin{proof}
 Induction on $n$. For $n = 2$ a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4(m-1) \ge 5$, so the base holds. Let $n \ge 3$ and split on the minimum total degree.
 
@@ -730,7 +738,7 @@ The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as th
 
 \section{The directed multigraph problem, solved in full}
 
-The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section just below, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. It is natural to hope the same trick settles the multigraph case at every $m$ too, and for a long while it very nearly does: dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one, and deleting a vertex of least weighted degree from that weighting drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
+The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section just below, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. It is natural to hope that the same trick settles the multigraph case at every $m$ too, and for a long while it very nearly does. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
 This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every pair's connectivity by exactly one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
@@ -769,7 +777,7 @@ Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n)
 
 \subsection{The upper bound: a reachability skeleton}
 
-It helps to first ask what a single vertex deletion actually buys at $m=2$: removing a vertex can only remove routes passing through it, so no pair's connectivity ever rises, and the whole $m=2$ induction rests on that one guarantee together with an averaging bound on how much one well-chosen vertex carries. The multigraph problem at a general $m$ wants the same two ingredients, a deletion that is guaranteed to lower every connectivity, paired with a bound on how much it removes, but there the natural analogue of ``one vertex'' breaks down: once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is ever guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead: one general enough to always exist, sparse enough to bound, and specific enough that removing it is guaranteed to lower every pairwise connectivity by exactly one.
+It helps to first ask what a single vertex deletion actually buys at $m=2$: removing a vertex can only remove routes passing through it, so no pair's connectivity ever rises, and the whole $m=2$ induction rests on that one guarantee together with an averaging bound on how much one well-chosen vertex carries. The multigraph problem at a general $m$ wants those same two ingredients: a deletion that is guaranteed to lower every connectivity, paired with a bound on how much it removes. There, though, the natural analogue of ``one vertex'' breaks down. Once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead: one general enough to always exist, sparse enough to bound, and specific enough that removing it is guaranteed to lower every pairwise connectivity by exactly one.
 
 \begin{definition}[Reachability skeleton]\label{def:reach-skeleton}
 Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using at most one copy of each arc it uses (no parallel copies, even if $D$ has them), is a \emph{reachability skeleton} of $D$ if, for every pair of vertices $u \ne v$, $u$ reaches $v$ by some directed path in $R$ exactly when $u$ reaches $v$ by some directed path in $D$.
@@ -858,13 +866,15 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
   \node[font=\small] at (2.6,2.0) {$R$};
 \end{scope}
 \end{tikzpicture}}
-\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, with all three arcs $A \to B$, $B \to C$, $A \to C$ present, exactly the transitively-closed triangle the proof rules out of the thinned $Q$: the arc $A \to C$ is redundant, since $A$ already reaches $C$ via $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$, and the underlying graph of $Q$, a path on three points, is triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the two component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
+\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the two component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
 \label{fig:skeleton-example}
 \end{figure}
 
 \begin{lemma}[Deleting a skeleton lowers every connectivity by one]\label{lem:reach-delete}
 Let $D$ be a directed multigraph with $\lec^{\max}(D) \le k$ for some $k \ge 1$, and let $R$ be a reachability skeleton of $D$. Write $D - R$ for the multigraph obtained by deleting, from each multiplicity $\mu(u,v)$, the one copy (if any) that $R$ uses on that pair. Then $\lec^{\max}(D - R) \le k - 1$.
 \end{lemma}
+
+In words: subtracting one copy of each skeleton arc costs every pair exactly one route. The skeleton preserves reachability, so however many arc-disjoint routes survive the deletion, one further route can always be run entirely inside the arcs that were deleted, and that extra route is what the original ceiling has to pay for.
 
 \begin{proof}
 Fix an ordered pair $u \ne v$ and suppose $D - R$ carries $t \ge 1$ pairwise arc-disjoint $u$--$v$ paths. These use arcs of $D - R$ and hence of $D$, since $D - R \subseteq D$, so $u$ reaches $v$ in $D$. Because $R$ is a reachability skeleton, $u$ then also reaches $v$ in $R$: some directed path $P$ from $u$ to $v$ uses only arcs of $R$. Every arc of $R$ has been subtracted out of $D - R$, so $P$ shares no arc with any of the $t$ paths already found inside $D - R$. Together, $P$ and those $t$ paths are $t+1$ pairwise arc-disjoint $u$--$v$ paths in $D$, so $t + 1 \le \lec_D(u,v) \le k$, that is, $t \le k-1$. Pairs with $t=0$ trivially satisfy $t \le k-1$ once $k \ge 1$, so this holds for every pair, giving $\lec^{\max}(D-R) \le k-1$.
@@ -897,6 +907,8 @@ For every $n \ge 2$, the $m$-free optimum $M^{*}(n)$ of \Cref{ch:certify} equals
 \]
 holds for every $n$ and every $m \ge 2$, with no hypothesis on the optimum.
 \end{corollary}
+
+In words: allowing fractional weights buys nothing. The relaxed optimum is already attained by an honest multigraph with weights $0$ and $1$, so the scaling identity that carries one computed number to every $m$ at once needs no integrality hypothesis attached to it.
 
 \begin{proof}
 For $M^{*}(n) \ge M(n)$, both constructions of \Cref{const:dir-multi-lower} at multiplicity one are $\{0,1\}$ matrices with all pairwise maximum flows equal to one, of total weight $2(n-1)$ and $\floor{n^2/4}$ respectively.
@@ -978,7 +990,7 @@ multiplicity, one per choice of partner.
 \end{remark}
 
 \begin{remark}[Which multigraphs attain $24$ arcs at $n=7$]\label{rem:n7-classification}
-\Cref{lem:saturated-attachment} identifies the whole extremal family of the linear branch, but \Cref{cor:dir-multi-n7}'s value alone does not say which digraphs attain $24$ arcs at $n=7$, $m=3$, the size where the linear and quadratic branches of $M(n)$ tie ($M(7)=\max(12,12)=12$). That finer question was settled separately, by machine, before the value itself had a proof by hand: the sound generation enumerator of \Cref{ch:certify} (\code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24, max\_degree=8)}, which prunes only with proved bounds and is therefore complete at every $n$) ran for about seven hours across ten processor cores and returned exactly three isomorphism classes: the two bipartite shapes $2 \cdot B_{3,4}$ and $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$, the one non-star tree whose maximum degree ($2$) is compatible with an $8$-regular graph one vertex up. Each of the three was re-verified by the exact checker. This is a genuine complement to \Cref{cor:dir-multi-n7}, not a step on the way to it: the reachability-skeleton induction proves the value $24$ without ever needing to know which graphs attain it, and this classification answers the separate question of which ones do, at this one size.
+\Cref{lem:saturated-attachment} identifies the whole extremal family of the linear branch, but \Cref{cor:dir-multi-n7}'s value alone does not say which digraphs attain $24$ arcs at $n=7$, $m=3$, the size where the linear and quadratic branches of $M(n)$ tie ($M(7)=\max(12,12)=12$). That finer question was settled separately, by machine, before the value itself had a proof by hand. The tool was the sound generation enumerator of \Cref{ch:certify}, in the call \code{enumerate\_extremal\_directed\_multigraphs\_via\_generation(7, 3, 24, max\_degree=8)}, which prunes only with proved bounds and is therefore complete at every $n$. It ran for about seven hours across ten processor cores and returned exactly three isomorphism classes. Two of them are the bipartite shapes $2 \cdot B_{3,4}$ and $2 \cdot B_{4,3}$. The third is the doubled bidirected path $P_7$, the one non-star tree whose maximum degree ($2$) is compatible with an $8$-regular graph one vertex up. Each of the three was re-verified by the exact checker. This is a genuine complement to \Cref{cor:dir-multi-n7}, not a step on the way to it: the reachability-skeleton induction proves the value $24$ without ever needing to know which graphs attain it, and this classification answers the separate question of which ones do, at this one size.
 \end{remark}
 
 \subsection{Uniqueness on the quadratic branch}\label{sec:quadratic-uniqueness}
@@ -1021,6 +1033,8 @@ Let $m \ge 2$ and $n \ge \max(8,\, 2m)$ with $n$ on the quadratic branch. If $D$
 the one-directional complete bipartite digraph on a balanced bipartition, every arc at multiplicity exactly $m-1$. The extremiser is therefore unique up to relabelling and the choice of which side is the larger.
 \end{theorem}
 
+In words: past $n = \max(8, 2m)$ there is exactly one way to be extremal on this branch. Split the vertices as evenly as possible, run an arc from every vertex of one side to every vertex of the other, and repeat each of those arcs $m-1$ times. No other multigraph on $n$ vertices reaches the same arc count.
+
 \begin{proof}
 Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \ge \beta = |B| = \floor{n/2}$.
 
@@ -1033,7 +1047,7 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 \emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the ceiling. Hence $D = (m-1) \cdot B_{\alpha,\beta}$, and $\alpha\beta = \floor{n^2/4}$ forces the bipartition to be balanced.
 \end{proof}
 
-Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. What can be said is that nothing in the argument suggests a real boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, the regularity just mentioned is worth recording on its own, since it is what makes that enumeration finite in practice: deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$, and for even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack, so every vertex has degree exactly $(m-1)n/2$. Third, the shape of the argument is worth noticing. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
+Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. What can be said is that nothing in the argument suggests a real boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, the regularity just mentioned is worth recording on its own, since it is what makes that enumeration finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$. Third, the shape of the argument is worth noticing. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
 
 \section{The hypergraph bounds}
 
@@ -1317,6 +1331,8 @@ $\kap_G(x, x') \le 2$ for all distinct $x, x' \in X$. Then
 $\mathrm{rank}(G) \le |X| - 1$.
 \end{lemma}
 
+In words: this is the engine behind the $m = 3$ hypergraph result, stated for a bipartite graph rather than for a hypergraph. Read $X$ as the vertices of a hypergraph and $Z$ as its hyperedges, so that $G$ is the incidence graph and $\mathrm{rank}(G)$, the number of independent cycles it carries, is the quantity the hyperedge count is eventually read off from. The four hypotheses say in turn that the picture really is an incidence graph (i), that no hyperedge repeats a vertex (ii), that no hyperedge dangles as a leaf (iii), and that the hypergraph is feasible at $m = 3$ (iv). The conclusion caps the independent cycles by the number of vertices.
+
 \begin{proof}
 Induction on $|V| + |E|$. The proof peels $G$ down to a core that cannot
 exist. Step~1 handles a cut vertex by arguing block by block. Steps~2 and~3
@@ -1527,6 +1543,8 @@ hypergraph, so
 \]
 \end{theorem}
 
+In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than under the weaker one, and for $r \ge 3$ that count is actually reached without repeating a single hyperedge. The two separations therefore agree here exactly as they did at $m = 2$.
+
 \begin{proof}
 Apply \Cref{lem:incidence-rank} to each connected component of the incidence
 graph $I(\HH)$, with $X$ the vertex class and $Z$ the hyperedge class:
@@ -1681,6 +1699,8 @@ reversal, and the backward edge and vertex extremal numbers equal the forward
 ones, for every $r$, $m$ and $n$.
 \end{lemma}
 
+In words: the backward model is the forward model seen in a mirror. Turning every hyperarc around swaps the tails with the heads and reverses every route, which leaves the number of independent routes between a pair untouched. The two models have identical extremal numbers, so nothing below needs to treat backward as a separate case.
+
 \begin{proof}
 Reversal sends a backward hyperarc ($|T| = r-1$, $|H| = 1$) to a forward one
 ($|T| = 1$) and is its own inverse, so it is an edge-count-preserving bijection of
@@ -1785,6 +1805,8 @@ edge- and the vertex-disjoint maxima are
 $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
 of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
 \end{theorem}
+
+In words: the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
 \begin{proof}
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
@@ -1899,6 +1921,8 @@ $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$ as the forward model, under both
 separations, and the bipartite construction of \Cref{prop:dir-hyper-first} is
 asymptotically optimal for it too.
 \end{theorem}
+
+In words: how a hyperedge is oriented does not move the leading term. Whether one vertex points at the other $r-1$ of them, or several do, the maximum carries the same $\frac{m-1}{r-1}\floor{n^2/4}$ in front, and only the linear term notices the difference, through the factor $2r+1$. With \Cref{lem:dir-hyper-duality} this closes the orientation axis to first order.
 
 \begin{proof}
 Let $R$ be the one-step shadow read in the general model, so $(u,v) \in A(R)$
@@ -2116,7 +2140,7 @@ Combining the two directions, at fixed $m$ and $n \to \infty$,
     \;\le\; K_m^{\mathrm{multi}}(n) \;<\; 2 m^2 n ,
 \]
 where the $o_m(1)$ vanishes as $m$ grows,
-so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$: the bouquet of \Cref{thm:clique-chain-vertex} is a lower bound of the right order in $n$ and in $m$ both, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is deliberately crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$, and the first inequality $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$ is the more informative half: it says this variant can never outrun the simple vertex problem by more than the multiplicity ceiling, which ties the least understood of the twelve to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
+so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$: the bouquet of \Cref{thm:clique-chain-vertex} is a lower bound of the right order in $n$ and in $m$ both, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is deliberately crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$. The first inequality, $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$, is the more informative half. It says that this variant can never outrun the simple vertex problem by more than the multiplicity ceiling, which ties the least understood of the twelve to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
 
 \subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
 
@@ -2163,7 +2187,7 @@ the maximum over all finite multisets of block sizes. In particular the value is
 \]
 Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ by the same identity, so $W_m(B) \le g_m(|V(B)|)$.
 
-\emph{The sizes fit.} If $G_0$ has $c$ components and blocks $B_1, \dots, B_t$, then $\sum_i (|V(B_i)| - 1) = n - c - (\text{number of isolated vertices contributed}) \le n-1$: within one component, contracting the block tree gives $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one, and summing over components loses one further vertex per extra component. With \Cref{lem:multi-vertex-objective} this proves $\le$.
+\emph{The sizes fit.} Suppose $G_0$ has $c$ components and blocks $B_1, \dots, B_t$. Within a single component, contracting the block tree makes $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one. Summing over components loses one further vertex for each extra component, so $\sum_i (|V(B_i)| - 1) = n - c - (\text{number of isolated vertices contributed}) \le n-1$. With \Cref{lem:multi-vertex-objective} this proves $\le$.
 
 \emph{Every multiset is realised.} Given blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, take one common vertex and attach the $B_i$ to it, pairwise disjoint otherwise, leaving any spare vertices isolated. The result uses $1 + \sum (b_i-1) \le n$ vertices. Its blocks are exactly the $B_i$, so by the first paragraph its $\kap$ agrees with $\kap_{B_i}$ on pairs inside a block and equals at most $1$ on pairs split between two blocks, which the shared vertex separates. So the graph is feasible and scores $\sum_i W_m(B_i)$, and choosing each $B_i$ optimal gives $\sum_i g_m(b_i)$. This proves $\ge$.
 \end{proof}
@@ -2266,7 +2290,7 @@ since $m / \ln n \to \infty$. By the degree bound (\Cref{lem:degree-bound}) $\le
 \end{proof}
 
 \begin{remark}[The vertex and directed analogues]\label{rem:threshold-analogues}
-Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in the random digraph $D(n,p)$, where each ordered pair's arc is tossed independently with probability $p$, the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are the theorems of Bollob\'as \cite[Ch.~7]{BollobasRandomGraphs} for $G(n,p)$, in hitting-time form due to Bollob\'as and Thomason \cite{BollobasThomason85}, and its directed analogue \cite{FriezeKaronski16}, which state that in this regime the global connectivities equal the minimum degree (respectively the minimum semi-degree, the smaller of a vertex's in- and out-degree) with high probability, so $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
+Below the threshold, $\kap^{\max} \le \lec^{\max}$ gives the vertex statement for free, and in the random digraph $D(n,p)$, where each ordered pair's arc is tossed independently with probability $p$, the out-degree version of the same union bound applies. Above the threshold, the minimum degree exceeds $m$ with high probability by the lower-tail bound. Mader's theorem alone does not carry this to the vertex problem, since $\kap^{\max} \le \lec^{\max}$ runs the wrong way to deduce $\kap^{\max} \ge m$ from the edge bound. What supplies it instead are three results: the theorems of Bollob\'as \cite[Ch.~7]{BollobasRandomGraphs} for $G(n,p)$, their hitting-time form due to Bollob\'as and Thomason \cite{BollobasThomason85}, and the directed analogue \cite{FriezeKaronski16}. In this regime all three say the same thing, that the global connectivities equal the minimum degree with high probability. In the directed case the relevant quantity is the minimum semi-degree, the smaller of a vertex's in- and out-degree. So $\kap^{\max}$ and the directed $\lec^{\max}$ also cross $m$ at $p^* = m/n$. The growth hypothesis $m / \ln n \to \infty$ is what lets the union bound beat the factor $n$. For fixed $m$, the bound is vacuous and finer tools (Poisson approximation of low-degree vertex counts) would be needed.
 \end{remark}
 
 \begin{remark}[How far the threshold reaches, and where it stops]\label{rem:threshold-scope}
