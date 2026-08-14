@@ -77,11 +77,12 @@ enumerated outright. Results:
 |---|---|---|---|
 | 8 | 2 | yes | 1, `= B(4,4)` |
 | 8 | 3 | yes | 1, `= 2B(4,4)` |
+| 8 | 4 | yes (`2m = 8`, the boundary) | 1, `= 3B(4,4)` |
 
 Larger `m` at `n = 8` widens the multiplicity cap and the enumeration slows
-sharply; those rows are in flight and are NOT claimed here until they return.
-The rows that matter for the open range are `m >= 5` at `n = 8`, since `2m > 8`
-puts them outside the proof.
+sharply (the `m=4` row already took 3.5M DFS nodes); the `m >= 5` rows are in
+flight and are NOT claimed here until they return. Those are the ones that
+matter for the open range, since `2m > 8` puts them outside the proof.
 
 ## What is still open
 

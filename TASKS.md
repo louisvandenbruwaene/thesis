@@ -95,6 +95,39 @@ the proof read FORWARDS; read BACKWARDS from equality it is rigid.
       different contradiction is needed. Enumeration finds no other extremiser
       there, so the hypothesis looks like an artefact of the argument.
 
+## OPEN — the 1974 problem (undirected vertex, m >= 6), reframed 2026-08-14
+STATE OF THE ART, read off the PRIMARY source (sorensen.pdf p.144), not just the
+database: Bollobas-Erdos conjectured c_m := lim k_m(n)/(n-1) = m/2 (n copies of
+K_m at a shared vertex). MADER DISPROVED IT for every m >= 6 (k_m(n) - mn/2 is
+unbounded). S-T give c_m >= (m(m-1)-2)/(2m-3) = m/2 + 1/4 + O(1/m). The only
+general UPPER bound is 2(m-1)n from Mader's density theorem, so the rate is
+pinned only within a factor of ~4.
+- [x] **thm:simple-vertex-blocks: k_m(n) is a knapsack over 2-connected blocks**,
+      so c_m = sup_b h_m(b)/(b-1) (superadditive + Fekete). Reproves m=3 (blocks
+      are edges and cycles, triangles win) and m=4 (K_4 wins) in two lines, and
+      identifies the Bollobas-Erdos conjecture as exactly "K_m is the best
+      block". No block on <= 9 vertices beats it, for any m <= 8 (all 194066
+      2-connected 9-vertex graphs checked).
+- [x] **WHY computation cannot see the truth.** The S-T witness glues copies of
+      K_m - e in a CYCLE, so it has NO cut vertex: it is a single 2-connected
+      block and the block reduction is blind to it. It does have 2-CUTS, so the
+      refinement wanted is the TRICONNECTED (Tutte/SPQR) decomposition, the same
+      machinery lem:incidence-rank already uses. Smallest member beating the
+      conjecture: n=26 at m=5, 24 at m=6, 18 at m=7, against the 9 exhaustion
+      reaches. Construction rebuilt and VERIFIED (counts, 2-connectivity,
+      kappa^max = m-1) at m=5,6,7, j<=3.
+- [ ] **NEXT: the triconnected refinement.** Decompose along 2-cuts and ask for
+      the best "3-block" rate. This is the step the reduction points at and the
+      SPQR tooling is in hand.
+- [ ] **CHEAPEST GAIN, rem:vertex-degeneracy: does a feasible graph always have
+      a vertex of degree <= m-1?** YES would make feasible graphs
+      (m-1)-degenerate and give k_m(n) <= (m-1)n - C(m,2), HALVING the constant
+      in the only general upper bound. Classical at m=3 (min degree 3 forces a
+      K_4 subdivision). No counterexample for m <= 6, n <= 10 (exhaustive over
+      all min-degree->=m graphs). Deliberately a QUESTION, not a conjecture: the
+      sizes reached are far below the 26-vertex scale where the Bollobas-Erdos
+      conjecture itself first fails. research_notes/simple_vertex_blocks.md
+
 ## OPEN — directed vertex problem at m >= 3
 - [x] **Leading constant and second-order ORDER settled 2026-08-12**
       (thm:dir-vertex-linear-error): k_m^dir(n) = n^2/4 + Theta_m(n)

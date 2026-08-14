@@ -283,6 +283,62 @@ The whole characterisation reads off that last identity. If $m(n-1)$ is even, eq
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
 
+\subsection{The vertex problem is a block problem}\label{sec:simple-vertex-blocks}
+
+The \emph{vertex} problem $k_m(n)$ is the one open since 1974, and this short section records the shape it has, which is the same shape \Cref{sec:multi-vertex-blocks} finds for the multigraph variant and which is worth having before either. Nothing here is deep. What it buys is a change of the object being searched: from graphs on $n$ vertices, with $n$ growing, to $2$-connected graphs alone.
+
+\begin{theorem}[The vertex problem is a knapsack over blocks]\label{thm:simple-vertex-blocks}
+For $b \ge 2$ let
+\[
+    h_m(b) \;:=\; \max\bigl\{\, |E(B)| \;:\; B \text{ $2$-connected or a single edge},\ |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} .
+\]
+Then for all $m \ge 2$ and $n \ge 2$,
+\[
+    k_m(n) \;=\; \max\Bigl\{\, \sum_i h_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} .
+\]
+Consequently $k_m(n) \ge k_m(n_1) + k_m(n_2)$ whenever $n = n_1 + n_2 - 1$, and
+\[
+    c_m \;:=\; \lim_{n \to \infty} \frac{k_m(n)}{n-1} \;=\; \sup_{b \ge 2} \frac{h_m(b)}{b-1}
+\]
+exists, the limit being approached from below.
+\end{theorem}
+
+\begin{proof}
+Let $G$ be feasible. Adjacent vertices $u,v$ lie in a common block $B$, and no $u$-$v$ path leaves $B$: leaving means crossing a cut vertex, and returning means crossing that same cut vertex a second time, which no path does. So $\kap_G(u,v) = \kap_B(u,v)$, every block inherits feasibility, and since every edge lies in exactly one block, $|E(G)| = \sum_B |E(B)| \le \sum_B h_m(|V(B)|)$. Within one component the block sizes satisfy $\sum_B (|V(B)|-1) = (\text{order of the component}) - 1$, and summing over components loses one further vertex apiece, so $\sum_B (|V(B)|-1) \le n-1$. That is $\le$.
+
+For $\ge$, take blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, pick one vertex, and attach all the $B_i$ to it, pairwise disjoint otherwise. The result has $1 + \sum(b_i-1) \le n$ vertices, its blocks are exactly the $B_i$, so pairs inside a block keep their $\kap$ and pairs split between two blocks are separated by the shared vertex and have $\kap \le 1 \le m-1$. It is feasible with $\sum_i |E(B_i)|$ edges.
+
+Superadditivity is the special case of gluing two extremal graphs at a single vertex. Writing $a_n := k_m(n)$, the sequence $(a_{n+1})$ is superadditive in $n-1$, so Fekete's lemma gives $a_n/(n-1) \to \sup_n a_n/(n-1)$, and $a_n/(n-1) \ge h_m(b)/(b-1)$ whenever $(b-1) \mid (n-1)$, while $a_n \le \max_b h_m(b)/(b-1) \cdot (n-1)$ from the display. So the limit is $\sup_b h_m(b)/(b-1)$.
+\end{proof}
+
+Three things follow at once, and they are a good test of whether the reformulation is saying anything.
+
+At $m = 3$ it \emph{proves} \Cref{thm:leonard}'s value. A block with $\kap^{\max} \le 2$ is an edge or a cycle, since a block that is neither contains a theta subgraph and a theta gives three internally disjoint paths. So $h_3(2) = 1$ and $h_3(b) = b$ for $b \ge 3$, the rate $b/(b-1)$ is largest at $b = 3$, and the knapsack packs triangles: $k_3(n) = 3\floor{(n-1)/2} + ((n-1) \bmod 2) = \floorfrac{3(n-1)}{2}$.
+
+At $m = 4$ it gives the value the same way, with $h_4(b) = 2(b-1)$ for $b \ge 4$, attained by $K_4$ at $b = 4$, so the rate is exactly $2$ and $k_4(n) = 2(n-1)$.
+
+At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, $n$ copies of $K_m$ sharing one vertex, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. Since the rate of a bouquet of blocks is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
+
+That is not a defect of the computation, and it is worth saying exactly how far out of reach the truth is, because the reason is structural rather than a matter of processor time. The conjecture is false: Leonard disproved it at $m = 5$ with an explicit graph on $57$ vertices \cite{Leonard73BE}, and Mader proved that for every $m \ge 6$ the difference $k_m(n) - mn/2$ is unbounded \cite{Mader73}, so $c_m > m/2$ there. What replaces it is a lower bound of S\o{}rensen and Thomassen \cite{SorensenThomassen74}: for each fixed $m$,
+\[
+    c_m \;\ge\; \frac{m(m-1)-2}{2m-3} \;=\; \frac{m}{2} + \frac{1}{4} + O(1/m) ,
+\]
+so the conjectured rate is wrong, but only by a constant.
+
+Their witness is built by a recursion worth describing in the language of this section, since it says precisely why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The cyclic arrangement is the whole point: three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the triconnected one, along $2$-cuts rather than cut vertices, which is the same Tutte/SPQR machinery \Cref{lem:incidence-rank} already uses on incidence graphs. That is the concrete next step this reformulation points at.
+
+It also explains the sizes. The recursion beats the rate $m/2$ only once $j > 2/(m-4)$, so the smallest member of the family that outruns a bouquet of $K_m$'s has $26$ vertices at $m = 5$, $24$ at $m = 6$ and $18$ at $m = 7$, against the nine that exhaustive enumeration reaches. The construction was rebuilt and checked here at $m = 5, 6, 7$ and $j \le 3$: the vertex and edge counts match the formulas exactly, every member is $2$-connected, and every member has $\kap^{\max} = m-1$, so each is feasible and none contains the forbidden $m$ internally disjoint paths.
+
+\begin{remark}[A degeneracy question, and what it would give]\label{rem:vertex-degeneracy}
+The only general upper bound available for $k_m(n)$ is the one \Cref{prop:multi-vertex-upper} uses, $k_m(n) < 2(m-1)n$, and it comes from Mader's density theorem \cite{Mader72} through the weak consequence that a feasible graph has no $m$-connected subgraph. Feasibility says much more than that. It gives, for instance, that any two adjacent vertices have at most $m-2$ common neighbours, since each common neighbour is a route of length two beside the edge.
+
+The natural strengthening is that a feasible graph always has a vertex of degree at most $m-1$. Since feasibility passes to induced subgraphs, that would make every feasible graph $(m-1)$-degenerate and give
+\[
+    k_m(n) \;\le\; (m-1)n - \binom{m}{2},
+\]
+halving the constant in the only general upper bound known. It holds for $m = 3$, where it is classical: a graph of minimum degree at least three contains a subdivision of $K_4$, and two branch vertices of that subdivision are joined by three internally disjoint paths. Exhaustive search over all graphs with minimum degree at least $m$ finds no feasible one for $m \le 6$ and $n \le 10$. It is stated here as a question rather than a conjecture, since the sizes reached are well below those at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
+\end{remark}
+
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}
 
 Three short lemmas feed the induction. The first shows a hub forces a linear bound for every $m$, and is the proof behind the hub branch of \Cref{conj:dir-arc}. The three lemmas below and the proof of \Cref{thm:dir-arc-m2-exact} that they support are the author's own, and its finite base cases $2 \le n \le 7$ were verified by the author's program, through the exhaustive search of \Cref{ch:certify} whose transcript is reproduced at the end of this appendix.

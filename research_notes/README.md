@@ -267,6 +267,31 @@ Scripts: `quadratic_branch_uniqueness.py` (self-contained, standard library only
 enumerates extremisers outright using acyclicity plus exact regularity plus the
 monotone-feasibility prune).
 
+### The 1974 problem as a block problem (2026-08-14)
+`k_m(n)`, the undirected vertex problem open since 1974, has the same block
+structure as the multigraph variant: `k_m(n)` is a knapsack over the best
+2-connected block of each size, so `c_m = lim k_m(n)/(n-1) = sup_b h_m(b)/(b-1)`.
+That reproves `m <= 4` in two lines and identifies the (disproved)
+Bollobas-Erdos conjecture as exactly the claim that `K_m` is the best block.
+Exhaustive computation shows no block on `<= 9` vertices beats it, for every
+`m <= 8`.
+
+The reason that is not evidence for the conjecture is the useful part. The
+Sorensen-Thomassen witness glues copies of `K_m - e` **in a cycle**, so it has no
+cut vertex at all: it is a single 2-connected block, invisible to a block
+decomposition, and the refinement needed is the triconnected (SPQR) one along
+2-cuts, which this thesis already uses elsewhere. Its smallest member beating
+the conjecture has 26 vertices at `m=5`, against the 9 exhaustion reaches. Also
+records a degeneracy question that would halve the only known upper bound.
+
+- [`simple_vertex_blocks.md`](simple_vertex_blocks.md) -- the state of the art
+  read off the primary source, the reduction, the block table, the verified
+  Sorensen-Thomassen recursion, and the degeneracy question.
+
+Scripts: `simple_vertex_blocks.py` (block table via geng), `st_construction.py`
+(rebuilds the Sorensen-Thomassen witness and checks counts, 2-connectivity and
+feasibility), `vertex_min_degree.py` (the degeneracy search).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal
