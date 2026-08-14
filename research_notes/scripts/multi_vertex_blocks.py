@@ -130,7 +130,15 @@ def main() -> None:
     print("\n[3] cross-check against the thesis program's exhaustive routine")
     from erdos915_unified import max_multigraph_vertex_standard      # noqa: E402
     import time
-    for (m, n) in [(2, 5), (3, 5), (4, 5), (5, 4), (5, 5), (6, 4)]:
+    # The default list is the fast one.  FULL=1 runs the wider sweep, which
+    # proves 23 cells (m=2 to n=7, m=3 to n=6, m in {4,5,6} to n=5) and leaves
+    # five at their time cap as lower bounds: (3,7), (4,6), (4,7), (5,6) all
+    # match the knapsack, and (5,7) returns 27 below the knapsack's 29, an
+    # unfinished branch and bound rather than a disagreement.
+    cells = [(2, 5), (3, 5), (4, 5), (5, 4), (5, 5), (6, 4)]
+    if os.environ.get("FULL"):
+        cells = [(m, n) for m in range(2, 7) for n in range(2, 8)]
+    for (m, n) in cells:
         k = knapsack(m, n, BMAX)
         ex, _, done = max_multigraph_vertex_standard(n, m, deadline=time.time() + 300)
         print(f"    m={m} n={n}: knapsack {k}, exhaustive {ex} "

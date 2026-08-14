@@ -76,8 +76,14 @@ Sweeping all 2-connected graphs on `b <= 8` vertices (1, 1, 3, 10, 56, 468,
 | 7 | 6 | 15 | 24 | 33 | 42 | 52 | 62 |
 | 8 | 7 | 18 | 30 | 42 | 54 | 66 | 79 |
 
-Every cell the thesis program had proved exhaustively agrees (checked at
-(2,5), (3,5), (4,5), (5,4), (5,5), (6,4)).
+Cross-checked against the thesis program's own exhaustive
+`max_multigraph_vertex_standard`, which shares no reasoning with the block
+argument. It **proved** 23 of these cells within its time limit, namely every
+`(m,n)` with `m=2` and `n<=7`, `m=3` and `n<=6`, and `m in {4,5,6}` with `n<=5`,
+and all 23 agree exactly. The five that hit the cap returned lower bounds, all
+consistent: `(3,7)->12`, `(4,6)->15`, `(4,7)->18`, `(5,6)->24` all match, and
+`(5,7)->27` sits below the knapsack's 29, which is the expected behaviour of an
+unfinished branch and bound rather than a disagreement.
 
 **`K_5^multi(7) = 29`**, not 27 and not 28. The bouquet was 2 short and the
 unfinished search 1 short. The witness was rebuilt as an explicit multigraph and
