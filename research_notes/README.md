@@ -197,6 +197,54 @@ Scripts: `two_step_budget_check.py` (self-contained, standard library only;
 checks all three route families against `kappa` rather than `lambda`, and
 reproves `k_3(4)=4`, `k_3(5)=6`, `k_4(5)=8` from scratch).
 
+The general-orientation gap that note left open is now closed too, see the next
+entry, and the multigraph constant it reports as 16 apart is now 11.66 apart,
+see the one after.
+
+### The general orientation model shares the constant (PROVED, 2026-08-14)
+`thm:dir-hyper-constant` covers the forward model (one tail, many heads) and, by
+reversal, the backward one, but its proof uses the single tail **twice**, once
+for the hyperedges routes enter through and once for the ones they leave
+through. With several tails both uses fail at once: two midpoints may leave
+through one shared hyperedge, and from `r >= 4` a mixed hyperedge may be one
+target's entrance and another's exit. The fix is not a second matching and not
+the greedy independent set the earlier note guessed at. Take a **maximum** family
+of two-step routes and ask what stopped it: every target it leaves unserved must
+be blocked by a hyperedge already spent, and a hyperedge has only `r` vertices to
+block with, counting tails and heads together. In the thesis as
+`thm:dir-hyper-general-constant`; the orientation axis now collapses
+asymptotically rather than only on the evidence.
+
+- recorded inside [`two_step_budget.md`](two_step_budget.md), section 2, since
+  it is the same argument's missing case rather than a separate topic.
+
+Scripts: `general_orientation_check.py` (self-contained, standard library only;
+checks the budget against exact `kappa`, the mechanism against a brute-force
+MAXIMUM family rather than a greedy one, the assembled bound on grown feasible
+instances, and deliberately adversarial worst cases).
+
+### The multigraph vertex problem is a block problem (PROVED, 2026-08-14)
+Recovering the `-sum(pi)` correction that `prop:multi-vertex-upper` discards
+turns the objective into an exact closed form,
+`sum over edges of (m - kappa_{G0}(u,v))` over the underlying simple graph. That
+is a sum of **local** terms, and no route between adjacent vertices leaves their
+block, so it is additive over blocks and the value is a knapsack over the best
+`2`-connected block of each size. Consequences: exact values for all `n <= 8`,
+`m <= 8` (in particular `K_5^multi(7) = 29`, against the bouquet's 27 and an
+unfinished search's 28); from `m = 5` on, a single `2`-connected block beats
+every split, so the bouquet is not the shape of the answer; and the winning
+blocks are unbalanced bipartite rather than complete, which gives a better
+construction and cuts the gap to the upper bound from 16 to `6+4sqrt2 ~ 11.66`.
+
+- [`multi_vertex_blocks.md`](multi_vertex_blocks.md) -- the closed form, the
+  block reduction, the exact table, the thickened `K_{s,t}` optimisation, and the
+  open residue (the remaining constant, and that `g_m(b)/(b-1)` is still rising
+  at `b=8`, so the table does not extrapolate).
+
+Scripts: `multi_vertex_blocks.py` (needs nauty's `geng` and networkx; sweeps all
+`2`-connected blocks, solves the knapsack, and cross-checks every cell the thesis
+program can prove exhaustively).
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal

@@ -22,16 +22,34 @@ in claude.md and deleted here.
       max_multigraph_vertex_standard(n, m). RUNNING as of 2026-07-30 22:50,
       PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
       (5,6),(5,7),(4,7) each capped at 5400s.
-- [ ] **New open problem (replaces the old one): is a same-size K_r chain
-      optimal, and what IS K_m^multi(n)?** thm:clique-chain-vertex is a lower
-      bound only. Mixed block sizes, multi-bridge connections, or a different
-      topology entirely are not ruled out. UPDATE 2026-08-12: an upper bound
-      now exists, prop:multi-vertex-upper, K_m^multi(n) <= (m-1)k_m(n) <
-      2(m-1)^2 n, so the ORDER is settled at Theta(m^2 n) and the section's
-      earlier "lower bound of the right order" claim is now earned rather than
-      assumed. What is left is a constant factor of about 16 and the extremal
-      structure. To improve it, attack the first inequality: it charges every
-      edge the full m-1 and throws away the -sum(pi) correction entirely.
+- [x] **The value is a BLOCK problem (2026-08-14), thm:multi-vertex-blocks.**
+      Recovering the discarded -sum(pi) correction exactly gives the closed form
+      K_m(n) = max over feasible simple G0 of sum_{uv in E}(m - kappa_{G0}(u,v)),
+      an EQUALITY (on an edge kappa = 1+pi, and mu = m-1-pi >= 1 so no edge
+      vanishes). That objective is a sum of LOCAL terms, adjacent vertices share
+      a block and no route between them leaves it, so it is additive over blocks
+      and K_m(n) is a knapsack over the best 2-connected block of each size.
+      Search space becomes "2-connected graphs on b <= n vertices" (geng -C).
+      EXACT VALUES for all n <= 8, m <= 8 (tab:multi-vertex-exact); agrees with
+      every cell the program had proved. K_5^multi(7) = 29, not the bouquet's 27
+      nor the unfinished search's 28. Clean split: thickened trees win for m<=3,
+      tie at m=4, and from m=5 a SINGLE 2-connected block beats every split, so
+      the bouquet is not the shape of the answer.
+- [x] **Better construction (2026-08-14), thm:multi-vertex-bipartite.** The
+      winning blocks are bipartite, not complete. Thickened K_{s,t} at
+      multiplicity m-s is feasible with total st(m-s); as a bouquet the rate is
+      st(m-s)/(s+t-1), optimised at t=m-1, s~(sqrt2-1)m, giving (3-2sqrt2)m^2
+      against the clique's m^2/8. Factor 8(3-2sqrt2)~1.373; the gap to the upper
+      bound falls from 16 to 6+4sqrt2~11.66. research_notes/
+      multi_vertex_blocks.md + scripts/multi_vertex_blocks.py.
+- [ ] **Still open: the remaining constant, between 3-2sqrt2 and 2.** The UPPER
+      bound is now the side to attack, and the closed form says what to prove:
+      bound sum_{uv in E(B)}(m - kappa_B(u,v)) for a 2-connected feasible B,
+      rather than |E| times (m-1). Also open: whether K_{s,t} plus edges inside
+      the small side is the true block family (the m=7,8 cells at n=7 say the
+      extras help), and whether g_m(b)/(b-1) is eventually constant in b. It is
+      still INCREASING at b=8 in every row, so tab:multi-vertex-exact does not
+      extrapolate: larger n needs larger blocks enumerated.
 
 ## RESOLVED 2026-08-13: the Sorensen-Thomassen constant
 The author obtained the paper (JCTB 17(2) 1974, 143-159, sorensen.pdf, gitignored
@@ -139,13 +157,19 @@ lem:two-step-budget, while a second and unrelated factor r-1 divides the leading
 term when the auxiliary one-step shadow digraph is traded back for hyperedges.
 Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
 (m-1)n(n-1)/(r-1) is smaller until n is around 16(m-1)(r-1)/3.
-- [ ] **Does the GENERAL orientation model share the constant?** The proof uses
-      the single tail twice, for entering and for leaving hyperedges. With
-      several tails, two routes may LEAVE through one shared hyperedge and
-      Step 2 needs a second matching, on a family whose conflicts run both
-      ways. A greedy independent set in the conflict graph looks like it gives
-      C = O(r)(m-1), which would suffice, but this was NOT worked out and is
-      not claimed. See research_notes/two_step_budget.md.
+- [x] **The GENERAL orientation model DOES share the constant (2026-08-14),
+      thm:dir-hyper-general-constant.** Neither a second matching nor a greedy
+      independent set: take a MAXIMUM family of two-step routes and ask what
+      stopped it. Every unserved target is blocked by a hyperedge the family
+      already spent, and a hyperedge has only r vertices to block with, counting
+      tails and heads TOGETHER (|T_e|+|H_e| = r exactly, which is what keeps the
+      constant at r rather than 2(r-1)). Gives C = (2r+1)(m-1), so
+      |E| <= (m-1)/(r-1) floor(n^2/4) + 4(2r+1)(m-1)^2/(r-1)(n-1). The argument
+      never needs the entering and leaving sides to be independent, which is
+      exactly what the general model denies, so it covers all three orientations.
+      Verified two ways (own max-flow + the program's), 0 violations. The
+      constant 2r+1 is NOT sharp (nothing found above r-1); it lands in the
+      linear term, so nothing rests on it. research_notes/two_step_budget.md.
 - [ ] **Exact values at finite n** for the directed hypergraph, both
       separations. The constant is settled, the value is not.
 

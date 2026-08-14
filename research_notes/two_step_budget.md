@@ -81,13 +81,58 @@ Because Step 1 and Step 2 both hold against `kappa`, the theorem covers the
 edge- and vertex-disjoint separations at once, so it settles the leading
 constant for two of the twelve variants.
 
-**Not covered: the general orientation model.** The single tail is used twice,
-for the entering and the leaving hyperedges. With several tails allowed, two
-routes may *leave* through one shared hyperedge, and Step 2 needs a second
-matching on that side, on a family whose conflicts run both ways at once. A
-greedy independent-set argument in the conflict graph looks like it would give
-`C = O(r)(m-1)`, which would be enough, but this was not worked out or checked
-and is not claimed.
+**The general orientation model: NOW COVERED (2026-08-14).** This section used
+to end by saying the single tail is used twice, for the entering and the leaving
+hyperedges, so with several tails two routes may *leave* through one shared
+hyperedge (and, from `r >= 4`, one mixed hyperedge may be one target's entrance
+and another's exit), leaving Step 2 needing a second matching on a family whose
+conflicts run both ways at once. It guessed that a greedy independent set would
+give `C = O(r)(m-1)`.
+
+The right move is not a second matching and not a greedy set. It is to stop
+*building* a family and take a **maximum** one, then ask what stopped it.
+
+> Let `T` be the targets as above. Consider families of routes indexed by
+> distinct targets, one hyperedge for the target `v`, an entrance and an exit for
+> a midpoint, all hyperedges distinct. Take a maximum such family `F`, of size
+> `M`, serving `S`, using hyperedge set `U`, so `|U| <= 2M` and (interiors empty
+> or distinct singletons) `M <= kappa(u,v) <= m-1`.
+> Any `t` in `T \ S` with an unused entrance and, if a midpoint, an unused exit
+> would extend `F`: the two are distinct because no hyperedge is both an entrance
+> and an exit for the same `t` (that would need `t` in its tail set and its head
+> set at once). So every entrance of `t` is in `U`, or every exit is, and either
+> way **`t` lies on a hyperedge of `U`**:
+>
+>     T \ S  subset  union over e in U of (T_e u H_e),
+>     |T| <= M + sum over U of (|T_e| + |H_e|) = M + r|U| <= (2r+1)M.
+
+Two points. The sides are counted **together**, using `|T_e| + |H_e| = r`
+exactly, which is what keeps the constant at `r` and not `2(r-1)`. And the
+argument never needs the entering and leaving families to be independent, which
+is precisely what the general model denies, so it covers forward, backward and
+general at once.
+
+Hence `R` is `(2r+1)(m-1)`-budgeted and the assembly is unchanged:
+
+    |E| <= (m-1)/(r-1) floor(n^2/4) + 4(2r+1)(m-1)^2/(r-1) (n-1).
+
+So the general model shares the leading constant, and the orientation axis
+collapses asymptotically. In the thesis as `thm:dir-hyper-general-constant`.
+
+The constant `2r+1` is **not** sharp and is not claimed to be: it comes from the
+crude `|U| <= 2M`. Adversarial instances in which every target shares both its
+entrance and its exit with another never push `|T|/kappa` above `r-1`, the
+forward model's own constant. Nothing rests on the gap, since the whole point of
+the budget lemma is that this constant lands in the linear term.
+
+Script: `scripts/general_orientation_check.py` (standard library only, own
+max-flow, own model). Checks (i) the budget on random general hypergraphs
+against exact `kappa`, (ii) the mechanism `M <= kappa` and the containment
+`T \ S subset union of U`, against a brute-force MAXIMUM family rather than a
+greedy one, (iii) Step 1 and the assembled bound on grown feasible instances,
+and (iv) the deliberate worst cases. Zero violations. Cross-checked against the
+thesis program's own `hyper_connectivity` on 300 feasible general hypergraphs
+and 5989 ordered pairs, also zero.
 
 ## 3. The multigraph vertex upper bound (repairing an overclaim)
 
@@ -114,8 +159,10 @@ apart. The first inequality is the interesting one and is tight at `m = 2`.
 
 - The exact value of `K_m^multi(n)` (the `28` against the bouquet's `27` at
   `m=5, n=7` still stands), and the constant factor of 16.
-- The exact directed hypergraph value at finite `n`, and whether the general
-  orientation model shares the leading constant.
+- The exact directed hypergraph value at finite `n`, for every orientation. (The
+  general model's leading constant is settled, see above; what the asymptotics
+  cannot see is the finite comparison at `n ~ r`, where general is strictly
+  denser.)
 - The linear coefficient in both directed simple problems, arc and vertex.
 - Everything the two-step budget cannot see. It is a *local* count, blind to
   anything beyond radius two, which is why it fixes leading terms and never

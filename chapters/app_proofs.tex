@@ -1745,24 +1745,135 @@ unbalanced split by a unit or two, but never by enough to move the $n^2$ term.) 
 lower bound agree in their $n^2$ term, which is the asymptotic claim.
 \end{proof}
 
-Three remarks on the statement. First, the two upper bounds are not comparable
+Two remarks on the statement. First, the two upper bounds are not comparable
 and both are worth keeping: the bound of \Cref{prop:dir-hyper-first} is the
 smaller one until $n$ is around $16(m-1)(r-1)/3$, since the linear term here
 carries a constant of $4(m-1)^2$, and the theorem is an asymptotic improvement
 rather than a uniform one. Second, at $r = 2$ the shadow is the digraph itself and
 $\mathrm{cod}$ is the multiplicity, so the theorem recovers the quadratic branch
 of \Cref{thm:dir-multi-full} up to its linear error term, which is the consistency
-check one wants, though it does not reprove that theorem, which is exact. Third, the argument uses the
-forward model twice, once for the entering hyperedges and once for the leaving
-ones, in both cases to know that a hyperedge has a single tail. The backward
-model is covered by \Cref{lem:dir-hyper-duality}, but the general model of
-\Cref{prop:dir-hyper-general} is not: with several tails allowed, two routes
-leaving through different midpoints may leave through one shared hyperedge, and
-Step 2 would need a second matching argument on that side too, on a family whose
-conflicts run both ways at once. Whether the general model shares this leading
-constant is therefore still open. Nothing here rules it out, and the route to it
-is visible rather than blocked, which is a better position than the factor of
-four the general model sat in before.
+check one wants, though it does not reprove that theorem, which is exact.
+
+A third remark used to say that the general orientation model was out of reach,
+and it is worth recording why, because the obstacle was real and the way past it
+is short. The proof above uses the forward model twice, once for the entering
+hyperedges and once for the leaving ones, in both cases to know that a hyperedge
+has a single tail. That is what makes Step 2's matching legitimate: the leaving
+hyperedges have pairwise distinct tails and so are automatically distinct from
+each other, and none of them can be an entering hyperedge, since the entering
+ones have tail $u$ and the leaving ones do not. Allow several tails and both
+statements fail at once. Two midpoints may leave through one shared hyperedge,
+and from $r \ge 4$ a single hyperedge with two tails and two heads may serve as
+one target's entrance and another's exit. So the conflicts run both ways and no
+matching on one side controls them.
+
+The repair is to stop building a large family and instead take a maximum one and
+ask what stopped it. A maximum family cannot be extended, so every target it
+leaves unserved must be obstructed by a hyperedge the family has already spent,
+and a hyperedge has only $r$ vertices in all to obstruct with. That counts the
+leftovers without ever needing the two sides to be independent, which is exactly
+what the general model denies.
+
+\begin{theorem}[The general orientation model shares the constant]\label{thm:dir-hyper-general-constant}
+Let $r \ge 2$ and $m \ge 2$, and let a directed $r$-uniform hyperedge be any split
+$(T, H)$ into a non-empty tail set and a non-empty head set, as in
+\Cref{prop:dir-hyper-general}. Every such multihypergraph $\HH$ on $n \ge 2$
+vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
+\[
+    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4}
+    \;+\; \frac{4(2r+1)(m-1)^2}{r-1}\,(n-1) .
+\]
+The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$. Hence for fixed
+$r$ and $m$ the general model has the same leading term
+$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$ as the forward model, under both
+separations, and the bipartite construction of \Cref{prop:dir-hyper-first} is
+asymptotically optimal for it too.
+\end{theorem}
+
+\begin{proof}
+Let $R$ be the one-step shadow read in the general model, so $(u,v) \in A(R)$
+exactly when some hyperedge has $u$ among its tails and $v$ among its heads, and
+$\mathrm{cod}(u,v)$ counts the hyperedges realising it. A hyperedge's tail set and
+head set are disjoint, so $R$ has no loops.
+
+\emph{Step 1: hyperedges against shadow arcs.} The $\mathrm{cod}(u,v)$ hyperedges
+realising an arc give that many one-step routes, one hyperedge apiece and
+different ones, with no interior vertex, so they are pairwise hyperedge-disjoint
+and internally vertex-disjoint and $\mathrm{cod}(u,v) \le \kap_{\HH}(u,v) \le m-1$.
+A hyperedge $(T,H)$ is counted by exactly the $|T|\,|H|$ ordered pairs it fills,
+and $|T| + |H| = r$ with both parts non-empty gives $|T|\,|H| \ge r-1$. Hence
+\[
+    (r-1)\,|E(\HH)| \;\le\; \sum_{(T,H) \in E(\HH)} |T|\,|H|
+    \;=\; \sum_{(u,v) \in A(R)} \mathrm{cod}(u,v) \;\le\; (m-1)\,|A(R)| .
+\]
+This is the count of \Cref{prop:dir-hyper-general} stopped one step early, exactly
+as Step 1 above stopped \Cref{prop:dir-hyper-first} one step early.
+
+\emph{Step 2: the shadow is budgeted.} Fix an ordered pair $(u,v)$ of distinct
+vertices and let $\mathcal{T}$ collect $v$ itself when $(u,v) \in A(R)$ together
+with every midpoint counted by $p_2(u,v)$, so
+$|\mathcal{T}| = \mathbf{1}_{(u,v) \in A(R)} + p_2(u,v)$. Call a hyperedge $e$ an
+\emph{entrance} for $t \in \mathcal{T}$ if $u$ is a tail of $e$ and $t$ a head,
+and an \emph{exit} for a midpoint $t$ if $t$ is a tail of $e$ and $v$ a head.
+Every $t \in \mathcal{T}$ has at least one entrance, and every midpoint at least
+one exit, by the definition of $R$. No hyperedge is both an entrance and an exit
+for the \emph{same} $t$, since that would put $t$ in its tail set and its head set
+at once.
+
+Consider families of routes indexed by distinct targets: for the target $v$ the
+one-step route through an entrance, and for a midpoint $t$ the two-step route
+$u \to t \to v$ through an entrance and an exit. Such a family is admissible when
+its hyperedges are pairwise distinct. Let $\mathcal{F}$ be one of maximum size
+$M$, serving the target set $S$, and let $U$ be the hyperedges it uses, so
+$|U| \le 2M$. The routes of $\mathcal{F}$ are pairwise hyperedge-disjoint by
+construction and internally vertex-disjoint because their interiors are the empty
+set and distinct singletons, so
+\[
+    M \;\le\; \kap_{\HH}(u,v) \;\le\; m-1 .
+\]
+
+Now take $t \in \mathcal{T} \setminus S$. If some entrance $e \notin U$ existed
+and, for a midpoint, some exit $f \notin U$ as well, then $e \ne f$ by the
+paragraph above and the route through them could be added to $\mathcal{F}$,
+serving a target not yet served and using no hyperedge already spent. That
+contradicts maximality. So every entrance of $t$ lies in $U$, or $t$ is a midpoint
+all of whose exits lie in $U$. Either way $t$ lies in the tail set or the head set
+of some member of $U$, and therefore
+\[
+    \mathcal{T} \setminus S \;\subseteq\; \bigcup_{e \in U} \bigl(T_e \cup H_e\bigr) ,
+    \qquad\text{so}\qquad
+    |\mathcal{T}| \;\le\; M + \sum_{e \in U} \bigl(|T_e| + |H_e|\bigr)
+    \;=\; M + r\,|U| .
+\]
+The last equality is where the two sides are counted together rather than
+separately, and it is what keeps the constant at $r$ rather than $2(r-1)$. With
+$|U| \le 2M$ this gives $|\mathcal{T}| \le (2r+1)M \le (2r+1)(m-1)$, so $R$ is
+$(2r+1)(m-1)$-budgeted in the sense of \Cref{def:two-step-budget}.
+
+\emph{Step 3: assembling.} \Cref{lem:two-step-budget} with $C = (2r+1)(m-1)$ gives
+$|A(R)| \le \floor{n^2/4} + 4(2r+1)(m-1)(n-1)$, and substituting into Step 1 gives
+the stated bound. The hypothesis $\lec^{\max} \le m-1$ implies
+$\kap^{\max} \le m-1$ by Whitney, so the bound holds there too. For the lower
+bound, the bipartite family of \Cref{prop:dir-hyper-first} consists of general
+hyperedges, so it witnesses $\approx (m-1)n^2/(4(r-1))$ here as well, and upper
+and lower bound agree in their $n^2$ term.
+\end{proof}
+
+Two things about that proof are worth separating. The constant $2r+1$ is not
+optimised and is not claimed to be sharp: it is what the crude estimate
+$|U| \le 2M$ gives, and a search over deliberately adversarial instances, in which
+every target shares both its entrance and its exit with another, never drives
+$|\mathcal{T}|/\kap(u,v)$ above $r-1$, the forward model's own constant. Nothing
+rests on the difference, since the whole point of \Cref{lem:two-step-budget} is
+that this constant lands in the linear term and never touches the $n^2/4$ that
+carries the leading constant. The second point is what the theorem does to the
+orientation axis of \Cref{sec:orientation-models}. Forward and backward were
+already known equal, exactly, by \Cref{lem:dir-hyper-duality}. The general model
+was known only to sit between the same two bounds a factor of four apart, which
+left room for it to be genuinely denser to first order. It is not. All three
+orientation models have the same leading term, and the computed differences
+between them at $n \approx r$ are a small-size effect that the asymptotics cannot
+see.
 
 
 \section{The multigraph vertex problem under the other convention}\label{sec:multi-vertex-standard}
@@ -1870,7 +1981,7 @@ Sharing a vertex is what buys that count. Disjoint blocks joined by bridges woul
 
 Optimising $r$ widens the gap further. Treated as continuous, the gain per vertex $\mathrm{gain}(r,m)/(r-1)$ peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$, so the construction gives $K_m^{\mathrm{multi}}(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1)$ at fixed large $m$, a different order in $m$ from the guess above.
 
-Even this is not the truth. At $m = 5$, $n = 7$ the construction above gives $27$, and an exhaustive branch and bound, stopped by its time limit before it could finish, had already found a feasible multigraph with $28$. So the value of $K_m^{\mathrm{multi}}(n)$ is genuinely open rather than reduced to a single inequality about cycle rank. What is not open is the order, and to say that the bouquet is a lower bound of the right order there has to be a matching upper bound. There is one, and it comes from reading the problem through its own underlying simple graph rather than through cycle rank.
+Even this is not the truth, and by more than the first evidence suggested. At $m = 5$, $n = 7$ the construction above gives $27$, and an exhaustive branch and bound, stopped by its time limit before it could finish, had already found a feasible multigraph with $28$. The true value there is $29$ (\Cref{tab:multi-vertex-exact}), so neither the construction nor that partial search was near it. What is not open is the order, and to say that the bouquet is a lower bound of the right order there has to be a matching upper bound. There is one, and it comes from reading the problem through its own underlying simple graph rather than through cycle rank. After it, \Cref{sec:multi-vertex-blocks} returns to the value itself and says what the right shape of the extremiser is, which is neither a tree nor a bouquet of cliques.
 
 \begin{proposition}[An upper bound of the same order]\label{prop:multi-vertex-upper}
 For all $m \ge 2$ and $n \ge 2$,
@@ -1895,7 +2006,105 @@ Combining the two directions, at fixed $m$ and $n \to \infty$,
     \;\le\; K_m^{\mathrm{multi}}(n) \;<\; 2 m^2 n ,
 \]
 where the $o_m(1)$ vanishes as $m$ grows,
-so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$: the bouquet of \Cref{thm:clique-chain-vertex} is a lower bound of the right order in $n$ and in $m$ both, and what separates the two sides is a constant factor tending to $16$. The upper bound is deliberately crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$, and the first inequality $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$ is the more informative half: it says this variant can never outrun the simple vertex problem by more than the multiplicity ceiling, which ties the least understood of the twelve to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
+so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$: the bouquet of \Cref{thm:clique-chain-vertex} is a lower bound of the right order in $n$ and in $m$ both, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is deliberately crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$, and the first inequality $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$ is the more informative half: it says this variant can never outrun the simple vertex problem by more than the multiplicity ceiling, which ties the least understood of the twelve to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
+
+\subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
+
+The lower bounds above are constructions and the upper bound is a density count, and neither says what an extremiser looks like. This section says exactly what it looks like, in the sense that it reduces the whole question to one about $2$-connected graphs, which is a genuine reduction and not a restatement: the number of vertices in play stops being $n$ and becomes the size of a single block.
+
+Two observations do it. The first is already in the section, one line further than it was taken.
+
+\begin{lemma}[The objective in closed form]\label{lem:multi-vertex-objective}
+For a simple graph $G_0$ on $n$ vertices with $\kap^{\max}_{G_0} \le m-1$, the largest total multiplicity of a feasible multigraph with underlying simple graph exactly $G_0$ is
+\[
+    W_m(G_0) \;:=\; \sum_{uv \in E(G_0)} \bigl(m - \kap_{G_0}(u,v)\bigr) ,
+\]
+and every simple graph arising as the underlying graph of a feasible multigraph satisfies $\kap^{\max}_{G_0} \le m-1$. Hence
+\[
+    K_m^{\mathrm{multi}}(n) \;=\; \max\bigl\{\, W_m(G_0) \;:\; G_0 \text{ simple on } n \text{ vertices},\ \kap^{\max}_{G_0} \le m-1 \,\bigr\} .
+\]
+\end{lemma}
+
+\begin{proof}
+By \Cref{lem:multi-vertex-split} feasibility reads $\mu(u,v) \le m-1-\pi(u,v)$ on every edge, so the best choice is $\mu(u,v) = m-1-\pi(u,v)$, which is what the paragraph before \Cref{thm:clique-chain-vertex} records. On an edge $\kap_{G_0}(u,v) = 1 + \pi(u,v)$, since the routes of $G_0$ between adjacent $u$ and $v$ are the single edge together with the routes of length at least two. Substituting turns $m-1-\pi(u,v)$ into $m - \kap_{G_0}(u,v)$ and the total into $W_m(G_0)$.
+
+Two things have to be checked for that maximum to be attained by a multigraph over $G_0$ itself. Feasibility of $G_0$ is the middle step of \Cref{prop:multi-vertex-upper}. And the chosen multiplicities are all at least one, so the underlying graph really is $G_0$ and no edge silently disappears: $\kap_{G_0}(u,v) \le m-1$ on an edge gives $\pi(u,v) \le m-2$, hence $\mu(u,v) = m-1-\pi(u,v) \ge 1$. Conversely any feasible multigraph is one of the multigraphs considered over its own underlying graph, so nothing is lost by maximising over $G_0$ first.
+\end{proof}
+
+That the objective is a sum over edges of a \emph{local} quantity is what makes the second observation bite. Recall that a \emph{block} of a graph is a maximal connected subgraph with no cut vertex of its own, so every block is either $2$-connected or a single edge, every edge lies in exactly one block, and two blocks meet in at most one vertex.
+
+\begin{theorem}[The multigraph vertex problem is a knapsack over blocks]\label{thm:multi-vertex-blocks}
+For a $2$-connected graph $B$, or a single edge, write
+\[
+    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
+\]
+with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
+\[
+    K_m^{\mathrm{multi}}(n)
+    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
+\]
+the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
+\end{theorem}
+
+\begin{proof}
+\emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
+\[
+    W_m(G_0) \;=\; \sum_{\text{blocks } B} W_m(B) .
+\]
+Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ by the same identity, so $W_m(B) \le g_m(|V(B)|)$.
+
+\emph{The sizes fit.} If $G_0$ has $c$ components and blocks $B_1, \dots, B_t$, then $\sum_i (|V(B_i)| - 1) = n - c - (\text{number of isolated vertices contributed}) \le n-1$: within one component, contracting the block tree gives $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one, and summing over components loses one further vertex per extra component. With \Cref{lem:multi-vertex-objective} this proves $\le$.
+
+\emph{Every multiset is realised.} Given blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, take one common vertex and attach the $B_i$ to it, pairwise disjoint otherwise, leaving any spare vertices isolated. The result uses $1 + \sum (b_i-1) \le n$ vertices. Its blocks are exactly the $B_i$, so by the first paragraph its $\kap$ agrees with $\kap_{B_i}$ on pairs inside a block and equals at most $1$ on pairs split between two blocks, which the shared vertex separates. So the graph is feasible and scores $\sum_i W_m(B_i)$, and choosing each $B_i$ optimal gives $\sum_i g_m(b_i)$. This proves $\ge$.
+\end{proof}
+
+The reduction changes what has to be searched. Instead of all feasible multigraphs on $n$ vertices, one enumerates $2$-connected simple graphs on $b \le n$ vertices, which \code{geng} does directly, evaluates $W_m$ on each, and solves a small knapsack. Every value in \Cref{tab:multi-vertex-exact} was produced that way, over all $2$-connected graphs on at most eight vertices, and every cell the exhaustive routine had previously proved agrees with it.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|ccccccc}
+    & $n=2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ \\
+    \midrule
+    $m=2$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ \\
+    $m=3$ & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ & $14$ \\
+    $m=4$ & $3$ & $6$ & $9$ & $12$ & $15$ & $18$ & $21$ \\
+    $m=5$ & $4$ & $9$ & $14$ & $19$ & $24$ & $\mathbf{29}$ & $34$ \\
+    $m=6$ & $5$ & $12$ & $19$ & $26$ & $33$ & $40$ & $47$ \\
+    $m=7$ & $6$ & $15$ & $24$ & $33$ & $42$ & $52$ & $62$ \\
+    $m=8$ & $7$ & $18$ & $30$ & $42$ & $54$ & $66$ & $79$ \\
+\end{tabular}
+\caption{$K_m^{\mathrm{multi}}(n)$, exact, from \Cref{thm:multi-vertex-blocks} together with an exhaustive sweep of the $2$-connected graphs on at most eight vertices ($1$, $1$, $3$, $10$, $56$, $468$ and $7123$ of them). The knapsack shows a clean split. For $m \le 3$ the optimum is a thickened tree, every block a single edge. At $m = 4$ the two agree, every split of the vertices scoring the same. From $m = 5$ on, a single $2$-connected block strictly beats every split, so the extremiser is $2$-connected and the bouquet is a construction rather than the answer. The bold cell is the one \Cref{thm:clique-chain-vertex} reaches only $27$ on and an unfinished search had found $28$ on. Every cell that \Cref{tab:multi-vertex} proves exhaustively agrees.}
+\label{tab:multi-vertex-exact}
+\end{table}
+
+What those blocks are is the useful part, and they are not cliques. At $m = 5$, $n = 6$ the winning block is exactly $K_{2,4}$ and at $m = 6$, $n = 7$ exactly $K_{2,5}$. At $m = 7$ and $m = 8$ with $n = 7$ it is $K_{3,4}$ with two extra edges inside the smaller side, and the $29$-witness at $m = 5$, $n = 7$ is $K_{2,4}$ with one further edge subdivided onto it. So the shape is bipartite, unbalanced, and sometimes decorated with a few extra edges, rather than complete. The clean member of that family already beats the bouquet of cliques outright.
+
+\begin{theorem}[Thickened complete bipartite blocks]\label{thm:multi-vertex-bipartite}
+Let $1 \le s \le t \le m-1$. Thicken every edge of $K_{s,t}$ to multiplicity $m-s$. The result is feasible, $\kap^{\max} \le m-1$, on $s+t$ vertices with total multiplicity $st(m-s)$. Hanging $k$ such blocks off one shared vertex gives, for $n = k(s+t-1)+1$,
+\[
+    K_m^{\mathrm{multi}}(n) \;\ge\; \frac{st\,(m-s)}{s+t-1}\,(n-1) .
+\]
+Optimised over $s$ and $t$ this rate is $\bigl(3 - 2\sqrt{2} + o_m(1)\bigr)m^2$, attained at $t = m-1$ and $s \sim (\sqrt{2}-1)m$, against the $\bigl(\tfrac18 + o_m(1)\bigr)m^2$ of \Cref{thm:clique-chain-vertex}. The improvement is by a factor $8(3-2\sqrt{2}) = 24 - 16\sqrt{2} \approx 1.373$.
+\end{theorem}
+
+\begin{proof}
+Write $S$ and $T$ for the two sides, $|S| = s$ and $|T| = t$.
+
+\emph{The connectivities of $K_{s,t}$.} For $u \ne u'$ in $S$, the $u$-$u'$ paths of length at least two are the $t$ two-step routes through the vertices of $T$, and $T$ is a cut of size $t$, so $\kap(u,u') = \pi(u,u') = t$. Symmetrically $\kap(v,v') = s$ for $v \ne v'$ in $T$. For adjacent $u \in S$ and $v \in T$, delete the edge $uv$: the sets $T \setminus \{v\}$ and $S \setminus \{u\}$ both separate $u$ from $v$, so $\pi(u,v) \le \min(s-1, t-1) = s-1$, and the $s-1$ routes $u, v_i, u_i, v$ through distinct $u_i \in S \setminus \{u\}$ and distinct $v_i \in T \setminus \{v\}$ attain it, which needs $s-1 \le t-1$. So $\pi(u,v) = s-1$ and $\kap(u,v) = s$.
+
+\emph{Feasibility and count.} By \Cref{lem:multi-vertex-split} the multigraph has $\kap = (m-s) + (s-1) = m-1$ on an edge, and $\kap = t \le m-1$ or $s \le m-1$ on a non-adjacent pair, so nothing exceeds the ceiling. The count is $st$ edges at multiplicity $m-s$. Equivalently, by \Cref{lem:multi-vertex-objective}, $W_m(K_{s,t}) = st(m - s)$.
+
+\emph{The bouquet.} $K_{s,t}$ is $2$-connected for $s \ge 2$ and is a single edge for $s=t=1$, so \Cref{thm:multi-vertex-blocks} applies and $k$ copies at one shared vertex are feasible with total $k\,st(m-s)$ on $n = k(s+t-1)+1$ vertices, which is the displayed rate.
+
+\emph{The optimum.} Fix $t = m-1$, its largest permitted value, and put $s = \alpha m$. The rate becomes
+\[
+    \frac{s\,(m-1)(m-s)}{s+m-2}
+    \;=\; \frac{\alpha(1-\alpha)}{1+\alpha}\,m^2 \;+\; O(m) ,
+\]
+and $h(\alpha) = \alpha(1-\alpha)/(1+\alpha)$ has $h'(\alpha) = (1 - 2\alpha - \alpha^2)/(1+\alpha)^2$, vanishing at $\alpha = \sqrt{2}-1$, where $h = 3 - 2\sqrt{2}$. Since $3 - 2\sqrt{2} > \tfrac18$, the family beats the clique bouquet, by the stated factor.
+\end{proof}
+
+Two comments. First, the trade-off the optimum balances is visible in the formula: a bigger $s$ buys more edges, $st$ of them, and costs route capacity on each, $m-s$ rather than $m$, and the clique is the special case where the two sides are forced equal to one another and to the whole block. Letting them differ is the entire gain, and the optimal shape is lopsided, one side of size about $0.41 m$ against the other at the ceiling $m-1$. Second, the bipartite family is not the answer either, since \Cref{tab:multi-vertex-exact} already shows extra edges inside the small side helping at $m = 8$. What is now known is that the answer is a block problem, that its blocks are dense bipartite-like graphs rather than cliques, and that the constant lies between $3 - 2\sqrt{2}$ and $2$.
 
 \section{The random threshold}
 
