@@ -379,8 +379,8 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
 \begin{tikzpicture}[>=Stealth, scale=1.0,
     mv/.style={gvertex},
     cut/.style={gvcut, minimum size=6.5mm},
-    pA/.style={line width=1.7pt, roleDiscover, line cap=round},
-    pB/.style={line width=1.7pt, KULblauw1, line cap=round}]
+    pA/.style={grA, line width=1.9pt},
+    pB/.style={grB, line width=1.9pt}]
   \node[mv]  (s) at (0,0)      {$s$};
   \node[mv]  (a) at (1.4,0.9)  {};
   \node[mv]  (c) at (1.4,-0.9) {};
@@ -391,7 +391,7 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
   \draw[pA] (s)--(a)--(w)--(b)--(t);
   \draw[pB] (s)--(c)--(w)--(d)--(t);
 \end{tikzpicture}
-\caption{The third axis, the \emph{separation}. The two $s$--$t$ routes drawn here, one orange and one blue, share no edge, so they count as two edge-disjoint paths and $\lec(s,t)=2$. Both pass through the single vertex $w$, however, so they are \emph{not} internally vertex-disjoint, and since every $s$--$t$ route must cross $w$ we have $\kap(s,t)=1$. This is Whitney's inequality $\kap \le \lec$ made concrete: the gap between the two separations is exactly what the vertex-disjoint problem measures, and the rest of the chapter shows it stays shut until $m = 5$.}
+\caption{The third axis, the \emph{separation}. The two $s$--$t$ routes drawn here, one orange and one green, share no edge, so they count as two edge-disjoint paths and $\lec(s,t)=2$. Both pass through the single vertex $w$ (purple), however, so they are \emph{not} internally vertex-disjoint, and since every $s$--$t$ route must cross $w$ we have $\kap(s,t)=1$. This is Whitney's inequality $\kap \le \lec$ made concrete: the gap between the two separations is exactly what the vertex-disjoint problem measures, and the rest of the chapter shows it stays shut until $m = 5$.}
 \label{fig:edge-vs-vertex}
 \end{figure}
 

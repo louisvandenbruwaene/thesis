@@ -11,7 +11,7 @@ This appendix holds the arguments deferred from the body: the ones that are eith
 % standard edge, aparc a directed arc, apredarc/apdashed forbidden objects.
 % ---------------------------------------------------------------------------
 \tikzset{
-  apx/.style={gvertex, minimum size=7pt},
+  apx/.style={gvertex, minimum size=4mm},
   apxlab/.style={gvertex},
   apz/.style={hnode},
   apgedge/.style={gline},
@@ -179,10 +179,10 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \centering
 \begin{subfigure}[b]{0.46\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
+\begin{tikzpicture}[scale=1.0]
 % hub at centre, three K_4 each sharing the hub.  m=4 => K_4.
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=12pt] (h) at (0,0) {};
-\node[apname] at (0.78,0.46) {$h$};
+\node[gvhub, minimum size=5mm] (h) at (0,0) {};
+\node[apname] at (0.86,0.52) {$h$};
 % three cliques arranged around hub at 90, 210, 330 degrees
 \foreach \ang/\name in {90/A, 210/B, 330/C}{
   \begin{scope}[rotate=\ang]
@@ -204,14 +204,14 @@ For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$
 \end{subfigure}\hfill
 \begin{subfigure}[b]{0.50\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.0, apx/.append style={minimum size=10pt}]
+\begin{tikzpicture}[scale=1.0]
 % hub h centred, six spokes evenly around it; hub edges + a sparse spoke graph
-\node[apx,fill=vertexorange,draw=vertexorange,minimum size=12pt] (h) at (0,0) {};
-\node[apname] at (0.3,-0.36) {$h$};
+\node[gvhub, minimum size=5mm] (h) at (0,0) {};
+\node[apname] at (0.42,-0.42) {$h$};
 \foreach \i/\ang in {1/90,2/150,3/210,4/270,5/330,6/30}{
   \node[apx] (v\i) at (\ang:2.3) {};
 }
-\node[apname,above=2pt] at (v1) {$v_1$};
+\node[apname,above=4pt] at (v1) {$v_1$};
 % hub edges (all present)
 \foreach \i in {1,...,6}{ \draw[apgedge] (h)--(v\i); }
 % spoke graph: two K_3 cliques {v1,v2,v3} and {v4,v5,v6}, each of degree m-2=2
@@ -812,17 +812,17 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
 \begin{figure}[htbp]
 \centering
 \resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[apx/.append style={minimum size=9pt}]
+\begin{tikzpicture}
 % ---- left panel: D, three bidirected SCCs A={a1,a2}, B={b1,b2}, C={c1,c2},
 % joined a2->b1, b2->c1, and the redundant direct arc a1->c2 bent well below
 % everything so it never crosses the other arcs.
 \begin{scope}
-  \node[apx] (a1) at (0,1)     {}; \node[apname,left=2pt]  at (a1) {$a_1$};
-  \node[apx] (a2) at (0,-1)    {}; \node[apname,left=2pt]  at (a2) {$a_2$};
-  \node[apx] (b1) at (2.6,1)   {}; \node[apname,above=2pt] at (b1) {$b_1$};
-  \node[apx] (b2) at (2.6,-1)  {}; \node[apname,below=2pt] at (b2) {$b_2$};
-  \node[apx] (c1) at (5.2,1)   {}; \node[apname,above=2pt] at (c1) {$c_1$};
-  \node[apx] (c2) at (5.2,-1)  {}; \node[apname,right=2pt] at (c2) {$c_2$};
+  \node[apxlab] (a1) at (0,1) {$a_1$};
+  \node[apxlab] (a2) at (0,-1) {$a_2$};
+  \node[apxlab] (b1) at (2.6,1) {$b_1$};
+  \node[apxlab] (b2) at (2.6,-1) {$b_2$};
+  \node[apxlab] (c1) at (5.2,1) {$c_1$};
+  \node[apxlab] (c2) at (5.2,-1) {$c_2$};
   \draw[aparc] (a1) to[bend left=14]  (a2);
   \draw[aparc] (a2) to[bend left=14]  (a1);
   \draw[aparc] (b1) to[bend left=14]  (b2);
@@ -841,12 +841,12 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
 % ---- right panel: R, same six vertices, same six internal arcs, only the
 % two witness arcs a2->b1 and b2->c1 survive between components.
 \begin{scope}[xshift=9.6cm]
-  \node[apx] (ra1) at (0,1)     {}; \node[apname,left=2pt]  at (ra1) {$a_1$};
-  \node[apx] (ra2) at (0,-1)    {}; \node[apname,left=2pt]  at (ra2) {$a_2$};
-  \node[apx] (rb1) at (2.6,1)   {}; \node[apname,above=2pt] at (rb1) {$b_1$};
-  \node[apx] (rb2) at (2.6,-1)  {}; \node[apname,below=2pt] at (rb2) {$b_2$};
-  \node[apx] (rc1) at (5.2,1)   {}; \node[apname,above=2pt] at (rc1) {$c_1$};
-  \node[apx] (rc2) at (5.2,-1)  {}; \node[apname,right=2pt] at (rc2) {$c_2$};
+  \node[apxlab] (ra1) at (0,1) {$a_1$};
+  \node[apxlab] (ra2) at (0,-1) {$a_2$};
+  \node[apxlab] (rb1) at (2.6,1) {$b_1$};
+  \node[apxlab] (rb2) at (2.6,-1) {$b_2$};
+  \node[apxlab] (rc1) at (5.2,1) {$c_1$};
+  \node[apxlab] (rc2) at (5.2,-1) {$c_2$};
   \draw[aparc] (ra1) to[bend left=14]  (ra2);
   \draw[aparc] (ra2) to[bend left=14]  (ra1);
   \draw[aparc] (rb1) to[bend left=14]  (rb2);
@@ -1143,12 +1143,13 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
 \begin{scope}
   % the Berge-path stations 1,3,5 sit on a baseline, the extra members 2,4,6
   % above, so each hyperedge is a clean metro line arcing over the path.
-  \node[apx] (1) at (0.0, 0.0) {}; \node[apname,below=2pt] at (1) {$1$};
-  \node[apx] (2) at (1.1, 1.3) {}; \node[apname,above=2pt] at (2) {$2$};
-  \node[apx] (3) at (2.2, 0.0) {}; \node[apname,below=2pt] at (3) {$3$};
-  \node[apx] (4) at (3.3, 1.3) {}; \node[apname,above=2pt] at (4) {$4$};
-  \node[apx] (5) at (4.4, 0.0) {}; \node[apname,below=2pt] at (5) {$5$};
-  \node[apx] (6) at (5.5, 1.3) {}; \node[apname,above=2pt] at (6) {$6$};
+  % labels sit INSIDE the vertices, the convention the body uses throughout
+  \node[apxlab] (1) at (0.0, 0.0) {$1$};
+  \node[apxlab] (2) at (1.1, 1.3) {$2$};
+  \node[apxlab] (3) at (2.2, 0.0) {$3$};
+  \node[apxlab] (4) at (3.3, 1.3) {$4$};
+  \node[apxlab] (5) at (4.4, 0.0) {$5$};
+  \node[apxlab] (6) at (5.5, 1.3) {$6$};
   % hyperedges as metro lines, each its own colour: e1 red, e2 blue, e3 grey.
   \begin{scope}[on background layer]
     \draw[metro, metroA]  (1)--(2)--(3);   % e1 = {1,2,3}
@@ -1170,8 +1171,7 @@ and \Cref{fig:star-hypertree} shows the star hypertree of
 % ----- right: incidence graph I(H): vertices (circles) | hyperedges (squares)
 \begin{scope}[xshift=7.0cm]
   \foreach \i/\y in {1/2.2,2/1.3,3/0.4,4/-0.5,5/-1.4,6/-2.3}{
-    \node[apx] (n\i) at (0,\y) {};
-    \node[apname,left=2pt] at (n\i) {$\i$};
+    \node[apxlab] (n\i) at (0,\y) {$\i$};
   }
   \node[apz] (E1) at (2.4,1.3) {$e_1$};
   \node[apz] (E2) at (2.4,-0.5){$e_2$};
@@ -1477,7 +1477,7 @@ most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[apx/.append style={minimum size=9pt}]
+\begin{tikzpicture}
 % Two blobs sharing the cut pair {a,b}: the far side ("rest of G", left) and
 % the 3-connected leaf L (right), joined only by the virtual edge {a,b}.
 \node[draw=KULblauw3b, fill=KULblauw1!8, line width=1pt,
@@ -1487,14 +1487,14 @@ most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
       ellipse, minimum width=3.3cm, minimum height=3.5cm] (L) at (5.4,0) {};
 \node[font=\small, vertexpurple] at (5.4,2.15) {leaf $L$ (3-connected)};
 % the shared cut pair a,b on the seam between the two blobs
-\node[apx] (a) at (2.7, 1.3) {};  \node[apname, above=3pt] at (a) {$a$};
-\node[apx] (b) at (2.7,-1.3) {};  \node[apname, below=3pt] at (b) {$b$};
+\node[apx] (a) at (2.7, 1.3) {};  \node[apname, above=4pt] at (a) {$a$};
+\node[apx] (b) at (2.7,-1.3) {};  \node[apname, below=4pt] at (b) {$b$};
 % virtual edge {a,b}: the leaf's single connection to the rest of G
 \draw[apdashed] (a)--(b);
 \node[apname, text=vertexred, fill=white, inner sep=1.5pt] at (2.7,0) {virtual $\{a,b\}$};
 % inside L: vertices and edges suggesting 3-connectivity, with a far node z*
 \node[apx] (z1) at (5.0, 1.0) {};
-\node[apx] (z2) at (6.3, 0.0) {};   \node[apname, right=4pt] at (z2) {$z^{*}$};
+\node[apx] (z2) at (6.15, 0.0) {};  \node[apname, right=3pt] at (z2) {$z^{*}$};
 \node[apx] (z3) at (5.0,-1.0) {};
 \draw[apgedge] (a)--(z1) (a)--(z2) (a)--(z3) (b)--(z1) (b)--(z2) (b)--(z3)
                (z1)--(z2) (z2)--(z3) (z1)--(z3);

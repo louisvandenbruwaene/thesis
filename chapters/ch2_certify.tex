@@ -146,9 +146,9 @@ The vertex-disjoint version follows the same idea after one construction: split 
    sp/.style={gvertex, minimum size=5pt},
    capf/.style={-{Stealth[length=1.6mm]}, line width=1pt, black!40},
    capw/.style={-{Stealth[length=2mm]}, line width=1.8pt, vertexred},
-   rxa/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexorange},
-   rxb/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexgreen!70!black},
-   rxc/.style={-{Stealth[length=2mm]}, line width=1.5pt, vertexpurple}]
+   rxa/.style={grAd, line width=1.5pt},
+   rxb/.style={grBd, line width=1.5pt},
+   rxc/.style={grCd, line width=1.5pt}]
 % ----- panel (a): original digraph, three routes through w -----
 \begin{scope}
   \node[smallvertex] (s) at (0,0) {$s$};
@@ -766,7 +766,7 @@ $0$ & $1$ & $u$ sink side, $v$ source side & $w(u,v) - 2 \le 0$ & $p^{st}_{uv} \
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
-    plab/.style={font=\scriptsize, fill=white, inner sep=1.5pt}]
+    plab/.style={edgelabel}]
     % the dashed cut line
     \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
     \node[color=KULblauw3b] at (0,2.65) {cut};
@@ -785,7 +785,7 @@ $0$ & $1$ & $u$ sink side, $v$ source side & $w(u,v) - 2 \le 0$ & $p^{st}_{uv} \
     \draw[->, edge, very thick, color=KULblauw1] (s) -- node[plab, above]{$p=w$} (b);
     \draw[->, edge, very thick, color=KULblauw1] (a) -- node[plab, below]{$p=w$} (t);
     % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
-    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.5]{$p=0$} (a);
+    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.30, below=1pt]{$p=0$} (a);
 \end{tikzpicture}
 \caption{One ordered pair's chosen cut. The dashed line splits the vertices into the source side, where $x^{st}_u = 1$, and the sink side, where $x^{st}_u = 0$. Only arcs running from source side to sink side cross the cut, and the first constraint forces their helper $p^{st}_{uv}$ up to the arc weight $w$ (the two thick arcs). Arcs that stay on one side, and arcs that run the other way across the line, contribute nothing. The second constraint then caps the total counted weight, the thick arcs, at one.}
 \label{fig:cut}

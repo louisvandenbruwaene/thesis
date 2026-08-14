@@ -237,8 +237,30 @@ Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
       THEOREM across tab:summary, ch4 open problems, the contribution
       statement, and the lay summary's closing sentence (2026-08-11).
 
-## Deferred figure polish (two items left deliberately, author's call)
-- fig:cut (ch2) keeps its deliberate two-tone highlight (gray=not counted,
-  blue=counted); revisit only if strict opacity uniformity is wanted.
-- Body vs appendix vertex convention (big labelled circles vs small dots with
-  side labels): both defensible; unify only on an author decision.
+## Figure uniformity pass (2026-08-14) -- both deferred items resolved
+- [x] **Body vs appendix vertex convention: UNIFIED** (author asked for it).
+      The appendix had been mixing two looks of its own: apxlab (labelled
+      circles, as in the body) in A.1/A.3, and apx (7pt unlabelled dots with
+      side labels) in A.2/A.4/A.5/A.6/A.7. Now: named vertices carry their label
+      INSIDE the circle (A.4 skeleton, A.5 incidence), matching the body
+      everywhere; genuinely unlabelled vertices stay dots but at 4mm rather than
+      7pt, so they read as the same family; per-figure size overrides dropped.
+- [x] **Two palette collisions fixed.** gvcut (cut vertices) was RGB-identical
+      to gvhub (hubs), both orange -> gvcut is now purple. fig:edge-vs-vertex
+      drew its two routes orange and KULblauw1, i.e. one route in the graph's own
+      blue, and the orange route ran through the orange cut vertex -> routes are
+      now the canonical orange/green (grA/grB) and the cut vertex purple;
+      caption updated to match.
+- [x] Route highlights in fig:vertex-split-example aliased onto grAd/grBd/grCd
+      instead of restating the colours; appendix hubs use gvhub (orange ring,
+      light fill) instead of a solid orange disc; fig:cut's plab folded into the
+      canonical edgelabel.
+- [x] Overlaps cleared: the p=0 label sat exactly on the dashed cut line in
+      fig:cut; z*, a and b were tight against their vertices in fig:tutte-leaf;
+      v_1 and h sat on their vertices in fig:hub-spokes.
+- fig:cut (ch2) still keeps its deliberate two-tone highlight (gray=not counted,
+  blue=counted); that one is intentional and was left alone.
+- fig:augmented-bipartite still draws the direct hop blue and the detour green
+  rather than the orange/green route pair: the blue says "this is one of the
+  bipartite layer's own arcs" and the prose names both colours twice. Left
+  deliberately; note it if the prose is ever reworded.
