@@ -36,7 +36,7 @@ The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine
 
 \Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The five runs below repeat that experiment across the family. The first four cover every combination of the two matrix models, simple and multigraph, with the two directions, and the fifth changes the separation, so that the behaviour can be seen not to be special to one case. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In every one the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
 
-The last of the five is the one worth comparing against the others. It runs the same directed multigraph problem under the \emph{vertex} separation rather than the arc one, and the stricter test is visible in the trace: the walk spends a markedly larger share of its steps on the infeasible side of the boundary before the cooling pulls it back, which is what a harder constraint looks like from inside the search.
+The last of the five is the one worth comparing against the others. It runs the same directed multigraph problem under the \emph{vertex} separation rather than the arc one. This is not a harder constraint in the sense of a smaller feasible region: Whitney's inequality makes the vertex-feasible family the larger of the two (\Cref{rem:whitney-direction}). What the trace shows is a harder \emph{search} rather than a harder problem: the walk spends a markedly larger share of its steps on the infeasible side of the boundary before the cooling pulls it back, evidence that the two separations reshape the search landscape without the vertex one confining it more.
 
 \begin{figure}[htbp]
     \centering
@@ -69,7 +69,7 @@ The last of the five is the one worth comparing against the others. It runs the 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n4_m3_vertex.png}
-    \caption{Search trace for the multigraph directed problem at $n = 4$, $m = 3$ under the \emph{vertex} separation, so the horizontal axis is $\kap^{\max}$ rather than $\lec^{\max}$. Compared with the arc runs above, the walk lingers much longer in the infeasible region before the cooling drives it back, the stricter separation seen from inside the search. File \code{trace\_multi\_directed\_n4\_m3\_vertex.png}.}
+    \caption{Search trace for the multigraph directed problem at $n = 4$, $m = 3$ under the \emph{vertex} separation, so the horizontal axis is $\kap^{\max}$ rather than $\lec^{\max}$. Compared with the arc runs above, the walk lingers much longer in the infeasible region before the cooling drives it back, evidence of a harder search rather than a harder constraint, since the vertex-feasible family is in fact the larger of the two (\Cref{rem:whitney-direction}). File \code{trace\_multi\_directed\_n4\_m3\_vertex.png}.}
     \label{fig:trace-multi-directed-vertex}
 \end{figure}
 

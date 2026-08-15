@@ -4073,8 +4073,8 @@ def _surface_known_value(vkey: str, n: int, m: int) -> int | None:
         return min(multigraph_undirected_edge(n, m), (m - 1) * tri_simple)
     if vkey == "multi_undirected_vertex":           # = simple vertex, m<=4
         return min(simple_undirected_edge(n, m), tri_simple) if m <= 4 else None
-    if vkey == "multi_directed_edge":               # cut-counting proves n<=6
-        return min(directed_multigraph_arc(n, m), (m - 1) * tri_dir) if n <= 6 else None
+    if vkey == "multi_directed_edge":               # thm:dir-multi-full, all n and m
+        return min(directed_multigraph_arc(n, m), (m - 1) * tri_dir)
     if vkey == "multi_directed_vertex":             # = simple digraph, exact m=2
         return min(directed_arc_lower_bound(n, 2), tri_dir) if m == 2 else None
     if vkey == "hyper_undirected_edge":             # incidence-rank, all m

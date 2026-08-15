@@ -77,12 +77,18 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
   two values agree exactly.
 - **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
-- **The exact value of `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
-  convention that parallel copies are distinct routes. The order is `Θ(m²n)` from both
-  sides, and a bouquet of thickened cliques is the best construction known, but it is
-  not optimal: at `m = 5`, `n = 7` it gives 27 where a search has found 28.
-- **Whether the *general* orientation model of the directed hypergraph shares the
-  leading constant** `(m-1)n²/(4(r-1))`, now proved for the forward and backward models.
+- **The exact constant in `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
+  convention that parallel copies are distinct routes. `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
+  theorem on both sides, and the value is exactly a block problem: a knapsack over the
+  best 2-connected block of each size, which settles it outright for every `n ≤ 8`,
+  `m ≤ 8` (at `m = 5`, `n = 7` the value is 29, not the bouquet's 27). The winning
+  blocks are dense bipartite graphs rather than cliques, thickening `K_{s,t}` reaches
+  a rate of `(3 - 2√2 + o(1))m²`, and what is open is the remaining gap to the upper
+  bound, currently a factor of about `6 + 4√2`.
+- The *general* orientation model of the directed hypergraph is now proved to share
+  the leading constant `(m-1)n²/(4(r-1))` with the forward and backward models, for
+  every `r` and `m`. What is still open is the finite-`n` comparison: whether the
+  values agree exactly once `n` exceeds `r`, or there is a first size where they do not.
 
 The directed multigraph problem is closed: `Lₘᵈⁱʳ(n) = (m-1)·max(2(n-1), ⌊n²/4⌋)` for
 every `n` and `m`, which also settles by hand the finite `n = 7` fact
