@@ -430,10 +430,53 @@ def directed_arc_lower_bound(n: int, m: int) -> int:
 def hypergraph_edge(n: int, m: int, r: int) -> int:
     """``floor((m-1)(n-1)/(r-1))`` hyperedges for the ``r``-uniform edge problem.
 
-    Proved modulo the hypergraph Gomory-Hu theorem; the star hypertree attains
-    the ``m = 2`` case and a sparse hypergraph attains the general bound.
+    Proved as an upper bound for every ``r``-uniform hypergraph, simple or
+    not (``prop:hyper-edge``, hypergraph Gomory-Hu). Attained by a
+    MULTIhypergraph (a repeated-hyperedge star) whenever ``(r-1) | (n-1)``.
+    Attained by a SIMPLE hypergraph, the model this program's twelve-panel
+    enumeration actually searches, only under the extra hypothesis
+    ``m - 1 <= C(n-2, r-2)`` (``thm:simple-hyper-edge``). Outside both
+    conditions this value is still a valid upper bound but is not known to
+    be attained by any hypergraph the program can build; use
+    ``_hyper_edge_simple_proved`` for the gated version figures should read.
     """
     return ((m - 1) * (n - 1)) // (r - 1)
+
+
+def _hyper_edge_simple_proved(n: int, m: int, r: int) -> int | None:
+    """``hypergraph_edge(n, m, r)``, gated to where a SIMPLE hypergraph is
+    proved to attain it (``thm:simple-hyper-edge``: ``m - 1 <= C(n-2, r-2)``).
+
+    Returns ``None`` outside that range. The twelve-variant program's hyper
+    rows enumerate simple hypergraphs (no repeated hyperedges), and outside
+    this condition the closed form is only an unattained upper bound for
+    that model, e.g. at ``n = r = m = 3`` it gives 2 while only one 3-set
+    exists on 3 vertices, so the simple maximum is 1.
+    """
+    if r < 2 or n < r:
+        return None
+    if m - 1 <= math.comb(n - 2, r - 2):
+        return hypergraph_edge(n, m, r)
+    return None
+
+
+def _hyper_vertex_simple_proved(n: int, m: int, r: int) -> int | None:
+    """The vertex-separation analogue of ``_hyper_edge_simple_proved``.
+
+    ``m = 2``: unconditional (``thm:hyper-vertex-m2``: repeated hyperedges
+    never help at ``kappa^max <= 1``, so the star hypertree, itself simple,
+    attains the bound for every ``n``, ``r``).
+    ``m = 3``: proved for simple hypergraphs only when
+    ``2 <= C(n-2, r-2)`` (``thm:hyper-vertex-m3``, ``rem:hyper-vertex-m3-scope``).
+    ``m >= 4``: open (``rem:hyper-vertex-m3-scope``).
+    """
+    if r < 2 or n < r:
+        return None
+    if m == 2:
+        return (n - 1) // (r - 1)
+    if m == 3 and math.comb(n - 2, r - 2) >= 2:
+        return (2 * (n - 1)) // (r - 1)
+    return None
 
 
 def directed_multigraph_arc(n: int, m: int) -> int:
@@ -3515,7 +3558,15 @@ _VARIANT_ENUM_CONFIGS: list[dict] = [
     dict(key="multi_directed_vertex",    title="multigraph directed vertex",
          directed=True,  simple=False, hypergraph=False, r=3, separation="vertex",
          enum_n=3, max_mult=5),
-    # row 3 — hypergraph r=3
+    # row 3 — hypergraph r=3.  simple=True here means SIMPLE r-uniform
+    # hypergraphs (no repeated hyperedges), matching the "three models"
+    # taxonomy of the Contribution Statement. prop:hyper-edge and
+    # thm:hyper-vertex-m3 are proved more generally, for MULTIhypergraphs,
+    # and coincide with this simple enumeration only under the conditions
+    # gated by _hyper_edge_simple_proved / _hyper_vertex_simple_proved
+    # (thm:simple-hyper-edge, rem:hyper-vertex-m3-scope). Outside those
+    # conditions this enumeration's exact answer can be strictly smaller
+    # than the closed form, e.g. (n,m,r)=(3,3,3): formula 2, enumeration 1.
     dict(key="hyper_undirected_edge",    title="hypergraph undirected edge",
          directed=False, simple=True,  hypergraph=True,  r=3, separation="edge",
          enum_n=5, max_mult=1),
@@ -4077,10 +4128,12 @@ def _surface_known_value(vkey: str, n: int, m: int) -> int | None:
         return min(directed_multigraph_arc(n, m), (m - 1) * tri_dir)
     if vkey == "multi_directed_vertex":             # = simple digraph, exact m=2
         return min(directed_arc_lower_bound(n, 2), tri_dir) if m == 2 else None
-    if vkey == "hyper_undirected_edge":             # incidence-rank, all m
-        return min(hypergraph_edge(n, m, 3), tri_hyp)
-    if vkey == "hyper_undirected_vertex":           # incidence-rank lemma, m<=3
-        return min(hypergraph_edge(n, m, 3), tri_hyp) if m <= 3 else None
+    if vkey == "hyper_undirected_edge":             # Gomory-Hu, simple-attaining iff m-1<=C(n-2,r-2)
+        known = _hyper_edge_simple_proved(n, m, 3)
+        return min(known, tri_hyp) if known is not None else None
+    if vkey == "hyper_undirected_vertex":           # incidence-rank lemma; see _hyper_vertex_simple_proved
+        known = _hyper_vertex_simple_proved(n, m, 3)
+        return min(known, tri_hyp) if known is not None else None
     # hyper_directed_edge, hyper_directed_vertex: open (new model), no formula.
     return None
 

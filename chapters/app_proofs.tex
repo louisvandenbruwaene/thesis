@@ -1106,6 +1106,10 @@ Let $r \ge 3$, $n \ge r$, and $2 \le m$ with $m-1 \le \binom{n-2}{r-2}$. Then th
 The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multihypergraph. For the lower bound, fix a hub $h$ and let $V' = V \setminus \{h\}$. By \Cref{lem:sparse-hypergraph} applied with rank $r-1$ and degree ceiling $d = m-1$ on the $n-1$ vertices of $V'$, there is an $(r-1)$-uniform simple hypergraph $\mathcal{G}^*$ on $V'$ with maximum degree at most $m-1$ and exactly $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. Adding $h$ to each hyperedge produces distinct $r$-sets, so the result $\HH$ is simple, and every non-hub vertex $w$ lies in $\deg_{\mathcal{G}^*}(w) \le m-1$ hyperedges, which form a cut isolating $w$. By \Cref{thm:menger-hyper}, $\lec^{\max}_\HH \le m-1$.
 \end{proof}
 
+\begin{remark}[The hypothesis is not decorative]\label{rem:simple-hyper-necessary}
+Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the identical hypothesis for the vertex separation, for the same reason. \Cref{tab:summary}'s two hypergraph rows and the twelve-panel program's hyper enumeration, which counts simple hypergraphs only, both carry this distinction, stated where each formula is used.
+\end{remark}
+
 The sparse hypergraph the construction needs is a corollary of a classical partition theorem, which we state before using it.
 
 \begin{theorem}[Baranyai \cite{Baranyai75}]\label{thm:baranyai}
