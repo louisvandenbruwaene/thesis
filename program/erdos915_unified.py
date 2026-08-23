@@ -2775,39 +2775,6 @@ def plot_degree_threshold(
     _save(path)
 
 
-def plot_connectivity_distribution(series: dict, n: int, p: float, path: str | Path) -> None:
-    """Plot overlaid histograms of the binding connectivity for several models.
-
-    ``series`` maps a label to a list of connectivity values (one per random
-    sample), as produced by :func:`montecarlo.connectivity_distribution`.  The
-    integer-valued histograms are drawn on shared integer bins so the shapes can
-    be compared directly across the kinds of graph.
-    """
-    # Shared integer bins across every series so the shapes line up exactly.
-    all_values = [value for values in series.values() for value in values]
-    low, high = min(all_values), max(all_values)
-    levels = list(range(low, high + 1))
-    colours = [_KUL_BLUE, _WARM, _KUL_DARK, _KUL_LIGHT]
-    group_count = len(series)
-    bar_width = 0.8 / group_count  # split each integer slot among the series
-
-    plt.figure(figsize=(7, 4.3))
-    for index, ((label, values), colour) in enumerate(zip(series.items(), colours)):
-        counts = [values.count(level) for level in levels]
-        # Offset each series' bars so grouped bars sit side by side per level.
-        offset = (index - (group_count - 1) / 2) * bar_width
-        positions = [level + offset for level in levels]
-        plt.bar(positions, counts, width=bar_width, color=colour, label=label,
-                edgecolor="white", linewidth=0.4)
-    plt.xticks(levels)
-    plt.xlabel("binding connectivity")
-    plt.ylabel("number of samples")
-    plt.title(f"Connectivity over random graphs, $n = {n}$, $p = {p}$")
-    plt.legend()
-    plt.grid(True, axis="y", alpha=0.3)
-    _save(path)
-
-
 _FRACTION_LABEL = {0.25: "1/4", 0.5: "1/2", 0.75: "3/4"}
 
 
@@ -3455,8 +3422,6 @@ def plot_extremal_gallery(path: str | Path, *,
     _save(path)
 
 
-_GUESS_STYLE = (0, (1, 1))   # dense dots: "we are very much guessing"
-
 
 def plot_variant_grid(panels: list[dict], path: str | Path,
                       m: int | None = None) -> None:
@@ -3583,6 +3548,41 @@ _VARIANT_ENUM_CONFIGS: list[dict] = [
 ]
 
 
+def _all_objects_of_variant(
+    n: int, *,
+    directed: bool,
+    simple: bool,
+    hypergraph: bool = False,
+    r: int = 3,
+    max_mult: int = 3,
+):
+    """Yield every labeled object of one variant on ``n`` vertices, one at a time.
+
+    The single enumeration the two sweeps below share.  For a hypergraph each
+    candidate hyperedge is present or absent; for a matrix model each cell runs
+    over ``{0, 1}`` when simple and ``{0, ..., max_mult}`` when multi.  Isomorphic
+    copies are included, which is what a distribution over the search space wants.
+    Yielding rather than collecting keeps the whole space out of memory.
+    """
+    if hypergraph:
+        candidates = _hyperedge_candidates(n, r, directed)
+        for mask in product((0, 1), repeat=len(candidates)):
+            chosen = [candidates[i] for i, flag in enumerate(mask) if flag]
+            yield Hypergraph(n, chosen, directed=directed)
+        return
+
+    variant = _variant_for(directed, simple)
+    cells = _matrix_cells(n, directed)
+    span = 2 if simple else (max_mult + 1)
+    base = Graph(n, variant)
+    for values in product(range(span), repeat=len(cells)):
+        candidate = base.copy()
+        for (u, v), value in zip(cells, values):
+            if value:
+                candidate.set_multiplicity(u, v, value)
+        yield candidate
+
+
 def enumerate_all_graphs(
     n: int, *,
     directed: bool,
@@ -3599,31 +3599,17 @@ def enumerate_all_graphs(
     absent.  The list covers the full labeled graph space (isomorphic copies
     included), which is what we want for the distribution over the search space.
     """
-    results: list[tuple[int, int]] = []
-
     if hypergraph:
         vertex_split = (separation == "vertex")
-        candidates = _hyperedge_candidates(n, r, directed)
-        for mask in product((0, 1), repeat=len(candidates)):
-            chosen = [candidates[i] for i, flag in enumerate(mask) if flag]
-            h = Hypergraph(n, chosen, directed=directed)
-            conn = max_hyper_connectivity(h, vertex_split=vertex_split)
-            results.append((h.edge_count(), conn))
-        return results
+        def measure(obj):
+            return max_hyper_connectivity(obj, vertex_split=vertex_split)
+    else:
+        measure = _connectivity_measure(separation)
 
-    variant = _variant_for(directed, simple)
-    measure = _connectivity_measure(separation)
-    cells = _matrix_cells(n, directed)
-    span = 2 if simple else (max_mult + 1)
-    base = Graph(n, variant)
-    for values in product(range(span), repeat=len(cells)):
-        candidate = base.copy()
-        for (u, v), value in zip(cells, values):
-            if value:
-                candidate.set_multiplicity(u, v, value)
-        conn = measure(candidate)
-        results.append((candidate.edge_count(), conn))
-    return results
+    return [(obj.edge_count(), measure(obj))
+            for obj in _all_objects_of_variant(
+                n, directed=directed, simple=simple,
+                hypergraph=hypergraph, r=r, max_mult=max_mult)]
 
 
 def _pair_connectivities(obj, *, separation: str, hypergraph: bool) -> list[int]:
@@ -3664,30 +3650,12 @@ def enumerate_pair_connectivities(
     it pickles compactly even though the sweep itself enumerates every graph.
     """
     table: Counter = Counter()
-
-    def record(obj):
+    for obj in _all_objects_of_variant(n, directed=directed, simple=simple,
+                                       hypergraph=hypergraph, r=r, max_mult=max_mult):
         pcs = _pair_connectivities(obj, separation=separation, hypergraph=hypergraph)
         lmax = max(pcs, default=0)
         for c in pcs:
             table[(lmax, c)] += 1
-
-    if hypergraph:
-        candidates = _hyperedge_candidates(n, r, directed)
-        for mask in product((0, 1), repeat=len(candidates)):
-            chosen = [candidates[i] for i, flag in enumerate(mask) if flag]
-            record(Hypergraph(n, chosen, directed=directed))
-        return dict(table)
-
-    variant = _variant_for(directed, simple)
-    cells = _matrix_cells(n, directed)
-    span = 2 if simple else (max_mult + 1)
-    base = Graph(n, variant)
-    for values in product(range(span), repeat=len(cells)):
-        candidate = base.copy()
-        for (u, v), value in zip(cells, values):
-            if value:
-                candidate.set_multiplicity(u, v, value)
-        record(candidate)
     return dict(table)
 
 

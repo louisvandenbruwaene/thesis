@@ -18,8 +18,6 @@ import math
 import sys
 from pathlib import Path
 
-import numpy as np
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from erdos915_unified import (  # noqa: E402
@@ -28,12 +26,10 @@ from erdos915_unified import (  # noqa: E402
     SIMPLE_DIRECTED,
     SIMPLE_UNDIRECTED,
     Graph,
-    _VARIANT_ENUM_CONFIGS,
     search_for_dense_graph,
     compute_enumeration_cache,
     compute_pair_enumeration_cache,
     compute_surface_cache,
-    connectivity_distribution,
     gallery_extremal_graphs,
     directed_arc_lower_bound,
     directed_multigraph_arc,
@@ -45,7 +41,6 @@ from erdos915_unified import (  # noqa: E402
     plot_extremal_gallery,
     plot_conn_dist_grid,
     plot_conn_threshold_3d,
-    plot_connectivity_distribution,
     plot_pair_conn_dist_grid,
     plot_directed_crossover,
     plot_edge_vertex_divergence,
