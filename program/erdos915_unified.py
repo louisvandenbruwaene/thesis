@@ -1118,7 +1118,7 @@ def max_edge_connectivity_via_tree(graph: Graph) -> int:
     return int(round(max(weights)))
 
 
-# --- PROVE: MILP for M*(n) via cut-counting (scipy/HiGHS or Gurobi backend) ---
+# --- PROVE: MILP for M*(n) via cut-counting (one PuLP model, CBC or Gurobi) ---
 # L_m^dir(n) = (m-1)*M*(n) where M*(n) = max sum(w) s.t. maxflow(s,t;w)<=1 all pairs.
 # Flow constraint encoded exactly: choose a cut x in {0,1}^n per pair, cap crossing
 # weight via p; zero MIP gap = proof.  Shared helpers build constraints for both backends.
@@ -1457,11 +1457,12 @@ def _proposal_energy(
     """Return ``(_energy(proposal), proposal_is_feasible)`` doing the least work.
 
     The energy ``-|E| + penalty * max(0, connectivity - (m-1))`` depends on the
-    connectivity only through the excess, and by monotonicity (Facts M1/M2 in the
-    thesis) that excess is provably zero on most steps, so no flow is needed:
+    connectivity only through the excess, and by monotonicity (parts (1) and (2)
+    of the thesis's Proposition on monotone binding connectivity) that excess is
+    provably zero on most steps, so no flow is needed:
 
-    - a removal from a feasible graph stays feasible (M1), excess 0;
-    - an addition while ``lam_ub <= m-2`` stays feasible (M2), excess 0.
+    - a removal from a feasible graph stays feasible (part 1), excess 0;
+    - an addition while ``lam_ub <= m-2`` stays feasible (part 2), excess 0.
 
     Only when neither shortcut applies do we run one capped predicate, and only when
     that reports an infeasible proposal do we spend the exact ``measure_full`` to get
@@ -1472,7 +1473,7 @@ def _proposal_energy(
     edges = proposal.edge_count()
     # Decide excess = max(0, measure(proposal) - (m-1)) with the least work.
     if (is_add and lam_ub <= m - 2) or (not is_add and feasible_current):
-        excess = 0                       # M2 (add) or M1 (remove): provably feasible
+        excess = 0                       # part (2) add, or part (1) remove: provably feasible
     elif not exceeds_bound(proposal, m - 1, separation=separation):
         excess = 0                       # at the boundary but the capped flow clears it
     else:

@@ -3,6 +3,190 @@
 Session start: 2026-06-11. Goal: rigorously prove the easiest unsolved variants
 (for all n and m where possible), logging progress here regularly.
 
+## 2026-08-17 — Authoritative audit trail for the final thesis corrections
+
+**Status and precedence.** This section records the corrections made during the
+final, repeated thesis audit. It is intended to let a later AI or human reviewer
+reconstruct and challenge every material editorial, mathematical, computational,
+and reproducibility change. Where an older entry in this file conflicts with this
+section or with the current theorem statements, the older entry is a historical
+work note and this section plus the current TeX source takes precedence. In
+particular, older phrases such as “for all n” and “unique extremizer” must not be
+copied back into the thesis without re-proving them under the precise hypotheses.
+
+The audit was deliberately conservative: an equality was weakened to an upper
+bound when attainment was not proved; a global classification was restricted to
+the actually searched class; and asymptotic notation was given the regime in
+which its constants are uniform. These changes do not constitute an independent
+proof that the thesis is error-free. They identify the precise points a future
+reviewer should attack first.
+
+### Mathematical corrections and reasons
+
+1. **Directed simple-graph second-order term excludes `m=2`.** The displayed
+   claim
+   `ell_m^dir(n)=n^2/4+Theta_m(n)` (and the corresponding `k_m^dir` claim) was
+   false as stated for every fixed `m >= 2`: at `m=2`, the extremal value is
+   eventually exactly `floor(n^2/4)`, so the correction is `O(1)`, not
+   `Theta(n)`. The theorem, introduction, contribution summary, Chapter 1, and
+   Chapter 4 now state the `Theta_m(n)` conclusion only for fixed `m >= 3` and
+   state the `m=2` exception explicitly. A future reviewer should check both
+   inequalities producing the linear term and verify that their constants may
+   depend on fixed `m` but not on `n`.
+
+2. **The multigraph joint-growth asymptotic now has its necessary regime.** The
+   unqualified formula `K_m^multi(n)=Theta(m^2 n)` is not uniform in arbitrary
+   simultaneous `m,n`; for example, at `n=2` the value is only `m-1`. It is now
+   asserted in the large-block-packing regime `n/m -> infinity`. The surrounding
+   prose explains why fixed or very small `n` is outside that claim. This was
+   corrected in the main text, Chapter 4, the proof appendix, and README. A
+   reviewer should derive explicit upper/lower constants in this regime and test
+   boundary sequences such as `n=2`, `n=m`, and `n=m^2`.
+
+3. **A missing `s=1` case was supplied in the bipartite multigraph proof.** In
+   the proof of `thm:multi-vertex-bipartite`, the argument treated the component
+   as a 2-connected block even when one bipartition class has size one. For
+   `s=1<t` the graph is instead a thickened tree. The proof now handles that case
+   separately. It also explicitly justifies that the rate used in the packing
+   argument is maximized at `t=m-1`, rather than leaving that monotonicity
+   implicit. The next reviewer should recompute the local connectivity in all
+   cases `s=1`, `t=1`, and `s,t>=2`, then independently differentiate or compare
+   the discrete rate.
+
+4. **Directed-multigraph extremal classification was not unique for odd `n`.**
+   The previous theorem called the balanced one-directional complete bipartite
+   construction unique up to isomorphism. When `n` is odd, reversing all arcs
+   changes which unequal part is the source, yielding two non-isomorphic directed
+   graphs. The theorem now gives the set
+   `{(m-1)B_(ceil,floor), (m-1)B_(floor,ceil)}`: one isomorphism class for even
+   `n`, two reversal-paired classes for odd `n`. The proof steps, theorem title,
+   introduction, and synthesis chapter were corrected accordingly. A reviewer
+   should verify that “isomorphism” here preserves arc direction and that no
+   implicit allowance for global reversal collapses the odd-order pair.
+
+5. **The `n=7,m=3` multigraph classification is degree-capped, not global.**
+   The text formerly claimed exactly three unrestricted extremal isomorphism
+   classes. That cannot be true: every doubled bidirected tree is extremal, and
+   there are already eleven undirected tree isomorphism classes on seven
+   vertices. The actual machine call imposed maximum total degree eight. The
+   thesis now says that, *within that cap*, the three observed classes are
+   `2B_(3,4)`, `2B_(4,3)`, and the doubled bidirected path. Chapter 2, Chapter 4,
+   the proof appendix, and gallery language now preserve this scope. The
+   saturated-attachment lemma is no longer presented as classifying every
+   linear-branch extremizer. A reviewer should inspect the generator arguments,
+   confirm whether the cap applies before or after canonicalization, and never
+   infer an unrestricted classification from this experiment.
+
+6. **Hypergraph upper bounds were separated from exact attainment.** Earlier
+   summaries blurred a universal upper bound with equality for all parameters.
+   For the `m=3` result, the bound is universal in its proved domain, while the
+   construction attaining it requires the stated rank/order conditions (in
+   particular the relevant `r >= 3` range); simple-hypergraph and
+   multihypergraph assertions are kept distinct. Tables, contribution claims,
+   Chapter 4, and proof language now say “upper bound” where equality has not
+   been proved. The next reviewer should check the incidence-rank lemma, every
+   divisibility/floor term, small `n<r`, repeated-edge behavior, and the exact
+   hypotheses of each construction. The older “NOW FULLY PROVED (all n, all r)”
+   wording below is therefore historical and superseded.
+
+7. **Directed-hypergraph claims were narrowed to the defined model.** A directed
+   hyperedge is a tail together with `r-1` heads, and routes follow that
+   orientation. Claims now distinguish this model from undirected Berge paths
+   and avoid presenting exploratory bounds as a general theorem for all notions
+   of directed hypergraph connectivity. A reviewer should independently check
+   the shadow/matching reductions, endpoint conventions, repeated hyperedges,
+   and whether cuts mix vertices and hyperedges in each statement.
+
+8. **Random-threshold prose was scoped to what the citations support.** The
+   audit removed an unsupported directed analogue, qualified the random-graph
+   threshold statement and its parameter regime, and corrected the density scale
+   used for the hypergraph discussion. These are contextual statements, not new
+   thesis theorems. A later reviewer should re-open the cited primary sources and
+   verify model, normalization, probability regime, and whether a threshold is
+   sharp or only order-of-magnitude.
+
+9. **Finite enumeration is no longer extrapolated beyond the computation.** Any
+   block/enumeration claim based on searches through `n,m <= 8` is now labeled as
+   evidence in that finite range rather than a theorem for `m >= 5` or arbitrary
+   order. Chapter 2 explains the certification boundary and Chapter 3 separates
+   discovery evidence from proof. The external AI contribution that suggested
+   one discovery route is explicitly attributed rather than silently absorbed.
+   A reviewer should match every numerical sentence to an archived command,
+   parameter cap, and certificate.
+
+### Reproducibility, exposition, and disclosure corrections
+
+10. **The reproducibility appendix was rewritten around executable artifacts.**
+    A long source-code listing was removed; it duplicated the maintained program,
+    inflated the PDF, and could silently diverge. The appendix now documents the
+    five implemented methods, dependencies (including optional parallel
+    facilities and their sequential fallback), commands, generated computational
+    figures, and archive relationship. Checksum instructions explicitly exclude
+    the manifest itself to avoid a self-referential hash. Claims that an external
+    archive is “authoritative” were softened where the repository contents are
+    the directly inspectable evidence. The PDF consequently fell from 296 to 171
+    pages. This is a presentation/reproducibility change, not a mathematical one.
+
+11. **Summary tables, captions, and interface descriptions were made literal.**
+    Table cells now distinguish exact results from bounds and computational
+    observations; figure captions state the actual generated scope. Chapter 1
+    describes a common *interface* across graph, digraph, and hypergraph models,
+    not one identical internal data model. Counts such as “five methods” were
+    aligned with the code. Grammatical/modeling fixes include plural “data
+    suggest” and removal of claims broader than the program implements.
+
+12. **Disclosure and front matter were simplified without hiding provenance.**
+    The AI-use disclosure was condensed but retains the division between machine
+    assistance and author responsibility. An unnecessary custom open-access page
+    was removed. External AI-generated ideas remain identified where materially
+    relevant. Bibliographic entries and nearby prose were corrected where the
+    former wording overstated what a source established. A reviewer should still
+    verify the final disclosure against the university's rules in force at the
+    actual submission date.
+
+### Files affected and how to review the patch
+
+The final audit changed `main.tex`, `chapters/ch1_basecases.tex`,
+`chapters/ch2_certify.tex`, `chapters/ch3_discover.tex`,
+`chapters/ch4_synthesis.tex`, `chapters/app_proofs.tex`,
+`chapters/app_code.tex`, `chapters/app_gallery.tex`, `README.md`, and `ref.bib`;
+`main.pdf` was rebuilt from those sources. This audit record is the additional
+change to `claude.md`. Use `git diff` rather than this summary alone: the diff is
+the exact record of altered language, while this section explains the intent.
+
+High-risk proof points for the next reviewer, in recommended order:
+
+1. Re-prove the hypergraph incidence-rank/SPQR-leaf argument and all equality
+   conditions without relying on the prose summary.
+2. Re-prove the directed reachability-skeleton and deletion-induction arguments,
+   checking zero-degree vertices and both orientations of every cut.
+3. Check the directed-multigraph equality case and the even/odd isomorphism split.
+4. Check the multigraph block-packing optimization, especially the thickened-tree
+   boundary and the precise meaning of `n/m -> infinity`.
+5. Re-run every finite enumeration with the displayed caps and compare canonical
+   representatives, including uncapped doubled-tree counterexamples.
+6. Verify directed-hypergraph shadow/matching statements directly from the route
+   definition, not by analogy with ordinary digraphs.
+7. Re-check every random-threshold sentence against its cited primary source.
+
+### Verification completed after the corrections
+
+On 2026-08-17 the following checks completed successfully:
+
+```text
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+cd program && ../.venv/bin/python -m unittest discover -s tests -v
+git diff --check
+```
+
+The build produced a 171-page PDF with resolved references. The test suite ran
+93 tests successfully with one optional test skipped. Parallel enumeration was
+unavailable in the sandbox and correctly used the tested sequential fallback.
+`git diff --check` reported no whitespace errors. LaTeX reported several
+underfull-box warnings, including in a long corrected proof remark; these are
+typesetting warnings rather than failed proofs or unresolved references. A future
+reviewer should nevertheless visually inspect those pages before submission.
+
 ## Status of open problems (from ch4_synthesis.tex)
 
 | Open item | Difficulty assessment | Plan |

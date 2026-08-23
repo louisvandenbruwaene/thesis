@@ -152,7 +152,7 @@ Random graphs & threshold $p^{*}=m/n$ \\
 {\color{black!45}\small Proved here with no hypothesis on the extremal shape:}\\[6pt]
 {\color{KULblauw1}\large $\displaystyle |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1)$}\\[8pt]
 {\color{black!45}\small and therefore}\\[6pt]
-{\color{KULblauw1}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\frac{n^2}{4}+\Theta_m(n)$}
+{\color{KULblauw1}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\frac{n^2}{4}+\Theta_m(n)\qquad(m\ge3)$}
 
 \vspace{16pt}
 \begin{minipage}{0.86\textwidth}
@@ -274,10 +274,10 @@ directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
 \begin{frame}{What is new here}
 \vfill
 \begin{itemize}\setlength{\itemsep}{5pt}
-  \item[\color{KULblauw1}\textbf{1}] \textbf{The hypergraph vertex problem, settled at $m=2$ and $m=3$}\\
-        {\footnotesize\color{black!60} for every uniformity $r$ and every $n$: $k_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}=\ell_m^{(r)}(n)$. The $m=3$ case rests on a new rank bound for incidence graphs, proved through Tutte's triconnected decomposition.}
-  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: $\ell_m^{\mathrm{dir}}(n)=k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$, unconditionally}\\
-        {\footnotesize\color{black!60} no assumption about the extremal shape, which every earlier route to this bound needed. The vertex separation is not a corollary of the arc one, and gets the same bound by borrowing the route family rather than the conclusion. Leaves a constant factor of about eight in one coefficient.}
+  \item[\color{KULblauw1}\textbf{1}] \textbf{The hypergraph vertex problem: settled at $m=2$; sharp at $m=3$ in its construction range}\\
+        {\footnotesize\color{black!60} a universal $m=3$ upper bound follows from a new incidence-graph rank bound. Equality is proved for $r\ge3$ when $2\le\binom{n-2}{r-2}$.}
+  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: both separations are $n^2/4+\Theta_m(n)$ for fixed $m\ge3$}\\
+        {\footnotesize\color{black!60} no assumption about the extremal shape, which every earlier route to this bound needed. The two statements are separate: the vertex separation is not a corollary of the arc one. The exact linear coefficient remains open.}
   \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs, solved outright: $L_m^{\mathrm{dir}}(n)=(m-1)\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$}\\
         {\footnotesize\color{black!60} every $n$ and every $m$, by peeling off one sparse reachability-preserving subgraph per unit of $m-1$. No parity split, no auxiliary conjecture, and the finite $n=7$ fact this problem once needed a solver for now follows in three lines.}
   \item[\color{KULblauw1}\textbf{4}] \textbf{One-way hyperedge networks: the leading term settled}\\

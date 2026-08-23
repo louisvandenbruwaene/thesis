@@ -78,7 +78,7 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
 - **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
 - **The exact constant in `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
-  convention that parallel copies are distinct routes. `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
+  convention that parallel copies are distinct routes. In the large-`n` block-packing regime, `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
   theorem on both sides, and the value is exactly a block problem: a knapsack over the
   best 2-connected block of each size, which settles it outright for every `n ≤ 8`,
   `m ≤ 8` (at `m = 5`, `n = 7` the value is 29, not the bouquet's 27). The winning

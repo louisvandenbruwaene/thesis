@@ -1,136 +1,192 @@
-Every number in this thesis that was not proved by hand came out of the program printed here, and this appendix prints all of it, with nothing summarised away. The point is that a reader who doubts a computed value can find the exact lines that produced it, rather than taking a description of them on trust.
+The software is part of the evidence behind the finite computations in this thesis, but printing every source file would make the archival document harder rather than easier to audit. Source code is most useful in its native, executable form: with its directory structure intact, under version control, and accompanied by tests and machine-readable data. This appendix therefore records the complete audit trail without duplicating roughly one hundred and forty pages of listings.
 
-There is no need to read this front to back. It is laid out so that you can jump to whichever part you want to check. The listing is broken into the same four movements as the thesis itself, because the program is organised that way on purpose: it defines the objects, then measures them, then proves things about them, then searches for examples and draws the results. Each part below opens with a short account of what it does and which chapter it belongs to, and every listing carries line numbers so that a reference like ``line 1412'' has one unambiguous meaning. Where a line of code was too long for the page it is wrapped, and the continuation is marked with a $\hookrightarrow$ arrow rather than being silently cut.
+The authoritative source tree is maintained at
+\begin{center}
+\url{https://github.com/louisvandenbruwaene/thesis}.
+\end{center}
+For the final submission, an archived snapshot rather than a moving branch name should be treated as definitive. It should be identified by a Git tag or commit hash and stored together with the PDF. A reader can then verify the checked-out version with
+\begin{verbatim}
+git rev-parse HEAD
+git status --short
+\end{verbatim}
+The first command identifies the exact revision, and the second should print nothing for an unmodified archive. This pairing matters: a commit hash alone does not reveal uncommitted changes.
 
-Four files make up the whole of it. The main program, \code{erdos915\_unified.py}, is the one the chapters discuss throughout and the only one that computes a reported result. \code{make\_figures.py} redraws every picture in the thesis by calling into that program, so a figure can never drift away from the numbers behind it. \code{\_erdos\_fast.c} is a small optional accelerator: it speeds up two inner loops and changes no answer, and the program runs correctly without it. The \code{tests/} directory holds the suite that checks all of the above.
+\section{What is in the archive}\label{app:software-layout}
 
-\section{The main program}\label{app:code-main}
+The computational material is deliberately divided by responsibility:
 
-\subsection{How the file opens}
+\begin{description}[style=nextline]
+  \item[\code{program/erdos915\_unified.py}]
+  The mathematical model, exact connectivity routines, finite certifiers, exhaustive enumerators, heuristic searches, random samplers, and the public \code{solve} interface. This is the only file used to compute the numerical extremal results reported in the thesis, and exploratory scripts in \code{research\_notes/} are outside that evidential path.
 
-The program begins by saying what it is for, then imports what it needs and fixes a few constants. Two decisions made here shape everything after. The first is that the heavy scientific libraries are optional: only \code{numpy} and \code{scipy} are required, and \code{matplotlib}, \code{networkx} and \code{pulp} are each wrapped so that the file still loads without them, with the features that need them disabled rather than the whole program failing. The second is that every import is hoisted to the top, so there is one place to look to see what the program depends on.
+  \item[\code{program/tests/}]
+  The independent regression suite. Its tests cover the graph and hypergraph representations, edge and vertex connectivity, known closed forms, named constructions, exhaustive enumeration, certification, search invariants, and random-model utilities.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1,
-  linerange={1-192}]{program/erdos915_unified.py}
+  \item[\code{program/make\_figures.py}]
+  The figure driver. It calls the routines in the main program and writes the plots in \code{figures/}. Randomised calls use fixed seeds.
 
-\subsection{The objects: graphs, hypergraphs, and the values we already know}
+  \item[\code{program/\_erdos\_fast.c} and \code{program/build\_fast.sh}]
+  An optional accelerator for selected inner loops. The Python implementation remains the reference path, and tests compare both implementations when the compiled helper is present.
 
-This part corresponds to \Cref{ch:basecases}. It defines what a graph is for the purposes of this thesis, which is a single square table of numbers: entry $(u,v)$ records how many parallel connections run from $u$ to $v$. That one table covers all eight of the matrix variants at once, because a \code{Variant} record says whether the graph is directed and whether it is simple, and those two switches are the only difference between them. Hypergraphs need a different shape, so they are stored as a list of the sets of vertices each hyperedge joins.
+  \item[\code{program/requirements.txt}]
+  The declared Python dependencies and supported version ranges.
 
-After the objects come the closed-form values the thesis proves or conjectures, each written as a small function whose docstring records whether it is proved, conjectured, or a bound only. Then come the named constructions, the specific graphs that achieve those values, so that a claimed bound can always be met with a concrete example rather than an existence argument.
+  \item[Execution transcripts]
+  The files \path{figures/certificate_log.txt}, \path{figures/basecase_search_log.txt}, and \path{figures/basecase_search_vertex_log.txt} are plain-text records of the finite runs reproduced in \Cref{sec:transcripts}. They record particular executions and are not substitutes for the source or for the mathematical interpretation of their status.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=193,
-  linerange={193-821}]{program/erdos915_unified.py}
+  \item[\code{figures/*.json}, \code{figures/*.pkl}, and generated images]
+  Cached data and presentation outputs. The JSON files are human-readable, while the pickle files are Python caches and must never be accepted from an untrusted source. None is a hand proof.
 
-\subsection{Measuring, and proving}
+  \item[\code{research\_notes/}]
+  Exploratory work, conjectures, and supporting scripts. A note in this directory is not part of the thesis merely because it exists in the repository. Only results stated in the thesis, with the proof or evidential status stated there, are claimed.
+\end{description}
 
-This part corresponds to \Cref{ch:certify}. Measuring comes first. The question ``how many independent routes join these two vertices'' is answered exactly, by turning it into a maximum-flow problem and solving that, which is Menger's theorem used as an algorithm. The same routine answers all four versions of the question, because whether routes must avoid shared edges or shared intermediate vertices is controlled by one flag that decides how the flow network is built, and hypergraphs are handled by giving each hyperedge a gate of its own.
+\section{Recreating the environment}\label{app:software-environment}
 
-Proving comes second and is a different kind of work. To show that no graph of a given size can beat a bound, it is not enough to fail to find one. The program instead writes the whole question as a single optimisation problem whose variables describe an arbitrary graph and whose constraints say that every pair of vertices admits a small cut. If that problem has no solution, no such graph exists, and that is a proof rather than an absence of evidence.
+The core program requires Python 3, NumPy, and SciPy. PuLP supplies the optional mixed-integer certifier, Matplotlib renders figures, and NetworkX supplies the optional Gomory--Hu comparison, and \code{geng} from \textsc{nauty} supports one generation pipeline. From the repository root, a clean virtual environment can be prepared with
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=822,
-  linerange={822-1335}]{program/erdos915_unified.py}
+\begin{verbatim}
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r program/requirements.txt
+\end{verbatim}
 
-\subsection{Searching}
+The requirements file records compatible ranges rather than freezing platform-specific binary wheels. For a long-term replication, the replicator should additionally record
 
-This part corresponds to \Cref{ch:discover}. Where proving is out of reach, the program looks for good examples instead. It starts from a graph, repeatedly makes a small random change, and keeps the change if it helps. Keeping only improvements gets stuck in the first decent shape it finds, so early on it also accepts some changes that make things worse, and it does this less and less as it goes, in the manner of hot metal cooling into an ordered state. A second engine, tabu search, walks the same landscape with a different rule: it always takes the best available move but refuses to revisit recent positions, which is what stops it circling.
+\begin{verbatim}
+python --version
+python -m pip freeze
+uname -a
+\end{verbatim}
 
-Two ideas make this fast enough to be useful. The search is told which edges are load-bearing, so that it changes those rather than wasting moves on edges that carry nothing. And it almost never measures connectivity fully: adding one connection can raise the count by at most one and removing one can never raise it at all, so most steps can be settled by arithmetic on a bound the search already carries, with an exact measurement only when the answer is genuinely in doubt. This part ends with \code{solve}, the single entry point that either proves or searches depending on one argument.
+and retain that output with the run transcript. Solver-backed claims also require the solver name, version, termination status, objective value, best bound, and reported optimality gap. Merely reporting that a solver returned a number is insufficient.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1336,
-  linerange={1336-2374}]{program/erdos915_unified.py}
+The optional C helper can be built from \code{program/} with
 
-\subsection{The random model}
+\begin{verbatim}
+bash build_fast.sh
+\end{verbatim}
+Its absence changes performance, not the mathematical definition or expected answer. A replication intended to test correctness rather than speed should first run without the helper and then, if desired, repeat with it enabled.
 
-Here begins the material behind \Cref{ch:synthesis}. This first piece builds random graphs and measures them, which is how the thesis looks at the typical case rather than the extreme one. Each of the six models gets its own sampler, and the multigraph samplers use a two-stage rule: decide whether a pair is connected at all, then decide how many parallel copies it gets, which recovers the ordinary random graph when the second stage is switched off.
+\section{The verification ladder}\label{app:verification-ladder}
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=2375,
-  linerange={2375-2612}]{program/erdos915_unified.py}
+The program uses five logically different kinds of computation. Their outputs must not be conflated.
 
-\subsection{Drawing the figures}
+\begin{table}[ht]
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Method & Legitimate conclusion & Required audit evidence \\
+    \midrule
+    Exact max flow & The connectivity of the supplied finite object & Input object, separation convention, exact-capacity construction, and agreement with invariant tests \\
+    Exhaustive enumeration & A finite optimum, provided every candidate in the stated space is covered & Generation rule, scope, symmetry handling, pruning justification, and a completed run \\
+    MILP certification & A finite upper bound when the model is sound and optimality is certified & Full formulation, solver status, objective and bound, zero gap, and independently checked witness for the lower bound \\
+    Heuristic search & A concrete feasible construction and hence a lower bound & The witness itself and an exact connectivity check. Run time or failure to improve never proves optimality \\
+    Monte Carlo sampling & An empirical distribution for the specified sampler and seed & Sampling rule, parameters, seed, and sample count, never an extremal proof or an asymptotic theorem \\
+    \bottomrule
+  \end{tabularx}
+  \caption{What each computational method can and cannot establish.}
+  \label{tab:software-evidence}
+\end{table}
 
-Every picture in the thesis is produced by the routines below, from the same data structures the rest of the program uses. They are collected here rather than in the figure script next door so that a plot and the computation behind it stay in one file.
+This hierarchy is enforced at the interface: \code{solve} labels returned information as exact, an upper bound, or a lower bound according to the method used. The prose of the thesis follows the same rule. In particular, a search result becomes a certified optimum only after an independent upper-bound argument meets it.
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=2613,
-  linerange={2613-3528}]{program/erdos915_unified.py}
+\section{Running the checks}\label{app:software-tests}
 
-\subsection{Walking the whole space}
+From \code{program/}, the two principal checks are
 
-At small sizes it is possible to visit every graph there is and record what it looks like, which is what these routines do. The result is the distribution behind the landscape figures, and, more importantly, a way to confirm a claimed maximum by exhaustion rather than by search. The three-dimensional surfaces are built on the same idea, run across a grid of sizes and route limits and cached so that the sweep is paid for once.
+\begin{verbatim}
+python erdos915_unified.py
+python -m unittest discover -s tests -v
+\end{verbatim}
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=3529,
-  linerange={3529-4438}]{program/erdos915_unified.py}
+The first runs the built-in invariant checks. The second runs the separate unit-test suite. Optional-dependency tests report \code{skipped} when their dependency is unavailable, and a green run with skipped tests therefore certifies only the exercised subset. A replication report should preserve the complete output and distinguish passed, failed, errored, and skipped tests.
 
-\subsection{The open variants}
+The most important cross-checks are structural rather than numerical. They include:
 
-These routines exist to attack the questions the thesis leaves open. They measure the hypergraph vertex problem, work with fractional weightings where the integer problem is out of reach, and provide the exhaustive maximisers used to test conjectures at the sizes where testing is still possible. Several results in \Cref{app:proofs} were found, or in two cases refuted, by running exactly these functions.
+\begin{itemize}
+  \item edge connectivity on trees, cycles, complete graphs, and parallel-edge examples whose values are known by inspection
+  \item vertex connectivity against Whitney's inequality and against an independently constructed split-vertex flow network
+  \item hypergraph connectivity reducing to ordinary graph connectivity at uniformity two
+  \item fast predicates agreeing with the uncapped exact routines
+  \item canonical forms remaining invariant under relabelling
+  \item named constructions simultaneously meeting their claimed edge count and connectivity ceiling
+  \item exhaustive small cases reproducing published or hand-proved values
+  \item heuristic witnesses being rechecked by the exact connectivity routine before they are reported.
+\end{itemize}
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4439,
-  linerange={4439-4986}]{program/erdos915_unified.py}
+A test can reveal an inconsistency, but passing tests do not prove an untested general theorem. This is why every general theorem in the thesis has a mathematical proof or a literature citation independently of the program.
 
-\subsection{The gallery}
+\section{Reproducing figures and finite outputs}\label{app:software-reproduction}
 
-Given a size and a route limit, these routines find every extremal graph there is, up to relabelling, and count the symmetries of each. Deciding when two graphs are the same graph drawn differently is done by trying all relabellings and keeping the smallest resulting table, which is slow in principle but perfectly quick at the sizes involved.
+All externally generated computational figures can be regenerated from \code{program/} with
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=4987,
-  linerange={4987-5521}]{program/erdos915_unified.py}
+\begin{verbatim}
+python make_figures.py
+\end{verbatim}
+The script writes into \code{figures/}. Because the random seeds are fixed, repeating a run with the same source and compatible numerical libraries should reproduce the underlying data. Raster or PDF bytes can nevertheless differ across Matplotlib, font, or compression versions even when the plotted numbers agree. Numerical data and labels should therefore be compared before file hashes.
 
-\subsection{The self-check}
+The finite certificates deserve a stricter protocol:
 
-The file ends with a suite of checks that runs when the program is executed directly. It re-derives known values, tests each construction against its predicted size and connectivity, confirms the fast routines agree with the slow ones they stand in for, and verifies the bounds proved in \Cref{app:proofs} on sampled graphs. It prints a line per check and fails loudly rather than quietly if any of them stops holding, which is what makes it useful as a regression test after an edit.
+\begin{enumerate}
+  \item check out the archived revision and confirm a clean worktree
+  \item record the software and solver versions
+  \item run the complete test suite and record all skips
+  \item run the relevant certifier with the same parameters as the transcript
+  \item require a completed optimal solve with zero reported gap
+  \item extract an extremal witness and check its edge count and every relevant local connectivity independently
+  \item compare the objective, bound, and witness with the statement in the thesis.
+\end{enumerate}
 
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=5522,
-  linerange={5522-5808}]{program/erdos915_unified.py}
+For long exhaustive runs, intermediate checkpoints may establish that work was performed but do not establish completion. Only the terminal output, together with the coverage argument for the generator and pruning rules, supports the finite upper bound.
 
-\section{The figure script}\label{app:code-figures}
+\section{Mapping the thesis to the code}\label{app:software-map}
 
-This is the only script that writes image files. It imports the main program and calls its plotting routines, so it holds no mathematics of its own. Keeping it separate means the figures can be regenerated in one command without running anything else, and every random choice it makes is seeded, so running it twice produces identical files.
+Names rather than printed line numbers are the stable references, since line numbers change whenever documentation or tests are improved. The principal entry points are:
 
-\lstinputlisting[style=sourcelisting, language=Python,
-  firstnumber=1]{program/make_figures.py}
+\begin{description}[style=nextline]
+  \item[Graph and hypergraph objects]
+  \code{Graph}, \code{Hypergraph}, and \code{Variant} define the finite objects and the direction, simplicity, multiplicity, uniformity, and separation choices.
 
-\section{The C accelerator}\label{app:code-c}
+  \item[Exact measurement]
+  \code{max\_edge\_connectivity}, \code{max\_vertex\_connectivity}, \code{max\_hyperedge\_connectivity}, and \code{max\_hyper\_vertex\_connectivity} implement the quantities defined in \Cref{ch:basecases}.
 
-Two operations dominate the running time at the sizes the searches reach: deciding whether a pair of vertices already has too many independent routes, and reducing a graph to a standard form so that two drawings of the same graph can be recognised as equal. Both are rewritten here in C, which is compiled separately and loaded if it is present.
+  \item[Certification and enumeration]
+  The functions documented under the certifier and exhaustive-enumeration sections of \code{program/README.md} support \Cref{ch:certify} and the finite transcripts in \Cref{sec:transcripts}.
 
-Nothing depends on it. Every function below has a pure Python counterpart in the main program, the two are tested against each other, and if the compiled library is missing the program simply uses the Python version. The size limits in the code are deliberate: the fixed-size buffers are safe only up to the stated number of vertices, and above it the program falls back rather than risking a buffer it cannot hold.
+  \item[Discovery]
+  The simulated-annealing engine is \path{search_for_dense_graph}, and the tabu engine is \path{tabu_search_for_dense_graph}. Both implement the searches described in \Cref{ch:discover}, and their results are lower bounds until separately certified.
 
-\lstinputlisting[style=sourcelisting, language=C,
-  firstnumber=1]{program/_erdos_fast.c}
+  \item[Unified entry point]
+  \code{solve} selects the applicable exact, certifying, or searching method and returns the evidential status with the result.
 
-\section{The test suite}\label{app:code-tests}
+  \item[Presentation]
+  \code{make\_figures.py} and the plotting functions generate the images, while the mathematical data originate in the same model and measurement routines used elsewhere.
+\end{description}
 
-The suite checks the program against facts established independently of it: closed forms proved by hand, constructions whose size and connectivity are known in advance, and small cases where an exhaustive walk gives the answer outright. Several tests compare two routines that are supposed to agree, such as a fast path against the slow one it replaces, which is what catches an optimisation that changes an answer. Tests needing an optional library skip themselves when it is absent, so the suite passes on a minimal installation rather than reporting failures for tools it was never given.
+The repository's \code{program/README.md} gives the current function-level map and command examples. If it ever conflicts with the archived source or with the mathematical definitions in the thesis, the source determines what was executed and the thesis determines what is claimed. The discrepancy must then be reported rather than silently reconciled.
 
-\subsection{Shared setup}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/__init__.py}
+\section{Archival checklist}\label{app:software-archive}
 
-\subsection{The graph model}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_model.py}
+For the submitted artefact to remain independently auditable, the following items should be deposited together:
 
-\subsection{The closed-form bounds}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_bounds.py}
+\begin{itemize}
+  \item the final PDF
+  \item the complete clean source tree, including tests and figure-generation scripts
+  \item an immutable Git tag or commit identifier for that tree
+  \item the dependency specification and, preferably, a frozen environment listing
+  \item the solver names and versions used for finite certificates
+  \item the plain-text terminal transcripts on which finite claims rely
+  \item the concrete extremal witnesses in a machine-readable format
+  \item a cryptographic checksum manifest for the deposited files.
+\end{itemize}
 
-\subsection{The named constructions}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_constructions.py}
+One portable way to create the last item on macOS is
 
-\subsection{The connectivity checker}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_connectivity.py}
-
-\subsection{Hypergraphs}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_hypergraph.py}
-
-\subsection{Edge sensitivity}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_sensitivity.py}
-
-\subsection{The search}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_search.py}
-
-\subsection{The prover}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_certify.py}
-
-\subsection{The random model}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_montecarlo.py}
-
-\subsection{The solver}
-\lstinputlisting[style=sourcelisting, language=Python, firstnumber=1]{program/tests/test_solve.py}
+\begin{verbatim}
+find . -type f ! -path './.git/*' ! -name 'SHA256SUMS' -print0 |
+  sort -z | xargs -0 shasum -a 256 > SHA256SUMS
+\end{verbatim}
+The manifest should be created only after the archive is final and should itself be stored alongside, not recursively included in, the hashed set. Together, the immutable revision, clean-worktree check, environment record, tests, transcripts, witnesses, and checksums provide stronger reproducibility than a static code listing inside the PDF.

@@ -1,6 +1,6 @@
 # Slides
 
-Three Beamer decks for *Erdős Problem 915, from Proof to Search*. All of them
+Two Beamer decks for *Erdős Problem 915, from Proof to Search*. Both
 reuse the thesis house style (`../shared/colors.tex` and
 `../shared/tikz-styles.tex`) so the colours and the graph vocabulary match the
 document.
@@ -9,7 +9,6 @@ document.
 |---|---|---|---|
 | `talk_10.tex` | 10 minutes | 10 | figure-led, one frame per minute |
 | `talk_60.tex` | 1 hour | 42 | figure-led, seven parts plus backup |
-| `slides.tex` | flexible | 20 | the older narrative deck, metaphor-led |
 
 ## Build
 
@@ -17,7 +16,6 @@ document.
 cd slides
 latexmk -pdf talk_10.tex     # the ten-minute version
 latexmk -pdf talk_60.tex     # the hour version
-latexmk -pdf slides.tex      # the older narrative deck
 ```
 
 ## The two figure-led decks
@@ -62,7 +60,7 @@ references replaced by short words, so they read on a slide. They are
 
 `\twelvetable` lives in `thesis-beamer.tex`, not in either deck, so it must be
 kept in step with `tab:summary` in `chapters/ch4_synthesis.tex` by hand. Its
-four status chips are PROVED, CITED, CONJ, and LEADING TERM, the last being the
-amber case where the `n^2` term is a theorem but the exact value is not. The
-older `slides.tex` carries its own copy of the same table and needs the same
-check.
+status chips distinguish PROVED, CITED, BOUND, CONJ, and LEADING TERM. BOUND
+marks a proved upper bound whose stated construction does not attain it for
+every parameter; LEADING TERM marks the amber case where the `n^2` term is a
+theorem but the exact value is not.
