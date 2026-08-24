@@ -3317,3 +3317,59 @@ program/README test count updated.
 
 VERIFY: 292 pp, 0 overfull, 0 undefined refs, three decks clean, theorem page rendered
 and read.
+
+## 2026-08-24 (Opus) -- the shortening pass, all three groups in one commit
+
+Executed revision 3 of the shortening plan (`~/.claude/plans/i-d-like-to-make-cryptic-tome.md`),
+aggressively: groups A, B and C in one pass rather than one group at a time.
+**173 pp -> 155 pp**, 0 overfull, 0 undefined refs, 103 tests OK, self-check ALL
+CHECKS PASSED.
+
+**NOTHING WAS DELETED.** Every removal was MOVED into `offcuts.tex` at the repo
+root, which `\input{preamble}`s the thesis's own preamble, so each excerpt renders
+exactly as it looked in the thesis and IS the source to paste back from. It builds
+to `offcuts.pdf` (38 pp, gitignored). Each excerpt carries a provenance header:
+plan item, source file, restore anchor (a verbatim fragment of the surviving text
+it sat after, NOT a line number), and the reason. Compressions print WAS and IS NOW
+together, the IS NOW pulled live from the current source at assembly time so the two
+cannot drift. `xr` + `\externaldocument{main}` resolves `\Cref` in an excerpt against
+the live thesis; it worked first try and needed no fallback. Labels inside an IS NOW
+extract are neutralised through `\offcutlabel` so they cannot clash with main's.
+
+WHAT WENT: B.2 traces (5 figs), B.3 (`conn_dist_m6` + `threshold_3d`, so Appendix B
+is now the gallery alone), `pair_conn_dist` + `edges_dist`, §2.9 and the inventory in
+2.9.1, A.12 self-check list, the `m=6` grid, three transcript dumps (replaced by
+`tab:basecase-search`), the worked vertex-split example, the wall-clock SA/tabu plot
+and four paragraphs, the engineering colour in §2.5/2.6, the Contribution Statement's
+second results narrative, two proof sketches in A.1, five thin codecards (10 -> 5),
+the three-regimes walk through all twelve variants in §3.6, the Chernoff primer.
+
+WHAT WAS KEPT AGAINST REVISION 1, on the author's review: `variant_surface_3d` (it
+separates proved from searched, that is variance not rarity), both hypergraph gadget
+examples (non-standard models), every pruning rule and its soundness (that is what
+licenses the word *proved*), the two base-case logs as a compact table (`app_proofs`
+cites them as the settled base cases of the directed m=2 VERTEX theorem, which cannot
+be inherited from the arc case), and `edge_vertex_sampling`.
+
+TWO PROSE FACTS THAT HAD TO BE RIGHT, both wrong in revision 1: tabu is the DEFAULT
+and reaches every value the thesis reports, annealing is retained for the self-check;
+and the sampling figure shows edge/vertex connectivity coming apart on a fraction of
+random samples, NOT the m=5 extremal divergence. Ch1 had quietly claimed the latter
+("It is already there, in miniature, in the random model"); rewritten.
+
+VERIFY: label diff against the baseline commit `d4d5a0d` across EVERY source file, not
+just `app_proofs.tex`. 14 labels left `chapters/`, all of them figures or sections that
+appear in `offcuts.tex`; ZERO thm/lem/prop/cor/conj/const/rem labels lost. One added,
+`tab:basecase-search`. Round trip tested on A6: pasted back at its anchor, rebuilt to
+157 pp, reverted. That +2 for a 1.5 pp figure is the float non-additivity the plan
+warned about, and it is why 155 rather than the estimated ~148: the estimates were
+pre-build and floats reflow.
+
+ALSO: `figures/` untouched by design (rule 2) since `offcuts.pdf` renders eleven of
+them, AND `slides/talk_60.tex` includes `variant_bounds_m6.png` and `conn_dist_m6.png`
+directly, so deleting them would have broken a deck silently. `program/README.md` now
+marks the offcut-only figures; Appendix C's archival checklist says `offcuts.tex` is
+not part of the submitted artefact. Plan item C2: the automorphism `assert count >= 1`
+in `_aut_count_matrix` is now an explicit `RuntimeError` (callers divide by that count
+and `python -O` strips asserts). `mistakes found 24082026.md` left as it is, being a
+closure record rather than a task list.

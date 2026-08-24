@@ -102,11 +102,6 @@ def _assign(self, u, v, value):
 \section{The connectivity checker built on maximum flow}
 The whole question reduces to a flow computation. A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity. Menger's theorem says the most edge-disjoint $u$--$v$ paths a graph offers equals its smallest $u$--$v$ cut, the fewest links whose removal severs every route between the two. The max-flow / min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that smallest cut is exactly the value of a maximum flow, once each multiplicity $\mu(u,v)$ is read as the capacity of the link $u \to v$. So the route count we are after is just a maximum-flow value: measure the flow and you have measured the connectivity. The routine that runs this flow and reports the route count is the connectivity \emph{checker}. It is the single most important routine in the program: it is the only place graph theory meets computation, and every later claim about connectivity passes through it. Because the search of \Cref{ch:discover} calls it by the million on tiny graphs, the program ships an optional compiled C helper that runs this same flow (named later in this chapter's reproducibility section). It is a speed-up only: it returns the identical value the pure-Python checker does, verified against it, so no number in the thesis depends on whether the helper is built.
 
-\codecard{local\_edge\_connectivity(G, s, t) $\to \mathbb{N}$}{MEASURE}
-{a graph $G$ and an ordered pair $(s,t)$}
-{$\lambda_G(s,t)$, the maximum number of edge-disjoint $s$--$t$ paths}
-{a single \code{scipy.sparse.csgraph.maximum\_flow} on the network whose arc capacities are the multiplicities $\mu$, so by Menger the flow value is the path count.}
-
 \codecard{max\_edge\_connectivity(G) $\to \mathbb{N}$}{MEASURE}
 {a graph $G$}
 {$\lambda^{\max}(G)$, the largest local edge-connectivity over all pairs}
@@ -138,75 +133,7 @@ The vertex-disjoint version follows the same idea after one construction: split 
 \label{fig:vertex-split}
 \end{figure}
 
-\Cref{fig:vertex-split-example} applies the split to a whole digraph. Three arc-disjoint routes are forced through one shared vertex $w$, so on the split network all three must cross the single unit-capacity arc inside $w$, which caps the number of internally vertex-disjoint routes below the edge-disjoint count.
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[>=Stealth, scale=0.78,
-   sp/.style={gvertex, minimum size=5pt},
-   capf/.style={-{Stealth[length=1.6mm]}, line width=1pt, black!40},
-   capw/.style={-{Stealth[length=2mm]}, line width=1.8pt, vertexred},
-   rxa/.style={grAd, line width=1.5pt},
-   rxb/.style={grBd, line width=1.5pt},
-   rxc/.style={grCd, line width=1.5pt}]
-% ----- panel (a): original digraph, three routes through w -----
-\begin{scope}
-  \node[smallvertex] (s) at (0,0) {$s$};
-  \node[smallvertex] (w) at (4,0) {$w$};
-  \node[smallvertex] (t) at (8,0) {$t$};
-  \node[smallvertex] (a) at (2,1.75) {$a$};
-  \node[smallvertex] (b) at (6,1.75) {$b$};
-  \node[smallvertex] (c) at (2,-1.75) {$c$};
-  \node[smallvertex] (d) at (6,-1.75) {$d$};
-  \draw[rxa] (s)--(w); \draw[rxa] (w)--(t);
-  \draw[rxb] (s)--(a); \draw[rxb] (a)--(w); \draw[rxb] (w)--(b); \draw[rxb] (b)--(t);
-  \draw[rxc] (s)--(c); \draw[rxc] (c)--(w); \draw[rxc] (w)--(d); \draw[rxc] (d)--(t);
-  \node[font=\scriptsize] at (4,-2.55) {$\lec(s,t)=3$: all three routes pass through $w$};
-  \node[font=\small] at (4,-3.25) {(a) original digraph};
-\end{scope}
-% ----- panel (b): split network, w_in -> w_out is the cap-1 bottleneck -----
-\begin{scope}[yshift=-7.2cm]
-  \foreach \name/\x/\y in {s/0/0, w/4/0, t/8/0, a/2/1.75, b/6/1.75, c/2/-1.75, d/6/-1.75}{
-    \node[sp] (\name-i) at (\x-0.36,\y) {};
-    \node[sp] (\name-o) at (\x+0.36,\y) {};
-    \node[font=\scriptsize, yshift=11pt] at ($(\name-i)!.5!(\name-o)$) {$\name$};
-  }
-  \foreach \name in {s,a,b,c,d,t}{\draw[capf] (\name-i)--(\name-o);}
-  \draw[capw] (w-i)--(w-o);
-  \node[vertexred, font=\scriptsize] at (4,-0.62) {cap $1$};
-  % external route arcs, out -> in
-  \draw[rxa] (s-o) to[bend left=5] (w-i);
-  \draw[rxa] (w-o) to[bend left=5] (t-i);
-  \draw[rxb] (s-o) to[bend left=10] (a-i);
-  \draw[rxb] (a-o) to[bend right=5] (w-i);
-  \draw[rxb] (w-o) to[bend left=5] (b-i);
-  \draw[rxb] (b-o) to[bend left=10] (t-i);
-  \draw[rxc] (s-o) to[bend right=10] (c-i);
-  \draw[rxc] (c-o) to[bend left=5] (w-i);
-  \draw[rxc] (w-o) to[bend right=5] (d-i);
-  \draw[rxc] (d-o) to[bend right=10] (t-i);
-  \node[font=\small] at (4,-3.25) {(b) split network: $\kap(s,t)=1$};
-\end{scope}
-\end{tikzpicture}
-\caption[Vertex splitting on a whole digraph]{The vertex-split checker on a
-larger example. \textbf{(a)} A digraph in which three arc-disjoint $s$--$t$
-routes, $s \to w \to t$ (orange), $s \to a \to w \to b \to t$ (green), and
-$s \to c \to w \to d \to t$ (purple), all pass through the single vertex $w$,
-so $\lec(s,t)=3$. \textbf{(b)} The split network replaces every vertex $V$ by
-an arc $V^{\mathrm{in}} \to V^{\mathrm{out}}$ of capacity one. All three routes
-must now traverse the single unit arc inside $w$ (red), which carries only one
-unit, so at most one internally vertex-disjoint route gets through and
-$\kap(s,t)=1$. Splitting every vertex this way turns the vertex-disjoint count
-into an ordinary maximum flow.}
-\label{fig:vertex-split-example}
-\end{figure}
-
-\codecard{max\_vertex\_connectivity(G) $\to \mathbb{N}$}{MEASURE}
-{a graph $G$}
-{$\kappa^{\max}(G)$, the largest local vertex-connectivity over all pairs}
-{the same sweep as the edge checker, but each flow runs on the split capacity matrix \code{\_split\_capacity\_matrix(G)} of \Cref{fig:vertex-split}, so the unit internal arcs count internally vertex-disjoint paths. Parallel edges are given capacity one here, so they never raise $\kappa$.}
-
-One convention in that codecard deserves to be said in prose, because it does not merely change how the checker computes, it changes what the multigraph vertex question asks. In vertex mode every adjacency carries capacity one, so a bundle of parallel edges counts as a single direct route. The rationale is that vertex-disjointness is about intermediate vertices, and parallel copies offer no new intermediate vertices to be disjoint over.
+That sweep is \code{max\_vertex\_connectivity}, identical to the edge checker except that each flow runs on the split capacity matrix, and it gives every adjacency capacity one, so parallel edges never raise $\kappa$. That last convention deserves to be said in prose, because it does not merely change how the checker computes, it changes what the multigraph vertex question asks. In vertex mode every adjacency carries capacity one, so a bundle of parallel edges counts as a single direct route. The rationale is that vertex-disjointness is about intermediate vertices, and parallel copies offer no new intermediate vertices to be disjoint over.
 
 \begin{remark}[What parallel edges mean in vertex mode]\label{sec:parallel-convention}
 That choice has a consequence which has to be stated rather than left implicit. If parallel copies never raise $\kap$, they never break feasibility either, so one could pile arbitrarily many copies onto any feasible multigraph and stay under the ceiling forever. Counted with multiplicity, the maximum number of edges would simply be infinite, and the extremal question would be empty. The two multigraph vertex variants are therefore posed here with the objective counting \emph{adjacencies}, that is, pairs joined by at least one edge, rather than edges with multiplicity. Under that reading the question is exactly the simple question on the underlying graph, which is why those two rows of \Cref{tab:summary} reduce to their simple counterparts and why every figure in this thesis reports the reduced problem for them.
@@ -218,18 +145,13 @@ The two checkers are the entire interface between graph theory and computation i
 
 The same checker answers two different questions. Throughout this chapter it runs in its exact-value mode, returning $\lambda^{\max}$ or $\kappa^{\max}$ on the nose, and every proved or reported number rests on that exact reading. The search of \Cref{ch:discover} needs only the cheaper yes-or-no question ``is the binding connectivity above the bound?'', so there the same flow runs in a capped mode that stops as soon as it has seen one route too many. The capped mode never changes a reported value: it is a faster way to ask for a single bit, and \Cref{ch:discover} shows that the search built on it reproduces the exact search step for step.
 
-The Gomory--Hu tree from \Cref{ch:basecases} reappears here as an efficiency, and it is the honest kind. For undirected graphs all $\binom{n}{2}$ edge-connectivities are read off a single weighted tree, so $\lambda^{\max}$ is the heaviest tree edge rather than the maximum over $\binom{n}{2}$ separate flows. The speed-up is real, but it is bought with a theorem, not a heuristic.
-
-\codecard{max\_edge\_connectivity\_via\_tree(G) $\to \mathbb{N}$}{MEASURE}
-{an undirected graph $G$}
-{$\lambda^{\max}(G)$, identical to the pairwise sweep}
-{build one Gomory--Hu tree with \code{networkx.gomory\_hu\_tree}, then return its heaviest edge, which costs $n-1$ flows in place of $\binom{n}{2}$ and cross-checks the checker.}
+The Gomory--Hu tree from \Cref{ch:basecases} reappears here as an efficiency, and it is the honest kind. For undirected graphs all $\binom{n}{2}$ edge-connectivities are read off a single weighted tree, so $\lambda^{\max}$ is the heaviest tree edge rather than the maximum over $\binom{n}{2}$ separate flows. The speed-up is real, but it is bought with a theorem, not a heuristic: \code{max\_edge\_connectivity\_via\_tree} builds one Gomory--Hu tree and returns its heaviest edge, at a cost of $n-1$ flows in place of $\binom{n}{2}$, and it cross-checks the pairwise sweep it replaces.
 
 The hypergraph is the one model that never used the multiplicity matrix, since it is stored as a plain list of hyperedges, each one a set of $r$ vertices. The checker still has to read it, and the trick is to run the same flow computation as before on a slightly larger network that we build on the spot. The difficulty is that one hyperedge ties several vertices together at once. By the edge-disjointness convention of \Cref{ch:basecases}, only one route may be counted through a hyperedge at a time, so we cannot just treat it as a bundle of ordinary links. Instead, for every hyperedge we add one extra helper point and connect each of that hyperedge's member vertices to it (\Cref{fig:hyper-gadget}). A route that wants to use the hyperedge now enters through one member vertex, passes through the helper point, and leaves through another.
 
 The key is to make the helper point carry a single unit of capacity, built by the very same device as the vertex bottleneck of \Cref{fig:vertex-split}: the helper point is split into an in-copy and an out-copy joined by one unit-capacity arc, and every route boarding the hyperedge must squeeze through that one arc. A second route would need a second unit of capacity there and so is shut out. That one unit is what captures the rule that one hyperedge serves one route.
 
-Counting routes between two vertices is then the very same maximum flow as before, run on this enlarged network, and when a hyperedge happens to hold just two vertices the helper point collapses back to an ordinary link, so the answer agrees with the graph case. That the flow on the enlarged network counts exactly the hyperedge-disjoint Berge routes is the hypergraph version of Menger's theorem, proved in \Cref{app:proofs} (\Cref{thm:menger-hyper}), so the checker rests on a theorem rather than an analogy.
+Counting routes between two vertices is then the very same maximum flow as before, run on this enlarged network, and when a hyperedge happens to hold just two vertices the helper point collapses back to an ordinary link, so the answer agrees with the graph case. That the flow on the enlarged network counts exactly the hyperedge-disjoint Berge routes is the hypergraph version of Menger's theorem, proved in \Cref{app:proofs} (\Cref{thm:menger-hyper}), so the checker rests on a theorem rather than an analogy. That checker is \code{max\_hyperedge\_connectivity}, which builds the enlarged capacity matrix and then takes the same maximum flow as the graph checker.
 
 \begin{figure}[ht]
 \centering
@@ -385,11 +307,6 @@ the checker reads $\lec(u, v) = 4$. A fifth route would have to reuse a gate.}
 \label{fig:hyper-gadget-example}
 \end{figure}
 One way to picture the helper point is the metro map of \Cref{ch:basecases}: each hyperedge is a metro line, its member vertices are the stations on it, and the helper is the line itself. Boarding at any station counts as taking that line. Because only one route may pass through the helper, only one train runs on the line at a time, so a second route must reach its destination without ever boarding it. The same flow computation that counts edge-disjoint paths through ordinary links now counts routes that share no line, which is exactly what Berge edge-disjointness means.
-
-\codecard{max\_hyperedge\_connectivity(H) $\to \mathbb{N}$}{MEASURE}
-{an $r$-uniform hypergraph $H$}
-{$\lambda^{\max}(H)$, the largest Berge edge-connectivity over all pairs}
-{build the enlarged capacity matrix \code{\_hyper\_capacity\_matrix(H)} in which every hyperedge becomes a helper point that only one route may pass through, then take the same maximum flow as the graph checker. On two-vertex hyperedges it matches ordinary edge-connectivity.}
 
 On the complete graph $K_n$ the hypergraph checker returns $n - 1$, and on the complete three-uniform hypergraph $K_4^{(3)}$ it returns $3$, larger than the two hyperedges through each pair because longer Berge routes also carry flow. The self-test confirms both of these values, so the construction is checked rather than merely asserted. The same helper-point network also answers the vertex-disjoint hypergraph question without alteration: splitting each ordinary vertex as in \Cref{fig:vertex-split} counts internally vertex-disjoint Berge routes. The one remaining direction, the \emph{directed} hypergraph, needs the helper point to learn which way is which, and that is the subject of the next subsection.
 
@@ -642,16 +559,14 @@ The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-e
 \label{fig:prune}
 \end{figure}
 
-Here \code{solve} changes its implementation without changing its interface. For a simple digraph it runs this branch and bound in place of the blind walk, still with the connectivity checker as the feasibility test, and so reaches the base cases $n \le 7$ that blind enumeration cannot. The booleans alone decide which of the two it uses, and the caller never asks.
-
-Run on the directed $m = 2$ problem \code{solve} returns the complete sequence $2, 4, 6, 8, 10, 12$ for $n = 2, \dots, 7$, each proved complete at its size. The densest digraph it finds at each $n$ is exactly the extremal shape \Cref{ch:basecases} named, the bidirected star (the hub) at every $n < 7$ and, at the crossover $n = 7$ itself, a graph of the tying value $12$ that both the hub and the one-directional bipartite digraph attain. The sweep stops there, so the bipartite side of the crossover is witnessed by the construction and the checker rather than by this search (\Cref{ch:discover} records that the cooled walk in fact stalls on the hub at $n = 8$). Within its range the search therefore confirms not just the values but the winning construction. These are exactly the base cases the induction requires, and with them the long proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather than on anything done by hand. The exhaustive-search transcript is in \Cref{app:proofs}.
+Run on the directed $m = 2$ problem, with \code{solve} switching to this branch and bound behind an unchanged interface and the booleans alone deciding which engine it uses, the sweep returns the complete sequence $2, 4, 6, 8, 10, 12$ for $n = 2, \dots, 7$, each proved complete at its size. The densest digraph it finds at each $n$ is exactly the extremal shape \Cref{ch:basecases} named, the bidirected star at every $n < 7$ and, at the crossover $n = 7$ itself, a graph of the tying value $12$ that both the hub and the one-directional bipartite digraph attain. The sweep stops there, so the bipartite side of the crossover is witnessed by the construction and the checker rather than by this search (\Cref{ch:discover} records that the cooled walk in fact stalls on the hub at $n = 8$). These are exactly the base cases the induction requires, and with them the long proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather than on anything done by hand. The transcript is tabulated in \Cref{sec:transcripts}.
 
 \section{Generating the directed cases faster}
 \Cref{thm:dir-multi-full} (\Cref{app:proofs}) now proves the directed multigraph value $L_m^{\mathrm{dir}}(n) = (m-1)M(n)$ by hand, for every $n$ and $m$ at once, so nothing in this section is load-bearing for that theorem any more. It remains useful for a narrower and genuinely separate question: which $n=7$ extremisers satisfy the maximum-total-degree cap $8$ used in the extension analysis (\Cref{rem:n7-classification}). This is not the unrestricted classification, since every doubled bidirected tree is extremal at the tie size, and the program lists only the capped family up to renaming, in two independent ways: when two different methods return the same list, that agreement is itself a check.
 
-The first way is a search written from scratch. It is a depth-first walk over multiplicity matrices that abandons a branch the moment it turns infeasible or can no longer beat the best graph found, and it keeps just one representative of each isomorphism class by reducing every finished graph to a canonical relabelling, the smallest matrix in dictionary order over all relabellings. The canonical form keeps the memory small, but the time is spent walking labelled partial graphs, and time is what runs out: the full classification at $n = 5$ costs this in-house search about $456$ seconds, and it climbs steeply from there.
+The first way is a search written from scratch: a depth-first walk over multiplicity matrices that abandons a branch the moment it turns infeasible or can no longer beat the best graph found, keeping one representative of each isomorphism class by reducing every finished graph to its canonical relabelling, the smallest matrix in dictionary order. The canonical form keeps the memory small, but the time is spent walking labelled partial graphs, and time is what runs out: the full classification at $n = 5$ costs this in-house search about $456$ seconds, and it climbs steeply from there.
 
-The second way (\Cref{tab:functions} names it) does not search at all, it generates, and it was suggested by Prof.\ Jan Goedgebeur. The idea is to hand the hard part, listing one graph per isomorphism class, to a tool that already does it supremely well: the \texttt{geng} program from the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14}, invoked through a subprocess and decoded from its \texttt{graph6} output (a compact one-line text encoding of a graph). \texttt{geng} lists the non-isomorphic \emph{undirected} graphs on $n$ vertices, and the program then decorates each one with the directed multiplicities the problem needs, so the isomorphism reduction is inherited for free from the support graph. The decoration itself is plain to state. For one support graph, walk its edges in a fixed order and assign each edge $\{u,v\}$ an ordered pair of multiplicities $\mu(u,v), \mu(v,u)$, each between $0$ and $m-1$ but not both zero, since an edge of the support must carry at least one arc. Along the way the checker measures the partly decorated multigraph, and the moment some pair already exceeds the connectivity ceiling the whole branch of assignments is abandoned, since adding further arcs can never lower a connectivity, the same monotonicity prune as \Cref{fig:prune}. A decoration that survives to the end with the target arc count is kept, reduced to its canonical form so that each isomorphism class is reported once. Different supports share nothing, so they are processed independently across the processor cores. The companion orientation tools \texttt{directg} and \texttt{watercluster2} are not used, because each gives only one orientation per edge and so cannot express the bidirected arcs and repeated multiplicities the extremal graphs are built from. Layering the multiplicities in-house on top of \texttt{geng} is what fits the problem. To be precise about credit: Prof.\ Goedgebeur is not an author of \texttt{nauty}, which is the work of McKay and Piperno cited above. He suggested the generation route, and it is his suggestion that the speed-up rests on.
+The second way (\Cref{tab:functions} names it), suggested by Prof.\ Jan Goedgebeur, does not search at all, it generates. It hands the hard part, listing one graph per isomorphism class, to the \texttt{geng} program of the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14}, invoked through a subprocess and decoded from its \texttt{graph6} output. \texttt{geng} lists the non-isomorphic \emph{undirected} graphs on $n$ vertices, and the program decorates each one with the directed multiplicities the problem needs, so the isomorphism reduction is inherited for free from the support graph. The decoration walks the support's edges in a fixed order and gives each edge $\{u,v\}$ an ordered pair of multiplicities $\mu(u,v), \mu(v,u)$, each between $0$ and $m-1$ but not both zero, since an edge of the support must carry at least one arc. The checker measures the partly decorated multigraph as it goes, and the moment some pair exceeds the connectivity ceiling the whole branch of assignments is abandoned, since adding further arcs can never lower a connectivity, the same monotonicity prune as \Cref{fig:prune}. A decoration surviving to the end with the target arc count is kept and reduced to canonical form, so each isomorphism class is reported once, and different supports share nothing, so they are processed independently across the processor cores. The companion orientation tools \texttt{directg} and \texttt{watercluster2} are not used, because each gives only one orientation per edge and so cannot express the bidirected arcs and repeated multiplicities the extremal graphs are built from. To be precise about credit: Prof.\ Goedgebeur is not an author of \texttt{nauty}, which is the work of McKay and Piperno cited above. He suggested the generation route, and it is his suggestion that the speed-up rests on.
 
 The two ways agree to the last graph. The generated pipeline reproduces the in-house classification exactly at every settled size, two non-isomorphic extremal families at $n = 4$ and three at $n = 5$, and it runs substantially faster, since the isomorphism work it never repeats is precisely what \texttt{geng} has already done. One difference decides which to trust further out: the in-house search leans on a conjectured counting bound once $n \ge 7$, while the generated enumeration prunes only with proved bounds, so it is sound and complete for the parameter range and any explicitly imposed degree cap. That soundness has now paid off. Pointed at the degree-bounded classification at $n = 7$, the generation enumerator completed the sweep in about seven hours across ten processor cores and returned exactly three extremal families, $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$ (\Cref{rem:n7-classification}).
 
@@ -813,24 +728,10 @@ With the microscope built and aimed at proof, the variants with small answers ar
 
 \section{Reproducibility}
 
-Every claim in this thesis that rests on computation can be re-run from a single Python driver. All of the program's logic lives in \code{program/erdos915\_unified.py}, one self-contained file. Its core needs only \code{numpy} and \code{scipy}, because every connectivity value it reports is a single \code{scipy} integer maximum flow on a capacity matrix. The model, the checker, the search, the enumeration, and the self-test all run on those two libraries alone.
-
-A few more libraries sit on top, each for one job. The certifier uses \code{pulp}, a Python library for writing an optimisation once and handing it to any solver, and runs it on CBC, the free solver \code{pulp} bundles, or on the commercial Gurobi solver by a one-line switch. Two others are optional and only for presentation: \code{matplotlib} draws the figures, and \code{networkx} supplies the Gomory--Hu tree behind one of them. An optional compiled helper, \code{\_erdos\_fast.so} (built from \code{\_erdos\_fast.c} by \code{build\_fast.sh}), speeds up the hot-path \code{\_tiny\_maxflow} and \code{\_canonical\_form} calls, but the pure-Python path returns the same answers.
-
-A handful of named entry points reach the whole pipeline. \code{solve} drives every variant. The measures are \code{max\_edge\_connectivity} and \code{max\_vertex\_connectivity}, with the hypergraph and Gomory--Hu views beside them. The provers are \code{prove\_directed\_multigraph} and \code{enumerate\_extremal\_directed\_multigraphs}, and \code{search\_for\_dense\_graph} is the discoverer. Running \code{python erdos915\_unified.py} executes the built-in self-test, the suite of invariant checks that confirms the connectivity values quoted throughout this chapter, including the sanity checks on the bidirected star and on $K_n$ and $K_4^{(3)}$.
-
-The figures and finite outputs are reproducible as well. Every figure is regenerated by the companion driver \code{program/make\_figures.py}, which imports the same file and fixes every random seed, and the table in \code{program/README.md} records which routine produces which figure. The exception is \Cref{fig:sa-vs-tabu}: it is deliberately wall-clock timed and therefore representative rather than seed-exact. Compatible environments reproduce the other numerical data, though image bytes may still differ with plotting libraries, fonts, or compression. The solver transcripts behind this chapter's finite values, the pruned-search log for \Cref{thm:dir-arc-m2-exact} and the cut-counting solver record for \Cref{thm:dir-multi-small}, are reproduced verbatim in \Cref{app:proofs}. The archive, commands, dependency record, and audit protocol are specified in \Cref{app:code}.
+Every claim in this thesis that rests on computation re-runs from a single Python driver. All of the program's logic lives in \code{program/erdos915\_unified.py}, one self-contained file whose core needs only \code{numpy} and \code{scipy}, because every connectivity value it reports is one \code{scipy} integer maximum flow on a capacity matrix. \code{pulp} sits on top for the certifier, and \code{matplotlib} and \code{networkx} only for presentation. \Cref{app:code} carries the rest in full: the archive layout, the environment, the named entry points, the commands, the table recording which routine draws which figure, and the archival protocol. The solver transcripts behind this chapter's finite values are reproduced in \Cref{sec:transcripts}.
 
 \subsection{What a machine-checked claim in this thesis means}\label{sec:certification-standard}
 
-Reproducibility is not the same as certification, and it is worth stating plainly what standard the computed results here meet, since a solver reporting \texttt{OPTIMAL} is not by itself a mathematical certificate. Four practices carry the weight.
-
-First, the exhaustive searches are self-certifying in a way the optimisations are not. A finished include-or-exclude sweep has visited a superset of the objects it needed to visit, and the two prunes are proved sound in \Cref{ch:discover}, so its verdict depends on no solver and no floating-point arithmetic, only on the checker. Where a value in this thesis is called \emph{proved}, that is usually the reason.
-
-Second, every reported connectivity is exact and integral. The checker is a single integer maximum flow, so no extremal value in the thesis is a rounded floating-point quantity. Real numbers enter in exactly one place that carries a reported extremal value, the fractional optimisation of \Cref{thm:dir-multi-small}, where the reported optimum is a $\{0,1\}$ matrix and is checked exactly.
-
-Third, the load-bearing computations are run twice, by implementations that share no code. The base cases of \Cref{thm:dir-arc-m2-exact} and \Cref{thm:dir-vertex-m2-exact} were each confirmed by the program and by separately written checkers, agreeing on every size. The values of \Cref{sec:multi-vertex-standard} were computed by the program's routine and by an independent script, agreeing on every cell. The maximum-total-degree-$8$ directed multigraph classification at $n = 7$ (\Cref{rem:n7-classification}) was produced by the generation enumerator and re-verified graph by graph with the exact checker. The integral MILP of this chapter re-proves $L_3^{\mathrm{dir}}(n)$ independently of the fractional route at every $n \le 6$, which is as far as it ever got. At $n = 7$ it timed out, so the value $L_3^{\mathrm{dir}}(7) = 24$ rests on the hand proof of \Cref{app:proofs} alone. The route-counting steps behind \Cref{thm:dir-vertex-linear-error} and \Cref{thm:dir-hyper-constant} were checked the same way before they were written down, over several thousand random digraphs and hypergraphs and every ordered pair in each, by a script that shares no code with this program. Those two are hand proofs and do not need the check to stand, but the check is what caught that both inequalities are attained with equality in real instances, which is how one knows the proof is not throwing anything away. Two implementations agreeing is not a proof, but it is the practical guard against the failure mode a certificate would catch, namely a correct method with a wrong program.
-
-Fourth, the self-test at the foot of the file is a standing regression check on every invariant the text quotes, and it is run after every change to the program.
+Reproducibility is not the same as certification, and it is worth stating plainly what standard the computed results here meet, since a solver reporting \texttt{OPTIMAL} is not by itself a mathematical certificate. Three practices carry the weight. The exhaustive searches are self-certifying in a way the optimisations are not: a finished include-or-exclude sweep has visited a superset of the objects it needed to visit, and the two prunes are proved sound in \Cref{ch:discover}, so its verdict depends on no solver and no floating-point arithmetic, only on the checker. Where a value in this thesis is called \emph{proved}, that is usually the reason. Every reported connectivity is exact and integral, a single integer maximum flow, so no extremal value in the thesis is a rounded floating-point quantity; real numbers enter in exactly one place that carries a reported extremal value, the fractional optimisation of \Cref{thm:dir-multi-small}, where the reported optimum is a $\{0,1\}$ matrix and is checked exactly. And the load-bearing computations are run twice, by implementations that share no code. Two implementations agreeing is not a proof, but it is the practical guard against the failure mode a certificate would catch, namely a correct method with a wrong program. \Cref{app:verification-ladder} sets out what each kind of computation may legitimately conclude and what evidence it must carry, and \Cref{app:software-tests} records which computations were checked which way.
 
 What this does not amount to is a formally checkable certificate of the kind a SAT solver can emit, such as a resolution proof a small independent verifier could replay. That standard would have been the right one to aim at for $L_3^{\mathrm{dir}}(7) = 24$ had it stayed a solver question, since an INFEASIBLE verdict is exactly the shape of claim a resolution proof records. It did not stay one: \Cref{app:proofs} proves the same statement, and its general case for every $n$ and $m$, by hand, so nothing in this thesis currently rests on an infeasibility verdict that lacks such a proof behind it.

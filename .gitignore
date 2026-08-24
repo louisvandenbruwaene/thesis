@@ -43,3 +43,6 @@ sorensen.pdf
 # author working files and third-party PDFs, kept locally only
 current status thesis.rtf
 directed_multigraph_extremal_revised.pdf
+
+# The offcuts record builds from offcuts.tex; the PDF is a build product
+offcuts.pdf

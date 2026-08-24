@@ -39,7 +39,7 @@ In any capacitated digraph, and for distinct vertices $u, v$, the maximum flow f
 \[
     \lec_G(u, v) = \min\{\, |C| : C \subseteq E(G),\ G - C \text{ has no } u\text{--}v \text{ path} \,\}.
 \]
-A directed capacitated graph is the most general object here, and every graph model the thesis uses is a special case of it. An undirected graph is the symmetric case, each edge a pair of opposite unit-capacity arcs. A multigraph is the integer-capacity case, with $\mu(u,v)$ units on the pair $uv$. The hypergraph version (\Cref{thm:menger-hyper}) is this very theorem applied to the helper-point network of \Cref{fig:hyper-gadget}, a capacitated digraph. The \emph{internally vertex-disjoint} version is obtained not by changing the theorem but by changing the graph it runs on, a device called \emph{vertex splitting}: replace each internal vertex $w$ by two copies joined by a single unit-capacity arc $w^- \to w^+$, send every arc that entered $w$ into $w^-$ and every arc that left $w$ out of $w^+$. A flow may now pass through $w$ at most once, so edge-disjoint paths in the split graph are exactly internally vertex-disjoint paths in the original, and a minimum edge cut there is a minimum vertex cut here. This split graph is literally what the checker of \Cref{ch:certify} builds, which is why a single maximum-flow routine measures all four separations.
+Every graph model the thesis uses is a special case of a directed capacitated graph: an undirected graph is the symmetric one, each edge a pair of opposite unit-capacity arcs; a multigraph is the integer-capacity one, with $\mu(u,v)$ units on the pair $uv$; and the hypergraph version (\Cref{thm:menger-hyper}) is this very theorem applied to the helper-point network of \Cref{fig:hyper-gadget}. The \emph{internally vertex-disjoint} version is obtained not by changing the theorem but by changing the graph it runs on, a device called \emph{vertex splitting}: replace each internal vertex $w$ by two copies joined by a single unit-capacity arc $w^- \to w^+$, send every arc that entered $w$ into $w^-$ and every arc that left $w$ out of $w^+$. A flow may then pass through $w$ at most once, so edge-disjoint paths in the split graph are exactly internally vertex-disjoint paths in the original, and a minimum edge cut there is a minimum vertex cut here. This split graph is what the checker of \Cref{ch:certify} builds, which is why a single maximum-flow routine measures all four separations.
 \end{theorem}
 
 \begin{theorem}[Gomory--Hu \cite{GomoryHu61}]\label{thm:gomory-hu}
@@ -48,7 +48,7 @@ Every \emph{undirected} capacitated graph $G$ has a weighted tree $T$ on the sam
 
 Two features of the statement fix how far it reaches, and both are used below. Being a theorem about capacities, it applies verbatim to a simple graph (unit weights), to a multigraph (integer weights, the multiplicity $\mu$ as capacity), and, in the form of \Cref{thm:hyper-gomory-hu}, to the hyperedge-connectivity of a hypergraph. But it needs the cut function to be \emph{symmetric}, which forces $G$ to be undirected: a digraph has $\lec(u,v) \ne \lec(v,u)$ in general and admits no such tree, and the vertex-connectivity function fails symmetry for the same reason. So the Gomory--Hu tree is precisely the tool for the undirected edge problems, where it drives Mader's theorem and its multigraph and hypergraph cousins (\Cref{thm:mader,thm:multigraph-edge,prop:hyper-edge}) through one argument, and precisely the tool that vanishes once arcs turn one-way.
 
-Existence rests on a single property of cuts. Write $d(S)$ for the capacity of the cut $(S, V \setminus S)$. This function is \emph{submodular}, meaning that $d(A) + d(B) \ge d(A \cap B) + d(A \cup B)$ for any two vertex sets $A$ and $B$. That is exactly the inequality which lets a cheapest $u$--$v$ cut crossing some other set $S$ be traded for one that does not, without ever losing capacity. Building the tree is then $n-1$ rounds of one minimum-cut computation each, each round splitting one bag of the current tree along a fresh minimum cut, with that trading property (the \emph{uncrossing} lemma) guaranteeing no earlier round's cut is ever spoiled by a later one. The full construction, uncrossing induction included, is in Gomory and Hu's original paper \cite{GomoryHu61}.
+Existence rests on a single property of cuts. Writing $d(S)$ for the capacity of the cut $(S, V \setminus S)$, this function is \emph{submodular}: $d(A) + d(B) \ge d(A \cap B) + d(A \cup B)$ for any two vertex sets. That is exactly the inequality which lets a cheapest $u$--$v$ cut crossing some other set be traded for one that does not, without losing capacity, and the tree is then built in $n-1$ rounds of one minimum-cut computation each, that trading property (the \emph{uncrossing} lemma) guaranteeing no earlier round's cut is spoiled by a later one. The construction, uncrossing induction included, is in Gomory and Hu's original paper \cite{GomoryHu61}.
 
 The most basic constraint on local connectivity is local: a pair cannot have more independent routes than either endpoint has edges. The constructions below use it constantly.
 
@@ -2254,23 +2254,6 @@ Two comments. First, the trade-off the optimum balances is visible in the formul
 
 The probabilistic ingredients are two Chernoff bounds, quoted in the form we use them.
 
-\begin{primer}[Primer: what a Chernoff bound says]
-Both proofs below need to say that a sum of many independent yes-or-no trials
-almost never lands far from its average. That is the content of a \emph{Chernoff
-bound}, and the intuition is worth stating even though we only quote the result.
-Let $X = X_1 + \dots + X_N$ count the successes among independent trials, with mean
-$\mu = \mathbb{E}[X]$. A Chernoff bound says the chance that $X$ overshoots $\mu$ by
-a factor $1 + \delta$, or undershoots it by a factor $1 - \delta$, decays
-\emph{exponentially} in $\mu$, not merely polynomially as Chebyshev's inequality
-would give. The mechanism is a single trick. Rather than bound $\Pr[X \ge a]$
-directly, bound $\Pr[e^{tX} \ge e^{ta}]$ by Markov's inequality for a parameter
-$t > 0$, use independence to factor $\mathbb{E}[e^{tX}] = \prod_i \mathbb{E}[e^{t
-X_i}]$ into a product over the trials, and then choose $t$ to make the resulting
-bound as small as possible. The exponential in the answer is exactly the $e^{tX}$
-that was fed through Markov. We quote the two tails in the shape the threshold
-proof consumes.
-\end{primer}
-
 \begin{theorem}[Chernoff bounds, see {\cite[Cor.~4.4, Thm.~4.4]{Mulzer18}}]\label{thm:chernoff}
 Let $X$ be a sum of independent $\{0,1\}$-valued random variables with mean $\mu$. For $\delta > 0$, $\Pr[X \ge (1+\delta)\mu] \le \exp\bigl(-\tfrac{\min(\delta, \delta^2)\,\mu}{4}\bigr)$, and for $\delta \in (0,1)$, $\Pr[X \le (1-\delta)\mu] \le \exp\bigl(-\tfrac{\delta^2 \mu}{2}\bigr)$.
 \end{theorem}
@@ -2310,30 +2293,41 @@ No directed conclusion is claimed here. A corresponding assertion for $D(n,p)$ r
 \[
     p^* \;=\; \frac{m}{\binom{n-1}{r-1}} \;=\; \Theta\!\left(\frac{m}{n^{r-1}}\right),
 \]
-which for $r \ge 3$ is smaller than $m/n$ by a factor of order $n^{r-2}$. Reading $m/n$ as the hypergraph balance point would therefore place it far above the expected-degree balance: at $r = 3$ and $n = 8$, for instance, $m/n$ is $3/8$ while $m/\binom{7}{2}$ is $3/21$. \Cref{fig:threshold-3d} accordingly sweeps each model in units of its own $p^*$ rather than a shared $p$. A second limit of scope is worth repeating here: the theorem assumes $m/\ln n \to \infty$, so any picture at a fixed small $m$ illustrates the shape of the transition without being an instance of the theorem.
+which for $r \ge 3$ is smaller than $m/n$ by a factor of order $n^{r-2}$. Reading $m/n$ as the hypergraph balance point would therefore place it far above the expected-degree balance: at $r = 3$ and $n = 8$, for instance, $m/n$ is $3/8$ while $m/\binom{7}{2}$ is $3/21$. Any sampling comparison across the models must therefore be read in units of each model's own $p^*$ rather than a shared $p$. A second limit of scope is worth repeating here: the theorem assumes $m/\ln n \to \infty$, so any picture at a fixed small $m$ illustrates the shape of the transition without being an instance of the theorem.
 \end{remark}
 
 \section{Computational transcripts}\label{sec:transcripts}
 
-The cut-counting optimisation formulation used as a finite solver check for \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the historical solver records, together with the exhaustive-search output that settles the directed base cases. The first records solver status but not an independently replayable dual certificate or gap. The theorem itself is proved by hand in this appendix. The complete commented source is maintained with the document as \texttt{erdos915\_unified.py} in the \texttt{program/} directory and should be included in the archived submission described in \Cref{app:code}. Its core runs on \texttt{numpy} and \texttt{scipy} alone, the certifier adds \texttt{pulp}, and \texttt{matplotlib} and \texttt{networkx} are optional analysis and visualisation dependencies. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
+The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and are settled by a pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, so each completed row is an upper-bound proof at that $n$. The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. \Cref{tab:basecase-search} records both runs. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}, and that agreement is a computed coincidence of the two searches rather than a formal consequence of Whitney's inequality.
 
-\lstinputlisting[style=pythonkul, language={}, caption={Historical solver output reporting $M^{*}(n)=2(n-1)$ and status \texttt{OPTIMAL} for $n=3,4,5,6$. The archived run did not record an independently checked optimality gap.}]{figures/certificate_log.txt}
+\begin{table}[ht]
+  \centering
+  \small
+  \begin{tabular}{@{}rrrrrl@{}}
+    \toprule
+    $n$ & arc-disjoint & vertex-disjoint & $M(n)$ & nodes & status \\
+    \midrule
+    2 & 2 & 2 & 2 & 5 & complete \\
+    3 & 4 & 4 & 4 & 22 & complete \\
+    4 & 6 & 6 & 6 & 537 & complete \\
+    5 & 8 & 8 & 8 & 17\,823 & complete \\
+    6 & 10 & 10 & 10 & 788\,101 & complete \\
+    7 & 12 & 12 & 12 & 45\,122\,129 & complete \\
+    \bottomrule
+  \end{tabular}
+  \caption{The directed $m = 2$ base cases under both separations: exhaustive
+  branch and bound over all simple digraphs on $n$ vertices with
+  $\lambda^{\max} \le 1$, and the same run with $\kappa^{\max} \le 1$. Same
+  driver, same prunes, only the inner feasibility test changes. Both columns
+  agree with $M(n) = \max(2(n-1), \floor{n^2/4})$ at every size, and every run
+  completed. The node counts coincide because the prunes do not depend on the
+  separation; the wall times do not, the vertex run at $n = 7$ taking
+  $3125$\,s against the arc run's $718$\,s. Full logs:
+  \code{figures/basecase\_search\_log.txt} and
+  \code{figures/basecase\_search\_vertex\_log.txt}.}
+  \label{tab:basecase-search}
+\end{table}
 
-The cut-counting optimisation closes the gap up to $n = 5$ inside a short budget and reaches $n = 6$ in about twenty minutes. Past that it stalls, because a solver handles the yes-or-no cut labels by case-splitting, trying a label both ways and solving each half, and the number of cases it must open grows too fast at $n = 7$. The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and those are settled instead by the pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, and it agrees with $\ell_2^{\mathrm{dir}}(n) = M(n)$ throughout.
+The cut-counting optimisation of \Cref{ch:certify} is a separate and weaker kind of record. It closes the directed multigraph problem only up to $n = 6$, taking about twenty minutes there, and stalls at $n = 7$ because the solver handles the yes-or-no cut labels by case-splitting and the number of cases grows too fast. Its archived runs reported $M^{*}(n) = 2(n-1)$ with status \texttt{OPTIMAL} for $3 \le n \le 6$, but recorded no independently checkable best bound or gap, so no claim here rests on them: \Cref{thm:dir-multi-full} proves the value for every $n$ and every $m$ by hand. The raw log is kept with the other two in the repository (\Cref{app:software-reproduction}).
 
-\lstinputlisting[style=pythonkul, language={}, caption={Exhaustive-search output for the base cases $2 \le n \le 7$: the maximum arc count equals $M(n) = 2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_log.txt}
-
-The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}.
-
-\lstinputlisting[style=pythonkul, language={}, caption={The same search run with the internally vertex-disjoint feasibility test, settling the base cases of \Cref{thm:dir-vertex-m2-exact}: the maximum arc count is again $2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_vertex_log.txt}
-
-\section{How the program checks itself}
-
-The invariants are checked by the self-test at the foot of \texttt{erdos915\_unified.py}, run simply with \texttt{python erdos915\_unified.py}. Every check passes, grouped here by what they cover.
-\begin{itemize}
-    \item \emph{Base values.} The checker against the proven $m = 2$ values $2, 4, 6, 8$, the first three vertex base cases of \Cref{thm:dir-vertex-m2-exact}, and the fast vertex-flow test against the exact checker it stands in for.
-    \item \emph{Sampled inequalities.} The counting step and both bounds of \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-error} on sampled feasible digraphs, including the high-degree case of the latter's proof, and Whitney's inequality on every sample.
-    \item \emph{Constructions.} Two values of the alternative-convention multigraph vertex problem of \Cref{sec:multi-vertex-standard}, including the one that separates it from the edge problem, the named constructions against their predicted sizes and connectivities, and the Gomory--Hu shortcut against brute-force max-flow.
-    \item \emph{The checker and driver.} The Berge connectivities of the hypergraph checker, the Monte Carlo appearance threshold, the cut-counting optima for small $n$, the search reaching the certified optimum, and the driver returning the proven value or a feasible witness in each mode.
-\end{itemize}
-A single companion script, \texttt{make\_figures.py}, regenerates every figure in the thesis from the same file, with the mapping listed in \texttt{program/README.md}.
+The complete commented source is maintained with the document as \code{erdos915\_unified.py} in the \code{program/} directory and should be included in the archived submission described in \Cref{app:code}.

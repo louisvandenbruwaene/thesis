@@ -110,17 +110,25 @@ Open Problems. `make_figures.py` writes every figure below.
 | `figures/temperature_trace.png` | a cooling run (Ch.3) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.3) |
 | `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.3) |
-| `figures/variant_bounds_m3.png`, `..._m6.png` | proved / conjectured / guessed, all twelve variants (Ch.3) |
+| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all twelve variants (Ch.3) |
+| `figures/variant_bounds_m6.png` | the same grid at m = 6 (offcut only) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.4) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.4) |
-| `figures/pair_conn_dist.png` | pooled per-pair connectivity distributions, all variants, mid-range split (Ch.4) |
-| `figures/edges_dist.png` | edge-count distributions, all variants, mid-range split (Ch.4) |
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (Ch.4) |
-| `figures/conn_dist_m6.png` | per-graph connectivity distributions, all variants (App. B) |
-| `figures/threshold_3d.png` | the threshold across densities, three variants (App. B) |
-| `figures/trace_*.png` | per-variant search traces (App. B, all five included) |
+| `figures/pair_conn_dist.png` | pooled per-pair connectivity distributions (offcut only) |
+| `figures/edges_dist.png` | edge-count distributions (offcut only) |
+| `figures/conn_dist_m6.png` | per-graph connectivity distributions at m = 6 (offcut only) |
+| `figures/threshold_3d.png` | the threshold across densities, three variants (offcut only) |
+| `figures/trace_*.png` | per-variant search traces (offcut only, all five) |
+| `figures/sa_vs_tabu_convergence.pdf` | SA against tabu, wall-clock timed (offcut only) |
 
-The solver records in the appendix (`figures/certificate_log.txt`,
-`figures/basecase_search_log.txt`) were produced by the named finite routines on
-the directed cases. Randomised searches use fixed seeds. The SA-versus-tabu
-figure is the documented exception because its stopping rule is wall-clock timed.
+**Offcut only** means the figure is no longer referenced from `main.tex`. It is
+still generated, still checked, and still rendered, but by `offcuts.tex` (the
+record of what the shortening pass removed) rather than by the thesis. None of
+these files may be deleted while that document exists.
+
+The solver records (`figures/certificate_log.txt`, `figures/basecase_search_log.txt`,
+`figures/basecase_search_vertex_log.txt`) were produced by the named finite
+routines on the directed cases; the appendix now tabulates them rather than
+printing them verbatim. Randomised searches use fixed seeds. The SA-versus-tabu
+timings are the documented exception, because their stopping rule is wall-clock.

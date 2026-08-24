@@ -133,7 +133,9 @@ All externally generated computational figures can be regenerated from \code{pro
 \begin{verbatim}
 python make_figures.py
 \end{verbatim}
-The script writes into \code{figures/}. Because the random seeds are fixed, repeating a run with the same source and compatible numerical libraries should reproduce the underlying data, with the single exception of \Cref{fig:sa-vs-tabu}, whose stopping rule is wall-clock timed. Raster or PDF bytes can nevertheless differ across Matplotlib, font, or compression versions even when the plotted numbers agree. Numerical data and labels should therefore be compared before file hashes.
+The script writes into \code{figures/}. Because the random seeds are fixed, repeating a run with the same source and compatible numerical libraries should reproduce the underlying data, with the single exception of the timing columns of \Cref{tab:sa-vs-tabu}, which are wall-clock and therefore representative rather than seed-exact. Raster or PDF bytes can nevertheless differ across Matplotlib, font, or compression versions even when the plotted numbers agree. Numerical data and labels should therefore be compared before file hashes.
+
+The finite run logs are kept beside the figures: \code{figures/basecase\_search\_log.txt} and \code{figures/basecase\_search\_vertex\_log.txt} are the two exhaustive base-case runs tabulated in \Cref{sec:transcripts}, and \code{figures/certificate\_log.txt} is the historical cut-counting solver record summarised there.
 
 The finite certificates deserve a stricter protocol:
 
@@ -158,7 +160,10 @@ Names rather than printed line numbers are the stable references, since line num
   \code{Graph}, \code{Hypergraph}, and \code{Variant} define the finite objects and the direction, simplicity, multiplicity, uniformity, and separation choices.
 
   \item[Exact measurement]
-  \code{max\_edge\_connectivity}, \code{max\_vertex\_connectivity}, \code{max\_hyperedge\_connectivity}, and \code{max\_hyper\_vertex\_connectivity} implement the quantities defined in \Cref{ch:basecases}.
+  \code{max\_edge\_connectivity}, \code{max\_vertex\_connectivity}, \code{max\_hyperedge\_connectivity}, and \code{max\_hyper\_vertex\_connectivity} implement the quantities defined in \Cref{ch:basecases}. Each is one pass of \code{local\_edge\_connectivity}, a single \code{scipy} integer maximum flow whose arc capacities are the multiplicities $\mu$, over every pair, ordered if the variant is directed, returning the largest value. The vertex routines run the same flow on the split capacity matrix \code{\_split\_capacity\_matrix(G)}, in which every adjacency has capacity one, so parallel edges never raise $\kappa$. The hypergraph routines run it on \code{\_hyper\_capacity\_matrix(H)}, in which each hyperedge becomes a helper point only one route may pass through, and agree with ordinary edge-connectivity on two-vertex hyperedges. \code{max\_edge\_connectivity\_via\_tree} is an undirected-only shortcut that reads $\lambda^{\max}$ off the heaviest edge of one Gomory--Hu tree, $n-1$ flows in place of $\binom{n}{2}$, and doubles as a cross-check on the pairwise sweep.
+
+  \item[Search instrumentation]
+  \code{edge\_sensitivity} returns $\sigma(e) = \lambda^{\max}(G) - \lambda^{\max}(G-e)$ by deleting $e$ and remeasuring, and \code{sensitivity\_map} computes it for the whole graph from one shared baseline. This is the quantity the cooling schedule of \Cref{ch:discover} biases its removals by.
 
   \item[Certification and enumeration]
   The functions documented under the certifier and exhaustive-enumeration sections of \code{program/README.md} support \Cref{ch:certify} and the finite transcripts in \Cref{sec:transcripts}.
@@ -189,6 +194,13 @@ For the submitted artefact to remain independently auditable, the following item
   \item the concrete extremal witnesses in a machine-readable format
   \item a cryptographic checksum manifest for the deposited files.
 \end{itemize}
+
+The working file \code{offcuts.tex}, which records the material removed from
+this document during its final shortening pass, is deliberately \emph{not} part
+of the submitted artefact. It is never \code{\textbackslash input} into
+\code{main.tex} and builds to a separate PDF. It is kept in the repository
+because it renders several figures that \code{main.tex} no longer references,
+so no file in \code{figures/} may be removed on the grounds of being unused.
 
 One portable way to create the last item on macOS is
 

@@ -5051,7 +5051,13 @@ def _aut_count_matrix(mu: np.ndarray) -> int:
     canon = _canonical_form(mu)
     count = sum(1 for perm in permutations(range(n))
                 if mu[np.ix_(list(perm), list(perm))].tobytes() == canon)
-    assert count >= 1  # the identity permutation is always an automorphism
+    if count < 1:
+        # The identity permutation is always an automorphism, so this is
+        # unreachable unless _canonical_form and this scan disagree. Raise
+        # rather than assert: callers divide by this count, and `python -O`
+        # strips asserts.
+        raise RuntimeError(f"automorphism count {count} < 1; "
+                           "canonical form disagrees with the permutation scan")
     return count
 
 

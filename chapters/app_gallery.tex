@@ -1,4 +1,4 @@
-This appendix collects the supplementary figures that the program produces but that the chapters reference rather than reproduce in full. Each one is named where it belongs in the body, and the file name printed in its caption matches the output of \code{make\_figures.py} and the figure table in \code{program/README.md}. Figures already shown in the running text are not repeated here.
+This appendix collects the gallery of extremal graphs, which the body names but does not reproduce in full. The file name printed in the caption matches the output of \code{make\_figures.py} and the figure table in \code{program/README.md}.
 
 \section{A gallery of extremal graphs}\label{app:gallery-extremal}
 
@@ -32,61 +32,4 @@ The extremal graphs are not abstractions. \Cref{fig:extremal-gallery} draws nine
     \label{fig:extremal-gallery}
 \end{figure}
 
-\section{Search traces across the variants}\label{app:traces}
 
-\Cref{fig:trace} in \Cref{ch:discover} follows one cooling run in detail. The five runs below repeat that experiment across the family. The first four cover every combination of the two matrix models, simple and multigraph, with the two directions, and the fifth changes the separation, so that the behaviour can be seen not to be special to one case. Each plots every visited graph by its binding connectivity (horizontal) against its size (vertical), colouring each point by the step at which it was visited, from the hot early exploration in warm tones to the converged tail in blue. In every one the walk strays past the feasibility boundary while hot and is driven back onto the densest feasible graph as the temperature falls, exactly as in the body figure. The seeds are fixed, so each picture reproduces verbatim.
-
-The last of the five is the one worth comparing against the others. It runs the same directed multigraph problem under the \emph{vertex} separation rather than the arc one, at $n = 4$ rather than the $n = 5$ of the arc runs above. This trace spends more of its sampled steps above its own feasibility boundary before the cooling pulls it back than the arc traces spend above theirs. The mismatched $n$ means this is not a controlled comparison, so nothing here should be read as ranking the two separations by difficulty, and Whitney's inequality in fact makes the vertex-feasible family the larger of the two (\Cref{rem:whitney-direction}).
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_simple_undirected_n7_m3.png}
-    \caption{Search trace for the simple undirected edge problem at $n = 7$, $m = 3$. File \code{trace\_simple\_undirected\_n7\_m3.png}.}
-    \label{fig:trace-simple-undirected}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n5_m3.png}
-    \caption{Search trace for the multigraph directed arc problem at $n = 5$, $m = 3$. File \code{trace\_multi\_directed\_n5\_m3.png}.}
-    \label{fig:trace-multi-directed}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_simple_directed_n5_m3.png}
-    \caption{Search trace for the simple directed arc problem at $n = 5$, $m = 3$. File \code{trace\_simple\_directed\_n5\_m3.png}.}
-    \label{fig:trace-simple-directed}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_multi_undirected_n5_m3.png}
-    \caption{Search trace for the multigraph undirected edge problem at $n = 5$, $m = 3$. File \code{trace\_multi\_undirected\_n5\_m3.png}.}
-    \label{fig:trace-multi-undirected}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.74\textwidth]{figures/trace_multi_directed_n4_m3_vertex.png}
-    \caption{Search trace for the multigraph directed problem at $n = 4$, $m = 3$ under the \emph{vertex} separation, so the horizontal axis is $\kap^{\max}$ rather than $\lec^{\max}$. This trace spends more of its sampled steps above its own feasibility boundary than the $n = 5$ arc traces above do above theirs, though the mismatched $n$ means the two are not a controlled comparison, and Whitney's inequality in fact makes the vertex-feasible family the larger of the two (\Cref{rem:whitney-direction}). File \code{trace\_multi\_directed\_n4\_m3\_vertex.png}.}
-    \label{fig:trace-multi-directed-vertex}
-\end{figure}
-
-\section{The variant landscape at \texorpdfstring{$m = 6$}{m = 6} and in three dimensions}\label{app:m6}
-
-This appendix shows the per-graph connectivity distribution at the fixed forbidden threshold $m = 6$, alongside a three-dimensional view of the appearance threshold (\Cref{fig:threshold-3d}). They confirm that raising the forbidden threshold relocates the feasibility boundary without changing the qualitative picture. The pooled pair-connectivity and edge-count grids of \Cref{ch:synthesis} (\Cref{fig:pair-conn-dist,fig:edge-dist}) already split each variant at its own mid-range connectivity, so they carry no separate $m = 6$ companion.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/conn_dist_m6.png}
-    \caption{How the full small-$n$ enumeration distributes by binding connectivity $\lambda^{\max}$ across all twelve variants at the fixed forbidden threshold $m = 6$. Blue bars are feasible graphs ($\lambda^{\max} \le 5$), red bars infeasible ones, and the dashed line marks the feasibility boundary. At this higher threshold most of the small graphs the enumeration reaches are feasible, so the blue mass dominates: raising $m$ moves the boundary out past the bulk of the distribution. File \code{conn\_dist\_m6.png}.}
-    \label{fig:conn-dist-m6}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.86\textwidth]{figures/threshold_3d.png}
-    \caption{A three-dimensional sampling experiment for three representative variants (simple undirected edge and simple directed arc at $n = 12$, three-uniform hypergraph edge at $n = 8$), all at $m = 3$. Each panel plots the fraction of samples (height) reaching each binding connectivity $\lambda^{\max}$ (depth) against density (width), and the mass migrates from low to high connectivity near the dashed degree-balance scale. The models do \emph{not} share a density scale: the guide is $m/n$ for the two graph models and $m/\binom{n-1}{r-1}$ for the hypergraph. Only the undirected graph panel corresponds to the model of \Cref{thm:gnp-threshold}, and the directed and hypergraph panels are empirical comparisons, not consequences of that theorem. Moreover, all three panels use fixed $m=3$ and therefore lie outside its asymptotic regime $m/\ln n\to\infty$. The figure illustrates behaviour at small parameters and does not establish a threshold for either unsupported model. File \code{threshold\_3d.png}.}
-    \label{fig:threshold-3d}
-\end{figure}
