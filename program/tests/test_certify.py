@@ -1,4 +1,4 @@
-"""The cut-counting prover: a zero-gap solve is a genuine upper-bound proof."""
+"""The cut-counting solver check and its reported small optima."""
 
 import os
 import unittest
@@ -16,19 +16,19 @@ from erdos915_unified import (
 )
 
 
-@unittest.skipUnless(PULP_AVAILABLE, "the MILP certifier needs the optional pulp")
-class Prover(unittest.TestCase):
-    def test_small_optima_are_proved(self):
-        # M*(n) = 2(n-1), optimal with zero gap, for the reachable sizes.
+@unittest.skipUnless(PULP_AVAILABLE, "the MILP solver check needs the optional pulp")
+class SolverCheck(unittest.TestCase):
+    def test_small_optima_are_reported(self):
+        # The solver reports M*(n) = 2(n-1) and OPTIMAL at these sizes.
         for n in (3, 4, 5):
             result = prove_directed_multigraph(n, time_limit=120.0)
-            self.assertTrue(result.is_proof())
+            self.assertTrue(result.solver_claims_optimal())
             self.assertEqual(result.status, "OPTIMAL")
             self.assertEqual(round(result.scaled_optimum), 2 * (n - 1))
 
-    def test_one_solve_settles_every_m(self):
+    def test_scaled_value_is_available_for_every_m(self):
         result = prove_directed_multigraph(4, time_limit=120.0)
-        self.assertTrue(result.is_proof())
+        self.assertTrue(result.solver_claims_optimal())
         for m in (2, 3, 4, 5):
             # L_m^dir(4) = (m-1) * M*(4) = (m-1) * 6.
             self.assertEqual(result.value_for(m), (m - 1) * 2 * (4 - 1))

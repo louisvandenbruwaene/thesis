@@ -17,7 +17,14 @@ The computational material is deliberately divided by responsibility:
 
 \begin{description}[style=nextline]
   \item[\code{program/erdos915\_unified.py}]
-  The mathematical model, exact connectivity routines, finite certifiers, exhaustive enumerators, heuristic searches, random samplers, and the public \code{solve} interface. This is the only file used to compute the numerical extremal results reported in the thesis, and exploratory scripts in \code{research\_notes/} are outside that evidential path.
+  The mathematical model, exact connectivity routines, finite certifiers, exhaustive enumerators, heuristic searches, random samplers, and the public \code{solve} interface. It computes all numerical extremal results except the block-knapsack table named immediately below.
+
+  \item[\code{research\_notes/scripts/multi\_vertex\_blocks.py}]
+  The single exception to the preceding evidential path. It generates \Cref{tab:multi-vertex-exact} by enumerating the $2$-connected simple blocks with \code{geng} and solving the resulting knapsack. From the repository root the archived run is
+  \begin{verbatim}
+  BMAX=8 python3 research_notes/scripts/multi_vertex_blocks.py
+  \end{verbatim}
+  Its terminal output is retained as \path{figures/multi_vertex_blocks_log.txt}.
 
   \item[\code{program/tests/}]
   The independent regression suite. Its tests cover the graph and hypergraph representations, edge and vertex connectivity, known closed forms, named constructions, exhaustive enumeration, certification, search invariants, and random-model utilities.
@@ -32,13 +39,13 @@ The computational material is deliberately divided by responsibility:
   The declared Python dependencies and supported version ranges.
 
   \item[Execution transcripts]
-  The files \path{figures/certificate_log.txt}, \path{figures/basecase_search_log.txt}, and \path{figures/basecase_search_vertex_log.txt} are plain-text records of the finite runs reproduced in \Cref{sec:transcripts}. They record particular executions and are not substitutes for the source or for the mathematical interpretation of their status.
+  The files \path{figures/certificate_log.txt}, \path{figures/basecase_search_log.txt}, \path{figures/basecase_search_vertex_log.txt}, and \path{figures/multi_vertex_blocks_log.txt} are plain-text records of finite runs used in the thesis. They record particular executions and are not substitutes for the source or for the mathematical interpretation of their status.
 
   \item[\code{figures/*.json}, \code{figures/*.pkl}, and generated images]
   Cached data and presentation outputs. The JSON files are human-readable, while the pickle files are Python caches and must never be accepted from an untrusted source. None is a hand proof.
 
   \item[\code{research\_notes/}]
-  Exploratory work, conjectures, and supporting scripts. A note in this directory is not part of the thesis merely because it exists in the repository. Only results stated in the thesis, with the proof or evidential status stated there, are claimed.
+  Exploratory work, conjectures, and supporting scripts. Apart from the block-table generator explicitly named above, a note in this directory is not part of the thesis merely because it exists in the repository. Only results stated in the thesis, with the proof or evidential status stated there, are claimed.
 \end{description}
 
 \section{Recreating the environment}\label{app:software-environment}
@@ -126,7 +133,7 @@ All externally generated computational figures can be regenerated from \code{pro
 \begin{verbatim}
 python make_figures.py
 \end{verbatim}
-The script writes into \code{figures/}. Because the random seeds are fixed, repeating a run with the same source and compatible numerical libraries should reproduce the underlying data. Raster or PDF bytes can nevertheless differ across Matplotlib, font, or compression versions even when the plotted numbers agree. Numerical data and labels should therefore be compared before file hashes.
+The script writes into \code{figures/}. Because the random seeds are fixed, repeating a run with the same source and compatible numerical libraries should reproduce the underlying data, with the single exception of \Cref{fig:sa-vs-tabu}, whose stopping rule is wall-clock timed. Raster or PDF bytes can nevertheless differ across Matplotlib, font, or compression versions even when the plotted numbers agree. Numerical data and labels should therefore be compared before file hashes.
 
 The finite certificates deserve a stricter protocol:
 

@@ -2,9 +2,9 @@
 
 Master's thesis of **Louis Vandenbruwaene** (KU Leuven), supervised by **Stijn Cambie**.
 
-The thesis studies an extremal question of Erdős — *how many edges (or arcs) can a
+The thesis studies an extremal question of Erdős: *how many edges (or arcs) can a
 graph on `n` vertices hold if no pair of vertices is joined by `m` independent
-routes?* — and follows it across **twelve variants**: three models (simple graphs,
+routes?* It follows the question across **twelve variants**: three models (simple graphs,
 multigraphs, `r`-uniform hypergraphs) × two directions (undirected / directed) × two
 separations (edge-disjoint / internally vertex-disjoint). It pairs hand proofs with a
 single unified program that measures connectivity exactly, certifies small-case upper
@@ -24,14 +24,14 @@ program/
                       cut-counting certifier, simulated-annealing search, and
                       the proof-support solvers.
   _erdos_fast.c       optional C hot-path helper, built as _erdos_fast.so
-                      by build_fast.sh; correctness does not depend on it.
+                      by build_fast.sh. Correctness does not depend on it.
   make_figures.py     regenerates every figure from the program (fixed seeds)
   tests/              unit tests
 popularising_summary/ lay summary
 research_notes/       conjectures and supposed proofs NOT in the thesis: too
                       specific or unfinished for the text, kept for future work
                       (AI or human). Self-contained, with reproducible scripts.
-CLAUDE.md, TASKS.md   operating notes and the prioritized open-problem queue
+claude.md, TASKS.md   operating notes and the prioritized open-problem queue
 main.pdf              the compiled thesis
 ```
 
@@ -49,33 +49,34 @@ Figures (needs Python 3 with numpy, scipy, networkx, matplotlib):
 cd program && python3 make_figures.py     # writes into ../figures/
 ```
 
-Every randomized search uses a fixed seed, so figures are reproducible.
+Randomized searches use fixed seeds. The wall-clock timed comparison can vary
+slightly with machine speed and scheduling, as documented in the thesis.
 
 ## The honesty contract
 
-The search **proves nothing** — it only exhibits concrete graphs, hence *lower
+The search **proves nothing**. It only exhibits concrete graphs, hence *lower
 bounds*. A value is called settled only when a hand proof or the cut-counting
 certifier supplies the matching *upper bound*. Every general statement in the thesis
-rests on a hand proof or a cited theorem; computations are supporting evidence.
+rests on a hand proof or a cited theorem. Computations are supporting evidence.
 
 ## Where to continue
 
 The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
 "Open problems")** and tracked in **`TASKS.md`**. The headline targets:
 
-- **The extremal decomposition** — proving an extremal non-hub digraph splits as `A ∪ B`
+- **The extremal decomposition.** Proving an extremal non-hub digraph splits as `A ∪ B`
   with `A → B` complete, no arc inside `A`, and no arc from `B` back to `A` would turn
   the directed-arc conjecture into a theorem for all `m ≥ 3`. The backward-arc clause is
   the hardest quarter of it, not the whole. Unconditionally the leading constant and the
   order of the term after it are already settled: `ℓₘᵈⁱʳ(n) = n²/4 + Θₘ(n)`, so what the
   decomposition is needed for is the coefficient of that linear term.
-- **The directed *vertex* problem at `m ≥ 3`** — a separate question, not a corollary of
+- **The directed *vertex* problem at `m ≥ 3`.** This is a separate question, not a corollary of
   the arc one. Whitney's `κ ≤ λ` makes the vertex-feasible family the larger of the two,
   so an arc upper bound does not restrict it. Proved equal at `m = 2` only by re-running
   the induction and its base cases under the vertex test. Unconditionally
   `kₘᵈⁱʳ(n) = n²/4 + Θₘ(n)`, so what is open is the linear coefficient and whether the
   two values agree exactly.
-- **The hypergraph vertex problem at `m ≥ 4`** — needs a 4-connectivity analogue of the
+- **The hypergraph vertex problem at `m ≥ 4`.** This needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
 - **The exact constant in `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
   convention that parallel copies are distinct routes. In the large-`n` block-packing regime, `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a

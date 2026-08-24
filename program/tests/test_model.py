@@ -1,6 +1,7 @@
 """The graph model: the multiplicity matrix and every operation on it."""
 
 import unittest
+from unittest.mock import patch
 
 from erdos915_unified import (
     Graph,
@@ -8,6 +9,7 @@ from erdos915_unified import (
     MULTI_UNDIRECTED,
     SIMPLE_DIRECTED,
     SIMPLE_UNDIRECTED,
+    thickened_one_directional_bipartite,
 )
 
 
@@ -122,6 +124,32 @@ class Mutation(unittest.TestCase):
         g = Graph(3, MULTI_UNDIRECTED)
         with self.assertRaises(ValueError):
             g.set_multiplicity(0, 1, -1)
+
+    def test_negative_add_and_remove_counts_rejected(self):
+        for variant in (SIMPLE_UNDIRECTED, MULTI_UNDIRECTED):
+            with self.subTest(variant=variant.name, operation="add"):
+                with self.assertRaises(ValueError):
+                    Graph(3, variant).add_edge(0, 1, -1)
+            with self.subTest(variant=variant.name, operation="remove"):
+                with self.assertRaises(ValueError):
+                    Graph(3, variant).remove_edge(0, 1, -1)
+
+    def test_thickened_wall_uses_guarded_mutation(self):
+        calls = []
+        original = Graph.set_multiplicity
+
+        def tracked(graph, u, v, value):
+            calls.append((u, v, value))
+            return original(graph, u, v, value)
+
+        with patch.object(Graph, "set_multiplicity", new=tracked):
+            wall = thickened_one_directional_bipartite(6, 3)
+        self.assertGreater(len(calls), 0)
+        self.assertEqual(wall.edge_count(), 18)
+
+    def test_thickened_wall_rejects_invalid_m(self):
+        with self.assertRaises(ValueError):
+            thickened_one_directional_bipartite(6, 1)
 
     def test_self_loops_rejected(self):
         g = Graph(3, MULTI_UNDIRECTED)

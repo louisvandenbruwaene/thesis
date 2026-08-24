@@ -19,7 +19,8 @@ class Bounds(unittest.TestCase):
         self.assertEqual(simple_undirected_edge(5, 3), 6)
         for n in range(2, 12):
             for m in range(2, 6):
-                self.assertEqual(simple_undirected_edge(n, m), (m * (n - 1)) // 2)
+                expected = min((m * (n - 1)) // 2, n * (n - 1) // 2)
+                self.assertEqual(simple_undirected_edge(n, m), expected)
 
     def test_multigraph_undirected_edge(self):
         for n in range(2, 12):
@@ -73,8 +74,14 @@ class Bounds(unittest.TestCase):
         self.assertEqual(directed_arc_lower_bound(4, 2), 6)
         for n in range(3, 14):
             for m in range(2, 5):
-                expected = max(m * (n - 1), (n + m - 2) ** 2 // 4)
+                expected = min(max(m * (n - 1), (n + m - 2) ** 2 // 4),
+                               n * (n - 1))
                 self.assertEqual(directed_arc_lower_bound(n, m), expected)
+
+    def test_directed_arc_lower_bound_never_exceeds_complete_digraph(self):
+        for n in range(2, 8):
+            for m in range(2, 12):
+                self.assertLessEqual(directed_arc_lower_bound(n, m), n * (n - 1))
 
     def test_hypergraph_edge(self):
         self.assertEqual(hypergraph_edge(7, 2, 3), 3)

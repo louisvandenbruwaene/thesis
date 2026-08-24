@@ -319,7 +319,7 @@ At $m = 3$ it \emph{proves} \Cref{thm:leonard}'s value. A block with $\kap^{\max
 
 At $m = 4$ the picture is $h_4(b) = 2(b-1)$ for every $b \ge 4$, so the rate is exactly $2$ at every block size and $k_4(n) = 2(n-1)$. This one is a repackaging rather than a second proof, and it is worth separating the two halves. The upper bound $h_4(b) \le k_4(b) = 2(b-1)$ is \Cref{thm:leonard} itself read on a block, so it cannot turn round and reprove it, and nothing as elementary as the theta argument above is on offer for the blocks with $\kap^{\max} \le 3$. What the reformulation does add is the extremal block, and it is one the appendix has already built: the hub-and-spokes graph $H_{4,b}$ of \Cref{const:hub-spokes}, a hub joined to every other vertex with a cycle on the rest. Unlike the shared-clique graph it is a single block, and it meets $2(b-1)$ at every size. An exhaustive sweep of the $2$-connected graphs confirms that it is optimal, and the unique optimum, at every $b$ from $4$ to $8$.
 
-At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, $n$ copies of $K_m$ sharing one vertex, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. Since the rate of a bouquet of blocks is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
+At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, as many copies of $K_m$ sharing one vertex as fit, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. Since the rate of a bouquet of blocks is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
 
 That is not a defect of the computation, and it is worth saying exactly how far out of reach the truth is, because the reason is structural rather than a matter of processor time. The conjecture is false: Leonard disproved it at $m = 5$ with an explicit graph on $57$ vertices \cite{Leonard73BE}, and Mader proved that for every $m \ge 6$ the difference $k_m(n) - mn/2$ is unbounded \cite{Mader73}, so $c_m > m/2$ there. What replaces it is a lower bound of S\o{}rensen and Thomassen \cite{SorensenThomassen74}: for each fixed $m$,
 \[
@@ -671,25 +671,25 @@ so the second-order term is linear in $n$ from both sides.
 
 What is left open is therefore a constant factor in one coefficient, not a shape. \Cref{conj:dir-arc} says the second-order coefficient is exactly $(m-2)/2$, and the theorem pins it between that and $4(m-1)$, a factor of $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. Closing that gap is where the structure of \Cref{open:decomposition} lives, and \Cref{rem:case2-tight} rules out the most obvious way to try.
 
-\begin{remark}[Case 2 cannot be sharpened without a new inequality]\label{rem:case2-tight}
-One might hope to cut Case 2's constant using the observation that in the conjectured extremiser, one whole side has $\min(d^+, d^-) = 0$, so summing \Cref{lem:small-side}'s worst case at every vertex looks wasteful. It is not: Case 2's bound is already the exact maximum obtainable from the two facts it uses, the budget $\sum_x d^+(x)\,d^-(x) \le (m-1)n(n-1)$ of Step 2 in \Cref{prop:dir-arc-stability} and the floor $d(x) \ge n/2$, and no cleverer use of those two facts alone can do better.
+\begin{remark}[Case 2's coefficient needs a new inequality]\label{rem:case2-tight}
+One might hope to cut Case 2's constant using the observation that in the conjectured extremiser, one whole side has $\min(d^+, d^-) = 0$, so summing \Cref{lem:small-side}'s worst case at every vertex looks wasteful. That observation alone does not cut the coefficient. The value four is the best universal coefficient obtainable from the two facts used in Case 2, the budget $\sum_x d^+(x)\,d^-(x) \le (m-1)n(n-1)$ of Step 2 in \Cref{prop:dir-arc-stability} and the floor $d(x) \ge n/2$.
 
-Think of the budget as money and of $t_x = \min(d^+(x), d^-(x))$ as what each vertex buys with it. At a vertex with $d(x) = s \ge n/2$, buying $t$ costs
+Think of the budget as money and of $t_x = \min(d^+(x), d^-(x))$ as what each vertex buys with it. At a vertex with $d(x)=s\ge n/2$, one also has $s\ge2t$. Hence the cheapest possible cost for a given $t$ is the two-branch function
 \[
-    d^+(x)\,d^-(x) \;=\; t\,(s - t) \;\ge\; t\Bigl(\frac{n}{2} - t\Bigr) \;=:\; c(t),
-    \qquad t \in \Bigl[0, \frac{n}{4}\Bigr],
+ c(t)=\min_{s\ge\max(n/2,2t)}t(s-t)
+ =\begin{cases}
+ t(n/2-t),&0\le t\le n/4,\\
+ t^2,&t\ge n/4.
+ \end{cases}
 \]
-the cheapest case being $s = n/2$, and the cap $t \le n/4$ coming from $t \le s/2$. Now $c$ is concave with $c(0) = 0$, so its slope is decreasing and buying in bulk is cheaper per unit than spreading the purchase out. Concretely, given two vertices holding $0 < a \le b$ strictly below the cap, shifting one unit from $a$ to $b$ leaves $a + b$ unchanged and lowers $c(a) + c(b)$. Repeating that exchange pushes every $t_x$ to one of the two ends, so under a shared budget $Q$ the true maximum of $\sum_x t_x$ puts as many vertices as the budget allows at the cap $t_x = n/4$ and the rest at $t_x = 0$. That is exactly the qualitative picture the conjectured extremiser suggests, and since $c(n/4) = n^2/16$ it already gives
+On the first branch the value per unit cost is $t/c(t)=1/(n/2-t)$, which increases to $4/n$, whereas on the second it is $1/t$, which decreases from $4/n$. Thus $t\le(4/n)c(t)$ for every $t$, with equality in the continuous relaxation at $t=n/4$. Summing and using the shared budget $Q=(m-1)n(n-1)$ gives
 \[
-    \sum_{x \in V} t_x
-    \;\le\; \underbrace{\frac{Q}{n^2/16}}_{\text{vertices at the cap}}
-            \cdot \underbrace{\frac{n}{4}}_{\text{each buying}}
-    \;=\; \frac{4Q}{n}
-    \;=\; 4(m-1)(n-1)
+    \sum_{x\in V}t_x\le\frac4n\sum_{x\in V}d^+(x)d^-(x)
+    \le\frac{4Q}{n}=4(m-1)(n-1).
 \]
-once the number of vertices at the cap is below $n$, which is Case 2's constant unchanged.
+Conversely, fix $m$ and take $n$ large. Assign $t=n/4$ to as many abstract vertices as the budget permits, assign one further $t\in[0,n/4]$ so that its continuous cost absorbs the remainder, and assign zero to the rest. This uses at most $16(m-1)+1\le n$ vertices. Since the remainder is within $O_m(n)$ of the full cost $n^2/16$, the final $t$ is $n/4-O_m(\sqrt n)$. The resulting total is $4(m-1)n-O_m(\sqrt n)$, matching the coefficient four asymptotically. Therefore no smaller universal coefficient follows from these two inequalities alone.
 
-The crude per-vertex bound therefore loses nothing, and the reason is that its two sources of slack close at that very point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the vertex profile the true optimum concentrates on. Cutting the constant therefore needs a second and independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
+The crude per-vertex bound therefore loses nothing within this relaxation, and the reason is that its two sources of slack close at that very point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the profile the relaxed optimum concentrates on. Cutting the constant therefore needs a second and independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
 \end{remark}
 
 \subsection{What that proof actually used}\label{sec:two-step-budget}
@@ -1276,8 +1276,9 @@ between $u$ and $v$ concatenate to a cycle of $I(\HH)$. This proves the claim.
 A forest on $n + q$ nodes has at most $n + q - 1$ edges, while $I(\HH)$ has
 exactly $rq$ edges, so $rq \le n + q - 1$, i.e.\ $q \le (n-1)/(r-1)$, and $q$
 is an integer. The star hypertree has $\floor{(n-1)/(r-1)}$ hyperedges and a
-tree as incidence graph (each block vertex lies in one hyperedge, every cycle
-would need two hyperedges sharing two vertices), so the floor is attained.
+forest as incidence graph (one tree together with any unused isolated vertices)
+because each block vertex lies in one hyperedge and every cycle would need two
+hyperedges sharing two vertices, so the floor is attained.
 \end{proof}
 
 \begin{proposition}[General lower bound]\label{prop:hyper-vertex-lower}
@@ -2108,7 +2109,7 @@ in range precisely when $m \ge 5$.
 \begin{proof}
 Write $G_0$ for the underlying simple graph.
 
-\emph{Feasibility.} The shared vertex is a cut vertex of $G_0$, and so is every vertex along the pendant path, since the blocks meet only there. So a path of length $\ge 2$ between two vertices of the same block cannot leave that block and come back: to do so it would have to pass through the shared vertex twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside its $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally-disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or with either endpoint on the pendant path, a single vertex separates them, the shared vertex in the first case and a path vertex in the second, so $\kap_G(u,v) \le 1$.
+\emph{Feasibility.} The shared vertex is a cut vertex of $G_0$, and so is every vertex along the pendant path, since the blocks meet only there. So a path of length $\ge 2$ between two vertices of the same block cannot leave that block and come back: to do so it would have to pass through the shared vertex twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside its $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally-disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or nonadjacent with either endpoint on the pendant path, a single cut vertex separates them, so $\kap_G(u,v) \le 1$. If $u,v$ are adjacent along the pendant path, then the edge lies on no cycle, and \Cref{lem:multi-vertex-split} gives $\kap_G(u,v)=\mu(u,v)+\pi(u,v)=(m-1)+0=m-1$.
 
 \emph{Count.} Since $q \ge 1$, every block edge is genuinely present, so $G_0$ is connected and $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$. This is where the hypothesis $r \le m$ earns its keep: at $r = m+1$ the multiplicity $q$ would drop to zero, the blocks would carry no edges at all, and $G_0$ would fall apart into isolated vertices. Only the $k$ blocks contribute to $\mathrm{rank}(G_0)$ or to $\sum \pi$, since the pendant edges have $\pi = 0$ and lie in no cycle. Each $K_r$ has rank $(r-1)(r-2)/2$ and contributes $\binom{r}{2}(r-2)$ to the sum, since each of its $\binom{r}{2}$ edges has $\pi = r-2$. Substituting into $(m-1)(n-1+\mathrm{rank}(G_0)) - \sum \pi$,
 \[
@@ -2196,7 +2197,7 @@ the maximum over all finite multisets of block sizes. In particular the value is
 \]
 Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ by the same identity, so $W_m(B) \le g_m(|V(B)|)$.
 
-\emph{The sizes fit.} Suppose $G_0$ has $c$ components and blocks $B_1, \dots, B_t$. Within a single component, contracting the block tree makes $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one. Summing over components loses one further vertex for each extra component, so $\sum_i (|V(B_i)| - 1) = n - c - (\text{number of isolated vertices contributed}) \le n-1$. With \Cref{lem:multi-vertex-objective} this proves $\le$.
+\emph{The sizes fit.} Suppose $G_0$ has $c$ components and blocks $B_1, \dots, B_t$. Within a single component, contracting the block tree makes $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one. Isolated components contribute zero to both sides, so summing gives $\sum_i (|V(B_i)| - 1) = n-c \le n-1$. With \Cref{lem:multi-vertex-objective} this proves $\le$.
 
 \emph{Every multiset is realised.} Given blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, take one common vertex and attach the $B_i$ to it, pairwise disjoint otherwise, leaving any spare vertices isolated. The result uses $1 + \sum (b_i-1) \le n$ vertices. Its blocks are exactly the $B_i$, so by the first paragraph its $\kap$ agrees with $\kap_{B_i}$ on pairs inside a block and equals at most $1$ on pairs split between two blocks, which the shared vertex separates. So the graph is feasible and scores $\sum_i W_m(B_i)$, and choosing each $B_i$ optimal gives $\sum_i g_m(b_i)$. This proves $\ge$.
 \end{proof}
@@ -2309,14 +2310,14 @@ No directed conclusion is claimed here. A corresponding assertion for $D(n,p)$ r
 \[
     p^* \;=\; \frac{m}{\binom{n-1}{r-1}} \;=\; \Theta\!\left(\frac{m}{n^{r-1}}\right),
 \]
-which for $r \ge 3$ is smaller than $m/n$ by a factor of order $n^{r-2}$. Reading $m/n$ as the hypergraph threshold would therefore place the transition far above where it happens: at $r = 3$ and $n = 8$, for instance, $m/n$ is $3/8$ while $m/\binom{7}{2}$ is $3/21$, and by the former density the sampled hypergraph is long past the transition. \Cref{fig:threshold-3d} accordingly sweeps each model in units of its own $p^*$ rather than a shared $p$. A second limit of scope is worth repeating here: the theorem assumes $m/\ln n \to \infty$, so any picture at a fixed small $m$ illustrates the shape of the transition without being an instance of the theorem.
+which for $r \ge 3$ is smaller than $m/n$ by a factor of order $n^{r-2}$. Reading $m/n$ as the hypergraph balance point would therefore place it far above the expected-degree balance: at $r = 3$ and $n = 8$, for instance, $m/n$ is $3/8$ while $m/\binom{7}{2}$ is $3/21$. \Cref{fig:threshold-3d} accordingly sweeps each model in units of its own $p^*$ rather than a shared $p$. A second limit of scope is worth repeating here: the theorem assumes $m/\ln n \to \infty$, so any picture at a fixed small $m$ illustrates the shape of the transition without being an instance of the theorem.
 \end{remark}
 
 \section{Computational transcripts}\label{sec:transcripts}
 
-The cut-counting optimisation formulation that certifies \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the solver transcripts that back it, together with the exhaustive-search output that settles the directed base cases. The complete commented source is maintained with the document as \texttt{erdos915\_unified.py} in the \texttt{program/} directory and should be included in the archived submission described in \Cref{app:code}. Its core runs on \texttt{numpy} and \texttt{scipy} alone, the certifier adds \texttt{pulp}, and \texttt{matplotlib} and \texttt{networkx} are optional analysis and visualisation dependencies. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
+The cut-counting optimisation formulation used as a finite solver check for \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the historical solver records, together with the exhaustive-search output that settles the directed base cases. The first records solver status but not an independently replayable dual certificate or gap. The theorem itself is proved by hand in this appendix. The complete commented source is maintained with the document as \texttt{erdos915\_unified.py} in the \texttt{program/} directory and should be included in the archived submission described in \Cref{app:code}. Its core runs on \texttt{numpy} and \texttt{scipy} alone, the certifier adds \texttt{pulp}, and \texttt{matplotlib} and \texttt{networkx} are optional analysis and visualisation dependencies. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
 
-\lstinputlisting[style=pythonkul, language={}, caption={Solver output: $M^{*}(n) = 2(n-1)$, optimal with zero gap, for $n = 3, 4, 5, 6$.}]{figures/certificate_log.txt}
+\lstinputlisting[style=pythonkul, language={}, caption={Historical solver output reporting $M^{*}(n)=2(n-1)$ and status \texttt{OPTIMAL} for $n=3,4,5,6$. The archived run did not record an independently checked optimality gap.}]{figures/certificate_log.txt}
 
 The cut-counting optimisation closes the gap up to $n = 5$ inside a short budget and reaches $n = 6$ in about twenty minutes. Past that it stalls, because a solver handles the yes-or-no cut labels by case-splitting, trying a label both ways and solving each half, and the number of cases it must open grows too fast at $n = 7$. The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and those are settled instead by the pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, and it agrees with $\ell_2^{\mathrm{dir}}(n) = M(n)$ throughout.
 

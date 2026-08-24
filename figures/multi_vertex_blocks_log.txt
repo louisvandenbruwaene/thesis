@@ -1,0 +1,42 @@
+Command: PYTHONPATH=/private/tmp/thesis-networkx BMAX=8 python3 research_notes/scripts/multi_vertex_blocks.py
+Python: 3.14.6
+NetworkX: 3.6.1
+nauty: 2.9.3, geng at /opt/homebrew/bin/geng
+Source SHA-256: 4bd26f12d9511a1e05d8d1fd3a4832f16de9061f95551a9d80deb4b3aa4ee9b1
+
+[1] g_m(b), best score of one block, for b <= 8
+    m=2  b=2:   1  b=3:   -  b=4:   -  b=5:   -  b=6:   -  b=7:   -  b=8:   -
+    m=3  b=2:   2  b=3:   3  b=4:   4  b=5:   5  b=6:   6  b=7:   7  b=8:   8
+    m=4  b=2:   3  b=3:   6  b=4:   9  b=5:  12  b=6:  15  b=7:  18  b=8:  21
+    m=5  b=2:   4  b=3:   9  b=4:  14  b=5:  19  b=6:  24  b=7:  29  b=8:  34
+    m=6  b=2:   5  b=3:  12  b=4:  19  b=5:  26  b=6:  33  b=7:  40  b=8:  47
+    m=7  b=2:   6  b=3:  15  b=4:  24  b=5:  33  b=6:  42  b=7:  52  b=8:  62
+    m=8  b=2:   7  b=3:  18  b=4:  30  b=5:  42  b=6:  54  b=7:  66  b=8:  79
+
+[2] K_m(n) by knapsack.  B = one block attains it, T = the thickened tree attains it
+    m=2     1BT      2T      3T      4T      5T      6T      7T
+    m=3     2BT      4T      6T      8T     10T     12T     14T
+    m=4     3BT     6BT     9BT    12BT    15BT    18BT    21BT
+    m=5     4BT      9B     14B     19B     24B     29B     34B
+    m=6     5BT     12B     19B     26B     33B     40B     47B
+    m=7     6BT     15B     24B     33B     42B     52B     62B
+    m=8     7BT     18B     30B     42B     54B     66B     79B
+
+[3] cross-check against the thesis program's exhaustive routine
+    m=2 n=5: knapsack 4, exhaustive 4 (proved) -> AGREE
+    m=3 n=5: knapsack 8, exhaustive 8 (proved) -> AGREE
+    m=4 n=5: knapsack 12, exhaustive 12 (proved) -> AGREE
+    m=5 n=4: knapsack 14, exhaustive 14 (proved) -> AGREE
+    m=5 n=5: knapsack 19, exhaustive 19 (proved) -> AGREE
+    m=6 n=4: knapsack 19, exhaustive 19 (proved) -> AGREE
+
+[4] bipartite bouquet against clique bouquet, rate per vertex
+       m    clique   bipartite     (s,t)   ratio
+       5       4.5         4.8    (2, 4)   1.067
+       8      10.0        11.7    (3, 7)   1.167
+      12      21.0        25.7   (5, 11)   1.222
+      20      55.0        70.2   (8, 19)   1.276
+      50     325.0       432.5  (21, 49)   1.331
+     100    1275.0      1722.9  (41, 99)   1.351
+     400   20100.0     27480.1(166, 399)   1.367
+    limit 8(3-2*sqrt2) = 1.3726, and the gap to the upper bound falls from 16 to 11.66

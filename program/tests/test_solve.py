@@ -2,6 +2,7 @@
 
 import shutil
 import unittest
+from unittest.mock import patch
 
 import itertools
 
@@ -9,10 +10,14 @@ import numpy as np
 
 from erdos915_unified import (
     solve,
+    directed_multigraph_arc,
+    max_edge_connectivity,
     enumerate_extremal_directed_multigraphs as _dfs_enum,
     enumerate_extremal_directed_multigraphs_via_generation as _gen_enum,
     _decorate_support_worker,
     _canonical_form,
+    _aut_count_matrix,
+    _directed_witness,
     PULP_AVAILABLE,
 )
 
@@ -60,6 +65,42 @@ class Solve(unittest.TestCase):
     def test_result_describe_is_readable(self):
         r = solve(4, 2, directed=True, simple=True, exhaustive=True, max_seconds=120.0)
         self.assertIn("value", r.describe())
+
+    def test_invalid_separation_is_rejected(self):
+        with self.assertRaises(ValueError):
+            solve(4, 2, separation="edges")
+
+    def test_named_multidigraph_witness_attains_the_proved_value(self):
+        for n, m in ((6, 3), (8, 3), (9, 3), (8, 4), (10, 3)):
+            with self.subTest(n=n, m=m):
+                witness = _directed_witness(n, m, simple=False)
+                self.assertIsNotNone(witness)
+                self.assertEqual(witness.edge_count(), directed_multigraph_arc(n, m))
+                self.assertLessEqual(max_edge_connectivity(witness), m - 1)
+
+    def test_missing_closed_form_witness_raises_at_runtime(self):
+        with patch("erdos915_unified._directed_witness", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "no named witness"):
+                solve(6, 3, directed=True, simple=False, exhaustive=True)
+
+    def test_wrong_closed_form_witness_raises_at_runtime(self):
+        witness = _directed_witness(6, 3, simple=False)
+        u, v, _ = next(witness.edges())
+        witness.remove_edge(u, v)
+        with patch("erdos915_unified._directed_witness", return_value=witness):
+            with self.assertRaisesRegex(RuntimeError, "named witness has"):
+                solve(6, 3, directed=True, simple=False, exhaustive=True)
+
+    def test_simple_directed_witness_includes_the_hub(self):
+        witness = _directed_witness(4, 3, simple=True)
+        self.assertIsNotNone(witness)
+        self.assertEqual(witness.edge_count(), 9)
+        self.assertLessEqual(max_edge_connectivity(witness), 2)
+
+    def test_automorphism_count_includes_identity(self):
+        mu = np.zeros((4, 4), dtype=int)
+        mu[0, 1] = mu[1, 0] = 1
+        self.assertGreaterEqual(_aut_count_matrix(mu), 1)
 
 
 @unittest.skipIf(shutil.which("geng") is None, "nauty's geng is not installed")

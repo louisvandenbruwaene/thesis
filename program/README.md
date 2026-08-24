@@ -9,8 +9,8 @@ merely *discovered*. An optional C helper accelerates small hot paths, but the
 Python implementation is the correctness path.
 
 There is one solver. Whatever the question, you call `solve(...)`: it picks the
-right method for the case (brute-force enumeration, the pruned exhaustive search,
-the cut-counting certifier, or the temperature search) and labels its answer
+right method for the case (a proved closed form, brute-force enumeration, the
+pruned exhaustive search, or the temperature search) and labels its answer
 honestly as exact, an upper bound, or a lower bound. You never run a different
 program for a different case.
 
@@ -19,7 +19,7 @@ program for a different case.
 ```
 program/
   erdos915_unified.py   the whole program: the model, the connectivity checker,
-                        Gomory-Hu, the cut-counting certifier, sensitivity, the
+                        Gomory-Hu, the cut-counting solver check, sensitivity, the
                         temperature search, solve(), the random-model sampling,
                         the figure routines, and a self-check in __main__
   _erdos_fast.c         optional C hot-path helpers for small max-flow and
@@ -36,25 +36,25 @@ Install with `pip install -r requirements.txt`. The core needs only `numpy` and
 `scipy`: the model, the connectivity checker, the search, the enumeration, the
 random-model sampling, and the self-check all run on those two alone, because every
 connectivity measure is one scipy integer max-flow on a capacity matrix (Menger).
-One more library backs the certifier and two are optional:
+One more library backs the solver check and two are optional:
 
-- `pulp` backs the MILP certifier (`prove_directed_multigraph` and
+- `pulp` backs the MILP solver checks (`prove_directed_multigraph` and
   `prove_integral_arc_bound`): one solver-agnostic cut-counting model that runs on
   CBC (bundled with `pulp`) by default and on Gurobi by passing `use_gurobi=True`.
-  The certifier raises a clear message if it is called without `pulp`.
+  These routines raise a clear message if called without `pulp`.
 - `matplotlib` is needed only to render the figures (`make_figures.py` and the
   `plot_*` routines). Without it everything else still runs.
 - `networkx` is needed only for the Gomory-Hu tree, a single figure/analysis
   helper. `gomory_hu_tree` raises a clear message if it is called without it.
 
-The program runs without a build step; `bash build_fast.sh` optionally compiles
+The program runs without a build step. `bash build_fast.sh` optionally compiles
 `_erdos_fast.so` to accelerate small hot-path searches.
 
 One optional extra: `enumerate_extremal_directed_multigraphs_via_generation` (the
 sound, generation-based directed-multigraph enumerator that follows J. Goedgebeur's
 `geng` suggestion) shells out to nauty's `geng`. It decorates the supports in
 parallel across processor cores (each support is independent), which is what makes
-the open `n = 7` classification practical on a multi-core machine; pass
+the open `n = 7` classification practical on a multi-core machine. Pass
 `parallel=False` for a single-process run. Everything else, including the
 self-test, the figures, and the test suite, runs without `geng`. Every test that
 needs an optional dependency skips itself cleanly when that dependency is absent,
@@ -68,7 +68,7 @@ From this `program/` directory:
 
 ```bash
 python erdos915_unified.py            # run the built-in invariant self-check
-python -m unittest discover -s tests  # run the full test suite (93 tests, stdlib only)
+python -m unittest discover -s tests  # run the full suite (no third-party test runner)
 python make_figures.py                # regenerate the figures in ../figures/
 ```
 
@@ -80,21 +80,21 @@ To solve a specific case, import `solve` and call it, for example:
 
 ```python
 from erdos915_unified import solve
-solve(6, 3, directed=True, exhaustive=True)   # prove the directed multigraph value
+solve(6, 3, directed=True, simple=False, exhaustive=True)  # directed multigraph value
 solve(16, 3, directed=True, exhaustive=False) # discover a dense example (lower bound)
 solve(7, 2, hypergraph=True, r=3)             # the hypergraph model
 ```
 
 ## The honesty contract
 
-| Method inside `solve` | What it gives you |
+| Computational route | What it gives you |
 |-----------------------|-------------------|
 | connectivity checker  | **exact** local connectivity (Menger / max-flow) |
-| cut-counting certifier | a **proved** upper bound for a fixed `n` when it reports OPTIMAL with zero gap |
+| cut-counting solver check | a finite solver result and primal witness, with no independently replayable certificate emitted |
 | temperature search | a **discovered** construction, hence only a **lower** bound, never a proof of optimality |
 | random-model sampling | an **estimate** over random samples, never a proof |
 
-The search proposes; the certifier and the hand proofs dispose.
+The search proposes. The certifier and the hand proofs dispose.
 
 ## Which output feeds which figure
 
@@ -120,6 +120,7 @@ Open Problems. `make_figures.py` writes every figure below.
 | `figures/threshold_3d.png` | the threshold across densities, three variants (App. B) |
 | `figures/trace_*.png` | per-variant search traces (App. B, all five included) |
 
-The solver transcripts in the appendix (`figures/certificate_log.txt`,
-`figures/basecase_search_log.txt`) were produced by `solve(...)` on the directed
-cases. All randomised searches use fixed seeds, so every figure is reproducible.
+The solver records in the appendix (`figures/certificate_log.txt`,
+`figures/basecase_search_log.txt`) were produced by the named finite routines on
+the directed cases. Randomised searches use fixed seeds. The SA-versus-tabu
+figure is the documented exception because its stopping rule is wall-clock timed.

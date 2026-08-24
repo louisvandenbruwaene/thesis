@@ -1,7 +1,11 @@
-Cut-MILP certification of the directed multigraph problem
-M*(n) is the scaled optimum; L_m^dir(n) = (m-1) M*(n).
+Historical cut-MILP solver record for the directed multigraph problem
+M*(n) is the scaled objective. L_m^dir(n) = (m-1) M*(n).
+Solver name/version: not recorded by the historical run
+Python/PuLP/library versions: not recorded by the historical run
+Best bound and reported optimality gap: not recorded by the historical run
+OPTIMAL below is therefore solver-reported status, not a replayable certificate.
 
-n=3: status=OPTIMAL, M*=4.000, target=2(n-1)=4, proof=True, time=0.0s, L_3^dir(n)=8
-n=4: status=OPTIMAL, M*=6.000, target=2(n-1)=6, proof=True, time=0.3s, L_3^dir(n)=12
-n=5: status=OPTIMAL, M*=8.000, target=2(n-1)=8, proof=True, time=5.9s, L_3^dir(n)=16
-n=6: status=OPTIMAL, M*=10.000, target=2(n-1)=10, proof=True, time=1259.9s, L_3^dir(n)=20
+n=3: status=OPTIMAL, M*=4.000, target=2(n-1)=4, solver_reported_optimal=True, time=0.0s, L_3^dir(n)=8
+n=4: status=OPTIMAL, M*=6.000, target=2(n-1)=6, solver_reported_optimal=True, time=0.3s, L_3^dir(n)=12
+n=5: status=OPTIMAL, M*=8.000, target=2(n-1)=8, solver_reported_optimal=True, time=5.9s, L_3^dir(n)=16
+n=6: status=OPTIMAL, M*=10.000, target=2(n-1)=10, solver_reported_optimal=True, time=1259.9s, L_3^dir(n)=20

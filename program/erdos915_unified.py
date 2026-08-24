@@ -32,9 +32,9 @@ they can never silently masquerade as one another:
     not an estimate.  This is the trusted core; everything else is checked
     against it.
 
-  * PROVE.   The cut-counting method proves *upper* bounds for a fixed number of
-    vertices: it shows that no graph on ``n`` vertices can be denser, with a
-    zero optimality gap, so an optimal solution is a genuine proof.
+  * PROVE.   Exhaustive enumeration proves upper bounds for a fixed number of
+    vertices.  The historical cut-counting optimisation is retained as an
+    independent finite solver check. It does not emit a replayable certificate.
 
   * DISCOVER. The random search finds concrete dense graphs, hence
     *lower* bounds.  A construction it returns is a witness that the extremal
@@ -75,6 +75,7 @@ which chapter's machinery you are reading. Each section keeps its own banner.
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import math
 import pickle
@@ -323,6 +324,8 @@ class Graph:
         graph updates both matrix entries to stay symmetric.
         """
         self._require_distinct(u, v)
+        if count < 0:
+            raise ValueError("edge count must be non-negative")
         new_value = self.mu[u, v] + count
         if self.variant.simple:
             new_value = min(new_value, 1)  # enforce the 0/1 simple-graph cap
@@ -331,6 +334,8 @@ class Graph:
     def remove_edge(self, u: int, v: int, count: int = 1) -> None:
         """Remove ``count`` parallel edges or arcs (never below zero)."""
         self._require_distinct(u, v)
+        if count < 0:
+            raise ValueError("edge count must be non-negative")
         new_value = max(0, self.mu[u, v] - count)
         self._assign(u, v, new_value)
 
@@ -353,6 +358,10 @@ class Graph:
 
     def _assign(self, u: int, v: int, value: int) -> None:
         """Write ``value`` into the matrix, mirroring it when undirected."""
+        if value < 0:
+            raise ValueError("multiplicity must be non-negative")
+        if self.variant.simple and value > 1:
+            raise ValueError("a simple graph cannot have multiplicity above one")
         self.mu[u, v] = value
         # Maintain the symmetry invariant for undirected graphs in one place.
         if not self.variant.directed:
@@ -371,8 +380,8 @@ class Graph:
 
 
 def simple_undirected_edge(n: int, m: int) -> int:
-    """``ell_m(n) = floor(m (n-1) / 2)``.  Proved (Mader, 1973)."""
-    return (m * (n - 1)) // 2
+    """Mader's value, capped by the complete graph when ``n < m``."""
+    return min((m * (n - 1)) // 2, n * (n - 1) // 2)
 
 
 def multigraph_undirected_edge(n: int, m: int) -> int:
@@ -419,12 +428,12 @@ def directed_arc_lower_bound(n: int, m: int) -> int:
     ``max(m(n-1), floor((n+m-2)^2/4))``.  The two branches are the hub
     construction (``const:directed-hub``) and the shifted-partition augmented
     bipartite construction (``const:augmented-bipartite``).  Proved as a lower
-    bound for all ``m``; conjectured to be tight for ``m >= 3``
+    bound for all ``m`` after capping at the complete digraph. It is conjectured to be tight for ``m >= 3``
     (``conj:dir-arc``), proved tight for ``m = 2``.
     """
     hub_branch = m * (n - 1)
     bipartite_branch = (n + m - 2) ** 2 // 4
-    return max(hub_branch, bipartite_branch)
+    return min(max(hub_branch, bipartite_branch), n * (n - 1))
 
 
 def hypergraph_edge(n: int, m: int, r: int) -> int:
@@ -702,6 +711,33 @@ def one_directional_bipartite(n: int) -> Graph:
     for a in part_a:
         for b in part_b:
             graph.add_edge(a, b)  # every arc runs A -> B only (one direction)
+    return graph
+
+
+def thickened_one_directional_bipartite(n: int, m: int) -> Graph:
+    """The balanced one-way wall with every arc repeated ``m-1`` times."""
+    if m < 2:
+        raise ValueError("thickened wall needs m >= 2")
+    graph = Graph(n, MULTI_DIRECTED)
+    wall = one_directional_bipartite(n)
+    for u, v, _ in wall.edges():
+        graph.set_multiplicity(u, v, m - 1)
+    return graph
+
+
+def directed_hub(n: int, m: int) -> Graph:
+    """The simple directed hub with ``m(n-1)`` arcs, defined for ``n >= m``."""
+    if n < m:
+        raise ValueError("directed_hub needs n >= m")
+    graph = Graph(n, SIMPLE_DIRECTED)
+    hub = 0
+    spokes = n - 1
+    for v in range(1, n):
+        graph.add_edge(hub, v)
+        graph.add_edge(v, hub)
+    for offset in range(1, m - 1):
+        for i in range(spokes):
+            graph.add_edge(1 + i, 1 + (i + offset) % spokes)
     return graph
 
 
@@ -1131,7 +1167,7 @@ class ProofResult:
     n: int
     status: str               # OPTIMAL, LIMIT, INFEASIBLE, UNBOUNDED, ...
     scaled_optimum: float     # M*(n) = max total weight, exact if status OPTIMAL
-    relative_gap_zero: bool   # whether the solver closed the gap to zero
+    solver_reported_optimal: bool  # solver status, not an independently replayed gap certificate
     solve_seconds: float
     weight_matrix: np.ndarray | None  # a witnessing matrix w, if one was found
 
@@ -1140,11 +1176,12 @@ class ProofResult:
         # Undo the (m-1) scaling: one proved M*(n) yields every m.
         return (m - 1) * int(round(self.scaled_optimum))
 
-    def is_proof(self) -> bool:
-        """Whether this run is a genuine upper-bound proof (optimal, gap zero)."""
-        # Only an OPTIMAL solve with a closed gap counts as a proof; a LIMIT
-        # (timed out) result is merely a feasible lower bound, never a proof.
-        return self.status == "OPTIMAL" and self.relative_gap_zero
+    def solver_claims_optimal(self) -> bool:
+        """Whether the solver returned its ``OPTIMAL`` status.
+
+        This is not an independently replayed optimality certificate.
+        """
+        return self.status == "OPTIMAL" and self.solver_reported_optimal
 
 
 def _ordered_pairs(n: int) -> list[tuple[int, int]]:
@@ -1160,7 +1197,7 @@ def _two_hop_triples(n: int) -> list[tuple[int, int, int]]:
 
 
 # Proved values of M*(k) for the deletion cuts below (proved: M*(k) =
-# 2(k-1) for k <= 6, proved by this very optimisation with zero gap).
+# 2(k-1) for k <= 6, reproduced by this optimisation and proved independently).
 _PROVEN_MSTAR = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}
 
 
@@ -1300,10 +1337,11 @@ def prove_directed_multigraph(
 ) -> ProofResult:
     """Prove ``M*(n)`` for the directed multigraph arc problem.
 
-    Returns a :class:`ProofResult`.  When its :meth:`is_proof` is true the value
-    is a proven upper bound, and ``value_for(m)`` gives ``L_m^dir(n)`` for every
-    ``m``.  ``use_gurobi`` picks the solver (see :func:`_pick_solver`); the default
-    uses Gurobi when its licence is active and CBC otherwise.
+    Returns a :class:`ProofResult` containing the solver's termination status
+    and primal weight matrix.  The method does not emit an independently
+    replayable optimality certificate. ``use_gurobi`` picks the solver (see
+    :func:`_pick_solver`). The default uses Gurobi when its licence is active and
+    CBC otherwise.
     """
     _require_pulp()
     prob, w = _cut_counting_model(
@@ -1328,7 +1366,7 @@ def prove_directed_multigraph(
         n=n, status=status,
         scaled_optimum=(pulp.value(prob.objective) if status == "OPTIMAL"
                         else float("nan")),
-        relative_gap_zero=(status == "OPTIMAL"),
+        solver_reported_optimal=(status == "OPTIMAL"),
         solve_seconds=elapsed, weight_matrix=weight_matrix,
     )
 
@@ -1936,17 +1974,21 @@ def _matrix_cells(n: int, directed: bool) -> list[tuple[int, int]]:
 def _directed_witness(n: int, m: int, simple: bool) -> Graph | None:
     """The densest named directed construction that is feasible for ``(n, m)``.
 
-    Used to exhibit a concrete graph attaining the proved value: the better
-    of the double star and the (augmented) one-directional bipartite, or
-    ``None`` if neither applies to this case.
+    Used to exhibit a concrete graph attaining the proved value: the best
+    applicable hub or one-directional-wall construction, or ``None`` if no
+    named construction applies to this case.
     """
     candidates: list[Graph] = []
-    if not (simple and m > 2):              # a simple star needs m == 2
-        candidates.append(double_star(n, m, directed=True))   # 2(n-1)(m-1) arcs
-    if m == 2:
-        candidates.append(one_directional_bipartite(n))       # floor(n^2/4) arcs
-    elif (m - 2) < (n - n // 2):            # augmented needs m-2 < ceil(n/2)
-        candidates.append(augmented_bipartite(n, m))
+    if simple:
+        if n >= m:
+            candidates.extend((directed_hub(n, m), augmented_bipartite(n, m)))
+        if m == 2:
+            candidates.append(one_directional_bipartite(n))
+    else:
+        candidates.extend((
+            double_star(n, m, directed=True),
+            thickened_one_directional_bipartite(n, m),
+        ))
     feasible = [g for g in candidates if max_edge_connectivity(g) <= m - 1]
     return max(feasible, key=lambda g: g.edge_count()) if feasible else None
 
@@ -2286,13 +2328,17 @@ def solve(
         hypergraph, r: switch to the ``r``-uniform hypergraph model instead.
         exhaustive: ``True`` to PROVE the optimum, ``False`` to DISCOVER one.
         separation: ``"edge"`` or ``"vertex"`` disjointness (matrix models).
-        max_seconds: wall-clock budget; always respected.
+        max_seconds: wall-clock budget, checked between iterations. One
+            iteration may overrun it.
         seed: random seed for the discovery searches.
 
     Returns:
         A :class:`SolveResult` whose ``bound`` is ``"exact"`` (proved),
         ``"lower"`` (a witness), or ``"upper"`` (proved, no matching witness).
     """
+    if separation not in ("edge", "vertex"):
+        raise ValueError("separation must be 'edge' or 'vertex'")
+
     start = time.time()
     deadline = start + max_seconds
 
@@ -2342,25 +2388,25 @@ def solve(
         return SolveResult(n, m, label, separation, value, bound, method,
                            time.time() - start, done, witness, note)
 
-    # EXHAUSTIVE, directed MULTIGRAPH arc problem: the cut-counting is the prover.
+    # Directed MULTIGRAPH arc problem: the general hand theorem gives the exact
+    # value directly.  The historical cut-counting routine remains available as
+    # an independent finite solver check, but solve() does not promote its status
+    # string to a replayable certificate.
     if directed and separation == "edge":
-        budget = max(1.0, deadline - time.time())
-        proof = prove_directed_multigraph(n, time_limit=budget)
-        if proof.is_proof():
-            # We only reach here for a multigraph, where (m-1) M*(n) IS the value.
-            value = proof.value_for(m)          # (m-1) * M*(n)
-            witness = _directed_witness(n, m, simple)
-            return SolveResult(n, m, label, separation, value, "exact",
-                               "cut-counting (gap zero)", time.time() - start,
-                               True, witness, "")
-        # Timed out: fall back to the best construction as a lower bound.
+        value = directed_multigraph_arc(n, m)
         witness = _directed_witness(n, m, simple)
-        low = witness.edge_count() if witness else 0
+        if witness is None:
+            raise RuntimeError(
+                f"closed form gives {value}, but no named witness was built")
+        witness_value = witness.edge_count()
+        if witness_value != value:
+            raise RuntimeError(
+                f"closed form gives {value}, but the named witness has "
+                f"{witness_value} arcs")
         return SolveResult(
-            n, m, label, separation, low, "lower",
-            "cut-counting hit the time limit; reporting a construction",
-            time.time() - start, False, witness,
-            "raise max_seconds to let the cut-counting close the gap")
+            n, m, label, separation, value, "exact",
+            "closed form (directed multigraph theorem)",
+            time.time() - start, True, witness, "")
 
     # EXHAUSTIVE otherwise (undirected, or vertex separation): brute force.
     value, witness, done = _brute_force_matrix(
@@ -2445,7 +2491,11 @@ class ThresholdCurve:
 
     @property
     def predicted_threshold(self) -> float:
-        """The proved location $p^{*} = m/n$."""
+        """The expected-degree balance point ``m/n`` for undirected ``G(n,p)``.
+
+        It is a proved threshold only when ``m / log(n)`` tends to infinity.
+        No threshold claim is made here for directed or hypergraph models.
+        """
         return self.m / self.n
 
 
@@ -3356,10 +3406,9 @@ def plot_extremal_gallery(path: str | Path, *,
     These are the structured extremisers the analysis identifies, not the
     trivial small trees: the directed double and bidirected stars, the doubled
     bipartite wall, the dense bidirected complete graph, the multigraph star at
-    full multiplicity, and the star hypertrees (drawn as metro maps). The program both builds these and,
-    at small ``n``, proves them optimal by the enumeration of
-    :func:`gallery_extremal_graphs`. The ``gallery_json`` argument is accepted for
-    backward compatibility and ignored.
+    full multiplicity, and the star hypertrees (drawn as metro maps). The
+    program builds these named families directly. The ``gallery_json`` argument
+    is accepted for backward compatibility and ignored.
     """
     if not MATPLOTLIB_AVAILABLE:
         raise RuntimeError("matplotlib is required for figures")
@@ -3659,6 +3708,21 @@ def enumerate_pair_connectivities(
     return dict(table)
 
 
+_CACHE_SCHEMA_VERSION = 2
+
+
+def _cache_metadata(namespace: str, **settings) -> dict:
+    """Fingerprint a cache by schema, source revision, and run configuration."""
+    normalised = json.loads(json.dumps(settings, sort_keys=True, default=str))
+    source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    return {
+        "schema": _CACHE_SCHEMA_VERSION,
+        "namespace": namespace,
+        "source_sha256": source_hash,
+        "settings": normalised,
+    }
+
+
 def compute_pair_enumeration_cache(
     cache_path: str | Path = "figures/pair_enumeration_cache.pkl",
     configs: list[dict] | None = None,
@@ -3673,9 +3737,13 @@ def compute_pair_enumeration_cache(
     if configs is None:
         configs = _VARIANT_ENUM_CONFIGS
 
+    meta = _cache_metadata("pair-enumeration", configs=configs)
     if cache_path.exists():
         with open(cache_path, "rb") as f:
-            cached = pickle.load(f)
+            payload = pickle.load(f)
+        cached = (payload.get("data", {})
+                  if isinstance(payload, dict) and payload.get("_meta") == meta
+                  else {})
     else:
         cached = {}
 
@@ -3695,7 +3763,7 @@ def compute_pair_enumeration_cache(
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cache_path, "wb") as f:
-            pickle.dump(cached, f)
+            pickle.dump({"_meta": meta, "data": cached}, f)
 
     return cached
 
@@ -3714,9 +3782,13 @@ def compute_enumeration_cache(
     if configs is None:
         configs = _VARIANT_ENUM_CONFIGS
 
+    meta = _cache_metadata("enumeration", configs=configs)
     if cache_path.exists():
         with open(cache_path, "rb") as f:
-            cached = pickle.load(f)
+            payload = pickle.load(f)
+        cached = (payload.get("data", {})
+                  if isinstance(payload, dict) and payload.get("_meta") == meta
+                  else {})
     else:
         cached = {}
 
@@ -3741,7 +3813,7 @@ def compute_enumeration_cache(
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cache_path, "wb") as f:
-            pickle.dump(cached, f)
+            pickle.dump({"_meta": meta, "data": cached}, f)
 
     return cached
 
@@ -4121,13 +4193,20 @@ def compute_surface_cache(
     supplies a ``"lower"`` bound.  Missing entries are skipped on later runs.
     """
     cache_path = Path(cache_path)
+    meta = _cache_metadata(
+        "surface", n_range=n_range, m_range=m_range,
+        max_seconds=max_seconds, seed=0)
+    invalidated = False
     if cache_path.exists():
         with open(cache_path) as f:
             cache = json.load(f)
+        if cache.pop("_meta", None) != meta:
+            cache = {}
+            invalidated = True
     else:
         cache = {}
 
-    changed = False
+    changed = invalidated
     ns = list(range(n_range[0], n_range[1] + 1))
     ms = list(range(m_range[0], m_range[1] + 1))
 
@@ -4154,7 +4233,7 @@ def compute_surface_cache(
                         changed = True
                     continue
                 if sm in cache[vkey][sn]:
-                    continue  # open cell already searched; keep the lower bound
+                    continue  # metadata match: this cell used the same source and budget
                 print(f"  surface: {cfg['title']}  n={n}  m={m}", flush=True)
                 res = solve(
                     n, m,
@@ -4181,7 +4260,7 @@ def compute_surface_cache(
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cache_path, "w") as f:
-            json.dump(cache, f)
+            json.dump({"_meta": meta, **cache}, f)
 
     return cache
 
@@ -4593,6 +4672,8 @@ def _canonical_form(mu: np.ndarray) -> bytes:
     is what bounds the enumeration's memory to the number of classes rather than
     the number of labelled copies.
     """
+    # Canonical keys must not depend on the caller's native integer width.
+    mu = np.ascontiguousarray(mu, dtype=np.int32)
     n = mu.shape[0]
     if _C is not None and n <= 7:
         flat, ptr = _c_flat(mu)
@@ -4965,10 +5046,13 @@ def _graph_from_mu(mu: np.ndarray, variant: Variant) -> Graph:
 
 def _aut_count_matrix(mu: np.ndarray) -> int:
     """Count vertex permutations that preserve ``mu`` (equals |Aut(G)|)."""
+    mu = np.ascontiguousarray(mu, dtype=np.int32)
     n = mu.shape[0]
     canon = _canonical_form(mu)
-    return sum(1 for perm in permutations(range(n))
-               if mu[np.ix_(list(perm), list(perm))].tobytes() == canon)
+    count = sum(1 for perm in permutations(range(n))
+                if mu[np.ix_(list(perm), list(perm))].tobytes() == canon)
+    assert count >= 1  # the identity permutation is always an automorphism
+    return count
 
 
 def _dir_relabel_key(edge, p: list) -> tuple:
@@ -5188,23 +5272,25 @@ def gallery_extremal_graphs(
     r: int = 3,
     time_per_case: float = 3.0,
 ) -> dict:
-    """Collect every non-isomorphic extremal graph for all 12 variants at small n, m.
+    """Classify graphs attaining the best value found for all 12 variants.
 
     For each (variant, n, m) triple where the enumeration finishes within
     ``time_per_case`` seconds, the function:
 
-    1. runs a short repeated search to discover the extremal edge count;
-    2. exhaustively enumerates every graph achieving that count;
+    1. runs a short repeated search to discover the extremal edge count.
+    2. exhaustively enumerates every graph achieving that count, without
+       claiming that the search target itself is optimal.
     3. deduplicates by isomorphism class and records ``n! / |Aut(G)|`` (the
        number of labelled copies) per class.
 
     Returns a JSON-serialisable dict with structure::
 
         result[variant_key]["n={n}_m={m}"] = {
-            "extremal_value": int,
+            "best_found_value": int,
             "classes": [{"repr": <matrix or edge list>, "labelled_count": int}],
             "total_labelled": int,   # sum of labelled_count over all classes
-            "complete": bool,        # False when the deadline was hit
+            "classification_complete": bool,
+            "optimality_proved": bool,
         }
 
     For matrix variants ``repr`` is the multiplicity matrix (list of lists of
@@ -5280,10 +5366,11 @@ def gallery_extremal_graphs(
                     for mu in reps
                 ]
                 result[key][f"n={n}_m={m}"] = {
-                    "extremal_value": best_val,
+                    "best_found_value": best_val,
                     "classes": classes,
                     "total_labelled": sum(c["labelled_count"] for c in classes),
-                    "complete": not timed_out,
+                    "classification_complete": not timed_out,
+                    "optimality_proved": False,
                 }
 
     for key, directed, vertex_split in hyper_configs:
@@ -5297,8 +5384,10 @@ def gallery_extremal_graphs(
                     directed=directed, vertex_split=vertex_split)
                 if not completed:
                     result[key][f"n={n}_m={m}"] = {
-                        "extremal_value": best_val, "classes": [],
-                        "total_labelled": 0, "complete": False,
+                        "best_found_value": best_val, "classes": [],
+                        "total_labelled": 0,
+                        "classification_complete": False,
+                        "optimality_proved": False,
                     }
                     continue
                 # Enumerate all achieving best_val.
@@ -5315,10 +5404,11 @@ def gallery_extremal_graphs(
                         "labelled_count": fn // _aut_count_hyper(raw, n, directed),
                     })
                 result[key][f"n={n}_m={m}"] = {
-                    "extremal_value": best_val,
+                    "best_found_value": best_val,
                     "classes": classes,
                     "total_labelled": sum(c["labelled_count"] for c in classes),
-                    "complete": not timed_out,
+                    "classification_complete": not timed_out,
+                    "optimality_proved": True,
                 }
 
     return result
@@ -5605,7 +5695,7 @@ def _run_checks() -> int:
         # verified separately:
         #
         #   result = prove_directed_multigraph(6, time_limit=2000.0)
-        #   assert result.is_proof() and round(result.scaled_optimum) == 10
+        #   assert result.solver_claims_optimal() and round(result.scaled_optimum) == 10
         #
         # The confirmed run (2026-06-13) is logged in program/logs/selftest_check.log
         # (search "n=6 OPTIMAL M*(6)=10 in 1315s").  Omitting n=6 from this loop is
@@ -5613,8 +5703,8 @@ def _run_checks() -> int:
         # alone does not reproduce the full n<=6 certification.
         for n in [3, 4, 5]:
             result = prove_directed_multigraph(n, time_limit=300.0)
-            check(f"n={n}: status={result.status}, M*={result.scaled_optimum:.1f}, proof={result.is_proof()}",
-                  result.is_proof() and round(result.scaled_optimum) == 2 * (n - 1))
+            check(f"n={n}: status={result.status}, M*={result.scaled_optimum:.1f}, solver_optimal={result.solver_claims_optimal()}",
+                  result.solver_claims_optimal() and round(result.scaled_optimum) == 2 * (n - 1))
 
         section("Prover: the valid inequalities sharpen but never move the optimum")
         # Turning the two-hop and symmetry-breaking rows off leaves the BARE exact
@@ -5624,8 +5714,8 @@ def _run_checks() -> int:
         # guards the prover's soundness, not just a re-run of the value.
         bare = prove_directed_multigraph(3, time_limit=120.0,
                                          use_two_hop=False, use_symmetry_breaking=False)
-        check(f"M*(3) with the tighteners off = {bare.scaled_optimum:.1f} (expect 4), proof={bare.is_proof()}",
-              bare.is_proof() and round(bare.scaled_optimum) == 4)
+        check(f"M*(3) with the tighteners off = {bare.scaled_optimum:.1f} (expect 4), solver_optimal={bare.solver_claims_optimal()}",
+              bare.solver_claims_optimal() and round(bare.scaled_optimum) == 4)
 
         section("Prover (integral): an INFEASIBLE verdict is a genuine upper-bound proof")
         # L_3^dir(4) = 12: a 12-arc multigraph exists, no 13-arc one does.  This
