@@ -554,17 +554,27 @@ wis.kuleuven.be\\
 % ============================================================================
 
 % Paragraph spacing
-\setlength{\parskip}{0.5em}
+\setlength{\parskip}{0.25em}
 \setlength{\parindent}{1.5em}
 \setcounter{tocdepth}{2}
 
 % Better theorem spacing
 \makeatletter
 \def\thm@space@setup{%
-    \thm@preskip=1em plus 0.3em minus 0.2em
-    \thm@postskip=1em plus 0.3em minus 0.2em
+    \thm@preskip=0.75em plus 0.25em minus 0.2em
+    \thm@postskip=0.75em plus 0.25em minus 0.2em
 }
 \makeatother
+
+% Let long display chains break across a page rather than pushing a whole
+% block to the next one, which otherwise leaves half-empty pages.
+\allowdisplaybreaks[2]
+
+% Float separation: the defaults leave more air around figures than this
+% document's dense pages need.
+\setlength{\floatsep}{10pt plus 3pt minus 2pt}
+\setlength{\textfloatsep}{12pt plus 3pt minus 2pt}
+\setlength{\intextsep}{10pt plus 3pt minus 2pt}
 
 % Epigraph for chapter quotes
 \usepackage{epigraph}

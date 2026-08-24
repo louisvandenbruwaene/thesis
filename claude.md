@@ -3610,3 +3610,53 @@ Every `\ref` target resolves, no sentence is duplicated across the document, and
 the rendered text carries no deictic reference ("the table", "reproduced below")
 without its referent. Program source was not changed, so the Python suite was
 not rerun.
+
+## 2026-08-24 (Claude) -- reference audit, self-containment, and the page budget
+
+A full audit of pictures, tables and proofs, beyond what LaTeX can see.
+
+Every `\ref` target resolves, every `\includegraphics` file exists, no `??`
+survives in the rendered text, no label's prefix disagrees with the object it
+points at, and every statement is proved, cited, or explicitly deferred. Three
+floats were labelled but never referenced: the paired twelve-variant grids, the
+Gomory--Hu distance figure, and the open-problems table. Each now has a
+sentence that names it, and the open-problems section gained the lead-in
+paragraph it never had. Nine anchors carry more than one label. All are
+deliberate (subfigures, the two chapter-merge aliases, the shared-clique
+alias), and the four aliases on the computational audit now carry a source
+comment saying what they are, since a live label on absent content is exactly
+how the earlier dangling references hid from LaTeX.
+
+Self-containment: the repository URL appeared only on the audit page, so a
+reader meeting `program/erdos915_unified.py` in Chapter 2 or a log path in
+Appendix A had no anchor. Chapter 2 now names the repository where the code is
+first mentioned and says every quoted file path is relative to it, and the
+block-sweep log in A.9 points at the same place.
+
+Thirty-five semicolons in running prose and captions were rewritten as full
+stops or conjunctions, per the author's standing preference. Semicolons inside
+table cells and in mathematical notation (`maxflow(s, t; w)`) are left alone,
+where they separate list items rather than clauses. No em-dashes or en-dashes
+occur in prose.
+
+Page budget: 108 -> 106 with no content removed, by tightening `\parskip` from
+0.5em to 0.25em, the theorem pre/post skips from 1em to 0.75em, and the three
+float separations, plus `\allowdisplaybreaks[2]` so long display chains no
+longer push whole blocks to the next page. Class-mandated settings (margins,
+1.5 line spacing, fonts, covers) were not touched. The document has no slack
+left: outside the cover, contents and back matter, only three pages fall below
+250 words, and those are chapter-end pages.
+
+The 100-page target is now mutually exclusive with the restored Appendix A.9.
+That section is seven pages, the tightening returned two, and the rest of the
+document is dense. Reaching 100 would mean deleting either A.9 (original
+mathematics) or the classical machinery in A.1 and A.2 (about three and a half
+pages, and the opposite of self-contained). Left at 106 with A.9 in place. The
+lever is one paragraph in `preamble.tex` and one section in `app_proofs.tex` if
+the author decides otherwise.
+
+VERIFY: `latexmk -pdf main.tex` -> 106 pp, `latexmk -pdf offcuts.tex` -> 117 pp,
+both with zero undefined references, zero multiply-defined labels, zero overfull
+boxes. Rendered pages 24, 25 and 42 were inspected as images to confirm the
+tightened spacing still reads comfortably. Program source unchanged, so the
+Python suite was not rerun.

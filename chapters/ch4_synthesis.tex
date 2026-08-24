@@ -68,13 +68,13 @@ The conjecture is nevertheless correct to first order and to the order of its er
     \qquad\text{hence}\qquad
     \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} + \Theta_m(n) \qquad (m\ge3).
 \]
-Thus only the coefficient of the linear term remains, between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The same route family is internally vertex-disjoint, so \Cref{thm:dir-vertex-linear-error} independently gives $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$; Whitney's inequality alone would not justify that transfer.
+Thus only the coefficient of the linear term remains, between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The same route family is internally vertex-disjoint, so \Cref{thm:dir-vertex-linear-error} independently gives $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$. Whitney's inequality alone would not justify that transfer.
 
 The directed multigraph problem, by contrast, is closed exactly (\Cref{thm:dir-multi-full}):
 \[
 L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,\max\!\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr),
 \]
-with doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic branch. Its proof peels off $m-1$ sparse reachability-preserving subgraphs instead of deleting vertices, eliminating the former parity obstruction. Equality also classifies the quadratic extremisers for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}); only the smaller range remains open.
+with doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic branch. Its proof peels off $m-1$ sparse reachability-preserving subgraphs instead of deleting vertices, eliminating the former parity obstruction. Equality also classifies the quadratic extremisers for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
 
 \section{Two principal phenomena}
 
@@ -178,7 +178,7 @@ directed $r$-hyper
 \end{table}
 
 Here $M(n)=\max(2(n-1),\floor{n^2/4})$. Simple-graph formulas assume
-$n\ge m$; below that range the complete object gives the trivial maximum.
+$n\ge m$. Below that range the complete object gives the trivial maximum.
 The edge-hypergraph bound is attained when $(r-1)\mid(n-1)$ for
 multihypergraphs, and for simple hypergraphs when $r\ge3$ and
 $m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained when
@@ -199,7 +199,7 @@ The table uses the \emph{forward} convention: one tail and $r-1$ heads. More gen
 under both separations. Thus the orientation choice does not add another asymptotic row to \Cref{tab:summary}.
 
 Finite values may differ when vertices are scarce. Whether forward and general
-agree exactly once $n>r$ remains open; the thesis uses the forward convention
+agree exactly once $n>r$ remains open, and the thesis uses the forward convention
 throughout its twelve-variant summary.
 
 \section{Contributions and limitations of the program}
@@ -210,6 +210,8 @@ Its limits are as clear as its reach, and stating them is part of the honesty th
 
 \section{Open problems}
 
+\Cref{tab:open-problems} separates what this thesis proves from what it leaves open, one row per frontier. Each row states the strongest thing known here and the exact next step, so that a reader who wants to continue knows which statement to attack rather than which topic to read about.
+
 \begin{table}[ht]
 \centering
 \scriptsize
@@ -219,9 +221,9 @@ Its limits are as clear as its reach, and stating them is part of the honesty th
 Problem & Known here & Remaining target \\
 \midrule
 Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-arc-linear-error}) & Prove the decomposition of \Cref{open:decomposition}, or otherwise determine the linear coefficient. \\
-Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value; an arc upper bound does not transfer. \\
+Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value, given that an arc upper bound does not transfer. \\
 Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
-Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$ & Determine $c_m$; the likely next structure is triconnected rather than merely blockwise. \\
+Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$ & Determine $c_m$, whose likely next structure is triconnected rather than merely blockwise. \\
 Multigraph vertex, parallel copies distinct & Block-knapsack formulation and order $\Theta(m^2n)$, with the per-vertex constant between $3-2\sqrt{2}$ and $2$ (\Cref{thm:multi-vertex-blocks,prop:multi-vertex-upper,thm:multi-vertex-bipartite}) & Determine the asymptotic constant and the optimal $2$-connected blocks. \\
 Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Locate the first failure for $r\ge3$ and replace the rank-two decomposition used at $m=3$. \\
 Directed hypergraphs & Leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\

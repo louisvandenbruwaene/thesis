@@ -1,11 +1,11 @@
 % Combined machine-method chapter.
 % Former source boundary: chapters/ch2_certify.tex
-The last chapter ended with several variants stuck for different reasons, but all ask one machine to do the same three jobs. It must represent every model, measure connectivity exactly, and then use that measurement either to \emph{prove} a finite optimum by exhaustive certification or to \emph{discover} a dense feasible graph. This chapter builds that single pipeline in that order. The epistemic distinction matters more than the shared implementation: measurement is exact, completed enumeration proves, and heuristic search supplies only a lower bound. \Cref{fig:spine} is the map. The small cards below name each routine and its interface; the function bodies stay in the archive because the argument needs the contract, not the code listing.
+The last chapter ended with several variants stuck for different reasons, but all ask one machine to do the same three jobs. It must represent every model, measure connectivity exactly, and then use that measurement either to \emph{prove} a finite optimum by exhaustive certification or to \emph{discover} a dense feasible graph. This chapter builds that single pipeline in that order. The epistemic distinction matters more than the shared implementation: measurement is exact, completed enumeration proves, and heuristic search supplies only a lower bound. \Cref{fig:spine} is the map. The small cards below name each routine and its interface. The function bodies stay in the archive because the argument needs the contract, not the code listing. That archive is the repository at \url{https://github.com/louisvandenbruwaene/thesis}, and every file path quoted in this thesis is relative to it, with the commands and the audit trail collected in \Cref{sec:transcripts}.
 
 \begin{figure}[ht]
 \centering
 \spinediagram
-\caption{The architecture as one pipeline. A single model feeds the exact max-flow checker; certification turns that measurement into finite upper bounds, while simulated annealing or tabu search uses it to discover lower bounds. The badge colours on the code cards match the boxes here.}
+\caption{The architecture as one pipeline. A single model feeds the exact max-flow checker. Certification turns that measurement into finite upper bounds, while simulated annealing or tabu search uses it to discover lower bounds. The badge colours on the code cards match the boxes here.}
 \label{fig:spine}
 \end{figure}
 
@@ -24,7 +24,7 @@ That one loop already settles the smallest cases, and the rest of the chapter is
 All graph variants use one multiplicity matrix $\mu$: it is symmetric when
 undirected and binary when simple. Hypergraphs are stored as $r$-sets, with a
 tail distinguished in the directed model. Consequently the same checker,
-certifier, and search routines serve every variant; only the capacity reduction
+certifier, and search routines serve every variant, and only the capacity reduction
 and separation test change.
 
 \section{The connectivity checker built on maximum flow}
@@ -159,10 +159,10 @@ A hyperedge is handled by adding one helper point, split by a unit-capacity arc,
   \node[font=\small] at (4,-1.4) {(b)};
 \end{scope}
 \end{tikzpicture}}
-\caption[The helper-point network on a whole hypergraph]{An undirected $3$-uniform hypergraph and its gate network for $u,v$. The four black routes use distinct capacity-one gates, so the checker reads $\lec(u,v)=4$; a fifth would reuse a gate.}
+\caption[The helper-point network on a whole hypergraph]{An undirected $3$-uniform hypergraph and its gate network for $u,v$. The four black routes use distinct capacity-one gates, so the checker reads $\lec(u,v)=4$. A fifth would reuse a gate.}
 \label{fig:hyper-gadget-example}
 \end{figure}
-Self-tests recover $n-1$ on $K_n$ and $3$ on $K_4^{(3)}$. Splitting the ordinary vertices as in \Cref{fig:vertex-split} gives the vertex-disjoint hypergraph checker; only direction still has to be added.
+Self-tests recover $n-1$ on $K_n$ and $3$ on $K_4^{(3)}$. Splitting the ordinary vertices as in \Cref{fig:vertex-split} gives the vertex-disjoint hypergraph checker, and only direction still has to be added.
 
 \subsection{The directed hypergraph checker}
 A \emph{directed} hyperedge has the one-tail, $r-1$-heads convention fixed in
@@ -172,7 +172,7 @@ $e = (a;\, b, c, \dots)$ it adds a gate $g_e$, a capacity-one arc
 $a \to g_e$, and arcs $g_e \to b$, $g_e \to c$, and so on
 (\Cref{fig:dir-hyper-gadget}). Thus a route reaches the gate only through the
 tail, and at most one route uses the hyperedge. Directed and undirected
-hyperedges therefore use the same capacity-one gate; only the incident wiring
+hyperedges therefore use the same capacity-one gate, and only the incident wiring
 changes.
 
 \begin{figure}[ht]
@@ -234,7 +234,7 @@ changes.
 \caption{Orient the hyperedge gate.}
 \label{fig:dir-hyper-gadget}
 \end{subfigure}
-\caption{The three capacity-one reductions used by the checker. Each forces competing routes through one unit-capacity bottleneck; direction changes only how the gate is wired.}
+\caption{The three capacity-one reductions used by the checker. Each forces competing routes through one unit-capacity bottleneck. Direction changes only how the gate is wired.}
 \label{fig:checker-gadgets}
 \end{figure}
 
@@ -250,7 +250,7 @@ The checker measures one graph. To bound \emph{every} graph of a given size, the
 This is the first thing \code{solve} does when it is asked to prove a small case. With its exhaustive flag set it walks that product, measures each candidate with the checker, and keeps the densest feasible one. The value it returns is exact and exhausted, a true upper bound for that $n$, but only while the count of graphs stays small. No new routine is involved, only \code{solve} choosing to enumerate.
 
 On the small cases this exhaustive mode independently reproduces every value
-proved by hand in \Cref{ch:basecases}; those values are not repeated here.
+proved by hand in \Cref{ch:basecases}, and those values are not repeated here.
 
 The honesty of the method is also its limit. The number of graphs it must visit grows as $2^{\binom{n}{2}}$ for simple undirected graphs and $2^{n(n-1)}$ for digraphs, and capping multiplicities at $m-1$, so that each cell ranges over the $m$ values $\{0,\dots,m-1\}$, raises the base from two to $m$, giving $m^{\binom{n}{2}}$ undirected multigraphs and $m^{n(n-1)}$ directed ones. The enumeration is exact wherever it finishes, and it finishes only for the smallest sizes. \Cref{sec:search-wall} measures exactly how fast this wall arrives. For now the point is that the wall arrives precisely where \Cref{ch:basecases} needed help, at the directed base cases $n = 6, 7$, so the next sections reach a little further than blind enumeration can.
 
@@ -283,7 +283,7 @@ The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-e
   \node[font=\scriptsize, vertexred, align=center] at (1.3,-3.5) {infeasible\\(prune)};
   \node[font=\scriptsize, vertexorange!80!black, align=center] at (3.1,-3.5) {cannot beat\\best (prune)};
 \end{tikzpicture}
-\caption{Branch and bound over digraphs. Each level fixes one adjacency; infeasible partial graphs (red) and branches unable to beat the incumbent (orange) are discarded, allowing the exact search to reach $n\le7$.}
+\caption{Branch and bound over digraphs. Each level fixes one adjacency. Infeasible partial graphs (red) and branches unable to beat the incumbent (orange) are discarded, allowing the exact search to reach $n\le7$.}
 \label{fig:prune}
 \end{figure}
 
@@ -317,7 +317,7 @@ The reverse inequality requires an optimum whose entries scale back to integers.
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 ,
 \]
-for every $m$. The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-integral}); the finite optimisation is retained to record the independent route by which the cases $n\le6$ were first checked.
+for every $m$. The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-integral}). The finite optimisation is retained to record the independent route by which the cases $n\le6$ were first checked.
 
 \begin{figure}[ht]
 \centering
@@ -360,7 +360,7 @@ By max-flow/min-cut, $\mathrm{maxflow}(s,t)\le1$ exactly when some $s$--$t$ cut 
 \codecard{prove\_directed\_multigraph(n) $\to$ ProofResult}{PROVE}
 {the vertex count $n$ (and tightening flags such as \code{use\_deletion\_cuts})}
 {$M^{*}(n)$ with the solver's termination status and a primal weight matrix. A replayable upper-bound certificate is not emitted}
-{builds the cut-counting MILP in \code{pulp}, runs CBC or Gurobi, and records the status and primal matrix; \code{prove\_integral\_arc\_bound} supplies a separate integer cross-check.}
+{builds the cut-counting MILP in \code{pulp}, runs CBC or Gurobi, and records the status and primal matrix, while \code{prove\_integral\_arc\_bound} supplies a separate integer cross-check.}
 
 With scaled weights $w$, binary side labels $x$, and non-negative crossing weights $p$, the model is
 \begin{align*}
@@ -372,7 +372,7 @@ With scaled weights $w$, binary side labels $x$, and non-negative crossing weigh
     & w \in [0,1], \quad x \in \{0,1\}.
 \end{align*}
 
-Because $w\le1$, the first constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$; in the other three cases its right-hand side is non-positive. The second constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
+Because $w\le1$, the first constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The second constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
 
 \begin{figure}[ht]
 \centering
@@ -398,7 +398,7 @@ Because $w\le1$, the first constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the
     % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
     \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.30, below=1pt]{$p=0$} (a);
 \end{tikzpicture}
-\caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$; same-side and backward arcs have $p=0$.}
+\caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$, while same-side and backward arcs have $p=0$.}
 \label{fig:cut}
 \end{figure}
 
@@ -406,7 +406,7 @@ Because $w\le1$, the first constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the
 For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
 \end{theorem}
 
-Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$; $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand and \Cref{sec:transcripts} retains the solver record.
+Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand and \Cref{sec:transcripts} retains the solver record.
 
 % Former source boundary: chapters/ch3_discover.tex
 Certification is exact only while it can cover every candidate. The second half of this chapter measures where that ends and replaces the exhaustive walk by a selective one: simulated annealing or tabu search explores a few graphs well, using the same checker to keep the best feasible construction. Its output is a concrete graph and therefore a lower bound, never an upper bound.
@@ -418,7 +418,7 @@ The exhaustive methods above visit every graph of a given size. The trouble is h
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/complexity_growth.png}
-    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order; directed objects grow fastest because they have more independent cells to fill.}
+    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent cells to fill.}
     \label{fig:complexity}
 \end{figure}
 
@@ -524,7 +524,7 @@ bounds, never proofs.
 \section{Results and evidential status}
 \label{sec:trichotomy}\label{sec:certification-standard}
 
-The checker \emph{measures} a supplied graph exactly; completed exhaustion \emph{proves} a finite optimum; the historical cut-counting optimisation is an independent finite check unless accompanied by a replayable bound; and heuristic search supplies only a witness and lower bound. A value is settled only when its lower and upper bounds meet. All computational claims rerun from \code{program/erdos915\_unified.py}; critical values are cross-checked by independent implementations, while \Cref{app:verification-ladder,app:software-tests} records the environment, commands, and audit evidence. No general theorem rests on an unauditable solver status.
+The checker \emph{measures} a supplied graph exactly. Completed exhaustion \emph{proves} a finite optimum. The historical cut-counting optimisation is an independent finite check unless accompanied by a replayable bound, and heuristic search supplies only a witness and lower bound. A value is settled only when its lower and upper bounds meet. All computational claims rerun from \code{program/erdos915\_unified.py}, and critical values are cross-checked by independent implementations, while \Cref{app:verification-ladder,app:software-tests} records the environment, commands, and audit evidence. No general theorem rests on an unauditable solver status.
 
 The directed simple arc problem at $m\ge3$ shows the boundary cleanly. Exhaustion proves the values $6,9,12,15$ for $n=3,4,5,6$ at $m=3$ under both separations (\Cref{rem:dir-vertex-m3}), but does not finish at $n=7$. Beyond that point the best reported lower bound is the better of the search and a named construction. The conjectured formula
 \[
@@ -533,7 +533,7 @@ The directed simple arc problem at $m\ge3$ shows the boundary cleanly. Exhaustio
 \]
 passes through every exhausted value and through the construction-backed lower bounds beyond them. Its linear-to-quadratic crossover occurs at $n=9$ when $m=3$, just past the exhausted range, and at $n=10$ it gives the thirty-arc counterexample of \Cref{rem:counterexample-m3}.
 
-The paired grids apply that reading to all twelve variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds; filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
+The paired grids of \Cref{fig:variant-bounds-comparison} apply that reading to all twelve variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds. filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
 
 \begin{figure}[htbp]
     \centering
@@ -549,7 +549,7 @@ The paired grids apply that reading to all twelve variants. Blue curves are theo
         \caption{$m=6$}
         \label{fig:variant-bounds-m6}
     \end{subfigure}
-    \caption{All twelve variants at $m=3$ and $m=6$. Rows select the model and columns the direction and separation; colours encode theorem, conjecture, or interpolation, while filled squares are exact finite values and open circles are witnesses.}
+    \caption{All twelve variants at $m=3$ and $m=6$. Rows select the model and columns the direction and separation, while colours encode theorem, conjecture, or interpolation, while filled squares are exact finite values and open circles are witnesses.}
     \label{fig:variant-bounds-comparison}
 \end{figure}
 

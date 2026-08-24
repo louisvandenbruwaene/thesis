@@ -270,13 +270,13 @@ A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The four models of \Cref{fig:three-models} with direction added. A directed hyperedge is a star from one tail to its heads; repetition creates parallel copies of those arcs.}
+\caption{The four models of \Cref{fig:three-models} with direction added. A directed hyperedge is a star from one tail to its heads, and repetition creates parallel copies of those arcs.}
 \label{fig:three-models-directed}
 \end{figure}
 
 A directed $r$-edge has one tail and $r-1$ heads. In the figures, one colour
 denotes one hyperedge, drawn either as a star or as a line oriented away from
-its tail; it is a single edge on several vertices, not a path of ordinary
+its tail. It is a single edge on several vertices, not a path of ordinary
 edges. A directed Berge route enters that edge at its tail and leaves at one
 of its heads.
 
@@ -394,7 +394,7 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
 
 Three models, two directions, two separations give twelve versions of one
 question. This chapter proves the short cases before the machine treats the
-family uniformly; the final status map appears in \Cref{fig:variant-tree-status}.
+family uniformly. The final status map appears in \Cref{fig:variant-tree-status}.
 
 \section{Cases with short proofs}
 Allowing parallel edges removes the parity subtlety, the dependence on whether $m(n-1)$ is even or odd, that produces the floor in Mader's theorem, and the answer becomes exactly linear. Write $L_m(n)$ for the multigraph analogue of $\ell_m(n)$.
