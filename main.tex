@@ -28,25 +28,30 @@ My use of generative-AI tools is described in the Contribution Statement. I rema
 
 \chapter*{Contribution Statement}
 \addcontentsline{toc}{chapter}{Contribution Statement}
-This thesis is my own work. I carried out the literature study, recast the twelve variants of the problem in one common language, and designed and wrote the single program that runs through all of them. I built every example, by hand or by computer search, checked each one with that program, wrote the proofs that appear in the thesis, and typeset the whole document. Where a result comes from the literature I say so and cite it. The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai, together with the standard probabilistic tools used for the random graphs. Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. The hypergraph results proved in this thesis do not depend on their splitting-off theorem.
+This thesis is my own work. I carried out the literature study, recast the twelve variants of the problem in one common language, and designed and wrote the single program that runs through all of them. I built every example, by hand or by computer search, checked each one with that program, wrote the proofs that appear in the thesis, and typeset the whole document. Where a result comes from the literature I say so and cite it. The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai. Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. The hypergraph results proved in this thesis do not depend on their splitting-off theorem.
 
 The program has three jobs and keeps them separate: it \emph{measures} connectivity exactly by maximum flow, it \emph{proves} a finite optimum by sweeping a finite space of graphs, and it \emph{discovers} dense graphs by metaheuristic search, which gives lower bounds and suggests conjectures but never an upper bound. Every general statement in the thesis rests on a proof by hand or a cited theorem. The computer searches are evidence that points the way, never a replacement for the argument.
 
 I used Claude Code, ChatGPT, and Gemini for literature leads, exploratory proof drafts, code assistance, \LaTeX{} editing, and proofreading. Their output was not treated as a source or as evidence: literature claims were checked against the cited publications, general mathematical claims were retained only with a proof or citation, and computational claims were checked by tests and, for critical cases, independent implementations. I reviewed and take responsibility for the final text, mathematics, and code. This statement records the role of the tools in the thesis. The same use must also be recorded in the separate KU Leuven GenAI transparency declaration submitted with the thesis.
 
-What is new in this thesis is told in full in \Cref{ch:synthesis} and proved in \Cref{app:proofs}. Listed compactly, and grouped by which of the twelve variants each concerns, my own results are these.
+My original results are stated fully in \Cref{ch:synthesis} and proved in \Cref{app:proofs}; the compact map is:
 
-\begin{itemize}
-  \item \emph{Hyperedge networks, vertex separation.} The problem is settled completely at $m = 2$, for every hyperedge size $r$ and every $n$ (\Cref{thm:hyper-vertex-m2}). At $m = 3$ I prove the universal upper bound $\floor{(m-1)(n-1)/(r-1)}$ for $r$-uniform multihypergraphs and prove it attained whenever $r \ge 3$ and $2 \le \binom{n-2}{r-2}$ (\Cref{thm:hyper-vertex-m3}), so in that range requiring routes to avoid one another's interiors costs nothing. The upper bound is the harder argument and rests on a new rank bound for incidence graphs, proved by way of Tutte's decomposition into three-connected pieces (\Cref{lem:incidence-rank}).
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}X@{}}
+\toprule
+Variant & Contribution \\
+\midrule
+Hypergraph, vertex separation & Exact value at $m=2$; the $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
+Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
+Directed simple graph, arc separation & Unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
+Multigraph, vertex separation with parallel routes distinct & Exact $m=2$ value, counterexamples to the thickened-tree guess, matching order $\Theta(m^2n)$, and an exact block-knapsack formulation (\Cref{thm:multi-vertex-m2,prop:multi-vertex-upper,thm:multi-vertex-blocks}). \\
+Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
+\bottomrule
+\end{tabularx}
+\end{center}
 
-  \item \emph{One-way multigraphs.} The exact value, for every $n$ and every $m$ (\Cref{thm:dir-multi-full}), closing what had stood as a conjecture confirmed only to six vertices. The idea is to delete a whole sparse spanning subgraph chosen to preserve reachability, rather than one vertex at a time, which avoids the obstruction that stopped the point-by-point argument at odd $n$ and needs no restriction on $m$. In three lines it also reproves by hand the finite fact $L_3^{\mathrm{dir}}(7) = 24$, to which the earlier route had reduced the whole $m = 3$ problem. Read backwards from equality the same argument is rigid, and classifies the extremal digraphs on the quadratic branch whenever $n \ge \max(8, 2m)$ as the balanced one-way complete bipartite digraphs at multiplicity $m-1$ (\Cref{thm:dir-multi-uniqueness}).
-
-  \item \emph{One-way simple graphs, arc separation.} The exact value is open for $m \ge 3$; what I prove is an unconditional bound on it, $\floor{n^2/4} + 4(m-1)(n-1)$ arcs under any route limit $m$ (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). Together these fix the leading constant of the standing conjecture (\Cref{conj:dir-arc}) and the order of its second term with no assumption about the shape of the extremiser, which is exactly what every previous route to that bound had needed. Separately, and this is a claim about shape rather than size, any feasible digraph becomes a one-way bipartite wall after deleting at most $\sqrt{m}\,n^{3/2}$ arcs. An external AI review suggested the counting idea behind this estimate. I verified the argument and derived the sharpening stated here.
-
-  \item \emph{Multigraphs, vertex separation, counting parallel copies as distinct routes.} This is the least understood of the twelve. I settle it at $m = 2$, then disprove the natural guess: the thickened tree the data up to $m = 4$ suggest is beaten, for every $m \ge 5$, by a bouquet of thickened cliques sharing one point, by a margin growing linearly in $n$ (\Cref{thm:clique-chain-vertex}), and a matching upper bound gives the right joint order in the regime $n/m \to \infty$ (\Cref{prop:multi-vertex-upper}). Even the bouquet is not the answer: the value is exactly a \emph{block} problem, a knapsack over the best two-connected block of each size (\Cref{thm:multi-vertex-blocks}), which settles it for every $n \le 8$ and $m \le 8$ and shows the winning blocks are bipartite rather than complete (\Cref{thm:multi-vertex-bipartite}).
-
-  \item \emph{Two results from isolating what the quadratic bound uses.} The answer is very little: one cap on one family of routes, and after that nothing but counting degrees (\Cref{lem:two-step-budget}), so any variant able to supply the cap inherits the bound. Hence $k_m^{\mathrm{dir}}(n) = n^2/4 + \Theta_m(n)$ for every fixed $m \ge 3$ (\Cref{thm:dir-vertex-linear-error}), a legitimate transfer because what carries across is the family of routes counted and not the bound itself, Whitney's inequality running the wrong way for the latter. And the leading constant for one-way hyperedge networks is settled outright at $(m-1)n^2/\bigl(4(r-1)\bigr)$, under both separations at once (\Cref{thm:dir-hyper-constant}), then extended to every way of splitting a hyperedge into tails and heads (\Cref{thm:dir-hyper-general-constant}), so the orientation axis closes to first order. These two reuse the externally suggested counting idea credited above, and my contribution here is the weaker hypothesis and the two arguments that supply it. The multigraph upper bound just mentioned is not one of them, and reaches its conclusion by an unrelated route through Mader's density theorem.
-\end{itemize}
+An external AI review suggested the counting idea behind the directed stability estimate. I verified it, sharpened it, isolated the weaker route-counting hypothesis, and supplied the separate arguments that apply it to directed vertex connectivity and directed hypergraphs.
 
 \chapter*{Short Summary}
 \addcontentsline{toc}{chapter}{Short Summary}
@@ -58,9 +63,9 @@ Mader proved that, for simple graphs and $n\ge m\ge2$,
 \[
 \ell_m(n)=\left\lfloor \frac{m(n-1)}2\right\rfloor .
 \]
-This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, and hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint), and the presence or absence of directions. Sampled random graphs $G(n,p)$ run alongside throughout as a lens on the typical case rather than as a separate model.
+This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, and hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint), and the presence or absence of directions.
 
-The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the random-graph threshold $p^*=m/n$ in the growing-connectivity regime $m/\ln n\to\infty$ and $m=o(n)$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-4$, which pulls above the edge value from $n=14$ onwards. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. The centrepiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a search guided by edge sensitivity, run as both simulated annealing and tabu search, discovers extremal graphs. The program rediscovers, each in its own variant, the double star (undirected multigraphs at $m=2$), the directed hub, the one-directional bipartite digraph, and the augmented-bipartite construction (the directed cases), certifies the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ at every $n\le6$, which was as far as any proof then reached, and frames the remaining open problems on the directed frontier.
+The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-4$, which pulls above the edge value from $n=14$ onwards. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. The centrepiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a search guided by edge sensitivity, run as both simulated annealing and tabu search, discovers extremal graphs. The program rediscovers, each in its own variant, the double star (undirected multigraphs at $m=2$), the directed hub, the one-directional bipartite digraph, and the augmented-bipartite construction (the directed cases), independently checks the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ at every $n\le6$, which was as far as any proof then reached, and frames the remaining open problems on the directed frontier.
 
 The interplay then pays back in the other direction. The hypergraph vertex problem is settled completely at $m=2$. At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time. For every fixed $m\ge3$, the simple digraph problem, arc and vertex alike, is pinned at $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser, and at $m=2$ its exact value has only an $O(1)$ correction to $n^2/4$. The directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
 
@@ -97,7 +102,6 @@ $M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = 
 $B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
 $\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
 $\sigma(e)$ & edge sensitivity $\lambda^{\max}(G)-\lambda^{\max}(G-e)$ \\
-$G(n,p)$ & binomial random graph
 \end{tabular}
 
 \tableofcontents
@@ -112,11 +116,9 @@ $G(n,p)$ & binomial random graph
 \chapter{The Problem and Its Base Cases}\label{ch:basecases}
 \input{chapters/ch1_basecases}
 
-\chapter{Certifying Bounds by Machine}\label{ch:certify}
-\input{chapters/ch2_certify}
-
-\chapter{Discovering Bounds by Search}\label{ch:discover}
-\input{chapters/ch3_discover}
+\chapter{Certifying and Discovering Bounds by Machine}
+\label{ch:machine}\label{ch:certify}\label{ch:discover}
+\input{chapters/ch2_machine}
 
 \chapter{Synthesis, Results, and Open Problems}\label{ch:synthesis}
 \input{chapters/ch4_synthesis}
@@ -128,14 +130,8 @@ $G(n,p)$ & binomial random graph
 \appendix
 \crefalias{chapter}{appendix}
 
-\chapter{Full Proofs and Computational Transcripts}\label{app:proofs}
+\chapter{Full Proofs and Computational Audit}\label{app:proofs}
 \input{chapters/app_proofs}
-
-\chapter{Supplementary Figures}\label{app:gallery}
-\input{chapters/app_gallery}
-
-\chapter{Software and Reproducibility}\label{app:code}
-\input{chapters/app_code}
 
 % ============================================================================
 % BACK MATTER

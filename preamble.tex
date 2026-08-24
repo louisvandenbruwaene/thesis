@@ -696,13 +696,12 @@ wis.kuleuven.be\\
 % bodies live in the running text; the full source accompanies the document.
 \usepackage{tabularx}
 
-% --- epistemic-role palette: the MODEL -> MEASURE -> PROVE/DISCOVER -> OBSERVE
+% --- epistemic-role palette: the MODEL -> MEASURE -> PROVE/DISCOVER spine
 %     spine, given one colour each so the role is legible at a glance. ----------
 \definecolor{roleModel}{RGB}{82,189,236}      % KULblauw3a : the data model
 \definecolor{roleMeasure}{RGB}{29,141,176}    % KULblauw1  : exact measurement
 \definecolor{roleProve}{RGB}{60,160,80}       % green      : proved upper bounds
 \definecolor{roleDiscover}{RGB}{220,140,40}   % orange     : discovered lowers
-\definecolor{roleObserve}{RGB}{140,80,160}    % violet     : sampled estimates
 \definecolor{roleDriver}{RGB}{30,110,135}     % KULblauw3b : the single entry point
 
 % A small filled badge; \colorbox keeps it robust inside tcolorbox titles.
@@ -713,17 +712,15 @@ wis.kuleuven.be\\
 \expandafter\newcommand\csname rolebadge@MEASURE\endcsname{\rb{roleMeasure}{MEASURE}}
 \expandafter\newcommand\csname rolebadge@PROVE\endcsname{\rb{roleProve}{PROVE}}
 \expandafter\newcommand\csname rolebadge@DISCOVER\endcsname{\rb{roleDiscover}{DISCOVER}}
-\expandafter\newcommand\csname rolebadge@OBSERVE\endcsname{\rb{roleObserve}{OBSERVE}}
 \expandafter\newcommand\csname rolebadge@DRIVER\endcsname{\rb{roleDriver}{DRIVER}}
 
 % Map each role to its accent colour so a card can tint its own frame, title bar,
 % and left edge to match its badge. This makes the MODEL -> MEASURE -> PROVE /
-% DISCOVER -> OBSERVE spine scannable down the page at a glance.
+% DISCOVER spine scannable down the page at a glance.
 \expandafter\def\csname cardcol@MODEL\endcsname{roleModel}
 \expandafter\def\csname cardcol@MEASURE\endcsname{roleMeasure}
 \expandafter\def\csname cardcol@PROVE\endcsname{roleProve}
 \expandafter\def\csname cardcol@DISCOVER\endcsname{roleDiscover}
-\expandafter\def\csname cardcol@OBSERVE\endcsname{roleObserve}
 \expandafter\def\csname cardcol@DRIVER\endcsname{roleDriver}
 
 % ============================================================================
@@ -786,14 +783,11 @@ wis.kuleuven.be\\
   flow/.style={->, thick, KULblauw3b!70}]
   \node[rolenode, fill=roleModel!16,    draw=roleModel]    (mod) at (0,0)     {\textbf{MODEL}\\[1pt]\scriptsize $\mu$ matrix};
   \node[rolenode, fill=roleMeasure!16,  draw=roleMeasure]  (mea) at (3.3,0)   {\textbf{MEASURE}\\[1pt]\scriptsize max-flow checker};
-  \node[rolenode, fill=roleProve!18,    draw=roleProve]    (pro) at (6.9,1.05){\textbf{PROVE}\\[1pt]\scriptsize cut-counting, search};
-  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (6.9,-1.05){\textbf{DISCOVER}\\[1pt]\scriptsize annealing, tabu};
-  \node[rolenode, fill=roleObserve!18,  draw=roleObserve]  (obs) at (10.5,0)  {\textbf{OBSERVE}\\[1pt]\scriptsize sampling};
+  \node[rolenode, fill=roleProve!18,    draw=roleProve]    (pro) at (7.0,0.85){\textbf{PROVE}\\[1pt]\scriptsize cut-counting, search};
+  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (7.0,-0.85){\textbf{DISCOVER}\\[1pt]\scriptsize annealing, tabu};
   \draw[flow] (mod) -- (mea);
   \draw[flow] (mea) -- (pro);
   \draw[flow] (mea) -- (dis);
-  \draw[flow] (pro) -- (obs);
-  \draw[flow] (dis) -- (obs);
 \end{tikzpicture}}
 
 % --- the variant tree: root -> model (3) -> direction (2) -> separation (2) --

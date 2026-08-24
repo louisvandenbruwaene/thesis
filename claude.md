@@ -3373,3 +3373,240 @@ not part of the submitted artefact. Plan item C2: the automorphism `assert count
 in `_aut_count_matrix` is now an explicit `RuntimeError` (callers divide by that count
 and `python -O` strips asserts). `mistakes found 24082026.md` left as it is, being a
 closure record rather than a task list.
+
+## 2026-08-24 (Codex) -- second shortening pass and compact m=6 restoration
+
+Continued the reversible shortening workflow above. **155 pp -> 149 pp**. The whole
+remaining random-graph side thread moved out: its Chapter 1 examples and sampling
+figure, appearance-threshold theorem, appendix proof, front-matter and software-inventory
+references, and the OBSERVE/sampling endpoint in the program-spine diagram. The redundant 3D twelve-variant
+surface and the one-figure Supplementary Figures appendix also moved out. The live
+thesis now moves directly through the twelve structural variants and their proof/search
+pipeline.
+
+RESTORED: `variant_bounds_m6.png`, formerly offcut A6, now sits beside the m=3
+twelve-variant grid in one compact two-panel figure in Chapter 3. A6 remains in
+`offcuts.tex`, explicitly marked restored, to preserve its former standalone full-width
+layout and caption. The two-panel figure and the shortened program-spine figure were
+rendered and inspected at physical PDF pages 63 and 31 respectively.
+
+REVERSIBILITY: every removed passage, theorem, proof, caption, diagram definition, and
+whole-appendix input is in new Group D of `offcuts.tex`, with source and restore anchors.
+No image assets or bibliography records were deleted. The manifest now distinguishes
+A6 as restored and lists D1--D4; `program/README.md` marks the newly offcut-only images.
+
+VERIFY: `latexmk -pdf main.tex` -> 149 pp; `latexmk -pdf offcuts.tex` -> 49 pp.
+Both logs have zero undefined references/citations, multiply-defined labels, overfull
+boxes, or missing PDF destinations. The removed-label audit found every removed label
+either preserved in `offcuts.tex` or still live in the paired-grid figure.
+`git diff --check` is clean. Program source was not changed, so the Python suite was not
+rerun.
+
+## 2026-08-24 (Codex) -- third shortening pass, figures retained and compacted
+
+Continued the same reversible workflow. **149 pp -> 131 pp.** No figure was removed
+in this pass. Chapter 2's three capacity-one checker reductions now share one row, its
+two full hypergraph examples remain at 82% text width, Chapter 4's directed crossover
+and backward-arc obstruction now share one row, and Chapter 3's paired $m=3/m=6$
+twelve-variant grids remain together on one page.
+
+WHAT WAS SHORTENED: Chapter 3's prove--certify--conjecture commentary; Chapter 4's
+directed-frontier interpretation, orientation-model discussion, and seven essay-form
+open problems; the Contribution Statement's five long result paragraphs; repeated
+checker exposition and captions; and the Software and Reproducibility appendix. The
+live versions retain the theorems, formulas, definitions, exact tables, caveats,
+commands, evidence standards, contribution scope, and AI-credit disclosure.
+
+REVERSIBILITY: Group E of `offcuts.tex` contains exact former snapshots for all five
+edits, including the old separate/full-size figure layouts, with provenance and restore
+anchors. Labels inside the snapshots are neutralised or namespaced so the archive can
+build beside the live thesis.
+
+VERIFY: `latexmk -pdf main.tex` -> 131 pp and `latexmk -pdf offcuts.tex` -> 79 pp.
+Both logs have zero undefined references/citations, multiply-defined labels, overfull
+boxes, or missing PDF destinations; `git diff --check` is clean. The compact figure
+pages were rendered and inspected at physical pages 37, 58, and 60. Program source was
+not changed, so the Python suite was not rerun.
+
+## 2026-08-24 (Codex) -- merge of the two machine-method chapters
+
+Merged the former Chapters 2 (certification) and 3 (search) into one chapter,
+**Certifying and Discovering Bounds by Machine**, and consolidated their source as
+`chapters/ch2_machine.tex`. `main.tex` now has three body chapters. The former
+`ch:certify` and `ch:discover` labels remain aliases on the combined chapter so the
+proof appendix and historical offcuts continue to resolve; new live cross-references
+use `ch:machine`, `sec:search-wall`, and `sec:rediscovery` where the distinction matters.
+
+The merged opening states the model--measure--prove/discover pipeline once. The old
+chapter-to-chapter hand-off is now Section 2.10, ``From certification to discovery: the
+enumeration wall.'' Repeated framing around the separate openings and transition was
+shortened, without removing a figure, theorem, algorithm, table, code card, or evidential
+caveat. The program README's chapter map and figure locations were updated.
+
+REVERSIBILITY: Group F of `offcuts.tex` preserves the former `main.tex` declarations,
+the two source filenames and boundary, the old README map, both chapter openings, the
+pipeline caption and driver-card sentence, the old transition, and every shortened
+enumeration-wall phrase. The substantive contents of both old source files remain live,
+in order, inside `chapters/ch2_machine.tex`.
+
+VERIFY: `main.pdf` remains 131 physical pages because the saved chapter break is
+absorbed by recto and appendix pagination. The contents page, combined chapter opening,
+and Section 2.10 transition were rendered and inspected at physical pages 8, 31, and
+47. `latexmk -pdf main.tex` and `latexmk -pdf offcuts.tex` complete successfully;
+the resulting PDFs are 131 and 85 pages. Both logs have zero undefined references or
+citations, multiply-defined labels, overfull boxes, or missing PDF destinations, and
+`git diff --check` is clean. Program source was not changed, so the Python suite was
+not rerun.
+
+## 2026-08-24 (Codex) -- conservative post-merge compression
+
+Compressed the merged machine-method chapter and the classical opening of the proof
+appendix without removing a figure, theorem, algorithm, proof, construction, code card,
+or substantive original result. The historical MILP section still contains the scaling
+argument, complete optimisation, both diagrams, and finite theorem, but its generic MILP
+tutorial, crossing-case table, big-M walkthrough, and repeated run history moved out.
+The former solver-claims, reproducibility, certification-standard, trichotomy, and honesty
+blocks are consolidated into one `Results and evidential status` section beside the final
+grid. Long captions in Chapters 1 and 2 now identify rather than reteach their figures.
+
+Appendix A retains the statements of Menger and Gomory--Hu, the full compact Mader
+argument, all three counting lemmas, both Mader figures, and every original proof. Its
+textbook flow/uncrossing explanation and long reading guide were compressed, and the
+Gomory--Hu diagram was scaled to 86 percent. The substantive alternative-convention
+section A.9 was deliberately left untouched.
+
+REVERSIBILITY: Group G of `offcuts.tex` preserves the displaced MILP tutorial and solver
+history, the four-case crossing table, the repeated evidence/reproducibility sections,
+the full former appendix reading guide and classical exposition, and every long-form
+caption replaced in this pass, with restore anchors. Groups A--F remain unchanged.
+
+VERIFY: `latexmk -pdf main.tex` -> 123 pp and `latexmk -g -pdf offcuts.tex` ->
+96 pp. This pass saves eight physical thesis pages from the 131-page merged baseline.
+Both logs have zero undefined references/citations, multiply-defined labels, overfull
+boxes, or missing PDF destinations; `git diff --check` is clean. The MILP opening and
+model were inspected at physical pages 39--40, the consolidated status/grid page at 50,
+and the revised appendix opening at 60. Program source was not changed, so the Python
+suite was not rerun.
+
+## 2026-08-24 (Codex) -- removal of one-case and redundant displays
+
+Removed the requested one-case cooling trace, complete labelled-graph landscape,
+introductory variant tree and 2-tree illustration, Mader construction picture, SPQR
+leaf schematic, appendix hyperedge-convention figure, machinery cross-reference table,
+finite orientation table, two multigraph-vertex tables, and directed base-case run table.
+The load-bearing SPQR argument remains as one compact paragraph without the tutorial or
+picture. The directed-hyperedge drawing convention now appears beside the first family
+of variant diagrams in Chapter 1. The Mader lower construction is stated once: the
+general hub-and-spokes construction specialises to the clique construction when the
+divisibility condition holds.
+
+Table 3.1 was rebuilt as a concise three-column `tabularx` at normal body size; it is no
+longer shrunk with `resizebox`. Generic machine listings were retained because they serve
+several variant families rather than documenting a single run. All displaced source is
+preserved as restore-ready entries H1--H12 in `offcuts.tex`, with local labels and restore
+anchors; no figure assets or program source were deleted.
+
+VERIFY: `latexmk -pdf main.tex` -> 115 pp and `latexmk -pdf offcuts.tex` ->
+108 pp. This pass saves eight physical thesis pages from the 123-page prior version.
+Both logs have zero undefined references/citations, multiply-defined labels, overfull
+boxes, or missing PDF destinations. Program source was not changed, so the Python suite
+was not rerun.
+
+## 2026-08-24 (Codex) -- removal of implementation displays and repeated results
+
+Removed all three raw code listings from Chapter 2, together with the conventional
+simulated-annealing pseudocode. Their mathematical content remains in prose: the matrix
+symmetry invariant, capacity-one hyperedge gate, monotone capped-flow cases, energy,
+Metropolis acceptance rule, cooling, and sensitivity bias. Removed the directed
+whole-hypergraph duplicate (the undirected example and compact directional gate remain),
+the plain-enumeration results table, and the rediscovery results table. Both table results
+are still stated as independent agreement with values proved elsewhere.
+
+Figure 2.9's sensitivity plot was reduced from 78 to 60 percent of text width. Table 3.1
+keeps normal body type but now uses six model rows with edge/arc and vertex results side by
+side, instead of twelve separate rows; it shares a page with the surrounding text rather
+than occupying a page alone. All displaced source is preserved as restore-ready entries
+I1--I8 in `offcuts.tex`; the full directed-example TikZ source was already present in E3.
+
+VERIFY: `latexmk -pdf main.tex` -> 113 pp and `latexmk -pdf offcuts.tex` ->
+114 pp. Both logs have zero undefined references/citations, multiply-defined labels,
+overfull boxes, or missing PDF destinations; `git diff --check` is clean. The compact
+Table 3.1 and reduced sensitivity figure were rendered and inspected at physical pages
+52 and 42. Program source was not changed, so the Python suite was not rerun.
+
+## 2026-08-24 (Codex) -- structural reduction to 100 pages
+
+Reduced the thesis from 113 to exactly 100 physical pages by moving complete units,
+not merely their captions. The seven-page appendix on the alternative convention where
+parallel copies count as distinct vertex-disjoint routes moved out in full; it is a
+separate extremal problem and is not one of the twelve variants under the convention
+fixed in Chapter 2. Its contribution-statement row, symbol, open-problem row, boundary
+discussion, and dependent cross-references moved with it.
+
+The separate Software and Reproducibility appendix and repeated computational-transcript
+section are consolidated into one short `Computational audit` section at the end of
+Appendix A, retaining the repository, commands, evidence hierarchy, finite ranges, and
+log paths. Chapter 2's representation figure and operations table moved out because
+Chapter 1 already defines the same model axes; one paragraph now states the shared data
+representation. The entire SA--tabu benchmark subsection and timing table also moved out,
+leaving only the method choice and evidential status.
+
+REVERSIBILITY: Group J of `offcuts.tex` contains the exact former alternative-convention
+section, transcript section, software appendix, scope references, representation displays,
+and SA--tabu subsection. Earlier Groups A--I remain intact. No figure asset or program
+source was deleted.
+
+VERIFY: `latexmk -pdf main.tex` -> 100 pp and `latexmk -pdf offcuts.tex` ->
+128 pp. Both logs have zero undefined references/citations, multiply-defined labels,
+overfull boxes, or missing PDF destinations; `git diff --check` is clean. The contents,
+compressed Chapter 2 opening, and computational-audit ending were text-inspected at
+physical pages 8--10, 28--30, and 95--97. Program source was not changed, so the Python
+suite was not rerun.
+
+## 2026-08-24 (Claude) -- repair of the shortening pass, and two restorations
+
+An audit of the 100-page version found that the LaTeX layer was clean (zero
+undefined references, zero multiply-defined labels, zero overfull boxes) while
+five prose references pointed at material the cuts had removed. Label aliasing
+hid the drift: `sec:transcripts` survived as a live label on the shortened
+audit section, so every pointer still resolved.
+
+Repaired, by making the promise true rather than by deleting it. The compact
+directed base-case table (offcut H12) is live again as `tab:basecase-search` in
+the computational audit, and the four passages that promised a transcript now
+point at it: Chapter 2's pruned-search section, the Appendix A.3 lead-in, its
+base-case paragraph, and the vertex counterpart in A.4. Its six rows were
+re-checked against `figures/basecase_search_log.txt` and
+`figures/basecase_search_vertex_log.txt`, including the node counts and the
+718 s against 3125 s wall times. The rediscovery table (offcut I7) is live
+again as `tab:rediscovery`, immediately before the sentence "What the table
+hides", which had been left with no table to hide anything.
+
+Two restorations, both judgement calls. First, the alternative multigraph-vertex
+convention (offcut J1) is back as Appendix A.9, without its two cell-by-cell
+data tables: it is an original result of this thesis, the strongest statement
+about it (a block-knapsack reduction with matching order) has no other home, and
+the section already argued its own scope. Its contribution row, the
+`K_m^multi` symbol, the open-problem row, and the boundary sentence in the
+parallel-copy remark came back with it (offcut J4). Its claims were re-checked
+against `figures/multi_vertex_blocks_log.txt`, which gives 19 at m=5,n=5 and 29
+at m=5,n=7 as the text states. Second, the two hypergraph vertex theorems, the
+first row of the Contribution Statement, were stated only in the appendix and in
+two table cells. They are now stated in Chapter 1 at the end of the hypergraph
+section, following the pattern already used for Mader and for the directed m=2
+values, and Appendix A.7 proves them as `Proof of \Cref{...}`.
+
+Also: the Short Summary said the program "certifies" the directed multigraph
+values at n<=6, one notch stronger than the body's own standard, and now says
+"independently checks". `chapters/app_code.tex` and `chapters/app_gallery.tex`
+were no longer `\input` anywhere and are removed, their content being preserved
+in `offcuts.tex` (E5, J3, A1, A2, D4) and in history. The README's chapter list
+was stale.
+
+VERIFY: `latexmk -pdf main.tex` -> 108 pp and `latexmk -pdf offcuts.tex` ->
+120 pp, both with zero undefined references, zero multiply-defined labels, zero
+overfull boxes. The restorations cost eight pages against the 100-page version.
+Every `\ref` target resolves, no sentence is duplicated across the document, and
+the rendered text carries no deictic reference ("the table", "reproduced below")
+without its referent. Program source was not changed, so the Python suite was
+not rerun.

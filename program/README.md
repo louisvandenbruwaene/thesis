@@ -98,23 +98,24 @@ The search proposes. The certifier and the hand proofs dispose.
 
 ## Which output feeds which figure
 
-The thesis is four chapters: (1) The Problem and Its Base Cases, (2) Certifying
-Bounds by Machine, (3) Discovering Bounds by Search, (4) Synthesis, Results, and
-Open Problems. `make_figures.py` writes every figure below.
+The thesis is three chapters: (1) The Problem and Its Base Cases, (2) Certifying
+and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems.
+`make_figures.py` writes every figure below.
 
 | Figure | Thesis chapter |
 |--------|----------------|
 | `figures/edge_vertex_divergence.png` | the m=5 divergence (Ch.1) |
-| `figures/edge_vertex_sampling.png` | edge vs vertex disjointness in G(n,p) (Ch.1) |
-| `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.3) |
-| `figures/temperature_trace.png` | a cooling run (Ch.3) |
-| `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.3) |
-| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.3) |
-| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all twelve variants (Ch.3) |
-| `figures/variant_bounds_m6.png` | the same grid at m = 6 (offcut only) |
-| `figures/directed_crossover.png` | hub/bipartite crossover (Ch.4) |
-| `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.4) |
-| `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (Ch.4) |
+| `figures/edge_vertex_sampling.png` | edge vs vertex disjointness in G(n,p) (offcut only) |
+| `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.2) |
+| `figures/temperature_trace.png` | a cooling run (Ch.2) |
+| `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.2) |
+| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2) |
+| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all twelve variants (Ch.2, paired with m = 6) |
+| `figures/variant_bounds_m6.png` | the same grid at m = 6 (Ch.2, paired with m = 3) |
+| `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
+| `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |
+| `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (offcut only) |
+| `figures/extremal_graphs_gallery.png` | the named extremal families (offcut only) |
 | `figures/pair_conn_dist.png` | pooled per-pair connectivity distributions (offcut only) |
 | `figures/edges_dist.png` | edge-count distributions (offcut only) |
 | `figures/conn_dist_m6.png` | per-graph connectivity distributions at m = 6 (offcut only) |

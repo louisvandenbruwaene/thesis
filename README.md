@@ -15,8 +15,10 @@ The built paper is **[`main.pdf`](main.pdf)**.
 ## What's here
 
 ```
-chapters/             the thesis text (ch1 base cases, ch2 certify, ch3 discover,
-                      ch4 synthesis, app_proofs appendix)
+chapters/             the thesis text (ch1_basecases, ch2_machine, ch4_synthesis,
+                      app_proofs appendix)
+offcuts.tex           every passage cut during the shortening pass, restore-ready
+                      (not part of the thesis, never input by main.tex)
 main.tex, preamble.tex, ref.bib, kulakreport.cls, *.pdf/*.png   LaTeX sources + logos
 figures/              all figures: matplotlib PNGs + their data caches
 program/
@@ -79,7 +81,7 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
 - **The hypergraph vertex problem at `m ≥ 4`.** This needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
 - **The exact constant in `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
-  convention that parallel copies are distinct routes. In the large-`n` block-packing regime, `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
+  convention that parallel copies are distinct routes (thesis Appendix A.9). In the large-`n` block-packing regime, `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
   theorem on both sides, and the value is exactly a block problem: a knapsack over the
   best 2-connected block of each size, which settles it outright for every `n ≤ 8`,
   `m ≤ 8` (at `m = 5`, `n = 7` the value is 29, not the bouquet's 27). The winning

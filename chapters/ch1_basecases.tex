@@ -21,7 +21,7 @@ To state the question precisely we need only a few ideas. A \emph{graph} $G$ is 
     \node[mv] at (\ang:1.4) {$\i$};
   }
 \end{tikzpicture}
-\caption{A simple graph on five vertices. It is $K_5$, the \emph{complete} graph in which every one of the $\binom{5}{2}=10$ pairs is joined by an edge (the binomial coefficient $\binom{5}{2}$ counts the ways to choose two of the five vertices), with the two edges $\{0,4\}$ and $\{1,3\}$ removed, so its edge set $E(G)$ holds eight edges. The five dots are the vertex set $V(G)$ and the lines are the edges. Because at most one line joins any given pair and no edge loops back to its own endpoint, this is a simple graph. The same graph returns in \Cref{fig:menger}, once we can count the independent routes between a pair.}
+\caption{The eight-edge simple graph $K_5-\{04,13\}$. It returns in \Cref{fig:menger} to illustrate independent routes.}
 \label{fig:k5-example}
 \end{figure}
 
@@ -63,7 +63,7 @@ the largest local edge-connectivity anywhere in $G$. A theorem of Menger \cite{M
     \node[mv] at (\ang:1.5) {$\i$};
   }
 \end{tikzpicture}
-\caption{Menger's theorem on the graph of \Cref{fig:k5-example}. The pair $1,3$ carries no edge of its own, yet three routes still join them with no shared edge, $1$-$0$-$3$ (orange), $1$-$2$-$3$ (green), and $1$-$4$-$3$ (purple), each through a different middle vertex, so $\lec(1,3)=3$. The three edges meeting vertex $1$ (inside the red dashed ring) are a smallest set whose removal cuts every $1$-$3$ route, and no set of just two edges can cut them all, because the three routes share no edge, so each removed edge breaks at most one route and two removals leave one route intact. The cheapest cut therefore also has size three. The most independent routes a pair can muster always equals the cheapest cut between them, the fact every bound in this thesis leans on.}
+\caption{Menger's theorem on \Cref{fig:k5-example}: three edge-disjoint $1$--$3$ routes (coloured) meet the three-edge cut around vertex $1$, so $\lec(1,3)=3$.}
 \label{fig:menger}
 \end{figure}
 
@@ -174,7 +174,7 @@ The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two indepe
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The first axis of variation, the \emph{model}, shown for the four object classes this thesis uses. In a \emph{simple graph} each pair of vertices is joined by at most one edge. A \emph{multigraph} permits parallel edges, here a triple and a double, so the multiplicity $\mu(u,v)$ counts how many copies join a pair. A \emph{hypergraph} replaces pairwise edges by hyperedges, each a set of $r \ge 2$ vertices ($r = 2$ gives back ordinary edges, and the depicted examples use $r =3$), drawn the way a metro map draws a line, threading all of its stations, one colour per hyperedge. Where two hyperedges share a stretch between stations the two lines run side by side, one colour each, exactly as a metro map separates lines along a shared stretch of track. A \emph{multi-hypergraph} lets a hyperedge be repeated, drawn as two parallel lines through the same stations, the hypergraph counterpart of parallel edges. When all hyperedges have the same size $r$ the hypergraph is $r$-uniform. The same connectivity question, how many independent routes a pair can be forced to share, is asked of all four.}
+\caption{The model axis: a simple graph, a multigraph with parallel edges, a $3$-uniform hypergraph drawn as metro lines, and a multi-hypergraph with a repeated hyperedge.}
 \label{fig:three-models}
 \end{figure}
 
@@ -270,9 +270,15 @@ A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The four models of \Cref{fig:three-models} redrawn \emph{directed}, the second axis applied to the first. Every edge becomes an arc, and a pair may now carry arcs both ways, the round trip an undirected edge cannot offer. The \emph{simple digraph} still allows at most one arc per ordered pair, so the two-cycle on the top pair is simple. The \emph{directed multigraph} adds parallel arcs, here a triple one way and a bidirected pair. The \emph{directed hypergraph} draws the same three hyperedges as \Cref{fig:three-models}, in the same colours, each now a metro-styled star, the tail sending one thick coloured arc to each of its heads, the star convention of \Cref{fig:dir-hyper-convention}. Taking each star's tail to be the middle station of the undirected line keeps every arc on the same edge as before. The blue and green hyperedges still share the bottom edge, now one arc running each way, the directed counterpart of two metro lines sharing a stretch of track. The \emph{directed multi-hypergraph} repeats the red hyperedge, so each of its arcs becomes a parallel pair. This last panel is the directed multi-hypergraph at the top of the model lattice, the most general object in the thesis.}
+\caption{The four models of \Cref{fig:three-models} with direction added. A directed hyperedge is a star from one tail to its heads; repetition creates parallel copies of those arcs.}
 \label{fig:three-models-directed}
 \end{figure}
+
+A directed $r$-edge has one tail and $r-1$ heads. In the figures, one colour
+denotes one hyperedge, drawn either as a star or as a line oriented away from
+its tail; it is a single edge on several vertices, not a path of ordinary
+edges. A directed Berge route enters that edge at its tail and leaves at one
+of its heads.
 
 \begin{figure}[ht]
 \centering
@@ -359,16 +365,7 @@ A digraph carries three degree counts at each vertex. The \emph{out-degree} $d^+
 
 \end{tikzpicture}
 
-\caption{A directed multigraph on the same five vertices as
-\Cref{fig:k5-example}, drawn in the same pentagon. It is not that graph with
-arrows added: the pair \(\{0,4\}\) is joined here and the pair \(\{0,2\}\)
-carries two parallel arcs, so this is a directed multigraph rather than a simple
-graph. Three arc-disjoint directed routes connect \(u\) to \(v\) (orange, green, purple).
-The three red marks cut the arcs leaving \(u\), the first arc of each route, so
-\(\lambda(u,v)=3\) by Menger's theorem. A directed cut counts only the arcs
-leaving \(u\)'s side, so the lone arc entering \(u\) from the top is not part of
-it. The out-degree \(d^{+}(u)=3\) and in-degree \(d^{-}(v)=4\) bound the value
-from above, and \(\lambda(u,v)=\min(3,4)=3\) meets the smaller one, at \(u\).}
+\caption{Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directed cut (red). Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
 \label{fig:directed-lambda}
 \end{figure}
 
@@ -391,58 +388,13 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
   \draw[pA] (s)--(a)--(w)--(b)--(t);
   \draw[pB] (s)--(c)--(w)--(d)--(t);
 \end{tikzpicture}
-\caption{The third axis, the \emph{separation}. The two $s$--$t$ routes drawn here, one orange and one green, share no edge, so they count as two edge-disjoint paths and $\lec(s,t)=2$. Both pass through the single vertex $w$ (purple), however, so they are \emph{not} internally vertex-disjoint, and since every $s$--$t$ route must cross $w$ we have $\kap(s,t)=1$. This is Whitney's inequality $\kap \le \lec$ made concrete: the gap between the two separations is exactly what the vertex-disjoint problem measures, and the rest of the chapter shows it stays shut until $m = 5$.}
+\caption{The separation axis: two edge-disjoint $s$--$t$ routes both pass through $w$, so $\lec(s,t)=2$ but $\kap(s,t)=1$.}
 \label{fig:edge-vs-vertex}
 \end{figure}
 
-Three models, two directions, two separations: twelve versions of one question. The thesis is the attempt to answer as many of them as honest mathematics allows, and to build a machine for the rest. Some answers are short and we prove them here. Some answers are long, and their length is the reason \Cref{ch:certify} exists. The rest of this chapter collects the variants whose proofs are short enough to belong in the body, so that the reader meets the easy slope before the climb. \Cref{fig:variant-tree} draws the whole space as one tree, so that the reader has a single map to return to as the chapters visit its branches one at a time.
-
-\begin{figure}[ht]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}
-  \node[vtroot, fill=KULblauw3a!18]  (root) at (6.6,3.9) {Problem 915};
-  \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6) {simple};
-  \node[vtmodel, fill=KULblauw3a!12] (multi)  at (6.6,2.6) {multi};
-  \node[vtmodel, fill=KULblauw3a!12] (hyper)  at (11.4,2.6) {hyper};
-  \draw[vtedge] (root) -- (simple);
-  \draw[vtedge] (root) -- (multi);
-  \draw[vtedge] (root) -- (hyper);
-  \node[vtdir, fill=KULblauw1!10] (d0) at (0.6,1.3)  {undirected};
-  \node[vtdir, fill=KULblauw1!10] (d1) at (3.0,1.3)  {directed};
-  \node[vtdir, fill=KULblauw1!10] (d2) at (5.4,1.3)  {undirected};
-  \node[vtdir, fill=KULblauw1!10] (d3) at (7.8,1.3)  {directed};
-  \node[vtdir, fill=KULblauw1!10] (d4) at (10.2,1.3) {undirected};
-  \node[vtdir, fill=KULblauw1!10] (d5) at (12.6,1.3) {directed};
-  \draw[vtedge] (simple) -- (d0);
-  \draw[vtedge] (simple) -- (d1);
-  \draw[vtedge] (multi)  -- (d2);
-  \draw[vtedge] (multi)  -- (d3);
-  \draw[vtedge] (hyper)  -- (d4);
-  \draw[vtedge] (hyper)  -- (d5);
-  \node[vtleaf, fill=white] (l0)  at (0,0)    {edge};
-  \node[vtleaf, fill=white] (l1)  at (1.2,0)  {vertex};
-  \node[vtleaf, fill=white] (l2)  at (2.4,0)  {edge};
-  \node[vtleaf, fill=white] (l3)  at (3.6,0)  {vertex};
-  \node[vtleaf, fill=white] (l4)  at (4.8,0)  {edge};
-  \node[vtleaf, fill=white] (l5)  at (6.0,0)  {vertex};
-  \node[vtleaf, fill=white] (l6)  at (7.2,0)  {edge};
-  \node[vtleaf, fill=white] (l7)  at (8.4,0)  {vertex};
-  \node[vtleaf, fill=white] (l8)  at (9.6,0)  {edge};
-  \node[vtleaf, fill=white] (l9)  at (10.8,0) {vertex};
-  \node[vtleaf, fill=white] (l10) at (12.0,0) {edge};
-  \node[vtleaf, fill=white] (l11) at (13.2,0) {vertex};
-  \draw[vtedge] (d0) -- (l0);  \draw[vtedge] (d0) -- (l1);
-  \draw[vtedge] (d1) -- (l2);  \draw[vtedge] (d1) -- (l3);
-  \draw[vtedge] (d2) -- (l4);  \draw[vtedge] (d2) -- (l5);
-  \draw[vtedge] (d3) -- (l6);  \draw[vtedge] (d3) -- (l7);
-  \draw[vtedge] (d4) -- (l8);  \draw[vtedge] (d4) -- (l9);
-  \draw[vtedge] (d5) -- (l10); \draw[vtedge] (d5) -- (l11);
-\end{tikzpicture}%
-}
-\caption{The whole space this thesis studies, drawn as one tree. Three model choices (simple graph, multigraph, $r$-uniform hypergraph), each splitting into undirected or directed, each in turn splitting into edge-disjoint or internally vertex-disjoint routes: twelve leaves, twelve variants. \Cref{fig:variant-tree-status} redraws this exact tree once every leaf's status is known.}
-\label{fig:variant-tree}
-\end{figure}
+Three models, two directions, two separations give twelve versions of one
+question. This chapter proves the short cases before the machine treats the
+family uniformly; the final status map appears in \Cref{fig:variant-tree-status}.
 
 \section{Cases with short proofs}
 Allowing parallel edges removes the parity subtlety, the dependence on whether $m(n-1)$ is even or odd, that produces the floor in Mader's theorem, and the answer becomes exactly linear. Write $L_m(n)$ for the multigraph analogue of $\ell_m(n)$.
@@ -509,55 +461,7 @@ One trap is worth naming, because an earlier draft of this thesis fell into it. 
 The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there covers every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies those two values separately, which is where the $k_5(7) = 15$ and $k_5(12) = 27$ of \Cref{thm:sorensen-thomassen} come from.
 \end{remark}
 
-At $m = 5$ the vertex problem genuinely diverges from the edge problem, visible in \Cref{fig:divergence} as the shaded gap that opens between the dashed blue and solid orange curves. Leonard had already found the first crack, an explicit $57$-vertex, $141$-edge counterexample to the general conjecture at $m = 5$ \cite{Leonard73BE}, before S{\o}rensen and Thomassen pinned the exact value down. The reason the crack opens at all is structural. Leonard's earlier method, the one that closes $m \le 4$, leans on the extremal graphs being assembled from cliques, vertex sets joined in all pairs, glued along shared cliques. A \emph{$k$-tree} is built up one vertex at a time: start from a complete graph on $k+1$ vertices, then again and again add a single new vertex and join it to all $k$ vertices of some clique of size $k$ that is already there. \Cref{fig:k-tree} grows a $2$-tree, hanging each new vertex on an edge already present. These clique scaffolds are exactly the building blocks the method uses. Through $m = 4$ those scaffolds are forced, and counting their edges gives the bound.
-
-\begin{figure}[ht]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[
-    mv/.style={gvertex},
-    newv/.style={gvnew},
-    base/.style={gline},
-    add/.style={gline, vertexorange, line width=1.6pt},
-    addstep/.style={-{Stealth[length=3mm]}, line width=1pt, black!55}]
-
-  % --- Step 1: the starting triangle K_3 on {1,2,3} ---
-  \begin{scope}[shift={(0,0)}]
-    \node[mv] (a1) at (0,1.25)    {$1$};
-    \node[mv] (a2) at (-1.05,0)   {$2$};
-    \node[mv] (a3) at (1.05,0)    {$3$};
-    \draw[base] (a1)--(a2) (a2)--(a3) (a3)--(a1);
-    \node[font=\small\bfseries, KULblauw1!85!black] at (0,-1.55) {start: $K_3$};
-  \end{scope}
-  \draw[addstep] (1.7,0.0) -- (2.6,0.0);
-
-  % --- Step 2: hang vertex 4 on the edge {2,3} ---
-  \begin{scope}[shift={(4.3,0)}]
-    \node[mv]   (b1) at (0,1.25)    {$1$};
-    \node[mv]   (b2) at (-1.05,0)   {$2$};
-    \node[mv]   (b3) at (1.05,0)    {$3$};
-    \node[newv] (b4) at (0,-1.15)   {$4$};
-    \draw[base] (b1)--(b2) (b2)--(b3) (b3)--(b1);
-    \draw[add]  (b4)--(b2) (b4)--(b3);
-    \node[font=\small\bfseries, vertexorange!82!black] at (0,-1.95) {$+\,4$ on edge $\{2,3\}$};
-  \end{scope}
-  \draw[addstep] (6.0,0.0) -- (6.9,0.0);
-
-  % --- Step 3: hang vertex 5 on the edge {3,4} ---
-  \begin{scope}[shift={(8.6,0)}]
-    \node[mv]   (c1) at (0,1.25)    {$1$};
-    \node[mv]   (c2) at (-1.05,0)   {$2$};
-    \node[mv]   (c3) at (1.05,0)    {$3$};
-    \node[mv]   (c4) at (0,-1.15)   {$4$};
-    \node[newv] (c5) at (1.95,-1.15){$5$};
-    \draw[base] (c1)--(c2) (c2)--(c3) (c3)--(c1) (c4)--(c2) (c4)--(c3);
-    \draw[add]  (c5)--(c3) (c5)--(c4);
-    \node[font=\small\bfseries, vertexorange!82!black] at (0.9,-1.95) {$+\,5$ on edge $\{3,4\}$};
-  \end{scope}
-\end{tikzpicture}}
-\caption{A $2$-tree grown one vertex at a time, read left to right. The blue triangle on $\{1,2,3\}$ is the starting $K_3$. Vertex $4$ is then joined to the two ends of the edge $\{2,3\}$, and vertex $5$ to the two ends of the edge $\{3,4\}$ (the new vertex and its two orange edges at each step), each new vertex hung on an edge already present. A general $k$-tree follows the same recipe with $K_{k+1}$ in place of the triangle and a $k$-clique in place of the edge. These are the clique scaffolds Leonard's count rests on.}
-\label{fig:k-tree}
-\end{figure} At $m = 5$ they are no longer the unique extremal shape. Additional configurations appear, and the clean count breaks. S{\o}rensen and Thomassen recover the exact value by a delicate structural induction, which we cite rather than reproduce. For $m \ge 6$ the exact value is unknown, and the vertex-disjoint problem has stood open since 1974. What is known there is a negative and a bound. Bollob\'{a}s and Erd\H{o}s had conjectured that the best graph is formed from as many copies of $K_m$ sharing one vertex as fit, namely $\floor{(n-1)/(m-1)}$ full copies plus a bounded remainder, which would give $k_m(n) = mn/2 + O(1)$. Mader disproved that for every $m \ge 6$, showing that the gap $k_m(n) - mn/2$ grows without bound \cite{Mader73}. S{\o}rensen and Thomassen then supplied a replacement lower bound, $k_m(n) > \frac{m(m-1)-2}{2m-3}(n-m)$ for infinitely many $n$ \cite{SorensenThomassen74}, whose rate exceeds $m/2$ by the factor $1 + (m-4)/(2m^2-3m)$, which is $1 + (1+o(1))/(2m)$ for large $m$ and only about $1.04$ at $m = 6$. So the shape of the answer is known to be linear in $n$ with a rate strictly above $m/2$, and it is the rate that is open. It is the one direction this thesis does not attempt to force, and \Cref{ch:synthesis} explains why.
+At $m = 5$ the vertex problem genuinely diverges from the edge problem, visible in \Cref{fig:divergence} as the shaded gap that opens between the dashed blue and solid orange curves. Leonard had already found the first crack, an explicit $57$-vertex, $141$-edge counterexample to the general conjecture at $m = 5$ \cite{Leonard73BE}, before S{\o}rensen and Thomassen pinned the exact value down. The reason the crack opens at all is structural. Leonard's earlier method, the one that closes $m \le 4$, leans on extremal graphs assembled from cliques. A \emph{$k$-tree} starts from $K_{k+1}$ and repeatedly joins one new vertex to every vertex of an existing $k$-clique. Through $m = 4$ these clique scaffolds are forced, and counting their edges gives the bound. At $m = 5$ they are no longer the unique extremal shape. Additional configurations appear, and the clean count breaks. S{\o}rensen and Thomassen recover the exact value by a delicate structural induction, which we cite rather than reproduce. For $m \ge 6$ the exact value is unknown, and the vertex-disjoint problem has stood open since 1974. What is known there is a negative and a bound. Bollob\'{a}s and Erd\H{o}s had conjectured that the best graph is formed from as many copies of $K_m$ sharing one vertex as fit, namely $\floor{(n-1)/(m-1)}$ full copies plus a bounded remainder, which would give $k_m(n) = mn/2 + O(1)$. Mader disproved that for every $m \ge 6$, showing that the gap $k_m(n) - mn/2$ grows without bound \cite{Mader73}. S{\o}rensen and Thomassen then supplied a replacement lower bound, $k_m(n) > \frac{m(m-1)-2}{2m-3}(n-m)$ for infinitely many $n$ \cite{SorensenThomassen74}, whose rate exceeds $m/2$ by the factor $1 + (m-4)/(2m^2-3m)$, which is $1 + (1+o(1))/(2m)$ for large $m$ and only about $1.04$ at $m = 6$. So the shape of the answer is known to be linear in $n$ with a rate strictly above $m/2$, and it is the rate that is open. It is the one direction this thesis does not attempt to force, and \Cref{ch:synthesis} explains why.
 
 \begin{figure}[ht]
     \centering
@@ -599,7 +503,7 @@ Split $V$ into parts $A$ and $B$ with $|A| = \floor{n/2}$ and $|B| = \ceil{n/2}$
   \node[font=\small] at (0,-1.5) {part $A$};
   \node[font=\small] at (4,-1.5) {part $B$};
 \end{tikzpicture}
-\caption{The one-directional complete bipartite digraph $B_{k,k}$ of \Cref{const:bipartite}, drawn here at $n = 8$ with $|A| = |B| = 4$. Every one of the $|A|\cdot|B| = \floor{n^2/4}$ arcs runs left to right, from $A$ to $B$. There are no arcs inside $A$, inside $B$, or back from $B$ to $A$. Because $B$ has no outgoing arcs and $A$ no incoming ones, the only route from any $a_i$ to any $b_j$ is the single arc $a_i \to b_j$, so every pair has local edge-connectivity $1$ while the arc count grows quadratically.}
+\caption{The one-directional complete bipartite digraph $B_{4,4}$. Its $16=\floor{n^2/4}$ arcs all run from $A$ to $B$, so every reachable pair has only its direct route and $\lec^{\max}=1$.}
 \label{fig:bipartite-digraph}
 \end{figure}
 
@@ -650,7 +554,7 @@ At $m = 2$ this construction is easiest to picture: the circulant layer is empty
   \end{scope}
 
 \end{tikzpicture}
-\caption{The directed hub at $n = 6$ for two values of $m$. \emph{Left ($m=2$):} the bidirected star. The hub $h$ is joined to each spoke by one arc in each direction, giving $2(n-1) = 10$ arcs. No circulant layer is added, so all spoke communication routes through $h$, so $\lec^{\max} = 1$. \emph{Right ($m=3$):} a single circulant layer is added among the five spokes. The blue arcs are the same hub-spoke pairs as on the left. The orange arcs are that one circulant layer, the cycle $0\to1\to2\to3\to4\to0$, so each spoke has $d^+ = d^- = m-1 = 2$. The total is $m(n-1) = 15$ arcs and $\lec^{\max} = 2$. For $m \ge 3$ the spokes are no longer isolated from one another, and tracing all the routes becomes the argument that fills the rest of the chapter.}
+\caption{The directed hub at $n=6$. Left: the $m=2$ bidirected star has $10$ arcs and $\lec^{\max}=1$. Right: adding one circulant layer gives the $m=3$ construction with $15$ arcs and $\lec^{\max}=2$.}
 \label{fig:bidirected-star}
 \end{figure}
 
@@ -733,7 +637,7 @@ Take $A = \{a_1, \dots, a_5\}$ and $B = \{b_1, \dots, b_5\}$ with all $25$ arcs 
   \node[font=\small] at (0,-3.3) {part $A$};
   \node[font=\small] at (4.0,-3.3) {part $B$};
 \end{tikzpicture}
-\caption{The thirty-arc counterexample of \Cref{rem:counterexample-m3}: the augmented bipartite digraph (\Cref{const:augmented-bipartite}) at $m = 3$, $n = 10$, $|A| = |B| = 5$. The $25$ faint arcs are the complete one-directional layer from $A$ to $B$, and the $5$ orange arcs form the directed cycle $b_1 \to b_2 \to b_3 \to b_4 \to b_5 \to b_1$ inside $B$, one extra in-arc per vertex of $B$. The heavy blue arc and the heavy green detour show the pair $a_1, b_2$ carrying $2$ arc-disjoint routes: the direct arc $a_1 \to b_2$ (blue) and the two-step detour $a_1 \to b_1 \to b_2$ (green) through the cycle predecessor $b_1$. Hence $\lec^{\max} = 2$, feasible at $m = 3$, while $30 > \max(3\cdot 9,\,25) = 27$.}
+\caption{The thirty-arc counterexample at $m=3$, $n=10$: $25$ arcs run from $A$ to $B$ and a directed $5$-cycle lies inside $B$. The highlighted direct route and detour show the binding value $\lec^{\max}=2$.}
 \label{fig:augmented-bipartite}
 \end{figure}
 
@@ -799,44 +703,36 @@ The proof, given in \Cref{app:proofs}, runs the multigraph argument through the 
   \foreach \p in {i1,o1,i2,o2,i3,o3,i4,o4} {\node[stn] at (\p) {};}
   \node[hub] at (h) {$h$};
 \end{tikzpicture}
-\caption{The star hypertree that attains the $m=2$ hypergraph bound, here $r=3$ and $n=9$, drawn as a metro map with the hub $h$ centred between two rows of stations. The single hub station lies on every line, and each of the $\floor{(n-1)/(r-1)} = 4$ hyperedges is one metro line of $r=3$ stations: it leaves the hub diagonally to an inner station and then runs horizontally to its outer station, hanging a fresh block of $r-1=2$ vertices off the hub. Because every line meets every other only at $h$, no pair has two hyperedge-disjoint routes, so the Berge connectivity is one everywhere, exactly as a spanning tree attained the multigraph bound.}
+\caption{The $r=3$, $n=9$ star hypertree: four hyperedges meet only at the hub $h$, attaining $\floor{(n-1)/(r-1)}=4$ with Berge connectivity one.}
 \label{fig:hyper-star}
 \end{figure}
 
-The proposition counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the genuinely new part. The metro picture shows why. An ordinary edge is a one-stop link between a single pair, so policing edge-disjointness means watching each pair on its own. A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches $\binom{r}{2}$ pairs at once, yet like a line that can run only one train at a time it may serve only one route. When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away, and it must do this for every line simultaneously. That bookkeeping is the one new piece of machinery the next chapter builds, and it is why the hypergraph rejoins the family only once the checker is in place.
+The edge bound is the easy half of the hypergraph story. The vertex separation is where this thesis has something new to say, and its two statements are worth having in front of the reader before the machinery that establishes them.
 
-\section{Random graphs as intuition}
-
-The short proofs above hinted that the edge and vertex problems travel together for a while, agreeing through $m = 4$ before the split at $m = 5$. That separation is a statement about extremal graphs, the densest ones the ceiling allows, and it is worth asking whether the same split can be seen in ordinary graphs drawn at random, with no extremal tuning at all. The random model is the natural place to build intuition, because it shows the qualitative behaviour of the connectivity notions before any construction is pushed to its limit. It is not a detour from the program to come, either: a sampled $G(n,p)$ is an ordinary graph, measured by the very same connectivity checker the next chapter builds for every other variant. Each of the $\binom{n}{2}$ possible edges of $G(n,p)$ is included independently with probability $p$, and on the resulting graph we read off both binding connectivities from the same sample. Whitney's inequality $\kap_G^{\max} \le \lec_G^{\max}$ guarantees the vertex value never exceeds the edge one, but it is silent on how often the two actually come apart.
-
-\Cref{fig:edge-vertex} looks directly at the distributions, fixing $n = 16$ and histogramming both connectivities over many samples at three densities. Two things are visible at once. As the density rises the whole distribution marches rightward, from a binding connectivity around five at $p = \tfrac14$ to around thirteen at $p = \tfrac34$, so by $n = 16$ the typical graph already sits well past the $m = 4$ at which the proofs agreed. And comparing the edge row to the vertex row, the vertex distribution sits at or just to the left of the edge one, never to its right, which is Whitney's inequality seen across a whole distribution rather than a single graph.
-
-The two pull apart on a fraction of samples that shrinks as the density grows, from about a fifth of the samples at $p = \tfrac14$ to only a handful by $p = \tfrac34$. The reason is structural. For $\kap^{\max}$ to fall below $\lec^{\max}$ some pair must carry more edge-disjoint routes than internally vertex-disjoint ones, which happens only when several of those routes are forced through one shared intermediate vertex. In a sparse graph routes are scarce and a single low-degree vertex can be exactly such a bottleneck, but as $p$ grows every vertex gains degree and the graph offers many alternative intermediate vertices, so independent routes almost never need to reuse one. In the dense limit the graph approaches the complete graph, where $\kap^{\max} = \lec^{\max} = n - 1$ for every pair and the gap closes entirely. What this shows is not the $m = 5$ extremal divergence, which is a statement about the densest graphs the ceiling allows and not about typical ones. It is the separate and weaker fact that the two notions do come apart in ordinary graphs, and that they do so exactly where routes are forced through a shared bottleneck vertex, which is the mechanism the extremal constructions go on to exploit deliberately.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{figures/edge_vertex_sampling.png}
-    \caption{Distributions of the binding connectivity in $G(16, p)$ over $400$ samples, at densities $p = \tfrac14, \tfrac12, \tfrac34$. There are $2^{\binom{16}{2}} = 2^{120}$ labelled graphs on $16$ vertices, far too many to enumerate, so these are Monte Carlo samples rather than the full population, and $400$ is plenty to show the shape of each distribution. The top row histograms the edge-connectivity $\lec^{\max}$, the bottom row the vertex-connectivity $\kap^{\max}$, measured on the same samples, with the mean marked by a dashed line and the fraction of samples on which $\kap^{\max} < \lec^{\max}$ printed on each vertex panel. Reading a column top to bottom, the vertex distribution sits at or to the left of the edge one, which is Whitney's inequality, and the gap is largest at the sparsest density ($22\%$ of samples) and closes as $p$ grows ($6\%$). All six panels share one axis range.}
-    \label{fig:edge-vertex}
-\end{figure}
-
-The random model also supplies a landmark of a different flavour. Below a sharp density the forbidden configuration is almost surely absent, and above it almost surely present. The theorem below proves the location of that threshold for edge-disjoint paths in $G(n,p)$, and the cited random-graph connectivity theorem then gives the same location for internally vertex-disjoint paths in the same undirected model.
-
-\begin{theorem}[Appearance threshold]\label{thm:gnp-threshold}
-Let $m = m(n) \ge 2$ grow with $n$ so that $m / \ln n \to \infty$ and $m = o(n)$, and let $c > 0$ be a constant. In the binomial random graph $G(n, p)$ with $p = c \cdot m / n$,
+\begin{theorem}[Hypergraph vertex value at $m = 2$]\label{thm:hyper-vertex-m2}
+For $r \ge 2$ and $n \ge 1$, the maximum number of hyperedges of an
+$r$-uniform multihypergraph on $n$ vertices with $\kap^{\max} \le 1$ is
 \[
-\lim_{n \to \infty} \Pr\bigl[\lec^{\max} \ge m\bigr] =
-\begin{cases}
-1 & \text{if } c > 1,\\
-0 & \text{if } c < 1,
-\end{cases}
+    k_2^{(r)}(n) \;=\; \floorfrac{n-1}{r-1},
 \]
-so the threshold for the appearance of a pair with local edge-connectivity at least $m$ is $p^* = m/n$. The same threshold governs local vertex-connectivity in $G(n,p)$ (\Cref{rem:threshold-analogues}). No directed analogue is claimed here, and the hypergraph models live on a different density scale (\Cref{rem:threshold-scope}).
+attained by the star hypertree of \Cref{fig:hyper-star}. In particular
+$k_2^{(r)}(n) = \ell_2^{(r)}(n)$: the vertex and edge problems agree at $m = 2$
+for every uniformity, and repeated hyperedges never help.
 \end{theorem}
 
-The proof is a concentration argument with two halves (\Cref{app:proofs}). Above the threshold the edge count concentrates past Mader's bound, so \Cref{thm:mader} itself forces a high pair into existence. Below it the maximum degree stays under $m$, and the degree bound caps every local connectivity. The two hypotheses earn their keep. The first, $m/\ln n \to \infty$, says $m$ must outgrow the natural logarithm of $n$, and that is what lets a union bound over the $n$ vertices close. The second, $m = o(n)$, says $m$ stays negligible next to $n$, which keeps the density $p = cm/n$ below one and in the sparse regime where the threshold lives. The proof directly settles only the simple undirected edge case. The vertex-disjoint statement uses a separate theorem about the global vertex-connectivity of $G(n,p)$, and \Cref{rem:threshold-analogues} gives the exact deduction and explains why no directed statement follows from it. Hypergraphs are also not covered: in a binomial $r$-uniform hypergraph a vertex lies in an expected $p\binom{n-1}{r-1}$ hyperedges, so the corresponding degree scale is $m/\binom{n-1}{r-1}$, smaller than $m/n$ by a factor of order $n^{r-2}$ once $r \ge 3$. \Cref{rem:threshold-scope} works this out, and each model must be read against its own degree scale.
+\begin{theorem}[Hypergraph vertex value at $m = 3$]\label{thm:hyper-vertex-m3}
+For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
+$\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
+$r \ge 3$ with $2 \le \binom{n-2}{r-2}$ the bound is attained by a simple
+hypergraph, so
+\[
+    k_3^{(r)}(n) \;=\; \floorfrac{2(n-1)}{r-1} \;=\; \ell_3^{(r)}(n).
+\]
+\end{theorem}
 
-One limitation must be stated plainly, lest the threshold be read as evidence about the problem this thesis actually studies. The growth hypothesis $m / \ln n \to \infty$ forces $m$ to climb with $n$, so the theorem says nothing whatever about a fixed small $m$, the regime of every exact value above, where $m$ is $2$, $3$, or $4$ and $n$ runs to infinity around it. There the union bound is vacuous and the appearance of a dense pair is governed by rare low-degree configurations that need finer, Poisson-type tools. The random model therefore enters as contrast and not as evidence: it shows how cleanly the question collapses in one limit, which throws into relief how stubbornly it resists in the fixed-$m$ limit the rest of the thesis must attack by hand and by machine.
+Both are proved in \Cref{app:proofs}. The first falls out once Berge routes are read as ordinary paths in the incidence graph, where the ceiling $\kap^{\max} \le 1$ says exactly that the incidence graph is a forest. The second is the harder one and carries the genuinely new tool: a rank bound for graphs in which one side of a partition must stay below local $3$-connectivity, proved by way of Tutte's triconnected decomposition, which the incidence translation then turns back into the hypergraph statement. At $m \ge 4$ that route stops for want of a $4$-connectivity analogue of the decomposition, and the value is open.
+
+The proposition counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the genuinely new part. The metro picture shows why. An ordinary edge is a one-stop link between a single pair, so policing edge-disjointness means watching each pair on its own. A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches $\binom{r}{2}$ pairs at once, yet like a line that can run only one train at a time it may serve only one route. When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away, and it must do this for every line simultaneously. That bookkeeping is the one new piece of machinery the next chapter builds, and it is why the hypergraph rejoins the family only once the checker is in place.
 
 \section{Where this work sits}
 
