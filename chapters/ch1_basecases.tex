@@ -396,28 +396,22 @@ Three models, two directions, two separations give twelve versions of one
 question. This chapter proves the short cases before the machine treats the
 family uniformly. The final status map appears in \Cref{fig:variant-tree-status}.
 
-\section{Cases with short proofs}
+\section{Two variants that settle at once}
 Allowing parallel edges removes the parity subtlety, the dependence on whether $m(n-1)$ is even or odd, that produces the floor in Mader's theorem, and the answer becomes exactly linear. Write $L_m(n)$ for the multigraph analogue of $\ell_m(n)$.
 
 \begin{theorem}\label{thm:multigraph-edge}
 For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
 \end{theorem}
 
-\begin{proof}
-For the lower bound, take a spanning tree of $K_n$, that is, a connected cycle-free subgraph that touches all $n$ vertices and so has exactly $n-1$ edges, and give every tree edge multiplicity $m - 1$, meaning $m-1$ parallel copies. The result has $(m-1)(n-1)$ edges. Any two vertices are joined by a unique path in the tree, of some length $k \ge 1$. To separate them one must cut some edge of that path, and the cheapest choice is the lightest tree edge on it, which still carries $m-1$ copies, so $\lec(u, v) = m - 1$ for every pair and $\lec^{\max} = m - 1$. The graph sits right at the ceiling.
+Both halves are short, and \Cref{app:proofs} gives them in full. The lower bound is a spanning tree with every edge thickened to $m-1$ parallel copies. Any two vertices are joined by a unique tree path, cutting them means cutting one of its edges, and every edge on it still carries $m-1$ copies, so every pair sits exactly at the ceiling and the count is $(m-1)(n-1)$. The upper bound is the Gomory--Hu double count of Mader's theorem with its second charge removed. Summing the $n-1$ tree capacities counts every edge of $G$ at least once, which already gives the bound. What it can no longer do is count most edges \emph{twice}, because parallel edges are now allowed and nothing forces a second charge. That missing factor of two is the entire difference between Mader's $\floor{m(n-1)/2}$ and the product $(m-1)(n-1)$, and it is the one place the simple-graph argument ever used simplicity.
 
-For the upper bound, suppose $\lec_G^{\max} \le m - 1$ and build a Gomory--Hu tree $T$ of $G$ (\Cref{thm:gomory-hu}), the same $(n-1)$-edge summary of all connectivities used for Mader's theorem. Each tree edge $e$ stands for a minimum cut of $G$, of capacity $c(e) = \lec_G(u,v) \le m-1$ for the pair $(u,v)$ it represents. Now charge each edge of $G$ to a tree edge: an edge $\{x,y\}$ crosses the cut of the lightest tree edge on the tree path from $x$ to $y$, so it is counted inside that tree edge's capacity. Summing the $n-1$ capacities therefore counts every edge of $G$ at least once, which already gives $|E(G)| \le \sum_{e \in T} c(e) \le (m-1)(n-1)$. Unlike Mader's simple-graph count there is no second charge to halve, because parallel edges are now allowed and nothing forces an edge to be counted twice. The tree-of-multiplicity-$(m-1)$ construction above meets this bound exactly, which is why the answer is the clean product $(m-1)(n-1)$ and not a floor.
-\end{proof}
-
-The vertex-disjoint question is just as quick at the first non-trivial value. Forbidding two internally vertex-disjoint paths is a strong constraint: it forbids cycles.
+The vertex-disjoint question is just as quick at the first non-trivial value, and for a reason worth naming, because it is the reason the vertex problem behaves so differently later on.
 
 \begin{proposition}\label{prop:leonard-m2}
 For simple graphs, $k_2(n) = n - 1$, attained exactly by trees.
 \end{proposition}
 
-\begin{proof}
-If $G$ contains a cycle, a closed loop of distinct vertices, then any two vertices on that cycle are joined by the two paths of the cycle, which are internally vertex-disjoint, so $\kap_G^{\max} \ge 2$. Hence $\kap_G^{\max} \le 1$ forces $G$ to be acyclic, free of cycles, and an acyclic graph on $n$ vertices has at most $n - 1$ edges, with equality for trees. A tree indeed has $\kap^{\max} = 1$: nonadjacent vertices have a unique path whose intermediate vertex separates them, while adjacent vertices are joined by their single edge alone.
-\end{proof}
+Forbidding two internally vertex-disjoint routes forbids cycles outright, because any two vertices lying on a cycle are already joined by the two arcs of that cycle, which meet only at their endpoints. A feasible graph is therefore acyclic, an acyclic graph on $n$ vertices carries at most $n-1$ edges, and a tree meets the ceiling exactly. \Cref{app:proofs} gives the details.
 
 Here $k_m(n)$ denotes the vertex-disjoint extremal function, the counterpart of $\ell_m(n)$ for $\kap^{\max}$. We have just seen $k_2(n) = n - 1 = \ell_2(n)$. The agreement of the edge and vertex problems is no accident at small $m$, and the moment it breaks is the first place the proofs begin to strain.
 
@@ -454,18 +448,14 @@ The additive constant above needs a word of explanation, because two conventions
 
 The primary source settles which is which. \cite{SorensenThomassen74} defines $f_k(n)$ as ``the least integer $r$ so that every graph with $n$ vertices and $r$ or more edges contains a $k$-rail'', which is the forcing convention, and its Theorem 4 reads $f_5(n) = \floor{8n/3} - 3$. Subtracting one gives the $\floor{8n/3} - 4$ of \Cref{thm:sorensen-thomassen}. A $k$-rail there is a union of $k$ paths pairwise meeting only at their two common endvertices, so it is precisely a pair at vertex-connectivity $k$, and the two problems are the same problem.
 
-The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ against $3n-3$, and it writes the Bollob\'{a}s-Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ where the convention here gives $\binom{m}{2}n$. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
-
-One trap is worth naming, because an earlier draft of this thesis fell into it. The comparison $k_5 > \ell_5$ is invariant under the shift, since \emph{both} functions move by one, so no internal check can detect a half-converted statement. What does detect it is evaluating the two sides in different conventions, which manufactures a spurious divergence one size early. Reading $\floor{8 \cdot 13/3} - 3 = 31$ against this thesis's $\ell_5(13) = 30$ appears to separate the two problems at $n = 13$, but the $31$ is a forcing count and the $30$ is an avoiding count. Done consistently, $k_5(13) = 30 = \ell_5(13)$ and the separation begins at $n = 14$, which is also what \cite{SorensenThomassen74} proves directly by showing $f_5(n) = \floor{5(n-1)/2} + 1$ throughout $6 \le n \le 13$.
-
-The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there covers every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies those two values separately, which is where the $k_5(7) = 15$ and $k_5(12) = 27$ of \Cref{thm:sorensen-thomassen} come from.
+The shift touches every constant this thesis quotes from that literature, and one trap it sets caught an earlier draft of this thesis. \Cref{rem:threshold-audit} records the full conversion table, the trap, and where the range of \Cref{thm:sorensen-thomassen} comes from.
 \end{remark}
 
 At $m = 5$ the vertex problem genuinely diverges from the edge problem, visible in \Cref{fig:divergence} as the shaded gap that opens between the dashed blue and solid orange curves. Leonard had already found the first crack, an explicit $57$-vertex, $141$-edge counterexample to the general conjecture at $m = 5$ \cite{Leonard73BE}, before S{\o}rensen and Thomassen pinned the exact value down. The reason the crack opens at all is structural. Leonard's earlier method, the one that closes $m \le 4$, leans on extremal graphs assembled from cliques. A \emph{$k$-tree} starts from $K_{k+1}$ and repeatedly joins one new vertex to every vertex of an existing $k$-clique. Through $m = 4$ these clique scaffolds are forced, and counting their edges gives the bound. At $m = 5$ they are no longer the unique extremal shape. Additional configurations appear, and the clean count breaks. S{\o}rensen and Thomassen recover the exact value by a delicate structural induction, which we cite rather than reproduce. For $m \ge 6$ the exact value is unknown, and the vertex-disjoint problem has stood open since 1974. What is known there is a negative and a bound. Bollob\'{a}s and Erd\H{o}s had conjectured that the best graph is formed from as many copies of $K_m$ sharing one vertex as fit, namely $\floor{(n-1)/(m-1)}$ full copies plus a bounded remainder, which would give $k_m(n) = mn/2 + O(1)$. Mader disproved that for every $m \ge 6$, showing that the gap $k_m(n) - mn/2$ grows without bound \cite{Mader73}. S{\o}rensen and Thomassen then supplied a replacement lower bound, $k_m(n) > \frac{m(m-1)-2}{2m-3}(n-m)$ for infinitely many $n$ \cite{SorensenThomassen74}, whose rate exceeds $m/2$ by the factor $1 + (m-4)/(2m^2-3m)$, which is $1 + (1+o(1))/(2m)$ for large $m$ and only about $1.04$ at $m = 6$. So the shape of the answer is known to be linear in $n$ with a rate strictly above $m/2$, and it is the rate that is open. It is the one direction this thesis does not attempt to force, and \Cref{ch:synthesis} explains why.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.74\textwidth]{figures/edge_vertex_divergence.png}
+    \includegraphics[width=\textwidth]{figures/edge_vertex_divergence.png}
     \caption{The edge and vertex extremal functions for $m = 2, 3, 4$ (blue shades, single curve per $m$ since they agree) and $m = 5$ (dashed blue for edge, solid orange for vertex). Through $m = 4$ the two problems give identical answers, and at $m = 5$ the vertex formula $k_5(n) = \floor{8n/3} - 4$ separates above the edge formula $\ell_5(n) = \floor{5(n-1)/2}$, with the gap shaded. The two curves still touch at every $n$ from $6$ to $13$ and part for good at $n = 14$, so the shading begins there.}
     \label{fig:divergence}
 \end{figure}
@@ -568,23 +558,7 @@ The hub construction leads for $n < 7$, the one-directional bipartite constructi
 
 The lower bound is the better of the two constructions. The upper bound is where the trouble starts.
 
-\paragraph{Idea of the upper bound at $m = 2$.} The value $M(n) = \max(2(n-1), \floor{n^2/4})$ is a contest between a linear term and a quadratic one, and which leads is pure arithmetic: $2(n-1) \ge \floor{n^2/4}$ precisely for $n \le 7$, with equality at $n = 7$, where both give $12$. So $M$ follows the bidirected star up to the crossover and the bipartite digraph past it, and $n = 7$ is the single value where the two constructions tie. The proof that no digraph beats $M(n)$ is an induction on $n$ (\Cref{app:proofs}). Write $a = |A(D)|$ for the number of arcs and delete a vertex $v$ of \emph{minimum} total degree. Two facts about that deletion meet. The degrees sum to twice the arc count, so the smallest of them is at most the average,
-\[
-    \deg(v) \;\le\; \frac{2a}{n},
-\]
-and the remaining digraph on $n-1$ vertices still respects the ceiling, so once $n - 1 \ge 7$ the inductive bound applies to it,
-\[
-    |A(D-v)| \;\le\; \floorfrac{(n-1)^2}{4}.
-\]
-The arc count of $D$ itself splits as $a = |A(D-v)| + \deg(v)$, the arcs away from the deleted vertex plus the arcs at it. Feeding both facts into that split leaves a copy of $a$ on each side, and gathering them before dividing by $1 - 2/n$ finishes the step:
-\[
-\begin{aligned}
-    a &\;\le\; \floorfrac{(n-1)^2}{4} + \frac{2a}{n}, \\[3pt]
-    a\Bigl(1 - \tfrac{2}{n}\Bigr) &\;\le\; \floorfrac{(n-1)^2}{4}, \\[3pt]
-    a &\;\le\; \frac{n}{n-2}\floorfrac{(n-1)^2}{4}.
-\end{aligned}
-\]
-A short parity check then shows the right-hand side never exceeds $\floor{n^2/4}$ once $n \ge 8$: for even $n$ it lands exactly on the bipartite value, and for odd $n$ a sub-unit slack is swallowed by the fact that $a$ is an integer. The averaging closes the step with no separate hub case, which is why the difficulty is not depth but bulk. Nothing in the argument is deep. It is a careful walk through two parity regimes, with the base cases $n \le 7$ settled by exhaustive computer search rather than by hand. That experience of a correct but long and almost entirely mechanical case-check is exactly what motivates the chapters that follow. One genuinely wants to hand the case-checking to a machine.
+\paragraph{Idea of the upper bound at $m = 2$.} Which of the two branches of $M(n) = \max(2(n-1), \floor{n^2/4})$ leads is pure arithmetic: $2(n-1) \ge \floor{n^2/4}$ precisely for $n \le 7$, with equality at $n = 7$, where both give $12$. So $M$ follows the bidirected star up to the crossover and the bipartite digraph past it, and $n = 7$ is the single size at which the two constructions tie. That no digraph beats $M(n)$ is an induction on $n$, carried out in \Cref{app:proofs}. Delete a vertex of \emph{minimum} total degree. Two facts about that deletion meet. The degrees sum to twice the arc count, so the deleted vertex carries at most the average $2a/n$ arcs, and what remains still respects the ceiling, so the inductive bound applies to it. Feeding both into the split of the arc count leaves a copy of $a$ on each side, and gathering them yields $a \le \tfrac{n}{n-2}\floor{(n-1)^2/4}$, which a parity check shows never exceeds $\floor{n^2/4}$ once $n \ge 8$. Nothing in the argument is deep. It is a careful walk through two parity regimes, with the base cases $n \le 7$ settled by exhaustive computer search rather than by hand. That experience of a correct but long and almost entirely mechanical case-check is exactly what motivates the chapters that follow. One genuinely wants to hand the case-checking to a machine.
 
 The vertex-disjoint version of the same question has the same answer at $m = 2$, but it is worth being careful about why, because Whitney's inequality is easy to read backwards here. Since $\kap \le \lec$ pairwise, a digraph that respects the arc ceiling automatically respects the vertex one, so the vertex-feasible family \emph{contains} the arc-feasible one and is in general strictly larger. The free consequence therefore runs one way only: the two constructions above keep $\kap^{\max} = 1$ as readily as $\lec^{\max} = 1$, which makes them lower bounds for the vertex problem too. No upper bound comes with them. What settles the vertex value is that the same induction goes through unchanged, because deleting a vertex lowers $\kap^{\max}$ for exactly the reason it lowers $\lec^{\max}$, and because the base cases $n \le 7$ were re-run under the stricter separation and returned the same six numbers. \Cref{app:proofs} gives both halves, and \Cref{rem:whitney-direction} there spells out the direction trap in full.
 
@@ -646,7 +620,7 @@ The counterexample generalises: the five-cycle gave every vertex of $B$ exactly 
 \begin{construction}[Augmented bipartite digraph]\label{const:augmented-bipartite}
 For $m \ge 2$ and $n \ge m$, set $|B| = \ceil{(n+m-2)/2}$ and $|A| = n - |B| = \floor{(n-m+2)/2}$, include every arc from $A$ to $B$, and inside $B$ give each vertex $b_j$ the $m-2$ in-arcs from its cyclic predecessors $b_{j-1}, \dots, b_{j-(m-2)}$ (indices mod $|B|$). The total is $\floor{(n+m-2)^2/4}$ arcs.
 
-For the connectivity, fix $a \in A$ and $b \in B$. Two kinds of route run from $a$ to $b$: the direct arc, and the two-step detours $a \to b' \to b$ that pass through an in-neighbour $b'$ of $b$ inside $B$. There are $m - 2$ detours, so $m - 1$ routes in all, and no two of them share an arc. They are also all there are, because the only in-arcs of $b$ that $a$ can reach are exactly those $m - 1$ arcs. Deleting them therefore cuts every route from $a$ to $b$. Pairs inside $B$ are limited by the in-degree $m - 2$, pairs inside $A$ and pairs from $B$ to $A$ have no routes at all, so $\lec^{\max} = m - 1$.
+Its arc count is the product of the two halves of $n+m-2$, and its connectivity is verified in \Cref{app:proofs}. The point there is that the only in-arcs of a $b \in B$ that any $a \in A$ can reach are the direct arc $a \to b$ and the $m-2$ two-step detours through $b$'s in-neighbours inside $B$, so each such pair carries exactly $m-1$ arc-disjoint routes and no more, while pairs inside $B$ are held down by the in-degree $m-2$ and pairs starting in $B$ or staying in $A$ have no routes at all.
 
 At $m = 2$ the inside of $B$ is empty and the construction reduces to \Cref{const:bipartite}, with the balanced partition $(\floor{n/2}, \ceil{n/2})$. At $m = 3$ the formula gives $|B| = \ceil{(n+1)/2}$, which coincides with $\ceil{n/2}$ at odd $n$ but gives $|B| = n/2 + 1$ at even $n$. Both the balanced and the shifted partition achieve the same arc count $\floor{n^2/4} + \ceil{n/2}$ in this case, so the two are interchangeable at $m = 3$. The shift to a strictly larger $B$ is structurally significant only at $m \ge 4$, where the balanced partition is suboptimal. At $m = 3$, $n = 10$ it is the thirty-arc counterexample of \Cref{rem:counterexample-m3}, drawn in \Cref{fig:augmented-bipartite} (using the equivalent balanced partition $|A| = |B| = 5$).
 \end{construction}

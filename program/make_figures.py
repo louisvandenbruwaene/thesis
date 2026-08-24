@@ -279,7 +279,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se = searched(matrix_ns, lb_simple_edge,
                   directed=False, simple=True, separation="edge")
     panels.append(dict(
-        title=f"undirected edge, $m={m}$  (proved)", ylabel="edges",
+        title=f"undirected edge (proved)", ylabel="edges",
         proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
         exact=ex, search=se))
 
@@ -290,7 +290,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se2 = searched(matrix_ns, lb_simple_edge,
                        directed=False, simple=True, separation="vertex")
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  (proved)", ylabel="edges",
+            title=f"undirected vertex (proved)", ylabel="edges",
             proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
             exact=ex2, search=se2))
     else:
@@ -304,7 +304,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se2 = _extend_lower_bounds(se2, lb_simple_edge, matrix_ns)
         band2 = _band(se2, tri_undirected, matrix_ns)
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  (open)", ylabel="edges",
+            title=f"undirected vertex (open)", ylabel="edges",
             guess="search",
             band=band2, exact=ex2, search=se2))
 
@@ -314,7 +314,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se3 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="edge")
     panels.append(dict(
-        title=f"directed arc, $m={m}$  (conjectured)", ylabel="arcs",
+        title=f"directed arc (conjectured)", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         branches=[(matrix_ns, [min(m * (n - 1), n * (n - 1)) for n in matrix_ns],
                    "hub $m(n{-}1)$"),
@@ -333,7 +333,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se4 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="vertex")
     panels.append(dict(
-        title=f"directed vertex, $m={m}$  (conjectured)", ylabel="arcs",
+        title=f"directed vertex (conjectured)", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex4, search=se4))
 
@@ -344,7 +344,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se5 = searched(matrix_ns, lb_multi_edge,
                    directed=False, simple=False, separation="edge")
     panels.append(dict(
-        title=f"undirected edge, $m={m}$  (proved)", ylabel="edges",
+        title=f"undirected edge (proved)", ylabel="edges",
         proved=(matrix_ns, [lb_multi_edge(n) for n in matrix_ns]),
         exact=ex5, search=se5))
 
@@ -352,12 +352,12 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     multi_vert_label = ("proved, $=$ simple" if vert_proved else "open, $=$ simple")
     if vert_proved:
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  ({multi_vert_label})", ylabel="edges",
+            title=f"undirected vertex ({multi_vert_label})", ylabel="edges",
             proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
             exact=ex2, search=se2))
     else:
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  ({multi_vert_label})", ylabel="edges",
+            title=f"undirected vertex ({multi_vert_label})", ylabel="edges",
             guess="search",
             band=_band(se2, tri_undirected, matrix_ns), exact=ex2, search=se2))
 
@@ -367,13 +367,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se7 = searched(matrix_ns, lb_multi_dir,
                    directed=True, simple=False, separation="edge")
     panels.append(dict(
-        title=f"directed arc, $m={m}$  (multigraph, proved)", ylabel="arcs",
+        title=f"directed arc (multigraph, proved)", ylabel="arcs",
         proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
     # (8) multigraph directed vertex -- conjectured (reduces to simple digraph).
     panels.append(dict(
-        title=f"directed vertex, $m={m}$  (conjectured, $=$ simple)", ylabel="arcs",
+        title=f"directed vertex (conjectured, $=$ simple)", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex4, search=se4))
 
@@ -384,7 +384,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se9 = searched(hyper_ns, lb_hyper_edge,
                    hypergraph=True, r=3, directed=False, separation="edge")
     panels.append(dict(
-        title=f"undirected edge, $m={m}$  (proved)", ylabel="hyperedges",
+        title=f"undirected edge (proved)", ylabel="hyperedges",
         proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
         exact=ex9, search=se9))
 
@@ -396,7 +396,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se10 = searched(hyper_ns, lb_hyper_edge,
                         hypergraph=True, r=3, directed=False, separation="vertex")
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  (proved)", ylabel="hyperedges",
+            title=f"undirected vertex (proved)", ylabel="hyperedges",
             proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
             exact=ex10, search=se10))
     else:
@@ -408,7 +408,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         # attainment condition m-1 <= n-2 has not kicked in yet.
         se10 = _extend_lower_bounds(se10, lb_hyper_edge, hyper_ns)
         panels.append(dict(
-            title=f"undirected vertex, $m={m}$  (open)", ylabel="hyperedges",
+            title=f"undirected vertex (open)", ylabel="hyperedges",
             guess="search",
             band=_band(se10, tri_hyper, hyper_ns), exact=ex10, search=se10))
 
@@ -421,7 +421,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # lower bound here (the search alone slips below the quadratic at larger n).
     se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed arc, $m={m}$  (open, new model)", ylabel="hyperarcs",
+        title=f"directed arc (open, new model)", ylabel="hyperarcs",
         guess="search",
         band=_band(se11, tri_dir_hyper, hyper_ns), exact=ex11, search=se11))
 
@@ -434,7 +434,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # feasible for the vertex separation at the same value.
     se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed vertex, $m={m}$  (open, new model)", ylabel="hyperarcs",
+        title=f"directed vertex (open, new model)", ylabel="hyperarcs",
         guess="search",
         band=_band(se12, tri_dir_hyper, hyper_ns), exact=ex12, search=se12))
 

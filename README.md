@@ -14,9 +14,13 @@ The built paper is **[`main.pdf`](main.pdf)**.
 
 ## What's here
 
+**Structure.** The three chapters state the results and explain in a few sentences
+what makes each one work; **every proof in the thesis lives in the appendix**, together
+with the supporting lemmas and propositions that no chapter states in its own right.
+
 ```
 chapters/             the thesis text (ch1_basecases, ch2_machine, ch4_synthesis,
-                      app_proofs appendix)
+                      app_proofs appendix -- all proofs are here)
 offcuts.tex           every passage cut during the shortening pass, restore-ready
                       (not part of the thesis, never input by main.tex)
 main.tex, preamble.tex, ref.bib, kulakreport.cls, *.pdf/*.png   LaTeX sources + logos
@@ -48,8 +52,16 @@ latexmk -pdf main.tex
 Figures (needs Python 3 with numpy, scipy, networkx, matplotlib):
 
 ```bash
-cd program && python3 make_figures.py     # writes into ../figures/
+cd program && ../.venv/bin/python3 make_figures.py   # writes into ../figures/
 ```
+
+The bundled `.venv` was created before the repo moved, so its `activate` script and
+console entry points still point at the old path. Call `.venv/bin/python3` directly,
+as above, or recreate the environment.
+
+Figure sizes are deliberate: each plot is drawn at close to the width the thesis
+gives it, so the point sizes in the plotting code survive to paper unshrunk. Enlarging
+a canvas without widening its slot in the document shrinks its labels in print.
 
 Randomized searches use fixed seeds. The wall-clock timed comparison can vary
 slightly with machine speed and scheduling, as documented in the thesis.

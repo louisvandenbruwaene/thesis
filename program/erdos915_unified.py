@@ -2692,7 +2692,10 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
     bipartite = [((n + m - 2) ** 2) // 4 for n in ns]
     envelope = [directed_arc_lower_bound(n, m) for n in ns]  # their pointwise max
 
-    plt.figure(figsize=(7, 4.3))
+    # Printed-size note: this figure is rendered at close to the width the
+    # thesis actually gives it, so the point sizes below survive to paper
+    # unshrunk. Enlarging the canvas here shrinks the labels in print.
+    plt.figure(figsize=(4.6, 3.3))
     plt.plot(ns, hub, "--", color=_KUL_DARK, label=r"hub branch $m(n-1)$")
     plt.plot(ns, bipartite, "--", color=_WARM,
              label=r"bipartite branch $\lfloor (n+m-2)^2/4\rfloor$")
@@ -2730,7 +2733,10 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
     n_start = 4  # common start for all curves
     ns = list(range(n_start, max_n + 1))
 
-    plt.figure(figsize=(8, 5))
+    # Printed-size note: this figure is rendered at close to the width the
+    # thesis actually gives it, so the point sizes below survive to paper
+    # unshrunk. Enlarging the canvas here shrinks the labels in print.
+    plt.figure(figsize=(6.2, 3.9))
 
     # m=2,3,4: edge == vertex -- one curve per m
     agree_palette = ["#AED9EE", "#5CB4D9", _KUL_DARK]
@@ -3059,7 +3065,10 @@ def draw_graph_with_sensitivity(
     labels = (node_labels if node_labels is not None
               else {v: str(v) for v in graph.vertices()})
 
-    fig, ax = plt.subplots(figsize=(8.6, 6.2))
+    # Printed-size note: this figure is rendered at close to the width the
+    # thesis actually gives it, so the point sizes below survive to paper
+    # unshrunk. Enlarging the canvas here shrinks the labels in print.
+    fig, ax = plt.subplots(figsize=(5.4, 3.9))
 
     for (u, v), sigma in sensitivities.items():
         mu = graph.multiplicity(u, v)
@@ -3249,7 +3258,10 @@ def plot_complexity_growth(path: str | Path) -> None:
              [log10_pow(2, hyper_cells(n)) for n in ns]),
         ]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.6), sharey=True)
+    # Printed-size note: displayed at full text width (about 6.1in), so the
+    # canvas is drawn at that width and the point sizes below reach paper
+    # unshrunk.
+    fig, axes = plt.subplots(1, 2, figsize=(6.3, 3.1), sharey=True)
     for ax, directed, title in [(axes[0], True, "directed graphs"),
                                 (axes[1], False, "undirected graphs")]:
         for label, colour, style, vals in curves(directed):
@@ -3269,7 +3281,10 @@ def plot_complexity_growth(path: str | Path) -> None:
                      ha="center", va="center",
                      arrowprops=dict(arrowstyle="->", color=_VIOLET, lw=1.0))
     axes[0].set_ylabel(r"$\log_{10}$ (number of graphs)")
-    axes[0].legend(fontsize=8.5, loc="upper left", title="model")
+    # One legend serves both panels. It sits in the RIGHT panel because the
+    # left one carries the "continues off the top" annotation in that corner,
+    # and at the printed canvas size the two would overlap.
+    axes[1].legend(fontsize=7.5, loc="upper left", title="model")
     fig.suptitle("Number of graphs blind enumeration must visit",
                  fontsize=12)
     _save(path)
@@ -3524,12 +3539,12 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
             if len(xs):
                 ax.plot(xs, ys, "o", mfc="none", mec=_VIOLET, mew=1.8,
                         markersize=8, label="search (lower bound)")
-        ax.set_title(panel["title"], fontsize=9.5)
-        ax.set_xlabel("vertices $n$", fontsize=8.5)
-        ax.set_ylabel(panel.get("ylabel", "edges"), fontsize=8.5)
-        ax.tick_params(labelsize=8)
+        ax.set_title(panel["title"], fontsize=8)
+        ax.set_xlabel("vertices $n$", fontsize=8)
+        ax.set_ylabel(panel.get("ylabel", "edges"), fontsize=8)
+        ax.tick_params(labelsize=7.5)
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=6.8, loc="upper left", framealpha=0.85)
+        ax.legend(fontsize=6.2, loc="upper left", framealpha=0.85)
 
     # The line styles (solid / dashed / dotted) are named in the per-panel
     # legends and spelled out in the caption, so the suptitle stays short and
@@ -3537,8 +3552,13 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     suptitle = "Erdős 915 across the twelve variants"
     if m is not None:
         suptitle += fr",  $m = {m}$"
+    # Printed-size note: the thesis gives this grid a full sideways page, so its
+    # usable width is the text HEIGHT (about 9.2in) and not the text width. The
+    # canvas is drawn at that size, which keeps the panel fonts at their stated
+    # point sizes on paper instead of shrinking them to near-invisibility.
     _variant_panel_grid(draw_panel, configs=panels, suptitle=suptitle, path=path,
-                        suptitle_fontsize=13)
+                        suptitle_fontsize=13, figsize=(9.2, 6.3),
+                        row_label_fontsize=9.5)
 
 
 # --- ENUMERATION LANDSCAPES: visit every labeled graph, collect (edges, lambda^max) ---
@@ -3880,7 +3900,8 @@ def plot_scatter_lambda_edges(
 
 def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
                         configs=None, suptitle_fontsize: float = 12.0,
-                        row_label_fontsize: float = 12.0) -> None:
+                        row_label_fontsize: float = 12.0,
+                        figsize: tuple[float, float] = (16, 11)) -> None:
     """Shared scaffold for every twelve-panel variant grid (three model rows by
     four columns): the distribution grids, the proved/conjectured bound grid, the
     sampled grid, and the extremal-envelope scatter.  Builds the axes, calls
@@ -3893,16 +3914,16 @@ def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
     """
     if configs is None:
         configs = _VARIANT_ENUM_CONFIGS
-    fig, axes = plt.subplots(3, 4, figsize=(16, 11))
+    fig, axes = plt.subplots(3, 4, figsize=figsize)
     for cfg, ax in zip(configs, axes.flat):
         draw_panel(ax, cfg)
     for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
-        axes[row, 0].annotate(name, xy=(-0.32, 0.5), xycoords="axes fraction",
+        axes[row, 0].annotate(name, xy=(-0.46, 0.5), xycoords="axes fraction",
                               rotation=90, ha="center", va="center",
                               fontsize=row_label_fontsize, fontweight="bold",
                               color=_KUL_DARK)
     fig.suptitle(suptitle, fontsize=suptitle_fontsize)
-    fig.tight_layout(rect=(0.02, 0.0, 1.0, 0.97))
+    fig.tight_layout(rect=(0.035, 0.0, 1.0, 0.97), w_pad=1.6, h_pad=1.2)
     _save(path)
 
 

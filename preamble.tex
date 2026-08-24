@@ -68,6 +68,9 @@
 % FIGURES AND TABLES
 % ============================================================================
 \usepackage{float}
+% rotating: the twelve-panel bounds grid needs a full sideways page, since at
+% text width its per-panel labels fall under 2pt.
+\usepackage{rotating}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{booktabs}
@@ -494,9 +497,10 @@
 \flushright
 \fontsize{14}{16}\selectfont \textbf{\theauthor}
 \end{textblock}
-\begin{textblock}{70}(8,191)
+\begin{textblock}{80}(8,187)
 \flushleft
-Supervisor: Prof. Stijn Cambie\\[-2pt]
+Promotor: Prof.\ Jan Goedgebeur\\[-2pt]
+Supervisor: Prof.\ Stijn Cambie\\[-2pt]
 \textcolor{blueaff}{KU Leuven}\\
 \end{textblock}
 \begin{textblock}{160}(8,191)
@@ -547,6 +551,47 @@ wis.kuleuven.be\\
 \end{textblock}
 \mbox{}
 \endgroup
+}
+
+% ============================================================================
+% COPYRIGHT AND DISCLAIMER PAGE
+% ----------------------------------------------------------------------------
+% Required by the Faculty of Science layout rules: the first page after the
+% cover carries the copyright notice, and the open-access disclaimer marking
+% the text as student work must follow the title page.
+% https://wet.kuleuven.be/english/mastersthesis/form
+% ============================================================================
+\newcommand{\makecopyrightpage}{%
+\thispagestyle{empty}%
+\begingroup
+\sffamily
+\null\vfill
+\begingroup
+\footnotesize
+\noindent\textbf{Copyright information}\\[2pt]
+Student paper as part of an academic education and examination. No correction
+was made to the paper after examination.
+
+\bigskip
+\noindent\textcopyright\ Copyright by KU Leuven
+
+\medskip
+\noindent Without prior written permission from both the supervisor(s) and the
+author(s), copying, reproducing, using, or realizing this publication or parts
+thereof is prohibited. For requests or information regarding the copying and/or
+use and/or realization of parts of this publication, please contact KU Leuven,
+Faculty of Science, Celestijnenlaan 200H box 2100, 3001 Leuven (Heverlee),
+Telephone +32 16 32 14 01.
+
+\medskip
+\noindent Prior written permission from the supervisor(s) is also required for
+using the (original) methods, products, circuits, and programs described in this
+work for industrial or commercial purposes, and for submitting this publication
+for scientific awards or contests.
+\par
+\endgroup
+\endgroup
+\clearpage
 }
 
 % ============================================================================

@@ -4,15 +4,20 @@ The journey set out from one clean theorem and followed it across twelve variant
 
 The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augmented bipartite construction with $\floor{(n+m-2)^2/4}$ arcs (\Cref{const:directed-hub,const:augmented-bipartite}). They cross near $n=9$ at $m=3$, and \Cref{conj:dir-arc} asserts that their maximum is exact. Exhaustion proves the small $m=3$ cases, but the general upper bound is structural: it would follow if every non-hub extremiser admitted the complete $A\to B$ decomposition of \Cref{open:decomposition}. The difficult clause forbids arcs returning from $B$ to $A$, since one such arc lets routes escape through $A$ and defeats the internal $m-2$ budget. \Cref{fig:directed-frontier-pair} places the numerical crossover and that obstruction together.
 
+% The crossover plot and the backward-arc diagram were side by side, which left
+% the plot 2.8in wide against a 6.9in canvas and its axis labels at 3.5pt.
+% Stacking them gives each most of the text width instead.
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.46\textwidth}
+    \begin{subfigure}[b]{0.72\textwidth}
     \centering
     \includegraphics[width=\linewidth]{figures/directed_crossover.png}
     \caption{The two lower-bound branches at $m=3$.}
     \label{fig:crossover}
-    \end{subfigure}\hfill
-    \begin{subfigure}[t]{0.52\textwidth}
+    \end{subfigure}
+
+    \bigskip
+    \begin{subfigure}[b]{0.72\textwidth}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth, scale=0.92,
@@ -27,13 +32,13 @@ The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augme
   \node[smallvertex] (b1) at (3,1.5) {$b_1$};
   \node[smallvertex] (b2) at (3,0) {$b_2$};
   \node[smallvertex] (b3) at (3,-1.5) {$b_3$};
-  \node[font=\scriptsize, KULblauw1] at (0,2.05) {part $A$};
-  \node[font=\scriptsize, KULblauw1] at (3,2.35) {part $B$};
+  \node[font=\scriptsize, KULblauw1] at (0,2.4) {part $A$};
+  \node[font=\scriptsize, KULblauw1] at (3,2.4) {part $B$};
   \foreach \x in {a1,a2}{\foreach \y in {b1,b2,b3}{\draw[abk] (\x) -- (\y);}}
   \draw[inb] (b1) to[bend left=20] (b2);
   \draw[inb] (b2) to[bend left=20] (b3);
   \node[font=\scriptsize, align=center] at (1.5,-2.5)
-     {(a) every arc $A\to B$, $B$ lightly\\thickened, none returns to $A$};
+     {every arc $A\to B$, $B$ lightly\\thickened, none returns to $A$};
 \end{scope}
 % ---------- panel (b): one backward arc manufactures a route ----------
 \begin{scope}[xshift=7.0cm]
@@ -51,30 +56,58 @@ The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augme
   \draw[esc] (c1) -- (d2);
   \node[vertexred, font=\scriptsize] at (1.35,-2.0) {backward arc $b_3\!\to\! a_1$};
   \node[font=\scriptsize, align=center] at (1.5,-2.5)
-     {(b) the route $b_3\to a_1\to b_2$\\now escapes $B$ through $A$};
+     {the route $b_3\to a_1\to b_2$\\now escapes $B$ through $A$};
 \end{scope}
 \end{tikzpicture}
 }
-\caption{The desired $A\to B$ form and one returning arc that breaks it.}
+\caption{Left, the desired $A\to B$ form. Right, one returning arc that breaks it.}
 \label{fig:backward-arc}
     \end{subfigure}
 \caption{The directed frontier in two views: the hub-to-wall crossover and the backward-arc obstruction to proving the wall optimal.}
 \label{fig:directed-frontier-pair}
 \end{figure}
 
-The conjecture is nevertheless correct to first order and to the order of its error. The two-step route count of \Cref{prop:dir-arc-stability,thm:dir-arc-linear-error} gives, without assuming any partition,
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} + 4(m-1)(n-1),
-    \qquad\text{hence}\qquad
-    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} + \Theta_m(n) \qquad (m\ge3).
-\]
-Thus only the coefficient of the linear term remains, between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The same route family is internally vertex-disjoint, so \Cref{thm:dir-vertex-linear-error} independently gives $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$. Whitney's inequality alone would not justify that transfer.
+The conjecture is nevertheless correct to first order and to the order of its error, and that much is a theorem with no hypothesis at all on the shape of the extremiser.
 
-The directed multigraph problem, by contrast, is closed exactly (\Cref{thm:dir-multi-full}):
+\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
+For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
-L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,\max\!\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr),
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
 \]
-with doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic branch. Its proof peels off $m-1$ sparse reachability-preserving subgraphs instead of deleting vertices, eliminating the former parity obstruction. Equality also classifies the quadratic extremisers for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
+so for each fixed $m$,
+\[
+    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
+\]
+and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
+\end{theorem}
+
+The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the ceiling, and that alone forces the arc count down to the wall plus a linear correction. What is left open is therefore only the coefficient of that linear term, somewhere between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The next section takes up what the bound does and does not say about the \emph{shape} of an extremiser, which is a separate question answered by a cruder version of the same count.
+
+The route family the count uses is internally vertex-disjoint and not merely arc-disjoint, which is what lets the whole argument be re-run under the stricter separation. Whitney's inequality alone would not justify the transfer, since it points the other way.
+
+\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
+For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
+\[
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
+\]
+and consequently, for each fixed $m$,
+\[
+    k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
+\]
+\end{theorem}
+
+So the directed vertex problem, which \Cref{app:proofs} otherwise keeps carefully separate from the arc one, has the same leading term and the same order of error. Whether the two agree exactly for $m \ge 3$ is open.
+
+Allowing parallel arcs, by contrast, closes the problem outright.
+
+\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
+For all $n \ge 2$ and $m \ge 2$,
+\[
+    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
+\]
+\end{theorem}
+
+The extremisers are doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic one. What makes the proof work, and what every earlier attempt lacked, is that it deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
 
 \section{Two principal phenomena}
 
@@ -82,9 +115,7 @@ Across all the variation, two phenomena stand out as the ones a first guess woul
 
 The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 4$ pulling strictly above $\ell_5(n)$ from $n = 14$ onwards (\Cref{thm:sorensen-thomassen}, and \Cref{rem:threshold-convention} for the counting convention that fixes the constant). The separation is genuinely a fact about $m$ rather than about $n$: at $m = 5$ the two values still agree at every size up to $n = 13$ and only then come apart, and beyond $m = 5$ the vertex problem becomes genuinely hard and has stayed open since 1974.
 
-The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling: $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. Place all $n$ vertices into two equal parts $A$ and $B$ and draw every arc from $A$ to $B$, one direction only. The result has $\floor{n^2/4}$ arcs, quadratic in $n$, yet $\lambda^{\max} = 1$: every pair has at most one arc-disjoint route, because every route must cross the $A$-to-$B$ wall exactly once and no arc crosses the other way to offer a second path. A graph whose arc count grows like $n^2$ can sit at connectivity one, something no undirected graph can do past a handful of vertices.
-
-The initial conjecture for the directed case was linear, matching the undirected intuition. The one-directional bipartite construction refutes it outright, already at $m = 2$: for $n = 8$ the wall holds $16$ arcs while the linear hub holds only $14$. At $m = 3$ the refutation is the thirty-arc augmented bipartite graph of \Cref{rem:counterexample-m3}, which packs $30$ arcs at $\lambda^{\max} = 2$ against the naive prediction of $27$. The construction generalises to every $m$ via \Cref{const:augmented-bipartite}, which thickens the larger part $B$ slightly so that each vertex of $B$ absorbs $m - 2$ extra in-arcs from inside $B$. Those extra arcs add exactly $m - 2$ short detours from $A$ to each $b \in B$. That lifts $\lambda^{\max}$ from $1$ to $m - 1$, while the arc count climbs to $\floor{(n+m-2)^2/4}$.
+The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling of $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. The one-directional wall of \Cref{const:bipartite} sends every arc from one half of the vertices to the other and holds $\floor{n^2/4}$ of them at $\lambda^{\max} = 1$, because a route must cross the wall exactly once and nothing crosses back to offer a second. An arc count growing like $n^2$ while the connectivity stays at one is something no undirected graph can do past a handful of vertices, and it is why the initial linear conjecture for the directed case fails already at $m = 2$, where on $n = 8$ the wall holds $16$ arcs against the hub's $14$. \Cref{const:augmented-bipartite} carries the same idea to every $m$ by letting each vertex of the larger part absorb $m - 2$ extra in-arcs from inside that part, which buys $m - 2$ short detours per pair and lifts $\lambda^{\max}$ to $m - 1$ while the count climbs to $\floor{(n+m-2)^2/4}$. Its $m = 3$ instance is the thirty-arc graph of \Cref{rem:counterexample-m3}, thirty arcs against the naive prediction of twenty-seven.
 
 The quadratic term is what makes the directed cases the deepest in the thesis. The upper bound argument must explain why no configuration beats the bipartite wall, which requires producing the partition in the first place, ruling out backward arcs, and controlling the internal structure of the large part $B$. That structural task is exactly what \Cref{open:decomposition} has not yet resolved for $m \ge 3$. What \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-error} show is that the wall is at least the right shape, and the two say it in different currencies, which is worth keeping apart. In \emph{size}, every feasible digraph is within $O_m(n)$ arcs of the wall, so the difficulty is a constant inside the second-order term rather than the phenomenon. In \emph{shape}, every feasible digraph becomes a wall after deleting $O(\sqrt{m}\,n^{3/2})$ arcs, which is a weaker error term because it comes from the cruder of the two counts, the one that does not get to induct on a low-degree vertex. The undirected problem has no analogous obstacle, because Mader's degree-counting argument closes it in a few lines. The quadratic phenomenon is therefore not just a curiosity: it is the geometric reason the directed and undirected problems live on different levels of difficulty.
 
@@ -192,15 +223,48 @@ exceptions are in \Cref{thm:mader,thm:leonard,thm:sorensen-thomassen,prop:hyper-
 \subsection{Orientation models for the directed hypergraph}
 \label{sec:orientation-models}
 
-The table uses the \emph{forward} convention: one tail and $r-1$ heads. More generally a hyperedge may split into non-empty tail and head sets. Reversal makes the one-head \emph{backward} model exactly equivalent to forward (\Cref{lem:dir-hyper-duality}), while \Cref{thm:dir-hyper-general-constant} proves that arbitrary splits have the same leading term
+The directed hypergraph row of \Cref{tab:summary} rests on one bound, which pins the leading term where previously only a factor-of-four window was known.
+
+\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
+Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
+$\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
 \[
-    (1+o(1))\frac{(m-1)n^2}{4(r-1)}
+    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2 (n-1).
 \]
-under both separations. Thus the orientation choice does not add another asymptotic row to \Cref{tab:summary}.
+The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
+stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
+edge- and the vertex-disjoint maxima are
+$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
+of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
+\end{theorem}
+
+The proof, in \Cref{app:proofs}, transports the digraph count of \Cref{thm:dir-arc-linear-error} through the incidence graph of the hypergraph, where a hyperedge becomes a node and the two-step route budget survives the translation. Since the bipartite construction already attains that leading term, it is asymptotically optimal.
+
+The table uses the \emph{forward} convention of one tail and $r-1$ heads. More generally a hyperedge may split into non-empty tail and head sets. Reversal makes the one-head \emph{backward} model exactly equivalent to forward (\Cref{lem:dir-hyper-duality}), while \Cref{thm:dir-hyper-general-constant} proves that arbitrary splits share the same leading term under both separations. Thus the orientation choice does not add another asymptotic row to \Cref{tab:summary}.
 
 Finite values may differ when vertices are scarce. Whether forward and general
 agree exactly once $n>r$ remains open, and the thesis uses the forward convention
 throughout its twelve-variant summary.
+
+\subsection{The multigraph vertex problem under the other convention}
+\label{sec:multi-vertex-summary}
+
+One variant of \Cref{tab:summary} deserves a statement of its own, because it is the one place where a whole extremal problem turns out to be a packing problem in disguise. Under the convention that parallel copies count as distinct routes, the multigraph vertex question becomes a genuinely different problem, written $K_m^{\mathrm{multi}}(n)$ and studied in \Cref{sec:multi-vertex-standard}. Its answer is additive over the blocks of the underlying simple graph, because adjacent vertices always share a block and no route between them ever leaves it.
+
+\begin{theorem}[The multigraph vertex problem is a knapsack over blocks]\label{thm:multi-vertex-blocks}
+For a $2$-connected graph $B$, or a single edge, write
+\[
+    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
+\]
+with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
+\[
+    K_m^{\mathrm{multi}}(n)
+    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
+\]
+the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
+\end{theorem}
+
+The consequence is a change in what one has to search. Instead of graphs on $n$ vertices with $n$ growing, the question is settled by knowing the best $2$-connected block of each size, and a knapsack then assembles them. That closes every value up to $n \le 8$ and $m \le 8$ by machine, and it refutes the natural guess: from $m = 5$ a single $2$-connected block beats every way of splitting the vertices, so the bouquet of cliques is not the shape of the answer. The best blocks turn out to be dense bipartite graphs rather than complete ones, giving order $\Theta(m^2 n)$ with a per-vertex constant between $3-2\sqrt2$ and $2$ (\Cref{thm:multi-vertex-bipartite,prop:multi-vertex-upper}). Closing that gap is the open problem \Cref{tab:open-problems} records.
 
 \section{Contributions and limitations of the program}
 

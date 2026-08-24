@@ -1,6 +1,6 @@
-This appendix contains the standard machinery and long proofs deferred from the body, with figures beside the arguments that need them.
+This appendix carries every proof in the thesis. The body states the results and says in a few sentences what makes each one work, and the argument itself is here, together with the supporting lemmas and propositions that no chapter states in its own right, and with figures beside the arguments that need them.
 
-\paragraph{How to read this appendix.} \Cref{thm:menger,thm:gomory-hu} and Mader's theorem are classical and may be skipped by readers who trust the cited results. The remaining sections contain the load-bearing directed and hypergraph arguments, and \Cref{sec:transcripts} records the source, commands, tests, and finite-output logs.
+\paragraph{How to read this appendix.} \Cref{thm:menger,thm:gomory-hu} and Mader's theorem are classical and may be skipped by readers who trust the cited results, as may the short proofs of the base-case values that follow them. The remaining sections contain the load-bearing directed and hypergraph arguments, and \Cref{sec:transcripts} records the source, commands, tests, and finite-output logs.
 
 % ---------------------------------------------------------------------------
 % These appendix figures use the SHARED thesis TikZ styles (../shared/tikz-
@@ -56,6 +56,29 @@ For every pair of vertices of a graph $G$, $\lec_G(u, v) \le \min(\deg u, \deg v
 
 \begin{proof}
 Every edge-disjoint $u$--$v$ path uses a distinct edge at $u$, so there are at most $\deg u$ of them, and likewise at most $\deg v$. In the directed case each arc-disjoint path leaves $u$ by a distinct out-arc and enters $v$ by a distinct in-arc.
+\end{proof}
+
+\Cref{ch:machine} leans on two monotonicity facts to keep the search's connectivity checks cheap. Both follow directly from max-flow / min-cut.
+
+\begin{proposition}[Monotonicity of the binding connectivity]\label{prop:monotone}
+Let $G$ be a graph or directed multigraph, and let $G'$ be obtained from $G$ by changing one adjacency by a single unit of multiplicity. Then
+% \Cref{ch:machine} cites these as "part (1)" and "part (2)", so this list
+% carries explicit numbers in place of the decorative global list icon.
+\begin{enumerate}[label=(\arabic*)]
+    \item \textup{(monotonicity)} removing the unit cannot raise $\lambda^{\max}$, and adding it cannot lower $\lambda^{\max}$, and
+    \item \textup{(unit step)} adding the unit raises $\lambda^{\max}$ by at most one.
+\end{enumerate}
+Both statements hold verbatim for the vertex measure $\kappa^{\max}$.
+\end{proposition}
+
+\begin{proof}
+Fix an ordered pair $(s,t)$. By the max-flow / min-cut theorem $\lambda_G(s,t)$ is the smallest capacity of any cut separating $s$ from $t$, where the capacity of a cut is the total multiplicity of the arcs that cross it from the source side to the sink side.
+
+For part (1), reducing one adjacency by a unit lowers the capacity of every cut that the changed arc crosses and leaves all other cut capacities untouched, so no cut capacity rises. The smallest cut capacity therefore cannot rise either, which gives $\lambda_{G'}(s,t) \le \lambda_G(s,t)$. Taking the maximum over all pairs yields $\lambda^{\max}(G') \le \lambda^{\max}(G)$. Adding a unit is the same statement read backwards.
+
+For part (2), write $G''$ for $G$ with one unit added to a single adjacency. That extra unit of capacity crosses any fixed cut at most once, so every cut has capacity at most one greater in $G''$ than in $G$. The smallest cut capacity thus grows by at most one, giving $\lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$, and together with part (1) we have $\lambda_G(s,t) \le \lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$. The maximum over pairs gives $\lambda^{\max}(G'') \le \lambda^{\max}(G) + 1$.
+
+For $\kappa^{\max}$ the argument is identical on the vertex-split network of \Cref{fig:vertex-split}, where changing an adjacency changes the capacity of its single arc $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the same way. Parallel copies leave that capacity at one and so change $\kappa^{\max}$ not at all, which only strengthens both parts.
 \end{proof}
 
 \section{Mader's theorem in full}
@@ -148,6 +171,18 @@ Rearranging gives $2|E(G)| \le m(n-1)$, and since $|E(G)|$ is an integer, $|E(G)
 
 The factor two comes from charging all but at most $n-1$ edges to at least two tree cuts. Parallel edges destroy that refinement, leaving the multigraph bound $(m-1)(n-1)$ of \Cref{thm:multigraph-edge}.
 
+\begin{proof}[Proof of \Cref{thm:multigraph-edge}]
+For the lower bound, take a spanning tree of $K_n$, that is, a connected cycle-free subgraph that touches all $n$ vertices and so has exactly $n-1$ edges, and give every tree edge multiplicity $m - 1$, meaning $m-1$ parallel copies. The result has $(m-1)(n-1)$ edges. Any two vertices are joined by a unique path in the tree, of some length $k \ge 1$. To separate them one must cut some edge of that path, and the cheapest choice is the lightest tree edge on it, which still carries $m-1$ copies, so $\lec(u, v) = m - 1$ for every pair and $\lec^{\max} = m - 1$. The graph sits right at the ceiling.
+
+For the upper bound, suppose $\lec_G^{\max} \le m - 1$ and build a Gomory--Hu tree $T$ of $G$ (\Cref{thm:gomory-hu}), the same $(n-1)$-edge summary of all connectivities used for Mader's theorem. Each tree edge $e$ stands for a minimum cut of $G$, of capacity $c(e) = \lec_G(u,v) \le m-1$ for the pair $(u,v)$ it represents. Now charge each edge of $G$ to a tree edge: an edge $\{x,y\}$ crosses the cut of the lightest tree edge on the tree path from $x$ to $y$, so it is counted inside that tree edge's capacity. Summing the $n-1$ capacities therefore counts every edge of $G$ at least once, which already gives $|E(G)| \le \sum_{e \in T} c(e) \le (m-1)(n-1)$. Unlike Mader's simple-graph count there is no second charge to halve, because parallel edges are now allowed and nothing forces an edge to be counted twice. The tree-of-multiplicity-$(m-1)$ construction above meets this bound exactly, which is why the answer is the clean product $(m-1)(n-1)$ and not a floor.
+\end{proof}
+
+The vertex measure at the first non-trivial ceiling is shorter still, and needs no tree at all.
+
+\begin{proof}[Proof of \Cref{prop:leonard-m2}]
+If $G$ contains a cycle, a closed loop of distinct vertices, then any two vertices on that cycle are joined by the two paths of the cycle, which are internally vertex-disjoint, so $\kap_G^{\max} \ge 2$. Hence $\kap_G^{\max} \le 1$ forces $G$ to be acyclic, free of cycles, and an acyclic graph on $n$ vertices has at most $n - 1$ edges, with equality for trees. A tree indeed has $\kap^{\max} = 1$: nonadjacent vertices have a unique path whose intermediate vertex separates them, while adjacent vertices are joined by their single edge alone.
+\end{proof}
+
 \begin{construction}[Hub-and-spokes graph]\label{const:hub-spokes}
 For $n \ge m \ge 2$, let $H_{m,n}$ have vertex set $\{h, v_1, \ldots, v_{n-1}\}$ with
 (i) all $n-1$ \emph{hub edges} $\{h, v_i\}$, and
@@ -206,6 +241,16 @@ The whole characterisation reads off that last identity. If $m(n-1)$ is even, eq
 \end{proof}
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
+
+\begin{remark}[Audit of the counting convention]\label{rem:threshold-audit}
+This remark completes \Cref{rem:threshold-convention}, which fixes the convention. What follows is the bookkeeping that convention forces on every constant quoted from the literature.
+
+The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ against $3n-3$, and it writes the Bollob\'{a}s-Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ where the convention here gives $\binom{m}{2}n$. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
+
+One trap is worth naming, because an earlier draft of this thesis fell into it. The comparison $k_5 > \ell_5$ is invariant under the shift, since \emph{both} functions move by one, so no internal check can detect a half-converted statement. What does detect it is evaluating the two sides in different conventions, which manufactures a spurious divergence one size early. Reading $\floor{8 \cdot 13/3} - 3 = 31$ against this thesis's $\ell_5(13) = 30$ appears to separate the two problems at $n = 13$, but the $31$ is a forcing count and the $30$ is an avoiding count. Done consistently, $k_5(13) = 30 = \ell_5(13)$ and the separation begins at $n = 14$, which is also what \cite{SorensenThomassen74} proves directly by showing $f_5(n) = \floor{5(n-1)/2} + 1$ throughout $6 \le n \le 13$.
+
+The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there covers every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies those two values separately, which is where the $k_5(7) = 15$ and $k_5(12) = 27$ of \Cref{thm:sorensen-thomassen} come from.
+\end{remark}
 
 \subsection{The vertex problem is a block problem}\label{sec:simple-vertex-blocks}
 
@@ -366,6 +411,16 @@ The proof above transfers the $m = 2$ induction but nothing more, and for $m \ge
 \]
 with every entry proved complete, so the two separations agree at every size the exhaustion reaches, and from $n = 3$ onwards both match the conjectured $\max(m(n-1), \floor{(n+m-2)^2/4})$. The table stops at $n = 6$ because that is where the exhaustion stops: at $n = 7$ neither sweep closes inside an hour and a half, and each returns the construction's $18$ as a bare lower bound. At $n = 2$ the conjecture's formula gives $3$ where only $2$ arcs exist at all, the usual degeneracy of the formula below $n = m$. Agreement over five sizes is evidence and not a proof, and the natural next question is structural rather than numerical: to separate the two problems one needs a digraph where some pair carries strictly more arc-disjoint routes than internally disjoint ones \emph{and} where that slack pays for extra arcs. The two demands pull against each other, which is perhaps why no small example does both.
 \end{remark}
+
+\begin{lemma}[The augmented bipartite digraph is feasible]\label{lem:augmented-feasible}
+For $m \ge 2$ and $n \ge m$, the digraph of \Cref{const:augmented-bipartite} satisfies $\lec^{\max} = m-1$ and has $\floor{(n+m-2)^2/4}$ arcs. Hence $\ell_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$.
+\end{lemma}
+
+\begin{proof}
+The arc count is $|B|\,(|A| + m - 2)$, one arc from each of the $|A|$ vertices of $A$ plus $m-2$ internal in-arcs, for each of the $|B|$ vertices of $B$. Now $|A| + m - 2 = \floor{(n+m-2)/2}$ and $|B| = \ceil{(n+m-2)/2}$, and the product of the two halves of an integer $N$ is $\floor{N^2/4}$, which gives the stated total at $N = n+m-2$.
+
+For the connectivity, fix $a \in A$ and $b \in B$. Two kinds of route run from $a$ to $b$: the direct arc, and the two-step detours $a \to b' \to b$ that pass through an in-neighbour $b'$ of $b$ inside $B$. There are $m - 2$ detours, so $m - 1$ routes in all, and no two of them share an arc. They are also all there are, because the only in-arcs of $b$ that $a$ can reach are exactly those $m - 1$ arcs. Deleting them therefore cuts every route from $a$ to $b$. Pairs inside $B$ are limited by the in-degree $m - 2$, pairs inside $A$ and pairs from $B$ to $A$ have no routes at all, so $\lec^{\max} = m - 1$.
+\end{proof}
 
 \section{Structural propositions on the directed frontier}
 
@@ -550,21 +605,9 @@ For any vertex $x$ of a digraph with total degree $d(x) = d^+(x) + d^-(x) > 0$,
 Write $\mu = \min(d^+(x), d^-(x))$ and $M = \max(d^+(x), d^-(x))$, so $\mu + M = d(x)$ and $\mu M = d^+(x)d^-(x)$. Since $\mu \le M$ we have $M \ge d(x)/2$, hence $d^+(x)d^-(x) = \mu M \ge \mu\, d(x)/2$, which rearranges to the claim.
 \end{proof}
 
-\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
-For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
-\]
-so for each fixed $m$,
-\[
-    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
-\]
-and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
-\end{theorem}
-
 In words: a feasible one-way simple graph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the truth of the matter, and the only thing still in question is how large the linear correction is. Nothing here assumes anything whatever about the shape of $D$.
 
-\begin{proof}
+\begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
 Induction on $n$. For $n = 2$ a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4(m-1) \ge 5$, so the base holds. Let $n \ge 3$ and split on the minimum total degree.
 
 \emph{Case 1: some vertex $v$ has $d(v) < n/2$.} Since $d(v)$ is an integer, $d(v) \le \floor{n/2}$. By \Cref{lem:subdigraph-monotone} the digraph $D - v$ on $n-1$ vertices is still feasible, so the induction hypothesis applies to it and
@@ -639,18 +682,7 @@ Read the proofs of \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-er
 
 The first application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} settles it at $m = 2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What does carry across is the route-counting, because the family Step 1 exhibits happens to be disjoint in the stronger sense as well, and once that is noticed the argument never needs the arc value at all.
 
-\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
-For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
-\]
-and consequently, for each fixed $m$,
-\[
-    k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
-\]
-\end{theorem}
-
-\begin{proof}
+\begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}]
 Fix an ordered pair $(u,v)$ of distinct vertices. The direct arc $(u,v)$, when it is present, is a route with no interior vertex at all, and a two-step route $u \to x \to v$ has interior exactly $\{x\}$, one vertex, distinct from both $u$ and $v$. Distinct midpoints give disjoint interiors, and the direct arc's interior is disjoint from all of them for want of any element, so these $\mathbf{1}_{(u,v) \in A(D)} + p_2(u,v)$ routes are pairwise internally vertex-disjoint and not merely arc-disjoint. Feasibility caps the family at $\kap_D(u,v) \le m-1$, so $D$ is $(m-1)$-budgeted and \Cref{lem:two-step-budget} applies.
 
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
@@ -671,13 +703,6 @@ For all $n \ge 2$, $\floorfrac{(n-1)^2}{4} + \floor{n/2} = \floorfrac{n^2}{4}$.
 \begin{proof}
 For $n = 2k$ the left side is $k(k-1) + k = k^2$, and for $n = 2k+1$ it is $k^2 + k = k(k+1)$. Both match the right side.
 \end{proof}
-
-\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
-For all $n \ge 2$ and $m \ge 2$,
-\[
-    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
-\]
-\end{theorem}
 
 \subsection{The lower bound: thickening}
 
@@ -1556,22 +1581,9 @@ exactly when some hyperedge of $\HH$ has tail $u$ and $v$ among its heads. Write
 $\mathrm{cod}(u,v)$ for the number of hyperedges realising that arc.
 \end{definition}
 
-\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
-Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
-$\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
-\[
-    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2 (n-1).
-\]
-The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
-stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
-edge- and the vertex-disjoint maxima are
-$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
-of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
-\end{theorem}
-
 In words: the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
-\begin{proof}
+\begin{proof}[Proof of \Cref{thm:dir-hyper-constant}]
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
 hyperedge's tail is not one of its heads.
 
@@ -1910,20 +1922,7 @@ Two things have to be checked for that maximum to be attained by a multigraph ov
 
 That the objective is a sum over edges of a \emph{local} quantity is what makes the second observation bite. Recall that a \emph{block} of a graph is a maximal connected subgraph with no cut vertex of its own, so every block is either $2$-connected or a single edge, every edge lies in exactly one block, and two blocks meet in at most one vertex.
 
-\begin{theorem}[The multigraph vertex problem is a knapsack over blocks]\label{thm:multi-vertex-blocks}
-For a $2$-connected graph $B$, or a single edge, write
-\[
-    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
-\]
-with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
-\[
-    K_m^{\mathrm{multi}}(n)
-    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
-\]
-the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
-\end{theorem}
-
-\begin{proof}
+\begin{proof}[Proof of \Cref{thm:multi-vertex-blocks}]
 \emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
 \[
     W_m(G_0) \;=\; \sum_{\text{blocks } B} W_m(B) .

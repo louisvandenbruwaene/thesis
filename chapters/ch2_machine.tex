@@ -59,14 +59,20 @@ A hyperedge is handled by adding one helper point, split by a unit-capacity arc,
 
 \begin{figure}[htbp]
 \centering
-\resizebox{0.82\textwidth}{!}{%
+% Printed legibility: this picture holds two 8-unit panels side by side, so
+% every extra centimetre of gap or of resize headroom is paid for twice over in
+% label size. The gap is kept tight, the box is given the full text width, and
+% the station and gate fonts are stepped up, which together lift the smallest
+% label from about 5.4pt to roughly 9pt on paper.
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[scale=0.92, >=Stealth,
    metro/.append style={line width=3.0pt},
-   faded/.style={metro, opacity=0.22, line width=2.2pt},
+   metrostop/.append style={font=\small\bfseries, minimum size=6.6mm},
+   faded/.style={metro, opacity=0.35, line width=2.2pt},
    flow/.style={line width=1.2pt, black!88, line cap=round,
                 preaction={draw, line width=3.0pt, white}},
    gate/.style={circle, fill=white, draw=black!30, line width=0.6pt,
-                inner sep=0.4pt, minimum size=12.5pt, font=\footnotesize}]
+                inner sep=0.4pt, minimum size=13.5pt, font=\small}]
 \def\stations{%
   \coordinate (Sa) at (0,0);  \coordinate (Sc) at (2,2);  \coordinate (Sd) at (6,2);
   \coordinate (Se) at (0,4);  \coordinate (Sj) at (8,4);  \coordinate (Sl) at (2,6);
@@ -104,7 +110,7 @@ A hyperedge is handled by adding one helper point, split by a unit-capacity arc,
   \node[font=\small] at (4,-1.4) {(a)};
 \end{scope}
 % --- panel (b): the helper-point flow network for the pair u, v ---
-\begin{scope}[xshift=11cm]
+\begin{scope}[xshift=9.6cm]
   \stations
   \coordinate (Helc) at (1,3);
   \coordinate (Hmcj) at (5,4);
@@ -175,9 +181,13 @@ tail, and at most one route uses the hyperedge. Directed and undirected
 hyperedges therefore use the same capacity-one gate, and only the incident wiring
 changes.
 
+% Printed legibility: three panels across at 0.32\textwidth shrank each picture
+% to roughly 0.58 of natural size and its labels to under 5pt. Stacking them
+% one per row at 0.70\textwidth reverses that, drawing each slightly larger
+% than natural instead.
 \begin{figure}[ht]
 \centering
-\begin{subfigure}[t]{0.32\textwidth}
+\begin{subfigure}[b]{0.70\textwidth}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -197,8 +207,10 @@ changes.
 \end{tikzpicture}}
 \caption{Split an ordinary vertex.}
 \label{fig:vertex-split}
-\end{subfigure}\hfill
-\begin{subfigure}[t]{0.32\textwidth}
+\end{subfigure}
+
+\bigskip
+\begin{subfigure}[b]{0.70\textwidth}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -214,8 +226,10 @@ changes.
 \end{tikzpicture}}
 \caption{Gate an undirected hyperedge.}
 \label{fig:hyper-gadget}
-\end{subfigure}\hfill
-\begin{subfigure}[t]{0.32\textwidth}
+\end{subfigure}
+
+\bigskip
+\begin{subfigure}[b]{0.70\textwidth}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth, gatearc/.style={gdir}]
@@ -459,7 +473,7 @@ The same sensitivities also explain a finished graph. Colouring a graph's arcs b
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.60\textwidth]{figures/sensitivity_mixed.png}
+    \includegraphics[width=0.85\textwidth]{figures/sensitivity_mixed.png}
     \caption{Arc sensitivity in a directed multigraph with $\lambda^{\max}=9$. Equal multiplicities can have different $\sigma$: the downstream bottleneck makes $s\to a$ cooler than $s\to b$, while arcs into the dead end $d$ have $\sigma=0$.}
     \label{fig:sensitivity}
 \end{figure}
@@ -468,32 +482,11 @@ A single cooling schedule can still settle into a local optimum, so in discovery
 
 \section{Keeping the checker cheap inside the search}
 
-The energy above reads the binding connectivity $\lambda^{\max}(G)$, and a literal implementation would call the checker afresh on the whole graph at every step. That checker is the most expensive routine in the program, one maximum flow per ordered pair, and the walk runs for thousands of steps with several restarts, so such a search would spend nearly all of its time remeasuring graphs that barely changed from the step before. Two elementary facts remove almost all of that work without altering a single number the search reports.
+The energy above reads the binding connectivity $\lambda^{\max}(G)$, and a literal implementation would call the checker afresh on the whole graph at every step. That checker is the most expensive routine in the program, one maximum flow per ordered pair, and the walk runs for thousands of steps with several restarts, so such a search would spend nearly all of its time remeasuring graphs that barely changed from the step before. Two elementary facts remove almost all of that work without altering a single number the search reports, and they are the monotonicity and unit-step bounds of \Cref{prop:monotone}. Removing a unit of multiplicity can never raise $\lambda^{\max}$, part~(1), and adding one can never lower it and raises it by at most one, part~(2). Both hold verbatim for $\kappa^{\max}$, and both fall straight out of max-flow / min-cut, so the proof sits in \Cref{app:proofs} with the rest of the machinery.
 
-\begin{proposition}[Monotonicity of the binding connectivity]\label{prop:monotone}
-Let $G$ be a graph or directed multigraph, and let $G'$ be obtained from $G$ by changing one adjacency by a single unit of multiplicity. Then
-% The prose below cites these as "part (1)" and "part (2)", so this list
-% carries explicit numbers in place of the decorative global list icon.
-\begin{enumerate}[label=(\arabic*)]
-    \item \textup{(monotonicity)} removing the unit cannot raise $\lambda^{\max}$, and adding it cannot lower $\lambda^{\max}$, and
-    \item \textup{(unit step)} adding the unit raises $\lambda^{\max}$ by at most one.
-\end{enumerate}
-Both statements hold verbatim for the vertex measure $\kappa^{\max}$.
-\end{proposition}
+Together they settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a single flow, capped so that it stops the instant it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
 
-\begin{proof}
-Fix an ordered pair $(s,t)$. By the max-flow / min-cut theorem $\lambda_G(s,t)$ is the smallest capacity of any cut separating $s$ from $t$, where the capacity of a cut is the total multiplicity of the arcs that cross it from the source side to the sink side.
-
-For part (1), reducing one adjacency by a unit lowers the capacity of every cut that the changed arc crosses and leaves all other cut capacities untouched, so no cut capacity rises. The smallest cut capacity therefore cannot rise either, which gives $\lambda_{G'}(s,t) \le \lambda_G(s,t)$. Taking the maximum over all pairs yields $\lambda^{\max}(G') \le \lambda^{\max}(G)$. Adding a unit is the same statement read backwards.
-
-For part (2), write $G''$ for $G$ with one unit added to a single adjacency. That extra unit of capacity crosses any fixed cut at most once, so every cut has capacity at most one greater in $G''$ than in $G$. The smallest cut capacity thus grows by at most one, giving $\lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$, and together with part (1) we have $\lambda_G(s,t) \le \lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$. The maximum over pairs gives $\lambda^{\max}(G'') \le \lambda^{\max}(G) + 1$.
-
-For $\kappa^{\max}$ the argument is identical on the vertex-split network of \Cref{fig:vertex-split}, where changing an adjacency changes the capacity of its single arc $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the same way. Parallel copies leave that capacity at one and so change $\kappa^{\max}$ not at all, which only strengthens both parts.
-\end{proof}
-
-These two facts settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part (1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part (2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a single flow, capped so that it stops the instant it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
-
-To know which case applies, the search carries a running upper bound on $\lambda^{\max}$, raised by one whenever it accepts an addition (part (2)) and left untouched when it accepts a removal (part (1)), and resynchronised to the exact value at the cadence where it already pays for flows to refresh the sensitivity map. The bound can only ever sit at or above the truth, so any step it clears is certainly feasible.
+To know which case applies, the search carries a running upper bound on $\lambda^{\max}$, raised by one whenever it accepts an addition (part~(2)) and left untouched when it accepts a removal (part~(1)), and resynchronised to the exact value at the cadence where it already pays for flows to refresh the sensitivity map. The bound can only ever sit at or above the truth, so any step it clears is certainly feasible.
 
 The key point is that the energy returned on every step is, by \Cref{prop:monotone}, exactly the value the naive implementation would have computed. Every accept-or-reject decision, every random draw, and the graph the walk finally returns are therefore unchanged, and the speed-up is invisible to every number the thesis reports. This is verified rather than asserted. A regression test runs both implementations, the fast one and a reference that measures exactly at every step, across all four graph variants and both separations, and checks that the two agree step for step in energy, in every accept-or-reject decision, and in the final graph, and that the returned graph is feasible under the exact checker. Nothing about the optimisation hides inside the bound: the witness the search reports is always certified by an exact measurement, exactly as in the slower search.
 
@@ -533,24 +526,24 @@ The directed simple arc problem at $m\ge3$ shows the boundary cleanly. Exhaustio
 \]
 passes through every exhausted value and through the construction-backed lower bounds beyond them. Its linear-to-quadratic crossover occurs at $n=9$ when $m=3$, just past the exhausted range, and at $n=10$ it gives the thirty-arc counterexample of \Cref{rem:counterexample-m3}.
 
-The paired grids of \Cref{fig:variant-bounds-comparison} apply that reading to all twelve variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds. filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[t]{0.495\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/variant_bounds_m3.png}
-        \caption{$m=3$}
-        \label{fig:variant-bounds-m3}
-    \end{subfigure}\hfill
-    \begin{subfigure}[t]{0.495\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/variant_bounds_m6.png}
-        \caption{$m=6$}
-        \label{fig:variant-bounds-m6}
-    \end{subfigure}
-    \caption{All twelve variants at $m=3$ and $m=6$. Rows select the model and columns the direction and separation, while colours encode theorem, conjecture, or interpolation, while filled squares are exact finite values and open circles are witnesses.}
-    \label{fig:variant-bounds-comparison}
-\end{figure}
+The paired grids of \Cref{fig:variant-bounds-m3,fig:variant-bounds-m6} apply that reading to all twelve variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds, while filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
 
 Where an upper bound exists, the search reaches it at every plotted size except the recorded directed $m=2$, $n=8$ stall. On the open directed sizes the named constructions, not the cooled walk, carry the best bounds once the extremal shape changes from a hub to a bipartite wall. The grid therefore validates the search where proof can check it and marks the remaining values honestly as evidence rather than conclusions.
+
+% Each grid holds twelve plot panels. Side by side at half the text width their
+% axis labels printed at under 2pt, so each now takes a full sideways page,
+% which is the only layout on A4 that leaves them legible. They are declared
+% after the closing paragraph so the running text fills its own page first.
+\begin{sidewaysfigure}[p]
+    \centering
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3.png}
+    \caption{All twelve variants at $m=3$. Rows select the model and columns the direction and separation, while colours encode theorem, conjecture, or interpolation, and filled squares are exact finite values against open circles for witnesses. \Cref{fig:variant-bounds-m6} is the same grid at $m=6$.}
+    \label{fig:variant-bounds-m3}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[p]
+    \centering
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6.png}
+    \caption{The same twelve variants at $m=6$, to be read against \Cref{fig:variant-bounds-m3}. Raising $m$ widens every feasible band, and the open circles thin out as the certified range falls behind the constructions.}
+    \label{fig:variant-bounds-m6}
+\end{sidewaysfigure}
