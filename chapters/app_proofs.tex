@@ -1,6 +1,6 @@
 This appendix carries every proof in the thesis. The body states the results and says in a few sentences what makes each one work, and the argument itself is here, together with the supporting lemmas and propositions that no chapter states in its own right, and with figures beside the arguments that need them.
 
-\paragraph{How to read this appendix.} \Cref{thm:menger,thm:gomory-hu} and Mader's theorem are classical and may be skipped by readers who trust the cited results, as may the short proofs of the base-case values that follow them. The remaining sections contain the load-bearing directed and hypergraph arguments, and \Cref{sec:transcripts} records the source, commands, tests, and finite-output logs.
+\paragraph{How to read this appendix.} It runs in four parts, and they are not of equal weight. \textsc{Part I} is classical machinery, \Cref{thm:menger,thm:gomory-hu} and Mader's theorem, and may be skipped by a reader who trusts the cited results. \textsc{Parts II} and \textsc{III} carry the original arguments, and a reader with time for three of them should read \Cref{thm:dir-multi-full} (the directed multigraph value, closed for every $n$ and $m$ by deleting a reachability skeleton rather than a vertex), \Cref{lem:incidence-rank} with \Cref{thm:hyper-vertex-m3} (the incidence rank bound proved through Tutte's triconnected decomposition, which settles the hypergraph vertex problem at $m = 3$), and \Cref{lem:two-step-budget} with the three theorems it drives, \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}, which pin four of the twelve variants asymptotically with no hypothesis on the shape of the extremiser. \textsc{Part IV} holds one self-contained extension and the computational audit.
 
 % ---------------------------------------------------------------------------
 % These appendix figures use the SHARED thesis TikZ styles (../shared/tikz-
@@ -29,6 +29,26 @@ This appendix carries every proof in the thesis. The body states the results and
   % apname with text=<colour>.)
   apname/.style={font=\scriptsize, inner sep=1.5pt},
 }
+
+% ---------------------------------------------------------------------------
+% Part dividers. The appendix is one chapter, so its ten sections would
+% otherwise present as a flat list longer than any body chapter. \apppart draws
+% a labelled rule before each group and writes the group into the table of
+% contents, so a reader can find the directed work or the hypergraph work
+% without scanning every section heading. It introduces no numbering and no new
+% label, so every \Cref{app:proofs} in the body still resolves to this chapter.
+% ---------------------------------------------------------------------------
+\newcommand{\apppart}[2]{%
+  \par\addvspace{1.2\baselineskip}%
+  \phantomsection% own anchor, so the bookmark does not collide with the chapter's
+  \addcontentsline{toc}{section}{\protect\numberline{}\textsc{#1}}%
+  \noindent{\color{KULblauw1}\rule{\linewidth}{1.1pt}}\par\nobreak
+  \vspace{2pt}\noindent{\normalfont\bfseries\color{KULblauw1}#1}\par\nobreak
+  \vspace{1pt}\noindent{\normalfont\small\itshape\color{black!70}#2}\par\nobreak
+  \vspace{2pt}\noindent{\color{KULblauw1}\rule{\linewidth}{0.4pt}}\par\nobreak
+  \addvspace{0.4\baselineskip}}
+
+\apppart{Part I. Classical machinery}{The two theorems every later argument runs on, and Mader's theorem proved in full through the Gomory--Hu tree. Cited results, reproved here so the thesis stands on its own.}
 
 \section{Menger, Gomory--Hu, and the degree bound}
 
@@ -307,6 +327,8 @@ The natural strengthening is that a feasible graph always has a vertex of degree
 \]
 halving the constant in the only general upper bound known. It holds for $m = 3$, where it is classical: a graph of minimum degree at least three contains a subdivision of $K_4$, and two branch vertices of that subdivision are joined by three internally disjoint paths. Exhaustive search over all graphs with minimum degree at least $m$ finds no feasible one for $m \le 6$ and $n \le 10$. It is stated here as a question rather than a conjecture, since the sizes reached are well below those at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
+
+\apppart{Part II. The directed results}{The exact value at $m=2$, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
 
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}
 
@@ -692,7 +714,7 @@ The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as th
 
 \section{The directed multigraph problem, solved in full}
 
-The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section just below, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. It is natural to hope that the same trick settles the multigraph case at every $m$ too, and for a long while it very nearly does. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
+The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. It is natural to hope that the same trick settles the multigraph case at every $m$ too, and for a long while it very nearly does. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
 This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every pair's connectivity by at least one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
@@ -998,9 +1020,11 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 
 Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. What can be said is that nothing in the argument suggests a real boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, a degree fact falls out of the same equality and is worth recording on its own, since it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, the shape of the argument is worth noticing. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
 
+\apppart{Part III. The hypergraph results}{The edge bound through a hypergraph Gomory--Hu tree, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
+
 \section{The hypergraph bounds}
 
-The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem from the recent literature.
+The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem, which is the classical construction of Gomory and Hu \cite{GomoryHu61} run on a symmetric submodular cut function rather than on the edge-cut function, as set out by Hanifehnezhad and Dolati \cite{HanifehnezhadDolati20}.
 
 \begin{theorem}[Menger for hypergraphs]\label{thm:menger-hyper}
 For a hypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disjoint Berge $u$--$v$ paths equals the minimum size of a set $C$ of hyperedges whose removal separates $u$ from $v$.
@@ -1020,7 +1044,7 @@ Build the helper-point network of \Cref{fig:hyper-gadget}: for each hyperedge $e
 Every $r$-uniform hypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$, its \emph{hypergraph Gomory--Hu tree}, such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path, and each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with $|\delta_\HH(S_t)| = c^*(t)$, where $\delta_\HH(S)$ is the set of hyperedges incident to both sides, that is, having at least one vertex in $S$ and at least one outside it.
 \end{theorem}
 
-This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedges straddling it, $|\delta_\HH(S)|$, in place of the edges. Gomory and Hu's construction \cite{GomoryHu61} needs nothing about the cut function beyond it being symmetric and submodular, and the hyperedge-cut function $|\delta_\HH(\cdot)|$ has both properties exactly as the ordinary edge-cut function does, so the identical uncrossing construction builds this tree too. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $|\delta_\HH(S_t)| = c^*(t)$.
+This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedges straddling it, $|\delta_\HH(S)|$, in place of the edges. Gomory and Hu's construction \cite{GomoryHu61} needs nothing about the cut function beyond it being symmetric and submodular \cite{HanifehnezhadDolati20}, and the hyperedge-cut function $|\delta_\HH(\cdot)|$ has both properties exactly as the ordinary edge-cut function does, so the identical uncrossing construction builds this tree too. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $|\delta_\HH(S_t)| = c^*(t)$.
 
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
 \emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
@@ -1785,6 +1809,8 @@ between them at $n \approx r$ are a small-size effect that the asymptotics canno
 see.
 
 
+\apppart{Part IV. One extension, and the audit}{A separate extremal problem that the parallel-copy convention of \Cref{sec:parallel-convention} sets aside, and the record of what was computed, with what, and to what standard.}
+
 \section{The multigraph vertex problem under the other convention}\label{sec:multi-vertex-standard}
 
 \Cref{sec:parallel-convention} collapses parallel copies in vertex mode, which makes the two multigraph vertex variants restatements of their simple counterparts and is why they carry no theorem of their own. This section takes the other reading seriously, because under it the question is genuinely new, and records what can be proved and what the machine finds. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally vertex-disjoint $u$-$v$ routes, since a single edge is a path with no interior. Write $K_m^{\mathrm{multi}}(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$ under this reading.
@@ -1984,11 +2010,19 @@ between $3-2\sqrt2$ and $2$.
 \label{app:software-reproduction}
 
 The authoritative code and audit instructions are maintained in the versioned
-repository at \url{https://github.com/louisvandenbruwaene/thesis}, and the
-submitted snapshot should record an immutable commit. From \code{program/},
+repository at \url{https://github.com/louisvandenbruwaene/thesis}. The snapshot
+this document was built from is commit \thesiscommit, which is the immutable
+reference for every number reported here. Anything later in that repository is a
+continuation and not what was submitted. From \code{program/},
 \code{python erdos915\_unified.py} runs the principal checks and
 \code{python -m unittest discover -s tests -v} runs the regression suite.
 \code{python make\_figures.py} regenerates the computational figures.
+The dependency ranges the program needs are in \code{program/requirements.txt},
+and the exact versions these runs were last verified against are pinned in
+\code{program/requirements-lock.txt}: Python 3.14.6 with NumPy 2.4.6,
+SciPy 1.18.0 and PuLP 3.3.2, plus Matplotlib 3.11.0 and NetworkX 3.6.1 for the
+two optional roles. Installing from the lock file reproduces that environment
+exactly.
 
 The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and are settled by a pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, so each completed row is an upper-bound proof at that $n$. The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. \Cref{tab:basecase-search} records both runs. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}, and that agreement is a computed coincidence of the two searches rather than a formal consequence of Whitney's inequality.
 

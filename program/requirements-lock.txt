@@ -1,0 +1,18 @@
+# The exact environment the reported values, figures and test suite were last
+# verified in (2026-08-25). Reproduce it with
+#
+#     python3 -m venv .venv && ./.venv/bin/pip install -r requirements-lock.txt
+#
+# Python 3.14.6 on macOS (darwin, arm64).
+#
+# Core, required.
+numpy==2.4.6
+scipy==1.18.0
+
+# MILP certifier (prove_directed_multigraph / prove_integral_arc_bound).
+pulp==3.3.2
+
+# Optional, presentation only: matplotlib renders the figures, networkx supplies
+# the Gomory-Hu tree behind one figure. The test suite skips cleanly without both.
+matplotlib==3.11.0
+networkx==3.6.1

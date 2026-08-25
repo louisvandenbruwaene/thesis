@@ -75,7 +75,7 @@ The interplay then pays back in the other direction. The hypergraph vertex probl
 \begin{tabular}{ll}
 MILP & mixed-integer linear program \\
 SA & simulated annealing \\
-SPQR & the triconnected decomposition tree (series, parallel, rigid pieces) \\
+SPQR & the triconnected decomposition tree (S series, P parallel, Q single edge, R rigid) \\
 \end{tabular}
 
 \bigskip
@@ -102,6 +102,8 @@ $M(n)$ & $\max\bigl(2(n-1), \floor{n^2/4}\bigr)$, the directed multigraph value 
 $M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$, equal to $M(n)$ by \Cref{cor:mstar-integral} \\
 $B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
 $\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
+$h_m(b)$ & most edges a feasible $2$-connected block on $b$ vertices can carry (\Cref{thm:simple-vertex-blocks}) \\
+$c_m$ & per-vertex growth constant of the simple undirected vertex problem, $c_m = \lim_{n\to\infty} k_m(n)/(n-1) = \sup_{b\ge2} h_m(b)/(b-1)$ (\Cref{thm:simple-vertex-blocks}) \\
 $\sigma(e)$ & edge sensitivity $\lambda^{\max}(G)-\lambda^{\max}(G-e)$ \\
 \end{tabular}
 

@@ -98,7 +98,9 @@ One example fixes the scale. The complete graph $K_n$ joins every pair, so every
 
 Mader's theorem is the floor we build on, and everything afterwards is a variation on it. There are three independent ways to change the rules, and they generate the landscape this thesis traverses.
 
-The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two independent choices generate it. The first is \emph{arity}: an edge may join exactly two vertices, or a \emph{hyperedge} may join any $r \ge 2$ of them, a route then passing through it between any two of its members. At $r = 2$ a hyperedge is an ordinary edge, so graphs are the $r = 2$ special case and the genuinely new setting begins at $r \ge 3$. The second is \emph{multiplicity}: a \emph{simple} object carries at most one copy of each edge, while a \emph{multi} object allows parallel copies, recorded by a multiplicity $\mu(u, v)$, so a single pair can already carry several independent routes. Because the two choices are independent they form a small lattice. At the top sits the most general object, the \emph{multi-hypergraph}, and lowering one toggle at a time restricts it downward: forbidding repeats gives the simple hypergraph, dropping the arity to two gives the multigraph, and doing both gives the simple graph at the bottom. Every theorem in this thesis is a statement about one node of this lattice, and the three rows of every comparison figure are its simple-graph, multigraph, and hypergraph levels.
+The first axis is the \emph{model}, drawn in \Cref{fig:three-models}. Two independent choices generate it. The first is \emph{arity}: an edge may join exactly two vertices, or a \emph{hyperedge} may join any $r \ge 2$ of them, a route then passing through it between any two of its members. At $r = 2$ a hyperedge is an ordinary edge, so graphs are the $r = 2$ special case and the genuinely new setting begins at $r \ge 3$. The second is \emph{multiplicity}: a \emph{simple} object carries at most one copy of each edge, while a \emph{multi} object allows parallel copies, recorded by a multiplicity $\mu(u, v)$, so a single pair can already carry several independent routes. Because the two choices are independent they form a small lattice. At the top sits the most general object, the \emph{multi-hypergraph}, and lowering one toggle at a time restricts it downward: forbidding repeats gives the simple hypergraph, dropping the arity to two gives the multigraph, and doing both gives the simple graph at the bottom. Every theorem in this thesis is a statement about one node of this lattice.
+
+The lattice has four nodes, but the count of variants below, and the three rows of every comparison figure, use only three model rows: simple graph, multigraph, and $r$-uniform hypergraph. The reason is that multiplicity does not do the same work at both arities. At $r = 2$ it changes the answer outright, $\floor{m(n-1)/2}$ against $(m-1)(n-1)$, so the simple and multi rows are two genuinely different problems. At $r \ge 3$ every upper bound proved here is proved for multihypergraphs and therefore holds for simple hypergraphs as well. What separates the two conventions is only \emph{where} the bound is attained, and each hypergraph statement records that as a side condition on $n$, $r$, and $m$ rather than as a second problem. The hypergraph row accordingly carries both conventions at once, with the attainment ranges stated in \Cref{tab:summary} and proved in \Cref{app:proofs}.
 
 \begin{figure}[ht]
 \centering
@@ -311,9 +313,10 @@ of its heads.
 % the fourth is already u->v
 
 % --- extra arcs to make the digraph richer ---
-% two arcs from 0 to 2 (one normal, one parallel)
+% one arc from 0 to 2.  Kept SIMPLE on purpose: this figure illustrates the
+% directed measure in the simple-digraph discussion, so no pair carries a
+% parallel copy.  Parallel arcs are drawn in the multigraph figures instead.
 \draw[me] (v0) to[bend right=12] (v2);
-\draw[me] (v0) to[bend right=24] (v2);   % second arc, more bent
 
 % one arc from 0 to 3 and one back:
 \draw[me] (v0) to[bend right=12] (v3);
@@ -365,7 +368,7 @@ of its heads.
 
 \end{tikzpicture}
 
-\caption{Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directed cut (red). Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
+\caption{Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directed cut (red) in a \emph{simple} digraph. Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
 \label{fig:directed-lambda}
 \end{figure}
 
@@ -393,7 +396,8 @@ The third axis is the \emph{separation}: routes may be required to avoid sharing
 \end{figure}
 
 Three models, two directions, two separations give twelve versions of one
-question. This chapter proves the short cases before the machine treats the
+question, the hypergraph model covering the simple and multi conventions
+together for the reason given above. This chapter proves the short cases before the machine treats the
 family uniformly. The final status map appears in \Cref{fig:variant-tree-status}.
 
 \section{Two variants that settle at once}
@@ -620,7 +624,7 @@ The counterexample generalises: the five-cycle gave every vertex of $B$ exactly 
 \begin{construction}[Augmented bipartite digraph]\label{const:augmented-bipartite}
 For $m \ge 2$ and $n \ge m$, set $|B| = \ceil{(n+m-2)/2}$ and $|A| = n - |B| = \floor{(n-m+2)/2}$, include every arc from $A$ to $B$, and inside $B$ give each vertex $b_j$ the $m-2$ in-arcs from its cyclic predecessors $b_{j-1}, \dots, b_{j-(m-2)}$ (indices mod $|B|$). The total is $\floor{(n+m-2)^2/4}$ arcs.
 
-Its arc count is the product of the two halves of $n+m-2$, and its connectivity is verified in \Cref{app:proofs}. The point there is that the only in-arcs of a $b \in B$ that any $a \in A$ can reach are the direct arc $a \to b$ and the $m-2$ two-step detours through $b$'s in-neighbours inside $B$, so each such pair carries exactly $m-1$ arc-disjoint routes and no more, while pairs inside $B$ are held down by the in-degree $m-2$ and pairs starting in $B$ or staying in $A$ have no routes at all.
+Its arc count is the product of the two halves of $n+m-2$, and its connectivity is verified in \Cref{app:proofs}. The point there is that the only in-arcs of a $b \in B$ that any $a \in A$ can reach are the direct arc $a \to b$ and the $m-2$ two-step detours through $b$'s in-neighbours inside $B$, so each such pair carries exactly $m-1$ arc-disjoint routes and no more, while pairs inside $B$ are held down by the in-degree $m-2$, and pairs from $B$ to $A$ or inside $A$ have no routes at all.
 
 At $m = 2$ the inside of $B$ is empty and the construction reduces to \Cref{const:bipartite}, with the balanced partition $(\floor{n/2}, \ceil{n/2})$. At $m = 3$ the formula gives $|B| = \ceil{(n+1)/2}$, which coincides with $\ceil{n/2}$ at odd $n$ but gives $|B| = n/2 + 1$ at even $n$. Both the balanced and the shifted partition achieve the same arc count $\floor{n^2/4} + \ceil{n/2}$ in this case, so the two are interchangeable at $m = 3$. The shift to a strictly larger $B$ is structurally significant only at $m \ge 4$, where the balanced partition is suboptimal. At $m = 3$, $n = 10$ it is the thirty-arc counterexample of \Cref{rem:counterexample-m3}, drawn in \Cref{fig:augmented-bipartite} (using the equivalent balanced partition $|A| = |B| = 5$).
 \end{construction}
@@ -646,6 +650,8 @@ The route between two vertices is a \emph{Berge path}, which alternates vertices
 With routes redefined this way the same Gomory--Hu machinery that proved the multigraph value carries over, and the base case has the same linear shape. The picture to keep in mind is a metro map: each hyperedge is a line, and a route from one vertex to another rides a line and changes to another line at a station the two share.
 
 A single hyperedge may serve only one route, so two Berge routes that share no hyperedge are edge-disjoint, the hypergraph counterpart of two edge-disjoint paths in a graph. In the metro picture, two hyperedges that share several vertices are distinct lines calling at several of the same stations, as in \Cref{fig:three-models}. Two routes are hyperedge-disjoint exactly when they never ride the same line.
+
+This is one of several inequivalent notions of hypergraph connectivity, and the choice matters, so it is worth saying which one is meant. Dewar, Pike and Proos \cite{DewarPikeProos18} survey the competing definitions and how they separate, and Berge routes with hyperedge-disjointness are the notion used throughout here, matching Berge's own \cite{Berge89}. The dual cut side is the hyperedge cut, whose minimisation is studied algorithmically by Chekuri and Xu \cite{ChekuriXu17}, and it is exactly the quantity the checker of \Cref{ch:machine} computes and the hypergraph Gomory--Hu tree of \Cref{thm:hyper-gomory-hu} organises.
 
 The separation axis needs its own definition here, and it is worth fixing now because the natural guess is not the one this thesis uses. Two Berge routes are called \emph{internally disjoint} when they share neither an intermediate vertex nor a hyperedge. Both halves are required. Demanding only that the routes avoid each other's intermediate stations would let two routes ride the same line, and a line that can run only one train at a time cannot serve two routes at once, so the resulting count would not correspond to anything the metro map can carry. Requiring both is also what makes the vertex measure the exact analogue of the graph one under the translation of \Cref{app:proofs}, where a hypergraph becomes its incidence graph, each hyperedge becomes a node, and internally disjoint routes become internally disjoint paths in the ordinary sense. It has the pleasant side effect that Whitney's inequality survives the move to hypergraphs by definition, since an internally disjoint family is in particular hyperedge-disjoint. Write $\kap_\HH(u,v)$ for the largest such family and $\kap^{\max}_\HH$ for its maximum over pairs.
 

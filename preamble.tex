@@ -462,6 +462,27 @@
 \author{Louis Vandenbruwaene}
 \date{Academic Year 2026--2027}
 
+% PDF document properties, so the file identifies itself in a reader's title bar,
+% in a library catalogue, and in any tool that reads the metadata rather than the
+% cover page. Without these the fields are blank.
+\hypersetup{
+    pdftitle={Connectivity Bounds in Graphs and Beyond},
+    pdfauthor={Louis Vandenbruwaene},
+    pdfsubject={Extremal graph theory: Erdos Problem 915 across twelve structural variants},
+    pdfkeywords={extremal graph theory, edge-disjoint paths, vertex-disjoint paths,
+                 local connectivity, Menger, Gomory-Hu, hypergraphs, digraphs,
+                 Erdos Problem 915, mixed-integer linear programming, tabu search},
+    pdfcreator={pdfTeX},
+}
+
+% The submitted snapshot. revision.tex is written by ./record_revision.sh, which
+% also tags the same commit, so the printed hash and the tag always agree. When
+% the file is absent (a working build between revisions) the appendix says so
+% rather than printing a stale hash.
+\newcommand{\thesistag}{submitted}
+\newcommand{\thesiscommit}{not recorded in this build}
+\IfFileExists{revision.tex}{\input{revision.tex}}{}
+
 % ============================================================================
 % OFFICIAL FACULTY OF SCIENCE COVER
 % ============================================================================

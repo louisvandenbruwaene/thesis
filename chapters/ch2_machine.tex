@@ -13,12 +13,12 @@ The last chapter ended with several variants stuck for different reasons, but al
 
 Everything in this chapter is a single function, \code{solve}, and it helps to hold its most basic version in mind from the start, because every later idea is a refinement of it and nothing is ever a separate program for a separate case. Given $n$ and $m$, the basic strategy is as plain as it sounds. Walk through every graph on $n$ vertices, measure the largest local connectivity $\lambda^{\max}$ of each with a max-flow computation, and keep the densest graph that stays at or below the ceiling $m - 1$. Because it has looked at every graph, the count it returns is the exact answer, not an estimate.
 
-That one loop already settles the smallest cases, and the rest of the chapter is built on top of it. We first make the measurement step trustworthy and quick, via the connectivity checker and a Gomory--Hu shortcut for undirected graphs. We then make the enumeration step skip whole families of hopeless graphs, via a pruned search. Finally, for the directed multigraph case, we describe the cut-counting optimisation used for the historical finite checks. The public \code{solve} interface now returns the general hand theorem directly for that variant, while the optimisation remains available as an independent experiment.
+That one loop already settles the smallest cases, and the rest of the chapter is built on top of it. We first make the measurement step trustworthy and quick, via the connectivity checker and a Gomory--Hu shortcut for undirected graphs. We then make the enumeration step skip whole families of hopeless graphs, via a pruned search. Finally, for the directed multigraph case, we describe the cut-counting optimisation used for the historical finite checks. The public \code{solve} interface now returns the general hand theorem directly for that variant, while the optimisation remains available as an independent experiment, invoked on its own rather than through \code{solve}.
 
 \codecard{solve(n, m, directed, simple, separation, exhaustive, max\_seconds)}{DRIVER}
 {the variant booleans \code{directed} and \code{simple} (or \code{hypergraph} with uniformity \code{r}), the \code{separation} (edge or vertex), $n$, $m$, the \code{method}, and a time budget \code{max\_seconds}}
 {a \code{SolveResult} carrying a value with an honest label: exact, lower bound, or upper bound}
-{picks the method the case allows: brute-force enumeration, the pruned search, or the cut-counting certifier when proving, and the temperature search or tabu search when discovering. It always respects the budget, and it is the one function the rest of the thesis ever calls.}
+{picks the method the case allows. Proving a matrix model runs the pruned branch and bound for simple digraphs, the closed form of \Cref{thm:dir-multi-full} for the directed multigraph arc value, and brute-force enumeration otherwise. Proving a hypergraph runs its own enumeration. Discovering runs tabu search or, with \code{method="sa"}, simulated annealing, again with a separate routine for hypergraphs. The cut-counting certifier is \emph{not} reached from here: it is called on its own as \code{prove\_directed\_multigraph}. The budget is checked between iterations, so a single iteration may overrun it.}
 
 \section{A single representation for all variants}
 All graph variants use one multiplicity matrix $\mu$: it is symmetric when
@@ -218,10 +218,24 @@ changes.
 \begin{scope}[on background layer]\draw[metro, metroA] (a)--(b)--(c);\end{scope}
 \node[smallvertex] at (a) {$a$}; \node[smallvertex] at (b) {$b$}; \node[smallvertex] at (c) {$c$};
 \draw[->, very thick, color=KULblauw3b] (2.85, 0.0) -- (3.95, 0.0);
-\begin{scope}[xshift=4.8cm]
-\node[smallvertex] (a2) at (0.0, 0.0) {$a$}; \node[smallvertex] (b2) at (1.0, 0.0) {$b$}; \node[smallvertex] (c2) at (2.0, 0.0) {$c$};
-\node[hnode, fill=metroA!70, minimum size=15pt] (h) at (1.0, 1.15) {$h_e$};
-\draw[edge] (a2) -- (h); \draw[edge] (b2) -- (h); \draw[edge] (c2) -- (h);
+\begin{scope}[xshift=4.6cm]
+% members in a column, gate pair beside them: every member sends one uncapped
+% arc into e^- and receives one uncapped arc out of e^+.
+\node[smallvertex] (a2) at (0.0,  1.30) {$a$};
+\node[smallvertex] (b2) at (0.0,  0.00) {$b$};
+\node[smallvertex] (c2) at (0.0, -1.30) {$c$};
+\node[hnode, fill=metroA!35, minimum size=15pt] (em) at (2.05,  0.62) {$e^-$};
+\node[hnode, fill=metroA!70, minimum size=15pt] (ep) at (2.05, -0.62) {$e^+$};
+% into the gate
+\draw[gdirfaint] (a2) to[bend left=8]  node[above, font=\scriptsize, text=black!55, pos=0.55]{$\infty$} (em);
+\draw[gdirfaint] (b2) to[bend left=10] (em);
+\draw[gdirfaint] (c2) to[bend left=22] (em);
+% out of the gate
+\draw[gdirfaint] (ep) to[bend left=22] (a2);
+\draw[gdirfaint] (ep) to[bend left=10] (b2);
+\draw[gdirfaint] (ep) to[bend left=8]  node[below, font=\scriptsize, text=black!55, pos=0.45]{$\infty$} (c2);
+% the one bottleneck
+\draw[gdir, line width=1.6pt, color=KULblauw3b] (em) -- node[right, font=\scriptsize]{cap $1$} (ep);
 \end{scope}
 \end{tikzpicture}}
 \caption{Gate an undirected hyperedge.}
@@ -240,21 +254,26 @@ changes.
 \end{scope}
 \draw[->, very thick, color=KULblauw3b] (2.4, 0.1) -- (3.5, 0.1);
 \begin{scope}[xshift=5.4cm]
-  \node[smallvertex] (a2) at (0.0, 1.05) {$a$}; \node[hnode, fill=metroB!20, minimum size=15pt] (g) at (0.0, 0.0) {$g_e$};
-  \node[smallvertex] (b2) at (-0.95, -1.05) {$b$}; \node[smallvertex] (c2) at (0.95, -1.05) {$c$};
-  \draw[gatearc] (a2) -- node[right, font=\scriptsize]{cap $1$} (g); \draw[gatearc] (g) -- (b2); \draw[gatearc] (g) -- (c2);
+  \node[smallvertex] (a2) at (0.0, 1.55) {$a$};
+  \node[hnode, fill=metroB!35, minimum size=15pt] (gm) at (0.0,  0.42) {$e^-$};
+  \node[hnode, fill=metroB!70, minimum size=15pt] (gp) at (0.0, -0.42) {$e^+$};
+  \node[smallvertex] (b2) at (-1.05, -1.55) {$b$}; \node[smallvertex] (c2) at (1.05, -1.55) {$c$};
+  \draw[gdirfaint] (a2) -- node[right, font=\scriptsize, text=black!60]{$\infty$} (gm);
+  \draw[gdir, line width=1.6pt, color=KULblauw3b] (gm) -- node[right, font=\scriptsize]{cap $1$} (gp);
+  \draw[gdirfaint] (gp) -- node[left, font=\scriptsize, text=black!60]{$\infty$} (b2);
+  \draw[gdirfaint] (gp) -- node[right, font=\scriptsize, text=black!60]{$\infty$} (c2);
 \end{scope}
 \end{tikzpicture}}
 \caption{Orient the hyperedge gate.}
 \label{fig:dir-hyper-gadget}
 \end{subfigure}
-\caption{The three capacity-one reductions used by the checker. Each forces competing routes through one unit-capacity bottleneck. Direction changes only how the gate is wired.}
+\caption{The three capacity-one reductions used by the checker. Each forces competing routes through \emph{one} unit-capacity bottleneck, drawn in dark blue: the internal arc $e^- \to e^+$ of the gate, or $v^{\mathrm{in}} \to v^{\mathrm{out}}$ for a split vertex. The membership arcs joining the gate to the hyperedge's vertices are uncapped, marked $\infty$. Direction changes only which of them are drawn. Undirected, every member links to the gate both ways. Directed, tails enter $e^-$ and heads leave $e^+$.}
 \label{fig:checker-gadgets}
 \end{figure}
 
 Adding ordinary vertex splitting to the directed gate measures the vertex variant as
 well, so the same reduction covers all four hypergraph cases.
-The gate is indifferent to how a hyperedge's vertices are split between tails and heads. It draws one capacity-one arc in from every tail and one out to every head, so the single forward tail it was built for is only the simplest case: give it a hyperedge with several tails and one head, or several of each, and it still counts the routes that enter at a tail and leave at a head. The same checker therefore measures every \emph{orientation model} of a directed Berge edge, not just the one-tail one, and \Cref{sec:orientation-models} takes up which of those models are worth distinguishing and what the program finds for them.
+The gate is indifferent to how a hyperedge's vertices are split between tails and heads. It draws one uncapped arc in from every tail and one uncapped arc out to every head, and the single unit of capacity sits where it always sits, on the internal arc $e^- \to e^+$. That placement is what makes the count right, and it is worth saying why the obvious alternative does not. Capping each tail's own arc at one instead would let a hyperedge with several tails carry one route per tail, so a single Berge edge would be usable several times over and the flow would overcount the disjoint routes. One shared bottleneck, entered from any tail and left toward any head, is used at most once no matter how many arcs feed it. The single forward tail the gate was built for is therefore only the simplest case: give it a hyperedge with several tails and one head, or several of each, and it still counts the routes that enter at a tail and leave at a head. The same checker therefore measures every \emph{orientation model} of a directed Berge edge, not just the one-tail one, and \Cref{sec:orientation-models} takes up which of those models are worth distinguishing and what the program finds for them.
 
 With the checker in place the proposed value of \Cref{prop:hyper-edge} can be tested on any small hypergraph the way every other variant is, which is the subject of the next section.
 
@@ -379,14 +398,19 @@ By max-flow/min-cut, $\mathrm{maxflow}(s,t)\le1$ exactly when some $s$--$t$ cut 
 With scaled weights $w$, binary side labels $x$, and non-negative crossing weights $p$, the model is
 \begin{align*}
     \text{maximise} \quad & \sum_{u \ne v} w(u, v) \\
-    \text{subject to} \quad & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
+    \text{subject to} \quad & x^{st}_s = 1, \quad x^{st}_t = 0 && \text{for all } (s,t), \\
+    & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
     & \sum_{u \ne v} p^{st}_{uv} \le 1 && \text{for all } (s,t), \\
     & w(s,t) + \sum_{x} \min\bigl(w(s,x), w(x,t)\bigr) \le 1 && \text{for all } (s,t), \\
     & d(v_0) \le d(v_1) \le \dots \le d(v_{n-1}), && \text{with } d(v) = \textstyle\sum_{u \ne v} \bigl(w(u,v) + w(v,u)\bigr), \\
     & w \in [0,1], \quad x \in \{0,1\}.
 \end{align*}
 
-Because $w\le1$, the first constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The second constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
+The first line is what makes the labelling an $s$--$t$ cut rather than an arbitrary bipartition, and it is not optional. Without it the all-zero labelling $x \equiv 0$ is admissible, no ordered pair $(u,v)$ ever crosses, every $p^{st}_{uv}$ rests at $0$, and the cut constraint below is satisfied by every weight matrix whatsoever. Pinning the source side of $s$ and the sink side of $t$ removes that escape and leaves the remaining $n-2$ labels free, which is precisely the choice of an $s$--$t$ cut. The implementation supplies these two values as constants rather than as variables (\code{program/erdos915\_unified.py}, in \code{\_cut\_counting\_model}), which is the same restriction imposed one step earlier.
+
+Because $w\le1$, the second constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The third constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
+
+The $\min$ in the two-step line is written as a minimum for readability only. A linear program cannot take one directly. It is linearised in the usual way, by an auxiliary variable $z^{sxt} \in [0,1]$ held below both arguments, $z^{sxt} \le w(s,x)$ and $z^{sxt} \le w(x,t)$, together with a binary selector $b^{sxt}$ and the two big-$M$ inequalities $z^{sxt} \ge w(s,x) - (1 - b^{sxt})$ and $z^{sxt} \ge w(x,t) - b^{sxt}$, which force $z^{sxt}$ up to whichever argument is the smaller. The displayed $\min$ is then the value of $z^{sxt}$.
 
 \begin{figure}[ht]
 \centering
@@ -442,11 +466,11 @@ Three readings of the figure matter for what follows. Adding vertices is the sha
 
 We want, for fixed $n$ and $m$, a graph with as many edges as possible subject to $\lambda^{\max} \le m - 1$ (or $\kappa^{\max} \le m - 1$ for the vertex variants). The space of graphs on $n$ vertices is enormous and its feasible region has no helpful shape: adding an edge can be harmless until, together with edges added long before, it suddenly creates a forbidden pair. A greedy walk that only ever accepts an improving move stalls at the first such collision, in a graph that is locally maximal but globally far from extremal.
 
-The classical method for this kind of landscape is \emph{simulated annealing} (SA), named after the metallurgical process of cooling a heated material slowly so that its atoms settle into a low-energy crystal rather than a disordered glass. Applied to graphs, annealing escapes local optima by sometimes accepting a worsening move, and by accepting fewer of them as the run proceeds. Each graph $G$ is a state with energy
+The classical method for this kind of landscape is \emph{simulated annealing} (SA), introduced as a combinatorial optimisation method by Kirkpatrick, Gelatt and Vecchi \cite{KirkpatrickGelattVecchi83} and named after the metallurgical process of cooling a heated material slowly so that its atoms settle into a low-energy crystal rather than a disordered glass. Applied to graphs, annealing escapes local optima by sometimes accepting a worsening move, and by accepting fewer of them as the run proceeds. Each graph $G$ is a state with energy
 \[
     E(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
 \]
-which rewards edges and penalises any excess connectivity. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly through infeasible graphs rather than being walled inside the feasible region, and we return below to why that freedom is worth having. A move toggles one adjacency. The Metropolis rule accepts an improving move always and a worsening move only with probability $e^{-\Delta E / T}$, a chance that shrinks both as the move gets worse and as the temperature drops, and the temperature $T$ falls geometrically, multiplied by a fixed factor just below one at every step.
+which rewards edges and penalises any excess connectivity. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly through infeasible graphs rather than being walled inside the feasible region, and we return below to why that freedom is worth having. A move toggles one adjacency. The Metropolis rule \cite{Metropolis53} accepts an improving move always and a worsening move only with probability $e^{-\Delta E / T}$, a chance that shrinks both as the move gets worse and as the temperature drops, and the temperature $T$ falls geometrically, multiplied by a fixed factor just below one at every step.
 
 This is what \code{solve} runs in its discovery mode. With the exhaustive flag off it anneals instead of enumerating, using geometric cooling and removals biased toward low-sensitivity edges, and returns the densest feasible graph it encountered together with the full temperature trace. What it returns is a witness, hence a lower bound, never a proof.
 
@@ -508,9 +532,11 @@ What the table hides is that the graphs themselves are the named constructions, 
 
 Some extremisers are past the size at which a quick search lands reliably, but the exact checker built above settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$: the smallest size at which the quadratic phenomenon strictly wins, made concrete. It is also a measured illustration of the search's limit: repeated cooling runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker, not from the search, which is exactly the division of labour this chapter argues for. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{rem:counterexample-m3}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, a lower bound the checker stamps as genuine.
 
-The discovery driver defaults to tabu search, using the same energy and
-single-adjacency neighbourhood but taking best-improving moves with a short
-tabu tenure and occasional perturbations. Simulated annealing remains an
+The discovery driver defaults to \emph{tabu search}, Glover's method \cite{Glover89}
+of forbidding the recently visited moves so a best-improving walk cannot cycle
+back into the local optimum it just left. It uses the same energy and
+single-adjacency neighbourhood as the annealer but takes best-improving moves
+with a short tabu tenure and occasional perturbations. Simulated annealing remains an
 independent cross-check. Both return checked witnesses and therefore lower
 bounds, never proofs.
 

@@ -3660,3 +3660,110 @@ both with zero undefined references, zero multiply-defined labels, zero overfull
 boxes. Rendered pages 24, 25 and 42 were inspected as images to confirm the
 tightened spacing still reads comfortably. Program source unchanged, so the
 Python suite was not rerun.
+
+## 2026-08-25 (Opus) -- external review actioned: six correctness fixes, five consistency fixes, seven citations
+
+An external review of the built PDF was handed over. Every claim was checked
+against the source before acting; all six correctness-level findings were real,
+and the review's bibliographic and version numbers were accurate to the digit.
+
+**SIX CORRECTNESS FIXES.**
+1. **The displayed MILP did not describe an s-t cut.** It omitted
+   $x^{st}_s = 1$ and $x^{st}_t = 0$, so $x \equiv 0$ was admissible, no ordered
+   pair ever crossed, every $p^{st}_{uv}$ rested at $0$, and the cut constraint
+   was satisfied by every weight matrix whatsoever. The formulation as printed
+   therefore bounded nothing. The implementation is right and always was: in
+   `_cut_counting_model` the two side values are Python CONSTANTS, not
+   `LpVariable`s (a deliberate choice recorded on 2026-06-19, since `cat="Binary"`
+   resets bounds to [0,1] and would make the cut core vacuous), which is exactly
+   why they never surfaced as constraints in the write-up. Both lines added, with
+   a paragraph on why they are load-bearing, and the two-step $\min$ is now shown
+   linearised through $z^{sxt}$ and its binary selector rather than printed as a
+   minimum a linear program cannot take.
+2. **The hypergraph gadget figure showed the wrong bottleneck.** The undirected
+   panel had ONE helper node with plain edges, and the directed panel put the
+   capacity-one label on the tail arc. The code (`_hyper_capacity_matrix`) and the
+   appendix proof of `thm:menger-hyper` both use the standard construction, one
+   gate split as $e^- \to e^+$ at capacity one with UNCAPPED membership arcs, so
+   the figure was the only place in the thesis that disagreed with itself. Both
+   panels redrawn to match, members in a column beside the gate pair so the six
+   membership arcs read cleanly, and the $\infty$ labels put on the arcs. The
+   accompanying prose was wrong in the same direction and said the gate "draws one
+   capacity-one arc in from every tail"; that variant would let a several-tailed
+   hyperedge carry one route PER TAIL and overcount the disjoint routes, which the
+   corrected passage now says explicitly.
+3. tab:summary's directed simple VERTEX cell said "same status and values" as the
+   arc cell, directly contradicting the preceding sentence that exact equality at
+   $m \ge 3$ is open. Cell now states its own values and names the open part.
+4. The augmented-bipartite case analysis in ch1 said "pairs starting in $B$ ...
+   have no routes", one clause after correctly saying pairs INSIDE $B$ are held
+   down by the in-degree. `lem:augmented-feasible` has the right split; the chapter
+   now matches it (from $B$ to $A$, or inside $A$).
+5. "The extremisers are doubled trees ..." overstated `rem:saturated-closure`,
+   which says in as many words that not every linear-branch extremiser has been
+   classified. Softened to constructions exhibited, with the appendix named.
+6. The `solve` code card did not describe `solve`. Cut-counting is NOT reached
+   from it (`prove_directed_multigraph` is called on its own), hypergraphs use
+   separate enumeration and search routines, and the budget is checked BETWEEN
+   iterations so one iteration may overrun it, as the docstring already said.
+   Card rewritten against the dispatch. Separately the code mislabelled simulated
+   annealing as "random search" in one `SolveResult`; corrected.
+
+**CONSISTENCY.** The model axis is described as two independent binary choices
+over four lattice nodes, but the variant count is three models; the reason is
+that multiplicity separates the problems at $r = 2$ and does not at $r \ge 3$,
+where every upper bound is proved for multihypergraphs and only ATTAINMENT
+differs, and ch1 now says so instead of leaving the arithmetic to the reader.
+"One representation holds every variant" contradicted ch1's own correct account
+and is now one interface over two internal representations. "The certifier proves
+upper bounds" is now "closes", matching `sec:certification-standard`. $c_m$ was
+used in the open-problems table with its definition only in the appendix; it and
+$h_m(b)$ are in the symbols table now, and the table cell carries the limit. The
+$\lambda$-measure figure in ch1 carried two parallel $v_0 \to v_2$ arcs inside the
+simple-digraph discussion; the duplicate is gone (it took part in neither the
+three highlighted routes nor the cut) and the caption says "simple".
+
+**CITATIONS.** Simulated annealing, the Metropolis rule and tabu search were
+explained with no citation at all; Metropolis et al. 1953, Kirkpatrick-Gelatt-
+Vecchi 1983 and Glover 1989 added, all three metadata-verified through Crossref.
+"A hypergraph Gomory--Hu theorem from the recent literature" was followed only by
+the 1961 graph citation; now cites Hanifehnezhad and Dolati 2020 for the
+symmetric-submodular construction (Crossref-verified: Inf. Comput. 271, 104479).
+`ChekuriXu17` and `DewarPikeProos18` sat in ref.bib uncited since they were added;
+both now support a real claim in the hypergraph section, where the thesis says
+which of several inequivalent connectivity notions it uses. `ErdosProblems` gained
+`url` and an access date. NOT DONE, flagged for the author: that entry lists Pal
+Erdos as the author of a website he cannot have written (erdosproblems.com is
+Thomas Bloom's), which the review did not raise and I could not verify (the site
+403s bots), so I did not silently change an attribution.
+
+**STRUCTURE AND REPRODUCIBILITY.** The appendix is longer than the three body
+chapters and presented as a flat list of ten sections. Rather than reverse the
+2026-08-24 decision to move every proof into it, the ten sections are now grouped
+under four signposted parts (classical machinery, directed, hypergraph, extension
+plus audit) that write themselves into the contents page, and the reading guide
+names the three original arguments worth reading first. This introduces no label
+and no numbering, so all 26 `\Cref{app:proofs}` in the body still resolve. THE
+BIGGER STRUCTURAL CALL, promoting one or two proofs into a body chapter, is the
+author's and is deliberately not taken here.
+The appendix promised an immutable commit and printed none: `record_revision.sh`
+now writes `revision.tex` (refused on a dirty tree) and tags the same commit, so
+the hash in the PDF and the tag in the repository cannot disagree; the audit
+section prints `\thesiscommit`. `requirements.txt` gave ranges only, so
+`requirements-lock.txt` pins the environment the runs were verified in, confirmed
+live: Python 3.14.6, NumPy 2.4.6, SciPy 1.18.0, PuLP 3.3.2, Matplotlib 3.11.0,
+NetworkX 3.6.1. PDF title/author/subject/keywords were blank and are now set.
+The lay summary called both strictest hypergraph limits exact; the $m=3$ result
+carries attainment conditions, so it now distinguishes the two (3310 characters,
+still one page, still inside the 3500 limit).
+
+**MINOR.** "the section just below" pointed upward; SPQR expanded without its Q
+component; "proving what proved cleanly". Five prose semicolons that my own edits
+introduced were removed before commit, per the standing rule.
+
+VERIFY: clean rebuild 115 pp (was 111), 0 overfull, 4 underfull (the same four the
+review saw), 0 undefined refs/cites, 0 multiply-defined labels, 0 LaTeX warnings.
+BibTeX clean, 28 entries cited (was 21), every new one resolving. 103 tests OK
+with the one expected skip. Lay summary rebuilds to one page. The redrawn gadget
+figure, the corrected MILP display, the summary table, both contents pages and a
+part divider were rendered to PNG and inspected.

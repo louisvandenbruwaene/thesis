@@ -18,3 +18,7 @@ pulp>=2.8,<4
 # the test suite, runs without them.
 # matplotlib>=3.8
 # networkx>=3.0
+
+# The exact environment in which the reported runs and the test suite passed is
+# recorded in requirements-lock.txt. The ranges above are what the program
+# actually needs; the lock file is what it was last verified against.

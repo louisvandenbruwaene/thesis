@@ -2371,7 +2371,7 @@ def solve(
         if method not in ("sa", "tabu"):
             raise ValueError("method must be 'sa' or 'tabu'")
         result = _search_within_budget(variant, n, m, separation, deadline, seed, method)
-        method_label = "tabu search" if method == "tabu" else "random search"
+        method_label = "tabu search" if method == "tabu" else "simulated annealing"
         return SolveResult(
             n, m, label, separation, result.best_edge_count, "lower",
             method_label, time.time() - start, True,
