@@ -256,8 +256,23 @@ def _reconcile_panel(panel: dict) -> dict:
        the true maximum at that ``n``; no proved/conjectured curve, no
        named-construction lower bound, and no search circle may sit above it.
        (This is what produced the green square *below* its own curve: a closed
-       form -- e.g. the hypergraph bound capped at the complete hypergraph -- can
-       overshoot what is actually achievable at small ``n``.)
+       form -- e.g. Mader's floor -- can overshoot what is actually achievable at
+       small ``n``, where the complete object is the answer.)
+
+       **The formula half of this is skipped when a panel passes**
+       ``clamp_formula=False``.  It applies to a curve that is a *value*, and the
+       four hypergraph panels draw a curve that is a proved upper *bound*
+       (``prop:hyper-edge``), attained only when ``m-1 <= C(n-2, r-2)`` for the
+       simple model or ``(r-1) | (n-1)`` for the multi one.  Clamping a bound
+       makes the line mean the true maximum wherever exhaustion happened to
+       finish and the looser bound wherever it did not, so one line carries two
+       theorems and the switch point is set by the exhaustion budget rather than
+       by any mathematics.  At ``m = 6, r = 3`` that read the true 8 at ``n = 5``
+       and the un-attained 12 at ``n = 6``, where the true maximum is 11.
+       Un-clamping only ever *raises* a curve, and an exact value can never
+       exceed a proved bound for the model being enumerated, so no square can
+       rise above its curve as a result.  The search circles are still clamped
+       below: a witness really cannot beat a proved optimum.
     2. **Search lower bounds rise with ``n``.**  A feasible graph on ``n``
        vertices stays feasible on ``n+1`` (add an isolated vertex), so the best
        feasible edge count can never *drop* as ``n`` grows.  We take a running
@@ -278,10 +293,18 @@ def _reconcile_panel(panel: dict) -> dict:
         xs, ys = curve
         return xs, [min(y, exact[x]) if x in exact else y for x, y in zip(xs, ys)]
 
-    # invariant 1 applied to every formula line
-    for key in ("proved", "conj"):
-        if panel.get(key) is not None:
-            panel[key] = cap_to_exact(panel[key])
+    # invariant 1 applied to every formula line, unless the panel says its
+    # formula is a BOUND rather than a value (see the docstring's invariant 1).
+    if panel.pop("clamp_formula", True):
+        for key in ("proved", "conj"):
+            if panel.get(key) is not None:
+                panel[key] = cap_to_exact(panel[key])
+    else:
+        # Tell the plotter, so its key can say "proved upper bound" rather than
+        # "proved".  Every blue curve in a hypergraph grid is a bound and every
+        # blue curve in a graph grid is a value, so this is a property of the
+        # figure and needs no per-panel mark inside the grid.
+        panel["proved_is_bound"] = True
 
     # invariants 1 then 2 applied to the search circles
     if panel.get("search") is not None:
@@ -575,6 +598,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     panels.append(dict(
         status="proved", ylabel="hyperedges",
         proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
+        clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
         exact=ex9, search=se9))
 
     # (10) hypergraph undirected vertex -- PROVED for m<=3 (incidence-rank lemma),
@@ -587,6 +611,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         panels.append(dict(
             status="proved", ylabel="hyperedges",
             proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
+            clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
             exact=ex10, search=se10))
     else:
         se10 = _search_points(hyper_ns, m, open_search_budget,
@@ -656,6 +681,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     panels.append(dict(
         status="proved", ylabel="hyperedges",
         proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
+        clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
         exact=ex13, search=se13))
 
     # (14) multihypergraph undirected vertex -- PROVED for m<=3, open for m>=4.
@@ -669,6 +695,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         panels.append(dict(
             status="proved", ylabel="hyperedges",
             proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
+            clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
             exact=ex14, search=se14))
     else:
         se14 = _search_points(hyper_ns, m, open_search_budget,

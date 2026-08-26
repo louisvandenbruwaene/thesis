@@ -37,25 +37,42 @@ sometimes reworded, and two were extended by the rewrite rather than merely kept
 
 ## Still open
 
-**1. The hypergraph "proved" curve means two different things at adjacent points.**
-Not a wrong value, but a presentational inconsistency worth one pass.
+**1. CLOSED 2026-08-26. The hypergraph "proved" curve meant two different
+things at adjacent points.**
 
-`prop:hyper-edge` gives a proved *upper bound* for every `r`-uniform hypergraph.
-`_reconcile_panel` invariant 1 then caps every `proved=` curve down to any
-machine-exact value at that `n`. So where exhaustion finished inside its budget
-the plotted line is the true maximum, and where it did not the line is the looser
-bound. At `m = 6, r = 3` that gives a kink: at `n = 5` the curve is clamped to the
-true 8, at `n = 6` it stays at 12 while the true maximum is 11 (verified two ways:
-all 125970 twelve-hyperedge simple 3-uniform hypergraphs on six vertices are
-infeasible, and the program's own branch and bound returns 11 exactly).
+`prop:hyper-edge` gives a proved *upper bound*. `_reconcile_panel` invariant 1
+capped every `proved=` curve down to any machine-exact value at that `n`, which
+is right for a curve carrying a closed-form *value* (Mader's floor overshoots at
+`n < m`, where the complete graph is the answer) and wrong for one carrying a
+bound. The line then meant the true maximum wherever exhaustion happened to
+finish inside its four-second budget and the looser bound wherever it did not,
+so the switch point was set by the budget rather than by any mathematics.
 
-Both readings are correct *as an upper bound*, so nothing published is false. But
-one line carrying two meanings is the kind of thing this thesis otherwise refuses
-to do. Fixing it properly means letting a panel carry an upper-bound curve that is
-exempt from the exact-value clamp, which touches every panel in
-`gather_variant_grid`, so it was recorded rather than rushed.
+Measured before fixing, the clamp fired at **one plotted point in the whole
+thesis**: `m = 6`, `r = 3`, simple hypergraph, undirected edge, `n = 5`, pulled
+from the bound's 10 down to the exact 8. At `m = 3` the bound is tight wherever
+exhaustion reached, so nothing was capped, and at `m = 6` the two vertex panels
+take the `open` branch (`hyper_vert_proved = (m <= 3)`) and carry no `proved=`
+curve at all. This note previously estimated the fix as touching every panel in
+`gather_variant_grid`. That was wrong: twelve panels keep the clamp untouched.
 
-Files: `program/make_figures.py`, `_reconcile_panel` and the two hypergraph panels.
+Fixed by a per-panel `clamp_formula=False`, set on the four hypergraph panels
+(`make_figures.py`, panels 9, 10, 13, 14) and honoured in `_reconcile_panel`.
+The search circles are still clamped, since a witness really cannot beat a
+proved optimum. Un-clamping only ever raises a curve, and an exact value can
+never exceed a proved bound for the model being enumerated, so no square can
+rise above its curve as a result. Verified by sweeping all sixteen panels at
+both `m`: no exact square above any curve, no search circle above any exact
+value.
+
+The panel now reads as one claim. The line is the bound, the markers are what
+has been reached, and the gaps are visible: at `m = 6` the exact square at
+`n = 5` is 8 against the curve's 10, and at `n = 6` the curve reads 12 where the
+true maximum is 11. `plot_variant_grid` labels the blue curve "proved upper
+bound" in a grid whose every blue curve is one, decided per figure rather than
+per panel, so no panel carries a mark its neighbours lack. Both hypergraph
+captions in `ch2_machine.tex` say the same in words, and both sideways pages
+were re-rendered to confirm the longer captions still fit.
 
 **2. The sixteen-variant rewrite has not been audited.**
 Commits `2829e47` and `3b353ea` promoted the multi-hypergraph to a first-class

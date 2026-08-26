@@ -3811,8 +3811,17 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     # kinds (what is claimed), then the point kinds (what was computed).  Only
     # the marks this figure actually draws are listed, so the hypergraph halves
     # stop advertising a red conjecture curve that appears in neither of them.
+    # A blue curve is a proved VALUE in the graph grids and a proved upper BOUND
+    # in the hypergraph ones (prop:hyper-edge, attained only inside a divisibility
+    # or binomial range).  The claim differs, so the key says which, decided per
+    # figure rather than per panel: every blue curve in one grid is the same kind.
+    _proved_panels = [p for p in panels if p.get("proved") is not None]
+    _proved_label = ("proved upper bound"
+                     if _proved_panels
+                     and all(p.get("proved_is_bound") for p in _proved_panels)
+                     else "proved")
     key_specs = [
-        ("proved", dict(color=_KUL_BLUE, lw=2.0, label="proved")),
+        ("proved", dict(color=_KUL_BLUE, lw=2.0, label=_proved_label)),
         ("conj", dict(color=_RED, lw=2.0, label="conjectured")),
         ("guess", dict(color=_GUESS, lw=2.0, label="guess (interpolated)")),
         ("band", dict(color=_WARM, lw=4, alpha=0.35, label="certain interval")),
