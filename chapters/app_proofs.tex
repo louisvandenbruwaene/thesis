@@ -393,7 +393,7 @@ Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \
 
 For the upper bound we show by strong induction on $n$ that $\lec^{\max}_D \le 1$ forces $|A(D)| \le M(n)$.
 
-\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, which walks every simple digraph with $\lec^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is recorded in \Cref{tab:basecase-search}, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}. The two smallest are also immediate by hand, as a check on the machine rather than as a separate argument. At $n = 2$ there are at most $2$ arcs. At $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. The point of the theorem is precisely that $n = 4, 5, 6, 7$ are \emph{not} immediate by hand, which is what makes handing the case-check to the program the right move.
+\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, which walks every simple digraph with $\lec^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. The transcript is recorded in \Cref{tab:basecase-search}, and the cut-counting certifier independently confirms the values within its reach through the $m = 2$ reduction of \Cref{thm:dir-multi-m2}. The two smallest are also immediate by hand, as a check on the machine rather than as a separate argument. At $n = 2$ there are at most $2$ arcs. At $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Unlike $n = 2, 3$, the cases $n = 4, 5, 6, 7$ are not immediate by hand, which is why the case-check is handed to the program.
 
 \emph{Inductive step $n \ge 8$.} Let $D$ be a simple digraph on $n$ vertices with $\lec^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ minimising the total degree $d(v) = d^+(v) + d^-(v)$. Since $\sum_v d(v) = 2a$, averaging gives $d(v_0) \le 2a/n$. By \Cref{lem:subdigraph-monotone} the digraph $D - v_0$ on $n-1 \ge 7$ vertices satisfies the induction hypothesis, so $a - d(v_0) \le M(n-1) = \floorfrac{(n-1)^2}{4}$. Combining,
 \[
@@ -416,10 +416,10 @@ For odd $n = 2k+1$ with $k \ge 4$, the same simplification gives $\floor{(n-1)^2
 The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 2$ (the induction here is already past the base cases, so $k \ge 4$), so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction.
 \end{proof}
 
-Two remarks on the shape of this proof. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. The proof is long not because it is deep but because the two regimes of $M(n)$ must be carried through the arithmetic separately, and that bookkeeping is precisely what \Cref{ch:certify} hands to the machine at the base cases.
+Three remarks on the shape of this proof. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. Third, the proof's length comes from carrying the two regimes of $M(n)$ through the arithmetic separately, the same bookkeeping \Cref{ch:certify} hands to the machine at the base cases.
 
 \begin{remark}[Which way Whitney runs]\label{rem:whitney-direction}
-It is worth pausing on the direction of Whitney's inequality before using it, because the tempting reading is the wrong one. From $\kap_D(u,v) \le \lec_D(u,v)$ for every pair it follows that $\kap^{\max}_D \le \lec^{\max}_D$, hence that
+Whitney's inequality is easy to misread: the tempting direction is the wrong one. From $\kap_D(u,v) \le \lec_D(u,v)$ for every pair it follows that $\kap^{\max}_D \le \lec^{\max}_D$, hence that
 \[
     \{D : \lec^{\max}_D \le m-1\} \;\subseteq\; \{D : \kap^{\max}_D \le m-1\}.
 \]
@@ -615,7 +615,7 @@ Splitting the all-pairs sum of (2a) along its diagonal and feeding in Step 1 now
       &\;=\; (m-1)\,n(n-1).
 \end{aligned}
 \]
-The point of the last two lines is that the digon term is absorbed exactly by the slack Step 1 left behind, so nothing is given away in passing from pairs to degrees. It is worth reading the conclusion in words: a vertex with a large in-degree \emph{and} a large out-degree is expensive, because it manufactures two-step routes for many pairs at once, and the budget for those routes is only quadratic in $n$.
+The last two lines absorb the digon term exactly against the slack Step 1 left behind, so nothing is given away in passing from pairs to degrees. In words, a vertex with a large in-degree \emph{and} a large out-degree is expensive, because it manufactures two-step routes for many pairs at once, and the budget for those routes is only quadratic in $n$.
 
 \emph{Step 3, the smaller half-degree is small on average.} Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy-Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$,
 \[
@@ -732,7 +732,7 @@ Fix an ordered pair $(u,v)$ of distinct vertices. The direct arc $(u,v)$, when i
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
 \end{proof}
 
-The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as the arc problem rather than in the wide one. Its leading constant is $\tfrac14$ unconditionally, the term after it is linear in $n$, and since $\ell_m^{\mathrm{dir}}(n) \le k_m^{\mathrm{dir}}(n)$ with both now inside $n^2/4 + \Theta_m(n)$, the two values agree to first order. What is left is the coefficient of the linear term, the same quantity \Cref{open:decomposition} is needed for on the arc side, together with the conjecture that the two values coincide exactly. It is worth being clear about what did and did not transfer. The upper bound of \Cref{thm:dir-arc-linear-error} did not: it is proved over the smaller family and says nothing here. The route family behind it did, and that is a statement about a construction rather than about a bound, which is why Whitney's inequality does not block it.
+The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as the arc problem rather than in the wide one. Its leading constant is $\tfrac14$ unconditionally, the term after it is linear in $n$, and since $\ell_m^{\mathrm{dir}}(n) \le k_m^{\mathrm{dir}}(n)$ with both now inside $n^2/4 + \Theta_m(n)$, the two values agree to first order. What is left is the coefficient of the linear term, the same quantity \Cref{open:decomposition} is needed for on the arc side, together with the conjecture that the two values coincide exactly. What did and did not transfer is stated precisely here. The upper bound of \Cref{thm:dir-arc-linear-error} did not: it is proved over the smaller family and says nothing here. The route family behind it did, and that is a statement about a construction rather than about a bound, which is why Whitney's inequality does not block it.
 
 \section{The directed multigraph problem, solved in full}
 
@@ -888,7 +888,7 @@ $L_3^{\mathrm{dir}}(7) = 24$.
 \end{corollary}
 
 \begin{proof}
-$M(7) = \max(12,12) = 12$, so \Cref{thm:dir-multi-full} at $m=3$, $n=7$ gives $L_3^{\mathrm{dir}}(7) = 2 \cdot 12 = 24$. Concretely, the induction peels two reachability skeletons off any $7$-vertex witness in turn, each of at most $M(7) = 12$ arcs by \Cref{lem:reach-skeleton}, first lowering $\lec^{\max}$ from $2$ to $1$ and then from $1$ to $0$: $24 = 12 + 12$ spends the whole budget twice over, with nothing left for a third pass. This is a proof by hand of the statement Chapters~\ref{ch:certify} and~\ref{ch:synthesis} once recorded as an outstanding computation. That computation was the mixed-integer program \code{prove\_integral\_arc\_bound(7, 3, 25)}, whose \code{INFEASIBLE} verdict would have settled the same fact, and which never returned one: it reached its time limit on the bundled CBC solver, and a fourteen-hour uncapped enumeration was stopped without a verdict. It was never run on a stronger solver, and it no longer needs to be. The machine route to this fact was abandoned unfinished and the hand proof above replaced it, rather than the two confirming each other.
+$M(7) = \max(12,12) = 12$, so \Cref{thm:dir-multi-full} at $m=3$, $n=7$ gives $L_3^{\mathrm{dir}}(7) = 2 \cdot 12 = 24$. Concretely, the induction peels two reachability skeletons off any $7$-vertex witness in turn, each of at most $M(7) = 12$ arcs by \Cref{lem:reach-skeleton}, first lowering $\lec^{\max}$ from $2$ to $1$ and then from $1$ to $0$: $24 = 12 + 12$ spends the whole budget twice over, with nothing left for a third pass. This is a proof by hand of the statement \Cref{ch:certify,ch:synthesis} once recorded as an outstanding computation. That computation was the mixed-integer program \code{prove\_integral\_arc\_bound(7, 3, 25)}, whose \code{INFEASIBLE} verdict would have settled the same fact, and which never returned one: it reached its time limit on the bundled CBC solver, and a fourteen-hour uncapped enumeration was stopped without a verdict. It was never run on a stronger solver, and it no longer needs to be. The machine route to this fact was abandoned unfinished and the hand proof above replaced it, rather than the two confirming each other.
 \end{proof}
 
 \begin{corollary}[The fractional relaxation is integral]\label{cor:mstar-integral}
@@ -1783,8 +1783,8 @@ unbalanced split by a unit or two, but never by enough to move the $n^2$ term.) 
 lower bound agree in their $n^2$ term, which is the asymptotic claim.
 \end{proof}
 
-Two remarks on the statement. First, the two upper bounds are not comparable
-and both are worth keeping: the bound of \Cref{prop:dir-hyper-first} is the
+Three remarks on the statement. First, the two upper bounds are not comparable
+and neither supersedes the other: the bound of \Cref{prop:dir-hyper-first} is the
 smaller one until $n$ is around $16(m-1)(r-1)/3$, since the linear term here
 carries a constant of $4(m-1)^2$, and the theorem is an asymptotic improvement
 rather than a uniform one. Second, at $r = 2$ the shadow is the digraph itself and
@@ -1792,8 +1792,8 @@ $\mathrm{cod}$ is the multiplicity, so the theorem recovers the quadratic branch
 of \Cref{thm:dir-multi-full} up to its linear error term, which is the consistency
 check one wants, though it does not reprove that theorem, which is exact.
 
-A third remark used to say that the general orientation model was out of reach.
-The obstacle and the way past it are both short to state. The proof above uses
+Third, the general orientation model can look out of reach, but the obstacle
+and the way past it are both short to state. The proof above uses
 the forward model twice, once for the entering hyperedges and once for the leaving ones, in both cases to know that a hyperedge
 has a single tail. That is what makes Step 2's matching legitimate: the leaving
 hyperedges have pairwise distinct tails and so are automatically distinct from
