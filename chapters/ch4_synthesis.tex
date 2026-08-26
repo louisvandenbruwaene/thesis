@@ -275,18 +275,7 @@ throughout its sixteen-variant summary.
 
 One variant of \Cref{tab:summary} takes a different form under the other convention and is stated separately here, because under that convention the extremal problem becomes a packing problem. When parallel copies count as distinct routes, the multigraph vertex question is a different problem, written $K_m^{\mathrm{multi}}(n)$ and studied in \Cref{sec:multi-vertex-standard}. Its answer is additive over the blocks of the underlying simple graph, because adjacent vertices always share a block and no route between them ever leaves it.
 
-\begin{theorem}[The multigraph vertex problem is a knapsack over blocks]\label{thm:multi-vertex-blocks}
-For a $2$-connected graph $B$, or a single edge, write
-\[
-    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
-\]
-with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
-\[
-    K_m^{\mathrm{multi}}(n)
-    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
-\]
-the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
-\end{theorem}
+Its value is a knapsack over those blocks: knowing the densest feasible $2$-connected graph of each size determines $K_m^{\mathrm{multi}}(n)$ at every $n$, and the blocks are then packed to fill the vertex budget (\Cref{thm:multi-vertex-blocks}).
 
 The consequence is a change in what one has to search. Instead of graphs on $n$ vertices with $n$ growing, the question is settled by knowing the best $2$-connected block of each size, and a knapsack then assembles them. That closes every value up to $n \le 8$ and $m \le 8$ by machine. Within that computed range, for $m \ge 5$ and $n\ge3$, a single $2$-connected block beats every way of splitting the vertices, so the bouquet of cliques is not the shape of the answer. The best blocks are dense and bipartite-like rather than complete, and the explicit complete-bipartite family gives order $\Theta(m^2 n)$ as $m\to\infty$ with $n/m\to\infty$, with a per-vertex constant between $3-2\sqrt2$ and $2$ (\Cref{thm:multi-vertex-bipartite,prop:multi-vertex-upper}). Closing that gap is the open problem \Cref{tab:open-problems} records.
 

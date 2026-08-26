@@ -102,6 +102,17 @@ and only touch this summary if the *status* (proved/open) changes.
   (author's standing style rule). Semicolons inside table cells or math
   notation are fine.
 - **British spelling** throughout the thesis (colour, optimise, etc.).
+- **The body states and draws, the appendix defines and proves.** A chapter
+  carries theorem statements, figures, and a few sentences of what makes each
+  result work. Formal constructions, verification of a construction's
+  connectivity, optimisation models, algorithmic bookkeeping and counting
+  conventions all live in \Cref{app:proofs}, however short they are, and the
+  body names the shape in words instead ("a hub joined to every other vertex in
+  both directions") with a pointer to the definition. Author instruction,
+  2026-08-26: the main story should read quickly and visually. When a body
+  passage grows a formal display that is not a headline result, move it rather
+  than shorten it, and check `??` afterwards, because every construction is
+  cross-referenced from three files.
 - **The prose states facts, it does not rate them.** Chapter 1 is the author's
   own hand and sets the register for the whole thesis: say what a thing IS,
   never what it is WORTH. Out: "it is worth noting/saying/recording", "the
@@ -338,3 +349,47 @@ important routine in the program", which is a verdict but is his.
 
 VERIFY: `latexmk` exit 0, 104 pp unchanged, 0 overfull, 0 occurrences of `??`,
 0 em-dashes, en-dashes or new prose semicolons on any changed line.
+
+## 2026-08-26 (Opus, fourth pass) — constructions and machinery moved to the appendix
+
+Author instruction: the main story should be quick, easy and visual, with the
+constructions and the convoluted math appendixed, and the appendix ordered and
+free of repetition. Body 36pp -> 33pp, appendix 55pp -> 59pp, total unchanged at
+104pp, which is what a move rather than a cut looks like.
+
+MOVED OUT OF THE BODY (every one a move, no label deleted, `??` still 0):
+- ch1's three directed constructions (`const:directed-hub`, `const:bipartite`,
+  `const:augmented-bipartite`) with their connectivity verifications, into a new
+  `sec:dir-constructions` that now opens Part II. The body names each shape in
+  words beside `fig:simple-digraph-m2` instead. These are the "cyclical graphs"
+  the author singled out: the hub's ring arcs and the augmented wall's cyclic
+  predecessors.
+- ch1's `rem:threshold-convention`, MERGED into the appendix's
+  `rem:threshold-audit`, which already opened by saying it completed it. Both
+  labels are kept on the merged remark.
+- ch2's mixed-integer model for $M^{*}(n)$: the six-line program, the cut-label
+  discussion, the linearisation, `fig:cut` and `thm:dir-multi-small`, into
+  `sec:mstar-model` at the END of the directed multigraph section, since
+  `cor:mstar-integral` superseded it. The body keeps the scaling idea and
+  `fig:scaling-reduction`, which is the visual half.
+- ch2's "keeping the checker cheap" case analysis and regression-test detail
+  into `sec:cheap-checker` in Part IV.
+- ch4's `thm:multi-vertex-blocks` statement, down to sit with its own proof.
+
+REPETITION REMOVED: Menger was stated in full in ch1, again in ch2 and again in
+the appendix; ch2 now cites `thm:menger`. ch1 announced the $n=7$ tie three
+times over (bridge paragraph, figure caption, following paragraph).
+
+TWO LATENT TYPOS FIXED, both unbalanced parentheses in ch1 that had survived
+every earlier pass: `(\Cref{fig:divergence}.` and the Gomory-Hu sketch's
+unclosed `(`. `grep`-style paren balancing over prose lines found no others.
+
+WHAT I DID NOT CUT, on inspection: `rem:case2-tight` looks like a digression but
+proves that four is the best universal coefficient obtainable from the two facts
+Case 2 uses, with a matching construction. That is mathematics, not commentary.
+The appendix is 17k words of non-proof against 12k of proof, but most of the
+non-proof is theorem statements, figures and the glosses that orient a reader
+between arguments, not recap.
+
+VERIFY: latexmk exit 0, 104pp, 0 overfull, 0 undefined refs, 0 occurrences of
+`??`, 147 labels each declared exactly once, no em-dashes or en-dashes added.

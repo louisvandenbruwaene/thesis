@@ -1,6 +1,6 @@
 This appendix carries every proof in the thesis. The body states the results and says in a few sentences what makes each one work, and the argument itself is here, together with the supporting lemmas and propositions that no chapter states in its own right, and with figures beside the arguments that need them.
 
-\paragraph{How to read this appendix.} It runs in four parts, and they are not of equal weight. \textsc{Part I} is classical machinery, \Cref{thm:menger,thm:gomory-hu} and Mader's theorem, and may be skipped by a reader who trusts the cited results. \textsc{Parts II} and \textsc{III} carry the original arguments, and a reader with time for three of them should read \Cref{thm:dir-multi-full} (the directed multigraph value, closed for every $n$ and $m$ by deleting a reachability skeleton rather than a vertex), \Cref{lem:incidence-rank} with \Cref{thm:hyper-vertex-m3} (the incidence rank bound proved through Tutte's triconnected decomposition, which settles the hypergraph vertex problem at $m = 3$), and \Cref{lem:two-step-budget} with the three theorems it drives, \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}, which pin six of the sixteen variants asymptotically with no hypothesis on the shape of the extremiser. \textsc{Part IV} holds one self-contained extension and the computational audit.
+\paragraph{How to read this appendix.} It runs in four parts, and they are not of equal weight. \textsc{Part I} is classical machinery, \Cref{thm:menger,thm:gomory-hu} and Mader's theorem, and may be skipped by a reader who trusts the cited results. \textsc{Parts II} and \textsc{III} carry the original arguments, and a reader with time for three of them should read \Cref{thm:dir-multi-full} (the directed multigraph value, closed for every $n$ and $m$ by deleting a reachability skeleton rather than a vertex), \Cref{lem:incidence-rank} with \Cref{thm:hyper-vertex-m3} (the incidence rank bound proved through Tutte's triconnected decomposition, which settles the hypergraph vertex problem at $m = 3$), and \Cref{lem:two-step-budget} with the three theorems it drives, \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}, which pin six of the sixteen variants asymptotically with no hypothesis on the shape of the extremiser. \textsc{Part IV} holds one self-contained extension, the search's connectivity bookkeeping, and the computational audit. Every construction the body refers to by name is defined here, the directed ones in \Cref{sec:dir-constructions}.
 
 % ---------------------------------------------------------------------------
 % These appendix figures use the SHARED thesis TikZ styles (../shared/tikz-
@@ -256,8 +256,12 @@ The whole characterisation reads off that last identity. If $m(n-1)$ is even, eq
 
 For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
 
-\begin{remark}[Audit of the counting convention]\label{rem:threshold-audit}
-This remark completes \Cref{rem:threshold-convention}, which fixes the convention. What follows is the bookkeeping that convention forces on every constant quoted from the literature.
+\begin{remark}[The counting convention, and the audit it forces]\label{rem:threshold-convention}\label{rem:threshold-audit}
+This thesis defines $\ell_m(n)$ and $k_m(n)$ as the \emph{largest} number of edges a graph can carry while \emph{no} pair is joined by $m$ independent routes. 
+S{\o}rensen and Thomassen, and the Erd\H{o}s Problems database \cite{ErdosProblems} after them, state the same results the other way round, as the \emph{smallest} number of edges that \emph{forces} such a pair. 
+Those two quantities are adjacent integers by construction: if $k$ is the largest feasible edge count then no graph on $n$ vertices with $k+1$ edges is feasible, so $k+1$ is exactly the forcing threshold.
+
+What follows is the bookkeeping that convention forces on every constant quoted from the literature.
 
 The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ against $3n-3$, and it writes the Bollob\'{a}s-Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ where the convention here gives $\binom{m}{2}n$. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
 
@@ -322,7 +326,31 @@ The natural strengthening is that a feasible graph always has a vertex of degree
 halving the constant in the only general upper bound known. It holds for $m = 3$, where it is classical: a graph of minimum degree at least three contains a subdivision of $K_4$, and two branch vertices of that subdivision are joined by three internally disjoint paths. Exhaustive search over all graphs with minimum degree at least $m$ finds no feasible one for $m \le 6$ and $n \le 10$. It is stated here as a question rather than a conjecture, since the sizes reached are well below those at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
 
-\apppart{Part II. The directed results}{The exact value at $m=2$, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
+\apppart{Part II. The directed results}{The three constructions the body names but does not define, the exact value at $m=2$, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
+
+\section{The directed constructions}\label{sec:dir-constructions}
+
+Three shapes carry every directed lower bound in this thesis. \Cref{ch:basecases} shows the first two side by side in \Cref{fig:simple-digraph-m2} and records what they reach. Here each is defined precisely and its connectivity checked.
+
+\begin{construction}[Directed hub]\label{const:directed-hub}
+For $n \ge m \ge 2$, take a hub $h$ and label the other $N = n-1$ vertices $0, \dots, N-1$. Add the $2N$ hub arcs $h \to i$ and $i \to h$, and on the non-hub vertices the $(m-2)N$ ring arcs $i \to i+j \bmod N$ for $j = 1, \dots, m-2$. The total is $m(n-1)$ arcs and every non-hub vertex has $d^+ = d^- = m-1$.
+\end{construction}
+
+Every ordered pair has a non-hub member, whose relevant degree is exactly $m-1$ and, since $n \ge m$, smaller than the hub's own $n-1$. That member is therefore the binding one and the degree bound gives $\lec^{\max} \le m-1$. At $m = 2$ the ring is empty and what remains is the \emph{bidirected star}, in which two spokes can only reach each other through the hub.
+
+\begin{construction}[One-directional bipartite digraph]\label{const:bipartite}
+Split the vertices into parts $A$ and $B$ of sizes $\floor{n/2}$ and $\ceil{n/2}$, and include every arc from $A$ to $B$ and none the other way. The total is $\floor{n^2/4}$ arcs.
+\end{construction}
+
+Nothing leaves $B$ and nothing enters $A$, so no route has a second step and every pair is joined by at most the one direct arc, giving $\lec^{\max} = 1$.
+
+\begin{construction}[Augmented bipartite digraph]\label{const:augmented-bipartite}
+For $n \ge m \ge 2$, set $|B| = \ceil{(n+m-2)/2}$ and $|A| = n - |B|$, include every arc from $A$ to $B$, and inside $B$ give each $b_j$ the $m-2$ in-arcs from its cyclic predecessors $b_{j-1}, \dots, b_{j-(m-2)}$. The total is $\floor{(n+m-2)^2/4}$ arcs.
+\end{construction}
+
+The only in-arcs of a $b \in B$ that an $a \in A$ can reach are the direct arc $a \to b$ and the $m-2$ two-step detours through $b$'s in-neighbours inside $B$, so such a pair carries exactly $m-1$ routes and no more, while pairs inside $B$ are held down by the in-degree $m-2$ and pairs from $B$ to $A$ or inside $A$ have no routes at all.
+
+At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$. Its $25$ arcs from $A$ to $B$ carry a five-cycle inside $B$, giving every $b_j$ one extra in-arc, so each pair $a_i, b_j$ has the direct arc and one detour and $\lec^{\max} = 2$. That is $30$ arcs against the guess of $27$, and the correction is exactly the shift of the partition towards $B$.
 
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}
 
@@ -708,7 +736,7 @@ The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as th
 
 \section{The directed multigraph problem, solved in full}
 
-The body proves $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ by an optimisation that scales $m$ out of the problem entirely (\Cref{thm:dir-multi-small}), and the section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. The same argument almost settles the multigraph case at every $m$. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
+An optimisation that scales $m$ out of the problem entirely gives $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ (\Cref{thm:dir-multi-small}, recorded in \Cref{sec:mstar-model} below), and the section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. The same argument almost settles the multigraph case at every $m$. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
 This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every pair's connectivity by at least one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
@@ -1015,6 +1043,66 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 \end{proof}
 
 Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. Nothing in the argument suggests a boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
+
+\subsection{The historical $m$-free model}\label{sec:mstar-model}
+
+\Cref{ch:certify} reduces the directed multigraph problem at every $m$ to one $m$-free optimisation, $M^{*}(n)$, by dividing multiplicities by $m-1$. This subsection writes out the model that computed it, the theorem it settled and the record of what was run. \Cref{cor:mstar-integral} above has since replaced it, so nothing below is load-bearing.
+
+By max-flow/min-cut, $\mathrm{maxflow}(s,t)\le1$ exactly when some $s$--$t$ cut has capacity at most one. The optimisation therefore chooses one cut per ordered pair. A binary label $x^{st}_u$ records its side, and $p^{st}_{uv}$ counts $w(u,v)$ only when $u\to v$ crosses from source to sink (\Cref{fig:cut}). This describes the exact feasible region. The archived wrapper retained an \texttt{OPTIMAL} status and primal witness but no independently replayable matching bound, so the runs are finite solver checks rather than formal certificates.
+
+With scaled weights $w$, binary side labels $x$, and non-negative crossing weights $p$, the model is
+\begin{align*}
+    \text{maximise} \quad & \sum_{u \ne v} w(u, v) \\
+    \text{subject to} \quad & x^{st}_s = 1, \quad x^{st}_t = 0 && \text{for all } (s,t), \\
+    & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
+    & \sum_{u \ne v} p^{st}_{uv} \le 1 && \text{for all } (s,t), \\
+    & w(s,t) + \sum_{x} \min\bigl(w(s,x), w(x,t)\bigr) \le 1 && \text{for all } (s,t), \\
+    & d(v_0) \le d(v_1) \le \dots \le d(v_{n-1}), && \text{with } d(v) = \textstyle\sum_{u \ne v} \bigl(w(u,v) + w(v,u)\bigr), \\
+    & w \in [0,1], \quad x \in \{0,1\}.
+\end{align*}
+
+The first line is what makes the labelling an $s$--$t$ cut rather than an arbitrary bipartition, and it is not optional. Without it the all-zero labelling $x \equiv 0$ is admissible, no ordered pair $(u,v)$ ever crosses, every $p^{st}_{uv}$ rests at $0$, and the cut constraint below is satisfied by every weight matrix whatsoever. Pinning the source side of $s$ and the sink side of $t$ removes that escape and leaves the remaining $n-2$ labels free, which is precisely the choice of an $s$--$t$ cut. The implementation supplies these two values as constants rather than as variables (\code{program/erdos915\_unified.py}, in \code{\_cut\_counting\_model}), which is the same restriction imposed one step earlier.
+
+Because $w\le1$, the second constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The third constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
+
+The $\min$ in the two-step line is written as a minimum for readability only. A linear program cannot take one directly. It is linearised in the usual way, by an auxiliary variable $z^{sxt} \in [0,1]$ held below both arguments, $z^{sxt} \le w(s,x)$ and $z^{sxt} \le w(x,t)$, together with a binary selector $b^{sxt}$ and the two big-$M$ inequalities $z^{sxt} \ge w(s,x) - (1 - b^{sxt})$ and $z^{sxt} \ge w(x,t) - b^{sxt}$, which force $z^{sxt}$ up to whichever argument is the smaller. The displayed $\min$ is then the value of $z^{sxt}$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
+    plab/.style={edgelabel}]
+    % the dashed cut line
+    \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
+    \node[color=KULblauw3b] at (0,2.65) {cut};
+    \node at (-2.4,2.65) {source side ($x=1$)};
+    \node at ( 2.4,2.65) {sink side ($x=0$)};
+    % source-side vertices
+    \node[vertex] (s)  at (-2.6, 1.1) {$s$};
+    \node[vertex] (a)  at (-1.3,-1.1) {$a$};
+    % sink-side vertices
+    \node[vertex] (t)  at ( 2.6,-1.1) {$t$};
+    \node[vertex] (b)  at ( 1.3, 1.1) {$b$};
+    % non-crossing arcs (p = 0): labels pushed to the outer side, white-filled
+    \draw[->, edge, color=gray] (s) -- node[plab, left=2pt]{$p=0$} (a);
+    \draw[->, edge, color=gray] (b) -- node[plab, right=2pt]{$p=0$} (t);
+    % crossing arcs source -> sink (p = w), highlighted
+    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[plab, above]{$p=w$} (b);
+    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[plab, below]{$p=w$} (t);
+    % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
+    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.30, below=1pt]{$p=0$} (a);
+\end{tikzpicture}
+\caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$, while same-side and backward arcs have $p=0$.}
+\label{fig:cut}
+\end{figure}
+% did you forget to bound n, or does the next theorem always hold even for large n?
+\begin{theorem}[Directed multigraph value, small $n$]\label{thm:dir-multi-small}
+For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
+\end{theorem}
+
+Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, 
+and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, 
+and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand 
+and \Cref{sec:transcripts} retains the solver record.
 
 \apppart{Part III. The hypergraph results}{The edge bound through a hypergraph Gomory--Hu tree, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
 
@@ -1827,7 +1915,7 @@ between them at $n \approx r$ are a small-size effect that the asymptotics canno
 see.
 
 
-\apppart{Part IV. One extension, and the audit}{A separate extremal problem that the parallel-copy convention of \Cref{sec:parallel-convention} sets aside, and the record of what was computed, with what, and to what standard.}
+\apppart{Part IV. One extension, and the audit}{A separate extremal problem that the parallel-copy convention of \Cref{sec:parallel-convention} sets aside, the bookkeeping that keeps the search's connectivity checks cheap, and the record of what was computed, with what, and to what standard.}
 
 \section{The multigraph vertex problem under the other convention}\label{sec:multi-vertex-standard}
 
@@ -1966,6 +2054,19 @@ Two things have to be checked for that maximum to be attained by a multigraph ov
 
 That the objective is a sum over edges of a \emph{local} quantity is what makes the second observation bite. Recall that a \emph{block} of a graph is a maximal connected subgraph with no cut vertex of its own, so every block is either $2$-connected or a single edge, every edge lies in exactly one block, and two blocks meet in at most one vertex.
 
+\begin{theorem}[The multigraph vertex problem is a knapsack over blocks]\label{thm:multi-vertex-blocks}
+For a $2$-connected graph $B$, or a single edge, write
+\[
+    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
+\]
+with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
+\[
+    K_m^{\mathrm{multi}}(n)
+    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
+\]
+the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
+\end{theorem}
+
 \begin{proof}[Proof of \Cref{thm:multi-vertex-blocks}]
 \emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
 \[
@@ -2024,6 +2125,18 @@ between $3-2\sqrt2$ and $2$.
 % the offcuts document still resolve. If this section is ever cut or renamed,
 % check what points at them: a live label on absent content is exactly how a
 % dangling reference hides from LaTeX.
+\section{The search's cheap connectivity bookkeeping}\label{sec:cheap-checker}
+
+\Cref{ch:certify} states that the search avoids most calls to the checker by tracking a bound on $\lambda^{\max}$ rather than recomputing it. This section records how, and how the shortcut is held to the value the naive implementation would have returned.
+
+Together they settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a capped pairwise sweep, stopping at the first pair for which it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
+
+To know which case applies, the search carries a running upper bound on $\lambda^{\max}$, raised by one whenever it accepts an addition (part~(2)) and left untouched when it accepts a removal (part~(1)), and resynchronised to the exact value at the cadence where it already pays for flows to refresh the sensitivity map. The bound can only ever sit at or above the truth, so any step it clears is certainly feasible.
+
+The energy returned on every step is, by \Cref{prop:monotone}, exactly the value the naive implementation would have computed. Every accept-or-reject decision, every random draw, and the graph the walk finally returns are therefore unchanged, and the speed-up is invisible to every number the thesis reports. A regression test runs both implementations, the fast one and a reference that measures exactly at every step, across all four graph variants and both separations, and checks that the two agree step for step in energy, in every accept-or-reject decision, and in the final graph, and that the returned graph is feasible under the exact checker. The witness the search reports is always certified exactly, either by the monotonicity deductions above or by the capped predicate, and the full binding-connectivity value is recomputed only when the energy or a recorded trace needs it.
+
+Where the method is needed differs by variant. For undirected graphs one could resynchronise the exact value cheaply from the Gomory--Hu shortcut used above, which encodes every pairwise edge-connectivity in $n - 1$ flows. The directed and vertex variants admit no such tree, so there the monotone bound and the capped predicate are the only inexpensive handle on feasibility, and they are what let the same matrix-search machinery serve every graph variant at speed.
+
 \section{Computational audit}\label{sec:transcripts}
 \label{app:code}\label{app:verification-ladder}\label{app:software-tests}
 \label{app:software-reproduction}

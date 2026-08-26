@@ -30,7 +30,7 @@ Every variant shares the same integer max-flow engine no matter the implementati
 \subsection{The connectivity checker built on maximum flow}
 The whole question reduces to a flow computation.
 A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
-Menger's theorem says that $\lambda(u,v)$, the maximum number of edge-disjoint $u-v$ paths, equals the minimum number of edges that must be removed to separate u from v. 
+Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into a smallest cut. 
 For a simple graph, give every edge capacity one: the capacity of a cut is then just the number of edges in it. 
 For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$. 
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
@@ -441,9 +441,9 @@ for the largest total weight of such a matrix, scaling gives
 The reverse inequality requires an optimum whose entries scale back to integers. The historical optima for $n\le6$ were $\{0,1\}$ double stars, so there
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
-    \qquad \text{for every } m \ge 2 ,
+    \qquad \text{for every } m \ge 2 .
 \]
-for every $m$. The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-integral}). The finite optimisation is retained to record the independent route by which the cases $n\le6$ were first checked.
+The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-integral}). The finite optimisation is retained to record the independent route by which the cases $n\le6$ were first checked.
 
 \begin{figure}[ht]
 \centering
@@ -481,61 +481,7 @@ for every $m$. The hand proof now establishes this identity for every $n$ (\Cref
 \label{fig:scaling-reduction}
 \end{figure}
 
-By max-flow/min-cut, $\mathrm{maxflow}(s,t)\le1$ exactly when some $s$--$t$ cut has capacity at most one. The optimisation therefore chooses one cut per ordered pair. A binary label $x^{st}_u$ records its side, and $p^{st}_{uv}$ counts $w(u,v)$ only when $u\to v$ crosses from source to sink (\Cref{fig:cut}). This describes the exact feasible region. The archived wrapper retained an \texttt{OPTIMAL} status and primal witness but no independently replayable matching bound, so the runs are finite solver checks rather than formal certificates.
-
-With scaled weights $w$, binary side labels $x$, and non-negative crossing weights $p$, the model is
-\begin{align*}
-    \text{maximise} \quad & \sum_{u \ne v} w(u, v) \\
-    \text{subject to} \quad & x^{st}_s = 1, \quad x^{st}_t = 0 && \text{for all } (s,t), \\
-    & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
-    & \sum_{u \ne v} p^{st}_{uv} \le 1 && \text{for all } (s,t), \\
-    & w(s,t) + \sum_{x} \min\bigl(w(s,x), w(x,t)\bigr) \le 1 && \text{for all } (s,t), \\
-    & d(v_0) \le d(v_1) \le \dots \le d(v_{n-1}), && \text{with } d(v) = \textstyle\sum_{u \ne v} \bigl(w(u,v) + w(v,u)\bigr), \\
-    & w \in [0,1], \quad x \in \{0,1\}.
-\end{align*}
-
-The first line is what makes the labelling an $s$--$t$ cut rather than an arbitrary bipartition, and it is not optional. Without it the all-zero labelling $x \equiv 0$ is admissible, no ordered pair $(u,v)$ ever crosses, every $p^{st}_{uv}$ rests at $0$, and the cut constraint below is satisfied by every weight matrix whatsoever. Pinning the source side of $s$ and the sink side of $t$ removes that escape and leaves the remaining $n-2$ labels free, which is precisely the choice of an $s$--$t$ cut. The implementation supplies these two values as constants rather than as variables (\code{program/erdos915\_unified.py}, in \code{\_cut\_counting\_model}), which is the same restriction imposed one step earlier.
-
-Because $w\le1$, the second constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The third constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
-
-The $\min$ in the two-step line is written as a minimum for readability only. A linear program cannot take one directly. It is linearised in the usual way, by an auxiliary variable $z^{sxt} \in [0,1]$ held below both arguments, $z^{sxt} \le w(s,x)$ and $z^{sxt} \le w(x,t)$, together with a binary selector $b^{sxt}$ and the two big-$M$ inequalities $z^{sxt} \ge w(s,x) - (1 - b^{sxt})$ and $z^{sxt} \ge w(x,t) - b^{sxt}$, which force $z^{sxt}$ up to whichever argument is the smaller. The displayed $\min$ is then the value of $z^{sxt}$.
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
-    plab/.style={edgelabel}]
-    % the dashed cut line
-    \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
-    \node[color=KULblauw3b] at (0,2.65) {cut};
-    \node at (-2.4,2.65) {source side ($x=1$)};
-    \node at ( 2.4,2.65) {sink side ($x=0$)};
-    % source-side vertices
-    \node[vertex] (s)  at (-2.6, 1.1) {$s$};
-    \node[vertex] (a)  at (-1.3,-1.1) {$a$};
-    % sink-side vertices
-    \node[vertex] (t)  at ( 2.6,-1.1) {$t$};
-    \node[vertex] (b)  at ( 1.3, 1.1) {$b$};
-    % non-crossing arcs (p = 0): labels pushed to the outer side, white-filled
-    \draw[->, edge, color=gray] (s) -- node[plab, left=2pt]{$p=0$} (a);
-    \draw[->, edge, color=gray] (b) -- node[plab, right=2pt]{$p=0$} (t);
-    % crossing arcs source -> sink (p = w), highlighted
-    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[plab, above]{$p=w$} (b);
-    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[plab, below]{$p=w$} (t);
-    % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
-    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.30, below=1pt]{$p=0$} (a);
-\end{tikzpicture}
-\caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$, while same-side and backward arcs have $p=0$.}
-\label{fig:cut}
-\end{figure}
-% did you forget to bound n, or does the next theorem always hold even for large n?
-\begin{theorem}[Directed multigraph value, small $n$]\label{thm:dir-multi-small}
-For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
-\end{theorem}
-
-Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, 
-and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, 
-and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand 
-and \Cref{sec:transcripts} retains the solver record.
+The model itself is a mixed-integer program with one chosen cut per ordered pair, and it is written out, with the theorem it settled and the record of what was run, in \Cref{sec:mstar-model}.
 
 \section{The heuristic search}
 
@@ -578,13 +524,7 @@ A single walk depends on where it started, so the search is repeated with a diff
 
 The energy above reads the binding connectivity $\lambda^{\max}(G)$, and a literal implementation would call the checker afresh on the whole graph at every step. That checker is the most expensive routine in the program: a capped sweep over ordered pairs, stopping each pair as soon as it finds one route too many and stopping the whole sweep at the first violating pair. The walk runs for thousands of steps with several restarts, so such a search would spend nearly all of its time remeasuring graphs that barely changed from the step before. Two elementary facts remove almost all of that work without altering a single number the search reports, and they are the monotonicity and unit-step bounds of \Cref{prop:monotone}. Removing a unit of multiplicity can never raise $\lambda^{\max}$, part~(1), and adding one can never lower it and raises it by at most one, part~(2). Both hold verbatim for $\kappa^{\max}$, and both fall straight out of max-flow / min-cut, so the proof sits in \Cref{app:proofs} with the rest of the machinery.
 
-Together they settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a capped pairwise sweep, stopping at the first pair for which it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
-
-To know which case applies, the search carries a running upper bound on $\lambda^{\max}$, raised by one whenever it accepts an addition (part~(2)) and left untouched when it accepts a removal (part~(1)), and resynchronised to the exact value at the cadence where it already pays for flows to refresh the sensitivity map. The bound can only ever sit at or above the truth, so any step it clears is certainly feasible.
-
-The energy returned on every step is, by \Cref{prop:monotone}, exactly the value the naive implementation would have computed. Every accept-or-reject decision, every random draw, and the graph the walk finally returns are therefore unchanged, and the speed-up is invisible to every number the thesis reports. A regression test runs both implementations, the fast one and a reference that measures exactly at every step, across all four graph variants and both separations, and checks that the two agree step for step in energy, in every accept-or-reject decision, and in the final graph, and that the returned graph is feasible under the exact checker. The witness the search reports is always certified exactly, either by the monotonicity deductions above or by the capped predicate, and the full binding-connectivity value is recomputed only when the energy or a recorded trace needs it.
-
-Where the method is needed differs by variant. For undirected graphs one could resynchronise the exact value cheaply from the Gomory--Hu shortcut used above, which encodes every pairwise edge-connectivity in $n - 1$ flows. The directed and vertex variants admit no such tree, so there the monotone bound and the capped predicate are the only inexpensive handle on feasibility, and they are what let the same matrix-search machinery serve every graph variant at speed.
+Together they settle almost every step without a flow. A removal applied to a feasible graph leaves it feasible, and an addition made while the graph sits strictly below the ceiling can lift $\lambda^{\max}$ by at most one, so in both cases the energy is known without measuring anything. Only an addition made at the ceiling itself needs the checker. The search therefore carries a running upper bound on $\lambda^{\max}$ and resynchronises it exactly only when that bound is what a step turns on. \Cref{sec:cheap-checker} gives the bookkeeping, and the regression test that holds the fast walk to the naive one step for step.
 
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 

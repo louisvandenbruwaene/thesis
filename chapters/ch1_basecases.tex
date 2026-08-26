@@ -445,7 +445,7 @@ For all $n \ge m$ and $m \le 4$,
 \]
 \end{theorem}
 
-Whitney's inequality $\kap \le \lec$ makes every edge-feasible graph vertex-feasible (\Cref{fig:divergence}.
+By Whitney's inequality every edge-feasible graph is vertex-feasible, so $k_m(n) \ge \ell_m(n)$ (\Cref{fig:divergence}).
 One is tempted to expect the equality forever. 
 This however is not the case, and S{\o}rensen and Thomassen proved that the vertex problem diverges from the edge problem at $m = 5$.
 
@@ -460,30 +460,12 @@ while $k_5(7) = 15$ and $k_5(12) = 27$. The formula first exceeds the edge value
 \]
 \end{theorem}
 
-\begin{remark}[A counting convention that shifts every quoted constant by one]\label{rem:threshold-convention}
-This thesis defines $\ell_m(n)$ and $k_m(n)$ as the \emph{largest} number of edges a graph can carry while \emph{no} pair is joined by $m$ independent routes. 
-S{\o}rensen and Thomassen, and the Erd\H{o}s Problems database \cite{ErdosProblems} after them, state the same results the other way round, as the \emph{smallest} number of edges that \emph{forces} such a pair. 
-Those two quantities are adjacent integers by construction: if $k$ is the largest feasible edge count then no graph on $n$ vertices with $k+1$ edges is feasible, so $k+1$ is exactly the forcing threshold.
-\end{remark}
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{figures/edge_vertex_divergence.png}
     \caption{The edge and vertex extremal functions for $m = 2, 3, 4$ (blue shades, single curve per $m$ since they agree) and $m = 5$ (dashed blue for edge, solid orange for vertex). The vertex function diverges from the edge function at $n = 14$ and grows faster thereafter.}
     \label{fig:divergence}
 \end{figure}
-
-\begin{construction}[Directed hub]\label{const:directed-hub}
-For $n \ge m \ge 2$, take a hub $h$ and label the other $N = n-1$ vertices $0, \dots, N-1$. Add the $2N$ hub arcs $h \to i$ and $i \to h$, and on the non-hub vertices the $(m-2)N$ ring arcs $i \to i+j \bmod N$ for $j = 1, \dots, m-2$. The total is $m(n-1)$ arcs and every non-hub vertex has $d^+ = d^- = m-1$.
-\end{construction}
-
-Every ordered pair has a non-hub member, whose relevant degree is exactly $m-1$ and, since $n \ge m$, smaller than the hub's own $n-1$. That member is therefore the binding one and the degree bound gives $\lec^{\max} \le m-1$. At $m = 2$ the ring is empty and what remains is the \emph{bidirected star}, in which two spokes can only reach each other through the hub.
-
-\begin{construction}[One-directional bipartite digraph]\label{const:bipartite}
-Split the vertices into parts $A$ and $B$ of sizes $\floor{n/2}$ and $\ceil{n/2}$, and include every arc from $A$ to $B$ and none the other way. The total is $\floor{n^2/4}$ arcs.
-\end{construction}
-
-Nothing leaves $B$ and nothing enters $A$, so no route has a second step and every pair is joined by at most the one direct arc, giving $\lec^{\max} = 1$.
 
 \begin{theorem}[Directed arc value at $m = 2$]\label{thm:dir-arc-m2-exact}
 For simple digraphs,
@@ -492,7 +474,7 @@ For simple digraphs,
 \]
 \end{theorem}
 
-The two constructions give the lower bound, one branch each. The upper bound is an induction on $n$ (\Cref{app:proofs}): delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The same induction never mentions the separation, so it survives the change to $\kap$ verbatim once the base cases are re-run.
+Two shapes give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is an induction on $n$ (\Cref{app:proofs}): delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The same induction never mentions the separation, so it survives the change to $\kap$ verbatim once the base cases are re-run.
 
 \begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
@@ -542,8 +524,7 @@ For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 \label{fig:simple-digraph-m2}
 \end{figure}
 
-The hub construction leads for $n < 7$, the one-directional bipartite construction leads for $n > 7$ and the two tie at $n = 7$, where both reach $12$ arcs. 
-They are shown side by side in \Cref{fig:simple-digraph-m2}.
+The hub leads for $n < 7$ and the bipartite wall leads for $n > 7$. 
 Notice how the directed value is quadratic in $n$ for large $n$, while the undirected value is linear.
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
@@ -551,11 +532,11 @@ This is because digraphs can be lopsided in one direction without creating route
 An $r$-uniform hypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has at most $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
 \end{proposition}
 
-The proof, given in \Cref{app:proofs}, runs the multigraph argument through the hypergraph Gomory-Hu theorem (\Cref{thm:hyper-gomory-hu} applied to the hyperedge-cut function in place of the edge-cut function, counting each hyperedge with the at least $r-1$ tree cuts it crosses. 
-The star hypertree (\Cref{fig:hyper-star}) attains the $m = 2$ case, a hub joined to disjoint blocks of $r-1$ vertices, with Berge connectivity one everywhere and $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
-One genuine surprise is worth recording here: for $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
-In the non-hypergraph case simplicity is exactly what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. 
-One edge size higher, they are equal.
+The proof is the multigraph argument again, run through the hypergraph Gomory-Hu tree, and \Cref{app:proofs} gives it. 
+The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one everywhere, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
+For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
+That is a real difference between the two edge sizes. 
+For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$, and one edge size higher the two are equal.
 
 \begin{figure}[h]
 \centering
@@ -604,10 +585,10 @@ hypergraph, so
 \]
 \end{theorem}
 
-The first falls out once Berge routes are read as ordinary paths in the incidence graph, where the ceiling $\kap^{\max} \le 1$ says exactly that the incidence graph is a forest. 
-The second is the harder one and carries the genuinely new tool: a rank bound for graphs in which one side of a partition must stay below local $3$-connectivity, proved by way of Tutte's triconnected decomposition, which the incidence translation then turns back into the hypergraph statement. 
-At $m \ge 4$ that route stops for want of a $4$-connectivity analogue of the decomposition, and the value is open.
-The proposition counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed and that measurement is the genuinely new part. 
+Both proofs read Berge routes as ordinary paths in the incidence graph, and \Cref{app:proofs} gives them. 
+The $m = 3$ case is the harder one and needs a rank bound proved through Tutte's triconnected decomposition. 
+At $m \ge 4$ that route stops for want of a $4$-connectivity analogue, and the value is open.
+The proposition counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part. 
 The metro picture shows why. 
 An ordinary edge is a one-stop link between a single pair, so policing edge-disjointness means watching each pair on its own. 
 A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches $\binom{r}{2}$ pairs at once, yet like a line that can run only one train at a time it may serve only one route. 
@@ -624,14 +605,6 @@ For simple digraphs and all $n \ge m \ge 2$,
 \]
 \end{conjecture}
 
-At $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. The first branch is the directed hub. The second is the bipartite digraph with one extra layer inside its larger part.
-
-\begin{construction}[Augmented bipartite digraph]\label{const:augmented-bipartite}
-For $n \ge m \ge 2$, set $|B| = \ceil{(n+m-2)/2}$ and $|A| = n - |B|$, include every arc from $A$ to $B$, and inside $B$ give each $b_j$ the $m-2$ in-arcs from its cyclic predecessors $b_{j-1}, \dots, b_{j-(m-2)}$. The total is $\floor{(n+m-2)^2/4}$ arcs.
-\end{construction}
-
-The only in-arcs of a $b \in B$ that an $a \in A$ can reach are the direct arc $a \to b$ and the $m-2$ two-step detours through $b$'s in-neighbours inside $B$, so such a pair carries exactly $m-1$ routes and no more, while pairs inside $B$ are held down by the in-degree $m-2$ and pairs from $B$ to $A$ or inside $A$ have no routes at all.
-
-At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$. Its $25$ arcs from $A$ to $B$ carry a five-cycle inside $B$, giving every $b_j$ one extra in-arc, so each pair $a_i, b_j$ has the direct arc and one detour and $\lec^{\max} = 2$. That is $30$ arcs against the guess of $27$, and the correction is exactly the shift of the partition towards $B$.
+At $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. The first branch is the directed hub of \Cref{const:directed-hub}. The second is the bipartite wall again, with the partition shifted towards the larger part and a short cycle added inside it so that each pair gains $m-2$ detours on top of its direct arc (\Cref{const:augmented-bipartite}). At $m = 3$, $n = 10$ that shape holds $30$ arcs, which is what refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$ and its prediction of $27$.
 
 For fixed $m \ge 3$ the matching upper bound is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer.
