@@ -393,3 +393,30 @@ between arguments, not recap.
 
 VERIFY: latexmk exit 0, 104pp, 0 overfull, 0 undefined refs, 0 occurrences of
 `??`, 147 labels each declared exactly once, no em-dashes or en-dashes added.
+
+## 2026-08-26 (Opus, fifth pass) — the variant grids: flipped, and one vocabulary
+
+Two author calls on the four sixteen-variant grids.
+
+**ROTATED 180 DEGREES.** They were turned so the figure's top sat at the left
+edge of the page. `\usepackage[figuresright]{rotating}` changed NOTHING, because
+the package default already behaves that way; only `figuresleft` flips it. The
+option names do not read the way you expect, so **verify a sideways float by
+rendering the page (`pdftoppm -f <page> -r 45 -png main.pdf out`), never by
+reading the option name.** These four are the only sideways floats in the
+thesis, so the preamble option affects exactly them.
+
+**NO PER-PANEL SPECIAL CASE.** The simple directed arc panel drew the two
+competing sub-branches of `conj:dir-arc` as dotted lines with an inline label,
+which made one panel of sixteen carry a mark the other fifteen did not. The
+`branches` key is gone from `gather_variant_grid`, from `plot_variant_grid` and
+from `_reconcile_panel`, and the shared key lost its "named construction" entry
+(four entries now, not five). Where a conjecture is a maximum of two counts, the
+curve plotted is that maximum. The branches are named in prose in
+`sec:dir-constructions` instead, which is where the constructions themselves now
+live after the fourth pass. `ch2_machine.tex`'s caption no longer describes a
+dotted line.
+
+VERIFY: grids redrawn in 3s from the machine-value cache (484 entries, 0
+computed), latexmk exit 0, 104pp, 0 overfull, 0 undefined refs, 0 `??`, program
+self-check ALL CHECKS PASSED, all four figure pages rendered and inspected.

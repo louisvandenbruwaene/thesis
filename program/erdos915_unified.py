@@ -3696,9 +3696,14 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                in the colour of the curve it refers to;
     ``ylabel`` what is being counted (edges, arcs, hyperedges, hyperarcs).
 
-    The point is one honest picture, distinguished by colour rather than dash
-    pattern: a blue line is settled, a red line is conjectured, a yellow line is
-    a guess, and the shaded band is the interval we are certain the truth lies in.
+    Every panel is drawn from the same vocabulary, with no per-variant extras:
+    a blue line is settled, a red line is conjectured, a yellow line is a guess,
+    and the shaded band is the interval we are certain the truth lies in.  The
+    directed arc panel used to add its two competing sub-branches as dotted
+    lines, which made one panel of sixteen carry a mark the others did not.
+    Where a conjecture is a maximum of two counts, the curve plotted is that
+    maximum, and the branches are named in prose instead (author call,
+    2026-08-26).
 
     ``row_range`` restricts the grid to a slice of the four model rows (e.g.
     ``(0, 2)`` for just simple and multigraph), so the sixteen panels can be
@@ -3726,7 +3731,6 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                    for panel in panels)
 
     drawn = {"band": _uses("band"),
-             "branch": any(panel.get("branches") for panel in panels),
              "proved": _uses("proved"), "conj": _uses("conj"),
              "guess": _uses("guess"),
              "exact": _uses_points("exact"), "search": _uses_points("search")}
@@ -3737,26 +3741,6 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
             xs, lo, hi = band
             ax.fill_between(xs, lo, hi, color=_WARM, alpha=0.10, linewidth=0)
             ax.plot(xs, hi, "-", color=_WARM, linewidth=0.7, alpha=0.55)
-        # The main curve, needed below to decide whether a named branch is
-        # visibly separate from it or hidden underneath it.
-        main = (panel.get("proved") or panel.get("conj") or panel.get("guess"))
-        for bxs, bys, bname in panel.get("branches", []):
-            ax.plot(bxs, bys, ":", color=_KUL_LIGHT, linewidth=1.4, zorder=2)
-            # Name the branch on the curve itself, but only where it is actually
-            # visible.  A branch that is the maximum at large n coincides with the
-            # curve it feeds, and labelling THAT would put a caption on a line the
-            # reader cannot see, next to a different line's colour.
-            if not main or not len(bys):
-                continue
-            span = max(main[1]) - min(main[1]) or 1
-            if abs(bys[-1] - main[1][-1]) > 0.06 * span:
-                ax.annotate(bname, xy=(bxs[-1], bys[-1]),
-                            xytext=(-3, -11), textcoords="offset points",
-                            ha="right", va="top", zorder=3.5,
-                            fontsize=6.6 * fontsize_scale, color=_KUL_LIGHT,
-                            bbox=dict(boxstyle="square,pad=0.15",
-                                      facecolor="white", edgecolor="none",
-                                      alpha=0.85))
         for key, colour in (("proved", _KUL_BLUE), ("conj", _RED),
                             ("guess", _GUESS)):
             if panel.get(key) is not None:
@@ -3817,8 +3801,6 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
         ("proved", dict(color=_KUL_BLUE, lw=2.0, label="proved")),
         ("conj", dict(color=_RED, lw=2.0, label="conjectured")),
         ("guess", dict(color=_GUESS, lw=2.0, label="guess (interpolated)")),
-        ("branch", dict(color=_KUL_LIGHT, lw=1.4, ls=":",
-                        label="named construction")),
         ("band", dict(color=_WARM, lw=4, alpha=0.35, label="certain interval")),
         ("exact", dict(color=_GREEN, marker="s", ls="none", markersize=4.4,
                        label="machine-checked (exact)")),

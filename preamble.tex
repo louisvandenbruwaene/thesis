@@ -68,9 +68,13 @@
 % FIGURES AND TABLES
 % ============================================================================
 \usepackage{float}
-% rotating: the twelve-panel bounds grid needs a full sideways page, since at
-% text width its per-panel labels fall under 2pt.
-\usepackage{rotating}
+% rotating: the sixteen-panel bounds grids need a full sideways page, since at
+% text width their per-panel labels fall under 2pt.
+% figuresleft: every sideways float is turned the opposite way from the package
+% default, so the grids read the other way up on the page (author call,
+% 2026-08-26). Verify by rendering the page, not by reading the option name:
+% the default already behaves as figuresright, so only figuresleft flips it.
+\usepackage[figuresleft]{rotating}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{booktabs}

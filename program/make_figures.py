@@ -278,13 +278,10 @@ def _reconcile_panel(panel: dict) -> dict:
         xs, ys = curve
         return xs, [min(y, exact[x]) if x in exact else y for x, y in zip(xs, ys)]
 
-    # invariant 1 applied to every formula line and to the named branches
+    # invariant 1 applied to every formula line
     for key in ("proved", "conj"):
         if panel.get(key) is not None:
             panel[key] = cap_to_exact(panel[key])
-    if panel.get("branches"):
-        panel["branches"] = [(*cap_to_exact((bx, by)), lbl)
-                             for bx, by, lbl in panel["branches"]]
 
     # invariants 1 then 2 applied to the search circles
     if panel.get("search") is not None:
@@ -510,18 +507,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                         directed=True, simple=True, separation="edge")
     se3 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="edge")
+    # No named sub-branches. conj:dir-arc is the maximum of a hub count and a
+    # bipartite count, and drawing the losing one as a dotted line made this the
+    # only panel of sixteen with a mark the others do not have. The curve plotted
+    # is the conjectured value itself, exactly as in every other panel.
     panels.append(dict(
         status="conjectured", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
-        branches=[(matrix_ns, [min(m * (n - 1), n * (n - 1)) for n in matrix_ns],
-                   "hub $m(n{-}1)$"),
-                  # Shifted-partition augmented bipartite floor((n+m-2)^2/4)
-                  # (the corrected conj:dir-arc branch; the old balanced count
-                  # floor(n^2/4)+(m-2)ceil(n/2) agrees at m<=3 but is smaller
-                  # at m>=4 and would sit below the conjecture curve at m=6).
-                  (matrix_ns,
-                   [min((n + m - 2) ** 2 // 4, n * (n - 1))
-                    for n in matrix_ns], "bipartite")],
         exact=ex3, search=se3))
 
     # (4) simple directed vertex -- conjectured (= arc).
