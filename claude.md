@@ -102,6 +102,14 @@ and only touch this summary if the *status* (proved/open) changes.
   (author's standing style rule). Semicolons inside table cells or math
   notation are fine.
 - **British spelling** throughout the thesis (colour, optimise, etc.).
+- **Mader's theorem stays proved in full in the appendix.** It is about four
+  printed pages and it is the only classical result the thesis reproves rather
+  than cites, which makes it the standing candidate whenever someone asks for a
+  shorter appendix. The author was asked directly on 2026-08-26 and chose to
+  keep it: it is the answer to the headline undirected edge problem, and its
+  Gomory--Hu double count is the move the multigraph and hypergraph arguments
+  reuse, so a reader who cannot check it there cannot check them either. Do not
+  reopen this without the author.
 - **The body states and draws, the appendix defines and proves.** A chapter
   carries theorem statements, figures, and a few sentences of what makes each
   result work. Formal constructions, verification of a construction's
@@ -445,7 +453,9 @@ in that section are the three-line degree bound and `prop:monotone`, which is th
 thesis's own lemma that the search depends on. The one classical result reproved
 in full is **Mader's theorem, about 4 printed pages**, and that is the single
 real lever left. It is a scholarly call about self-containedness, not a cleanup,
-so it goes to the author.
+so it went to the author, who chose to KEEP it in full. Recorded as a standing
+convention above. The appendix therefore stays at 59 pages and there is no
+further safe cut in it.
 
 Other things checked and found NOT to be levers: only 5 figures in the whole
 appendix; no theorem is stated twice (checked by label and by title); the
