@@ -223,7 +223,7 @@ For all $n \ge m \ge 2$ the graph $H_{m,n}$ has $\floorfrac{m(n-1)}{2}$ edges an
 The edge count is $(n-1) + \floorfrac{(m-2)(n-1)}{2} = \floorfrac{m(n-1)}{2}$, since $(m-2)(n-1)$ and $m(n-1)$ have the same parity. For the connectivity, any two distinct vertices include at least one spoke vertex $v_i$, whose total degree is at most $1 + (m-2) = m-1$. \Cref{lem:degree-bound} then gives $\lec(u,v) \le m-1$.
 \end{proof}
 
-Together the upper bound and \Cref{thm:extremal-existence} prove \Cref{thm:mader}. The proof also reveals which graphs are extremal: equality forces both inequalities in the chain to be tight.
+The upper bound above proves \Cref{thm:mader}, and it uses no relation between $n$ and $m$: the Gomory--Hu tree has $n-1$ edges whatever $m$ is. \Cref{thm:extremal-existence} adds that the bound is attained once $n \ge m$, which is where that hypothesis is needed and where it belongs. Below it the complete graph is itself feasible and the bound is valid but slack, with equality returning exactly at $n = m$. The proof also reveals which graphs are extremal: equality forces both inequalities in the chain to be tight.
 
 \begin{theorem}[Characterisation of equality]\label{thm:extremal-char}
 Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{2}$, and let $T$ be a Gomory--Hu tree of $G$. If $m(n-1)$ is even, then every tree edge has weight exactly $m-1$, every tree edge is also an edge of $G$, and every edge of $G$ joins vertices at tree distance at most $2$. If $m(n-1)$ is odd, there is exactly one unit of slack, located in exactly one of three places: one tree edge has weight $m-2$, or one tree edge is not an edge of $G$, or one edge of $G$ joins vertices at tree distance $3$. Everything else is tight.
