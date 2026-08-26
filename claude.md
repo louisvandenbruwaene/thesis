@@ -217,3 +217,71 @@ skip; program self-check ALL CHECKS PASSED; `latexmk` exit 0, 102 pp, 0 overfull
 NOTE: the standing rule above about running `program/sync_code_appendix.py` is
 STALE. Appendix C was removed in the 2026-08-24 shortening pass and no chapter
 inputs `app_code.tex` any more, so there are no line ranges left to sync.
+
+## 2026-08-26 (Opus, second session) — the variant grids were being CUT OFF the page
+
+The author's complaint was that the sixteen-variant grids "look horrible". They
+did, and the worst of it was not a styling problem.
+
+**THE FIGURES OVERFLOWED THE ROTATED PAGE AND LATEX SAID NOTHING.** The canvas
+was 9.2 x 8.4in and each half is placed at `width=0.98\textheight` inside a
+`sidewaysfigure`, so on the page it was 9.14in wide by 8.35in tall while the
+rotated page has the text WIDTH, 6.10in, to give. Roughly 2.2in ran off the
+paper: the suptitle, the caption and the bottom half of the legend were simply
+not there in the built PDF, and `latexmk` exited 0 with no overfull box and no
+float warning. **`grep Overfull` is not a sufficient check for a sideways
+figure. Render the page (`pdftoppm -f <page> -r 55 -png main.pdf out`) and look
+at it.** The canvas is now 9.2 x 4.9in, sized backwards from what the rotated
+page has left after the caption, and it is saved with `bbox_tight=False` so the
+crop-to-content bounding box cannot silently change that ratio again. Verified
+by rendering all four pages.
+
+**THE ROW LABEL WAS GUESSING WHERE THE Y LABEL ENDED.** `annotate(xy=(-0.46,
+0.5), xycoords="axes fraction")` scales with panel width, so the offset that
+cleared a narrow panel landed on top of a wide one's y label. It now MEASURES:
+after `fig.canvas.draw()`, `get_tightbbox` says where the leftmost column's
+labels actually end and the model name hangs just left of that. This fixed the
+other four grids that share `_variant_panel_grid` at the same time.
+
+Other figure changes, all in `plot_variant_grid`: the four column identities
+moved out of sixteen long panel titles into four column headers, leaving each
+panel a one-word coloured status chip ("proved" / "conjectured" / "open", and
+the inherited rows stack "= simple" above the word); markers shrank (rings 8 ->
+5.2, mew 1.8 -> 1.1) so the curve reads THROUGH a search circle that lands on
+it, which is the whole point of those circles; the legend is built from the
+marks the figure actually draws, so the hypergraph halves stopped advertising a
+red conjecture curve neither of them has; the named branch is labelled on the
+curve instead of in the caption, and only where it is visibly separate from the
+curve it feeds.
+
+**THE MACHINE-VALUE CACHE** (`figures/machine_values.json`, 480 entries,
+committed like the other caches). The four grids ran several hundred `solve`
+calls on every regeneration: 26 minutes, and it is now 3 seconds.
+`make_figures.py --grids-only` redraws just these four,
+`make_figures.py --refresh` recomputes every value. The stored fingerprint
+covers the program only ABOVE its chapter 4 banner, which is everything `solve`
+runs. Hashing the whole file would have fired on every edit to the plotting code
+below, and a warning that always fires is one nobody reads. A mismatch is
+reported and the values are reused. Caching the timed searches also pins the
+published figures to the run that produced them, which the reproducibility
+appendix now states.
+
+**FOUR OTHER FIGURES WERE STILL THE TWELVE-VARIANT ONES.** Not stale numbers,
+a missing ROW: `conn_dist_m6`, `edges_dist`, `pair_conn_dist` and
+`scatter_lambda_edges` on disk were 3x4 grids with no multihypergraph row at
+all, because `figures/enumeration_cache.pkl` and
+`figures/pair_enumeration_cache.pkl` still held twelve keys and nothing had
+rebuilt them when `_VARIANT_ENUM_CONFIGS` went 12 -> 16. Both caches are
+regenerated (the twelve shared entries came back byte-identical, checked, so
+only the four new rows are new data) and all four figures redrawn at 4x4. If a
+variant is ever added again, those two pickles must be rebuilt in the same
+commit.
+
+Also fixed while in there, both pre-existing: `\Cref{sec:search-wall}` in ch2
+pointed at a label the chapter rewrite deleted (one `??` in the PDF, repointed
+to `fig:complexity`), and thirteen strings still said "twelve variants" after
+the fourth model landed, four of them PRINTED as figure suptitles.
+
+VERIFY: 116 tests OK, 1 expected skip; self-check ALL CHECKS PASSED; `latexmk`
+exit 0, 104 pp, 0 overfull, 0 occurrences of `??`; all four sideways pages
+rendered and inspected.

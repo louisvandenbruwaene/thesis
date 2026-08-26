@@ -273,11 +273,37 @@ The connectivity checker works on all variants but measures only one graph at a 
 All graphs of a fixed number of vertices must be enumerated to discover the bound for a single connectivity constraint.
 A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal entry, a multigraph a choice in $\{0,\dots,m-1\}$,
 and a digraph varies every ordered pair rather than only the upper triangle.
-A hypergraph is not a matrix at all, so it is enumerated over its own list: the candidates are the $\binom{n}{r}$ vertex sets of size $r$, or the oriented splits of them in the directed model, and a hypergraph is a choice of how many copies of each the list holds, at most one for a simple hypergraph and up to $m-1$ for a multihypergraph.
-\Cref{fig:matrix-rep} shows both encodings.
-Walking those possibilities, measuring each candidate with the checker, and keeping the densest feasible one settles a bound exactly.
+A hypergraph is not a matrix at all, so it is enumerated over its own list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
+In the directed model, the tail is specified with a pointer and the multihypergraphs have multiplicities for each hyperedge.
+\Cref{fig:matrix-rep} shows how an undirected multigraph and hypergraph are represented.
+Using these representations for all graph variants means iteration traverses all possible representation states easily. 
+Walking those possibilities, measuring each candidate with the checker and keeping the densest feasible graph settles a bound exactly.
 If the enumeration hits its deadline before finishing, the returned graph is labelled as a lower bound.
-On the small cases this exhaustive mode independently reproduces every value proved by hand in \Cref{ch:basecases} and those values are not repeated here.
+On the small cases this exhaustive mode independently reproduces every value proved by hand in \Cref{ch:basecases}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/complexity_growth.png}
+    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent cells to fill.}
+    \label{fig:complexity}
+\end{figure}
+
+
+Adding vertices multiplies the number of possible graphs by an exponential in $n$, 
+so a single extra vertex can move a problem from minutes to days. 
+Raising the connectivity budget is the next cost, 
+lifting the base of the exponent rather than its height, 
+which is why the multigraph curves sit above the simple ones in every panel. 
+Direction is the third: a digraph has twice as many possibilities as the undirected graph 
+on the same vertices (and a directed $3$-uniform hyperedge, a tail with two heads, 
+has three times as many), so the directed panel climbs fastest of all, 
+and those are precisely the variants whose answers \Cref{ch:basecases} could not prove. 
+The separation, by contrast, costs nothing here, because edge and vertex disjointness 
+search the same graphs and differ only in what the checker measures, which is an increase linear to the number of graphs.
+% The cut-counting certifier reaches a few vertices further than blind enumeration, 
+% but solving its encoding is itself hard and the gain is measured in single vertices, 
+% not orders of magnitude. Past that, no exhaustive method reaches the interesting sizes.
+% i don't know about any cut counting, perhaps leave it out. 
 
 \begin{figure}[ht]
 \centering
@@ -321,7 +347,7 @@ The number of graphs the checker must visit grows as $2^{\binom{n}{2}}$ for simp
 and capping multiplicities at $m-1$, so that each run ranges over the $m$ values $\{0,\dots,m-1\}$, raises the base from two to $m$, 
 giving $m^{\binom{n}{2}}$ undirected multigraphs and $m^{n(n-1)}$ directed ones. 
 The enumeration is exact wherever it finishes and it does so only for the smallest sizes. 
-\Cref{sec:search-wall} measures exactly how fast the search space grows. 
+\Cref{fig:complexity} measures exactly how fast the search space grows. 
 
 \subsection{Pruned search}
 The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-exact}) are the finite checks the induction of \Cref{app:proofs} depends on, and they sit just past where blind enumeration of digraphs is tractable.
@@ -506,23 +532,10 @@ The $\min$ in the two-step line is written as a minimum for readability only. A 
 For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
 \end{theorem}
 
-Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand and \Cref{sec:transcripts} retains the solver record.
-
-% Former source boundary: chapters/ch3_discover.tex
-Certification is exact only while it can cover every candidate. The second half of this chapter measures where that ends and replaces the exhaustive walk by a selective one: simulated annealing or tabu search explores a few matrix-model graphs well, while a randomised greedy routine handles hypergraphs. Each uses the same checker to keep the best feasible construction. Its output is a concrete object and therefore a lower bound, never an upper bound.
-
-\section{From certification to discovery: the enumeration wall}\label{sec:search-wall}
-
-The exhaustive methods above visit every graph of a given size. The trouble is how many that is. A simple undirected graph on $n$ vertices is a yes-or-no choice on each of the $\binom{n}{2}$ possible edges, so there are $2^{\binom{n}{2}}$ of them. A digraph chooses on each of the $n(n-1)$ ordered pairs, giving $2^{n(n-1)}$, and allowing multiplicities up to a cap $c$ raises the base from two to $c + 1$. These are not numbers that merely grow. They detonate. \Cref{fig:complexity} draws the growth on a logarithmic scale, where each step up the axis multiplies the count tenfold, and the message is the same in every panel: the count passes any reachable budget while $n$ is still in the single digits.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{figures/complexity_growth.png}
-    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent cells to fill.}
-    \label{fig:complexity}
-\end{figure}
-
-Three readings of the figure matter for what follows. Adding vertices is the sharpest cost: each new vertex multiplies the count by an exponential in $n$, so a single extra vertex can move a problem from seconds to centuries. Raising the connectivity budget is the next cost, lifting the base of the exponent rather than its height, which is why the multigraph curves sit above the simple one in every panel. Direction is the third: a digraph has twice as many cells to fill as the undirected graph on the same vertices (and a directed $3$-uniform hyperedge, a tail with two heads, has three times as many), so the directed panel climbs fastest of all, and those are precisely the variants whose answers \Cref{ch:basecases} could not prove. The separation, by contrast, costs nothing here, because edge and vertex disjointness search the same graphs and differ only in what the checker measures. The cut-counting certifier reaches a few vertices further than blind enumeration, but solving its encoding is itself hard and the gain is measured in single vertices, not orders of magnitude. Past that, no exhaustive method reaches the interesting sizes.
+Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, 
+and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, 
+and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand 
+and \Cref{sec:transcripts} retains the solver record.
 
 \section{The heuristic search}
 
@@ -609,24 +622,46 @@ The directed simple arc problem at $m\ge3$ shows the boundary cleanly. Exhaustio
 \]
 passes through every exhausted value and through the construction-backed lower bounds beyond them. Its linear-to-quadratic crossover occurs at $n=9$ when $m=3$, just past the exhausted range, and at $n=10$ it gives the thirty-arc counterexample of \Cref{const:augmented-bipartite}.
 
-The paired grids of \Cref{fig:variant-bounds-m3,fig:variant-bounds-m6} apply that reading to all sixteen variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds, while filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
+The paired grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} apply that reading to all sixteen variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds, while filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
 
 Where an upper bound is known to be attainable, the search reaches it at every plotted size except the recorded directed $m=2$, $n=8$ stall. The undirected hypergraph rows carry the one systematic exception, and it is a feature of the bound rather than of the search. There the blue curve is \Cref{prop:hyper-edge}, an upper bound proved for every $r$-uniform hypergraph, but the two models attain it under different conditions: a simple hypergraph only when $m-1\le\binom{n-2}{r-2}$, a multihypergraph only when $(r-1)\mid(n-1)$. Below its own threshold neither is known to meet the curve, and for the simple model at $m=6$, $n=6$, $r=3$ nothing does: the curve reads $12$, yet all $125\,970$ twelve-hyperedge simple $3$-uniform hypergraphs on six vertices are infeasible and the true maximum is $11$. The circles there are the search's own witnesses and sit below the curve, which is the honest picture of a gap that is not closed. That the two rows part company is the point of separating them, and the smallest case is $n=r=m=3$, where a simple hypergraph carries one hyperedge and the multihypergraph carries two. On the open directed sizes the named constructions, not the search, carry the best bounds once the extremal shape changes from a hub to a bipartite wall. The grid therefore validates the search where proof can check it and marks the remaining values honestly as evidence rather than conclusions.
 
-% Each grid holds sixteen plot panels. Side by side at half the text width their
-% axis labels printed at under 2pt, so each now takes a full sideways page,
-% which is the only layout on A4 that leaves them legible. They are declared
-% after the closing paragraph so the running text fills its own page first.
+% Each grid holds sixteen plot panels. Side by side at half the text width
+% their axis labels printed at under 2pt, and even at four rows to a single
+% sideways page the panels were still too small to read comfortably. Each
+% grid is therefore split across two sideways pages, graph models on the
+% first and hypergraph models on the second, so every panel gets a full page
+% to itself and prints at a legible size. They are declared after the closing
+% paragraph so the running text fills its own page first.
+% The images are drawn at an aspect ratio chosen for THIS placement: rotated,
+% the width below is the text height and what is left for the image is the
+% text WIDTH minus the caption, about 4.9in against a 9.1in width. Do not
+% widen a caption below into another line or two without checking the page:
+% the overflow is silent, and it cuts the legend off the bottom of the paper.
 \begin{sidewaysfigure}[p]
     \centering
-    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3.png}
-    \caption{All sixteen variants at $m=3$. Rows select the model and columns the direction and separation. Colours encode theorem, conjecture, or interpolation, filled squares are exact finite values, and open circles are witnesses. The dotted lines in the simple directed arc panel are its two competing branches, the hub and the bipartite wall. \Cref{fig:variant-bounds-m6} is the same grid at $m=6$.}
-    \label{fig:variant-bounds-m3}
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_graphs.png}
+    \caption{The eight graph-model variants at $m=3$: simple and multigraph rows, undirected and directed columns. A blue curve is a theorem, a red one a conjecture and a yellow one an interpolation, filled squares are exact finite values, and open circles are witnesses. The dotted line named on the simple directed arc panel is the hub branch of \Cref{conj:dir-arc}. Its bipartite branch is the larger of the two beyond the crossover, so past that point it runs underneath the red curve. \Cref{fig:variant-bounds-m3-hyper} continues with the hypergraph rows at the same $m$, and \Cref{fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} redraw both halves at $m=6$.}
+    \label{fig:variant-bounds-m3-graphs}
 \end{sidewaysfigure}
 
 \begin{sidewaysfigure}[p]
     \centering
-    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6.png}
-    \caption{The same sixteen variants at $m=6$, to be read against \Cref{fig:variant-bounds-m3}. Raising $m$ widens every feasible band, and the exact squares thin out as the enumeration range falls behind the constructions.}
-    \label{fig:variant-bounds-m6}
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_hypergraphs.png}
+    \caption{The eight hypergraph-model variants at $m=3$, continuing \Cref{fig:variant-bounds-m3-graphs}: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key.}
+    \label{fig:variant-bounds-m3-hyper}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[p]
+    \centering
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6_graphs.png}
+    \caption{The same eight graph-model variants at $m=6$, to be read against \Cref{fig:variant-bounds-m3-graphs}. Raising $m$ widens every feasible band, and the exact squares thin out as the enumeration range falls behind the constructions.}
+    \label{fig:variant-bounds-m6-graphs}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}[p]
+    \centering
+    \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6_hypergraphs.png}
+    \caption{The same eight hypergraph-model variants at $m=6$, continuing \Cref{fig:variant-bounds-m6-graphs} and to be read against \Cref{fig:variant-bounds-m3-hyper}.}
+    \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}

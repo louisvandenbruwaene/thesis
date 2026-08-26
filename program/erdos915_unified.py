@@ -188,6 +188,7 @@ except ImportError:
     GridSpec = None
     FancyArrowPatch = None
     Patch = None
+    mlines = None
     blended_transform_factory = None
     MATPLOTLIB_AVAILABLE = False
 
@@ -443,7 +444,7 @@ def hypergraph_edge(n: int, m: int, r: int) -> int:
     Proved as an upper bound for every ``r``-uniform hypergraph, simple or
     not (``prop:hyper-edge``, hypergraph Gomory-Hu). Attained by a
     MULTIhypergraph (a repeated-hyperedge star) whenever ``(r-1) | (n-1)``.
-    Attained by a SIMPLE hypergraph, the model this program's twelve-panel
+    Attained by a SIMPLE hypergraph, the model this program's sixteen-panel
     enumeration actually searches, only under the extra hypothesis
     ``m - 1 <= C(n-2, r-2)`` (``thm:simple-hyper-edge``). Outside both
     conditions this value is still a valid upper bound but is not known to
@@ -457,7 +458,7 @@ def _hyper_edge_simple_proved(n: int, m: int, r: int) -> int | None:
     """``hypergraph_edge(n, m, r)``, gated to where a SIMPLE hypergraph is
     proved to attain it (``thm:simple-hyper-edge``: ``m - 1 <= C(n-2, r-2)``).
 
-    Returns ``None`` outside that range. The twelve-variant program's hyper
+    Returns ``None`` outside that range. The sixteen-variant program's hyper
     rows enumerate simple hypergraphs (no repeated hyperedges), and outside
     this condition the closed form is only an unattained upper bound for
     that model, e.g. at ``n = r = m = 3`` it gives 2 while only one 3-set
@@ -1029,7 +1030,7 @@ def _split_capacity_matrix(graph: Graph,
     choice discussed at length in the thesis (sec:parallel-convention).  The
     default False caps every adjacency at one, so a bundle of parallel edges is a
     single direct route and a multigraph measures as its underlying simple graph:
-    that is the convention the twelve variants use.  Setting it True gives the
+    that is the convention the sixteen variants use.  Setting it True gives the
     adjacency capacity ``mu(u,v)``, so ``q`` parallel copies count as ``q``
     internally disjoint routes, which is the alternative convention explored in
     sec:multi-vertex-standard.
@@ -3353,11 +3354,18 @@ def plot_sa_vs_tabu_convergence(
     _save(path)
 
 
-def _save(path: str | Path, *, tight: bool = True) -> None:
+def _save(path: str | Path, *, tight: bool = True,
+          bbox_tight: bool = True) -> None:
     """Tighten the layout, write the file, and close the figure.
 
     ``tight=False`` skips ``tight_layout`` for the 3-D figures, where it
     misbehaves with the projected axes (they manage their own spacing).
+
+    ``bbox_tight=False`` skips the crop-to-content bounding box, so the saved
+    image has exactly the figure's own aspect ratio.  Use it for a figure whose
+    printed size is fixed in advance (a full sideways page): with the crop on,
+    the saved aspect depends on how much whitespace the content left over, and a
+    canvas sized to fit a page can be saved at an aspect that no longer does.
     """
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     if tight:
@@ -3367,7 +3375,8 @@ def _save(path: str | Path, *, tight: bool = True) -> None:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             plt.tight_layout()
-    plt.savefig(path, dpi=150, bbox_inches="tight")
+    plt.savefig(path, dpi=150,
+                bbox_inches="tight" if bbox_tight else None)
     plt.close()  # release the figure so head-less runs don't leak memory
 
 
@@ -3639,13 +3648,40 @@ def plot_extremal_gallery(path: str | Path, *,
 
 
 
-def plot_variant_grid(panels: list[dict], path: str | Path,
-                      m: int | None = None) -> None:
-    """All twelve variants on one grid, in the proved/conjectured/guessed language.
+# The four questions every model row is asked, in column order.  They live above
+# the columns because they are a property OF the column, not of the panel: naming
+# them in all sixteen panel titles is what made those titles wider than the
+# column could hold.
+_VARIANT_COL_HEADERS = ("undirected, edge", "undirected, vertex",
+                        "directed, arc", "directed, vertex")
 
-    ``panels`` is a row-major list of twelve dictionaries (rows = model simple,
-    multi, hyper; columns = undirected edge, undirected vertex, directed arc,
-    directed vertex).  Each panel may carry any of:
+
+def _status_colour(status: str):
+    """Colour of the curve a panel's status word refers to.
+
+    Matched on substrings rather than on equality because a row that inherits its
+    value from another one says so first ("= simple, conjectured").
+    """
+    low = status.lower()
+    if "conj" in low:
+        return _RED
+    if "open" in low:
+        return _GUESS
+    if "proved" in low:
+        return _KUL_BLUE
+    return _KUL_DARK
+
+
+def plot_variant_grid(panels: list[dict], path: str | Path,
+                      m: int | None = None,
+                      row_range: tuple[int, int] | None = None,
+                      fontsize_scale: float = 1.0,
+                      subtitle: str | None = None) -> None:
+    """All sixteen variants on one grid, in the proved/conjectured/guessed language.
+
+    ``panels`` is a row-major list of sixteen dictionaries (rows = model simple,
+    multi, hyper, multihyper; columns = undirected edge, undirected vertex,
+    directed arc, directed vertex).  Each panel may carry any of:
 
     ``proved`` ``(xs, ys)`` solid blue line, a theorem holding for all ``n``;
     ``conj``   ``(xs, ys)`` solid red line, a conjecture formula;
@@ -3654,80 +3690,178 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     ``band``   ``(xs, lo, hi)`` the certain interval, an easy construction below
                and the trivial maximum edge count above;
     ``exact``  ``(xs, ys)`` filled squares, sizes the machine proved;
-    ``search`` ``(xs, ys)`` open circles, the search lower bounds.
+    ``search`` ``(xs, ys)`` open circles, the search lower bounds;
+    ``status`` the one word this panel's value has earned ("proved",
+               "conjectured", "open"), shown as a coloured chip inside the panel
+               in the colour of the curve it refers to;
+    ``ylabel`` what is being counted (edges, arcs, hyperedges, hyperarcs).
 
     The point is one honest picture, distinguished by colour rather than dash
     pattern: a blue line is settled, a red line is conjectured, a yellow line is
     a guess, and the shaded band is the interval we are certain the truth lies in.
+
+    ``row_range`` restricts the grid to a slice of the four model rows (e.g.
+    ``(0, 2)`` for just simple and multigraph), so the sixteen panels can be
+    split across two page-sized images instead of squeezed onto one.
+    ``fontsize_scale`` raises every panel font to match the extra room a
+    two-row half gives them (pass 1.2-1.3).
     """
+    two_row = row_range is not None and (row_range[1] - row_range[0]) == 2
+
+    row_labels = _VARIANT_ROW_LABELS
+    if row_range is not None:
+        lo, hi = row_range
+        panels = panels[lo * 4:hi * 4]
+        row_labels = row_labels[lo:hi]
+
+    # Which marks this figure actually uses, read off the panels BEFORE anything
+    # is drawn.  Collecting the flags inside ``draw_panel`` instead would set them
+    # after the legend was built, since the scaffold draws the panels only once it
+    # has been handed the key.
+    def _uses(key):
+        return any(panel.get(key) is not None for panel in panels)
+
+    def _uses_points(key):
+        return any(panel.get(key) is not None and len(panel[key][0])
+                   for panel in panels)
+
+    drawn = {"band": _uses("band"),
+             "branch": any(panel.get("branches") for panel in panels),
+             "proved": _uses("proved"), "conj": _uses("conj"),
+             "guess": _uses("guess"),
+             "exact": _uses_points("exact"), "search": _uses_points("search")}
+
     def draw_panel(ax, panel):
         band = panel.get("band")
         if band is not None:
             xs, lo, hi = band
-            ax.fill_between(xs, lo, hi, color=_WARM, alpha=0.12,
-                            label="certain interval")
-            ax.plot(xs, lo, "-", color=_WARM, linewidth=0.8, alpha=0.6)
-            ax.plot(xs, hi, "-", color=_WARM, linewidth=0.8, alpha=0.6)
-        for branch in panel.get("branches", []):
-            bxs, bys, _ = branch
-            ax.plot(bxs, bys, ":", color=_KUL_LIGHT, linewidth=1.3)
-        if panel.get("proved") is not None:
-            xs, ys = panel["proved"]
-            ax.plot(xs, ys, "-", color=_KUL_BLUE, linewidth=2.3)
-        if panel.get("conj") is not None:
-            xs, ys = panel["conj"]
-            ax.plot(xs, ys, "-", color=_RED, linewidth=2.0)
-        if panel.get("guess") is not None:
-            xs, ys = panel["guess"]
-            ax.plot(xs, ys, "-", color=_GUESS, linewidth=2.0)
-        if panel.get("exact") is not None:
-            xs, ys = panel["exact"]
-            if len(xs):
-                ax.plot(xs, ys, "s", color=_GREEN, markersize=7)
+            ax.fill_between(xs, lo, hi, color=_WARM, alpha=0.10, linewidth=0)
+            ax.plot(xs, hi, "-", color=_WARM, linewidth=0.7, alpha=0.55)
+        # The main curve, needed below to decide whether a named branch is
+        # visibly separate from it or hidden underneath it.
+        main = (panel.get("proved") or panel.get("conj") or panel.get("guess"))
+        for bxs, bys, bname in panel.get("branches", []):
+            ax.plot(bxs, bys, ":", color=_KUL_LIGHT, linewidth=1.4, zorder=2)
+            # Name the branch on the curve itself, but only where it is actually
+            # visible.  A branch that is the maximum at large n coincides with the
+            # curve it feeds, and labelling THAT would put a caption on a line the
+            # reader cannot see, next to a different line's colour.
+            if not main or not len(bys):
+                continue
+            span = max(main[1]) - min(main[1]) or 1
+            if abs(bys[-1] - main[1][-1]) > 0.06 * span:
+                ax.annotate(bname, xy=(bxs[-1], bys[-1]),
+                            xytext=(-3, -11), textcoords="offset points",
+                            ha="right", va="top", zorder=3.5,
+                            fontsize=6.6 * fontsize_scale, color=_KUL_LIGHT,
+                            bbox=dict(boxstyle="square,pad=0.15",
+                                      facecolor="white", edgecolor="none",
+                                      alpha=0.85))
+        for key, colour in (("proved", _KUL_BLUE), ("conj", _RED),
+                            ("guess", _GUESS)):
+            if panel.get(key) is not None:
+                xs, ys = panel[key]
+                ax.plot(xs, ys, "-", color=colour, linewidth=2.0,
+                        solid_capstyle="round", zorder=2.5)
         if panel.get("search") is not None:
             xs, ys = panel["search"]
             if len(xs):
-                ax.plot(xs, ys, "o", mfc="none", mec=_VIOLET, mew=1.8,
-                        markersize=8)
-        ax.set_title(panel["title"], fontsize=9)
-        ax.set_xlabel("vertices $n$", fontsize=8.5)
-        ax.set_ylabel(panel.get("ylabel", "edges"), fontsize=8.5)
-        ax.tick_params(labelsize=8)
-        ax.grid(True, alpha=0.3)
-        # NO per-panel legend.  Every panel draws from the same six-item
-        # vocabulary, so sixteen copies of that key would occupy more of the
-        # figure than the curves themselves, which is exactly the complaint this
-        # layout answers.  One shared key sits under the whole grid instead,
-        # built below; the dotted named branches are named in the caption.
+                # Hollow, and small enough that the curve reads THROUGH the ring
+                # rather than under a chain of discs.  Where the search lands on
+                # the curve that coincidence is the finding, so it has to be
+                # visible; the old size-8 rings with a size-1.8 edge simply hid it.
+                ax.plot(xs, ys, "o", mfc="none", mec=_VIOLET, mew=1.1,
+                        markersize=5.2, zorder=3)
+        if panel.get("exact") is not None:
+            xs, ys = panel["exact"]
+            if len(xs):
+                ax.plot(xs, ys, "s", color=_GREEN, markersize=4.4, zorder=4)
 
-    # One figure-level key, in the order a reader meets the marks: the three
-    # curve kinds (what is claimed), then the two point kinds (what was computed).
-    legend_handles = [
-        mlines.Line2D([], [], color=_KUL_BLUE, lw=2.3, label="proved"),
-        mlines.Line2D([], [], color=_RED, lw=2.0, label="conjectured"),
-        mlines.Line2D([], [], color=_GUESS, lw=2.0, label="guess (interpolated)"),
-        mlines.Line2D([], [], color=_KUL_LIGHT, lw=1.3, ls=":",
-                      label="named construction"),
-        mlines.Line2D([], [], color=_GREEN, marker="s", ls="none", markersize=7,
-                      label="machine-checked (exact)"),
-        mlines.Line2D([], [], color=_VIOLET, marker="o", ls="none", markersize=8,
-                      mfc="none", mew=1.8, label="search (lower bound)"),
+        status = panel.get("status", "")
+        if status:
+            colour = _status_colour(status)
+            # A row that inherits its value from another one says so first, and
+            # the two facts stack rather than run: "= simple, conjectured" on one
+            # line is wider than the panel it has to sit inside.
+            ax.text(0.045, 0.945, status.replace(", ", "\n"),
+                    transform=ax.transAxes,
+                    ha="left", va="top", fontsize=6.9 * fontsize_scale,
+                    color=colour, fontweight="bold", zorder=5,
+                    bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
+                              edgecolor=colour, linewidth=0.7, alpha=0.90))
+        ax.set_ylabel(panel.get("ylabel", "edges"),
+                      fontsize=8.0 * fontsize_scale, labelpad=2.5)
+        ax.tick_params(labelsize=7.4 * fontsize_scale, length=2.5, pad=1.5)
+        # Both axes count things, so neither ever wants a fractional tick.
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True, nbins=6))
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True, nbins=5))
+        ax.grid(True, alpha=0.25, linewidth=0.6)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        # Headroom above the curve for the status chip, which sits at 0.945 of
+        # the axes height and must not land on the line at large n.
+        ax.margins(x=0.05, y=0.14)
+
+    def finish(fig, axes):
+        # "vertices n" is the same on all eight panels, so it is written once per
+        # column, under the bottom row.  Ticks stay on every panel: each has its
+        # own y scale and is read on its own.
+        for ax in axes[-1, :]:
+            ax.set_xlabel("vertices $n$", fontsize=8.5 * fontsize_scale)
+
+    # One figure-level key, in the order a reader meets the marks: the curve
+    # kinds (what is claimed), then the point kinds (what was computed).  Only
+    # the marks this figure actually draws are listed, so the hypergraph halves
+    # stop advertising a red conjecture curve that appears in neither of them.
+    key_specs = [
+        ("proved", dict(color=_KUL_BLUE, lw=2.0, label="proved")),
+        ("conj", dict(color=_RED, lw=2.0, label="conjectured")),
+        ("guess", dict(color=_GUESS, lw=2.0, label="guess (interpolated)")),
+        ("branch", dict(color=_KUL_LIGHT, lw=1.4, ls=":",
+                        label="named construction")),
+        ("band", dict(color=_WARM, lw=4, alpha=0.35, label="certain interval")),
+        ("exact", dict(color=_GREEN, marker="s", ls="none", markersize=4.4,
+                       label="machine-checked (exact)")),
+        ("search", dict(color=_VIOLET, marker="o", ls="none", markersize=5.2,
+                        mfc="none", mew=1.1, label="search (lower bound)")),
     ]
 
-    # The line styles are named in the shared legend and spelled out in the
-    # caption, so the suptitle stays short and just records the threshold m.
     suptitle = "Erdős 915 across the sixteen variants"
     if m is not None:
         suptitle += fr",  $m = {m}$"
-    # Printed-size note: the thesis gives this grid a full sideways page, so its
-    # usable width is the text HEIGHT (about 9.2in) and not the text width. The
-    # canvas is drawn at that size, which keeps the panel fonts at their stated
-    # point sizes on paper instead of shrinking them to near-invisibility.  The
-    # fourth model row makes it taller than it was at twelve panels.
+    if subtitle:
+        # One line, not two: the second line of a two-line suptitle pushed the
+        # column headers into the top row of panels.
+        suptitle += f"   ·   {subtitle}"
+
+    # Printed-size note, and the reason this figure sets its geometry by hand.
+    # The thesis gives each half its own full sideways page, so the image is
+    # placed at a width of 0.98\textheight (about 9.1in) and the height it may
+    # occupy is what is left of the text WIDTH (about 6.1in) after the caption,
+    # roughly 4.9in.  The canvas is therefore 9.2 x 4.9 and is saved WITHOUT a
+    # crop-to-content bounding box, so that ratio survives to the page.  The old
+    # 9.2 x 8.4 canvas was taller than the rotated page could hold and the
+    # suptitle, the caption and half the legend were simply cut off the paper.
+    key_handles = [mlines.Line2D([], [], **spec)
+                   for key, spec in key_specs if drawn[key]]
+
+    figsize = (9.2, 4.9) if two_row else (9.2, 9.4)
+    adjust = dict(left=0.085, right=0.995,
+                  top=0.845 if two_row else 0.925,
+                  bottom=0.155 if two_row else 0.085,
+                  wspace=0.30, hspace=0.34 if two_row else 0.45)
     _variant_panel_grid(draw_panel, configs=panels, suptitle=suptitle, path=path,
-                        suptitle_fontsize=13, figsize=(9.2, 8.4),
-                        row_label_fontsize=9.5,
-                        legend_handles=legend_handles, legend_ncol=6)
+                        suptitle_fontsize=12.0,
+                        figsize=figsize, row_labels=row_labels,
+                        col_headers=_VARIANT_COL_HEADERS,
+                        col_header_fontsize=9.5 * fontsize_scale,
+                        row_label_fontsize=9.5 * fontsize_scale,
+                        adjust=adjust, finish=finish,
+                        legend_handles=key_handles,
+                        legend_ncol=len(key_handles),
+                        legend_fontsize=8.4,
+                        legend_y=0.075 if two_row else 0.045,
+                        bbox_tight=False)
 
 
 # --- ENUMERATION LANDSCAPES: visit every labeled graph, collect (edges, lambda^max) ---
@@ -4034,7 +4168,7 @@ def plot_scatter_lambda_edges(
     enum_data: dict[str, list[tuple[int, int]]],
     path: str | Path,
 ) -> None:
-    """Extremal envelope of edge count against binding connectivity, all twelve variants.
+    """Extremal envelope of edge count against binding connectivity, all sixteen variants.
 
     For each variant the full enumeration is drawn as a faint grey cloud (one
     point per labeled graph) with the binding connectivity ``lambda^max`` on the
@@ -4086,7 +4220,7 @@ def plot_scatter_lambda_edges(
     _variant_panel_grid(
         draw_panel, path=path,
         suptitle=("Extremal envelope: edge count against binding connectivity "
-                  "across all twelve variants (full enumeration)"),
+                  "across all sixteen variants (full enumeration)"),
         suptitle_fontsize=13)
 
 
@@ -4094,7 +4228,15 @@ def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
                         configs=None, suptitle_fontsize: float = 12.0,
                         row_label_fontsize: float = 12.0,
                         figsize: tuple[float, float] = (16, 14),
-                        legend_handles=None, legend_ncol: int = 6) -> None:
+                        row_labels: tuple[str, ...] | None = None,
+                        col_headers: tuple[str, ...] | None = None,
+                        col_header_fontsize: float = 10.0,
+                        adjust: dict | None = None,
+                        finish=None,
+                        legend_handles=None, legend_ncol: int = 6,
+                        legend_fontsize: float = 10.0,
+                        legend_y: float = 0.012,
+                        bbox_tight: bool = True) -> None:
     """Shared scaffold for every sixteen-panel variant grid (four model rows by
     four columns): the distribution grids, the proved/conjectured bound grid, the
     sampled grid, and the extremal-envelope scatter.  Builds the axes, calls
@@ -4105,6 +4247,21 @@ def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
     sixteen enumeration variants but may be any 16-item list (e.g. the sampled
     configs or a precomputed ``panels`` list).
 
+    ``col_headers`` names the four columns once above the top row, for grids whose
+    columns ask the same four questions of every model row.  Repeating that naming
+    inside all sixteen panel titles is what pushed the old titles to a width the
+    column could not hold.
+
+    ``adjust`` takes explicit ``subplots_adjust`` fractions instead of
+    ``tight_layout``.  Prefer it wherever the figure's printed aspect ratio
+    matters: ``tight_layout`` plus a tight save bounding box crops the canvas to
+    its content, so the saved aspect is whatever the content happened to need,
+    and a figure sized for a page can come back too tall for it.  Pass
+    ``bbox_tight=False`` alongside, and the saved file is exactly ``figsize``.
+
+    ``finish(fig, axes)`` runs after every panel is drawn, for touches that need
+    to know a panel's place in the grid (an x label on the bottom row only).
+
     ``legend_handles`` puts ONE figure-level legend under the whole grid instead
     of repeating the same key inside all sixteen panels.  Sixteen copies of a
     six-entry key cost more area than the curves they explain, so prefer this
@@ -4112,30 +4269,56 @@ def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
     """
     if configs is None:
         configs = _VARIANT_ENUM_CONFIGS
-    rows = len(_VARIANT_ROW_LABELS)
-    fig, axes = plt.subplots(rows, 4, figsize=figsize)
+    if row_labels is None:
+        row_labels = _VARIANT_ROW_LABELS
+    rows = len(row_labels)
+    fig, axes = plt.subplots(rows, 4, figsize=figsize, squeeze=False)
     for cfg, ax in zip(configs, axes.flat):
         draw_panel(ax, cfg)
-    for row, name in enumerate(_VARIANT_ROW_LABELS):
-        axes[row, 0].annotate(name, xy=(-0.46, 0.5), xycoords="axes fraction",
-                              rotation=90, ha="center", va="center",
-                              fontsize=row_label_fontsize, fontweight="bold",
-                              color=_KUL_DARK)
+    if col_headers:
+        for col, header in enumerate(col_headers):
+            axes[0, col].set_title(header, fontsize=col_header_fontsize,
+                                   fontweight="bold", color=_KUL_DARK, pad=7)
+    if finish is not None:
+        finish(fig, axes)
     fig.suptitle(suptitle, fontsize=suptitle_fontsize)
-    fig.tight_layout(rect=(0.035, 0.0, 1.0, 0.97), w_pad=1.6, h_pad=1.35)
+    if adjust is not None:
+        fig.subplots_adjust(**adjust)
+    else:
+        fig.tight_layout(rect=(0.035, 0.0, 1.0, 0.97), w_pad=1.6, h_pad=1.35)
+    # Row labels go outside everything the leftmost column already draws.  Their x
+    # is MEASURED, not guessed: after a draw, ``get_tightbbox`` reports where that
+    # column's tick labels and y label actually end, and the model name is hung
+    # just left of it.  Guessing the offset in axes fractions (the old
+    # ``xy=(-0.46, 0.5)``) scales with the panel width, so the same number that
+    # cleared a narrow panel landed on top of the y label of a wide one.
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    for row, name in enumerate(row_labels):
+        ax0 = axes[row, 0]
+        left = ax0.get_tightbbox(renderer).transformed(inv).x0
+        pos = ax0.get_position()
+        fig.text(max(left - 0.014, 0.004), pos.y0 + pos.height / 2, name,
+                 rotation=90, ha="center", va="center",
+                 fontsize=row_label_fontsize, fontweight="bold",
+                 color=_KUL_DARK)
     if legend_handles:
         # The legend is anchored just BELOW the figure box rather than inside it.
         # Reserving a strip inside (via the tight_layout rect or subplots_adjust)
         # does not survive the tight bounding box the save uses, and the key lands
         # on the bottom row's "vertices n" labels.  Hanging it outside is robust:
         # the tight crop expands to include it, so it can never overlap an axis.
+        # With ``bbox_tight=False`` there is no crop to expand, so the caller
+        # reserves the strip through ``adjust`` and puts ``legend_y`` inside it.
         fig.legend(handles=legend_handles, loc="upper center", ncol=legend_ncol,
-                   fontsize=10, frameon=False, bbox_to_anchor=(0.5, 0.012),
+                   fontsize=legend_fontsize, frameon=False,
+                   bbox_to_anchor=(0.5, legend_y),
                    columnspacing=1.6, handletextpad=0.6,
                    bbox_transform=fig.transFigure)
     # tight=False because the layout above is already final: _save would otherwise
     # run a second, rect-less tight_layout that discards the rect set here.
-    _save(path, tight=False)
+    _save(path, tight=False, bbox_tight=bbox_tight)
 
 
 def plot_conn_dist_grid(
@@ -4144,7 +4327,7 @@ def plot_conn_dist_grid(
     path: str | Path,
     known_maxima: dict[str, int] | None = None,
 ) -> None:
-    """12-panel histogram of lambda_max distribution, all variants, fixed m.
+    """16-panel histogram of lambda_max distribution, all variants, fixed m.
 
     Bars to the left of the feasibility boundary m-1 are coloured blue (the
     graphs we study); bars at or above m are coloured red (infeasible for this
@@ -4180,7 +4363,7 @@ def plot_conn_dist_grid(
         # panels stop showing spurious half-integer labels (0.5, 1.5, ...).
         ax.set_xticks(levels)
         ax.grid(True, axis="y", alpha=0.3)
-        # The feasibility boundary is identical in all twelve panels, so it is
+        # The feasibility boundary is identical in all sixteen panels, so it is
         # explained once in the title and caption rather than repeated as a
         # legend in every panel. A legend is drawn only when a per-panel known
         # maximum line is present (a value that genuinely differs by panel).
@@ -4189,7 +4372,7 @@ def plot_conn_dist_grid(
         ax.text(0.02, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
                 ha="left", va="top", fontsize=8, color="grey")
 
-    suptitle = (fr"Connectivity distribution across all twelve variants, $m = {m}$ "
+    suptitle = (fr"Connectivity distribution across all sixteen variants, $m = {m}$ "
                 fr"(blue = feasible $\lambda^{{\max}} \leq {threshold}$, red = infeasible)")
     _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
                         row_label_fontsize=12)
@@ -4200,7 +4383,7 @@ def _midrange_lambda_threshold(hi: int) -> int:
 
     The distribution figures split graphs by ``lambda^max`` into a blue (low) and
     a red (high) population.  A single global boundary collapses some panels to one
-    colour (every graph below it, or almost none), because the twelve variants
+    colour (every graph below it, or almost none), because the sixteen variants
     reach very different connectivity ranges at the sizes enumeration allows.
     Splitting instead at ``round(hi/2)`` -- the middle of what each enumeration can
     reach -- keeps both populations visible in every panel, scaled to what is
@@ -4260,7 +4443,7 @@ def plot_pair_conn_dist_grid(
         ax.text(0.02, 0.98, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
                 ha="left", va="top", fontsize=8, color="grey")
 
-    suptitle = ("Pair-connectivity distribution across all twelve variants "
+    suptitle = ("Pair-connectivity distribution across all sixteen variants "
                 "(every vertex pair of every graph pooled, split at each variant's "
                 r"mid-range $\lambda^{\max}$: blue from low-connectivity graphs, red from high)")
     _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
@@ -4322,7 +4505,7 @@ def plot_edge_dist_grid(
         ax.text(0.98, 0.02, f"$n={cfg['enum_n']}$", transform=ax.transAxes,
                 ha="right", va="bottom", fontsize=7, color="grey")
 
-    suptitle = ("Edge-count distribution across all twelve variants "
+    suptitle = ("Edge-count distribution across all sixteen variants "
                 r"(stacked by connectivity, split at each variant's mid-range "
                 r"$\lambda^{\max}$: blue low-connectivity graphs, red high)")
     _variant_panel_grid(draw_panel, suptitle=suptitle, path=path,
@@ -4501,7 +4684,7 @@ def plot_variant_3d_surfaces(
     cache_path: str | Path,
     path: str | Path,
 ) -> None:
-    """3-D bar chart of the optimal bound over the (n, m) grid, all twelve variants.
+    """3-D bar chart of the optimal bound over the (n, m) grid, all sixteen variants.
 
     Each bar's height is the bound value; exact points are blue, lower-bound
     points are purple.  The 3x4 layout matches the flat grid figure.
@@ -4554,7 +4737,7 @@ def plot_variant_3d_surfaces(
                 edgecolor="white", linewidth=0.25,
             )
 
-        # Same camera for every panel so the twelve are read side by side, and a
+        # Same camera for every panel so the sixteen are read side by side, and a
         # z-axis anchored at 0 so bar heights are comparable within a panel.
         ax.view_init(elev=24, azim=-58)
         peak = max(vs_exact + vs_lower, default=1)

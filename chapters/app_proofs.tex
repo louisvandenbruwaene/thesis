@@ -2037,7 +2037,7 @@ reference for every number reported here. Anything later in that repository is a
 continuation and not what was submitted. From \code{program/},
 \code{python erdos915\_unified.py} runs the principal checks and
 \code{python -m unittest discover -s tests -v} runs the regression suite.
-\code{python make\_figures.py} regenerates the computational figures.
+\code{python make\_figures.py} regenerates the computational figures. The several hundred \code{solve} calls behind the four variant grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} are read from \code{figures/machine\_values.json}, a readable record of what each of those runs returned, so the grids redraw in seconds and the plotted points are the ones this document was built from rather than whatever a fresh timed search happens to reach. Deleting that file, or passing \code{-{}-refresh}, recomputes every entry, which is how the record is checked.
 Two block sweeps are the one thing that does not run from this file. They live
 in \code{research\_notes/scripts/simple\_vertex\_blocks.py} and
 \code{research\_notes/scripts/multi\_vertex\_blocks.py}, are self-contained, and

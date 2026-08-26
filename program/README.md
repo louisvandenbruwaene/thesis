@@ -70,7 +70,32 @@ From this `program/` directory:
 python erdos915_unified.py            # run the built-in invariant self-check
 python -m unittest discover -s tests  # run the full suite (no third-party test runner)
 python make_figures.py                # regenerate the figures in ../figures/
+python make_figures.py --grids-only   # just the four sixteen-variant bound grids
+python make_figures.py --refresh      # ignore the cached machine values, recompute
 ```
+
+### The machine-value cache
+
+The four sixteen-variant bound grids are built from several hundred `solve`
+calls, exhaustive enumerations run to a timeout and timed searches, and that is
+almost all the wall clock in `make_figures.py`. Their results are kept in
+`../figures/machine_values.json`, one readable entry per
+`(kind, n, m, budget, variant)`, holding the value that run produced or `null`
+where an exhaustion did not finish inside its budget. With the file present the
+grids redraw in about three seconds instead of half an hour.
+
+Caching a *timed* search is not only a speed-up. A search given four seconds
+finds what four seconds of one particular machine reaches, so recomputing it
+elsewhere can legitimately return a different (still honest) lower bound and
+move a plotted circle. Recording the value pins the published figure to the run
+that produced it.
+
+Delete the file, or pass `--refresh`, to recompute every entry from scratch;
+that is the check that the file is still telling the truth. The fingerprint
+stored beside the values covers the program above its chapter 4 banner, which is
+everything `solve` runs, so editing the plotting code below does not raise a
+false alarm. A mismatch is reported and the values are reused, since whether it
+matters is a judgement about what changed.
 
 The test suite needs no third-party test runner: it uses the standard library
 `unittest`. If you do have `pytest` installed, `pytest tests` discovers the same
@@ -113,8 +138,11 @@ was produced; rerun those calls to check it.
 | `figures/temperature_trace.png` | a cooling run (Ch.2) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.2) |
 | `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
-| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all sixteen variants (Ch.2, paired with m = 6) |
-| `figures/variant_bounds_m6.png` | the same grid at m = 6 (Ch.2, paired with m = 3) |
+| `figures/variant_bounds_m3_graphs.png` | proved / conjectured / guessed, the eight graph-model variants at m = 3 (Ch.2) |
+| `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Ch.2) |
+| `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Ch.2) |
+| `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Ch.2) |
+| `figures/machine_values.json` | the cached `solve` results those four grids plot (not a figure) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (offcut only) |

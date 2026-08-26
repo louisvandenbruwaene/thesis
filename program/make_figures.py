@@ -14,6 +14,8 @@ fixed seed, so the output is reproducible.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 import sys
 from pathlib import Path
@@ -62,6 +64,123 @@ FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
 # ----------------------------------------------------------------------
+#  The machine-value cache.
+#  Every number the variant grids plot comes from a ``solve`` call, and there
+#  are several hundred of them: exhaustive enumerations that run to a timeout,
+#  and timed searches. That is nearly all the wall clock in this script, and
+#  none of it changes between runs, so the results are kept on disk.
+# ----------------------------------------------------------------------
+
+MACHINE_CACHE_PATH = FIGURES / "machine_values.json"
+
+
+class MachineValues:
+    """Remembered results of the ``solve`` calls behind the variant grids.
+
+    One entry per ``(kind, n, m, budget, variant)``, holding the value that run
+    produced, or ``null`` where an exhaustion did not finish inside its budget.
+    Deleting ``figures/machine_values.json`` recomputes every one of them, which
+    is the check that the file is still telling the truth; ``--refresh`` does the
+    same within a single run.
+
+    Caching a *timed* search is not only a speed-up. A search given four seconds
+    finds what four seconds of that particular machine will reach, so recomputing
+    it elsewhere can legitimately return a different (still honest) lower bound
+    and move a plotted circle. Recording the value fixes the published figure to
+    the run that produced it, which is the stronger reproducibility claim.
+
+    The program's own hash is stored beside the values as provenance. A mismatch
+    is reported rather than acted on: it means the values were computed by an
+    earlier version of ``erdos915_unified.py``, and whether that matters is a
+    judgement about what changed, so the run says so and leaves the decision
+    (rerun with ``--refresh``, or not) to the reader.
+    """
+
+    def __init__(self, path: Path, *, refresh: bool = False):
+        self.path = Path(path)
+        self.values: dict[str, int | None] = {}
+        self.meta: dict = {}
+        self.hits = 0
+        self.misses = 0
+        stored_hash = None
+        if not refresh and self.path.exists():
+            blob = json.loads(self.path.read_text())
+            self.values = blob.get("values", {})
+            self.meta = blob.get("meta", {})
+            stored_hash = self.meta.get("program_sha256")
+        self.program_hash = self._program_hash()
+        if stored_hash is not None and stored_hash != self.program_hash:
+            print(f"NOTE: {self.path.name} was written by a different version of "
+                  f"erdos915_unified.py ({stored_hash[:12]} vs "
+                  f"{self.program_hash[:12]}).\n"
+                  f"      Cached values are being reused. Rerun with --refresh "
+                  f"to recompute them all.")
+
+    # Where the value-determining half of the program ends.  Everything above
+    # this banner is the model, the checker, the provers, the search and
+    # ``solve`` itself; everything below it is figures and the self-check.
+    _VALUE_CODE_ENDS_AT = "##  CHAPTER 4"
+
+    @classmethod
+    def _program_hash(cls) -> str:
+        """Fingerprint of the code that can change a cached value.
+
+        Deliberately NOT the whole file. Hashing all six thousand lines would
+        make every edit to the plotting code below invalidate a cache of search
+        results the plotting code cannot possibly affect, and a warning that
+        fires on every unrelated edit is one nobody reads. The cut is at the
+        chapter 4 banner: above it is everything ``solve`` runs, below it is the
+        figures.
+        """
+        source = (Path(__file__).resolve().parent
+                  / "erdos915_unified.py").read_text()
+        head, sep, _ = source.partition(cls._VALUE_CODE_ENDS_AT)
+        if not sep:                      # banner renamed: fall back to the lot
+            print("NOTE: could not find the chapter 4 banner in "
+                  "erdos915_unified.py; fingerprinting the whole file, so the "
+                  "machine-value cache will report a mismatch after any edit.")
+            head = source
+        return hashlib.sha256(head.encode()).hexdigest()
+
+    @staticmethod
+    def key(kind: str, n: int, m: int, budget: float, kwargs: dict) -> str:
+        """A canonical, human-readable key, so the JSON can be read and audited."""
+        parts = [kind, f"n={n}", f"m={m}", f"budget={budget:g}"]
+        parts += [f"{name}={kwargs[name]}" for name in sorted(kwargs)]
+        return "|".join(parts)
+
+    def get_or_run(self, kind, n, m, budget, kwargs, run):
+        cache_key = self.key(kind, n, m, budget, kwargs)
+        if cache_key in self.values:
+            self.hits += 1
+            return self.values[cache_key]
+        self.misses += 1
+        self.values[cache_key] = run()
+        # Written after every miss, not once at the end: a full refresh of the
+        # four grids takes minutes, and an interrupted one should keep whatever
+        # it had already paid for.
+        self.save()
+        return self.values[cache_key]
+
+    def save(self) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.meta = dict(self.meta)
+        self.meta["program_sha256"] = self.program_hash
+        self.meta["entries"] = len(self.values)
+        blob = {"meta": self.meta,
+                "values": dict(sorted(self.values.items()))}
+        self.path.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
+
+    def report(self) -> str:
+        return (f"machine values: {self.hits} from cache, {self.misses} computed "
+                f"({self.path.name}, {len(self.values)} entries)")
+
+
+MACHINE_VALUES = MachineValues(MACHINE_CACHE_PATH,
+                               refresh="--refresh" in sys.argv)
+
+
+# ----------------------------------------------------------------------
 #  The all-variant grid: proved / conjectured / guessed, with machine points.
 #  Every number below comes from one driver, ``solve``: exhaustive for an exact
 #  point, discovery for a search lower bound.  The formula curves come from the
@@ -69,15 +188,22 @@ FIGURES = Path(__file__).resolve().parent.parent / "figures"
 # ----------------------------------------------------------------------
 
 def _exact_points(ns, m, budget, **kw):
-    """Machine-proved sizes: increasing n until the exhaustion no longer finishes."""
+    """Machine-proved sizes: increasing n until the exhaustion no longer finishes.
+
+    A size the exhaustion could not finish is cached as ``None``, not skipped: it
+    is as much a result of the run as a value is, and without it every later run
+    would pay for the same timeout again.
+    """
     xs, ys = [], []
     for n in ns:
-        res = solve(n, m, exhaustive=True, max_seconds=budget, **kw)
-        if res.bound == "exact":
-            xs.append(n)
-            ys.append(res.value)
-        else:
+        def run(n=n):
+            res = solve(n, m, exhaustive=True, max_seconds=budget, **kw)
+            return res.value if res.bound == "exact" else None
+        value = MACHINE_VALUES.get_or_run("exact", n, m, budget, kw, run)
+        if value is None:
             break          # once it cannot finish, larger n cannot either
+        xs.append(n)
+        ys.append(value)
     return xs, ys
 
 
@@ -85,9 +211,11 @@ def _search_points(ns, m, budget, **kw):
     """Discovery lower bounds: a concrete feasible graph at each n (the LB construction)."""
     xs, ys = [], []
     for n in ns:
-        res = solve(n, m, exhaustive=False, max_seconds=budget, seed=0, **kw)
+        def run(n=n):
+            return solve(n, m, exhaustive=False, max_seconds=budget,
+                         seed=0, **kw).value
         xs.append(n)
-        ys.append(res.value)
+        ys.append(MACHINE_VALUES.get_or_run("search", n, m, budget, kw, run))
     return xs, ys
 
 
@@ -348,7 +476,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se = searched(matrix_ns, lb_simple_edge,
                   directed=False, simple=True, separation="edge")
     panels.append(dict(
-        title=f"undirected edge (proved)", ylabel="edges",
+        status="proved", ylabel="edges",
         proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
         exact=ex, search=se))
 
@@ -359,7 +487,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se2 = searched(matrix_ns, lb_simple_edge,
                        directed=False, simple=True, separation="vertex")
         panels.append(dict(
-            title=f"undirected vertex (proved)", ylabel="edges",
+            status="proved", ylabel="edges",
             proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
             exact=ex2, search=se2))
     else:
@@ -373,7 +501,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se2 = _extend_lower_bounds(se2, lb_simple_edge, matrix_ns)
         band2 = _band(se2, tri_undirected, matrix_ns)
         panels.append(dict(
-            title=f"undirected vertex (open)", ylabel="edges",
+            status="open", ylabel="edges",
             guess="search",
             band=band2, exact=ex2, search=se2))
 
@@ -383,7 +511,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se3 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="edge")
     panels.append(dict(
-        title=f"directed arc (conjectured)", ylabel="arcs",
+        status="conjectured", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         branches=[(matrix_ns, [min(m * (n - 1), n * (n - 1)) for n in matrix_ns],
                    "hub $m(n{-}1)$"),
@@ -402,7 +530,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se4 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="vertex")
     panels.append(dict(
-        title=f"directed vertex (conjectured)", ylabel="arcs",
+        status="conjectured", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex4, search=se4))
 
@@ -413,20 +541,20 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se5 = searched(matrix_ns, lb_multi_edge,
                    directed=False, simple=False, separation="edge")
     panels.append(dict(
-        title=f"undirected edge (proved)", ylabel="edges",
+        status="proved", ylabel="edges",
         proved=(matrix_ns, [lb_multi_edge(n) for n in matrix_ns]),
         exact=ex5, search=se5))
 
     # (6) multigraph undirected vertex -- equals simple (parallel edges irrelevant for vertex cuts).
-    multi_vert_label = ("$=$ simple, proved" if vert_proved else "$=$ simple, open")
+    multi_vert_label = ("= simple, proved" if vert_proved else "= simple, open")
     if vert_proved:
         panels.append(dict(
-            title=f"undirected vertex ({multi_vert_label})", ylabel="edges",
+            status=multi_vert_label, ylabel="edges",
             proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
             exact=ex2, search=se2))
     else:
         panels.append(dict(
-            title=f"undirected vertex ({multi_vert_label})", ylabel="edges",
+            status=multi_vert_label, ylabel="edges",
             guess="search",
             band=_band(se2, tri_undirected, matrix_ns), exact=ex2, search=se2))
 
@@ -436,13 +564,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se7 = searched(matrix_ns, lb_multi_dir,
                    directed=True, simple=False, separation="edge")
     panels.append(dict(
-        title=f"directed arc (proved)", ylabel="arcs",
+        status="proved", ylabel="arcs",
         proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
     # (8) multigraph directed vertex -- conjectured (reduces to simple digraph).
     panels.append(dict(
-        title=f"directed vertex ($=$ simple, conj.)", ylabel="arcs",
+        status="= simple, conjectured", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex4, search=se4))
 
@@ -453,7 +581,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se9 = searched(hyper_ns, attained_hyper_edge,
                    hypergraph=True, r=3, directed=False, separation="edge")
     panels.append(dict(
-        title=f"undirected edge (proved)", ylabel="hyperedges",
+        status="proved", ylabel="hyperedges",
         proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
         exact=ex9, search=se9))
 
@@ -465,7 +593,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         se10 = searched(hyper_ns, attained_hyper_vertex,
                         hypergraph=True, r=3, directed=False, separation="vertex")
         panels.append(dict(
-            title=f"undirected vertex (proved)", ylabel="hyperedges",
+            status="proved", ylabel="hyperedges",
             proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
             exact=ex10, search=se10))
     else:
@@ -479,7 +607,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         # it does not.  Gating at the source needs no safety net.
         se10 = _extend_lower_bounds(se10, attained_hyper_edge, hyper_ns)
         panels.append(dict(
-            title=f"undirected vertex (open)", ylabel="hyperedges",
+            status="open", ylabel="hyperedges",
             guess="search",
             band=_band(se10, tri_hyper, hyper_ns), exact=ex10, search=se10))
 
@@ -492,7 +620,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # lower bound here (the search alone slips below the quadratic at larger n).
     se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed arc (open)", ylabel="hyperarcs",
+        status="open", ylabel="hyperarcs",
         guess="search",
         band=_band(se11, tri_dir_hyper, hyper_ns), exact=ex11, search=se11))
 
@@ -505,7 +633,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # feasible for the vertex separation at the same value.
     se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed vertex (open)", ylabel="hyperarcs",
+        status="open", ylabel="hyperarcs",
         guess="search",
         band=_band(se12, tri_dir_hyper, hyper_ns), exact=ex12, search=se12))
 
@@ -534,7 +662,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                     hypergraph=True, r=3, directed=False, simple=False,
                     separation="edge")
     panels.append(dict(
-        title=f"undirected edge (proved)", ylabel="hyperedges",
+        status="proved", ylabel="hyperedges",
         proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
         exact=ex13, search=se13))
 
@@ -547,7 +675,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                         hypergraph=True, r=3, directed=False, simple=False,
                         separation="vertex")
         panels.append(dict(
-            title=f"undirected vertex (proved)", ylabel="hyperedges",
+            status="proved", ylabel="hyperedges",
             proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
             exact=ex14, search=se14))
     else:
@@ -556,7 +684,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                               separation="vertex")
         se14 = _extend_lower_bounds(se14, attained_multihyper_vertex, hyper_ns)
         panels.append(dict(
-            title=f"undirected vertex (open)", ylabel="hyperedges",
+            status="open", ylabel="hyperedges",
             guess="search",
             band=_band(se14, tri_hyper, hyper_ns), exact=ex14, search=se14))
 
@@ -571,7 +699,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                           separation="edge")
     se15 = _extend_lower_bounds(se15, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed arc (open)", ylabel="hyperarcs",
+        status="open", ylabel="hyperarcs",
         guess="search",
         band=_band(se15, tri_dir_hyper, hyper_ns), exact=ex15, search=se15))
 
@@ -584,11 +712,39 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
                           separation="vertex")
     se16 = _extend_lower_bounds(se16, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed vertex (open)", ylabel="hyperarcs",
+        status="open", ylabel="hyperarcs",
         guess="search",
         band=_band(se16, tri_dir_hyper, hyper_ns), exact=ex16, search=se16))
 
     return [_reconcile_panel(p) for p in panels]
+
+
+def variant_grid_figures() -> None:
+    """The four sixteen-variant bound grids: m = 3 and m = 6, each in two halves.
+
+    Each grid is split across two page-sized halves (graph models, then
+    hypergraph models) rather than squeezed sixteen-up onto one page, so every
+    panel prints legibly (see chapters/ch2_machine.tex, the two sidewaysfigure
+    pairs around fig:variant-bounds-m3/m6).  The halves are named in the
+    suptitle, not numbered: "rows 1-2" only means anything to a reader holding
+    the unsplit grid, which nobody has.
+
+    Split out of :func:`main` so it can be rerun on its own
+    (``python make_figures.py --grids-only``) while the layout is being tuned.
+    """
+    row_halves = [
+        (0, 2, "graphs", "simple and multigraph models"),
+        (2, 4, "hypergraphs", "hypergraph and multihypergraph models"),
+    ]
+    for m_val in (3, 6):
+        print(f"gathering all-variant grid m={m_val}...")
+        panels = gather_variant_grid(m=m_val)
+        for lo, hi, stem, subtitle in row_halves:
+            out = FIGURES / f"variant_bounds_m{m_val}_{stem}.png"
+            plot_variant_grid(panels, path=out, m=m_val, row_range=(lo, hi),
+                              fontsize_scale=1.25, subtitle=subtitle)
+            print(f"wrote {out.name}")
+    print(MACHINE_VALUES.report())
 
 
 def main() -> None:
@@ -675,13 +831,7 @@ def main() -> None:
     plot_extremal_gallery(FIGURES / "extremal_graphs_gallery.png")
     print("wrote extremal_graphs_gallery.png")
 
-    # Bounds grids: one for m=3 and one for m=6 (more purple dots).
-    for m_val in (3, 6):
-        print(f"gathering all-variant grid m={m_val} (runs solve many times)...")
-        panels = gather_variant_grid(m=m_val)
-        out = FIGURES / f"variant_bounds_m{m_val}.png"
-        plot_variant_grid(panels, path=out, m=m_val)
-        print(f"wrote {out.name}")
+    variant_grid_figures()
 
     # --------------------------------------------------------------
     # Full-enumeration scatter and distribution figures.
@@ -769,4 +919,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # --grids-only reruns just the four variant grids (the layout-heavy ones);
+    # --refresh ignores figures/machine_values.json and recomputes every solve.
+    if "--grids-only" in sys.argv:
+        variant_grid_figures()
+    else:
+        main()
