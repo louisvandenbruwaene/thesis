@@ -102,6 +102,24 @@ and only touch this summary if the *status* (proved/open) changes.
   (author's standing style rule). Semicolons inside table cells or math
   notation are fine.
 - **British spelling** throughout the thesis (colour, optimise, etc.).
+- **The prose states facts, it does not rate them.** Chapter 1 is the author's
+  own hand and sets the register for the whole thesis: say what a thing IS,
+  never what it is WORTH. Out: "it is worth noting/saying/recording", "the
+  point is", "what it buys is", "nothing here is deep", "a good test of
+  whether", "that is not a defect", "earns its keep", "deserves a statement of
+  its own", "the deepest in the thesis", and the intensifiers "genuinely",
+  "honest/honestly", "plainly". Out too: rhetorical setups ("what the table
+  hides is", "the first thing to notice is", "two things stand out") and
+  retrospective participial cascades ("The journey set out from one clean
+  theorem and followed it across sixteen variants, proving..., building...").
+  KEEP every epistemic status fact: proved vs conjectured vs open vs
+  search-only, which computations finished and which were abandoned, which
+  bounds are attained. "The search proves no upper bounds" is a fact about the
+  method and stays. "Stating its limits is part of the honesty the thesis
+  insists on" is the thesis praising itself and goes. Technical uses of the
+  same words stay ("genuinely fractional" as against integral, "the
+  restriction is essential" followed by a counterexample). Author instruction,
+  2026-08-26.
 - **Never claim a computation finished when it didn't.** A past session's
   worst mistake (2026-08-11 audit) was three places asserting a MILP run
   "returns INFEASIBLE" when it had actually been abandoned unfinished.
@@ -285,3 +303,38 @@ the fourth model landed, four of them PRINTED as figure suptitles.
 VERIFY: 116 tests OK, 1 expected skip; self-check ALL CHECKS PASSED; `latexmk`
 exit 0, 104 pp, 0 overfull, 0 occurrences of `??`; all four sideways pages
 rendered and inspected.
+
+## 2026-08-26 (Opus, third pass) — the tone of chapters 2, 4 and the appendix
+
+The author asked how chapter 1's prose compares with the rest, then asked for
+the rest to match it. Reading all four files first mattered, because the
+obvious hypothesis was wrong: sentence length is nearly identical everywhere
+(mean about 25 words, median 21 to 24), the no-semicolon rule is kept
+throughout (the prose-only semicolons a first count found were tikz statements
+and `\;` math spacing), and British spelling holds. The difference is not
+complexity or house style, it is STANCE. Chapter 1 says what things are. The
+drafted material rates them as well, and the rating is what the author wanted
+gone. The rule is now a standing convention above.
+
+Fifty-seven passages rewritten across `ch2_machine.tex`, `ch4_synthesis.tex`
+and `app_proofs.tex`. The heaviest were chapter 4's opening participial
+cascade, its closing "that, finally, is the use of building the microscope",
+"Its limits are as clear as its reach, and stating them is part of the honesty
+the thesis insists on", and the appendix's "Nothing here is deep" and "That is
+not a defect of the computation".
+
+**THE LINE THAT MATTERS WHEN DOING THIS AGAIN: a verdict about the WORK goes,
+an epistemic fact about a RESULT stays.** Every proved/conjectured/open marker,
+every "the search proves no upper bounds", every "the machine route was
+abandoned unfinished and the hand proof replaced it", and every "the gap is not
+closed" survived intact and was re-grepped afterwards to confirm it. Two
+rewrites had to be redone because the first attempt replaced one tic with
+another ("what matters here", "the two halves separate") or left a dangling
+antecedent ("that boundary" with nothing to refer back to).
+
+Also left alone deliberately: the author's own sentences in his hand-written
+chapter 1 and the opening of chapter 2, including "It is the single most
+important routine in the program", which is a verdict but is his.
+
+VERIFY: `latexmk` exit 0, 104 pp unchanged, 0 overfull, 0 occurrences of `??`,
+0 em-dashes, en-dashes or new prose semicolons on any changed line.
