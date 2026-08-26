@@ -1112,17 +1112,17 @@ and \Cref{sec:transcripts} retains the solver record.
 The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem, which is the classical construction of Gomory and Hu \cite{GomoryHu61} run on a symmetric submodular cut function rather than on the edge-cut function, as set out by Hanifehnezhad and Dolati \cite{HanifehnezhadDolati20}.
 
 \begin{theorem}[Menger for hypergraphs]\label{thm:menger-hyper}
-For a hypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disjoint Berge $u$--$v$ paths equals the minimum size of a set $C$ of hyperedges whose removal separates $u$ from $v$.
+For a multihypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disjoint Berge $u$--$v$ paths equals the minimum size of a set $C$ of hyperedges whose removal separates $u$ from $v$. Parallel copies count separately on both sides: two routes may not ride the same copy, and cutting a hyperedge means cutting every copy of it. A simple hypergraph is the case where every multiplicity is one.
 \end{theorem}
 
 \begin{proof}
-Build the helper-point network of \Cref{fig:hyper-gadget}: for each hyperedge $e$ a helper arc $e^- \to e^+$ of capacity one, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. The proof matches the number of disjoint Berge paths to the size of a minimum cut by translating between Berge-path language and flow language in each direction: a family of hyperedge-disjoint Berge paths becomes a family of arc-disjoint flow paths, and conversely a flow becomes a family of Berge paths, as the next two paragraphs spell out in turn.
+Build the helper-point network of \Cref{fig:hyper-gadget}: for each distinct hyperedge $e$ a helper arc $e^- \to e^+$ whose capacity is the multiplicity $\mu(e)$, which is one for a simple hypergraph, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. The proof matches the number of disjoint Berge paths to the size of a minimum cut by translating between Berge-path language and flow language in each direction: a family of hyperedge-disjoint Berge paths becomes a family of arc-disjoint flow paths, and conversely a flow becomes a family of Berge paths, as the next two paragraphs spell out in turn.
 
-\emph{Berge paths become flow.} A Berge path $u, e_1, v_1, \dots, e_k, v$ becomes the directed walk $u \to e_1^- \to e_1^+ \to v_1 \to \cdots \to v$, crossing one helper arc per hyperedge it uses. The $e_i$ along a single Berge path are distinct, and two hyperedge-disjoint Berge paths share no hyperedge at all, so they use disjoint sets of helper arcs and translate to \emph{arc-disjoint} flow paths, paths that share no arc, each carrying one unit of flow.
+\emph{Berge paths become flow.} A Berge path $u, e_1, v_1, \dots, e_k, v$ becomes the directed walk $u \to e_1^- \to e_1^+ \to v_1 \to \cdots \to v$, crossing one helper arc per hyperedge it uses, and carrying one unit of flow. The $e_i$ along a single Berge path are distinct, and a hyperedge-disjoint family rides no copy twice, so at most $\mu(e)$ of its paths cross the helper arc of $e$. Each helper arc therefore carries at most its own capacity and the family is a feasible flow of value $k$. Only at multiplicity one are these paths pairwise arc-disjoint, and the argument never needs them to be.
 
-\emph{Flow becomes Berge paths.} Conversely, because every capacity is an integer, a maximum flow may be taken integral, and an integral flow of value $k$ splits into $k$ arc-disjoint unit paths. Reading a helper crossing $\cdots x \to e^- \to e^+ \to y \cdots$ back as the single hyperedge step $x, e, y$, that is, \emph{suppressing} the two helper nodes, turns each unit path into a Berge path, and no two of them can share a hyperedge, since that would send two units across some capacity-one helper arc.
+\emph{Flow becomes Berge paths.} Conversely, because every capacity is an integer, a maximum flow may be taken integral, and an integral flow of value $k$ decomposes into $k$ unit paths. Reading a helper crossing $\cdots x \to e^- \to e^+ \to y \cdots$ back as the single hyperedge step $x, e, y$, that is, \emph{suppressing} the two helper nodes, turns each unit path into a Berge path. At most $\mu(e)$ of them cross the helper arc of $e$, since that is its capacity, so each may be given a copy of $e$ of its own and no copy serves two routes. The $k$ Berge paths are therefore hyperedge-disjoint.
 
-\emph{Cuts.} Finally, the member arcs are uncapped, so any cut of finite capacity uses helper arcs only, and a set of helper arcs separates $u$ from $v$ in the network exactly when the corresponding hyperedges separate them in $\HH$. The max-flow min-cut theorem equates the largest number of arc-disjoint flow paths with the smallest helper-arc cut, which is precisely the claim.
+\emph{Cuts.} Finally, the member arcs are uncapped, so any cut of finite capacity uses helper arcs only, and a set of helper arcs separates $u$ from $v$ in the network exactly when the corresponding hyperedges separate them in $\HH$. Its capacity is $\sum \mu(e)$ over those hyperedges, which is the number of copies removed, so cut capacity and the size of $C$ are the same count. The max-flow min-cut theorem equates the largest number of arc-disjoint flow paths with the smallest helper-arc cut, which is precisely the claim.
 \end{proof}
 
 \begin{theorem}[Hypergraph Gomory--Hu]\label{thm:hyper-gomory-hu}
@@ -1348,6 +1348,49 @@ edge-connectivity at most $m-1$, and Whitney's inequality
 $\kap \le \lec$ holds pairwise (an internally vertex-disjoint family is in
 particular hyperedge-disjoint under our definition), so the same hypergraph
 is feasible for the vertex problem.
+\end{proof}
+
+The simple model needs $m-1$ distinct $(r-1)$-sets to hang off the hub, which is
+what $m-1 \le \binom{n-2}{r-2}$ asks for. A multihypergraph does not, because it
+may repeat one hyperedge instead, and that closes a different range of cases.
+
+\begin{proposition}[The multihypergraph lower bound]\label{prop:hyper-vertex-lower-multi}
+For $r \ge 2$, $m \ge 2$ and $(r-1) \mid (n-1)$,
+\[
+    K_m^{(r)}(n) \;\ge\; \frac{(m-1)(n-1)}{r-1},
+\]
+attained by the star hypertree of \Cref{fig:hyper-star} with every hyperedge
+taken at multiplicity $m-1$. At $m = 3$ this meets the upper bound of
+\Cref{thm:hyper-vertex-m3}, so
+\[
+    K_3^{(r)}(n) \;=\; \floorfrac{2(n-1)}{r-1}
+    \qquad\text{whenever } (r-1) \mid (n-1).
+\]
+That range neither contains nor is contained in the simple model's
+$2 \le \binom{n-2}{r-2}$, so the two models close different cases.
+\end{proposition}
+
+\begin{proof}
+Take the hub $h$, split the other $n-1$ vertices into blocks $G_1, \dots, G_q$ of
+size $r-1$ with $q = (n-1)/(r-1)$, and give each hyperedge $\{h\} \cup G_i$
+multiplicity $m-1$. The count is $(m-1)q$, which is the displayed value.
+
+For the connectivity, take $u \ne w$. If both lie in one block $G_i$, or if one of
+them is $h$ and the other lies in $G_i$, the $m-1$ copies of $\{h\} \cup G_i$ are
+$m-1$ one-step Berge routes between them. A one-step route has no interior vertex,
+so no two of them share one, and they ride different copies, so the family is
+internally vertex-disjoint and $\kap(u,w) \ge m-1$. Those same $m-1$ copies are
+also every hyperedge containing the block vertex among $u, w$, so deleting them
+separates the pair and \Cref{thm:menger-hyper} caps $\kap(u,w)$ at $m-1$.
+
+If $u \in G_i$ and $w \in G_j$ with $i \ne j$, then two different blocks meet only
+at $h$, so every $u$--$w$ Berge route has $h$ in its interior. Two internally
+vertex-disjoint routes cannot both use $h$ there, so $\kap(u,w) \le 1$. Hence
+$\kap^{\max} = m-1$ and the hypergraph is feasible.
+
+At $m = 3$ the count is $2(n-1)/(r-1)$, which is $\floor{2(n-1)/(r-1)}$ under the
+divisibility hypothesis, and \Cref{thm:hyper-vertex-m3} bounds every
+multihypergraph by that same quantity.
 \end{proof}
 
 At $m=3$ the upper-bound side closes completely, and equality follows in the construction range stated below. The engine is a rank bound for

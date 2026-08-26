@@ -74,20 +74,42 @@ per panel, so no panel carries a mark its neighbours lack. Both hypergraph
 captions in `ch2_machine.tex` say the same in words, and both sideways pages
 were re-rendered to confirm the longer captions still fit.
 
-**2. The sixteen-variant rewrite has not been audited.**
-Commits `2829e47` and `3b353ea` promoted the multi-hypergraph to a first-class
-variant, rewrote the chapters, and relaxed Mader's hypothesis. That work postdates
-both review batches and neither review saw it. The build is clean (0 overfull,
-0 undefined, 102 pages) and the suite is green, but neither of those would catch
-the class of problem both batches actually found: prose that drifts from what the
-code does. Worth pointing a fresh reviewer at specifically:
+**2. AUDITED 2026-08-27. The sixteen-variant rewrite.**
 
-- the count itself, since `ch1`'s old "three models, two directions, two
-  separations" explanation was written to justify **twelve** and the arithmetic
-  has changed;
-- the multi-hypergraph rows of `tab:summary`, which are new;
-- the `cap μ` gate, which generalises a construction whose correctness argument
-  in `thm:menger-hyper` was written for `cap 1`.
+All three things this note asked a fresh reviewer to look at were checked.
+
+*The count.* Clean. `ch1` reads "three toggles create a lattice of eight models"
+and separation is applied afterwards, so eight times two is sixteen with no
+leftover twelve-era arithmetic anywhere.
+
+*The multi-hypergraph rows of `tab:summary`.* One defect. The vertex cell claimed
+repeats close "cases the simple model misses at `m=3`". True, and verified
+numerically at eight parameter points, but no theorem in the thesis stated it:
+`thm:hyper-vertex-m3` and `prop:hyper-vertex-lower` both give attainment by a
+*simple* hypergraph when `m-1 <= C(n-2, r-2)`, and nothing covered the multi
+lower bound. Fixed by adding `prop:hyper-vertex-lower-multi`: the star hypertree
+at multiplicity `m-1` has `kappa^max = m-1` exactly and attains
+`(m-1)(n-1)/(r-1)` whenever `(r-1) | (n-1)`, which at `m=3` meets the upper bound.
+Stated in `ch1` beside the theorem and cited from the table's notes.
+
+*The `cap mu` gate.* One defect, in the opposite direction to the one predicted
+here. This note worried the `cap mu` gate generalised a construction proved for
+`cap 1`. In fact `thm:menger-hyper` and the program agreed at capacity one
+(`cap[gate_in, gate_out] = 1`, one gate per *copy*), and it was the two gadget
+figures and the `ch2` prose that described a capacity-`mu` gate nothing built.
+Resolved on the author's call by moving the code to the text rather than the
+text to the code: `_hyper_capacity_matrix` now gives each *distinct* hyperedge
+one gate of capacity `mu`, and `thm:menger-hyper` is restated and reproved for
+multiplicities.
+
+Merging cannot change a measured value: `q` copies at capacity one are `q`
+parallel arcs between the same two nodes, and replacing parallel arcs by one arc
+of their summed capacity leaves every cut alone, hence the min cut and the max
+flow. Checked rather than asserted, over 149532 pairwise measurements with 1670
+instances carrying real duplicates and both directed storage spellings, 0
+mismatches, and pinned permanently by `MergedGateMatchesPerCopy` in
+`tests/test_hypergraph.py`, which keeps the old per-copy construction as the
+reference. Benchmarked at 1.006 times the old cost, which is noise.
 
 **3. `claude.md` no longer records the two review batches.**
 The condensation in `09ef22e` was deliberate and the file is much better for it,

@@ -230,8 +230,9 @@ Here $M(n)=\max(2(n-1),\floor{n^2/4})$. Simple-graph formulas assume
 $n\ge m$. Below that range the complete object gives the trivial maximum.
 The edge-hypergraph bound is attained when $(r-1)\mid(n-1)$ for
 multihypergraphs, and for simple hypergraphs when $r\ge3$ and
-$m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained when
-$r\ge3$ and $2\le\binom{n-2}{r-2}$. The two multigraph vertex rows use the
+$m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained by a simple hypergraph when
+$r\ge3$ and $2\le\binom{n-2}{r-2}$, and by a multihypergraph whenever
+$(r-1)\mid(n-1)$ (\Cref{prop:hyper-vertex-lower-multi}). The two multigraph vertex rows use the
 counting convention of \Cref{sec:parallel-convention}. Under the other
 convention, where parallel copies count as distinct routes, the multigraph
 vertex question becomes a separate extremal problem, studied in

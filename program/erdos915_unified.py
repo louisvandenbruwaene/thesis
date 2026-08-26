@@ -627,33 +627,56 @@ def _dir_tails_heads(edge) -> tuple[frozenset, frozenset]:
 def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False):
     """Integer capacity matrix of the hypergraph flow network (one per variant).
 
-    Each hyperedge becomes an in/out gate joined by a capacity-1 arc, so at most
-    one disjoint Berge route may traverse it: this is the hyperedge-as-node trick.
-    With ``vertex_split`` each ORIGINAL vertex is *also* split into an in/out pair
-    of capacity one, so the flow counts internally vertex-disjoint Berge routes
-    instead of edge-disjoint ones.  For a directed hypergraph the gate is entered
-    only from a tail and left only toward a head (one tail for the forward model,
-    several for the general one); for an undirected one every member links to the
-    gate both ways.  The hypergraph variants are thus the same construction with a
-    boolean or two flipped, not separate measures.
+    Each DISTINCT hyperedge becomes an in/out gate joined by one arc whose
+    capacity is that hyperedge's multiplicity, so a simple hypergraph's gate
+    passes one route and ``q`` parallel copies pass ``q``: this is the
+    hyperedge-as-node trick.  With ``vertex_split`` each ORIGINAL vertex is *also*
+    split into an in/out pair of capacity one, so the flow counts internally
+    vertex-disjoint Berge routes instead of edge-disjoint ones.  For a directed
+    hypergraph the gate is entered only from a tail and left only toward a head
+    (one tail for the forward model, several for the general one); for an
+    undirected one every member links to the gate both ways.  The hypergraph
+    variants are thus the same construction with a boolean or two flipped, not
+    separate measures.
 
-    Vertices index ``0..base-1`` (``base = 2n`` split, else ``n``); hyperedge gate
-    ``i`` indexes ``base+2i`` (in) and ``base+2i+1`` (out).  ``leave(v)``/``enter(v)``
-    return the index a route leaves/enters vertex ``v`` through, so the same scipy
-    max-flow that serves plain graphs serves hypergraphs too.
+    Merging copies cannot change any measured value.  Giving each of ``q`` copies
+    its own capacity-one gate puts ``q`` parallel arcs between the same pair of
+    nodes, and replacing parallel arcs by one arc of their summed capacity leaves
+    every cut's capacity untouched, hence the min cut and the max flow too.  This
+    is the standard parallel-arc reduction, so the merged network is the same
+    network drawn once rather than a different one, and it is the network
+    ``fig:hyper-gadget`` and ``thm:menger-hyper`` describe.
+
+    Vertices index ``0..base-1`` (``base = 2n`` split, else ``n``); the gate of the
+    ``i``-th distinct hyperedge indexes ``base+2i`` (in) and ``base+2i+1`` (out).
+    ``leave(v)``/``enter(v)`` return the index a route leaves/enters vertex ``v``
+    through, so the same scipy max-flow that serves plain graphs serves
+    hypergraphs too.
     """
     n = hypergraph.num_vertices
     base = 2 * n if vertex_split else n
-    size = base + 2 * len(hypergraph.hyperedges)
+    # Group the copies.  The key normalises the two directed storage forms, so a
+    # legacy forward tuple and its general spelling share one gate; an unmergeable
+    # spelling would only split a gate back into parallel ones, which the
+    # reduction above shows is the same network again.
+    gates: dict = {}
+    for edge in hypergraph.hyperedges:
+        key = _dir_tails_heads(edge) if hypergraph.directed else frozenset(edge)
+        slot = gates.get(key)
+        if slot is None:
+            gates[key] = [edge, 1]               # representative, multiplicity
+        else:
+            slot[1] += 1
+    size = base + 2 * len(gates)
     cap = np.zeros((size, size), dtype=int)
     leave = (lambda v: 2 * v + 1) if vertex_split else (lambda v: v)
     enter = (lambda v: 2 * v) if vertex_split else (lambda v: v)
     if vertex_split:
         for v in range(n):
             cap[2 * v, 2 * v + 1] = 1            # one route through each vertex
-    for index, edge in enumerate(hypergraph.hyperedges):
+    for index, (edge, multiplicity) in enumerate(gates.values()):
         gate_in, gate_out = base + 2 * index, base + 2 * index + 1
-        cap[gate_in, gate_out] = 1               # one route through each hyperedge
+        cap[gate_in, gate_out] = multiplicity    # one route per copy
         if hypergraph.directed:
             tails, heads = _dir_tails_heads(edge)
             for tail in tails:                   # enter the gate from any tail

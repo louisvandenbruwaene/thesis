@@ -1,6 +1,10 @@
 """The hypergraph model and Berge connectivity by the helper-point network."""
 
+import itertools
+import random
 import unittest
+
+import numpy as np
 
 from erdos915_unified import (
     Hypergraph,
@@ -12,6 +16,10 @@ from erdos915_unified import (
     star_hypertree,
     _hyperedge_candidates,
     _hyper_canonical,
+    _csgraph_maxflow,
+    _csr,
+    _dir_tails_heads,
+    _UNBOUNDED,
 )
 
 
@@ -111,6 +119,118 @@ class DirectedOrientationModels(unittest.TestCase):
                 4, 3, 2, directed=True, kind="forward",
                 time_limit=10.0, seed_lb=5,
             )
+
+
+def _per_copy_capacity_matrix(hg, *, vertex_split=False):
+    """The gate network with ONE CAPACITY-ONE GATE PER COPY.
+
+    This is the construction ``_hyper_capacity_matrix`` used before it merged
+    parallel copies into a single gate of capacity ``mu``.  It is kept here, and
+    only here, as the reference the merged version is held to.
+    """
+    n = hg.num_vertices
+    base = 2 * n if vertex_split else n
+    size = base + 2 * len(hg.hyperedges)
+    cap = np.zeros((size, size), dtype=int)
+    leave = (lambda v: 2 * v + 1) if vertex_split else (lambda v: v)
+    enter = (lambda v: 2 * v) if vertex_split else (lambda v: v)
+    if vertex_split:
+        for v in range(n):
+            cap[2 * v, 2 * v + 1] = 1
+    for index, edge in enumerate(hg.hyperedges):
+        gate_in, gate_out = base + 2 * index, base + 2 * index + 1
+        cap[gate_in, gate_out] = 1
+        if hg.directed:
+            tails, heads = _dir_tails_heads(edge)
+            for tail in tails:
+                cap[leave(tail), gate_in] = _UNBOUNDED
+            for head in heads:
+                cap[gate_out, enter(head)] = _UNBOUNDED
+        else:
+            for vertex in edge:
+                cap[leave(vertex), gate_in] = _UNBOUNDED
+                cap[gate_out, enter(vertex)] = _UNBOUNDED
+    return cap, leave, enter
+
+
+def _per_copy_connectivity(hg, source, target, *, vertex_split=False):
+    cap, leave, enter = _per_copy_capacity_matrix(hg, vertex_split=vertex_split)
+    if vertex_split:
+        cap[2 * source, 2 * source + 1] = _UNBOUNDED
+        cap[2 * target, 2 * target + 1] = _UNBOUNDED
+    return int(_csgraph_maxflow(_csr(cap, dtype=int),
+                                leave(source), enter(target)).flow_value)
+
+
+class MergedGateMatchesPerCopy(unittest.TestCase):
+    """One gate of capacity mu must measure what mu capacity-one gates measured.
+
+    The checker gives each DISTINCT hyperedge one gate whose capacity is its
+    multiplicity, which is the network ``fig:hyper-gadget`` draws and
+    ``thm:menger-hyper`` proves.  Giving every copy its own capacity-one gate puts
+    parallel arcs between the same two nodes, and combining parallel arcs into one
+    arc of their summed capacity leaves every cut alone, so the two networks have
+    the same min cut and the same max flow.  This test is that argument checked
+    rather than asserted, over both separations, both orientations, and both
+    directed storage spellings.
+    """
+
+    def _cases(self, trials, seed):
+        rng = random.Random(seed)
+        for _ in range(trials):
+            n = rng.randint(2, 6)
+            r = rng.randint(2, min(4, n))
+            directed = rng.random() < 0.5
+            candidates = list(itertools.combinations(range(n), r))
+            edges = []
+            for _ in range(rng.randint(0, 6)):
+                base = rng.choice(candidates)
+                if not directed:
+                    edges.append(frozenset(base))
+                    continue
+                members = list(base)
+                tails = frozenset(rng.sample(members, rng.randint(1, r - 1)))
+                heads = frozenset(x for x in members if x not in tails)
+                if not heads:
+                    continue
+                # exercise the legacy forward spelling as well as the general one,
+                # since the merge key has to see through the difference
+                if len(tails) == 1 and rng.random() < 0.5:
+                    edges.append((next(iter(tails)), heads))
+                else:
+                    edges.append((tails, heads))
+            yield Hypergraph(n, edges, directed=directed)
+
+    def test_agrees_with_the_per_copy_network(self):
+        compared = with_repeats = 0
+        for hg in self._cases(trials=400, seed=20260827):
+            keys = {(_dir_tails_heads(e) if hg.directed else frozenset(e))
+                    for e in hg.hyperedges}
+            if len(keys) != len(hg.hyperedges):
+                with_repeats += 1
+            for source, target in itertools.permutations(range(hg.num_vertices), 2):
+                for vertex_split in (False, True):
+                    merged = hyper_connectivity(hg, source, target,
+                                                vertex_split=vertex_split)
+                    per_copy = _per_copy_connectivity(hg, source, target,
+                                                      vertex_split=vertex_split)
+                    self.assertEqual(
+                        merged, per_copy,
+                        msg=(f"n={hg.num_vertices} directed={hg.directed} "
+                             f"split={vertex_split} pair=({source},{target}) "
+                             f"edges={hg.hyperedges}"))
+                    compared += 1
+        self.assertGreater(compared, 5000)
+        # the test is worthless if nothing ever had a copy to merge
+        self.assertGreater(with_repeats, 20)
+
+    def test_a_repeated_hyperedge_carries_one_route_per_copy(self):
+        triple = frozenset({0, 1, 2})
+        for copies in (1, 2, 3, 4):
+            h = Hypergraph(3, [triple] * copies)
+            self.assertEqual(hyperedge_connectivity(h, 0, 1), copies)
+            self.assertEqual(hyper_connectivity(h, 0, 1, vertex_split=True), copies)
+
 
 
 if __name__ == "__main__":
