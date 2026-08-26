@@ -420,3 +420,40 @@ dotted line.
 VERIFY: grids redrawn in 3s from the machine-value cache (484 entries, 0
 computed), latexmk exit 0, 104pp, 0 overfull, 0 undefined refs, 0 `??`, program
 self-check ALL CHECKS PASSED, all four figure pages rendered and inspected.
+
+## 2026-08-26 (Opus, sixth pass) — figure 2.4, and where the appendix pages actually go
+
+`plot_complexity_growth`: suptitle removed (the caption already says what is
+counted), the key moved out of the right panel to one row under both, and the
+"continues off the top" note moved into the empty upper-left corner with an
+arrow, renamed to match the key exactly ("$3$-uniform hypergraph", not
+"$3$-uniform directed"). Same `_save(tight=False, bbox_tight=True)` pattern as
+the variant grids: no second rect-less `tight_layout` to discard the adjust, but
+the tight save box still crops the surplus white the legend strip leaves.
+
+**MEASURED THE APPENDIX RATHER THAN GUESSING.** 59 physical pages, split:
+Part I classical machinery 9, directed arc $m=2$ 5, structural propositions 6,
+directed multigraph chain 12 (skeleton 7, classification 3, historical model 1),
+hypergraph bounds 4, hypergraph vertex 5, **directed hypergraph 11**, multigraph
+vertex other convention 4, cheap checker 1, audit 2.
+
+The author asked whether citing other people's results more often would save
+space. **It would not, because that is already the practice**: `thm:menger` and
+`thm:gomory-hu` are stated with citations and NOT reproved ("its standard
+submodular-cut construction is proved in \cite{GomoryHu61}"), and the only proofs
+in that section are the three-line degree bound and `prop:monotone`, which is the
+thesis's own lemma that the search depends on. The one classical result reproved
+in full is **Mader's theorem, about 4 printed pages**, and that is the single
+real lever left. It is a scholarly call about self-containedness, not a cleanup,
+so it goes to the author.
+
+Other things checked and found NOT to be levers: only 5 figures in the whole
+appendix; no theorem is stated twice (checked by label and by title); the
+12k proof words against 17k non-proof words look lopsided but the non-proof is
+theorem statements, figure captions and the glosses that orient a reader between
+arguments; and the one genuine internal repetition (the tail-head count derived
+in both `prop:dir-hyper-general` and `thm:dir-hyper-general-constant`) is six
+lines that the second proof needs in a different form, and it already says so.
+
+VERIFY: latexmk exit 0, 104pp, 0 overfull, 0 `??`, 116 tests OK with 1 expected
+skip.

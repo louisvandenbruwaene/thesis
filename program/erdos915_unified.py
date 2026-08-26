@@ -3422,7 +3422,8 @@ def plot_complexity_growth(path: str | Path) -> None:
     # Printed-size note: displayed at full text width (about 6.1in), so the
     # canvas is drawn at that width and the point sizes below reach paper
     # unshrunk.
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 3.1), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(6.3, 3.4), sharey=True)
+    handles = None
     for ax, directed, title in [(axes[0], True, "directed graphs"),
                                 (axes[1], False, "undirected graphs")]:
         for label, colour, style, vals in curves(directed):
@@ -3433,22 +3434,38 @@ def plot_complexity_growth(path: str | Path) -> None:
         ax.set_title(title)
         ax.set_xlabel("vertices $n$")
         ax.grid(True, alpha=0.3)
+        if handles is None:
+            handles = ax.get_legend_handles_labels()
     # Cap the shared vertical axis at 100 so the slowest curve (the directed
     # 3-uniform hypergraph) runs off the top instead of compressing every other
     # curve into a thin band near the bottom.  sharey=True propagates the limit.
     axes[0].set_ylim(0, 100)
-    axes[0].annotate(r"$3$-uniform directed" + "\n" + r"continues off the top",
-                     xy=(9.55, 99.3), xytext=(7.5, 92), fontsize=8, color=_VIOLET,
-                     ha="center", va="center",
-                     arrowprops=dict(arrowstyle="->", color=_VIOLET, lw=1.0))
+    # The note names the curve EXACTLY as the key does, and sits in the one
+    # corner of the left panel no curve reaches (small n, high count), with the
+    # arrow doing the pointing. Written over the curve, as it was, it was
+    # unreadable against the dotted line it described.
+    axes[0].annotate(r"$3$-uniform hypergraph" + "\n" + "continues off the top",
+                     xy=(9.35, 98.5), xytext=(5.9, 86), fontsize=7.5,
+                     color=_VIOLET, ha="center", va="center",
+                     arrowprops=dict(arrowstyle="->", color=_VIOLET, lw=0.9,
+                                     shrinkB=1))
     axes[0].set_ylabel(r"$\log_{10}$ (number of graphs)")
-    # One legend serves both panels. It sits in the RIGHT panel because the
-    # left one carries the "continues off the top" annotation in that corner,
-    # and at the printed canvas size the two would overlap.
-    axes[1].legend(fontsize=7.5, loc="upper left", title="model")
-    fig.suptitle("Number of graphs blind enumeration must visit",
-                 fontsize=12)
-    _save(path)
+    # One key under BOTH panels rather than inside one of them: the panels are
+    # a matched pair and a key parked in the right one reads as belonging to it
+    # alone, besides crowding the corner its own curves climb into. No "model"
+    # title either, since every entry is plainly a model.
+    fig.subplots_adjust(left=0.105, right=0.985, top=0.90, bottom=0.30,
+                        wspace=0.08)
+    fig.legend(*handles, loc="upper center", ncol=5, fontsize=7.2,
+               frameon=False, bbox_to_anchor=(0.5, 0.155),
+               columnspacing=1.0, handletextpad=0.5,
+               bbox_transform=fig.transFigure)
+    # No suptitle: the caption says what the figure counts, and the axis label
+    # already says the count is of graphs (author call, 2026-08-26).
+    # tight=False so the adjust above survives (a second, rect-less tight_layout
+    # would discard it), but the tight SAVE box stays on, to crop the surplus
+    # white the reserved legend strip leaves behind.
+    _save(path, tight=False, bbox_tight=True)
 
 
 def _circle_layout(n, hub=None):
