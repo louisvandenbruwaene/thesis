@@ -284,7 +284,7 @@ On the small cases this exhaustive mode independently reproduces every value pro
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/complexity_growth.png}
-    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent cells to fill.}
+    \caption{Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent entries to decide.}
     \label{fig:complexity}
 \end{figure}
 
@@ -294,10 +294,13 @@ so a single extra vertex can move a problem from minutes to days.
 Raising the connectivity budget is the next cost, 
 lifting the base of the exponent rather than its height, 
 which is why the multigraph curves sit above the simple ones in every panel. 
-Direction is the third: a digraph has twice as many possibilities as the undirected graph 
-on the same vertices (and a directed $3$-uniform hyperedge, a tail with two heads, 
-has three times as many), so the directed panel climbs fastest of all, 
-and those are precisely the variants whose answers \Cref{ch:basecases} could not prove. 
+Direction is the third: a digraph decides an ordered pair where the undirected graph
+decides an unordered one, giving it twice as many entries and a count that is the
+undirected one squared rather than a multiple of it.
+A directed $3$-uniform hyperedge, a tail with two heads, has three orientations for every
+undirected hyperedge.
+The directed panel therefore climbs fastest of all,
+and those are precisely the variants whose answers \Cref{ch:basecases} could not prove.
 The separation, by contrast, costs nothing here, because edge and vertex disjointness 
 search the same graphs and differ only in what the checker measures, which is an increase linear to the number of graphs.
 
@@ -524,19 +527,19 @@ Together they settle almost every step without a flow. A removal applied to a fe
 
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
-Before the search is pointed at the open cases, it is run on the settled ones. Run from the empty graph on the cases settled in \Cref{ch:basecases} or by the exact methods above, and told only to pack in edges without breaching the connectivity ceiling, the cooled search arrives unprompted at the named constructions and matches the established value in every tested case. \Cref{tab:rediscovery} reports the densest graph it found against the value the theory predicts.
+Before the search is pointed at the open cases, it is run on the settled ones. Run from the empty graph on the cases settled in \Cref{ch:basecases} or by the exact methods above, and told only to pack in edges without breaching the connectivity ceiling, the tabu search arrives unprompted at the named constructions and matches the established value in every tested case. \Cref{tab:rediscovery} reports the densest graph it found against the value the theory predicts.
 
 \begin{table}[ht]
     \centering
     \small
     \input{figures/rediscovery_table.tex}
-    \caption{Validation by rediscovery. For each variant the temperature search, run from scratch with a handful of restarts, recovers exactly the extremal value proved or certified earlier. The ``Search'' column is a lower bound found by annealing, and the ``Theory'' column is the proved or certified value.}
+    \caption{Validation by rediscovery. For each variant the tabu search, run from scratch with a handful of restarts, recovers exactly the extremal value proved or certified earlier. The ``Search'' column is the lower bound it found, and the ``Theory'' column is the proved or certified value.}
     \label{tab:rediscovery}
 \end{table}
 
-The graphs themselves are the named constructions, not only graphs of the right size. The simple undirected run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every edge at multiplicity $m - 1$, an instance of the multi-tree extremiser behind \Cref{thm:multigraph-edge}. The directed multigraph runs settle on the double star of \Cref{const:directed-hub}, both directions of every spoke at full multiplicity. The simple directed runs find the bidirected star at $n = 4$ and, at $n = 7$, land on twelve arcs, the value at which the hub and the one-directional wall tie, exactly the crossover \Cref{thm:dir-arc-m2-exact} predicts. The cooled search does not know these names. It rediscovers the structures because, under the connectivity ceiling, there is nowhere denser to go.
+The graphs themselves are the named constructions, not only graphs of the right size. The simple undirected run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every edge at multiplicity $m - 1$, an instance of the multi-tree extremiser behind \Cref{thm:multigraph-edge}. The directed multigraph runs settle on a thickened star, the spanning tree of \Cref{const:dir-multi-lower} taken to be a star, with both directions of every spoke at full multiplicity. The simple directed runs find the bidirected star at $n = 4$ and, at $n = 7$, land on twelve arcs, the value at which the hub and the one-directional wall tie, exactly the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search does not know these names. It rediscovers the structures because, under the connectivity ceiling, there is nowhere denser to go.
 
-Some extremisers are past the size at which a quick search lands reliably, but the exact checker built above settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$, so this is the smallest size at which the quadratic phenomenon strictly wins. It is also where the search reaches its limit: repeated cooling runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker rather than from the search. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{const:augmented-bipartite}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the same status every witness either search engine returns.
+Some extremisers are past the size at which a quick search lands reliably, but the exact checker built above settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$, so this is the smallest size at which the quadratic phenomenon strictly wins. It is also where the search reaches its limit: repeated tabu runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker rather than from the search. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{const:augmented-bipartite}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the same status every witness either search engine returns.
 
 \section{Results and evidential status}
 \label{sec:trichotomy}\label{sec:certification-standard}

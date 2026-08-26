@@ -649,7 +649,7 @@ For any vertex $x$ of a digraph with total degree $d(x) = d^+(x) + d^-(x) > 0$,
 Write $\mu = \min(d^+(x), d^-(x))$ and $M = \max(d^+(x), d^-(x))$, so $\mu + M = d(x)$ and $\mu M = d^+(x)d^-(x)$. Since $\mu \le M$ we have $M \ge d(x)/2$, hence $d^+(x)d^-(x) = \mu M \ge \mu\, d(x)/2$, which rearranges to the claim.
 \end{proof}
 
-In words: a feasible one-way simple graph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. Nothing here assumes anything about the shape of $D$.
+\Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:synthesis}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. The proof below assumes nothing about the shape of $D$.
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
 Induction on $n$. For $n = 2$ a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4(m-1) \ge 5$, so the base holds. Let $n \ge 3$ and split on the minimum total degree.
@@ -780,6 +780,7 @@ A reachability skeleton keeps every yes-or-no fact about who can reach whom and 
 Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
 \end{lemma}
 
+\begin{proof}
 Building $R$ takes three steps: handle the traffic \emph{inside} each strongly connected piece of $D$, handle the traffic \emph{between} pieces, then count. A \emph{strongly connected component} (an SCC) is a maximal set of vertices any two of which reach each other, and every directed multigraph partitions uniquely into its SCCs, since mutual reachability is an equivalence relation. \Cref{fig:skeleton-example} carries one small running example through all three steps, and every object named below appears in it concretely.
 
 \emph{Step 1: inside each component.} Fix one SCC of order $n_i \ge 1$ and pick any vertex $r$ inside it as a root. Since $r$ reaches every vertex of the component, a standard fact about digraphs gives a spanning \emph{out-arborescence}: a tree of $n_i - 1$ arcs of $D$, every one pointing away from $r$, along which $r$ alone reaches every other vertex of the component (grow it one hop at a time, always available since the component is strongly connected). Symmetrically, because every vertex of the component reaches $r$, there is a spanning \emph{in-arborescence} of $n_i - 1$ arcs, every one pointing toward $r$, along which every vertex reaches $r$. Taking both trees together, any two vertices $u, v$ of the component are joined by the route $u \to r \to v$, first the in-arborescence, then the out-arborescence, so the $2(n_i - 1)$ arcs of the two trees alone reconstruct \emph{every} reachability relation inside this one component.
@@ -807,6 +808,7 @@ using the identity $\floor{(q+1)^2/4} - \floor{q^2/4} = \floor{(q+1)/2}$, checke
     f(q) \;\le\; \max\bigl(f(1),\,f(n)\bigr) \qquad \text{for } 1 \le q \le n.
 \]
 At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ every component is a single vertex, so $f(n) = 0 + \floor{n^2/4}$. Hence $f(q) \le \max\bigl(2(n-1), \floor{n^2/4}\bigr) = M(n)$ for every $q$ in range, which is the lemma.
+\end{proof}
 
 \begin{figure}[htbp]
 \centering
@@ -1094,7 +1096,6 @@ The $\min$ in the two-step line is written as a minimum for readability only. A 
 \caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$, while same-side and backward arcs have $p=0$.}
 \label{fig:cut}
 \end{figure}
-% did you forget to bound n, or does the next theorem always hold even for large n?
 \begin{theorem}[Directed multigraph value, small $n$]\label{thm:dir-multi-small}
 For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
 \end{theorem}
@@ -1712,7 +1713,7 @@ exactly when some hyperedge of $\HH$ has tail $u$ and $v$ among its heads. Write
 $\mathrm{cod}(u,v)$ for the number of hyperedges realising that arc.
 \end{definition}
 
-In words: the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
+\Cref{thm:dir-hyper-constant}, stated in \Cref{ch:synthesis}, says in words that the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
 \begin{proof}[Proof of \Cref{thm:dir-hyper-constant}]
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
