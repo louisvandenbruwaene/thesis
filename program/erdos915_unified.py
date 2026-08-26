@@ -3258,9 +3258,6 @@ def draw_graph_with_sensitivity(
     ax.set_ylim(min(ys) - my, max(ys) + my)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title("Parallel arcs drawn explicitly, coloured by sensitivity "
-                 "$\\sigma$:\ncool ($\\sigma=0$, free) $\\to$ warm (load-bearing)",
-                 fontsize=12)
     _save(path)
 
 

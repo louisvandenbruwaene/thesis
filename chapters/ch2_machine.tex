@@ -300,10 +300,6 @@ has three times as many), so the directed panel climbs fastest of all,
 and those are precisely the variants whose answers \Cref{ch:basecases} could not prove. 
 The separation, by contrast, costs nothing here, because edge and vertex disjointness 
 search the same graphs and differ only in what the checker measures, which is an increase linear to the number of graphs.
-% The cut-counting certifier reaches a few vertices further than blind enumeration, 
-% but solving its encoding is itself hard and the gain is measured in single vertices, 
-% not orders of magnitude. Past that, no exhaustive method reaches the interesting sizes.
-% i don't know about any cut counting, perhaps leave it out. 
 
 \begin{figure}[ht]
 \centering
@@ -489,13 +485,13 @@ We want, for fixed $n$ and $m$, a graph with as many edges as possible subject t
 
 Every graph is scored by one number, its energy
 \[
-    E(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
+    \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
 \]
 which rewards edges and penalises any excess connectivity. A move toggles one adjacency, and the search walks from the empty graph by repeatedly taking the move that lowers the energy most. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly above the ceiling instead of being walled inside the feasible region.
 
-The method used is \emph{tabu search} \cite{Glover89}, which escapes a local optimum by forbidding the pairs it has just touched. After each move the pair it changed is put on a tabu list for a fixed number of steps, so the walk cannot immediately undo what it just did and cycle back into the optimum it came from. A move that would beat the best graph seen so far overrides the tabu flag, and the walk perturbs itself when it stalls.
+The method used is \emph{tabu search} \cite{Glover89}, which escapes a local optimum by forbidding the pairs it has just touched. Among the moves not forbidden, the walk always takes the one that lowers $\Phi$ most, even when every candidate raises it: this is what lets it climb back out of a minimum rather than stopping there, unlike a greedy walk that only ever accepts an improving move. After each move the pair it changed is put on a tabu list for a fixed number of steps, so the walk cannot immediately undo what it just did and cycle back into the optimum it came from. A move that would beat the best graph seen so far overrides the tabu flag regardless of its status, an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, and the walk perturbs itself when it stalls.
 
-The obvious alternative is \emph{simulated annealing}, which escapes local optima instead by sometimes accepting a worsening move, less and less often as a temperature parameter falls. On the same energy and the same neighbourhood, at equal wall-clock budget, it is the weaker engine here. The two tie on the undirected problems, and on the directed ones, which are the hard cases, tabu wins outright: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser where annealing stalls at $20$, and $18$ arcs against $16$ on the simple digraph. Every discovery value this thesis reports therefore comes from tabu search. Annealing is kept only as an independent cross-check in the program's self-test, where agreement between two unrelated walks is worth more than the speed of either.
+Simulated annealing is the obvious alternative, and on the same energy and the same neighbourhood, at equal wall-clock budget, it is the weaker engine here. The two tie on the undirected problems, and on the directed ones, which are the hard cases, tabu wins outright: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser where annealing stalls at $20$, and $18$ arcs against $16$ on the simple digraph. Every discovery value this thesis reports therefore comes from tabu search. Annealing is kept only as an independent cross-check in the program's self-test, where agreement between two unrelated walks is worth more than the speed of either.
 
 It is fair to ask why the walk is allowed above the ceiling at all. Reaching every feasible graph does not require it. Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. From any feasible target we can therefore delete edges one at a time down to the empty graph without ever crossing the ceiling, and reading that path backward builds the target up the same way. The feasible region is connected through the empty graph by single-edge moves that stay inside it, so a walk that never went infeasible could in principle visit every feasible graph there is.
 
@@ -514,7 +510,7 @@ Colouring a graph's arcs by $\sigma$ then explains a finished graph at a glance.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/sensitivity_mixed.png}
-    \caption{Arc sensitivity in a directed multigraph with $\lambda^{\max}=9$. Equal multiplicities can have different $\sigma$: the downstream bottleneck makes $s\to a$ cooler than $s\to b$, while arcs into the dead end $d$ have $\sigma=0$.}
+    \caption{Arc sensitivity in a directed multigraph with $\lambda^{\max}=9$, each parallel copy drawn as its own arc so multiplicity is read by counting rather than from a label. Equal multiplicities can have different $\sigma$: the downstream bottleneck makes $s\to a$ cooler than $s\to b$, while arcs into the dead end $d$ have $\sigma=0$.}
     \label{fig:sensitivity}
 \end{figure}
 
@@ -540,15 +536,7 @@ Before the search is pointed at the open cases, it is run on the settled ones. R
 
 The graphs themselves are the named constructions, not only graphs of the right size. The simple undirected run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every edge at multiplicity $m - 1$, an instance of the multi-tree extremiser behind \Cref{thm:multigraph-edge}. The directed multigraph runs settle on the double star of \Cref{const:directed-hub}, both directions of every spoke at full multiplicity. The simple directed runs find the bidirected star at $n = 4$ and, at $n = 7$, land on twelve arcs, the value at which the hub and the one-directional wall tie, exactly the crossover \Cref{thm:dir-arc-m2-exact} predicts. The cooled search does not know these names. It rediscovers the structures because, under the connectivity ceiling, there is nowhere denser to go.
 
-Some extremisers are past the size at which a quick search lands reliably, but the exact checker built above settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$, so this is the smallest size at which the quadratic phenomenon strictly wins. It is also where the search reaches its limit: repeated cooling runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker rather than from the search. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{const:augmented-bipartite}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound.
-
-The discovery driver defaults to \emph{tabu search}, Glover's method \cite{Glover89}
-of forbidding the recently visited moves so a best-improving walk cannot cycle
-back into the local optimum it just left. It uses the same energy and
-single-adjacency neighbourhood as the annealer but takes best-improving moves
-with a short tabu tenure and occasional perturbations. Simulated annealing remains an
-independent cross-check. Both return checked witnesses and therefore lower
-bounds, never proofs.
+Some extremisers are past the size at which a quick search lands reliably, but the exact checker built above settles them immediately by measuring their connectivity. The one-directional bipartite digraph on eight vertices has $16$ arcs at $\lambda^{\max} = 1$, and $16$ already exceeds the linear hub value $2(n-1) = 14$, so this is the smallest size at which the quadratic phenomenon strictly wins. It is also where the search reaches its limit: repeated cooling runs at $n = 8$, $m = 2$ stall at the hub value of $14$, because dismantling a finished hub and rebuilding a one-directional wall is far more than the single-arc moves of the walk can tunnel through. The known answer there comes from the construction and the checker rather than from the search. The augmented bipartite digraph on ten vertices at $m = 3$ has $30$ arcs at $\lambda^{\max} = 2$, the thirty-arc counterexample of \Cref{const:augmented-bipartite}, confirmed pair by pair against the naive bound of $27$ it refutes. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$. None of these is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the same status every witness either search engine returns.
 
 \section{Results and evidential status}
 \label{sec:trichotomy}\label{sec:certification-standard}
