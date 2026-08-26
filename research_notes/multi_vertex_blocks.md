@@ -94,10 +94,12 @@ A clean split in the knapsack, worth stating:
 
 - `m <= 3`: the **thickened tree** wins, every block a single edge.
 - `m = 4`: tie, every split of the vertices scores the same.
-- `m >= 5`: a **single 2-connected block** strictly beats every split. So the
-  bouquet is a construction, not the shape of the answer.
+- `m >= 5` and `3 <= n <= 8`: a **single 2-connected block** strictly beats
+  every split in the computed table. At `n=2` the single-edge block and the
+  thickened tree are the same object. So the bouquet is a construction, not
+  the shape of the answer.
 
-## 4. The blocks are bipartite, not complete
+## 4. The blocks are bipartite-like, not complete
 
 Read off the winners: `m=5,n=6` is exactly `K_{2,4}`; `m=6,n=7` is exactly
 `K_{2,5}`; `m=7` and `m=8` at `n=7` are `K_{3,4}` plus two edges inside the

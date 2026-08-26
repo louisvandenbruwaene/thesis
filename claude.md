@@ -11,7 +11,7 @@ the reasoning behind a specific past decision, `git log -p -- <file>` or grep
 ## What this repo is
 
 A KU Leuven master's thesis on Erdős Problem 915 (the general connectivity
-threshold problem, extended across twelve graph/digraph/hypergraph variants,
+threshold problem, extended across sixteen graph/digraph/hypergraph variants,
 in two separations — edge/arc and vertex). `main.tex` is the thesis,
 `chapters/app_proofs.tex` carries every proof, `program/erdos915_unified.py`
 is the single-file companion program (checker, provers, search, figures),
@@ -129,3 +129,91 @@ and only touch this summary if the *status* (proved/open) changes.
   (the site blocks automated fetches); leave for the author.
 - `gurobi_handoff/` is vestigial since `thm:dir-multi-full` closed the
   problem it was built for by hand. Left in place, not deleted.
+
+## 2026-08-26 (Opus) — the fourth model: sixteen variants, and the author's chapter rewrite actioned
+
+The author rewrote Chapter 1 and the opening of Chapter 2 by hand, commenting out
+large passages and leaving inline instructions. This session executed those, added
+the fourth model, and repaired what the rewrite broke.
+
+**THE REWRITE BROKE 22 CROSS-REFERENCES AND LATEX NEVER SAID SO.** Commenting out
+the constructions left seven labels undefined (`const:directed-hub`,
+`const:bipartite`, `const:augmented-bipartite`, `rem:counterexample-m3`,
+`prop:leonard-m2`, `sec:parallel-convention`, `thm:dir-vertex-m2-exact`), cited
+from 22 places. `latexmk -g` exited 0 with **zero warnings** and the PDF printed
+`??` at all 22. Cleveref's fallback emits `??` without a "Reference undefined"
+line, so the build log is not a sufficient check here.
+**Use `pdftotext main.pdf - | grep -c '??'` as the real gate.**
+Repaired by restoring only what is genuinely needed, per the author's own calls:
+`prop:leonard-m2` deleted outright (subsumed by `thm:leonard` at m<=4, so restating
+it was redundant); `rem:counterexample-m3` folded into `const:augmented-bipartite`
+as its m=3, n=10 instance with the three citations repointed;
+`sec:parallel-convention` attached to the live convention paragraph in ch2; the
+three constructions and the m=2 vertex theorem restated compactly in ch1.
+Both directed constructions were re-verified numerically before writing them
+(hub hits m(n-1) at lambda=m-1 for (7,2),(6,3),(8,3),(9,4),(7,5); bipartite hits
+floor(n^2/4) at lambda=1 for n=6..9; augmented bipartite hits floor((n+m-2)^2/4)
+at lambda=m-1 for seven (n,m) including the 30-arc n=10,m=3 case).
+
+**THE FOURTH MODEL: TWELVE VARIANTS -> SIXTEEN.** The author's new ch1
+`fig:eight-models` and `tab:notation` already carried multiplicity as an axis on
+hypergraphs; the rest of the thesis had not caught up. This is a real split, not
+a relabelling, and it does NOT collapse the way the multigraph vertex rows do:
+q parallel copies of a hyperedge give q Berge routes with EMPTY interiors, so they
+are pairwise hyperedge-disjoint AND internally vertex-disjoint, raising kappa as
+well as lambda. Multiplicity is therefore capped at m-1 in both separations and
+all four multihypergraph cells are genuine. Machine-confirmed at the smallest
+witness, n=r=m=3: simple maximum 1, multi maximum 2, exactly the split
+`prop:hyper-edge` predicts (simple attains when m-1 <= C(n-2,r-2), multi when
+(r-1)|(n-1)). Program: `_hyper_multiplicity_cap`, a `simple` axis threaded through
+`_brute_force_hypergraph`, `_random_hypergraph_search`, `max_feasible_hyperedges`
+and `solve`; `_VARIANT_ENUM_CONFIGS` 12 -> 16; `gather_variant_grid` 12 -> 16
+panels; `_variant_panel_grid` 3x4 -> 4x4. Thesis: `tab:summary` 6 -> 8 rows,
+`fig:variant-tree-status` 3 -> 4 model blocks, and the count swept through ch2,
+ch4, app_proofs, both READMEs and this file.
+
+**A BUG I INTRODUCED AND CAUGHT BEFORE PUBLISHING.** The new multihypergraph
+panels capped their curve at `C(n,r)`, the SIMPLE trivial maximum. A
+multihypergraph may take each hyperedge up to m-1 times, so its ceiling is
+`(m-1) C(n,r)`. At n=r=m=3 the wrong cap reads 1 where the true value is 2, which
+would have put an exact square ABOVE its own curve, the exact artefact the author
+caught in June. Fixed with `lb_multihyper_edge`; the regeneration now carries an
+inline assert that no exact point exceeds its proved/conjectured curve.
+
+**PRUNING NOW APPLIES TO EVERY VARIANT, AS THE TEXT CLAIMS.** The author asked
+"we prune for all variants and not just directed arc m2 right?" The honest answer
+was no: only `_exhaustive_directed` pruned, while `_brute_force_matrix` and the
+hypergraph sweep were blind `product` walks. Rather than soften the text,
+`_brute_force_matrix` was rewritten as a depth-first search with the same two
+prunings. **Writing the argument out caught two real defects in my own code:**
+the headroom was `(total - i - 1) * (span - 1)` where the undecided count is
+`total - i`, which under-estimates and would have pruned branches that could still
+beat the incumbent (silently returning values too small); and `separation` is
+keyword-only, so the call would have raised TypeError. Both fixed before testing.
+Guarded by `PrunedEnumerationMatchesBlind` in `tests/test_solve.py`, which runs
+the pruned search against a separately written blind sweep over every variant and
+every reachable size (53 cells, 0 mismatches) and also asserts each witness is
+really feasible and really carries its reported count.
+
+**ANNEALING REMOVED FROM THE THESIS NARRATIVE** (author's instruction). ch2's
+search sections are now built on tabu search, with annealing named once as the
+measured-weaker alternative (ties undirected, loses 24 vs 20 and 18 vs 16 on the
+directed cases) and retained only as the self-test cross-check. The temperature
+and cooling exposition is gone; edge sensitivity survives as a diagnostic, since
+tabu does not use it as a removal dial.
+
+**THE FIGURE LEGEND.** `plot_variant_grid` drew a six-entry legend inside EVERY
+panel, which at sixteen panels occupied more area than the curves. Replaced by one
+figure-level key. Three attempts failed before the cause surfaced: **`_save()` runs
+a SECOND, rect-less `plt.tight_layout()`**, discarding any `rect` or
+`subplots_adjust` reservation the caller made. The grid now passes
+`_save(path, tight=False)` and hangs the legend below the figure box, where the
+tight bounding box expands to include it.
+
+VERIFY: 115 tests OK (was 103, +12 from the new differential test), 1 expected
+skip; program self-check ALL CHECKS PASSED; `latexmk` exit 0, 102 pp, 0 overfull,
+0 undefined refs, and 0 occurrences of `??` in the extracted PDF text.
+
+NOTE: the standing rule above about running `program/sync_code_appendix.py` is
+STALE. Appendix C was removed in the 2026-08-24 shortening pass and no chapter
+inputs `app_code.tex` any more, so there are no line ranges left to sync.

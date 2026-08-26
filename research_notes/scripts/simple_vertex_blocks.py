@@ -71,6 +71,13 @@ def h(m: int, b: int):
     return best, arg
 
 
+def optimal_count(m: int, b: int) -> int:
+    """Number of unlabelled blocks attaining h_m(b)."""
+    best, _ = h(m, b)
+    return sum(B.number_of_edges() == best and feasible(B, m)
+               for B in biconnected(b))
+
+
 def main() -> None:
     print("h_m(b) = max edges of a 2-connected feasible block on b vertices,")
     print("and h_m(b)/(b-1), whose supremum over b is c_m = lim k_m(n)/(n-1)\n")
@@ -82,6 +89,10 @@ def main() -> None:
             v, _ = h(m, b)
             cells.append(f"{v:>3}/{b-1}={v/(b-1):4.2f} " if v >= 0 else "   none    ")
         print(f"  {m}  " + "".join(cells))
+
+    print("\nuniqueness check quoted for m=4 in the thesis")
+    for b in range(4, min(BMAX, 8) + 1):
+        print(f"  b={b}: {optimal_count(4, b)} unlabelled optimum")
 
     print("\nbest rigorous lower bound on c_m from blocks with b <= "
           f"{BMAX}, against what is known")

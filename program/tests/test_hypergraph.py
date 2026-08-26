@@ -11,6 +11,7 @@ from erdos915_unified import (
     max_hyperedge_connectivity,
     star_hypertree,
     _hyperedge_candidates,
+    _hyper_canonical,
 )
 
 
@@ -64,6 +65,15 @@ class DirectedOrientationModels(unittest.TestCase):
             self.assertEqual(hyper_connectivity(legacy, s, t),
                              hyper_connectivity(general, s, t))
 
+    def test_canonical_form_accepts_mixed_storage_forms(self):
+        legacy = (0, frozenset({1, 2}))
+        general = (frozenset({0}), frozenset({1, 2}))
+        self.assertEqual(_hyper_canonical([legacy], 3, True),
+                         _hyper_canonical([general], 3, True))
+        mixed = _hyper_canonical([legacy, general], 3, True)
+        self.assertEqual(len(mixed), 2)
+        self.assertEqual(mixed[0], mixed[1])
+
     def test_candidate_counts_split_at_r3(self):
         # At r = 3 every split has a singleton side, so general = forward + backward.
         fwd = _hyperedge_candidates(4, 3, True, kind="forward")
@@ -94,6 +104,13 @@ class DirectedOrientationModels(unittest.TestCase):
             g, _ = max_feasible_hyperedges(n, 3, m, directed=True, kind="general",
                                            time_limit=3.0, seed_lb=f)
             self.assertGreaterEqual(g, f)
+
+    def test_unverified_seed_cannot_be_reported_as_exact(self):
+        with self.assertRaisesRegex(ValueError, "claimed feasible"):
+            max_feasible_hyperedges(
+                4, 3, 2, directed=True, kind="forward",
+                time_limit=10.0, seed_lb=5,
+            )
 
 
 if __name__ == "__main__":

@@ -2,15 +2,15 @@
 
 One main Python file, `erdos915_unified.py`, models every variant of Erdős
 Problem 915, measures connectivity exactly, certifies upper bounds for small
-sizes, and searches for extremal graphs with a temperature-guided walk. It is
+sizes, and searches for extremal objects with model-specific heuristics. It is
 written to be read top to bottom: clear names, docstrings everywhere, and a
 strict separation between what is *measured*, what is *proved*, and what is
 merely *discovered*. An optional C helper accelerates small hot paths, but the
 Python implementation is the correctness path.
 
 There is one solver. Whatever the question, you call `solve(...)`: it picks the
-right method for the case (a proved closed form, brute-force enumeration, the
-pruned exhaustive search, or the temperature search) and labels its answer
+right method for the case (a proved closed form, brute-force enumeration, a
+matrix search, or randomised greedy hypergraph search) and labels its answer
 honestly as exact, an upper bound, or a lower bound. You never run a different
 program for a different case.
 
@@ -100,7 +100,10 @@ The search proposes. The certifier and the hand proofs dispose.
 
 The thesis is three chapters: (1) The Problem and Its Base Cases, (2) Certifying
 and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems.
-`make_figures.py` writes every figure below.
+`make_figures.py` writes every figure below except
+`figures/rediscovery_table.tex`, which is a small hand-kept LaTeX table of
+`solve(...)` discovery runs at fixed seeds. Its header records how each row
+was produced; rerun those calls to check it.
 
 | Figure | Thesis chapter |
 |--------|----------------|
@@ -109,8 +112,8 @@ and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems
 | `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.2) |
 | `figures/temperature_trace.png` | a cooling run (Ch.2) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.2) |
-| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2) |
-| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all twelve variants (Ch.2, paired with m = 6) |
+| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
+| `figures/variant_bounds_m3.png` | proved / conjectured / guessed, all sixteen variants (Ch.2, paired with m = 6) |
 | `figures/variant_bounds_m6.png` | the same grid at m = 6 (Ch.2, paired with m = 3) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |

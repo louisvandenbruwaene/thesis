@@ -21,21 +21,31 @@
 
 \chapter*{Foreword}
 \addcontentsline{toc}{chapter}{Foreword}
-This thesis studies how many edges or arcs a network can contain when no pair of vertices is allowed to have too many independent routes between them. The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. The work is told as a journey. It begins with the variants whose answers can be proved cleanly by hand, watches those proofs grow longer and more delicate as the model changes, and at the point where a single argument no longer suffices it turns to a unified program. That program holds all twelve variants behind one common interface, so a single piece of code serves them all. It measures connectivity exactly with a maximum-flow routine, the standard way to count the independent routes between two points. It runs a prover that sweeps every graph of a small fixed size and, when none beats a target, reports that sweep as a genuine upper-bound proof. And it runs a search guided by heuristics that either let hot metal cool slowly into shape or simply take the best direction on offer and never backtrack.
+This thesis studies how many edges or arcs a network can contain when no pair of vertices is allowed to have too many independent routes between them.
+The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. 
+The work begins with the necessary background to formulate the problem and all its variants. 
+It then discusses their answers or highlights the difficulty behind unsolved cases. 
+Afterwards, computational research on small graphs confirms these values or provides evidence for conjectures. 
+This is accomplished by measuring connectivity with a maximum-flow routine and by searching for extremal graphs with metaheuristics.
+The results of these computations are thus either a proof of the extremal value in the search space or a lower bound that is conjectured to also be upper, supported by the unfinished search for a counterexample.
+At the end, the thesis synthesises the results and presents the open problems that remain.
+This work is theoretical in nature, but the computational methods and the resulting conjectures are of interest to anyone who uses networks and wants to understand the relationship between connectivity and the connections they entail.\\
 
-I am grateful to my supervisor, Prof.\ Stijn Cambie, for his day-to-day guidance, corrections, and mathematical feedback throughout the project. I could not ask for a more understanding and enthusiastic supervisor. I thank my promotor, Prof.\ Jan Goedgebeur, whose suggestion of the \texttt{nauty} generation pipeline sharply accelerated the directed enumeration. I also thank the people who discussed early versions of the arguments, checked examples, or helped clarify the presentation. Above all I thank my girlfriend Sara, whose patience and encouragement carried me through the long stretches of this work.
-
-My use of generative-AI tools is described in the Contribution Statement. I remain responsible for every claim, proof, computation, and formulation in this thesis.
+I am grateful to my supervisor, Prof.\ Stijn Cambie, for his day-to-day guidance, corrections, and mathematical feedback throughout the project.
+I could not ask for a more understanding and enthusiastic supervisor.
+I thank my promotor, Prof.\ Jan Goedgebeur, whose graph theory implementation knowledge pushed the boundaries of the computational work significantly.
+I also thank the people who discussed early versions of the arguments, checked examples, or helped clarify the presentation. 
+Above all I thank my girlfriend Sara, whose patience and encouragement carried me through the long stretches of this work.
 
 \chapter*{Contribution Statement}
 \addcontentsline{toc}{chapter}{Contribution Statement}
-This thesis is my own work. I carried out the literature study, recast the twelve variants of the problem in one common language, and designed and wrote the single program that runs through all of them. I built every example, by hand or by computer search, checked each one with that program, wrote the proofs that appear in the thesis, and typeset the whole document. Where a result comes from the literature I say so and cite it. The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai. Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. The hypergraph results proved in this thesis do not depend on their splitting-off theorem.
-
-The program has three jobs and keeps them separate: it \emph{measures} connectivity exactly by maximum flow, it \emph{proves} a finite optimum by sweeping a finite space of graphs, and it \emph{discovers} dense graphs by metaheuristic search, which gives lower bounds and suggests conjectures but never an upper bound. Every general statement in the thesis rests on a proof by hand or a cited theorem. The computer searches are evidence that points the way, never a replacement for the argument.
-
-I used Claude Code, ChatGPT, and Gemini for literature leads, exploratory proof drafts, code assistance, \LaTeX{} editing, and proofreading. Their output was not treated as a source or as evidence: literature claims were checked against the cited publications, general mathematical claims were retained only with a proof or citation, and computational claims were checked by tests and, for critical cases, independent implementations. I reviewed and take responsibility for the final text, mathematics, and code. This statement records the role of the tools in the thesis. The same use must also be recorded in the separate KU Leuven GenAI transparency declaration submitted with the thesis.
-
-My original results are stated fully in \Cref{ch:synthesis} and proved in \Cref{app:proofs}. The compact map is:
+All the work in this thesis is my own, except where I explicitly say otherwise. 
+I used Artificial Intelligence to implement the code, suggest and verify proofs, format \LaTeX and spellcheck. 
+Where a result comes from the literature I say so and cite it. 
+The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai. 
+Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
+Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
+The summary of my original results is:
 
 \begin{center}
 \small
@@ -43,16 +53,15 @@ My original results are stated fully in \Cref{ch:synthesis} and proved in \Cref{
 \toprule
 Variant & Contribution \\
 \midrule
-Hypergraph, vertex separation & Exact value at $m=2$; the $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
+Hypergraph, vertex separation & Exact value at $m=2$. The $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
 Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
 Directed simple graph, arc separation & Unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
-Multigraph, vertex separation with parallel routes distinct & Exact $m=2$ value, counterexamples to the thickened-tree guess, matching order $\Theta(m^2n)$, and an exact block-knapsack formulation (\Cref{thm:multi-vertex-m2,prop:multi-vertex-upper,thm:multi-vertex-blocks}). \\
-Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
+Multigraph, vertex separation with parallel routes distinct & Exact $m=2$ value, counterexamples to the thickened-tree guess, matching order $\Theta(m^2n)$ as $m\to\infty$ with $n/m\to\infty$, and an exact block-knapsack formulation (\Cref{thm:multi-vertex-m2,prop:multi-vertex-upper,thm:multi-vertex-blocks}). \\
+Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and, for fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-An external AI review suggested the counting idea behind the directed stability estimate. I verified it, sharpened it, isolated the weaker route-counting hypothesis, and supplied the separate arguments that apply it to directed vertex connectivity and directed hypergraphs.
 
 \chapter*{Short Summary}
 \addcontentsline{toc}{chapter}{Short Summary}
@@ -62,13 +71,28 @@ An external AI review suggested the counting idea behind the directed stability 
 \]
 Mader proved that, for simple graphs and $n\ge m\ge2$,
 \[
-\ell_m(n)=\left\lfloor \frac{m(n-1)}2\right\rfloor .
+\ell_m(n)\le\left\lfloor \frac{m(n-1)}2\right\rfloor 
 \]
-This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, and hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint), and the presence or absence of directions.
+and provided a construction achieving this bound when $(m-1)|(n-1)$.
+This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multi-hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint) and the presence or absence of directions.
+The simple case for edge-disjoint paths is proven independently here using Gomory-Hu trees \cite{GomoryHu61} and a general extremal graph construction resolves this case for all $n$ and $m$.
+Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$ and the equality of the simple edge and vertex problems for $m\le4$ and their divergence at $m=5$, as shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
+The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. 
 
-The thesis is organised as a journey from hand proofs to computation. The early variants are settled rigorously: the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the edge and vertex problems for $m\le4$, and the first divergence at $m=5$, where S{\o}rensen and Thomassen prove $k_5(n)=\lfloor 8n/3\rfloor-4$, which pulls above the edge value from $n=14$ onwards. The directed case forces the turn: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction, and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. The centrepiece is then a unified program. One multiplicity-matrix representation models almost all twelve variants, an exact maximum-flow checker measures local connectivity, a cut-counting optimisation certifies upper bounds for small sizes, and a search guided by edge sensitivity, run as both simulated annealing and tabu search, discovers extremal graphs. The program rediscovers, each in its own variant, the double star (undirected multigraphs at $m=2$), the directed hub, the one-directional bipartite digraph, and the augmented-bipartite construction (the directed cases), independently checks the directed multigraph values $L_m^{\mathrm{dir}}(n)=2(n-1)(m-1)$ at every $n\le6$, which was as far as any proof then reached, and frames the remaining open problems on the directed frontier.
 
-The interplay then pays back in the other direction. The hypergraph vertex problem is settled completely at $m=2$. At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time. For every fixed $m\ge3$, the simple digraph problem, arc and vertex alike, is pinned at $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser, and at $m=2$ its exact value has only an $O(1)$ correction to $n^2/4$. The directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
+The centerpiece is then a unified program, which represents non-hypergraphs with a multiplicity-matrix and converts the vertex-disjoint problem to an edge-disjoint one by a standard vertex-splitting construction.
+The hypergraphs are handled as a list of hyperedges, which may use head and tail sets to represent directed hyperedges.
+Then a maximum-flow algorithm measures connectivity between all pairs of vertices and reports the maximum local connectivity.
+At each point of the program, optimisations are applied to reduce the search space and traverse it more efficiently.
+When these optimisations are exhausted and the computation becomes intractable, the program uses metaheuristics to search for extremal graphs, which are then checked for correctness.
+
+
+
+The hypergraph vertex problem is settled completely at $m=2$. 
+At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. 
+On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time. 
+For every fixed $m\ge3$, the simple digraph problem, arc and vertex alike, is pinned at $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser and at $m=2$ its exact value has only an $O(1)$ correction to $n^2/4$. 
+For fixed $r$ and $m$, the directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
 
 \chapter*{Abbreviations and Symbols}
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}
@@ -116,7 +140,7 @@ $\sigma(e)$ & edge sensitivity $\lambda^{\max}(G)-\lambda^{\max}(G-e)$ \\
 \cleardoublepage
 \pagenumbering{arabic}
 
-\chapter{The Problem and Its Base Cases}\label{ch:basecases}
+\chapter{The Problem and Its Variants}\label{ch:basecases}
 \input{chapters/ch1_basecases}
 
 \chapter{Certifying and Discovering Bounds by Machine}

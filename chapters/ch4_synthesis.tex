@@ -1,4 +1,4 @@
-The journey set out from one clean theorem and followed it across twelve variants, proving by hand what yielded to hand argument, building a machine where the proofs ran out, certifying the small cases the machine could close, and using the search to discover the dense graphs the proofs had singled out and to point at the ones still open. This closing chapter draws the threads together. It maps the directed frontier, where proof and certificate both still fall short of the full answer, names the two genuine surprises the landscape contains, gathers the twelve answers into one picture, and says plainly what the program changed and where it stops.
+The journey set out from one clean theorem and followed it across sixteen variants, proving by hand what yielded to hand argument, building a machine where the proofs ran out, certifying the small cases the machine could close, and using the search to discover the dense graphs the proofs had singled out and to point at the ones still open. This closing chapter draws the threads together. It maps the directed frontier, where proof and certificate both still fall short of the full answer, names the two genuine surprises the landscape contains, gathers the sixteen answers into one picture, and says plainly what the program changed and where it stops.
 
 \section{The directed frontier and the missing decomposition}
 
@@ -113,39 +113,45 @@ The extremisers include the doubled trees on the linear branch and the balanced 
 
 Across all the variation, two phenomena stand out as the ones a first guess would not have predicted.
 
-The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 4$ pulling strictly above $\ell_5(n)$ from $n = 14$ onwards (\Cref{thm:sorensen-thomassen}, and \Cref{rem:threshold-convention} for the counting convention that fixes the constant). The separation is genuinely a fact about $m$ rather than about $n$: at $m = 5$ the two values still agree at every size up to $n = 13$ and only then come apart, and beyond $m = 5$ the vertex problem becomes genuinely hard and has stayed open since 1974.
+The first is the divergence at $m = 5$. The edge and vertex problems agree for $m \le 4$, and it would be natural to expect them to agree forever. Instead they part company at the very next value, with $k_5(n) = \floor{8n/3} - 4$ for every $n \ge 6$ except the two sizes $n = 7$ and $n = 12$ that the paper settles separately, pulling strictly above $\ell_5(n)$ from $n = 14$ onwards (\Cref{thm:sorensen-thomassen}, and \Cref{rem:threshold-convention} for the counting convention that fixes the constant). The separation is genuinely a fact about $m$ rather than about $n$: at $m = 5$ the two values still agree at every size up to $n = 13$ and only then come apart, and beyond $m = 5$ the vertex problem becomes genuinely hard and has stayed open since 1974.
 
-The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling of $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. The one-directional wall of \Cref{const:bipartite} sends every arc from one half of the vertices to the other and holds $\floor{n^2/4}$ of them at $\lambda^{\max} = 1$, because a route must cross the wall exactly once and nothing crosses back to offer a second. An arc count growing like $n^2$ while the connectivity stays at one is something no undirected graph can do past a handful of vertices, and it is why the initial linear conjecture for the directed case fails already at $m = 2$, where on $n = 8$ the wall holds $16$ arcs against the hub's $14$. \Cref{const:augmented-bipartite} carries the same idea to every $m$ by letting each vertex of the larger part absorb $m - 2$ extra in-arcs from inside that part, which buys $m - 2$ short detours per pair and lifts $\lambda^{\max}$ to $m - 1$ while the count climbs to $\floor{(n+m-2)^2/4}$. Its $m = 3$ instance is the thirty-arc graph of \Cref{rem:counterexample-m3}, thirty arcs against the naive prediction of twenty-seven.
+The second is the quadratic bipartite phenomenon. In an undirected graph every edge contributes to the degree of both its endpoints, and Mader's theorem turns that symmetry into a hard ceiling of $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph breaks the symmetry. The one-directional wall of \Cref{const:bipartite} sends every arc from one half of the vertices to the other and holds $\floor{n^2/4}$ of them at $\lambda^{\max} = 1$, because a route must cross the wall exactly once and nothing crosses back to offer a second. An arc count growing like $n^2$ while the connectivity stays at one is something no undirected graph can do past a handful of vertices, and it is why the initial linear conjecture for the directed case fails already at $m = 2$, where on $n = 8$ the wall holds $16$ arcs against the hub's $14$. \Cref{const:augmented-bipartite} carries the same idea to every $m$ by letting each vertex of the larger part absorb $m - 2$ extra in-arcs from inside that part, which buys $m - 2$ short detours per pair and lifts $\lambda^{\max}$ to $m - 1$ while the count climbs to $\floor{(n+m-2)^2/4}$. Its $m = 3$, $n = 10$ instance holds thirty arcs against the naive prediction of twenty-seven.
 
-The quadratic term is what makes the directed cases the deepest in the thesis. The upper bound argument must explain why no configuration beats the bipartite wall, which requires producing the partition in the first place, ruling out backward arcs, and controlling the internal structure of the large part $B$. That structural task is exactly what \Cref{open:decomposition} has not yet resolved for $m \ge 3$. What \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-error} show is that the wall is at least the right shape, and the two say it in different currencies, which is worth keeping apart. In \emph{size}, every feasible digraph is within $O_m(n)$ arcs of the wall, so the difficulty is a constant inside the second-order term rather than the phenomenon. In \emph{shape}, every feasible digraph becomes a wall after deleting $O(\sqrt{m}\,n^{3/2})$ arcs, which is a weaker error term because it comes from the cruder of the two counts, the one that does not get to induct on a low-degree vertex. The undirected problem has no analogous obstacle, because Mader's degree-counting argument closes it in a few lines. The quadratic phenomenon is therefore not just a curiosity: it is the geometric reason the directed and undirected problems live on different levels of difficulty.
+The quadratic term is what makes the directed cases the deepest in the thesis. The upper bound argument must explain why no configuration beats the bipartite wall, which requires producing the partition in the first place, ruling out backward arcs, and controlling the internal structure of the large part $B$. That structural task is exactly what \Cref{open:decomposition} has not yet resolved for $m \ge 3$. What \Cref{prop:dir-arc-stability} and \Cref{thm:dir-arc-linear-error} show is that the wall is at least the right shape, and the two say it in different currencies, which is worth keeping apart. In \emph{size}, the extremal value lies within $O_m(n)$ of the wall's count, so the difficulty is a constant inside the second-order term rather than the phenomenon. In \emph{shape}, every feasible digraph becomes a subgraph of a one-directional bipartite graph after deleting $O(\sqrt{m}\,n^{3/2})$ arcs, which is a weaker error term because it comes from the cruder of the two counts, the one that does not get to induct on a low-degree vertex. The undirected problem has no analogous obstacle, because Mader's degree-counting argument closes it in a few lines. The quadratic phenomenon is therefore not just a curiosity: it is the geometric reason the directed and undirected problems live on different levels of difficulty.
 
-\section{Summary of the twelve variants}
+\section{Summary of the sixteen variants}
 
-\Cref{tab:summary} records the status of all twelve structural variants. Each entry is marked by how it is known: proved by hand here or in \Cref{app:proofs}, cited to the literature, conjectured with a proved lower bound, or, for the two rows where only the leading term is settled, proved asymptotically. No row now rests on a machine certificate alone. That category was live in earlier drafts, when the directed multigraph value was known only for the sizes the cut-counting optimisation could close, and \Cref{thm:dir-multi-full} retired it. The distinction is the honesty contract of \Cref{ch:machine} carried through to the summary. \Cref{fig:variant-tree-status} shows the same distinction as a picture before the table spells out every case.
+\Cref{tab:summary} records the status of all sixteen structural variants. Each entry is marked by how it is known: proved by hand here or in \Cref{app:proofs}, cited to the literature, conjectured with a proved lower bound, or, for the two rows where only the leading term is settled, proved asymptotically. No row now rests on a machine certificate alone. That category was live in earlier drafts, when the directed multigraph value was known only for the sizes the cut-counting optimisation could close, and \Cref{thm:dir-multi-full} retired it. The distinction is the honesty contract of \Cref{ch:machine} carried through to the summary. \Cref{fig:variant-tree-status} shows the same distinction as a picture before the table spells out every case.
 
 \begin{figure}[t]
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}
-  \node[vtroot, fill=KULblauw3a!18]  (root) at (6.6,3.9) {Problem 915};
-  \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6) {simple};
-  \node[vtmodel, fill=KULblauw3a!12] (multi)  at (6.6,2.6) {multi};
+  \node[vtroot, fill=KULblauw3a!18]  (root) at (9.0,3.9) {Problem 915};
+  \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6)  {simple};
+  \node[vtmodel, fill=KULblauw3a!12] (multi)  at (6.6,2.6)  {multi};
   \node[vtmodel, fill=KULblauw3a!12] (hyper)  at (11.4,2.6) {hyper};
+  \node[vtmodel, fill=KULblauw3a!12] (mhyper) at (16.2,2.6) {multi-hyper};
   \draw[vtedge] (root) -- (simple);
   \draw[vtedge] (root) -- (multi);
   \draw[vtedge] (root) -- (hyper);
+  \draw[vtedge] (root) -- (mhyper);
   \node[vtdir, fill=regimeProved!22]      (d0) at (0.6,1.3)  {undirected};
   \node[vtdir, fill=regimeConjectured!22] (d1) at (3.0,1.3)  {directed};
   \node[vtdir, fill=regimeProved!22]      (d2) at (5.4,1.3)  {undirected};
   \node[vtdir, fill=regimeConjectured!22] (d3) at (7.8,1.3)  {directed};
   \node[vtdir, fill=regimeProved!22]      (d4) at (10.2,1.3) {undirected};
   \node[vtdir, fill=regimeOpen!28]        (d5) at (12.6,1.3) {directed};
+  \node[vtdir, fill=regimeProved!22]      (d6) at (15.0,1.3) {undirected};
+  \node[vtdir, fill=regimeOpen!28]        (d7) at (17.4,1.3) {directed};
   \draw[vtedge] (simple) -- (d0);
   \draw[vtedge] (simple) -- (d1);
   \draw[vtedge] (multi)  -- (d2);
   \draw[vtedge] (multi)  -- (d3);
   \draw[vtedge] (hyper)  -- (d4);
   \draw[vtedge] (hyper)  -- (d5);
+  \draw[vtedge] (mhyper) -- (d6);
+  \draw[vtedge] (mhyper) -- (d7);
   \node[vtleaf, fill=regimeProved!16]      (l0)  at (0,0)    {edge};
   \node[vtleaf, fill=regimeProved!16]      (l1)  at (1.2,0)  {vertex};
   \node[vtleaf, fill=regimeConjectured!16] (l2)  at (2.4,0)  {edge};
@@ -158,12 +164,18 @@ The quadratic term is what makes the directed cases the deepest in the thesis. T
   \node[vtleaf, fill=regimeProved!16]      (l9)  at (10.8,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l11) at (13.2,0) {vertex};
+  \node[vtleaf, fill=regimeProved!16]      (l12) at (14.4,0) {edge};
+  \node[vtleaf, fill=regimeProved!16]      (l13) at (15.6,0) {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l14) at (16.8,0) {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l15) at (18.0,0) {vertex};
   \draw[vtedge] (d0) -- (l0);  \draw[vtedge] (d0) -- (l1);
   \draw[vtedge] (d1) -- (l2);  \draw[vtedge] (d1) -- (l3);
   \draw[vtedge] (d2) -- (l4);  \draw[vtedge] (d2) -- (l5);
   \draw[vtedge] (d3) -- (l6);  \draw[vtedge] (d3) -- (l7);
   \draw[vtedge] (d4) -- (l8);  \draw[vtedge] (d4) -- (l9);
   \draw[vtedge] (d5) -- (l10); \draw[vtedge] (d5) -- (l11);
+  \draw[vtedge] (d6) -- (l12); \draw[vtedge] (d6) -- (l13);
+  \draw[vtedge] (d7) -- (l14); \draw[vtedge] (d7) -- (l15);
   \node[vtleaf, fill=regimeProved!16, minimum width=8mm]      (leg1) at (0,-1.3) {};
   \node[anchor=west, font=\scriptsize] at (0.9,-1.3) {closed form proved, with exceptions in \Cref{tab:summary}};
   \node[vtleaf, fill=regimeConjectured!16, minimum width=8mm] (leg2) at (0,-2.1) {};
@@ -172,7 +184,7 @@ The quadratic term is what makes the directed cases the deepest in the thesis. T
   \node[anchor=west, font=\scriptsize] at (0.9,-2.9) {leading constant proved, exact value open};
 \end{tikzpicture}%
 }
-\caption{Status of the twelve variants. Blue marks a proved closed form in the ranges stated in \Cref{tab:summary}, red a conjectured exact formula with proved lower bound, and amber a proved leading term with unknown exact value. The table is authoritative for exceptions and conventions.}
+\caption{Status of the sixteen variants. Blue marks a proved closed form in the ranges stated in \Cref{tab:summary}, red a conjectured exact formula with proved lower bound, and amber a proved leading term with unknown exact value. The table is authoritative for exceptions and conventions.}
 \label{fig:variant-tree-status}
 \end{figure}
 
@@ -180,31 +192,37 @@ The quadratic term is what makes the directed cases the deepest in the thesis. T
 \centering
 \renewcommand{\arraystretch}{1.06}
 \setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.16\textwidth}XX@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.155\textwidth}XX@{}}
 \toprule
 Model & Edge/arc-disjoint & Vertex-disjoint \\
 \midrule
-undirected simple
-  & $\floor{m(n-1)/2}$; exact
-  & edge value for $m\le4$; $\floor{8n/3}-4$ for $m=5$; open for $m\ge6$ \\
-undirected multi
-  & $(m-1)(n-1)$; exact
-  & simple value; adjacency-count convention \\
-undirected $r$-hyper
-  & $\le\floor{(m-1)(n-1)/(r-1)}$; equality in ranges below
-  & $\floor{(n-1)/(r-1)}$ for $m=2$; $\le\floor{2(n-1)/(r-1)}$ for $m=3$; equality ranges below \\
-directed simple
-  & $M(n)$ for $m=2$; $n^2/4+\Theta_m(n)$ for $m\ge3$; exact then conjectured
-  & $M(n)$ for $m=2$; $n^2/4+\Theta_m(n)$ for $m\ge3$; exact equality with the arc value open \\
-directed multi
-  & $(m-1)M(n)$; exact
-  & simple-digraph value; adjacency-count convention \\
-directed $r$-hyper
-  & $(1+o(1))(m-1)n^2/[4(r-1)]$; leading term exact
-  & same leading term \\
+undirected simple graph
+  & $\floor{m(n-1)/2}$, exact
+  & edge value for $m\le4$, $\floor{8n/3}-4$ for $m=5$, $n\ne7,12$, open for $m\ge6$ \\
+undirected multigraph
+  & $(m-1)(n-1)$, exact
+  & simple value, adjacency-count convention \\
+undirected $r$-hyper, simple
+  & $\le\floor{(m-1)(n-1)/(r-1)}$, equality when $r\ge3$ and $m-1\le\binom{n-2}{r-2}$
+  & $\floor{(n-1)/(r-1)}$ for $m=2$, $\le\floor{2(n-1)/(r-1)}$ for $m=3$, same equality range \\
+undirected $r$-hyper, multi
+  & the same bound, equality when $(r-1)\mid(n-1)$
+  & the same bounds, with repeats never helping at $m=2$ and closing cases the simple model misses at $m=3$ \\
+directed simple graph
+  & $M(n)$ for $m=2$, $n^2/4+\Theta_m(n)$ for $m\ge3$, exact then conjectured
+  & $M(n)$ for $m=2$, $n^2/4+\Theta_m(n)$ for $m\ge3$, exact equality with the arc value open \\
+directed multigraph
+  & $(m-1)M(n)$, exact
+  & simple-digraph value, adjacency-count convention \\
+directed $r$-hyper, simple
+  & $(1+o(1))(m-1)n^2/[4(r-1)]$ for fixed $r,m$, leading term exact
+  & same leading term for fixed $r,m$ \\
+directed $r$-hyper, multi
+  & same leading term, the bound being proved for multihypergraphs
+  & same leading term for fixed $r,m$ \\
 \bottomrule
 \end{tabularx}
-\caption{The twelve variants and the strongest result known for each.}
+\caption{The sixteen variants and the strongest result known for each.}
 \label{tab:summary}
 \end{table}
 
@@ -238,13 +256,19 @@ $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
 of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
 \end{theorem}
 
-The proof, in \Cref{app:proofs}, transports the digraph count of \Cref{thm:dir-arc-linear-error} through the incidence graph of the hypergraph, where a hyperedge becomes a node and the two-step route budget survives the translation. Since the bipartite construction already attains that leading term, it is asymptotically optimal.
+The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
+$u\to v$ records that some hyperedge has tail $u$ and head $v$.  A matching
+argument transfers the hypergraph route ceiling to the shadow's two-step route
+budget, after which \Cref{lem:two-step-budget} controls the shadow and a
+tail--head incidence count converts its arcs back to hyperedges. Since the
+bipartite construction already attains that leading term, it is asymptotically
+optimal.
 
 The table uses the \emph{forward} convention of one tail and $r-1$ heads. More generally a hyperedge may split into non-empty tail and head sets. Reversal makes the one-head \emph{backward} model exactly equivalent to forward (\Cref{lem:dir-hyper-duality}), while \Cref{thm:dir-hyper-general-constant} proves that arbitrary splits share the same leading term under both separations. Thus the orientation choice does not add another asymptotic row to \Cref{tab:summary}.
 
 Finite values may differ when vertices are scarce. Whether forward and general
 agree exactly once $n>r$ remains open, and the thesis uses the forward convention
-throughout its twelve-variant summary.
+throughout its sixteen-variant summary.
 
 \subsection{The multigraph vertex problem under the other convention}
 \label{sec:multi-vertex-summary}
@@ -264,7 +288,7 @@ with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n 
 the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
 \end{theorem}
 
-The consequence is a change in what one has to search. Instead of graphs on $n$ vertices with $n$ growing, the question is settled by knowing the best $2$-connected block of each size, and a knapsack then assembles them. That closes every value up to $n \le 8$ and $m \le 8$ by machine, and it refutes the natural guess: from $m = 5$ a single $2$-connected block beats every way of splitting the vertices, so the bouquet of cliques is not the shape of the answer. The best blocks turn out to be dense bipartite graphs rather than complete ones, giving order $\Theta(m^2 n)$ with a per-vertex constant between $3-2\sqrt2$ and $2$ (\Cref{thm:multi-vertex-bipartite,prop:multi-vertex-upper}). Closing that gap is the open problem \Cref{tab:open-problems} records.
+The consequence is a change in what one has to search. Instead of graphs on $n$ vertices with $n$ growing, the question is settled by knowing the best $2$-connected block of each size, and a knapsack then assembles them. That closes every value up to $n \le 8$ and $m \le 8$ by machine, and it refutes the natural guess: within that computed range, for $m \ge 5$ and $n\ge3$, a single $2$-connected block beats every way of splitting the vertices, so the bouquet of cliques is not the shape of the answer. The best blocks are dense and bipartite-like rather than complete, and the explicit complete-bipartite family gives order $\Theta(m^2 n)$ as $m\to\infty$ with $n/m\to\infty$, with a per-vertex constant between $3-2\sqrt2$ and $2$ (\Cref{thm:multi-vertex-bipartite,prop:multi-vertex-upper}). Closing that gap is the open problem \Cref{tab:open-problems} records.
 
 \section{Contributions and limitations of the program}
 
@@ -288,9 +312,9 @@ Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cr
 Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value, given that an arc upper bound does not transfer. \\
 Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
 Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m = \lim_n k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) & Determine $c_m$, whose likely next structure is triconnected rather than merely blockwise. \\
-Multigraph vertex, parallel copies distinct & Block-knapsack formulation and order $\Theta(m^2n)$, with the per-vertex constant between $3-2\sqrt{2}$ and $2$ (\Cref{thm:multi-vertex-blocks,prop:multi-vertex-upper,thm:multi-vertex-bipartite}) & Determine the asymptotic constant and the optimal $2$-connected blocks. \\
+Multigraph vertex, parallel copies distinct & Block-knapsack formulation and order $\Theta(m^2n)$ as $m\to\infty$ with $n/m\to\infty$, with the per-vertex constant between $3-2\sqrt{2}$ and $2$ (\Cref{thm:multi-vertex-blocks,prop:multi-vertex-upper,thm:multi-vertex-bipartite}) & Determine the asymptotic constant and the optimal $2$-connected blocks. \\
 Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Locate the first failure for $r\ge3$ and replace the rank-two decomposition used at $m=3$. \\
-Directed hypergraphs & Leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
+Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
 \bottomrule
 \end{tabularx}
 \caption{The remaining problems, separated from the results already proved in this thesis.}

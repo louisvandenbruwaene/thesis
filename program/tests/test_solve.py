@@ -1,6 +1,7 @@
 """The single solver: one solve() call handles every kind of question."""
 
 import shutil
+import time
 import unittest
 from unittest.mock import patch
 
@@ -10,15 +11,20 @@ import numpy as np
 
 from erdos915_unified import (
     solve,
+    Graph,
+    Variant,
     directed_multigraph_arc,
+    exceeds_bound,
     max_edge_connectivity,
+    _brute_force_matrix,
+    _connectivity_measure,
+    _matrix_cells,
     enumerate_extremal_directed_multigraphs as _dfs_enum,
     enumerate_extremal_directed_multigraphs_via_generation as _gen_enum,
     _decorate_support_worker,
     _canonical_form,
     _aut_count_matrix,
     _directed_witness,
-    PULP_AVAILABLE,
 )
 
 
@@ -35,19 +41,29 @@ class Solve(unittest.TestCase):
                   max_seconds=3.0, method="sa")
         self.assertEqual(r.bound, "lower")
         self.assertEqual(r.value, 6)
+        self.assertFalse(r.complete)
+
+    def test_matrix_discovery_defaults_to_tabu(self):
+        r = solve(3, 2, directed=True, simple=True, exhaustive=False,
+                  max_seconds=0.0)
+        self.assertEqual(r.method, "tabu search")
+        self.assertEqual(r.bound, "lower")
+        self.assertFalse(r.complete)
 
     def test_exhaustive_undirected_finds_the_spanning_tree(self):
         r = solve(5, 2, directed=False, simple=True, exhaustive=True, max_seconds=30.0)
         self.assertTrue(r.proven)
         self.assertEqual(r.value, 4)  # a spanning tree on 5 vertices
 
-    @unittest.skipUnless(PULP_AVAILABLE,
-                         "solve() proves this one through the MILP certifier, "
-                         "which needs the optional pulp")
     def test_directed_multigraph_is_proved(self):
+        # No pulp needed: solve() returns the closed form of thm:dir-multi-full
+        # for this variant and checks it against a named witness.  It used to
+        # route through the MILP certifier, and the skip that guarded that is
+        # gone, so this branch is now covered on a minimal numpy+scipy install.
         r = solve(4, 3, directed=True, simple=False, exhaustive=True, max_seconds=120.0)
         self.assertTrue(r.proven)
         self.assertEqual(r.value, 12)  # L_3^dir(4) = 2(n-1)(m-1) = 12
+        self.assertIn("closed form", r.method)
 
     def test_vertex_separation_undirected(self):
         # k_2(n) = n - 1: no cycle is allowed, so a spanning tree is extremal.
@@ -58,9 +74,16 @@ class Solve(unittest.TestCase):
 
     def test_hypergraph_discovery(self):
         r = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0,
-                  method="sa")
+                  method="random-greedy")
         self.assertEqual(r.bound, "lower")
         self.assertEqual(r.value, 3)
+        self.assertFalse(r.complete)
+        self.assertEqual(r.method, "randomised greedy search")
+
+    def test_hypergraph_discovery_rejects_matrix_search_methods(self):
+        with self.assertRaisesRegex(ValueError, "random-greedy"):
+            solve(7, 2, hypergraph=True, r=3, exhaustive=False,
+                  max_seconds=0.1, method="sa")
 
     def test_result_describe_is_readable(self):
         r = solve(4, 2, directed=True, simple=True, exhaustive=True, max_seconds=120.0)
@@ -165,6 +188,141 @@ class SupportWorker(unittest.TestCase):
         worker = {_canonical_form(mu) for mu in reps}
         dfs = {_canonical_form(mu) for mu in _dfs_enum(n, m, target)}
         self.assertEqual(worker, dfs)
+
+
+class MultigraphVertexObjective(unittest.TestCase):
+    """The two multigraph VERTEX variants count adjacencies, not multiplicity.
+
+    sec:parallel-convention poses them that way because a parallel copy never
+    raises kappa, so counted with multiplicity the maximum would be infinite and
+    the question empty.  solve() must therefore report the simple value on the
+    underlying graph.  It once reported Graph.edge_count() on a multigraph, which
+    is (m-1) times too large and returns a witness whose parallel copies do no
+    work; these tests pin the objective down in both modes and both directions.
+    """
+
+    def _check(self, *, directed, exhaustive, n, m, expected):
+        r = solve(n, m, directed=directed, simple=False, separation="vertex",
+                  exhaustive=exhaustive, max_seconds=30.0)
+        self.assertEqual(r.value, expected)
+        # The witness must be simple: every adjacency at multiplicity one, so
+        # the reported count really is an adjacency count.
+        mu = r.witness.mu
+        self.assertTrue(((mu == 0) | (mu == 1)).all(), f"witness not simple:\n{mu}")
+        # And the count must agree with the witness read as adjacencies.
+        adjacencies = int((mu > 0).sum())
+        if not directed:
+            adjacencies //= 2
+        self.assertEqual(r.value, adjacencies)
+        self.assertIn("adjacencies", r.note)
+
+    def test_exhaustive_undirected_counts_adjacencies(self):
+        # K_3 has kappa^max = 2 = m - 1, so all three adjacencies are feasible.
+        # Counting multiplicity instead would give 6 (every pair doubled).
+        self._check(directed=False, exhaustive=True, n=3, m=3, expected=3)
+
+    def test_exhaustive_directed_counts_adjacencies(self):
+        # The same on ordered pairs: 6 adjacencies, not 12 arcs.
+        self._check(directed=True, exhaustive=True, n=3, m=3, expected=6)
+
+    def test_discovery_undirected_counts_adjacencies(self):
+        self._check(directed=False, exhaustive=False, n=3, m=3, expected=3)
+
+    def test_discovery_directed_counts_adjacencies(self):
+        self._check(directed=True, exhaustive=False, n=3, m=3, expected=6)
+
+    def test_value_matches_the_simple_variant_it_reduces_to(self):
+        # The reduction is the whole claim of sec:parallel-convention: the
+        # multigraph vertex question IS the simple vertex question.  Check the
+        # two drivers agree rather than just checking a hardcoded number.
+        for directed in (False, True):
+            for n, m in ((4, 2), (4, 3), (5, 2)):
+                multi = solve(n, m, directed=directed, simple=False,
+                              separation="vertex", exhaustive=True, max_seconds=60.0)
+                plain = solve(n, m, directed=directed, simple=True,
+                              separation="vertex", exhaustive=True, max_seconds=60.0)
+                self.assertEqual(multi.value, plain.value,
+                                 f"directed={directed} n={n} m={m}")
+
+    def test_the_value_never_exceeds_the_adjacencies_available(self):
+        # The tell-tale of the old bug.  An adjacency count cannot exceed the
+        # number of pairs there are, but a multiplicity count can and did: at
+        # n=3, m=3 the driver reported 6 undirected "edges" on 3 vertices, which
+        # offer only 3 pairs.  The bound below is trivially true of the right
+        # objective and was violated by the wrong one at every m >= 3.
+        # Kept to n <= 4: the old objective violated this at EVERY m >= 3 and
+        # every n, so a small grid pins it, and the directed exhaustion at n = 5
+        # cost more than the rest of this file put together.
+        for directed in (False, True):
+            for n in (3, 4):
+                pairs = n * (n - 1) if directed else n * (n - 1) // 2
+                for m in (3, 4, 5):
+                    r = solve(n, m, directed=directed, simple=False,
+                              separation="vertex", exhaustive=True, max_seconds=60.0)
+                    self.assertLessEqual(
+                        r.value, pairs,
+                        f"directed={directed} n={n} m={m}: reported {r.value} "
+                        f"against only {pairs} pairs")
+
+
+class PrunedEnumerationMatchesBlind(unittest.TestCase):
+    """The pruned enumerator returns exactly what a blind sweep would.
+
+    ``_brute_force_matrix`` discards two kinds of branch: those whose partial
+    graph already breaks the connectivity ceiling (no completion of it can be
+    feasible, since adding edges never lowers a connectivity) and those whose
+    best conceivable completion cannot beat the graph already in hand.  Neither
+    can drop the true maximum.  This test is the guard on that argument: it runs
+    the pruned search against a blind product sweep written separately below, on
+    every variant and every size the blind one can still reach.
+    """
+
+    @staticmethod
+    def _blind(variant, n, m, separation):
+        """Every graph of the variant, measured, densest feasible one kept."""
+        measure = _connectivity_measure(separation)
+        cells = _matrix_cells(n, variant.directed)
+        span = 2 if variant.simple else m
+        best = 0
+        for values in itertools.product(range(span), repeat=len(cells)):
+            graph = Graph(n, variant)
+            for (u, v), value in zip(cells, values):
+                if value:
+                    graph.set_multiplicity(u, v, value)
+            if measure(graph) <= m - 1 and graph.edge_count() > best:
+                best = graph.edge_count()
+        return best
+
+    def test_pruned_equals_blind_on_every_variant(self):
+        variants = [Variant(directed=False, simple=True),
+                    Variant(directed=False, simple=False),
+                    Variant(directed=True, simple=True)]
+        checked = 0
+        for variant in variants:
+            for separation in ("edge", "vertex"):
+                if not variant.simple and separation == "vertex":
+                    continue        # solve() reduces this to the simple problem
+                for n in range(2, 6):
+                    for m in (2, 3, 4):
+                        span = 2 if variant.simple else m
+                        if span ** len(_matrix_cells(n, variant.directed)) > 200000:
+                            continue        # keep the blind sweep tractable
+                        blind = self._blind(variant, n, m, separation)
+                        value, witness, done = _brute_force_matrix(
+                            variant, n, m, separation, time.time() + 120.0)
+                        self.assertTrue(done)
+                        self.assertEqual(
+                            value, blind,
+                            f"{variant} sep={separation} n={n} m={m}: "
+                            f"pruned {value} against blind {blind}")
+                        if witness is not None:
+                            # the witness must really be feasible and really
+                            # carry the reported count, not merely tie the number
+                            self.assertEqual(witness.edge_count(), value)
+                            self.assertFalse(exceeds_bound(
+                                witness, m - 1, separation=separation))
+                        checked += 1
+        self.assertGreater(checked, 20)
 
 
 if __name__ == "__main__":

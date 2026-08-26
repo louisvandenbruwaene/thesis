@@ -1,12 +1,12 @@
-# Erdős Problem 915 across twelve variants
+# Erdős Problem 915 across sixteen variants
 
 Master's thesis of **Louis Vandenbruwaene** (KU Leuven), supervised by **Stijn Cambie**.
 
 The thesis studies an extremal question of Erdős: *how many edges (or arcs) can a
 graph on `n` vertices hold if no pair of vertices is joined by `m` independent
-routes?* It follows the question across **twelve variants**: three models (simple graphs,
-multigraphs, `r`-uniform hypergraphs) × two directions (undirected / directed) × two
-separations (edge-disjoint / internally vertex-disjoint). It pairs hand proofs with a
+routes?* It follows the question across **sixteen variants**: four models (simple graphs,
+multigraphs, `r`-uniform hypergraphs, `r`-uniform multihypergraphs) × two directions
+(undirected / directed) × two separations (edge-disjoint / internally vertex-disjoint). It pairs hand proofs with a
 single unified program that measures connectivity exactly, certifies small-case upper
 bounds, and discovers dense constructions.
 
@@ -34,9 +34,14 @@ program/
   make_figures.py     regenerates every figure from the program (fixed seeds)
   tests/              unit tests
 popularising_summary/ lay summary
-research_notes/       conjectures and supposed proofs NOT in the thesis: too
-                      specific or unfinished for the text, kept for future work
-                      (AI or human). Self-contained, with reproducible scripts.
+research_notes/       conjectures and supposed proofs mostly NOT in the thesis:
+                      too specific or unfinished for the text, kept for future
+                      work (AI or human). Self-contained, with reproducible
+                      scripts. Two exceptions the thesis does cite, both
+                      deliberately written apart from the main program so they
+                      corroborate it rather than share its code:
+                      scripts/simple_vertex_blocks.py (the 2-connected block
+                      sweep behind c_m) and scripts/multi_vertex_blocks.py.
 claude.md, TASKS.md   operating notes and the prioritized open-problem queue
 main.pdf              the compiled thesis
 ```
@@ -53,6 +58,15 @@ Figures (needs Python 3 with numpy, scipy, networkx, matplotlib):
 
 ```bash
 cd program && ../.venv/bin/python3 make_figures.py   # writes into ../figures/
+```
+
+The two independent block sweeps additionally need nauty's `geng` on `PATH`
+(the recorded environment used nauty 2.9.3). From the repository root, the
+commands matching the ranges quoted in the thesis are:
+
+```bash
+BMAX=9 .venv/bin/python3 research_notes/scripts/simple_vertex_blocks.py
+BMAX=8 .venv/bin/python3 research_notes/scripts/multi_vertex_blocks.py
 ```
 
 The bundled `.venv` was created before the repo moved, so its `activate` script and
@@ -97,7 +111,7 @@ The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
   theorem on both sides, and the value is exactly a block problem: a knapsack over the
   best 2-connected block of each size, which settles it outright for every `n ≤ 8`,
   `m ≤ 8` (at `m = 5`, `n = 7` the value is 29, not the bouquet's 27). The winning
-  blocks are dense bipartite graphs rather than cliques, thickening `K_{s,t}` reaches
+  blocks are dense and bipartite-like rather than cliques; thickening `K_{s,t}` reaches
   a rate of `(3 - 2√2 + o(1))m²`, and what is open is the remaining gap to the upper
   bound, currently a factor of about `6 + 4√2`.
 - The *general* orientation model of the directed hypergraph is now proved to share

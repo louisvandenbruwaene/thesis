@@ -177,6 +177,7 @@ try:
     from matplotlib.colors import PowerNorm  # noqa: E402
     from matplotlib.gridspec import GridSpec  # noqa: E402
     from matplotlib.patches import FancyArrowPatch, Patch  # noqa: E402
+    import matplotlib.lines as mlines  # noqa: E402  (proxy artists for shared legends)
     from matplotlib.transforms import blended_transform_factory  # noqa: E402
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the '3d' projection)
     MATPLOTLIB_AVAILABLE = True
@@ -526,9 +527,20 @@ class Hypergraph:
     """
 
     def __init__(self, num_vertices: int, hyperedges: Iterable = (),
-                 *, directed: bool = False):
+                 *, directed: bool = False, r: int | None = None):
+        """``r`` states the uniformity and is ENFORCED when given.
+
+        It defaults to None, meaning unenforced, because the container itself is
+        general: it only requires each hyperedge to span at least two vertices,
+        and it will hold edges of mixed sizes without complaint.  Every generator
+        in this program emits uniform hyperedges, so the searches and enumerations
+        are uniform as a matter of how they are built rather than of what the
+        container permits.  Pass ``r`` wherever a caller depends on that and wants
+        it checked rather than assumed.
+        """
         self.num_vertices = num_vertices
         self.directed = directed
+        self.r = r
         # Each entry is a frozenset, or a ``(tail, frozenset(heads))`` pair.
         self.hyperedges: list = []
         for edge in hyperedges:
@@ -551,6 +563,7 @@ class Hypergraph:
                     raise ValueError("a directed hyperedge needs disjoint, non-empty tail and head sets")
                 if any(v < 0 or v >= self.num_vertices for v in members):
                     raise ValueError("hyperedge refers to a vertex outside the graph")
+                self._check_uniform(members)
                 self.hyperedges.append((tails, heads))
                 return
             tail, heads = first, frozenset(raw_heads)    # legacy forward (tail, heads)
@@ -559,6 +572,7 @@ class Hypergraph:
                 raise ValueError("a directed hyperedge needs a tail and a distinct head")
             if any(v < 0 or v >= self.num_vertices for v in members):
                 raise ValueError("hyperedge refers to a vertex outside the graph")
+            self._check_uniform(members)
             self.hyperedges.append((tail, heads))
         else:
             vertices = frozenset(edge)  # a hyperedge is a set of distinct vertices
@@ -566,7 +580,15 @@ class Hypergraph:
                 raise ValueError("a hyperedge must contain at least two vertices")
             if any(v < 0 or v >= self.num_vertices for v in vertices):
                 raise ValueError("hyperedge refers to a vertex outside the graph")
+            self._check_uniform(vertices)
             self.hyperedges.append(vertices)
+
+    def _check_uniform(self, members) -> None:
+        """Reject a hyperedge of the wrong size, when a uniformity was declared."""
+        if self.r is not None and len(members) != self.r:
+            raise ValueError(
+                f"this hypergraph was declared {self.r}-uniform, but the "
+                f"hyperedge spans {len(members)} vertices")
 
     def members(self, edge) -> frozenset:
         """The vertex set of a stored hyperedge, directed or not."""
@@ -754,10 +776,11 @@ def augmented_bipartite(n: int, m: int) -> Graph:
     ``floor((n+m-2)^2/4)`` (``const:augmented-bipartite`` in the thesis).
 
     Requires ``n >= m`` so that ``|A| >= 1`` and the circulant offsets stay
-    distinct.  At ``m = 2`` or ``m = 3`` the partition equals the balanced
-    ``(floor(n/2), ceil(n/2))`` split and the formula reduces to
-    ``floor(n^2/4) + (m-2)ceil(n/2)``.  At ``m >= 4`` the shifted partition
-    gives strictly more arcs.  For ``m = 3, n = 10`` this is the 30-arc
+    distinct.  At ``m = 2`` the partition is balanced.  At ``m = 3`` the
+    selected split is balanced for odd ``n`` and shifted by one vertex for even
+    ``n``; the balanced and shifted choices have the same count
+    ``floor(n^2/4) + ceil(n/2)``.  From ``m = 4`` the shifted partition can
+    improve the count.  For ``m = 3, n = 10`` either split gives the 30-arc
     counterexample.
     """
     size_b = (n + m - 2 + 1) // 2   # ceil((n+m-2)/2)
@@ -1615,8 +1638,11 @@ def search_for_dense_graph(
     """
     rng = random.Random(seed)
     measure = _connectivity_measure(separation)
+    if max_multiplicity is not None and max_multiplicity < 0:
+        raise ValueError("max_multiplicity must be non-negative")
     # Multiplicity cap: simple graphs are always 0/1; multigraphs default to m-1.
-    cap = 1 if variant.simple else (max_multiplicity if max_multiplicity else m - 1)
+    cap = 1 if variant.simple else (
+        max_multiplicity if max_multiplicity is not None else m - 1)
     pairs = None  # built lazily once we know we need it
 
     current = Graph(n, variant)  # start from the empty graph: feasible, energy 0
@@ -1785,7 +1811,10 @@ def tabu_search_for_dense_graph(
     """
     rng = random.Random(seed)
     measure = _connectivity_measure(separation)
-    cap = 1 if variant.simple else (max_multiplicity if max_multiplicity else m - 1)
+    if max_multiplicity is not None and max_multiplicity < 0:
+        raise ValueError("max_multiplicity must be non-negative")
+    cap = 1 if variant.simple else (
+        max_multiplicity if max_multiplicity is not None else m - 1)
 
     current = Graph(n, variant)            # start empty: feasible, energy 0
     best_graph, best_edges = current.copy(), 0
@@ -1935,7 +1964,7 @@ class SolveResult:
     bound: str              # "exact" | "lower" | "upper"
     method: str             # how the value was obtained
     seconds: float
-    complete: bool          # an exhaustive run that actually finished
+    complete: bool          # True only when a proving route completed; never discovery
     witness: object | None  # a Graph/Hypergraph attaining ``value``, if any
     note: str = ""
 
@@ -1951,6 +1980,11 @@ class SolveResult:
                 f"value {relation}{self.value}  "
                 f"[{self.bound}, {self.method}, {self.seconds:.1f}s]")
         return line if not self.note else f"{line}\n    note: {self.note}"
+
+
+def _joined_note(*parts: str) -> str:
+    """Join the non-empty note fragments a SolveResult may carry."""
+    return "; ".join(part for part in parts if part)
 
 
 def _variant_for(directed: bool, simple: bool) -> Variant:
@@ -2002,23 +2036,64 @@ def _brute_force_matrix(
     the budget ran out first, in which case the value is only a lower bound.
     A simple cell ranges over ``{0, 1}``; a multigraph cell over ``{0, ..., m-1}``
     because multiplicity ``m`` already gives ``m`` parallel disjoint routes.
+
+    The walk is a depth-first assignment of the cells in a fixed order, with the
+    same two prunings the digraph prover uses (:func:`_exhaustive_directed`), so
+    that every model is enumerated the same way rather than only the directed one:
+
+    * **Feasibility is monotone.**  Undecided cells sit at zero, so any completion
+      of the current partial graph only ever RAISES multiplicities, and raising a
+      multiplicity can never lower a connectivity (:func:`exceeds_bound` measures
+      what is already placed).  Once the partial graph breaks the ceiling, every
+      completion of it breaks the ceiling too, and the whole subtree is dropped.
+    * **A counting ceiling.**  At depth ``pos`` the cells ``pos .. total-1`` are
+      still undecided, which is ``total - pos`` of them, and each can add at most
+      ``span - 1``.  So ``count + (total - pos) * (span - 1)`` is an upper bound
+      on every completion below this node.  If even that ceiling cannot beat the
+      best feasible graph already in hand, the subtree is dropped unexplored.
+      The test is ``<=`` rather than ``<`` because only a strict improvement ever
+      replaces the incumbent.
+
+    Both prunings only ever discard graphs that are infeasible or that cannot beat
+    the incumbent, so a run that finishes returns exactly the maximum the blind
+    sweep would have returned.  That equivalence is not left to the argument
+    above: ``tests/test_solve.py`` differential-tests this routine against a blind
+    product sweep over every variant and every size the blind one can reach.
     """
-    measure = _connectivity_measure(separation)
     cells = _matrix_cells(n, variant.directed)
     span = 2 if variant.simple else m       # cell value lives in range(span)
-    best_count, best_graph, completed = 0, None, True
-    base = Graph(n, variant)
-    for tick, values in enumerate(product(range(span), repeat=len(cells))):
-        if tick % 256 == 0 and time.time() > deadline:
-            completed = False               # ran out before exhausting the space
-            break
-        candidate = base.copy()
-        for (u, v), value in zip(cells, values):
-            if value:
-                candidate.set_multiplicity(u, v, value)
-        if measure(candidate) <= m - 1 and candidate.edge_count() > best_count:
-            best_count, best_graph = candidate.edge_count(), candidate.copy()
-    return best_count, best_graph, completed
+    total = len(cells)
+    # headroom[pos] = the most the still-undecided cells pos .. total-1 can add.
+    headroom = [(total - i) * (span - 1) for i in range(total + 1)]
+    best_count, best_graph = 0, None
+    completed = [True]
+    graph = Graph(n, variant)
+
+    def descend(pos: int, count: int) -> None:
+        nonlocal best_count, best_graph
+        if not completed[0]:
+            return
+        if count + headroom[pos] <= best_count:
+            return                          # even the ceiling cannot beat the best
+        if time.time() > deadline:
+            completed[0] = False            # ran out before exhausting the space
+            return
+        if pos == total:
+            if count > best_count:
+                best_count, best_graph = count, graph.copy()
+            return
+        u, v = cells[pos]
+        # Descending values first, so a dense feasible graph is found early and
+        # the counting prune bites on the sparser siblings.
+        for value in range(span - 1, 0, -1):
+            graph.set_multiplicity(u, v, value)
+            if not exceeds_bound(graph, m - 1, separation=separation):
+                descend(pos + 1, count + value)
+        graph.set_multiplicity(u, v, 0)
+        descend(pos + 1, count)
+
+    descend(0, 0)
+    return best_count, best_graph, completed[0]
 
 
 def _search_within_budget(
@@ -2079,25 +2154,46 @@ def _hyperedge_candidates(n: int, r: int, directed: bool, *, kind: str = "forwar
     raise ValueError(f"unknown directed hyperedge kind {kind!r}")
 
 
+def _hyper_multiplicity_cap(m: int, simple: bool) -> int:
+    """How many copies of one hyperedge a feasible hypergraph may carry.
+
+    A simple hypergraph allows at most one.  In a multihypergraph, ``q`` parallel
+    copies of a hyperedge already give ``q`` Berge routes between any two of its
+    members, one per copy, and those routes have empty interiors, so they are
+    pairwise hyperedge-disjoint AND internally vertex-disjoint.  Feasibility
+    therefore caps every multiplicity at ``m - 1`` by itself, under BOTH
+    separations.  This is what keeps the multihypergraph question finite, and it
+    is why the multi rows do not collapse onto the simple ones the way the
+    multigraph VERTEX rows do (``sec:parallel-convention``): there a parallel copy
+    is a route with an empty interior between ADJACENT vertices only, and the
+    objective was redefined to count adjacencies.
+    """
+    return 1 if simple else m - 1
+
+
 def _brute_force_hypergraph(
     n: int, r: int, m: int, deadline: float,
     *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
+    simple: bool = True,
 ) -> tuple[int, Hypergraph | None, bool]:
     """Exhaustively maximise hyperedges over all ``r``-uniform hypergraphs.
 
-    Each possible hyperedge is present or absent, so the search visits
-    ``2 ** (#candidates)`` hypergraphs; only tiny ``(n, r)`` finish.  The
+    Each possible hyperedge is given a multiplicity from ``0`` to
+    :func:`_hyper_multiplicity_cap`, so the search visits ``(cap + 1) ** (#candidates)``
+    hypergraphs; only tiny ``(n, r)`` finish, and the multihypergraph sweep
+    (``simple=False``) reaches roughly one vertex fewer than the simple one.  The
     ``directed`` and ``vertex_split`` flags select which of the four hypergraph
     measures decides feasibility, exactly as ``solve`` passes them through, and
     ``kind`` selects the directed orientation model (forward/backward/general).
     """
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
+    cap = _hyper_multiplicity_cap(m, simple)
     best_count, best_h, completed = 0, None, True
-    for tick, mask in enumerate(product((0, 1), repeat=len(candidates))):
+    for tick, mult in enumerate(product(range(cap + 1), repeat=len(candidates))):
         if tick % 256 == 0 and time.time() > deadline:
             completed = False
             break
-        chosen = [candidates[i] for i, on in enumerate(mask) if on]
+        chosen = [candidates[i] for i, q in enumerate(mult) for _ in range(q)]
         hypergraph = Hypergraph(n, chosen, directed=directed)
         if (max_hyper_connectivity(hypergraph, vertex_split=vertex_split) <= m - 1
                 and hypergraph.edge_count() > best_count):
@@ -2108,20 +2204,24 @@ def _brute_force_hypergraph(
 def _random_hypergraph_search(
     n: int, r: int, m: int, deadline: float, seed: int,
     *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
+    simple: bool = True,
 ) -> tuple[int, Hypergraph | None]:
     """Greedy randomised growth: add random hyperedges while feasible, restart.
 
     A discovery heuristic for the hypergraph model (search is matrix-only):
     each pass shuffles the candidate hyperedges and adds each one that keeps the
-    Berge connectivity within ``m - 1``; the densest pass within budget wins.  The
-    feasible hypergraph it returns is the easy construction behind a lower bound.
-    ``kind`` selects the directed orientation model.
+    Berge connectivity within ``m - 1``; the densest pass within budget wins.  In
+    the multihypergraph model each candidate is offered up to
+    :func:`_hyper_multiplicity_cap` times rather than once, so parallel copies can
+    be discovered.  The feasible hypergraph it returns is the easy construction
+    behind a lower bound.  ``kind`` selects the directed orientation model.
     """
     rng = random.Random(seed)
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
+    cap = _hyper_multiplicity_cap(m, simple)
     best_count, best_h = 0, None
     while time.time() < deadline:
-        order = candidates[:]
+        order = [e for e in candidates for _ in range(cap)]
         rng.shuffle(order)
         hypergraph = Hypergraph(n, directed=directed)
         for edge in order:
@@ -2313,24 +2413,41 @@ def solve(
     directed: bool = False, simple: bool = True,
     hypergraph: bool = False, r: int = 3,
     exhaustive: bool = False, separation: str = "edge",
-    max_seconds: float = 60.0, seed: int = 0, method: str = "tabu",
+    max_seconds: float = 60.0, seed: int = 0, method: str | None = None,
 ) -> SolveResult:
     """The single driver: prove the exact value, or discover a dense example.
 
-    Discovery defaults to ``method="tabu"``: tabu search is the stronger engine on
+    Matrix-model discovery defaults to tabu search: it is the stronger engine on
     the harder directed problems and the one used to solve the problems in this
-    work.  Simulated annealing (``method="sa"``) is kept for the self-check and
-    verification, where the lighter engine is enough.
+    work.  Simulated annealing (``method="sa"``) is kept as an independent
+    cross-check.  Hypergraph discovery uses its separate randomised greedy engine;
+    select it explicitly with ``method="random-greedy"`` or leave ``method=None``.
 
     Args:
         n, m: the vertices and the forbidden number of independent routes.
-        directed, simple: the two matrix axes (ignored when ``hypergraph``).
+        directed, simple: the direction and multiplicity axes.  Both apply to
+            the hypergraph model too: ``simple=False`` there means a
+            multihypergraph, where a hyperedge may be repeated up to ``m - 1``
+            times.  That is a genuinely different problem from the simple one,
+            not a relabelling, since repeated hyperedges change which values are
+            attainable (``prop:hyper-edge``).
         hypergraph, r: switch to the ``r``-uniform hypergraph model instead.
         exhaustive: ``True`` to PROVE the optimum, ``False`` to DISCOVER one.
         separation: ``"edge"`` or ``"vertex"`` disjointness (matrix models).
-        max_seconds: wall-clock budget, checked between iterations. One
-            iteration may overrun it.
+            ``simple=False`` with ``separation="vertex"`` is REDUCED to the
+            simple problem on the underlying graph, because those two variants
+            are posed with the objective counting adjacencies rather than edges
+            with multiplicity (``sec:parallel-convention``).  The returned value
+            is therefore an adjacency count and the witness is a simple graph;
+            ``SolveResult.note`` and ``.variant`` both say so.
+        max_seconds: wall-clock budget.  The engines poll it at their natural
+            loop boundaries (the annealer and blind enumerators do so in small
+            batches), so the final batch may overrun it.
         seed: random seed for the discovery searches.
+        method: discovery engine.  ``None`` selects tabu search for matrix models
+            and randomised greedy search for hypergraphs; the explicit alternatives
+            are ``"sa"``, ``"tabu"``, and ``"random-greedy"`` in their respective
+            models.  It is ignored in exhaustive mode.
 
     Returns:
         A :class:`SolveResult` whose ``bound`` is ``"exact"`` (proved),
@@ -2347,35 +2464,64 @@ def solve(
     # the direction pick which of the four Berge measures decides feasibility.
     if hypergraph:
         vertex_split = (separation == "vertex")
-        label = f"{r}-uniform {'directed ' if directed else ''}hypergraph"
+        label = (f"{r}-uniform {'directed ' if directed else ''}"
+                 f"{'' if simple else 'multi'}hypergraph")
         if exhaustive:
             value, witness, done = _brute_force_hypergraph(
-                n, r, m, deadline, directed=directed, vertex_split=vertex_split)
+                n, r, m, deadline, directed=directed, vertex_split=vertex_split,
+                simple=simple)
             bound = "exact" if done else "lower"
             method = "brute-force enumeration"
             note = "" if done else "budget ran out; value is only a lower bound"
         else:
+            if method not in (None, "random-greedy"):
+                raise ValueError(
+                    "hypergraph discovery uses method='random-greedy'; "
+                    "'sa' and 'tabu' are matrix-model methods")
             value, witness = _random_hypergraph_search(
-                n, r, m, deadline, seed, directed=directed, vertex_split=vertex_split)
-            bound, done, method = "lower", True, "randomised greedy search"
+                n, r, m, deadline, seed, directed=directed,
+                vertex_split=vertex_split, simple=simple)
+            bound, done, method = "lower", False, "randomised greedy search"
             note = "discovery only ever yields a lower bound"
         return SolveResult(n, m, label, separation, value, bound, method,
                            time.time() - start, done, witness, note)
 
     # ----- the matrix models -----------------------------------------------
+    # The two MULTIGRAPH VERTEX variants are posed with the objective counting
+    # ADJACENCIES, not edges with multiplicity (sec:parallel-convention).  The
+    # reason is that a parallel copy never raises kappa, so it never breaks
+    # feasibility either: counted with multiplicity the maximum would simply be
+    # infinite and the question empty.  Under the adjacency reading the problem
+    # IS the simple problem on the underlying graph, so we solve that instead.
+    # Without this reduction the driver would optimise Graph.edge_count(), which
+    # counts multiplicity, and report (m-1) times the real answer with a witness
+    # whose parallel copies contribute nothing.
+    reduced_to_simple = (not simple) and separation == "vertex"
+    if reduced_to_simple:
+        simple = True
     variant = _variant_for(directed, simple)
     label = variant.describe()
+    reduction_note = (
+        "multigraph vertex variant: the objective counts adjacencies "
+        "(sec:parallel-convention), so this is the simple problem on the "
+        "underlying graph" if reduced_to_simple else "")
+    if reduced_to_simple:
+        label = f"{label} (multigraph vertex, reduced)"
 
     # DISCOVER: search within the budget; the witness found is a lower bound.
     if not exhaustive:
-        if method not in ("sa", "tabu"):
+        selected_method = "tabu" if method is None else method
+        if selected_method not in ("sa", "tabu"):
             raise ValueError("method must be 'sa' or 'tabu'")
-        result = _search_within_budget(variant, n, m, separation, deadline, seed, method)
-        method_label = "tabu search" if method == "tabu" else "simulated annealing"
+        result = _search_within_budget(
+            variant, n, m, separation, deadline, seed, selected_method)
+        method_label = ("tabu search" if selected_method == "tabu"
+                        else "simulated annealing")
         return SolveResult(
             n, m, label, separation, result.best_edge_count, "lower",
-            method_label, time.time() - start, True,
-            result.best_graph, "discovery only ever yields a lower bound")
+            method_label, time.time() - start, False,
+            result.best_graph, _joined_note(
+                "discovery only ever yields a lower bound", reduction_note))
 
     # EXHAUSTIVE, simple directed: a pruned exhaustive digraph search is exact.
     # This is the prover for the m=2 base cases of the directed theorem, and it
@@ -2384,7 +2530,9 @@ def solve(
         value, witness, done = _exhaustive_directed(n, m, separation, deadline)
         bound = "exact" if done else "lower"
         method = "exhaustive digraph search (branch and bound)"
-        note = "" if done else "budget ran out; value is only a lower bound"
+        note = _joined_note(
+            "" if done else "budget ran out; value is only a lower bound",
+            reduction_note)
         return SolveResult(n, m, label, separation, value, bound, method,
                            time.time() - start, done, witness, note)
 
@@ -2413,8 +2561,10 @@ def solve(
         variant, n, m, separation, deadline)
     bound = "exact" if done else "lower"
     method = "brute-force enumeration"
-    note = ("" if done else "budget ran out; value is only a lower bound "
-            "(no cut-counting exists for this case)")
+    note = _joined_note(
+        "" if done else "budget ran out; value is only a lower bound "
+                        "(no cut-counting exists for this case)",
+        reduction_note)
     return SolveResult(n, m, label, separation, value, bound, method,
                        time.time() - start, done, witness, note)
 
@@ -2682,7 +2832,8 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
     """Plot the two competing directed branches and their maximum versus ``n``.
 
     Shows how the linear hub branch ``m(n-1)`` is overtaken by the quadratic
-    augmented-bipartite branch near ``n ~ 2m``: the heart of the directed story.
+    augmented-bipartite branch.  Before floors, the upper crossover is
+    ``n = m + 2 + 2*sqrt(m)``, hence ``n ~ m`` for growing ``m``.
     """
     ns = list(range(2, max_n + 1))
     hub = [m * (n - 1) for n in ns]                         # linear hub branch
@@ -2755,7 +2906,8 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
     plt.plot(ns5, edge5, "--", color=_KUL_BLUE, linewidth=2.4,
              label=r"$m=5$: edge $\ell_5(n)=\lfloor 5(n-1)/2\rfloor$")
     plt.plot(ns5, vert5, "-",  color=_WARM,     linewidth=2.4,
-             label=r"$m=5$: vertex $k_5(n)=\lfloor 8n/3\rfloor-4$")
+             label=r"$m=5$: vertex $k_5(n)=\lfloor 8n/3\rfloor-4$ "
+                   r"($n\neq7,12$)")
     # shade only where the gap is positive
     plt.fill_between(ns5, edge5, vert5, where=[v > e for v, e in zip(vert5, edge5)],
                      alpha=0.15, color=_WARM)
@@ -3517,53 +3669,76 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
             ax.plot(xs, lo, "-", color=_WARM, linewidth=0.8, alpha=0.6)
             ax.plot(xs, hi, "-", color=_WARM, linewidth=0.8, alpha=0.6)
         for branch in panel.get("branches", []):
-            bxs, bys, blabel = branch
-            ax.plot(bxs, bys, ":", color=_KUL_LIGHT, linewidth=1.3, label=blabel)
+            bxs, bys, _ = branch
+            ax.plot(bxs, bys, ":", color=_KUL_LIGHT, linewidth=1.3)
         if panel.get("proved") is not None:
             xs, ys = panel["proved"]
-            ax.plot(xs, ys, "-", color=_KUL_BLUE, linewidth=2.3, label="proved")
+            ax.plot(xs, ys, "-", color=_KUL_BLUE, linewidth=2.3)
         if panel.get("conj") is not None:
             xs, ys = panel["conj"]
-            ax.plot(xs, ys, "-", color=_RED, linewidth=2.0, label="conjectured")
+            ax.plot(xs, ys, "-", color=_RED, linewidth=2.0)
         if panel.get("guess") is not None:
             xs, ys = panel["guess"]
-            ax.plot(xs, ys, "-", color=_GUESS, linewidth=2.0,
-                    label="guess (interpolated)")
+            ax.plot(xs, ys, "-", color=_GUESS, linewidth=2.0)
         if panel.get("exact") is not None:
             xs, ys = panel["exact"]
             if len(xs):
-                ax.plot(xs, ys, "s", color=_GREEN, markersize=7,
-                        label="machine-checked (exact)")
+                ax.plot(xs, ys, "s", color=_GREEN, markersize=7)
         if panel.get("search") is not None:
             xs, ys = panel["search"]
             if len(xs):
                 ax.plot(xs, ys, "o", mfc="none", mec=_VIOLET, mew=1.8,
-                        markersize=8, label="search (lower bound)")
-        ax.set_title(panel["title"], fontsize=8)
-        ax.set_xlabel("vertices $n$", fontsize=8)
-        ax.set_ylabel(panel.get("ylabel", "edges"), fontsize=8)
-        ax.tick_params(labelsize=7.5)
+                        markersize=8)
+        ax.set_title(panel["title"], fontsize=9)
+        ax.set_xlabel("vertices $n$", fontsize=8.5)
+        ax.set_ylabel(panel.get("ylabel", "edges"), fontsize=8.5)
+        ax.tick_params(labelsize=8)
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=6.2, loc="upper left", framealpha=0.85)
+        # NO per-panel legend.  Every panel draws from the same six-item
+        # vocabulary, so sixteen copies of that key would occupy more of the
+        # figure than the curves themselves, which is exactly the complaint this
+        # layout answers.  One shared key sits under the whole grid instead,
+        # built below; the dotted named branches are named in the caption.
 
-    # The line styles (solid / dashed / dotted) are named in the per-panel
-    # legends and spelled out in the caption, so the suptitle stays short and
-    # just records the variant family and the threshold m.
-    suptitle = "Erdős 915 across the twelve variants"
+    # One figure-level key, in the order a reader meets the marks: the three
+    # curve kinds (what is claimed), then the two point kinds (what was computed).
+    legend_handles = [
+        mlines.Line2D([], [], color=_KUL_BLUE, lw=2.3, label="proved"),
+        mlines.Line2D([], [], color=_RED, lw=2.0, label="conjectured"),
+        mlines.Line2D([], [], color=_GUESS, lw=2.0, label="guess (interpolated)"),
+        mlines.Line2D([], [], color=_KUL_LIGHT, lw=1.3, ls=":",
+                      label="named construction"),
+        mlines.Line2D([], [], color=_GREEN, marker="s", ls="none", markersize=7,
+                      label="machine-checked (exact)"),
+        mlines.Line2D([], [], color=_VIOLET, marker="o", ls="none", markersize=8,
+                      mfc="none", mew=1.8, label="search (lower bound)"),
+    ]
+
+    # The line styles are named in the shared legend and spelled out in the
+    # caption, so the suptitle stays short and just records the threshold m.
+    suptitle = "Erdős 915 across the sixteen variants"
     if m is not None:
         suptitle += fr",  $m = {m}$"
     # Printed-size note: the thesis gives this grid a full sideways page, so its
     # usable width is the text HEIGHT (about 9.2in) and not the text width. The
     # canvas is drawn at that size, which keeps the panel fonts at their stated
-    # point sizes on paper instead of shrinking them to near-invisibility.
+    # point sizes on paper instead of shrinking them to near-invisibility.  The
+    # fourth model row makes it taller than it was at twelve panels.
     _variant_panel_grid(draw_panel, configs=panels, suptitle=suptitle, path=path,
-                        suptitle_fontsize=13, figsize=(9.2, 6.3),
-                        row_label_fontsize=9.5)
+                        suptitle_fontsize=13, figsize=(9.2, 8.4),
+                        row_label_fontsize=9.5,
+                        legend_handles=legend_handles, legend_ncol=6)
 
 
 # --- ENUMERATION LANDSCAPES: visit every labeled graph, collect (edges, lambda^max) ---
 
-# Row-major table of all twelve variants, matching gather_variant_grid.
+# The four models, in the row order every variant grid uses.  Two axes generate
+# them, multiplicity (simple / multi) and arity (graph / hypergraph); the columns
+# then split by direction and separation, giving the sixteen variants.
+_VARIANT_ROW_LABELS = ("simple graph", "multigraph",
+                       "hypergraph $r=3$", "multihypergraph $r=3$")
+
+# Row-major table of all sixteen variants, matching gather_variant_grid.
 # ``enum_n`` is the vertex count used for full enumeration.
 # ``max_mult`` caps per-cell multiplicity for multigraph variants.
 _VARIANT_ENUM_CONFIGS: list[dict] = [
@@ -3593,12 +3768,10 @@ _VARIANT_ENUM_CONFIGS: list[dict] = [
     dict(key="multi_directed_vertex",    title="multigraph directed vertex",
          directed=True,  simple=False, hypergraph=False, r=3, separation="vertex",
          enum_n=3, max_mult=5),
-    # row 3 — hypergraph r=3.  simple=True here means SIMPLE r-uniform
-    # hypergraphs (no repeated hyperedges), matching the "three models"
-    # taxonomy of the Contribution Statement. prop:hyper-edge and
-    # thm:hyper-vertex-m3 are proved more generally, for MULTIhypergraphs,
-    # and coincide with this simple enumeration only under the conditions
-    # gated by _hyper_edge_simple_proved / _hyper_vertex_simple_proved
+    # row 3 — SIMPLE r=3 hypergraph (no repeated hyperedge).  prop:hyper-edge and
+    # thm:hyper-vertex-m3 are proved for MULTIhypergraphs and coincide with this
+    # simple enumeration only under the conditions gated by
+    # _hyper_edge_simple_proved / _hyper_vertex_simple_proved
     # (thm:simple-hyper-edge, rem:hyper-vertex-m3-scope). Outside those
     # conditions this enumeration's exact answer can be strictly smaller
     # than the closed form, e.g. (n,m,r)=(3,3,3): formula 2, enumeration 1.
@@ -3614,6 +3787,25 @@ _VARIANT_ENUM_CONFIGS: list[dict] = [
     dict(key="hyper_directed_vertex",    title="hypergraph directed vertex",
          directed=True,  simple=True,  hypergraph=True,  r=3, separation="vertex",
          enum_n=4, max_mult=1),
+    # row 4 — MULTIhypergraph r=3: a hyperedge may repeat, up to m-1 copies
+    # (_hyper_multiplicity_cap).  Unlike the multigraph VERTEX rows this does NOT
+    # collapse onto the simple rows: parallel copies of a hyperedge are routes
+    # with empty interiors, so they raise kappa as well as lambda, and the
+    # question stays a genuine one in both separations.  It is exactly the model
+    # prop:hyper-edge / thm:hyper-vertex-m2 / thm:hyper-vertex-m3 are stated for.
+    # One vertex smaller than the simple rows, since the sweep is (m)^C not 2^C.
+    dict(key="multihyper_undirected_edge",   title="multihypergraph undirected edge",
+         directed=False, simple=False, hypergraph=True,  r=3, separation="edge",
+         enum_n=4, max_mult=2),
+    dict(key="multihyper_undirected_vertex", title="multihypergraph undirected vertex",
+         directed=False, simple=False, hypergraph=True,  r=3, separation="vertex",
+         enum_n=4, max_mult=2),
+    dict(key="multihyper_directed_edge",     title="multihypergraph directed arc",
+         directed=True,  simple=False, hypergraph=True,  r=3, separation="edge",
+         enum_n=3, max_mult=2),
+    dict(key="multihyper_directed_vertex",   title="multihypergraph directed vertex",
+         directed=True,  simple=False, hypergraph=True,  r=3, separation="vertex",
+         enum_n=3, max_mult=2),
 ]
 
 
@@ -3901,30 +4093,49 @@ def plot_scatter_lambda_edges(
 def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
                         configs=None, suptitle_fontsize: float = 12.0,
                         row_label_fontsize: float = 12.0,
-                        figsize: tuple[float, float] = (16, 11)) -> None:
-    """Shared scaffold for every twelve-panel variant grid (three model rows by
+                        figsize: tuple[float, float] = (16, 14),
+                        legend_handles=None, legend_ncol: int = 6) -> None:
+    """Shared scaffold for every sixteen-panel variant grid (four model rows by
     four columns): the distribution grids, the proved/conjectured bound grid, the
     sampled grid, and the extremal-envelope scatter.  Builds the axes, calls
     ``draw_panel(ax, cfg)`` on each panel config in turn, adds the per-row model
     labels and the suptitle, and saves.  Only the per-panel drawing and the panel
     configs differ between the grids, so the caller supplies both; everything else
     (layout, row labels, save) lives here once.  ``configs`` defaults to the
-    twelve enumeration variants but may be any 12-item list (e.g. the sampled
+    sixteen enumeration variants but may be any 16-item list (e.g. the sampled
     configs or a precomputed ``panels`` list).
+
+    ``legend_handles`` puts ONE figure-level legend under the whole grid instead
+    of repeating the same key inside all sixteen panels.  Sixteen copies of a
+    six-entry key cost more area than the curves they explain, so prefer this
+    wherever every panel shares one vocabulary.
     """
     if configs is None:
         configs = _VARIANT_ENUM_CONFIGS
-    fig, axes = plt.subplots(3, 4, figsize=figsize)
+    rows = len(_VARIANT_ROW_LABELS)
+    fig, axes = plt.subplots(rows, 4, figsize=figsize)
     for cfg, ax in zip(configs, axes.flat):
         draw_panel(ax, cfg)
-    for row, name in enumerate(("simple", "multigraph", "hypergraph $r=3$")):
+    for row, name in enumerate(_VARIANT_ROW_LABELS):
         axes[row, 0].annotate(name, xy=(-0.46, 0.5), xycoords="axes fraction",
                               rotation=90, ha="center", va="center",
                               fontsize=row_label_fontsize, fontweight="bold",
                               color=_KUL_DARK)
     fig.suptitle(suptitle, fontsize=suptitle_fontsize)
-    fig.tight_layout(rect=(0.035, 0.0, 1.0, 0.97), w_pad=1.6, h_pad=1.2)
-    _save(path)
+    fig.tight_layout(rect=(0.035, 0.0, 1.0, 0.97), w_pad=1.6, h_pad=1.35)
+    if legend_handles:
+        # The legend is anchored just BELOW the figure box rather than inside it.
+        # Reserving a strip inside (via the tight_layout rect or subplots_adjust)
+        # does not survive the tight bounding box the save uses, and the key lands
+        # on the bottom row's "vertices n" labels.  Hanging it outside is robust:
+        # the tight crop expands to include it, so it can never overlap an axis.
+        fig.legend(handles=legend_handles, loc="upper center", ncol=legend_ncol,
+                   fontsize=10, frameon=False, bbox_to_anchor=(0.5, 0.012),
+                   columnspacing=1.6, handletextpad=0.6,
+                   bbox_transform=fig.transFigure)
+    # tight=False because the layout above is already final: _save would otherwise
+    # run a second, rect-less tight_layout that discards the rect set here.
+    _save(path, tight=False)
 
 
 def plot_conn_dist_grid(
@@ -4571,7 +4782,7 @@ def verify_hyper_vertex_value(n: int, r: int, m: int) -> bool:
 def max_feasible_hyperedges(
     n: int, r: int, m: int,
     *, directed: bool = False, vertex_split: bool = False, kind: str = "forward",
-    time_limit: float = 20.0, seed_lb: int = 0,
+    simple: bool = True, time_limit: float = 20.0, seed_lb: int = 0,
 ) -> tuple[int, bool]:
     """Largest number of ``r``-uniform hyperedges with Berge connectivity ``<= m-1``.
 
@@ -4587,11 +4798,15 @@ def max_feasible_hyperedges(
     feasible and the include branch is dropped; and a branch is cut once
     ``active + remaining`` cannot beat the best feasible count already seen.  A
     short randomised warm start raises that incumbent first, so the bound prune
-    bites early.  ``seed_lb`` is an externally known feasible lower bound (e.g. the
+    bites early.  ``seed_lb`` is a caller-certified feasible lower bound (e.g. the
     forward value when maximising over the general model, which contains every
-    forward hypergraph) used to start the incumbent; it never changes the proven
-    optimum, only the pruning.
+    forward hypergraph).  Because it arrives without a witness, it is never used
+    for pruning: it is merged only into an inexact timeout result.  A completed
+    search either confirms it or rejects it, so an unverified number can never be
+    reported as an exact optimum.
     """
+    if seed_lb < 0:
+        raise ValueError("seed_lb must be non-negative")
     deadline = time.time() + time_limit
     # Warm start: a short greedy randomised lower bound sharpens the bound prune;
     # kept brief so the branch and bound, which does the actual proving, keeps
@@ -4599,10 +4814,10 @@ def max_feasible_hyperedges(
     warm_share = min(0.3 * time_limit, 1.5)
     lb, _ = _random_hypergraph_search(
         n, r, m, time.time() + warm_share, seed=0,
-        directed=directed, vertex_split=vertex_split, kind=kind)
-    lb = max(lb, seed_lb)
+        directed=directed, vertex_split=vertex_split, kind=kind, simple=simple)
 
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
+    cap = _hyper_multiplicity_cap(m, simple)
     total = len(candidates)
     best = [lb]
     timed_out = [False]
@@ -4611,7 +4826,7 @@ def max_feasible_hyperedges(
     def dfs(pos: int, count: int) -> None:
         if timed_out[0]:
             return
-        if count + (total - pos) <= best[0]:
+        if count + cap * (total - pos) <= best[0]:
             return                                   # cannot beat the incumbent
         if time.time() > deadline:
             timed_out[0] = True
@@ -4620,16 +4835,29 @@ def max_feasible_hyperedges(
             if count > best[0]:
                 best[0] = count
             return
-        # Include candidates[pos], but only if the set stays feasible.
-        active.add_hyperedge(candidates[pos])
-        if max_hyper_connectivity(active, vertex_split=vertex_split) <= m - 1:
-            dfs(pos + 1, count + 1)
-        active.hyperedges.pop()
-        # Exclude candidates[pos].
+        # Give candidates[pos] each multiplicity from cap down to 0.  Feasibility
+        # is monotone in multiplicity as well as in membership, so the moment one
+        # multiplicity is infeasible every larger one is too and the rest of the
+        # descending run is skipped.
+        added = 0
+        for q in range(1, cap + 1):
+            active.add_hyperedge(candidates[pos])
+            added += 1
+            if max_hyper_connectivity(active, vertex_split=vertex_split) > m - 1:
+                break
+            dfs(pos + 1, count + q)
+        for _ in range(added):
+            active.hyperedges.pop()
+        # Exclude candidates[pos] entirely.
         dfs(pos + 1, count)
 
     dfs(0, 0)
-    return best[0], (not timed_out[0])
+    exact = not timed_out[0]
+    if exact and seed_lb > best[0]:
+        raise ValueError(
+            f"seed_lb={seed_lb} was claimed feasible, but exhaustive search "
+            f"proved the optimum is only {best[0]}")
+    return (best[0] if exact else max(best[0], seed_lb)), exact
 
 
 def _c_flat(mu: np.ndarray) -> tuple[np.ndarray, "_ct.POINTER[_ct.c_int]"]:
@@ -5085,14 +5313,14 @@ def _aut_count_matrix(mu: np.ndarray) -> int:
 def _dir_relabel_key(edge, p: list) -> tuple:
     """Permutation-relabelled key of one directed hyperedge.
 
-    Keeps the legacy forward shape ``(int, tuple_of_heads)`` for forward edges
-    (so their canonical keys and dedup counts are unchanged) and uses
-    ``(tuple_of_tails, tuple_of_heads)`` for general edges.
+    Both accepted storage forms are normalised to
+    ``(tuple_of_tails, tuple_of_heads)``.  Besides making a legacy forward edge
+    and its general-form equivalent canonicalise identically, the uniform shape
+    lets a single collection safely contain both forms.
     """
-    first, heads = edge
-    if isinstance(first, (set, frozenset)):
-        return (tuple(sorted(p[t] for t in first)), tuple(sorted(p[h] for h in heads)))
-    return (p[first], tuple(sorted(p[h] for h in heads)))
+    tails, heads = _dir_tails_heads(edge)
+    return (tuple(sorted(p[t] for t in tails)),
+            tuple(sorted(p[h] for h in heads)))
 
 
 def _hyper_canonical(hyperedges: list, n: int, directed: bool) -> tuple:
@@ -5843,7 +6071,7 @@ def _run_checks() -> int:
           tree.proven and tree.value == 4)
     # Hypergraph discovery returns a feasible lower bound for the r=3, m=2 case.
     hyper = solve(7, 2, hypergraph=True, r=3, exhaustive=False, max_seconds=3.0,
-                  method="sa")
+                  method="random-greedy")
     check(f"solve discovery 3-uniform hypergraph n=7,m=2: {hyper.value} ({hyper.bound})",
           hyper.bound == "lower" and hyper.value == 3)
 

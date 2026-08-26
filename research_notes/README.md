@@ -186,12 +186,13 @@ factor `r-1` that lands in the linear error term while a second, unrelated
 factor `r-1` divides the leading one. (3) The **multigraph vertex** problem
 gets its first upper bound, `K_m^multi(n) <= (m-1)k_m(n) < 2(m-1)^2 n`, via
 Mader's density theorem, which turns the section's unearned claim that the
-bouquet has "the right order" into a theorem, `Theta(m^2 n)`.
+bouquet has "the right order" into a theorem, `Theta(m^2 n)` as `m -> infinity`
+with `n/m -> infinity` (not uniformly for fixed small `n`).
 
 - [`two_step_budget.md`](two_step_budget.md) -- the three derivations, why the
   vertex transfer is legitimate when Whitney runs the wrong way, why the two
-  factors of `r-1` are different factors, and what is still open (the general
-  orientation model, the constants, the exact values).
+  factors of `r-1` are different factors, and the questions that note originally
+  left open. The general-orientation question was subsequently closed below.
 
 Scripts: `two_step_budget_check.py` (self-contained, standard library only;
 checks all three route families against `kappa` rather than `lambda`, and

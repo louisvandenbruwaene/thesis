@@ -37,6 +37,20 @@ class Search(unittest.TestCase):
             self.assertEqual(result.best_edge_count, expected)
             self.assertLessEqual(max_edge_connectivity(result.best_graph), 2)
 
+    def test_zero_multiplicity_cap_is_respected(self):
+        # Zero is a meaningful explicit cap. It used to be treated as false and
+        # silently replaced by the default m-1 cap.
+        for engine in (search_for_dense_graph, tabu_search_for_dense_graph):
+            result = engine(MULTI_UNDIRECTED, n=4, m=3, steps=20,
+                            max_multiplicity=0, seed=0)
+            self.assertEqual(result.best_edge_count, 0)
+
+    def test_negative_multiplicity_cap_is_rejected(self):
+        for engine in (search_for_dense_graph, tabu_search_for_dense_graph):
+            with self.assertRaisesRegex(ValueError, "non-negative"):
+                engine(MULTI_UNDIRECTED, n=4, m=3, steps=1,
+                       max_multiplicity=-1, seed=0)
+
 
 class TabuSearch(unittest.TestCase):
     """Tabu search is the deterministic twin of the annealer: same energy and

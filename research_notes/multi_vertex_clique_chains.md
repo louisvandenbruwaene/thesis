@@ -13,8 +13,10 @@ The construction below is **not** claimed to be optimal. See section 6.
 > **SUPERSEDED AS A CONSTRUCTION (2026-08-14).** The refutation stands and the
 > thesis keeps `thm:clique-chain-vertex`, but thickened cliques are no longer the
 > best known family, and, more to the point, no longer the right *shape*: the
-> extremal blocks are unbalanced **bipartite** graphs. Thickened `K_{s,t}` beats
-> the clique bouquet by a factor `8(3-2sqrt2) ~ 1.373`, and the value is now
+> computed extremal blocks are dense and **bipartite-like**, while unbalanced
+> complete bipartite graphs give the best proved asymptotic construction.
+> Thickened `K_{s,t}` beats the clique bouquet by a factor
+> `8(3-2sqrt2) ~ 1.373`, and the value is now
 > known to be exactly a block knapsack, which settles it for all `n <= 8`,
 > `m <= 8`. See [`multi_vertex_blocks.md`](multi_vertex_blocks.md).
 

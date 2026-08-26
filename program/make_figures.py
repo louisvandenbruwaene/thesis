@@ -36,6 +36,8 @@ from erdos915_unified import (  # noqa: E402
     draw_graph_with_sensitivity,
     edge_vertex_distribution,
     hypergraph_edge,
+    _hyper_edge_simple_proved,
+    _hyper_vertex_simple_proved,
     multigraph_undirected_edge,
     plot_complexity_growth,
     plot_extremal_gallery,
@@ -175,11 +177,13 @@ def _reconcile_panel(panel: dict) -> dict:
 
 
 def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_budget=4.0):
-    """Build the twelve panels of the all-variant grid (row-major, model x col).
+    """Build the sixteen panels of the all-variant grid (row-major, model x col).
 
     ``m`` is the forbidden connectivity value shown in every panel.
 
-    Two uniformity rules make the twelve panels directly comparable:
+    Four model rows (simple graph, multigraph, hypergraph, multihypergraph)
+    by four columns (undirected/directed x edge/vertex).  Two uniformity rules
+    make the sixteen panels directly comparable:
 
     1. Every matrix panel plots its search lower bounds over the *same* vertex
        range ``matrix_ns`` and every hypergraph panel over ``hyper_ns``, so each
@@ -246,7 +250,72 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         return min(directed_multigraph_arc(n, m), (m - 1) * n * (n - 1))
 
     def lb_hyper_edge(n):
+        # prop:hyper-edge, a proved UPPER bound for every r-uniform hypergraph.
+        # Right for the proved curve, WRONG as a lower bound: see below.
         return min(hypergraph_edge(n, m, 3), math.comb(n, 3))
+
+    def attained_hyper_edge(n):
+        """The same value, but only where a SIMPLE hypergraph is proved to reach it.
+
+        The panels enumerate and search SIMPLE hypergraphs, and thm:simple-hyper-edge
+        attains the bound only when ``m - 1 <= C(n-2, 1)``.  Outside that range the
+        closed form is an upper bound nobody has exhibited, so promoting it to an
+        open-circle witness asserts a graph that need not exist.  It sometimes does
+        not: at ``n = 6, m = 6`` the formula gives 12, yet all 125970 twelve-edge
+        simple 3-uniform hypergraphs on six vertices are infeasible and the true
+        maximum is 11.  Returning 0 here leaves the honest search value alone.
+        """
+        proved = _hyper_edge_simple_proved(n, m, 3)
+        return 0 if proved is None else min(proved, math.comb(n, 3))
+
+    def attained_hyper_vertex(n):
+        """The vertex analogue, gated by thm:hyper-vertex-m2 / thm:hyper-vertex-m3."""
+        proved = _hyper_vertex_simple_proved(n, m, 3)
+        return 0 if proved is None else min(proved, math.comb(n, 3))
+
+    def lb_multihyper_edge(n):
+        """prop:hyper-edge again, but capped at the MULTIhypergraph trivial max.
+
+        The cap matters and is not the simple one.  A simple hypergraph cannot
+        hold more than ``C(n,r)`` hyperedges, but a multihypergraph may take each
+        of them up to ``m-1`` times, so its ceiling is ``(m-1) C(n,r)``.  Capping
+        this row at ``C(n,r)`` would push the curve BELOW the true value at small
+        n: at ``n = r = m = 3`` it would read 1 where the multihypergraph star
+        actually carries 2, putting an exact square above its own curve.
+        """
+        return min(hypergraph_edge(n, m, 3), (m - 1) * math.comb(n, 3))
+
+    def attained_multihyper_edge(n):
+        """The multihypergraph half of prop:hyper-edge.
+
+        The displayed bound holds for EVERY r-uniform hypergraph.  A
+        multihypergraph is proved to attain it when ``(r - 1) | (n - 1)``, where
+        the star hypertree's blocks divide the non-hub vertices exactly and each
+        hyperedge is taken at full multiplicity.  Outside that range the formula
+        is an upper bound nobody has exhibited in this model, so return 0 and let
+        the honest search value stand, exactly as ``attained_hyper_edge`` does for
+        the simple model.  Note the two gates are genuinely different conditions,
+        which is the whole reason the two rows are separate variants: at
+        ``n = r = m = 3`` the simple gate fails and the multi gate holds, and the
+        machine confirms the split, one hyperedge against two.
+        """
+        if (n - 1) % 2 != 0:            # r - 1 = 2 throughout these panels
+            return 0
+        return lb_multihyper_edge(n)
+
+    def attained_multihyper_vertex(n):
+        """The multihypergraph vertex analogue.
+
+        thm:hyper-vertex-m2 and thm:hyper-vertex-m3 are both stated FOR
+        multihypergraphs, so whatever the simple model is proved to attain, the
+        multi model attains too, and this plants at least that much.  It is
+        deliberately CONSERVATIVE: repeats do help at m = 3 in cases the simple
+        gate rejects (machine-checked at n = r = m = 3, where the simple maximum
+        is 1 and the multi maximum is 2), and there this returns 0 and lets the
+        honest search value stand rather than plant a number no theorem covers.
+        At m = 2 repeats provably never help (thm:hyper-vertex-m2).
+        """
+        return attained_hyper_vertex(n)
 
     def lb_dir_hyper(n):
         # The PROVED bipartite family of prop:dir-hyper-first at r = 3:
@@ -349,7 +418,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
         exact=ex5, search=se5))
 
     # (6) multigraph undirected vertex -- equals simple (parallel edges irrelevant for vertex cuts).
-    multi_vert_label = ("proved, $=$ simple" if vert_proved else "open, $=$ simple")
+    multi_vert_label = ("$=$ simple, proved" if vert_proved else "$=$ simple, open")
     if vert_proved:
         panels.append(dict(
             title=f"undirected vertex ({multi_vert_label})", ylabel="edges",
@@ -367,13 +436,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     se7 = searched(matrix_ns, lb_multi_dir,
                    directed=True, simple=False, separation="edge")
     panels.append(dict(
-        title=f"directed arc (multigraph, proved)", ylabel="arcs",
+        title=f"directed arc (proved)", ylabel="arcs",
         proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
     # (8) multigraph directed vertex -- conjectured (reduces to simple digraph).
     panels.append(dict(
-        title=f"directed vertex (conjectured, $=$ simple)", ylabel="arcs",
+        title=f"directed vertex ($=$ simple, conj.)", ylabel="arcs",
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex4, search=se4))
 
@@ -381,7 +450,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # (9) hypergraph undirected edge -- proved for all m.
     ex9 = _exact_points(range(2, 8), m, exact_budget,
                         hypergraph=True, r=3, directed=False, separation="edge")
-    se9 = searched(hyper_ns, lb_hyper_edge,
+    se9 = searched(hyper_ns, attained_hyper_edge,
                    hypergraph=True, r=3, directed=False, separation="edge")
     panels.append(dict(
         title=f"undirected edge (proved)", ylabel="hyperedges",
@@ -393,7 +462,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     ex10 = _exact_points(range(2, 7), m, exact_budget,
                          hypergraph=True, r=3, directed=False, separation="vertex")
     if hyper_vert_proved:
-        se10 = searched(hyper_ns, lb_hyper_edge,
+        se10 = searched(hyper_ns, attained_hyper_vertex,
                         hypergraph=True, r=3, directed=False, separation="vertex")
         panels.append(dict(
             title=f"undirected vertex (proved)", ylabel="hyperedges",
@@ -402,11 +471,13 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     else:
         se10 = _search_points(hyper_ns, m, open_search_budget,
                               hypergraph=True, r=3, directed=False, separation="vertex")
-        # Whitney again: the proved hyperedge value is a lower bound for the
-        # vertex separation (its extremiser is vertex-feasible).  The exact cap
-        # in _reconcile_panel corrects the small-n corner where the simple
-        # attainment condition m-1 <= n-2 has not kicked in yet.
-        se10 = _extend_lower_bounds(se10, lb_hyper_edge, hyper_ns)
+        # Whitney again: an ATTAINED hyperedge value is a lower bound for the
+        # vertex separation too, since that extremiser is vertex-feasible.  It
+        # must be the attained one: _reconcile_panel's exact-value clamp was
+        # relied on here to fix the small-n corner, but it can only fire where
+        # exhaustion actually finished inside its budget, which at m = 6, n = 6
+        # it does not.  Gating at the source needs no safety net.
+        se10 = _extend_lower_bounds(se10, attained_hyper_edge, hyper_ns)
         panels.append(dict(
             title=f"undirected vertex (open)", ylabel="hyperedges",
             guess="search",
@@ -421,7 +492,7 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # lower bound here (the search alone slips below the quadratic at larger n).
     se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed arc (open, new model)", ylabel="hyperarcs",
+        title=f"directed arc (open)", ylabel="hyperarcs",
         guess="search",
         band=_band(se11, tri_dir_hyper, hyper_ns), exact=ex11, search=se11))
 
@@ -434,9 +505,88 @@ def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_bu
     # feasible for the vertex separation at the same value.
     se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
     panels.append(dict(
-        title=f"directed vertex (open, new model)", ylabel="hyperarcs",
+        title=f"directed vertex (open)", ylabel="hyperarcs",
         guess="search",
         band=_band(se12, tri_dir_hyper, hyper_ns), exact=ex12, search=se12))
+
+    # ----- row 4: multihypergraph (r=3), hyperedges may repeat ----------
+    # This row is NOT a relabelling of row 3.  Parallel copies of a hyperedge are
+    # Berge routes with empty interiors, so q copies give q routes that are both
+    # hyperedge-disjoint and internally vertex-disjoint: multiplicity raises kappa
+    # as well as lambda, and neither separation collapses (contrast the multigraph
+    # VERTEX rows, which do, under sec:parallel-convention).  Multiplicity is
+    # therefore capped at m-1 and the four cells are genuine extremal questions.
+    # Every simple hypergraph IS a multihypergraph, so the row-3 value is always a
+    # valid lower bound here and is planted as one; the machine sweep is one vertex
+    # shorter because it walks m^C assignments rather than 2^C.
+
+    def multi_lb(simple_fn, attained_fn):
+        """Lower bound for a multi panel: the better of the simple row and the
+        multi-specific construction.  Both are exhibited feasible objects, so the
+        maximum of the two is honest."""
+        return lambda n: max(simple_fn(n), attained_fn(n))
+
+    # (13) multihypergraph undirected edge -- prop:hyper-edge, proved for all m.
+    ex13 = _exact_points(range(2, 7), m, exact_budget,
+                         hypergraph=True, r=3, directed=False, simple=False,
+                         separation="edge")
+    se13 = searched(hyper_ns, multi_lb(attained_hyper_edge, attained_multihyper_edge),
+                    hypergraph=True, r=3, directed=False, simple=False,
+                    separation="edge")
+    panels.append(dict(
+        title=f"undirected edge (proved)", ylabel="hyperedges",
+        proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
+        exact=ex13, search=se13))
+
+    # (14) multihypergraph undirected vertex -- PROVED for m<=3, open for m>=4.
+    ex14 = _exact_points(range(2, 6), m, exact_budget,
+                         hypergraph=True, r=3, directed=False, simple=False,
+                         separation="vertex")
+    if hyper_vert_proved:
+        se14 = searched(hyper_ns, attained_multihyper_vertex,
+                        hypergraph=True, r=3, directed=False, simple=False,
+                        separation="vertex")
+        panels.append(dict(
+            title=f"undirected vertex (proved)", ylabel="hyperedges",
+            proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
+            exact=ex14, search=se14))
+    else:
+        se14 = _search_points(hyper_ns, m, open_search_budget,
+                              hypergraph=True, r=3, directed=False, simple=False,
+                              separation="vertex")
+        se14 = _extend_lower_bounds(se14, attained_multihyper_vertex, hyper_ns)
+        panels.append(dict(
+            title=f"undirected vertex (open)", ylabel="hyperedges",
+            guess="search",
+            band=_band(se14, tri_hyper, hyper_ns), exact=ex14, search=se14))
+
+    # (15) multihypergraph directed arc -- OPEN.  thm:dir-hyper-constant is stated
+    # for forward directed r-uniform MULTIhypergraphs, so the proved leading term
+    # is this row's as much as row 3's; the exact value is open in both.
+    ex15 = _exact_points(range(2, 5), m, exact_budget,
+                         hypergraph=True, r=3, directed=True, simple=False,
+                         separation="edge")
+    se15 = _search_points(hyper_ns, m, open_search_budget,
+                          hypergraph=True, r=3, directed=True, simple=False,
+                          separation="edge")
+    se15 = _extend_lower_bounds(se15, lb_dir_hyper, hyper_ns)
+    panels.append(dict(
+        title=f"directed arc (open)", ylabel="hyperarcs",
+        guess="search",
+        band=_band(se15, tri_dir_hyper, hyper_ns), exact=ex15, search=se15))
+
+    # (16) multihypergraph directed vertex -- OPEN, same construction and bound.
+    ex16 = _exact_points(range(2, 5), m, exact_budget,
+                         hypergraph=True, r=3, directed=True, simple=False,
+                         separation="vertex")
+    se16 = _search_points(hyper_ns, m, open_search_budget,
+                          hypergraph=True, r=3, directed=True, simple=False,
+                          separation="vertex")
+    se16 = _extend_lower_bounds(se16, lb_dir_hyper, hyper_ns)
+    panels.append(dict(
+        title=f"directed vertex (open)", ylabel="hyperarcs",
+        guess="search",
+        band=_band(se16, tri_dir_hyper, hyper_ns), exact=ex16, search=se16))
 
     return [_reconcile_panel(p) for p in panels]
 

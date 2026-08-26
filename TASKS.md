@@ -32,12 +32,13 @@ in claude.md and deleted here.
       Search space becomes "2-connected graphs on b <= n vertices" (geng -C).
       EXACT VALUES for all n <= 8, m <= 8 (tab:multi-vertex-exact); agrees with
       every cell the program had proved. K_5^multi(7) = 29, not the bouquet's 27
-      nor the unfinished search's 28. Clean split: thickened trees win for m<=3,
-      tie at m=4, and from m=5 a SINGLE 2-connected block beats every split, so
-      the bouquet is not the shape of the answer.
+      nor the unfinished search's 28. In the computed table, thickened trees win
+      for m<=3, tie at m=4, and for m>=5 and n>=3 a SINGLE 2-connected block
+      beats every split, so the bouquet is not the shape of the answer.
 - [x] **Better construction (2026-08-14), thm:multi-vertex-bipartite.** The
-      winning blocks are bipartite, not complete. Thickened K_{s,t} at
-      multiplicity m-s is feasible with total st(m-s); as a bouquet the rate is
+      computed winning blocks are dense and bipartite-like, not complete;
+      thickened K_{s,t} is the explicit asymptotic construction. At
+      multiplicity m-s it is feasible with total st(m-s); as a bouquet the rate is
       st(m-s)/(s+t-1), optimised at t=m-1, s~(sqrt2-1)m, giving (3-2sqrt2)m^2
       against the clique's m^2/8. Factor 8(3-2sqrt2)~1.373; the gap to the upper
       bound falls from 16 to 6+4sqrt2~11.66. research_notes/
