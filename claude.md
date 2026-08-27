@@ -795,3 +795,34 @@ already stated elsewhere: $\ell_3(2)=1$ (Mader's floor), $L_3^{\mathrm{dir}}(2)=
 (the n=2 fix from the second session above, now shown bold green rather
 than a bare circle), and the $m=6,n=5/6,r=3$ hypergraph values ($8$ exact,
 $\le12$ not $12$) against `ch2_machine.tex`'s own stated $11$.
+
+**MERGED TO ONE TABLE**, same session, on the author's follow-up request.
+`variant_value_tables()` now writes a single `figures/variant_table_all.tex`
+instead of four: one shared column grid (`_TABLE_NS = 2..8`, the graph rows'
+range) for every row, an `$m=3$`/`$m=6$` `\multicolumn` section header
+before each half, and `_panel_cell` returns `None` (an empty cell, not a
+value) wherever `n` sits outside a panel's curve range at all -- the one
+new case being every hypergraph/multihypergraph row's `n=2` column, since
+`hyper_ns` starts at 3. `ch2_machine.tex` collapsed to one
+`table` environment (`\label{tab:variant-values}`) after the fourth
+`sidewaysfigure`, replacing all four `tab:variant-values-m{3,6}-*` labels
+and their per-table captions with one caption covering every distinction
+the four used to split across themselves (bound-vs-value, lower-bound
+witness, the m=6 Leonard cutoff, the blank-cell convention).
+
+**A REAL BUILD FAILURE ON THE WAY, UNRELATED TO THE CONTENT CHANGE.** After
+deleting the four old fragments and editing the chapter, `latexmk` came
+back exit 12 with pdflatex choking on null bytes (`^^@`) reading what
+should have been `main.aux`, and 40 references reported undefined as a
+result. This is the exact failure mode `CLAUDE.md` already documents from
+two sessions ago ("latexmk -C then a clean rebuild"): stale/corrupted
+aux state from a prior run, not a defect in the new table or chapter edit.
+`latexmk -C` followed by a plain rebuild fixed it immediately, and the
+result matches the git diff exactly, confirming the source was never the
+cause.
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 106pp, 0 overfull, 0
+undefined refs, 0 occurrences of `??`. The merged table's page rendered
+and inspected directly: all thirty-two rows fit on one page with room to
+spare, section headers and blank n=2 hypergraph cells both render as
+intended.
