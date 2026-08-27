@@ -949,3 +949,66 @@ regenerate cleanly (442 cache hits, 10 fresh computes, all in the `m=3`
 directed simple-arc/vertex panels). `latexmk -pdf` exit 0, 104pp, 0
 overfull/underfull, 0 undefined refs, 0 occurrences of `??`. 127 tests OK,
 1 expected skip. Program self-check ALL CHECKS PASSED.
+
+## 2026-08-27 (Sonnet, sixth session) — three more inline author comments in ch2
+
+Three remaining author comments in `ch2_machine.tex`, none touching the
+program, all prose/placement only.
+
+**THE "WEIRD BULLSHIT" PASSAGE.** Two commented-out paragraphs sat dead in
+`sec:rediscovery` (never printed, since both were themselves `%`-commented),
+sandwiching the author's judgment: "this just seems like some weird bullshit
+i don't wanna read ... extract the things that need to be said, and say it
+better and or elsewhere." Read against the rest of the thesis first: the
+first paragraph's per-model rediscovery facts (spanning tree, multigraph
+star, thickened star, bidirected star, the $n=7$ tie) are stated nowhere
+else, so they were rewritten and printed. The second paragraph's headline
+numbers (the $n=8$ wall's $16$ against the hub's $14$, the $m=3,n=10$
+augmented-bipartite $30$ against $27$) turned out to be **already stated**
+in `ch4_synthesis.tex`'s "Two principal phenomena" section, so restating them
+here would have violated the thesis's own repetition-removed convention.
+Kept only what that section does not carry: the tabu search's own stall at
+$n=8,m=2$ (a fact about the search, which is this section's actual subject)
+and the $n=7,m=4$ double-star witness ($36$ arcs). Both new paragraphs are
+now live prose, checked against the no-em/en-dash and no-prose-semicolon
+rule and the banned-verdict-phrase list.
+
+**THE SIDEWAYS FIGURES, MOVED.** `%move these sideways figures to the last
+chapter, alongside their exlpanation` sat before the four
+`variant_bounds_m{3,6}_{graphs,hypergraphs}` grids. Moved them, their design-
+rationale comments, the `tab:variant-values` table, and the two paragraphs
+between them, out of ch2's rediscovery section and into ch4's own "Summary
+of the sixteen variants" section, right after `tab:summary` and
+`fig:variant-tree-status`, which is the coarse version of the exact same
+sixteen-variant status these four grids and this table give as numbers. One
+new bridging sentence introduces them there. All four labels
+(`fig:variant-bounds-m{3,6}-{graphs,hyper}`) and `tab:variant-values` are
+unchanged, so the one cross-reference to them from `app_proofs.tex` still
+resolves without edits. Rendered all five relocated pages after the rebuild
+(the `.aux` label page numbers do not match `pdftoppm`'s physical page
+index, since front matter uses roman numerals; used `pdftotext` per-page
+splitting to find the true physical pages instead) and confirmed all four
+grids and the table still fit inside their sideways/portrait pages at the
+new location.
+
+**THE "WTF" COMMENT.** `%wtf: you can't prove something for all values and
+then just say: oh we found one that doesn't work, but don't worry` sat
+before the $m=6,n=6,r=3$ hypergraph-exception paragraph. The paragraph was
+never actually contradictory, `\Cref{prop:hyper-edge}` is proved as an upper
+BOUND, not as an attained value, but "the curve's $12$ overstates the true
+maximum of $11$" read like a theorem failing rather than a bound simply not
+being tight. Reworded to lead with what the theorem does and does not claim
+(bounds from above, does not claim attainment outside its stated ranges)
+before stating the $m=6$ non-attainment fact, so the paragraph now reads as
+one proved fact about non-attainment rather than a theorem-vs-counterexample
+tension.
+
+**A SEMICOLON SLIPPED INTO MY OWN FIRST DRAFT OF THE BRIDGING SENTENCE**,
+caught by grepping the diff before committing rather than after. Two-sentence
+split instead.
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 104pp, 0 overfull, 0
+undefined refs, 0 occurrences of `??`. No em-dashes, en-dashes or prose
+semicolons in the diff (checked directly against `git diff`, not by eye). No
+duplicate labels introduced. All three executed comments deleted from the
+source (they no longer exist in `ch2_machine.tex`).
