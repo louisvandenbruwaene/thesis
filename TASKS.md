@@ -281,13 +281,23 @@ comments themselves are gone from ch4.
       vertex one is open for m >= 6. The caption defers to tab:summary, which is
       a weak defence for a figure meant to be read on its own. A fourth regime
       colour would fix the claim as well as the legend layout.
-- [ ] **One attribution still unverified against the paper.** Mader73 carries
-      two loads: thm:mader (edge problem solved) and "k_m(n) - mn/2 is
-      unbounded for m >= 6" in sec:simple-vertex-blocks. The second is now
-      history rather than load, since the Sorensen-Thomassen display refutes
-      the conjecture for every m >= 5 on its own, but confirm it if you get
-      library access. Leonard72b, Bartfai60 and Bollobas66 were resolved from
-      their titles on 2026-08-27 and are no longer in doubt.
+- [x] **Attributions verified 2026-08-27 against erdosproblems.com/915** (page
+      last edited 2025-12-08, thanks list includes Stijn Cambie). All settled,
+      nothing outstanding. Ma73 = Mader, Math. Z. 131 (1973) 223-231 carries
+      BOTH loads: it establishes l_m(n) for every m >= 2 (Erdos 915) AND
+      disproves the Bollobas-Erdos vertex conjecture, giving for every m >= 6
+      and every C an n with k_m(n) > mn/2 + C. Le72 = Leonard, JCTB 13 (1972)
+      242-250, "line-disjoint" (the thesis title is right), proves
+      l_m(n) = k_m(n) for 2 <= m <= 4 as well as l_5. Ba60 proves k_3, Bo66
+      proves k_4. NOTE: the database's Ba60 is Bartfai's Mat. Lapok note
+      175-176, NOT the Acta paper this repo cites; both are 1960 and the m=3
+      edge and vertex values coincide, and ref.bib now says so.
+- [ ] **New lever, from the same check.** Sorensen-Thomassen prove in
+      SoTh74 that the Bollobas-Erdos bound DOES hold for 3-connected graphs.
+      That is one refinement past thm:simple-vertex-blocks and it is exactly
+      the triconnected/SPQR direction sec:simple-vertex-blocks already names
+      as its next step, so the missing piece is the assembly bookkeeping
+      rather than a bound on the rigid pieces. Recorded in app_proofs.
 - [ ] **tab:summary.** "Is this table still needed, given tab:variant-values,
       which looks better? Perhaps move some of it into that one, or into
       tab:open-problems." Editorial call for the author. Note that tab:summary

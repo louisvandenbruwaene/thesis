@@ -2,7 +2,7 @@
 % COMPREHENSIVE BIBLIOGRAPHY FOR ERDOS PROBLEM 915 THESIS
 % ============================================================================
 %
-% NOTE ON UNCITED ENTRIES. Twenty-seven of the entries below are cited by the
+% NOTE ON UNCITED ENTRIES. Twenty-nine of the entries below are cited by the
 % current text, and those are the only ones the printed bibliography carries,
 % since bibtex emits cited entries alone. The rest are retained deliberately:
 % they supported passages that the 2026-08 shortening passes cut, and those
@@ -13,7 +13,7 @@
 %   AbboudKT21, AhujaMagnantiOrlin93, Berge89, Bollobas78, BollobasRandomGraphs,
 %   BollobasThomason85, BondyMurty08, BondySimonovits74, Dinic70, EdmondsKarp72,
 %   ErdosRenyi59, ErdosStone46, Frank11, GoldbergTarjan88, Heule18,
-%   HeuleKullmannMarek16, Karger00, KovariSosTuran54, Leonard73,
+%   HeuleKullmannMarek16, Karger00, KovariSosTuran54,
 %   McKayRadziszowski95, Mulzer18, NagamochiIbaraki92, Orlin13, Razborov07,
 %   Schrijver03.
 %
@@ -35,7 +35,7 @@
     pages = {223--231},
     year = {1973},
     doi = {10.1007/BF01187240},
-    note = {Solves Erd\H{o}s Problem 915 for edge-disjoint paths}
+    note = {Carries both halves used here. It establishes $\ell_m(n)$ for every $m \ge 2$, which solves Erd\H{o}s Problem 915 for edge-disjoint paths, and it disproves the Bollob\'{a}s--Erd\H{o}s conjecture for the vertex problem, giving for every $m \ge 6$ and every $C$ an $n$ with $k_m(n) > mn/2 + C$}
 }
 
 @misc{vandenbruwaene_thesis,
@@ -112,7 +112,7 @@
     pages = {281--284},
     year = {1973},
     doi = {10.1007/BF02018594},
-    note = {Gives the explicit $m = 5$ counterexample on 57 vertices used in this thesis. The $m \le 4$ equality is not from this paper: $m = 4$ is Bollob\'{a}s 1966 and $m = 3$ is elementary}
+    note = {Gives the explicit $m = 5$ counterexample, on 57 vertices and 141 edges, and a constant $c > 0$ with $k_5(n) > (5/2 + c)n - O(1)$. The $m \le 4$ equality is from Leonard's 1972 paper, not this one}
 }
 
 @article{Leonard72b,
@@ -123,7 +123,7 @@
     pages = {242--250},
     year = {1972},
     doi = {10.1016/0095-8956(72)90059-7},
-    note = {``Line-disjoint'' is edge-disjoint, and ``at most four'' is $\lambda^{\max} \le 4$, so this is the \emph{edge} problem at $m = 5$ in the notation of this thesis, not a vertex result}
+    note = {``Line-disjoint'' is edge-disjoint and ``at most four'' is $\lambda^{\max} \le 4$, so the title names the edge problem at $m = 5$. The paper also proves $\ell_m(n) = k_m(n)$ for $2 \le m \le 4$, which is the equality stated in Chapter~1}
 }
 
 @article{Leonard73,
@@ -133,7 +133,8 @@
     volume = {25},
     pages = {687--692},
     year = {1973},
-    doi = {10.4153/CJM-1973-069-x}
+    doi = {10.4153/CJM-1973-069-x},
+    note = {Determines $\ell_6(n)$, the edge value one step past Leonard's own $m = 5$}
 }
 
 @article{SorensenThomassen74,
@@ -145,7 +146,7 @@
     pages = {143--159},
     year = {1974},
     doi = {10.1016/0095-8956(74)90082-3},
-    note = {Theorem 4 determines $f_5(n) = \lfloor 8n/3 \rfloor - 3$ for $n \ge 6$, $n \ne 7$, $n \ne 12$. Their $f_k(n)$ is the least edge count that forces a $k$-rail, one more than this thesis's $k_m(n)$, so the value here is $\lfloor 8n/3 \rfloor - 4$}
+    note = {Theorem 4 determines $f_5(n) = \lfloor 8n/3 \rfloor - 3$ for $n \ge 6$, $n \ne 7$, $n \ne 12$. Their $f_k(n)$ is the least edge count that forces a $k$-rail, one more than this thesis's $k_m(n)$, so the value here is $\lfloor 8n/3 \rfloor - 4$. The same paper gives the general lower bound on $c_m$ and proves that the Bollob\'{a}s--Erd\H{o}s bound does hold for $3$-connected graphs}
 }
 
 % ============================================================================
@@ -159,7 +160,7 @@
     volume = {11},
     pages = {167--171},
     year = {1960},
-    note = {Determines the $m = 3$ edge-disjoint value, one of the small cases later subsumed by Mader's theorem}
+    note = {Settles the $m = 3$ case, where the edge and vertex values coincide. The Erd\H{o}s Problems database credits $k_3$ to B\'{a}rtfai's Hungarian note of the same year in Mat.\ Lapok, while this is the Acta paper, whose title states the edge-disjoint form}
 }
 
 @article{Bollobas66,
@@ -328,9 +329,9 @@
     title = {Erd{\H{o}}s Problems, Problem 915},
     howpublished = {\url{https://www.erdosproblems.com/915}},
     url = {https://www.erdosproblems.com/915},
-    urldate = {2026-08-25},
+    urldate = {2026-08-27},
     year = {2026},
-    note = {Accessed 25 August 2026}
+    note = {Accessed 27 August 2026; the page was last edited 8 December 2025}
 }
 
 % ============================================================================
