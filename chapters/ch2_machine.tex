@@ -615,7 +615,7 @@ The directed simple arc problem at $m\ge3$ shows where the settled range ends. E
 \]
 passes through every exhausted value and through the construction-backed lower bounds beyond them. Its linear-to-quadratic crossover occurs at $n=9$ when $m=3$, just past the exhausted range, and at $n=10$ it gives the thirty-arc counterexample of \Cref{const:augmented-bipartite}.
 
-The paired grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} apply that reading to all sixteen variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds, while filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds.
+The paired grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} apply that reading to all sixteen variants. Blue curves are theorems, red curves conjectures, and yellow curves interpolate lower bounds, while filled squares are exact finite values and open circles are witnesses. Directed vertex values were checked separately because Whitney's inequality transfers witnesses but not upper bounds. \Cref{tab:variant-values-m3-graphs,tab:variant-values-m3-hyper,tab:variant-values-m6-graphs,tab:variant-values-m6-hyper} give the same sixteen variants as numbers, in the same colours, for a reader who wants a value rather than a position on a curve.
 
 Where an upper bound is known to be attainable, the search reaches it at every plotted size except the recorded directed $m=2$, $n=8$ stall. The undirected hypergraph rows carry the one systematic exception, and it is a feature of the bound rather than of the search. There the blue curve is \Cref{prop:hyper-edge}, an upper bound proved for every $r$-uniform hypergraph, but the two models attain it under different conditions: a simple hypergraph only when $m-1\le\binom{n-2}{r-2}$, a multihypergraph only when $(r-1)\mid(n-1)$. Below its own threshold neither is known to meet the curve, and for the simple model at $m=6$, $n=6$, $r=3$ nothing does: the curve reads $12$, yet all $125\,970$ twelve-hyperedge simple $3$-uniform hypergraphs on six vertices are infeasible and the true maximum is $11$. The circles there are the search's own witnesses and sit below the curve, so the gap is not closed. The two rows part company, which is why they are kept separate, and the smallest case is $n=r=m=3$, where a simple hypergraph carries one hyperedge and the multihypergraph carries two. On the open directed sizes the named constructions, not the search, carry the best bounds once the extremal shape changes from a hub to a bipartite wall. The grid therefore checks the search against proof wherever proof is available, and marks the remaining values as evidence rather than conclusions.
 
@@ -638,12 +638,32 @@ Where an upper bound is known to be attainable, the search reaches it at every p
     \label{fig:variant-bounds-m3-graphs}
 \end{sidewaysfigure}
 
+\begin{table}[p]
+    \centering
+    \footnotesize
+    \resizebox{\textwidth}{!}{%
+    \input{figures/variant_table_m3_graphs.tex}%
+    }
+    \caption{\Cref{fig:variant-bounds-m3-graphs} as numbers. Blue is proved, red conjectured, gold open, matching the figure's curves, and a bold green entry is machine-checked exact regardless of the row's colour. A plain (non-bold) proved entry is still the exact value for every $n$, since the closed form is a theorem there, not a bound reached only at small sizes.}
+    \label{tab:variant-values-m3-graphs}
+\end{table}
+
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_hypergraphs.png}
     \caption{The eight hypergraph-model variants at $m=3$, continuing \Cref{fig:variant-bounds-m3-graphs}: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key. The blue curve here is \Cref{prop:hyper-edge}, a proved upper bound rather than a proved value, which is why the key names it as one. It is attained only inside the ranges stated there, so a square or a circle below it marks a gap that is open rather than an error.}
     \label{fig:variant-bounds-m3-hyper}
 \end{sidewaysfigure}
+
+\begin{table}[p]
+    \centering
+    \footnotesize
+    \resizebox{\textwidth}{!}{%
+    \input{figures/variant_table_m3_hypergraphs.tex}%
+    }
+    \caption{\Cref{fig:variant-bounds-m3-hyper} as numbers, same colour code. The two undirected rows are proved only as an upper bound (\Cref{prop:hyper-edge}): a $\le$-prefixed blue entry bounds the true value without being known to equal it, while a plain blue entry (or a bold green one) is the value itself. The two directed rows are open, and a $\ge$-prefixed gold entry is a verified construction rather than a proved optimum.}
+    \label{tab:variant-values-m3-hyper}
+\end{table}
 
 \begin{sidewaysfigure}[p]
     \centering
@@ -652,9 +672,29 @@ Where an upper bound is known to be attainable, the search reaches it at every p
     \label{fig:variant-bounds-m6-graphs}
 \end{sidewaysfigure}
 
+\begin{table}[p]
+    \centering
+    \footnotesize
+    \resizebox{\textwidth}{!}{%
+    \input{figures/variant_table_m6_graphs.tex}%
+    }
+    \caption{\Cref{fig:variant-bounds-m6-graphs} as numbers, same colour code as \Cref{tab:variant-values-m3-graphs}. Raising $m$ from $3$ to $6$ moves two rows, undirected simple vertex and its multigraph reduction, from proved to open (\Cref{thm:leonard}, valid only for $m\le4$), so the same variant that carried no $\ge$ prefix at $m=3$ carries one here past its exhausted range.}
+    \label{tab:variant-values-m6-graphs}
+\end{table}
+
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6_hypergraphs.png}
     \caption{The same eight hypergraph-model variants at $m=6$, continuing \Cref{fig:variant-bounds-m6-graphs} and to be read against \Cref{fig:variant-bounds-m3-hyper}. The blue curve is again the upper bound of \Cref{prop:hyper-edge}, and at this $m$ it runs visibly above what has been reached: the exact square at $n=5$ is $8$ against the curve's $10$, and at $n=6$ the curve reads $12$ where the true maximum is $11$.}
     \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}
+
+\begin{table}[p]
+    \centering
+    \footnotesize
+    \resizebox{\textwidth}{!}{%
+    \input{figures/variant_table_m6_hypergraphs.tex}%
+    }
+    \caption{\Cref{fig:variant-bounds-m6-hyper} as numbers, same colour code as \Cref{tab:variant-values-m3-hyper}. The undirected edge row's $n=6$ entry is the $\le12$ named above and in that figure's caption: the true maximum there is $11$, established by the full enumeration described above rather than by the timed exhaustion behind this table's exact entries.}
+    \label{tab:variant-values-m6-hyper}
+\end{table}

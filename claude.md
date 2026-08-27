@@ -722,3 +722,76 @@ VERIFY: `make_figures.py --grids-only` regenerated all four grids (453/454
 values from cache, 1 newly computed); all four inspected. `latexmk -pdf`
 exit 0, 0 overfull, 0 undefined refs, 0 occurrences of `??` in extracted
 text.
+
+## 2026-08-27 (Sonnet, third session) — exact-value tables beside the four variant grids, and the thesis renamed
+
+**RENAME.** `\title` and `pdftitle` (which had drifted from each other and
+from the cover page's rendered text) both moved to "Maximizing Edge Density
+Subject to Connectivity Constraints"; `pdfsubject`'s stale "twelve
+structural variants" corrected to "sixteen" while in there.
+
+**THE TABLES.** The author asked for the four variant-bounds grids'
+numbers in table form, exact values a reader can read off rather than a
+curve position to eyeball, same colour code, and to run the code to find
+m/n ranges that land mostly inside what is actually known. `gather_variant_grid`
+already carries everything needed (it feeds the plots), so
+`program/make_figures.py:variant_value_tables()` reuses it directly: no new
+solving, only formatting, confirmed by the 3-second `--tables-only` run
+pulling almost everything from `figures/machine_values.json`.
+
+Four new colours in `preamble.tex` (`vtProved`/`vtConjectured`/`vtOpen`/
+`vtExact`/`vtSearch`) are the LITERAL hex codes `plot_variant_grid` uses
+(`_KUL_BLUE`/`_RED`/`_GUESS`/`_GREEN`/`_VIOLET`), not the visually-close but
+not-identical `regimeProved`/`regimeConjectured`/`regimeOpen` already used
+by `fig:variant-tree-status` -- kept those alone rather than retuning an
+existing figure nobody asked to change.
+
+**GETTING THE EPISTEMIC STATUS OF EACH CELL RIGHT WAS THE ACTUAL WORK.**
+A number's colour is its row's curve colour (blue/red/gold); a bold GREEN
+override means the machine independently confirmed it exact, exactly like
+a filled square in the figure. Everything else needed a prefix to stay
+honest: a proved GRAPH row (Mader, `thm:dir-multi-full`, ...) gets no
+prefix past its exhausted range, because the closed form IS the value for
+every n, not a bound merely reached at small sizes. The four hypergraph
+"proved" rows are different -- `_reconcile_panel` already marks them
+`proved_is_bound=True` because `prop:hyper-edge` is a proved upper bound,
+attained only inside stated ranges -- so those get `$\le$` past their exact
+range, not a bare number. Conjectured and open rows get `$\ge$`: the
+number is a verified construction, optimality is not proved. Missing this
+distinction would have silently overclaimed exactly the thing
+`ch2_machine.tex`'s existing prose already warns about (the $m=6,n=6,r=3$
+cell reading $12$ where the truth is $11$) -- and the generated table's
+`n=6` cell for that row does read `$\le12$`, not a bare `12`, confirming
+the gating works.
+
+Row metadata (`_VARIANT_ROW_META`) reuses `tab:rediscovery`'s own symbols
+for the eight graph rows ($\ell_m(n)$, $k_m(n)$, $\ell_m^{\mathrm{dir}}(n)$,
+$k_m^{\mathrm{dir}}(n)$, $L_m(n)$, $L_m^{\mathrm{dir}}(n)$); the eight
+hypergraph rows have no standing short symbol elsewhere in the thesis and
+none was invented for them.
+
+n-ranges (`_GRAPH_TABLE_NS = 2..8`, `_HYPER_TABLE_NS = 3..8`) were picked
+after printing every panel's actual `exact_ns` at $m=3,6$ (not guessed):
+graph rows mostly exhaust to $n=5$-$8$, hypergraph rows to $n=3$-$5$
+(the two multihypergraph directed rows only to $n=3$), so both ranges run
+a couple of sizes past that into formula/lower-bound territory, giving
+each table a dense proved/exact core that thins into qualified entries,
+the tabular analogue of a plot whose squares run out before its circles
+do.
+
+Four tables (`tab:variant-values-m{3,6}-{graphs,hyper}`), each `\input` right
+after its matching `sidewaysfigure`, `\resizebox{\textwidth}{!}` for safety
+against the 9-10 column width, `\multirow` grouping the model column exactly
+as the figure groups rows. LaTeX's float placement packed three of the four
+onto one page and left the fourth alone on the next, which is `[p]` behaving
+normally (a floats-only page, not one float per page) and not a placement
+bug.
+
+VERIFY: `make_figures.py --tables-only` wrote all four fragments from cache
+(no new solving). `latexmk -pdf` exit 0, 106pp, 0 overfull, 0 undefined
+refs, 0 occurrences of `??`. All four rendered pages inspected directly
+(not just the log) and cross-checked against three independent facts
+already stated elsewhere: $\ell_3(2)=1$ (Mader's floor), $L_3^{\mathrm{dir}}(2)=4$
+(the n=2 fix from the second session above, now shown bold green rather
+than a bare circle), and the $m=6,n=5/6,r=3$ hypergraph values ($8$ exact,
+$\le12$ not $12$) against `ch2_machine.tex`'s own stated $11$.

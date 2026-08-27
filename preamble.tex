@@ -879,6 +879,17 @@ for scientific awards or contests.
 \colorlet{regimeProved}{KULblauw1}
 \colorlet{regimeConjectured}{vertexred}
 \colorlet{regimeOpen}{vertexorange}
+
+% --- the sixteen-variant VALUE tables (tab:variant-values-*): the literal hex
+% codes plot_variant_grid() uses in erdos915_unified.py (_KUL_BLUE, _RED,
+% _GUESS, _GREEN, _VIOLET), so a number's colour in the table matches its
+% curve or marker colour in the corresponding figure exactly, not just
+% approximately as regimeConjectured/regimeOpen above do.
+\definecolor{vtProved}{HTML}{1D8DB0}
+\definecolor{vtConjectured}{HTML}{E05050}
+\definecolor{vtOpen}{HTML}{E6B800}
+\definecolor{vtExact}{HTML}{3CA050}
+\definecolor{vtSearch}{HTML}{9B5DE5}
 \tikzset{
   vtroot/.style={rectangle, rounded corners=3pt, draw=KULblauw3b, very thick,
                  minimum width=26mm, minimum height=9mm, font=\sffamily\small\bfseries},
