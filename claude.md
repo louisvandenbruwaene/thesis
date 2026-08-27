@@ -634,3 +634,57 @@ over by the stash episode above; the clean rebuild fixed it, source content was
 never the cause). 127 tests OK, 5 expected skips (optional deps not installed
 in this environment). Self-check ALL CHECKS PASSED. No em-dashes, en-dashes or
 new prose semicolons on any changed line; no banned verdict-prose phrases.
+
+## 2026-08-27 (Sonnet) — the double star was wrong, four more ch2 comments, a full-thesis read
+
+Four remaining author comments in `ch2_machine.tex`, found after the previous
+session's commit (`cfc5a7f`) had already executed two others.
+
+**THE DOUBLE STAR PARAGRAPH WAS NOT JUST WONKY, IT WAS WRONG.** The author's
+comment called the reasoning wonky and asked for a better explanation, not a
+rewrite of the math. Reading it against the rest of the thesis turned up an
+actual defect: the paragraph's own inline definition of "double star" (two
+distinct vertices $a,b$, a one-directional in-star to $a$ and out-star from
+$b$) gives $2n-3$ arcs by direct count, not the $2(n-1)$ every other mention
+of the double star needs. `program/erdos915_unified.py`'s `double_star()` is
+one hub bidirected to every leaf, and the thesis's own worked example two
+paragraphs later (36 arcs at $n=7,m=4$) only checks out against $2(n-1)(m-1)$
+with the single-hub shape. Rewritten to name the correct construction via
+`\Cref{const:dir-multi-lower}` rather than redefine it inline, and to fix the
+logic the wrong definition was papering over: the double star only witnesses
+$M^*(n)$ through the $n=7$ crossover, past it the bipartite construction
+takes over, so the old "such an integral optimum exists for every $n$"
+overstated what `cor:mstar-integral` actually proves. What generalises to
+every $n$ is not the double-star shape but the bare existence of *some*
+$\{0,1\}$ maximiser, proved by a different argument entirely (clearing
+denominators from a rational optimum).
+
+**THE OTHER THREE.** "Measuring only on the possible bounds" is now a
+`\subsection` of "The heuristic search" rather than its own section: the
+author guessed it belonged next to Pruned/Generating search instead, which
+checked out false, its running-bound bookkeeping needs the walk's add/remove
+move structure and does not exist on the DFS-based exhaustive code paths.
+The benchmark-table question (add this bookkeeping trick as a fourth
+compared method?) is answered by leaving the table alone, for the same
+reason. `tab:rediscovery` gets a `Variant` column naming each row's symbol
+($\ell_m(n)$, $L_m(n)$, $\ell_m^{\mathrm{dir}}(n)$, $L_m^{\mathrm{dir}}(n)$),
+found by a background full-thesis pass since the two comments requesting it
+(`%no need to put the m values in the names` and the variant-symbol ask)
+don't match the imperative-verb grep used to find the other three.
+
+**A FULL READ FOUND NOTHING ELSE.** A background pass read every remaining
+chapter (`ch1_basecases`, the rest of `ch2_machine`, `ch4_synthesis`,
+`app_proofs`) against its own cited definitions and theorems, the same
+diligence the double-star fix used, and confirmed no second case of that
+shape. Two items read but not re-derived line by line: the directed
+hypergraph section and the hypergraph-vertex block primer, both dense
+multi-step proofs with no surface inconsistency found.
+
+**BUNDLED WITH THIS COMMIT, NOT THIS SESSION'S WORK:** the edge-sensitivity
+section's archival to `offcuts.tex` (author instruction, same day) was
+already staged when this session started. `\sigma(e)` was an annealer-only
+removal bias that tabu, the source of every reported value, never uses.
+Recorded here only because it shipped in the same push.
+
+VERIFY: `latexmk -pdf` exit 0, 104pp, 0 overfull/underfull, 0 undefined refs,
+0 occurrences of `??` in extracted text.
