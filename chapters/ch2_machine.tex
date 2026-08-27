@@ -4,7 +4,7 @@ This chapter will serve as a sanity check for the given theorems, establishing t
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
 Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those statements are naive because they are based on small graphs only.
 Larger graph spaces will be scoured by a heuristic, namely tabu search.
-A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the ceiling and sampling alone would never meet it.
+A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the ceiling.
 The archive is the repository at \url{https://github.com/louisvandenbruwaene/thesis} and every file path quoted in this thesis is relative to it, with the commands and the audit trail collected in \Cref{sec:transcripts}.
 Below is a diagram of the program's architecture, showing how the modelled graphs are fed to the checker and how the results are used to either certify or discover bounds.
 \begin{figure}[ht]
@@ -14,54 +14,65 @@ Below is a diagram of the program's architecture, showing how the modelled graph
 \label{fig:spine}
 \end{figure}
 
-\section{The solver}
+\section{Modelling}
+All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is symmetric when undirected and binary when simple. 
+Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices with a tail distinguished in the directed model. 
+\Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
+Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
+All possible graphs of a given size will later be checked to see if they are extremal for the given size and connectivity restraint.
+Matrices are iterated as a depth-first search with cells taking values between $0$ and $m-1$, and the diagonal is always zero.
+Hypergraphs are implemented similarly from the ground up as there are no matrix tools for them.
+Notice how depth first search is optimal for memory efficiency and finding extremal graphs as soon as possible.
 
+
+\section{Measuring}
 Given $n$ and $m$, walk through every graph on $n$ vertices, measure the largest
 local connectivity $\lambda^{\max}$ or $\kap^{\max}$ of each with a max-flow computation and
 keep the densest graph that stays at or below the ceiling $m - 1$. 
-In the vertex-disjoint case the graph will be transformed before the flow can be measured.
-Hypergraphs will also need to be transformed into a flow network, because it's represented by a (multi)set of hyperedges rather than a multiplicity matrix.
-The enumeration step will skip whole families of hopeless graphs, via a pruned search. 
-
-All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is symmetric when undirected and binary when simple. 
-Hypergraphs are stored as (multi)sets of hyperedges, with a tail distinguished in the directed model. 
-Every variant shares the same integer max-flow engine no matter the implementation. 
-
-\subsection{The connectivity checker built on maximum flow}
-The whole question reduces to a flow computation.
+If the enumeration cannot finish within the time limit, the best graph so far is returned.
+It is therefore detrimental to distinguish between the densest graph possible and found.
+Here they are called exact (upper) bounds and lower bounds respectively.
+In the vertex-disjoint and hypergraph cases the graph will be transformed before the flow can be measured.
+This ensures that every variant shares the same integer max-flow engine no matter the implementation.
+Thus the whole question reduces to a flow computation:
 A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
-Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into a smallest cut. 
-For a simple graph, give every edge capacity one: the capacity of a cut is then just the number of edges in it. 
+Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges/arcs in a minimal cut. 
+For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities. 
 For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$. 
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
-The max-flow/min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that this smallest cut has exactly the value of a maximum flow. 
+The max-flow/min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that this smallest cut has exactly the value of a maximum flow.
 So the route count we are after is just a maximum-flow value: measure the flow and you have measured the connectivity.
 
 The routine that runs this flow and reports the route count is the connectivity \emph{checker}. 
-It is the single most important routine in the program.
 The program ships an optional compiled C helper that runs this same flow more efficiently. 
 
-The vertex-disjoint version follows the same idea after one transformation: 
-split each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}). 
-Every arc $u \to v$ of the original graph becomes $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the split network. 
-The construction is not special to digraphs: 
-for an undirected graph each edge $\{u,v\}$ is first read as the two opposite arcs $u \to v$ and $v \to u$
-and then the same split applies, so one routine serves the undirected and directed vertex problems alike. 
-Routing through $v$ now consumes the one unit of capacity on its internal arc, so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow. 
-A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network therefore equals the number of internally vertex-disjoint $u$-$v$ paths in the original graph.
-In the vertex disjoint variants multiplicity of an edge is irrelevant compared to its existence, so parallel edges never raise $\kappa$.\label{sec:parallel-convention}
-Since parallel copies never raise $\kappa$, they never break the connectivity constraints either.
-Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
-The multigraph vertex variants are therefore posed on the underlying simple graph, which is why those two rows of \Cref{tab:summary} reduce to their simple counterparts and why every figure in this thesis reports the reduced problem for them.
+\subsection{Transformations}
+This max-flow computation is built for directed multigraphs (including simple digraphs) with edge-disjoint paths.
+That is why the other variants will have to be transformed into such a flow network.
+Undirected multigraphs have the natural identification to a directed multigraph by replacing 
+every edge with a pair of arcs that are going in opposite directions.
+Multi-hypergraphs need to replace their hyperedges with a helper gate, 
+an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
+Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity, 
+so the one arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
+A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit, 
+which is what forces a route to cross it from tail to head.
+The directed hypergraph's flow network is just a restricted version of the undirected one.
+Another representations for multi-hypergraphs is a separate gate with capacity one for each hyperedge.
 
-A hyperedge is handled by adding a helper gate, an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
-Every member runs into the entry and out of the exit at unlimited capacity, so the one arc between them is the only narrow part (\Cref{fig:hyper-gadget}).
-A directed hyperedge is wired the same way, except that only its tails reach the entry and only its heads leave the exit, which is what forces a route to cross it from tail to head.
-Every route using the hyperedge must cross that one arc, so the number of routes it can carry is exactly its multiplicity, one for a simple hypergraph.
-Putting the capacity on the shared arc rather than on each member's own arc is what makes the count right, since capping the members individually would let a hyperedge with several tails carry a separate route for each of them.
 The hypergraph Menger theorem (\Cref{thm:menger-hyper}) proves that the resulting maximum flow is exactly the Berge connectivity. 
 \Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph. 
-For the vertex-disjoint hypergraph checker, the ordinary vertices are split as before and the helper point is added to the split network with infinite internal capacity.
+For the vertex-disjoint hypergraph checker, 
+the ordinary vertices are split as before and the helper point is added to the split network with infinite internal capacity.
+
+Lastly, all vertex-disjoint versions can then be transformed into an identical edge-disjoint question by splitting
+each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}). 
+Every arc $u \to v$ of the digraph becomes $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the split network.
+Routing through $v$ now consumes the one unit of capacity on its internal arc, 
+so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow. 
+A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network therefore equals the number of internally vertex-disjoint $u$-$v$ paths in the original graph.
+Notice how the undirected or hypergraph transformation is done beforehand and 
+the gates aren't split by this step.
 
 \begin{figure}[htbp]
 \centering
@@ -175,7 +186,6 @@ For the vertex-disjoint hypergraph checker, the ordinary vertices are split as b
 \label{fig:hyper-gadget-example}
 \end{figure}
 
-
 % Printed legibility: three panels across at 0.32\textwidth shrank each picture
 % to roughly 0.58 of natural size and its labels to under 5pt. Stacking them
 % one per row at 0.70\textwidth reverses that, drawing each slightly larger
@@ -266,8 +276,6 @@ For the vertex-disjoint hypergraph checker, the ordinary vertices are split as b
 \label{fig:checker-gadgets}
 \end{figure}
 
-
-
 \section{Checking every graph of a fixed size}
 The connectivity checker works on all variants but measures only one graph at a time. 
 All graphs of a fixed number of vertices must be enumerated to discover the bound for a single connectivity constraint.
@@ -275,7 +283,7 @@ A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off
 and a digraph varies every ordered pair rather than only the upper triangle.
 A hypergraph is not a matrix at all, so it is enumerated over its own list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
 In the directed model, the tail is specified with a pointer and the multihypergraphs have multiplicities for each hyperedge.
-\Cref{fig:matrix-rep} shows how an undirected multigraph and hypergraph are represented.
+\Cref{fig:matrix-rep} shows how a directed multigraph and hypergraph are represented.
 Using these representations for all graph variants means iteration traverses all possible representation states easily. 
 Walking those possibilities, measuring each candidate with the checker and keeping the densest feasible graph settles a bound exactly.
 If the enumeration hits its deadline before finishing, the returned graph is labelled as a lower bound.
@@ -288,39 +296,32 @@ On the small cases this exhaustive mode independently reproduces every value pro
     \label{fig:complexity}
 \end{figure}
 
-
-Adding vertices multiplies the number of possible graphs by an exponential in $n$, 
-so a single extra vertex can move a problem from minutes to days. 
-Raising the connectivity budget is the next cost, 
-lifting the base of the exponent rather than its height, 
-which is why the multigraph curves sit above the simple ones in every panel. 
-Direction is the third: a digraph decides an ordered pair where the undirected graph
-decides an unordered one, giving it twice as many entries and a count that is the
-undirected one squared rather than a multiple of it.
-A directed $3$-uniform hyperedge, a tail with two heads, has three orientations for every
-undirected hyperedge.
-The directed panel therefore climbs fastest of all,
-and those are precisely the variants whose answers \Cref{ch:basecases} could not prove.
-The separation, by contrast, costs nothing here, because edge and vertex disjointness 
-search the same graphs and differ only in what the checker measures, which is an increase linear to the number of graphs.
+Adding vertices is the most expensive change, followed by raising the connectivity
+budget and, lastly, adding direction, which doubles the possibilities for each pair.
+Directed hypergraphs are especially numerous because each hyperedge also requires a
+choice of tail and heads. 
+These are precisely the variants whose answers \Cref{ch:basecases} could not prove.
+The separation, by contrast, does not change the enumeration: edge and vertex disjointness
+search the same graphs and differ only in output.
 
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth]
-% ---- (a) graph -> multiplicity matrix, diagonal highlighted ----
+% ---- (a) digraph -> multiplicity matrix, diagonal highlighted, asymmetric ----
 \node[vertex] (A) at (0,   0)   {$1$};
 \node[vertex] (B) at (2.0, 0)   {$2$};
 \node[vertex] (C) at (1.0, 1.7) {$3$};
-\draw[edge] (A) to[bend left=15]  (B);
-\draw[edge] (A) to[bend right=15] (B);
-\draw[edge] (B) -- (C);
-\draw[edge] (A) -- (C);
-\node[font=\small] at (1.0, -0.8) {multigraph $G$};
+\draw[arc] (A) to[bend left=15]  (B);
+\draw[arc] (A) to[bend right=15] (B);
+\draw[arc] (B) to[bend left=15]  (C);
+\draw[arc] (C) to[bend left=15] (B);
+\draw[arc] (A) -- (C);
+\node[font=\small] at (1.0, -0.8) {directed multigraph $G$};
 \node at (3.3, 0.55) {$\xrightarrow{\;\mu\;}$};
-\node at (5.4, 0.55) {$\begin{pmatrix} {\color{vertexred}\mathbf 0} & 2 & 1 \\ 2 & {\color{vertexred}\mathbf 0} & 1 \\ 1 & 1 & {\color{vertexred}\mathbf 0} \end{pmatrix}$};
+\node at (5.4, 0.55) {$\begin{pmatrix} {\color{vertexred}\mathbf 0} & 2 & 1 \\ 0 & {\color{vertexred}\mathbf 0} & 1 \\ 0 & 1 & {\color{vertexred}\mathbf 0} \end{pmatrix}$};
 \node[font=\small] at (5.4, -0.8) {multiplicity matrix $\mu$};
-\node[font=\scriptsize, vertexred] at (5.4, -1.3) {diagonal always $0$: no loops};
-% ---- (b) hypergraph -> list of hyperedges, one of them repeated ----
+\node[font=\scriptsize, vertexred] at (5.4, -1.3) {Diag($\mu$)$=0$ (no loops)};
+% ---- (b) directed hypergraph -> list of hyperedges, tail 3 shared by both ----
 \begin{scope}[yshift=-3.5cm]
   \coordinate (p1) at (0.0, 0.6);
   \coordinate (p2) at (0.0,-0.6);
@@ -328,17 +329,19 @@ search the same graphs and differ only in what the checker measures, which is an
   \coordinate (p4) at (2.2, 0.6);
   \coordinate (p5) at (2.2,-0.6);
   \begin{scope}[on background layer]
-    \draw[metro, metroA] (p1)--(p3)--(p2);
-    \draw[metro, metroB] (p4)--(p3)--(p5);
+    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p1);
+    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p2);
+    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p4);
+    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p5);
   \end{scope}
   \foreach \p/\lbl in {p1/1,p2/2,p3/3,p4/4,p5/5} {\node[smallvertex] at (\p) {$\lbl$};}
-  \node[font=\small] at (1.1,-1.25) {hypergraph $H$};
+  \node[font=\small] at (1.1,-1.25) {directed hypergraph $H$};
   \node at (3.3, 0.0) {$\longrightarrow$};
-  \node[font=\small, align=left] at (5.7, 0.0)
-    {list of hyperedges:\\[3pt] $e_1=\{1,2,3\}$\\[1pt] $e_2=\{3,4,5\}$};
+  \node[font=\small, align=left] at (5.9, 0.0)
+    {list of hyperedges:\\[3pt] $e_1: \{3\ |\ 1,2\}$\\[1pt] $e_2:\{3\ |\ 4,5\}$};
 \end{scope}
 \end{tikzpicture}
-\caption{The two encodings. A graph or digraph is the multiplicity matrix $\mu$, which is symmetric when undirected and binary when simple. A hypergraph is a list of vertex sets instead, since a matrix would need $n^r$ entries and be almost all zero. A multihypergraph repeats an entry in that list.}
+\caption{The two encodings, shown for the directed variants. The digraph is represented by the multiplicity matrix $\mu$, where $\mu_{ij}$ counts arcs from $i$ to $j$. The directed hypergraph is a list of hyperedges instead, where the tail of each is isolated. Multihypergraphs repeat at least one entry in the list of hyperedges. Since a matrix (or tensor) representation would need $n^r$ entries and those would be almost all zero, that generalization is worth deviation from for efficiency.}
 \label{fig:matrix-rep}
 \end{figure}
 
@@ -349,16 +352,24 @@ The enumeration is exact wherever it finishes and it does so only for the smalle
 \Cref{fig:complexity} measures exactly how fast the search space grows. 
 
 \subsection{Pruned search}
+The enumeration step will skip whole families of hopeless graphs, via a pruned search. 
 The base cases $n \le 7$ of the directed $m = 2$ theorem (\Cref{thm:dir-arc-m2-exact}) are the finite checks the induction of \Cref{app:proofs} depends on, and they sit just past where blind enumeration of digraphs is tractable.
-They can be reached by enumerating more cleverly, and the same two prunings serve every variant, since neither mentions direction, multiplicity, arity, or which separation the checker is measuring.
-
-Every variant offers a fixed list of edges its graphs are allowed to use, whether those are pairs, ordered pairs, or oriented sets of $r$ vertices, and a graph is a choice of how many copies each of them gets. Rather than writing out whole choices one after another, fix an order on that list and decide the edges one at a time, leaving the undecided ones absent. Each partly built graph then stands for the whole family of graphs agreeing with it so far, and a pruning discards that family in one step.
+They can be reached by enumerating more cleverly.
+Every variant offers a fixed list of edges its graphs are allowed to use, 
+whether those are pairs, ordered pairs, or oriented sets of $r$ vertices, 
+and a graph is a choice of how many copies each of them gets. 
+Rather than writing out whole choices one after another, 
+fix an order on that list and decide the edges one at a time, 
+leaving the undecided ones absent. 
+Each partly built graph then stands for the whole family of graphs agreeing with it so far, 
+and a pruning discards that entire family if it is deemed to bear no fruit.
 
 Adding an edge never lowers a connectivity, since a family of disjoint routes survives intact when more edges are laid around it (\Cref{prop:monotone}). Every completion of a partly built graph only ever adds, so the partly built graph is a floor under all of them. The moment it breaks the ceiling, so does every completion, and the branch is abandoned.
 
-The second pruning counts. Take the edges already placed and add the most the undecided ones could ever contribute, which is how many are left times the largest multiplicity allowed. That sum is an upper bound on every completion, so if even it cannot beat the best feasible graph found so far, the branch is dropped unexplored (\Cref{fig:prune}).
-
-Only infeasible graphs and graphs that cannot beat the incumbent are ever discarded, so a run that finishes returns exactly the maximum the blind walk would have returned. A regression test pins that by running both side by side over every variant and every size the blind one can still reach. The graph left at the end of a surviving branch also needs no final check, since the last edge it placed was tested against a graph identical to it, every later one being absent.
+A second pruning method takes the edges already placed and adds the most the undecided ones could ever contribute, which is how many are left times the largest multiplicity allowed. 
+That sum is an upper bound on every completion, so if even it cannot beat the best feasible graph found so far, 
+the branch is dropped unexplored (\Cref{fig:prune}).
+Only infeasible graphs and graphs that cannot beat the incumbent are ever discarded, so a run that finishes returns exactly the maximum the basic walk would have returned. 
 
 \begin{figure}[ht]
 \centering
@@ -386,47 +397,55 @@ Only infeasible graphs and graphs that cannot beat the incumbent are ever discar
   \node[font=\scriptsize, vertexred, align=center] at (1.3,-3.5) {infeasible\\(prune)};
   \node[font=\scriptsize, vertexorange!80!black, align=center] at (3.1,-3.5) {cannot beat\\best (prune)};
 \end{tikzpicture}
-\caption{Branch and bound over digraphs. Each level fixes one adjacency. Infeasible partial graphs (red) and branches unable to beat the incumbent (orange) are discarded, allowing the exact search to reach $n\le7$.}
+\caption{Each level of the partially built graph fixes one adjacency. Infeasible partial graphs (red) and branches unable to beat the incumbent (orange) are discarded.}
 \label{fig:prune}
 \end{figure}
 
-Run on the directed $m=2$ problem, the sweep returns the complete sequence
-$2, 4, 6, 8, 10, 12$ for $n=2,\dots,7$: each size is proved complete.
-The densest digraph it finds at each $n$ is exactly the extremal shape named in
-\Cref{ch:basecases}. For $n<7$, it is the bidirected star. At the crossover
-$n=7$, both the hub and the one-directional bipartite digraph attain the tying
-value $12$.
-These are exactly the base cases the induction requires, and with them the long
-proof of \Cref{thm:dir-arc-m2-exact} rests on a single auditable search rather
-than on anything done by hand. \Cref{tab:basecase-search} tabulates that sweep
-beside its vertex counterpart.
-
 \subsection{Generating search}
-One way to improve speed of the enumeration further is a depth-first pruned walk, keeping one representative of each isomorphism class by reducing every finished graph to its canonical relabelling, the smallest matrix in dictionary order. 
-The canonical form keeps the memory small, but the time is spent walking labelled partial graphs, 
-and time is what runs out: the full classification at $n = 5$ costs this in-house search about $456$ seconds, and it climbs steeply from there.
+Instead of iterating all possible graphs and measuring their connectivity which repeats many similar graphs,
+another method suggested by Prof.\ Jan Goedgebeur generates all non-isomorphic graphs. 
+It uses the \texttt{geng} program from the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14} 
+to perform the difficult task of generating one representative of each isomorphism class. 
+The program is called as a subprocess, and its \texttt{graph6} output is decoded. 
+For a given $n$, \texttt{geng} produces all non-isomorphic \emph{undirected} graphs. 
+The program then treats each such graph as a support graph and assigns directed arc multiplicities to its edges. 
+Consequently, the search automatically inherits the support graph's isomorphism reduction. 
+For each support edge $\{u,v\}$, considered in a fixed order, it assigns the ordered pair 
+of multiplicities $\mu(u,v)$ and $\mu(v,u)$. Each multiplicity lies between $0$ and $m-1$, 
+and they cannot both be zero because every support edge must represent at least one arc. 
+After each assignment, the checker evaluates the partially decorated multigraph. 
+If any pair already exceeds the allowed connectivity, that branch is stopped immediately: 
+adding more arcs cannot decrease connectivity. This is the same monotonicity-based pruning used in \Cref{fig:prune}. 
+Decorations that reach the target arc count are retained and converted to canonical form, 
+which ensures that each isomorphism class is reported only once. 
+Because different support graphs produce disjoint search spaces, they can be processed independently on separate processor cores. 
+The related orientation tools \texttt{directg} and \texttt{watercluster2} are not used.
+They assign only one orientation to each edge, so they cannot represent the bidirected edges
+or the repeated arc multiplicities that occur in the extremal graphs.
 
-The second way, suggested by Prof.\ Jan Goedgebeur, does not search at all, it generates. It hands the hard part, listing one graph per isomorphism class, to the \texttt{geng} program of the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14}, invoked through a subprocess and decoded from its \texttt{graph6} output. 
-\texttt{geng} lists the non-isomorphic \emph{undirected} graphs on $n$ vertices, and the program decorates each one with the directed multiplicities the problem needs, so the isomorphism reduction is inherited for free from the support graph. 
-The decoration walks the support's edges in a fixed order and gives each edge $\{u,v\}$ an ordered pair of multiplicities $\mu(u,v), \mu(v,u)$, each between $0$ and $m-1$ but not both zero, since an edge of the support must carry at least one arc. 
-The checker measures the partly decorated multigraph as it goes, and the moment some pair exceeds the connectivity ceiling the whole branch of assignments is abandoned, since adding further arcs can never lower a connectivity, the same monotonicity prune as \Cref{fig:prune}. 
-A decoration surviving to the end with the target arc count is kept and reduced to canonical form, so each isomorphism class is reported once, and different supports share nothing, so they are processed independently across the processor cores. 
-The companion orientation tools \texttt{directg} and \texttt{watercluster2} are not used, because each gives only one orientation per edge and so cannot express the bidirected arcs and repeated multiplicities the extremal graphs are built from. 
-To be precise about credit: Prof.\ Goedgebeur is not an author of \texttt{nauty}, which is the work of McKay and Piperno cited above. He suggested the generation route, and it is his suggestion that the speed-up rests on.
+\Cref{tab:generating-benchmark} times three ways of proving $\ell_2^{\mathrm{dir}}(n)$ for a simple digraph on a single core: a blind sweep over every matrix assignment with no pruning at all, the depth-first pruned search of \Cref{fig:prune}, and the geng-generated pipeline above.
+The blind sweep is left out past $n = 4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s and the next vertex would cost days, the same growth \Cref{fig:complexity} plots.
+Below $n = 5$ both remaining methods are dominated by fixed overhead, a Python call against a subprocess spawn, rather than by search cost, and neither number there is a meaningful comparison.
+From $n = 5$ the gap widens with every vertex: generation is $5.5$ times faster at $n = 5$, $20$ times faster at $n = 6$ and $68$ times faster at $n = 7$, where the pruned search takes $1156.6$\,s against the generated pipeline's $17.0$\,s.
+All three methods return the same proved value at every $n$ where they finish.
 
-The two ways agree to the last graph. The generated pipeline reproduces the in-house classification exactly at every settled size, two non-isomorphic extremal families at $n = 4$ and three at $n = 5$, and it runs substantially faster, since the isomorphism work it never repeats is precisely what \texttt{geng} has already done. 
-One difference decides which to trust further out: the in-house search leans on a conjectured counting bound once $n \ge 7$, while the generated enumeration prunes only with proved bounds, so it is sound and complete for the parameter range and any explicitly imposed degree cap. 
-That soundness has now paid off. 
-Pointed at the degree-bounded classification at $n = 7$, the generation enumerator completed the sweep in about seven hours across ten processor cores and returned exactly three extremal families, $2 \cdot B_{3,4}$, $2 \cdot B_{4,3}$, and the doubled bidirected path $P_7$ (\Cref{rem:n7-classification}).
+\begin{table}[ht]
+    \centering
+    \small
+    \input{figures/generating_benchmark_table.tex}
+    \caption{Wall-clock time to prove $\ell_2^{\mathrm{dir}}(n)$ by three methods, single core. The blind sweep has no pruning. The pruned search is \Cref{fig:prune}'s depth-first branch and bound. The generated pipeline is the geng-seeded search above. A dash marks a run not attempted at that size.}
+    \label{tab:generating-benchmark}
+\end{table}
 
 \section{Proving every \texorpdfstring{$m$}{m} at once}
 
-The pruned search looks at one pair $(n,m)$ at a time.
-Historically, the directed multigraph checker used a different idea: it rescaled the multiplicities by a factor of $m-1$ and then checked the relevant thresholds for a fixed $n$ in one pass.
+The search so far looks at one pair $(n,m)$ at a time, but for the directed multigraph a faster method can be used: 
+it rescaled the multiplicities by a factor of $m-1$ and then checked the relevant thresholds for a fixed $n$ in one pass.
 The general theorem of \Cref{thm:dir-multi-full} has now replaced this route in \code{solve}, but the older formulation is still a useful independent finite check.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
-This produces weights $w(u,v)\in[0,1]$, pairwise maximum flow at most one, and a total weight equal to the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
+This produces weights $w(u,v)\in[0,1]$, pairwise maximum flow at most one, 
+and a total weight equal to the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
 Thus, with
 \[
     M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s, t\Bigr\}
@@ -437,13 +456,27 @@ for the largest total weight of such a matrix, scaling gives
     \qquad \text{for every } m \ge 2 .
 \]
 
-The reverse inequality requires an optimum whose entries scale back to integers. The historical optima for $n\le6$ were $\{0,1\}$ double stars, so there
+For the reverse inequality, we need a maximum-weight matrix whose entries can
+be multiplied by $m-1$ to give integer arc multiplicities.  Here a
+\emph{double star} is the directed $0$--$1$ matrix obtained by choosing two
+distinct vertices $a$ and $b$, putting an arc from every other vertex to $a$
+and from $b$ to every other vertex, and putting all other entries equal to
+zero.  (The two centres may also be described as the sink and source of the
+star.)  Thus it has one incoming star and one outgoing star, with no parallel
+arcs.  The historical optima for $n\le6$ had exactly this form, so their
+entries remain integral after multiplying by $m-1$.
+The hand proof now proves the stronger statement that such an integral
+optimum exists for every $n$ (\Cref{cor:mstar-integral}).  Consequently, for
+every $n$ and every $m\ge2$, the maximum number of arcs in a directed
+multigraph with pairwise maximum flow at most $m-1$ is exactly
+$(m-1)M^*(n)$: the scaled double-star construction gives the lower bound,
+and the preceding scaling argument gives the upper bound. 
+The finite optimisation is retained only as an independent check of the cases $n\le6$.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
 \]
-The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-integral}). The finite optimisation is retained to record the independent route by which the cases $n\le6$ were first checked.
-
+%the reasoning in this paragraph is wonky, please improve it. (don't give a full proof, just explain better)
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, font=\small]
@@ -480,25 +513,59 @@ The hand proof now establishes this identity for every $n$ (\Cref{cor:mstar-inte
 \label{fig:scaling-reduction}
 \end{figure}
 
-The model itself is a mixed-integer program with one chosen cut per ordered pair, and it is written out, with the theorem it settled and the record of what was run, in \Cref{sec:mstar-model}.
+The model itself is a mixed-integer program with one chosen cut per ordered pair, and it is written out, 
+with the theorem it settled and the record of what was run, in \Cref{sec:mstar-model}.
 
 \section{The heuristic search}
+So far, iterating all graphs of a fixed size that meet the connectivity constraint and counting their edges was a blind walk.
+Apart from pruning, there is nothing that steers the walk towards better candidates because they all need to be checked anyway.
+From a certain point onwards, that will become impossible due to the massive number of possible graphs.
+The goal then becomes finding the densest possible graphs in such an efficient and guided way that they are 
+likely to be an (almost) extremal graph.
+The guide that pulls the walk towards a (local) maximum is called a heuristic.
+To avoid getting stuck in a local maximum, a metaheuristic allows worsening moves to discover new optima.
 
-We want, for fixed $n$ and $m$, a graph with as many edges as possible subject to $\lambda^{\max} \le m - 1$ (or $\kappa^{\max} \le m - 1$ for the vertex variants). The space of graphs on $n$ vertices is enormous and its feasible region has no helpful shape: adding an edge can be harmless until, together with edges added long before, it suddenly creates a forbidden pair. A greedy walk that only ever accepts an improving move stalls at the first such collision, in a graph that is locally maximal but globally far from extremal.
-
-Every graph is scored by one number, its energy
+To implement the metaheuristic, give each graph one number: its energy
 \[
     \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
 \]
-which rewards edges and penalises any excess connectivity. A move toggles one adjacency, and the search walks from the empty graph by repeatedly taking the move that lowers the energy most. The penalty is a soft constraint rather than a hard one, so the walk may pass briefly above the ceiling instead of being walled inside the feasible region.
+which rewards edges and penalises any excess connectivity. 
+The search starts from the empty graph and moves by toggling an arc. 
+The method used is \emph{tabu search} \cite{Glover89}, 
+which escapes a local optimum by forbidding the pairs it has just touched. 
+Among the moves not forbidden, the walk always takes the one that lowers $\Phi$ most, even when every candidate raises it.
+This is unlike a greedy walk that only ever accepts an improving move. 
+After each move the pair it changed is put on a tabu list for a fixed number of steps, 
+so the walk cannot immediately undo what it just did and cycle back into the optimum it came from. 
+A move that would beat the best graph seen so far overrides the tabu flag regardless of its status, 
+an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, 
+and the walk perturbs itself when it stalls.
 
-The method used is \emph{tabu search} \cite{Glover89}, which escapes a local optimum by forbidding the pairs it has just touched. Among the moves not forbidden, the walk always takes the one that lowers $\Phi$ most, even when every candidate raises it: this is what lets it climb back out of a minimum rather than stopping there, unlike a greedy walk that only ever accepts an improving move. After each move the pair it changed is put on a tabu list for a fixed number of steps, so the walk cannot immediately undo what it just did and cycle back into the optimum it came from. A move that would beat the best graph seen so far overrides the tabu flag regardless of its status, an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, and the walk perturbs itself when it stalls.
+Simulated annealing allows worsening moves with decreasing probability over time and is an alternative on the same energy and the same neighbourhood, 
+but at equal wall-clock budget it is the weaker engine here. 
+Tabu always wins speedwise and there manages to close hard problems faster: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser, where annealing stalls at $20$ and $18$ arcs against $16$ on the simple digraph. 
+Every discovery value this thesis reports therefore comes from tabu search. 
+Annealing is kept only as an independent cross-check in the program's self-test, 
+where agreement between two unrelated walks is worth more than the speed of either.
 
-Simulated annealing is the obvious alternative, and on the same energy and the same neighbourhood, at equal wall-clock budget, it is the weaker engine here. The two tie on the undirected problems, and on the directed ones, which are the hard cases, tabu wins outright: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser where annealing stalls at $20$, and $18$ arcs against $16$ on the simple digraph. Every discovery value this thesis reports therefore comes from tabu search. Annealing is kept only as an independent cross-check in the program's self-test, where agreement between two unrelated walks is worth more than the speed of either.
-
-It is fair to ask why the walk is allowed above the ceiling at all. Reaching every feasible graph does not require it. Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. From any feasible target we can therefore delete edges one at a time down to the empty graph without ever crossing the ceiling, and reading that path backward builds the target up the same way. The feasible region is connected through the empty graph by single-edge moves that stay inside it, so a walk that never went infeasible could in principle visit every feasible graph there is.
-
-We let it go infeasible anyway, because reachability and efficiency are different things. A feasible graph can be locally maximal, meaning every edge we might add creates a forbidden pair, and yet still sit far below the densest feasible graph. To improve such a graph the walk has to add an edge and then remove a different one, a swap whose first half is infeasible. A walk confined to feasible graphs could only find that better graph by retreating most of the way back to the empty graph and climbing a different slope, a detour far longer than the budget allows. Allowing a brief excursion above the ceiling lets the walk trade one load-bearing edge for a better one in two moves rather than dozens. Going above the bound is never the goal. It is the shortcut the walk takes on its way back down to it.
+It is fair to ask why the walk is allowed above the ceiling at all. 
+Reaching every feasible graph does not require it. 
+Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, 
+so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. 
+From any feasible target we can therefore delete edges one at a time down to the empty graph 
+without ever crossing the ceiling, and reading that path backward builds the target up the same way. 
+The feasible region is connected through the empty graph by single-edge moves that stay inside it, 
+so a walk that never went infeasible could in principle visit every feasible graph there is.
+We let it go infeasible anyway, because reachability and efficiency are different things. 
+A feasible graph can be locally maximal, meaning every edge we might add creates a forbidden pair, 
+and yet still sit far below the densest feasible graph. 
+To improve such a graph the walk has to add an edge and then remove a different one, 
+a swap whose first half is infeasible. 
+A walk confined to feasible graphs could only find that better graph by retreating most of the way back 
+to the empty graph and climbing a different slope, a detour far longer than the budget allows. 
+Allowing a brief excursion above the ceiling lets the walk trade one load-bearing edge for a better one 
+in two moves rather than dozens. Going above the bound is never the goal. 
+It is the shortcut the walk takes on its way back down to it.
 
 \section{Edge sensitivity}
 

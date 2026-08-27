@@ -576,3 +576,61 @@ entries and bypass the guard exactly when it is needed. The completed ones were
 relabelled (a finished exhaustion's value does not depend on how long it was
 allowed) and the 23 unfinished ones dropped and recomputed, since "did not finish
 in 4s" is not the same claim as "did not finish in 60s".
+
+## 2026-08-27 (Opus, seventh pass) — the author's two inline comments in ch2
+
+Two instructions left as source comments in `chapters/ch2_machine.tex`, executed.
+
+**THE SPINE DIAGRAM.** `%change the picture: remove 'cut-counting, search' and
+'annealing'` sat after `fig:spine`. The `\spinediagram` macro (`preamble.tex`)
+gave its PROVE node the subtitle "cut-counting, search" and its DISCOVER node
+"annealing, tabu". Annealing left the thesis narrative in an earlier pass
+(tabu is the only search method described now) and the historical cut-counting
+MILP is no longer PROVE's headline route, so the PROVE node lost its subtitle
+entirely and DISCOVER's now reads "tabu" alone. Comment deleted.
+
+**THE GENERATING-SEARCH BENCHMARK TABLE**, requested by
+`%include a small table (of different runs for values (n,m) to compare before
+and after) for ggenerating search here and also with and without pruning` at
+the end of `\subsection{Generating search}`. Timed three ways of proving
+$\ell_2^{\mathrm{dir}}(n)$ on a single core, $n = 3..7$: a blind sweep with no
+pruning at all (reference sweep from `tests/test_solve.py`, reimplemented
+standalone), the in-house pruned search (`_exhaustive_directed`), and the
+geng-generated pipeline (`enumerate_extremal_directed_multigraphs_via_generation`,
+`parallel=False` for a fair single-core comparison). Numbers are real
+measurements from this machine, not invented: blind 0.05s/6.3s at $n=3,4$ then
+abandoned (2^{n(n-1)} makes $n=5$ tens of minutes with this reference
+implementation); pruned 0.003s/0.008s/0.22s/14.5s/1156.6s at $n=3..7$; geng
+0.009s/0.008s/0.039s/0.73s/17.0s. Below $n=5$ both are overhead-noise (a
+Python call against a subprocess spawn); from $n=5$ generation pulls ahead by
+5.5x, 20x, 68x. New `\Cref{tab:generating-benchmark}` with two sentences of
+prose, sourced from `figures/generating_benchmark_table.tex`, matching
+`tab:rediscovery`'s `\input`-a-tabular house style. The benchmark script is
+saved at `research_notes/scripts/generating_search_benchmark.py` for
+reproduction, following the same sys.path pattern as the other standalone
+scripts in that directory.
+
+**ONE MORE DEFECT FOUND IN PASSING.** The same author hand-edit that added the
+two comments also introduced `\Cref{FordFulkerson56}` where the surrounding
+sentence cites a paper, not a labelled float. Fixed to `\cite{FordFulkerson56}`;
+this would have printed a `??` inline (cleveref has no bibkey to resolve) had
+it survived to build.
+
+**A STASH RECOVERY, FOR THE RECORD.** Baselining the pre-change build via
+`git stash` and a rebuild-then-pop briefly diverged the working tree: the pop
+reported a conflict on one file yet silently dropped the edits to two others.
+Nothing was lost because the stash itself still held everything from the
+moment of stashing; `git checkout stash@{0} -- <path>` per file, verified
+against the stash's own diff before dropping it, is the recovery. Lesson for
+next time: don't stash a dirty tree that mixes the author's own uncommitted
+prose with in-progress edits just to get a baseline build. A worktree or a
+plain `git diff` against HEAD on the specific changed hunks would have gotten
+the same baseline without touching the working tree at all.
+
+VERIFY: `latexmk -C` then a clean rebuild, exit 0, 106pp, 0 overfull, 0
+occurrences of `??` in the extracted PDF text (an intermediate build before the
+`-C` clean exited 12 on a corrupted `\@writefile` from stale aux/toc state left
+over by the stash episode above; the clean rebuild fixed it, source content was
+never the cause). 127 tests OK, 5 expected skips (optional deps not installed
+in this environment). Self-check ALL CHECKS PASSED. No em-dashes, en-dashes or
+new prose semicolons on any changed line; no banned verdict-prose phrases.

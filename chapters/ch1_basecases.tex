@@ -95,7 +95,7 @@ Writing the answer as an extremal function,
     \ell_m(n) = \max\{\, |E(G)| : |V(G)| = n,\ \lec_G^{\max} \le m - 1 \,\},
 \]
 the problem asks for $\ell_m(n)$, the most edges possible under the ceiling. 
-Mader proved that no graph under the ceiling has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case and provided the shared-clique construction, which achieves the bound but is only defined when $m-1$ divides $n-1$.
+Mader proved that no graph under the ceiling has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case and provided the shared-clique construction, which achieves the (lower) bound but is only defined when $m-1$ divides $n-1$.
 The brackets $\floor{\,\cdot\,}$ round their content down to the nearest whole number and their ceiling counterpart $\ceil{\,\cdot\,}$ rounds up. Both recur throughout, because an edge count is always an integer while the formulas that bound it need not be.
 
 \begin{theorem}[Mader \cite{Mader73}]\label{thm:mader}
@@ -402,10 +402,18 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \label{fig:edge-vs-vertex}
 \end{figure}
 
+In the vertex disjoint variants multiplicity of an edge is irrelevant compared to its existence, 
+so parallel edges never raise $\kappa$.\label{sec:parallel-convention}
+Therefore they never break the connectivity constraints either.
+Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
+The multigraph vertex variants are thus posed on the underlying simple graph, 
+which is why those two rows of \Cref{tab:summary} reduce to their simple counterparts and why every figure in this thesis reports the reduced problem for them.
 
-With all this in mind, the thesis considers multi-hypergraphs and directed multi-hypergraphs for both edge- and vertex-disjoint routes, where $r=2$ and no parallel edges are special cases. 
+With all this in mind, the thesis considers multi-hypergraphs and directed multi-hypergraphs for both edge- and vertex-disjoint routes, 
+where $r=2$ and no parallel edges are special cases. 
 The final status map appears in \Cref{fig:variant-tree-status}. 
 The notation for all their extremal functions is summarised in \Cref{tab:notation}.
+
 
 \begin{table}[ht]
 \centering
