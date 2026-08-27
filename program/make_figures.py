@@ -625,7 +625,19 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
             band=band2, exact=ex2, search=se2))
 
     # (3) simple directed arc -- conjectured.
-    ex3 = _exact_points(range(2, 8), m, exact_budget,
+    # The shared exact_budget (60s) is calibrated for the hypergraph panels
+    # (see its own docstring) and is far too short here: at m=3, n=6 this
+    # panel's own exhaustion measures 544.2s (edge) and 1422.7s (vertex) on
+    # the author's machine, matching rem:dir-vertex-m3's claim that the
+    # exhaustion behind the appendix's n=6 row (both separations = 15)
+    # completes, while n=7 does not finish even in about an hour and a half.
+    # A dedicated budget with the range capped at n=6 reproduces exactly that
+    # boundary: generous enough to reach the size the appendix proves, and
+    # never large enough to spend an hour discovering n=7 still will not
+    # finish, which range(2, 8) under a many-minute budget would otherwise do
+    # twice (edge and vertex) at every m this grid is drawn for.
+    dir_simple_exact_budget = 1800.0
+    ex3 = _exact_points(range(2, 7), m, dir_simple_exact_budget,
                         directed=True, simple=True, separation="edge")
     se3 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="edge")
@@ -639,7 +651,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         exact=ex3, search=se3))
 
     # (4) simple directed vertex -- conjectured (= arc).
-    ex4 = _exact_points(range(2, 8), m, exact_budget,
+    ex4 = _exact_points(range(2, 7), m, dir_simple_exact_budget,
                         directed=True, simple=True, separation="vertex")
     se4 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="vertex")

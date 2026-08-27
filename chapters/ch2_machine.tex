@@ -1,5 +1,5 @@
 
-The previous chapter gave insight into the problem and some variants, but left most harder questions open.
+The previous chapter gave insight into the problem and some variants, but left most of the harder questions open.
 This chapter will serve as a sanity check for the given theorems by testing them on small graphs through brute-force enumeration.
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
 Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those statements are naive because they are based on small graphs only.
@@ -36,7 +36,7 @@ In the vertex-disjoint and hypergraph cases the graph will be transformed before
 This ensures that every variant shares the same integer max-flow engine no matter the implementation.
 Thus the whole question reduces to a flow computation:
 A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
-Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges/arcs in a minimal cut. 
+Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges/arcs in a minimum cut.
 For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities. 
 For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$. 
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
@@ -49,8 +49,7 @@ The program ships an optional compiled C helper that runs this same flow more ef
 \subsection{Transformations}
 This max-flow computation is built for directed multigraphs (including simple digraphs) with edge-disjoint paths.
 That is why the other variants will have to be transformed into such a flow network.
-Undirected multigraphs have the natural identification to a directed multigraph by replacing 
-every edge with a pair of arcs that are going in opposite directions.
+Undirected multigraphs have a natural identification with a directed multigraph, obtained by replacing every edge with a pair of arcs going in opposite directions.
 Multi-hypergraphs need to replace their hyperedges with a helper gate, 
 an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
 Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity, 
@@ -296,10 +295,9 @@ On the small cases this exhaustive mode independently reproduces every value pro
     \label{fig:complexity}
 \end{figure}
 
-Adding vertices is the most expensive change, followed by raising the connectivity
-budget and, lastly, adding direction, which doubles the possibilities for each pair.
+The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and cubically for hypergraphs. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
-choice of tail and heads. 
+choice of tail and heads.
 These are precisely the variants whose answers \Cref{ch:basecases} could not prove.
 The separation, by contrast, does not change the enumeration: edge and vertex disjointness
 search the same graphs and differ only in output.
@@ -411,8 +409,7 @@ For a given $n$, \texttt{geng} produces all non-isomorphic \emph{undirected} gra
 The program then treats each such graph as a support graph and assigns directed arc multiplicities to its edges. 
 Consequently, the search automatically inherits the support graph's isomorphism reduction. 
 For each support edge $\{u,v\}$, considered in a fixed order, it assigns the ordered pair 
-of multiplicities $\mu(u,v)$ and $\mu(v,u)$. Each multiplicity lies between $0$ and $m-1$, 
-and they cannot both be zero because every support edge must represent at least one arc. 
+of multiplicities $\mu(u,v)$ and $\mu(v,u)$. Each lies between $0$ and $m-1$, and the two cannot both be zero because every support edge must represent at least one arc.
 After each assignment, the checker evaluates the partially decorated multigraph. 
 If any pair already exceeds the allowed connectivity, that branch is stopped immediately: 
 adding more arcs cannot decrease connectivity. This is the same monotonicity-based pruning used in \Cref{fig:prune}. 
@@ -447,7 +444,7 @@ This produces weights $w(u,v)\in[0,1]$, pairwise maximum flow at most one,
 and a total weight equal to the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
 Thus, with
 \[
-    M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s, t\Bigr\}
+    M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s \ne t\Bigr\}
 \]
 for the largest total weight of such a matrix, scaling gives
 \[
@@ -469,8 +466,10 @@ catches up and then overtakes it, and the maximiser becomes
 single shape witnesses $M^{*}(n)$ at every $n$. What generalises is not one
 construction but the fact that \emph{some} $\{0,1\}$ matrix always attains
 $M^{*}(n)$, which \Cref{cor:mstar-integral} proves for every $n$ by a
-different route, clearing denominators from a rational optimum rather than
-exhibiting a shape. Consequently, for every $n$ and every $m\ge2$, the
+different route: an explicit $\{0,1\}$ construction gives attainment, and
+clearing denominators from a rational optimum rules out any fractional
+matrix doing better, rather than exhibiting a shape for the optimum itself.
+Consequently, for every $n$ and every $m\ge2$, the
 maximum number of arcs in a directed multigraph with pairwise maximum flow at
 most $m-1$ is exactly $(m-1)M^*(n)$: scaling that integral maximiser by
 $m-1$ gives the lower bound, and the preceding scaling argument gives the
@@ -523,17 +522,17 @@ with the theorem it settled and the record of what was run, in \Cref{sec:mstar-m
 So far, iterating all graphs of a fixed size that meet the connectivity constraint and counting their edges was a blind walk.
 Apart from pruning, there is nothing that steers the walk towards better candidates because they all need to be checked anyway.
 From a certain point onwards, that will become impossible due to the massive number of possible graphs.
-The goal then becomes finding the densest possible graphs in such an efficient and guided way that they are 
-likely to be an (almost) extremal graph.
+The goal then becomes finding the densest possible graphs in such an efficient and guided way that they are
+likely to be (almost) extremal.
 The guide that pulls the walk towards a (local) maximum is called a heuristic.
 To avoid getting stuck in a local maximum, a metaheuristic allows worsening moves to discover new optima.
 
 To implement the metaheuristic, give each graph one number: its energy
 \[
-    \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ \lambda^{\max}(G) - (m - 1)\bigr),
+    \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ c^{\max}(G) - (m - 1)\bigr),
 \]
-which rewards edges and penalises any excess connectivity. 
-The search starts from the empty graph and moves by toggling an arc. 
+which rewards edges (arcs, hyperedges) and penalises any excess connectivity, where $c^{\max}(G)$ denotes $\lambda^{\max}(G)$ or $\kappa^{\max}(G)$, matching whichever separation the run measures.
+The search starts from the empty graph and moves by toggling one adjacency: an edge, an arc, or a hyperedge, depending on the model.
 The method used is \emph{tabu search} \cite{Glover89}, 
 which escapes a local optimum by forbidding the pairs it has just touched. 
 Among the moves not forbidden, the walk always takes the one that lowers $\Phi$ most, even when every candidate raises it.
@@ -546,7 +545,7 @@ and the walk perturbs itself when it stalls.
 
 Simulated annealing allows worsening moves with decreasing probability over time and is an alternative on the same energy and the same neighbourhood, 
 but at equal wall-clock budget it is the weaker engine here. 
-Tabu always wins speedwise and there manages to close hard problems faster: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser, where annealing stalls at $20$ and $18$ arcs against $16$ on the simple digraph. 
+Tabu always wins speedwise and closes hard problems faster: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
 Every discovery value this thesis reports therefore comes from tabu search. 
 Annealing is kept only as an independent cross-check in the program's self-test, 
 where agreement between two unrelated walks is worth more than the speed of either.
@@ -572,7 +571,7 @@ It is the shortcut the walk takes on its way back down to it.
 A single walk depends on where it started, so either engine is run several times from a different seed until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
 
 \subsection{Measuring only on the possible bounds}
-Removing an arc can never raise $\lambda^{\max}$, while adding one raises it by at most one. 
+Removing an edge, arc, or hyperedge can never raise $\lambda^{\max}$, while adding one raises it by at most one.
 The same holds for $\kappa^{\max}$.
 This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}. 
 Therefore the max-flow algorithm only needs to be run every once in a while,

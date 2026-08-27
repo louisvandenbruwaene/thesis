@@ -6,7 +6,7 @@ This chapter gives the foundation for the question and its variants and goes ove
 \section{Graphs and routes}
 
 To state the question precisely we need only a few ideas. 
-A \emph{graph} $G$ is a finite set of points, called \emph{vertices}, together with a (multi)set of \emph{edges}, each joining two (or more) distinct vertices. 
+A \emph{graph} $G$ is a finite set of points, called \emph{vertices}, together with a (multi)set of \emph{edges}, each joining two distinct vertices.
 We write $V(G)$ for the set of vertices and $E(G)$ for the (multi)set of edges. 
 Therefore $|E(G)|$ is the number of edges, which is the very quantity this thesis tries to make as large as possible under certain constraints.
 If $E(G)$ is a set and its edges join exactly two vertices, $G$ is a \emph{simple graph}.
@@ -105,7 +105,7 @@ For all $n \ge 2$ and $m \ge 2$,
 \]
 \end{theorem}
 
-Notice how $n \ge m$ is not needed here, but will be to attain equality since simple graphs cannot exceed the edge count of complete graphs. 
+Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
 The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory-Hu tree (\Cref{thm:gomory-hu}). 
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
 The very same Gomory-Hu tree returns for the multigraph and hypergraph variants (\Cref{thm:multigraph-edge}, \Cref{prop:hyper-edge}). 
@@ -282,7 +282,7 @@ The \emph{in-degree} $d^-(v)$ counts the arcs entering $v$ and the vertices they
 The \emph{total degree} $d(v) = d^+(v) + d^-(v)$ adds the two. 
 \Cref{fig:directed-lambda} shows a digraph carrying three arc-disjoint routes between one chosen pair of vertices. 
 The directed form of Menger's theorem says that route count equals the size of the smallest arc-cut separating the pair, and the figure also marks the out-degree and in-degree that bound both quantities from above, which is exactly how Menger reads in a one-way network.
-A directed $r$-edge has one tail and $r-1$ heads. 
+A directed $r$-hyperedge has one tail and $r-1$ heads.
 In the figures, one colour denotes one hyperedge, drawn either as a star or as a line oriented away from its tail. 
 It is a single edge on several vertices, not a path of ordinary edges. 
 A directed \emph{Berge route} enters that edge at its tail and leaves at one of its heads.
@@ -665,4 +665,4 @@ tail--head incidence count converts its arcs back to hyperedges. Since the
 bipartite construction already attains that leading term, it is asymptotically
 optimal.
 
-For fixed $m \ge 3$ the matching upper bound is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer.
+For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer.

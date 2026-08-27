@@ -886,3 +886,66 @@ VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 104pp, 0 overfull/
 underfull, 0 occurrences of `??`, 0 undefined refs, no duplicate labels,
 no banned verdict-prose phrases, no new em-dashes/en-dashes/prose
 semicolons. Committed as `b17ae67`.
+
+## 2026-08-27 (Sonnet, fifth session) — a third external review, one real
+## machine-value bug, and a plotting-crash environment gotcha
+
+A third external review found nine issues. Eight were prose-only (a Mader
+equality claim false at `n=2, m=3` with `K_2`, a "doubles" complexity claim
+that should say "squares", `M^*(n)`'s definition missing `s \ne t`, the
+integrality proof crediting the wrong half of the argument to the wrong
+technique, the energy function and "toggling an arc" both narrower than the
+section they sit in, the opening graph definition conflating graphs and
+hypergraphs, a misattributed "matching upper bound is open" paragraph, and a
+cluster of grammar fixes), all fixed directly in `ch1_basecases.tex` and
+`ch2_machine.tex`, plus a missing `\texorpdfstring` on `sec:mstar-model`'s
+heading (the likely PDF-bookmark warning source, matching the pattern
+already fixed at two other headings).
+
+**THE NINTH WAS A REAL BUG, THE SAME SHAPE AS THE 2026-08-27 MACHINE-VALUE
+BUDGET BUG BUT AT A DIFFERENT CELL.** `rem:dir-vertex-m3` (`app_proofs.tex`)
+states `\ell_3^{\mathrm{dir}}(6) = k_3^{\mathrm{dir}}(6) = 15`, "every entry
+proved complete." `variant_table_all.tex`'s `n=6` cell on both directed rows
+of the `m=3` simple-graph block read `\ge 15`, unbolded and conjectured-red,
+because `gather_variant_grid`'s panels (3) and (4) shared `_EXACT_BUDGET`
+(60s), calibrated for the hypergraph panels and nowhere near enough for
+this pair: measured directly with `solve(6, 3, exhaustive=True, ...)`, the
+edge separation takes 544.2s and the vertex separation 1422.7s on this
+machine. `n = 7` does not finish even in the appendix's own hour and a half,
+so raising the shared budget outright would have made every regeneration
+(at both `m = 3` and `m = 6`, since the two panels are built once per `m`)
+risk burning up to two more multi-thousand-second timeouts trying `n = 7`
+for nothing. Fixed with a dedicated `dir_simple_exact_budget = 1800.0` and
+the range capped at `range(2, 7)`, so `n = 7` is never attempted at all
+regardless of `m`, which reproduces exactly the boundary the appendix
+already proves and cannot regress into a multi-hour rebuild. `m = 6`'s
+own `n \le 6` values needed fresh cache entries too (the budget is part of
+the cache key) but complete quickly, so the only visible output change is
+`variant_bounds_m3_graphs.png` and the three affected table rows; the other
+three grids and every other row are byte-for-byte unchanged, confirming the
+fix is exactly as narrow as intended.
+
+**A SESSION CONVENTION WORTH RECORDING: THIS REPO'S BARE `python3` IS NOT
+THE RIGHT INTERPRETER FOR ANYTHING FIGURE-RELATED.** The first regeneration
+attempt ran under the system `python3`, which has no matplotlib installed at
+all. `erdos915_unified.py`'s import guard sets `plt`, `mlines` and every
+other matplotlib name to `None` together on any `ImportError` in that block,
+so the module loads fine and every non-figure function (the solver, the
+checker, the test suite) works normally, and `plot_variant_grid` runs for
+most of its length before failing late, on `mlines.Line2D`, deep inside
+legend construction, rather than immediately on `plt`. A hundred-plus line
+traceback that only fails at the very end of a plotting function is a sign
+of a missing optional dependency, not a code defect, and the fix is to use
+**`.venv/bin/python3`**, this repo's own virtualenv, which has matplotlib
+3.11.0 and every other optional dependency installed. Every command in this
+file that touches `program/make_figures.py`, `plot_*`, or anything under
+the FIGURES section of `erdos915_unified.py` should invoke that interpreter,
+not the bare `python3` on PATH.
+
+VERIFY: `solve(6, 3, exhaustive=True, ...)` independently confirms 15 for
+both separations (544.2s edge, 1422.7s vertex, matching the appendix).
+`make_figures.py --grids-only` then `--tables-only` under `.venv/bin/python3`
+regenerate cleanly (442 cache hits, 10 fresh computes, all in the `m=3`
+directed simple-arc/vertex panels). `latexmk -pdf` exit 0, 104pp, 0
+overfull/underfull, 0 undefined refs, 0 occurrences of `??`. 127 tests OK,
+1 expected skip. Program self-check ALL CHECKS PASSED.
