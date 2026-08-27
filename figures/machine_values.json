@@ -1,9 +1,10 @@
 {
  "meta": {
   "program_sha256": "2396b5ccd604534e82fa1d1450348352cbaa2f8320ffc44294a376264c9aa9ce",
-  "entries": 484
+  "entries": 486
  },
  "values": {
+  "exact|n=2|m=3|budget=10|directed=True|separation=edge|simple=False": 4,
   "exact|n=2|m=3|budget=60|directed=False|hypergraph=True|r=3|separation=edge": 0,
   "exact|n=2|m=3|budget=60|directed=False|hypergraph=True|r=3|separation=edge|simple=False": 0,
   "exact|n=2|m=3|budget=60|directed=False|hypergraph=True|r=3|separation=vertex": 0,
@@ -17,6 +18,7 @@
   "exact|n=2|m=3|budget=60|directed=True|hypergraph=True|r=3|separation=vertex|simple=False": 0,
   "exact|n=2|m=3|budget=60|directed=True|separation=edge|simple=True": 2,
   "exact|n=2|m=3|budget=60|directed=True|separation=vertex|simple=True": 2,
+  "exact|n=2|m=6|budget=10|directed=True|separation=edge|simple=False": 10,
   "exact|n=2|m=6|budget=60|directed=False|hypergraph=True|r=3|separation=edge": 0,
   "exact|n=2|m=6|budget=60|directed=False|hypergraph=True|r=3|separation=edge|simple=False": 0,
   "exact|n=2|m=6|budget=60|directed=False|hypergraph=True|r=3|separation=vertex": 0,

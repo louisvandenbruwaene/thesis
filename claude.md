@@ -688,3 +688,37 @@ Recorded here only because it shipped in the same push.
 
 VERIFY: `latexmk -pdf` exit 0, 104pp, 0 overfull/underfull, 0 undefined refs,
 0 occurrences of `??` in extracted text.
+
+## 2026-08-27 (Sonnet, second session) — n=2 in the four variant grids
+
+The author flagged two things about `figures/variant_bounds_m{3,6}_{graphs,
+hypergraphs}.png`: n=2 looked too trivial as a starting point, and the
+leftmost plotted point in two of the four figures showed a search-found
+lower bound where it should have shown a proved value.
+
+**BOTH TRACED TO `make_figures.py:gather_variant_grid`.** Panel 7
+(multigraph directed arc, proved for every n>=2 by `thm:dir-multi-full`) computed
+its machine-checked points with `ex7 = _exact_points(range(3, 6), ...)`, the
+only "proved" panel among the sixteen whose exact range excludes n=2. Every
+sibling proved panel (`ex`, `ex2`, `ex5`, `ex9`, `ex13`) starts at `range(2,
+...)`. Since the search curve (`se7`) does cover n=2, that panel's leftmost
+point rendered as a bare open circle with no green square backing it, in
+both `variant_bounds_m3_graphs.png` and `variant_bounds_m6_graphs.png` (the
+two figures carrying the graph-model row). Confirmed by cropping the
+rendered PNG before and after: before, n=2 was circle-only; after
+`range(2, 6)`, it is the same green square every other proved panel gets.
+
+Separately, the eight hypergraph/multihypergraph panels (r=3) are
+structurally zero at n=2, since no 3-element subset exists on 2 vertices.
+Not a bug, but the author judged it an uninformative point rather than a
+real one, and asked (via clarifying question, since it touches the code's
+"same range for every panel" invariant) to drop it for the hypergraph rows
+only, keeping the graph-model rows at n=2 where the value is real (K_2 has
+1 edge). `hyper_ns` moved to `range(3, 13)`, and the eight matching exact
+ranges (`ex9`..`ex16`) each shifted their lower endpoint from 2 to 3 to
+match. `matrix_ns` (graph-model rows) is unchanged.
+
+VERIFY: `make_figures.py --grids-only` regenerated all four grids (453/454
+values from cache, 1 newly computed); all four inspected. `latexmk -pdf`
+exit 0, 0 overfull, 0 undefined refs, 0 occurrences of `??` in extracted
+text.

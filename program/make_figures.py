@@ -463,7 +463,10 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     # that, to show each variant's trend and let the search discover dense
     # ("maybe extremal") graphs at sizes exhaustion cannot reach.
     matrix_ns = list(range(2, 17))   # all matrix panels, n = 2..16
-    hyper_ns = list(range(2, 13))    # all hypergraph panels, n = 2..12
+    # n = 2 forces zero hyperedges for every r=3 panel below (no 3-set exists on
+    # 2 vertices), a structural degeneracy rather than a data point, so the
+    # hypergraph panels start where the first hyperedge can.
+    hyper_ns = list(range(3, 13))    # all hypergraph panels, n = 3..12
 
     def tri_undirected(n):
         return n * (n - 1) // 2
@@ -670,7 +673,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
             band=_band(se2, tri_undirected, matrix_ns), exact=ex2, search=se2))
 
     # (7) multigraph directed arc -- proved for all n and m (thm:dir-multi-full).
-    ex7 = _exact_points(range(3, 6), m, 10.0,
+    ex7 = _exact_points(range(2, 6), m, 10.0,
                         directed=True, simple=False, separation="edge")
     se7 = searched(matrix_ns, lb_multi_dir,
                    directed=True, simple=False, separation="edge")
@@ -687,7 +690,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
 
     # ----- row 3: hypergraph (r=3) -------------------------------------
     # (9) hypergraph undirected edge -- proved for all m.
-    ex9 = _exact_points(range(2, 8), m, exact_budget,
+    ex9 = _exact_points(range(3, 8), m, exact_budget,
                         hypergraph=True, r=3, directed=False, separation="edge")
     se9 = searched(hyper_ns, attained_hyper_edge,
                    hypergraph=True, r=3, directed=False, separation="edge")
@@ -699,7 +702,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
 
     # (10) hypergraph undirected vertex -- PROVED for m<=3 (incidence-rank lemma),
     #      open for m>=4.
-    ex10 = _exact_points(range(2, 7), m, exact_budget,
+    ex10 = _exact_points(range(3, 7), m, exact_budget,
                          hypergraph=True, r=3, directed=False, separation="vertex")
     if hyper_vert_proved:
         se10 = searched(hyper_ns, attained_hyper_vertex,
@@ -725,7 +728,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
             band=_band(se10, tri_hyper, hyper_ns), exact=ex10, search=se10))
 
     # (11) hypergraph directed arc -- OPEN (new directed Berge model).
-    ex11 = _exact_points(range(2, 6), m, exact_budget,
+    ex11 = _exact_points(range(3, 6), m, exact_budget,
                          hypergraph=True, r=3, directed=True, separation="edge")
     se11 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, separation="edge")
@@ -738,7 +741,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         band=_band(se11, tri_dir_hyper, hyper_ns), exact=ex11, search=se11))
 
     # (12) hypergraph directed vertex -- OPEN (new directed Berge model).
-    ex12 = _exact_points(range(2, 6), m, exact_budget,
+    ex12 = _exact_points(range(3, 6), m, exact_budget,
                          hypergraph=True, r=3, directed=True, separation="vertex")
     se12 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, separation="vertex")
@@ -768,7 +771,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         return lambda n: max(simple_fn(n), attained_fn(n))
 
     # (13) multihypergraph undirected edge -- prop:hyper-edge, proved for all m.
-    ex13 = _exact_points(range(2, 7), m, exact_budget,
+    ex13 = _exact_points(range(3, 7), m, exact_budget,
                          hypergraph=True, r=3, directed=False, simple=False,
                          separation="edge")
     se13 = searched(hyper_ns, multi_lb(attained_hyper_edge, attained_multihyper_edge),
@@ -781,7 +784,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         exact=ex13, search=se13))
 
     # (14) multihypergraph undirected vertex -- PROVED for m<=3, open for m>=4.
-    ex14 = _exact_points(range(2, 6), m, exact_budget,
+    ex14 = _exact_points(range(3, 6), m, exact_budget,
                          hypergraph=True, r=3, directed=False, simple=False,
                          separation="vertex")
     if hyper_vert_proved:
@@ -806,7 +809,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     # (15) multihypergraph directed arc -- OPEN.  thm:dir-hyper-constant is stated
     # for forward directed r-uniform MULTIhypergraphs, so the proved leading term
     # is this row's as much as row 3's; the exact value is open in both.
-    ex15 = _exact_points(range(2, 5), m, exact_budget,
+    ex15 = _exact_points(range(3, 5), m, exact_budget,
                          hypergraph=True, r=3, directed=True, simple=False,
                          separation="edge")
     se15 = _search_points(hyper_ns, m, open_search_budget,
@@ -819,7 +822,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         band=_band(se15, tri_dir_hyper, hyper_ns), exact=ex15, search=se15))
 
     # (16) multihypergraph directed vertex -- OPEN, same construction and bound.
-    ex16 = _exact_points(range(2, 5), m, exact_budget,
+    ex16 = _exact_points(range(3, 5), m, exact_budget,
                          hypergraph=True, r=3, directed=True, simple=False,
                          separation="vertex")
     se16 = _search_points(hyper_ns, m, open_search_budget,
