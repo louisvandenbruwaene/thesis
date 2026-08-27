@@ -27,7 +27,7 @@ The work begins with the necessary background to formulate the problem and all i
 It then discusses their answers or highlights the difficulty behind unsolved cases. 
 Afterwards, computational research on small graphs confirms these values or provides evidence for conjectures. 
 This is accomplished by measuring connectivity with a maximum-flow routine and by searching for extremal graphs with metaheuristics.
-The results of these computations are thus either a proof of the extremal value in the search space or a lower bound that is conjectured to also be upper, supported by the unfinished search for a counterexample.
+Completed computations either prove the extremal value in a finite search space or produce a lower bound, while unfinished searches provide only evidence for conjectures.
 At the end, the thesis synthesises the results and presents the open problems that remain.
 This work is theoretical in nature, but the computational methods and the resulting conjectures are of interest to anyone who uses networks and wants to understand the relationship between connectivity and the connections they entail.\\
 
@@ -40,7 +40,7 @@ Above all I thank my girlfriend Sara, whose patience and encouragement carried m
 \chapter*{Contribution Statement}
 \addcontentsline{toc}{chapter}{Contribution Statement}
 All the work in this thesis is my own, except where I explicitly say otherwise. 
-I used Artificial Intelligence to implement the code, suggest and verify proofs, format \LaTeX and spellcheck. 
+I used artificial intelligence to implement the code, suggest and verify proofs, format \LaTeX{} and check spelling.
 Where a result comes from the literature I say so and cite it. 
 The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai. 
 Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
@@ -80,7 +80,7 @@ Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1
 The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. 
 
 
-The centerpiece is then a unified program, which represents non-hypergraphs with a multiplicity-matrix and converts the vertex-disjoint problem to an edge-disjoint one by a standard vertex-splitting construction.
+The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity-matrix and converts the vertex-disjoint problem to an edge-disjoint one by a standard vertex-splitting construction.
 The hypergraphs are handled as a list of hyperedges, which may use head and tail sets to represent directed hyperedges.
 Then a maximum-flow algorithm measures connectivity between all pairs of vertices and reports the maximum local connectivity.
 At each point of the program, optimisations are applied to reduce the search space and traverse it more efficiently.

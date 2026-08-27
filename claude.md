@@ -27,7 +27,7 @@ passage cut during the 2026-08 shortening passes with restore anchors.
   pulp (MILP prover), networkx (Gomory–Hu view only) and matplotlib (figures)
   are optional and guarded. `nauty`/`geng` optional for faster enumeration.
 - Tests: `cd program && python -m unittest discover -s tests` — currently
-  103 tests, 1 expected skip on a minimal (no-pulp) install.
+  127 tests, 1 expected skip on a minimal (no-pulp) install.
 - Standard of done before calling anything finished: rebuild the PDF clean,
   run the test suite, run the program's own `_run_checks` self-test, and
   re-verify any numeric claim against at least one independent implementation
