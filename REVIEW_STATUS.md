@@ -111,12 +111,36 @@ mismatches, and pinned permanently by `MergedGateMatchesPerCopy` in
 `tests/test_hypergraph.py`, which keeps the old per-copy construction as the
 reference. Benchmarked at 1.006 times the old cost, which is noise.
 
-**3. `claude.md` no longer records the two review batches.**
-The condensation in `09ef22e` was deliberate and the file is much better for it,
-but the reasoning behind several current choices now lives only in the git log.
-The two entries worth restoring in one or two lines each are why the multigraph
-vertex variants reduce to the simple problem, and why the hypergraph witness is
-gated by attainment rather than clamped downstream.
+**3. CLOSED 2026-08-27. `claude.md` no longer recorded the two review batches.**
+
+Both entries this note asked for are restored as standing conventions, each with
+the reasoning rather than just the conclusion: why the multigraph vertex variants
+reduce to the simple problem (parallel copies never raise kappa, so counted with
+multiplicity the question has no finite answer, and why the multihypergraph cells
+do NOT collapse the same way), and why the hypergraph witness is gated at the
+source by proved attainment rather than clamped downstream (the downstream clamp
+can only fire where exhaustion finished, which at `m = 6, n = 6, r = 3` it does
+not). A dated entry for this session's work is appended to the same file.
+
+One thing fixed while in there: the standing rule to run
+`program/sync_code_appendix.py` after editing the program was dead, since
+Appendix C was removed in the 2026-08-24 shortening pass, and a later session
+note said so while the rule itself still instructed the opposite. The rule is now
+corrected rather than contradicted.
+
+## Still open
+
+**1. The machine-value cache is the record, and it is machine-dependent.**
+
+Not a defect, a property worth stating once. The `exact` entries are exhaustions
+under a wall-clock budget and the `search` entries are timed heuristics, so what
+a given machine reaches is part of the answer. `MachineValues._reconcile` now
+makes a refresh unable to degrade the record, and the budget is set well clear of
+the boundary, so the failure mode is closed. What remains is a documentation
+question: `sec:transcripts` tells a reader that passing `--refresh` "is how the
+record is checked", and it is worth one clause there saying that a refresh
+confirms or improves the record and never replaces a recorded value with a worse
+one, since that is now what the code guarantees.
 
 ## Not done, by choice
 

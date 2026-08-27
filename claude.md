@@ -143,15 +143,47 @@ and only touch this summary if the *status* (proved/open) changes.
   worst mistake (2026-08-11 audit) was three places asserting a MILP run
   "returns INFEASIBLE" when it had actually been abandoned unfinished.
   State plainly what ran to completion and what did not.
+- **The multigraph VERTEX variants are posed on the underlying simple graph,
+  and that is why two rows of `tab:summary` read "= simple".** Parallel copies
+  never raise kappa, since a second copy of an edge is a route with an empty
+  interior between vertices that are already adjacent. So counted with
+  multiplicity the extremal question has no finite answer at all: thicken any
+  feasible graph and kappa never moves. The thesis therefore counts adjacencies
+  for those two cells (`sec:parallel-convention` in ch2), which collapses them
+  onto the simple problem. This is NOT what happens one arity up: q parallel
+  copies of a HYPEREDGE give q Berge routes with empty interiors between any two
+  of its members, so multiplicity does raise kappa there, the cap is m-1 in both
+  separations, and all four multihypergraph cells are genuine
+  (`_hyper_multiplicity_cap`). Restored 2026-08-27 from the review record; it had
+  survived only in the git log after the condensation.
+
+- **The hypergraph witness is gated at the source by proved attainment, never
+  clamped downstream.** `prop:hyper-edge` is an upper bound that a simple
+  hypergraph attains only when `m-1 <= C(n-2, r-2)` and a multihypergraph only
+  when `(r-1) | (n-1)`. Outside those ranges the closed form is a number nobody
+  has exhibited, so plotting it as a witness asserts a hypergraph that need not
+  exist, and sometimes does not: at `n = 6, m = 6, r = 3` it reads 12 while all
+  125970 twelve-hyperedge simple 3-uniform hypergraphs on six vertices are
+  infeasible and the true maximum is 11. `attained_hyper_edge` and
+  `attained_hyper_vertex` therefore return 0 outside the proved range and leave
+  the search's own value alone. The tempting alternative, letting
+  `_reconcile_panel`'s exact-value clamp catch it downstream, does not work: that
+  clamp can only fire where exhaustion actually finished inside its budget, which
+  at exactly this cell it does not. Restored 2026-08-27.
+
 - **Reversible shortening.** Anything cut from the thesis during a
   length-reduction pass goes into `offcuts.tex` with a provenance header
   (source file, restore anchor, reason) — never delete thesis content outright
   without archiving it there first.
 - **Commit and push at the end of each session** (standing author
   preference).
-- **Run `program/sync_code_appendix.py`** after any edit to
-  `erdos915_unified.py` — Appendix C reproduces the source verbatim with
-  hardcoded line ranges that this script keeps in sync.
+- **`program/sync_code_appendix.py` is DEAD.** It kept Appendix C's verbatim
+  source listing in step with hardcoded line ranges. Appendix C was removed in
+  the 2026-08-24 shortening pass and no chapter inputs `app_code.tex` any more,
+  so there are no ranges left to sync and nothing to run after editing the
+  program. This entry used to instruct the opposite and a later session note
+  contradicted it; the rule itself is corrected here (2026-08-27) so nobody
+  follows a dead one.
 - Before trusting a numeric or bibliographic claim inherited from an older
   note in this file's history, re-verify it — several "settled" facts in
   earlier sessions turned out to rest on a convention mismatch (Whitney
@@ -467,3 +499,80 @@ lines that the second proof needs in a different form, and it already says so.
 
 VERIFY: latexmk exit 0, 104pp, 0 overfull, 0 `??`, 116 tests OK with 1 expected
 skip.
+
+## 2026-08-27 (Opus) — a full read for mistakes, then the audit item and the cache
+
+The author asked for a read of the whole thesis to find and fix mistakes, then
+for the two open `REVIEW_STATUS.md` items. Everything below is verified against
+the program rather than against an earlier note.
+
+**NINE DEFECTS FROM THE FULL READ.** The heaviest cluster was left by the pass
+that swapped annealing for tabu in the narrative: the argument was rewritten and
+the vocabulary was not. `tab:rediscovery`'s caption said the Search column came
+from annealing and called it "the temperature search", while ch2 two pages
+earlier said every discovery value comes from tabu, which is what `solve`
+actually defaults to for matrix models. Four more leftovers ("the cooled search"
+twice, "repeated cooling runs", ch4's "one cooled search"). ch2 cited
+`const:directed-hub` for the doubled star the multigraph runs land on, but that
+construction is a SIMPLE digraph with m(n-1) arcs, 9 at n=4 m=3, where the table
+prints the thickened tree's 12. ch2 said a digraph has "twice as many
+possibilities" as the undirected graph on the same vertices, where it is the
+square. Plus: `thm:hyper-vertex-m2` named a multihypergraph maximum with the
+simple-hypergraph symbol, two "In words" glosses had drifted away from the
+statements they gloss, `lem:reach-skeleton` had no proof environment, the SA
+abbreviation was defined and never used, and an answered author question sat in
+the source.
+
+**THE MATHEMATICS WAS NOT THE PROBLEM.** The S-T exceptions, the n=14
+divergence, the m=3 n=10 refutation, every crossover, Mader's double count, the
+skeleton convexity argument, `lem:incidence-rank`, the bipartite-block
+optimisation and the 194066 two-connected graphs on nine vertices all check out.
+Every defect was in the seam between prose and code, which is where both review
+batches also found theirs.
+
+**REVIEW_STATUS ITEM 1, the hypergraph curve, CLOSED.** `_reconcile_panel`
+invariant 1 capped every `proved=` curve to any machine-exact value, which is
+right for a curve carrying a closed-form VALUE and wrong for one carrying
+`prop:hyper-edge`, an upper BOUND. Measured before fixing: the clamp fired at ONE
+plotted point in the thesis. That note's estimate that a fix touches every panel
+in `gather_variant_grid` was wrong by twelve panels. Fixed with a per-panel
+`clamp_formula=False` on the four hypergraph panels, and the key now says "proved
+upper bound" in a grid whose every blue curve is one, which is a property of the
+figure and needs no per-panel mark.
+
+**REVIEW_STATUS ITEM 2, the sixteen-variant rewrite, AUDITED.** The count is
+clean. Two defects. `tab:summary` claimed repeats close cases the simple model
+misses at m=3, which is true but had no theorem behind it: added
+`prop:hyper-vertex-lower-multi`. And **the cap-mu gate was backwards from the
+prediction**: `thm:menger-hyper` and the code agreed at capacity one, one gate
+per COPY, while the two gadget figures and the ch2 prose described a capacity-mu
+gate nothing built. On the author's call the CODE moved to the text:
+`_hyper_capacity_matrix` now gives each distinct hyperedge one gate of capacity
+mu. Merging is the parallel-arc reduction, so no value can change, and that is
+checked rather than asserted (149532 measurements, 0 mismatches) and pinned by
+`MergedGateMatchesPerCopy`, which keeps the old construction as its reference.
+
+**THE CACHE COULD SILENTLY DEGRADE THE FIGURES, AND NOW CANNOT.** A refresh run
+while the test suite was competing for CPU came back with 123 changed values. The
+checker was not the cause (benchmarked at 1.006x, and the differential test
+proves the values). They are TIMED measurements, and the record itself needed
+more budget than it granted: four completed exhaustions in it take about 8.4s
+against a 4s budget, so they returned "did not finish", and `_exact_points` stops
+at the first one and dropped four more sizes behind them.
+
+Two changes. `MachineValues._reconcile` now holds every recomputed value against
+the published one: a `None` never overwrites a recorded exact value, a weaker
+search result never overwrites a stronger one, and two DIFFERENT exact values are
+reported as a contradiction rather than applied. So a refresh can confirm the
+figures or improve them and has no path to making them worse, and every departure
+is printed. Nine tests in `tests/test_machine_values.py`. And the exhaustion
+budget went 4s to 60s, chosen by probing all 23 unfinished entries at 45s: two of
+them finish, at 24.3s and 28.6s, and 21 do not, so anything under about 30s
+leaves a completed exhaustion marginal. Search budgets deliberately unchanged,
+since raising those moves witnesses rather than reproducing them.
+
+**THE BUDGET IS PART OF THE CACHE KEY**, so raising it would orphan all 128 exact
+entries and bypass the guard exactly when it is needed. The completed ones were
+relabelled (a finished exhaustion's value does not depend on how long it was
+allowed) and the 23 unfinished ones dropped and recomputed, since "did not finish
+in 4s" is not the same claim as "did not finish in 60s".

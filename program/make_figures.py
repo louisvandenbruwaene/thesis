@@ -79,9 +79,21 @@ class MachineValues:
 
     One entry per ``(kind, n, m, budget, variant)``, holding the value that run
     produced, or ``null`` where an exhaustion did not finish inside its budget.
-    Deleting ``figures/machine_values.json`` recomputes every one of them, which
-    is the check that the file is still telling the truth; ``--refresh`` does the
-    same within a single run.
+    ``--refresh`` recomputes every one of them, which is the check that the file
+    is still telling the truth.
+
+    A recompute can confirm the record or improve it, and cannot make it worse:
+    see :meth:`_reconcile`. That guard matters because these are *timed*
+    measurements, so a slower or busier machine returns worse numbers for
+    reasons that have nothing to do with the mathematics. Without it a refresh
+    on a loaded machine silently downgraded four completed exhaustions to "did
+    not finish", and since :func:`_exact_points` stops at the first one, four
+    further sizes were dropped behind them.
+
+    Deleting the file is therefore a *stronger* reset than ``--refresh``: it
+    removes the record the guard compares against, so whatever the run reaches is
+    what gets written. Use ``--refresh`` to audit the file and deletion only to
+    rebuild it from nothing deliberately.
 
     Caching a *timed* search is not only a speed-up. A search given four seconds
     finds what four seconds of that particular machine will reach, so recomputing
@@ -102,12 +114,21 @@ class MachineValues:
         self.meta: dict = {}
         self.hits = 0
         self.misses = 0
+        # The published record, kept even under --refresh, which is exactly when
+        # it is needed: it is what a recomputed value is held against so that a
+        # refresh can confirm or improve the figures but never degrade them.
+        self.published: dict[str, int | None] = {}
+        self.kept: list[str] = []          # recompute was worse, record stands
+        self.improved: list[str] = []      # recompute was better, record moves
+        self.contradictions: list[str] = []  # two different exact values
         stored_hash = None
-        if not refresh and self.path.exists():
+        if self.path.exists():
             blob = json.loads(self.path.read_text())
-            self.values = blob.get("values", {})
-            self.meta = blob.get("meta", {})
-            stored_hash = self.meta.get("program_sha256")
+            self.published = blob.get("values", {})
+            if not refresh:
+                self.values = dict(self.published)
+                self.meta = blob.get("meta", {})
+            stored_hash = blob.get("meta", {}).get("program_sha256")
         self.program_hash = self._program_hash()
         if stored_hash is not None and stored_hash != self.program_hash:
             print(f"NOTE: {self.path.name} was written by a different version of "
@@ -155,12 +176,59 @@ class MachineValues:
             self.hits += 1
             return self.values[cache_key]
         self.misses += 1
-        self.values[cache_key] = run()
+        self.values[cache_key] = self._reconcile(kind, cache_key, run())
         # Written after every miss, not once at the end: a full refresh of the
         # four grids takes minutes, and an interrupted one should keep whatever
         # it had already paid for.
         self.save()
         return self.values[cache_key]
+
+    def _reconcile(self, kind, cache_key, fresh):
+        """Hold a freshly computed value against the published one.
+
+        A recompute is a *timed* measurement, so it carries the speed and the
+        load of the machine that ran it as well as the mathematics. Both kinds of
+        entry here are one-directional, which is what makes a safe rule possible.
+
+        An ``exact`` entry is a completed exhaustion, so its value is the true
+        maximum and cannot legitimately change. ``None`` means only that the run
+        ran out of budget, which is a fact about the machine, not about the
+        graph. So a ``None`` never overwrites a recorded value, and two different
+        numbers are a contradiction that gets reported rather than applied.
+
+        A ``search`` entry is a lower bound witnessed by a graph that was
+        actually exhibited, so a larger value is always the better knowledge and
+        a smaller one only says this run had less time. The record therefore
+        moves up and never down.
+
+        A refresh can consequently confirm the figures or improve them, and has
+        no path by which it can make them worse. Every departure is recorded and
+        printed, so nothing is quietly kept either.
+        """
+        if cache_key not in self.published:
+            return fresh                       # genuinely new entry
+        old = self.published[cache_key]
+        if fresh == old:
+            return old
+        if kind == "exact":
+            if fresh is None:
+                self.kept.append(f"{cache_key}: did not finish this time, "
+                                 f"keeping the recorded {old}")
+                return old
+            if old is None:
+                self.improved.append(f"{cache_key}: finished this time, "
+                                     f"None -> {fresh}")
+                return fresh
+            self.contradictions.append(f"{cache_key}: recorded {old}, "
+                                       f"recomputed {fresh}")
+            return old
+        # search: a lower bound, so keep the better of the two
+        if old is not None and (fresh is None or fresh < old):
+            self.kept.append(f"{cache_key}: this run reached {fresh}, "
+                             f"keeping the recorded {old}")
+            return old
+        self.improved.append(f"{cache_key}: {old} -> {fresh}")
+        return fresh
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -172,8 +240,22 @@ class MachineValues:
         self.path.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
 
     def report(self) -> str:
-        return (f"machine values: {self.hits} from cache, {self.misses} computed "
-                f"({self.path.name}, {len(self.values)} entries)")
+        lines = [f"machine values: {self.hits} from cache, {self.misses} computed "
+                 f"({self.path.name}, {len(self.values)} entries)"]
+        if self.improved:
+            lines.append(f"  {len(self.improved)} entries improved on the record:")
+            lines += [f"    {line}" for line in self.improved]
+        if self.kept:
+            lines.append(f"  {len(self.kept)} recomputes came back worse and were "
+                         f"NOT applied (the record stands):")
+            lines += [f"    {line}" for line in self.kept]
+        if self.contradictions:
+            lines.append(f"  {len(self.contradictions)} CONTRADICTIONS: a completed "
+                         f"exhaustion disagrees with the recorded one. The record "
+                         f"was kept. This is a real defect, not a timing artefact, "
+                         f"and needs investigating before the figures are trusted:")
+            lines += [f"    {line}" for line in self.contradictions]
+        return "\n".join(lines)
 
 
 MACHINE_VALUES = MachineValues(MACHINE_CACHE_PATH,
@@ -324,7 +406,21 @@ def _reconcile_panel(panel: dict) -> dict:
     return panel
 
 
-def gather_variant_grid(m=3, exact_budget=4.0, search_budget=0.4, open_search_budget=4.0):
+# The exhaustion budget was 4s, which was below what the record itself needed:
+# four completed exhaustions in it take about 8.4s on this machine, so a refresh
+# downgraded them to "did not finish" and _exact_points dropped four more sizes
+# behind them.  All 23 unfinished entries were then probed at 45s to find where
+# the real boundary is.  Two of them finish, at 24.3s and 28.6s, and the other 21
+# do not, so anything below about 30s leaves a completed exhaustion marginal,
+# which is the fragility this is meant to remove.  60s is a little over twice the
+# slowest exhaustion that finishes at all and well under the next one that does
+# not.  The search budgets are deliberately unchanged: raising those would move
+# plotted witnesses rather than reproduce them, which is a different decision.
+_EXACT_BUDGET = 60.0
+
+
+def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
+                        open_search_budget=4.0):
     """Build the sixteen panels of the all-variant grid (row-major, model x col).
 
     ``m`` is the forbidden connectivity value shown in every panel.
