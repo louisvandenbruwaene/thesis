@@ -436,7 +436,6 @@ All three methods return the same proved value at every $n$ where they finish.
     \caption{Wall-clock time to prove $\ell_2^{\mathrm{dir}}(n)$ by three methods, single core. The blind sweep has no pruning. The pruned search is \Cref{fig:prune}'s depth-first branch and bound. The generated pipeline is the geng-seeded search above. A dash marks a run not attempted at that size.}
     \label{tab:generating-benchmark}
 \end{table}
-
 \section{Proving every \texorpdfstring{$m$}{m} at once}
 
 The search so far looks at one pair $(n,m)$ at a time, but for the directed multigraph a faster method can be used: 
@@ -456,27 +455,31 @@ for the largest total weight of such a matrix, scaling gives
     \qquad \text{for every } m \ge 2 .
 \]
 
-For the reverse inequality, we need a maximum-weight matrix whose entries can
-be multiplied by $m-1$ to give integer arc multiplicities.  Here a
-\emph{double star} is the directed $0$--$1$ matrix obtained by choosing two
-distinct vertices $a$ and $b$, putting an arc from every other vertex to $a$
-and from $b$ to every other vertex, and putting all other entries equal to
-zero.  (The two centres may also be described as the sink and source of the
-star.)  Thus it has one incoming star and one outgoing star, with no parallel
-arcs.  The historical optima for $n\le6$ had exactly this form, so their
-entries remain integral after multiplying by $m-1$.
-The hand proof now proves the stronger statement that such an integral
-optimum exists for every $n$ (\Cref{cor:mstar-integral}).  Consequently, for
-every $n$ and every $m\ge2$, the maximum number of arcs in a directed
-multigraph with pairwise maximum flow at most $m-1$ is exactly
-$(m-1)M^*(n)$: the scaled double-star construction gives the lower bound,
-and the preceding scaling argument gives the upper bound. 
+For the reverse inequality, an integral matrix is needed whose weight equals
+$M^{*}(n)$, since a $\{0,1\}$ matrix survives multiplication by $m-1$ as
+integer arc multiplicities untouched. \Cref{const:dir-multi-lower}'s spanning
+tree taken to be a star already supplies one on the linear branch: the
+\emph{double star}, one hub bidirected to every other vertex, $2(n-1)$ arcs
+at multiplicity one. For $n\le6$ the linear branch $2(n-1)$ is the larger
+term of $M(n)$, so the double star already realises $M^{*}(n)$ there, and the
+historical optima for those $n$ take exactly this form. Past the crossover
+at $n=7$ (\Cref{thm:dir-arc-m2-exact}) the quadratic branch $\floor{n^2/4}$
+catches up and then overtakes it, and the maximiser becomes
+\Cref{const:dir-multi-lower}'s other half, the bipartite digraph, instead: no
+single shape witnesses $M^{*}(n)$ at every $n$. What generalises is not one
+construction but the fact that \emph{some} $\{0,1\}$ matrix always attains
+$M^{*}(n)$, which \Cref{cor:mstar-integral} proves for every $n$ by a
+different route, clearing denominators from a rational optimum rather than
+exhibiting a shape. Consequently, for every $n$ and every $m\ge2$, the
+maximum number of arcs in a directed multigraph with pairwise maximum flow at
+most $m-1$ is exactly $(m-1)M^*(n)$: scaling that integral maximiser by
+$m-1$ gives the lower bound, and the preceding scaling argument gives the
+upper bound.
 The finite optimisation is retained only as an independent check of the cases $n\le6$.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
 \]
-%the reasoning in this paragraph is wonky, please improve it. (don't give a full proof, just explain better)
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, font=\small]
@@ -566,31 +569,23 @@ to the empty graph and climbing a different slope, a detour far longer than the 
 Allowing a brief excursion above the ceiling lets the walk trade one load-bearing edge for a better one 
 in two moves rather than dozens. Going above the bound is never the goal. 
 It is the shortcut the walk takes on its way back down to it.
+A single walk depends on where it started, so either engine is run several times from a different seed until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
 
-\section{Edge sensitivity}
-
-Which edges a walk should leave alone is itself a measurement. For an edge $e$ define its \emph{sensitivity}
-\[
-    \sigma(e) = \lambda^{\max}(G) - \lambda^{\max}(G - e),
-\]
-the amount by which deleting $e$ relaxes the binding connectivity. A load-bearing edge sits on a tightest cut and has $\sigma(e) > 0$: removing it would drop $\lambda^{\max}$ and so loosen the very constraint that limits how many edges the graph may hold. A free edge has $\sigma(e) = 0$, so it can be removed without easing the binding pair, which usually means it can be put to better use elsewhere. The program measures this by deleting $e$ and letting the checker remeasure, reusing one shared baseline across a whole graph rather than recomputing it per edge.
-
-Colouring a graph's arcs by $\sigma$ then explains a finished graph at a glance. \Cref{fig:sensitivity} shows all four sensitivity levels on one directed multigraph: the darkest arcs carry the most flow and lower $\lambda^{\max}$ the most when removed, while the cool arc contributes nothing. It makes the tightness of a witness visible, which is what turns a bare edge count into something a reader can check the shape of.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.85\textwidth]{figures/sensitivity_mixed.png}
-    \caption{Arc sensitivity in a directed multigraph with $\lambda^{\max}=9$, each parallel copy drawn as its own arc so multiplicity is read by counting rather than from a label. Equal multiplicities can have different $\sigma$: the downstream bottleneck makes $s\to a$ cooler than $s\to b$, while arcs into the dead end $d$ have $\sigma=0$.}
-    \label{fig:sensitivity}
-\end{figure}
-
-A single walk depends on where it started, so the search is repeated with a different seed until the wall-clock budget runs out and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
-
-\section{Keeping the checker cheap inside the search}
-
-The energy above reads the binding connectivity $\lambda^{\max}(G)$, and a literal implementation would call the checker afresh on the whole graph at every step. That checker is the most expensive routine in the program: a capped sweep over ordered pairs, stopping each pair as soon as it finds one route too many and stopping the whole sweep at the first violating pair. The walk runs for thousands of steps with several restarts, so such a search would spend nearly all of its time remeasuring graphs that barely changed from the step before. Two elementary facts remove almost all of that work without altering a single number the search reports, and they are the monotonicity and unit-step bounds of \Cref{prop:monotone}. Removing a unit of multiplicity can never raise $\lambda^{\max}$, part~(1), and adding one can never lower it and raises it by at most one, part~(2). Both hold verbatim for $\kappa^{\max}$, and both fall straight out of max-flow / min-cut, so the proof sits in \Cref{app:proofs} with the rest of the machinery.
-
-Together they settle almost every step without a flow. A removal applied to a feasible graph leaves it feasible, and an addition made while the graph sits strictly below the ceiling can lift $\lambda^{\max}$ by at most one, so in both cases the energy is known without measuring anything. Only an addition made at the ceiling itself needs the checker. The search therefore carries a running upper bound on $\lambda^{\max}$ and resynchronises it exactly only when that bound is what a step turns on. \Cref{sec:cheap-checker} gives the bookkeeping, and the regression test that holds the fast walk to the naive one step for step.
+\subsection{Measuring only on the possible bounds}
+Removing an arc can never raise $\lambda^{\max}$, while adding one raises it by at most one. 
+The same holds for $\kappa^{\max}$.
+This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}. 
+Therefore the max-flow algorithm only needs to be run every once in a while,
+depending on how close to the constraint the graph sits.
+A removal applied to a feasible graph leaves it feasible, 
+and an addition made while the graph sits strictly below the ceiling can 
+lift $\lambda^{\max}$ by at most one, 
+so in both cases the energy is known without measuring anything. 
+Only an addition made at the ceiling itself needs the checker. 
+The search therefore carries a running upper bound on $\lambda^{\max}$ and 
+resynchronises it exactly only when that bound is what a step turns on. 
+\Cref{sec:cheap-checker} gives the bookkeeping, 
+and the regression test that holds the fast walk to the naive one step for step.
 
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 

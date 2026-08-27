@@ -136,7 +136,7 @@ was produced; rerun those calls to check it.
 | `figures/edge_vertex_sampling.png` | edge vs vertex disjointness in G(n,p) (offcut only) |
 | `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.2) |
 | `figures/temperature_trace.png` | a cooling run (Ch.2) |
-| `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (Ch.2) |
+| `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (offcut only) |
 | `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
 | `figures/variant_bounds_m3_graphs.png` | proved / conjectured / guessed, the eight graph-model variants at m = 3 (Ch.2) |
 | `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Ch.2) |

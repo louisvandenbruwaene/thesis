@@ -161,6 +161,7 @@ I4--I8 & Directed duplicate, repeated tables (I7 restored), annealing algorithm,
 J1 (restored) & Alternative multigraph-vertex convention and its full proofs & \code{app\_proofs.tex} \\
 J2--J4 & Repeated transcripts, software appendix, and removed scope references (J4 partly restored) & \code{app\_proofs.tex}, \code{app\_code.tex}, front matter \\
 J5--J6 & Repeated representation displays and the SA--tabu benchmark & \code{ch2\_machine.tex} \\
+J7 & The edge-sensitivity section, a proposal bias used only by the annealer & \code{ch2\_machine.tex} \\
 \bottomrule
 \end{tabularx}
 }
@@ -2818,6 +2819,27 @@ The annealer is not the only way to walk this landscape. A natural alternative, 
 \end{table}
 
 Each tabu step scans the whole neighbourhood, so it is far more expensive than the annealer's single random proposal, and takes many fewer but better-aimed steps in the same wall-clock, a cost the equal-time comparison already absorbs. Tabu search is therefore the program's default for solving the problems, reaching every value this thesis reports, the rediscovery checks and the conjectural lower bounds alike, and reaching the harder directed optima past the exhausted range where the annealer plateaus. Simulated annealing is kept for the self-check and verification, where the small values fall at once, the lighter per-step cost is all that is needed, and its independent restarts parallelise trivially across cores.
+\end{offcut}
+
+\begin{offcut}{J7. Edge sensitivity section}{J7}{chapters/ch2\_machine.tex, former Section 2.6}{after the heuristic-search restarts paragraph}{$\sigma(e)$ is a removal-proposal bias used only inside the annealer, which \Cref{ch:certify} already names and describes without it, and tabu, the engine every reported value in this thesis comes from, never uses it. The author judged the colouring-a-witness diagnostic use not reason enough to keep the section. Author instruction, 27 August 2026.}
+\section{Edge sensitivity}
+
+For an edge $e$, define its \emph{sensitivity}
+\[
+    \sigma(e) = \lambda^{\max}(G) - \lambda^{\max}(G - e),
+\]
+the amount by which deleting $e$ relaxes the binding connectivity. A load-bearing edge sits on a tightest cut and has $\sigma(e) > 0$: removing it would drop $\lambda^{\max}$ and so loosen the very constraint that limits how many edges the graph may hold. A free edge has $\sigma(e) = 0$, so removing it eases nothing, and it can usually be put to better use elsewhere. The program measures $\sigma$ by deleting $e$ and letting the checker remeasure against a baseline $\lambda^{\max}(G)$ shared by every edge, so a whole graph's sensitivity map costs one flow per edge rather than one per edge plus a repeated baseline.
+
+Sensitivity plays no part in the energy $\Phi$: it never scores a candidate graph, only chooses which edge a removal move tries next, and only inside the annealer. Rather than choosing a present edge uniformly, the annealer draws its removal target with weight $\exp(-\sigma(e)/T)$, so a load-bearing edge is disfavoured, and the disfavouring sharpens as $T$ cools towards zero. Building the map costs one flow per edge, so it is cached and refreshed only once every \code{bias\_refresh} steps rather than before every proposal, at the price of acting on a map that is briefly out of date. Tabu search carries no such bias and needs none: at every step it already scores every move in its whole neighbourhood exactly before taking the best one, so there is nothing left for a cheap hint to buy. Since every discovery value this thesis reports comes from tabu, sensitivity shapes none of them. It remains in the program as the annealer's own device and as part of the independent cross-check the annealer provides.
+
+Colouring a graph's arcs by $\sigma$ reads a finished witness at a glance regardless of which engine produced it. \Cref{fig:sensitivity} shows all four sensitivity levels on one directed multigraph: the darkest arcs carry the most flow and lower $\lambda^{\max}$ the most when removed, while the cool arc contributes nothing. It turns a bare edge count into something a reader can check the shape of.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/sensitivity_mixed.png}
+    \caption{Arc sensitivity in a directed multigraph with $\lambda^{\max}=9$, each parallel copy drawn as its own arc so multiplicity is read by counting rather than from a label. Equal multiplicities can have different $\sigma$: the downstream bottleneck makes $s\to a$ cooler than $s\to b$, while arcs into the dead end $d$ have $\sigma=0$.}
+    \label{fig:sensitivity}
+\end{figure}
 \end{offcut}
 
 \end{document}
