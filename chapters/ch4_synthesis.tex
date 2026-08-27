@@ -1,8 +1,21 @@
-The thesis began with one theorem and carried it across sixteen variants. Some of them yielded to hand argument, the machine settled the small cases of others, and the search supplied dense graphs where neither reached. This chapter collects the results. It describes the directed frontier, where neither the proofs nor the certificate reach the full answer, sets out two phenomena that run through the variants, gathers the sixteen values into one table, and states what the program does and does not do.
+This thesis began with proving certain variants using logical arguments, 
+confirmed those results for small graphs and then searched for dense graphs in the numerous possibilities. 
+This chapter collects the output of those programs, interprets it and provides conclusions for all variants.
 
 \section{The directed frontier and the missing decomposition}
 
-The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augmented bipartite construction with $\floor{(n+m-2)^2/4}$ arcs (\Cref{const:directed-hub,const:augmented-bipartite}). They cross near $n=9$ at $m=3$, and \Cref{conj:dir-arc} asserts that their maximum is exact. Exhaustion proves the small $m=3$ cases, but the general upper bound is structural: it would follow if every non-hub extremiser admitted the complete $A\to B$ decomposition of \Cref{open:decomposition}. The difficult clause forbids arcs returning from $B$ to $A$, since one such arc lets routes escape through $A$ and defeats the internal $m-2$ budget. \Cref{fig:directed-frontier-pair} places the numerical crossover and that obstruction together.
+The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augmented bipartite construction with $\floor{(n+m-2)^2/4}$ arcs (\Cref{const:directed-hub,const:augmented-bipartite}). They cross near $n=9$ at $m=3$.
+
+\begin{conjecture}\label{conj:dir-arc}
+For simple digraphs and all $n \ge m \ge 2$,
+\[
+    \ell_m^{\mathrm{dir}}(n) = \max\!\left(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\right).
+\]
+\end{conjecture}
+
+At $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. The first branch is the directed hub of \Cref{const:directed-hub}. The second is the bipartite wall again, with the partition shifted towards the larger part and a short cycle added inside it so that each pair gains $m-2$ detours on top of its direct arc (\Cref{const:augmented-bipartite}). At $m = 3$, $n = 10$ that shape holds $30$ arcs, which is what refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$ and its prediction of $27$.
+
+Exhaustion proves the small $m=3$ cases, but the general upper bound is structural: it would follow if every non-hub extremiser admitted the complete $A\to B$ decomposition of \Cref{open:decomposition}. The difficult clause forbids arcs returning from $B$ to $A$, since one such arc lets routes escape through $A$ and defeats the internal $m-2$ budget. \Cref{fig:directed-frontier-pair} places the numerical crossover and that obstruction together.
 
 % The crossover plot and the backward-arc diagram were side by side, which left
 % the plot 2.8in wide against a 6.9in canvas and its axis labels at 3.5pt.
@@ -67,47 +80,11 @@ The directed arc problem is a race between a hub with $m(n-1)$ arcs and an augme
 \label{fig:directed-frontier-pair}
 \end{figure}
 
-The conjecture is nevertheless correct to first order and to the order of its error, and that much is a theorem with no hypothesis at all on the shape of the extremiser.
+The conjecture is nevertheless correct to first order and to the order of its error, and that much is \Cref{thm:dir-arc-linear-error}, proved with no hypothesis at all on the shape of the extremiser. What is left open is therefore only the coefficient of the linear error term, somewhere between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The next section takes up what the bound does and does not say about the \emph{shape} of an extremiser, which is a separate question answered by a weaker version of the same argument.
 
-\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
-For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
-\]
-so for each fixed $m$,
-\[
-    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
-\]
-and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
-\end{theorem}
+So the directed vertex problem, which \Cref{app:proofs} otherwise keeps separate from the arc one, has the same leading term and the same order of error, by \Cref{thm:dir-vertex-linear-error}. Whether the two agree exactly for $m \ge 3$ is open.
 
-The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the ceiling, and that alone forces the arc count down to the wall plus a linear correction. What is left open is therefore only the coefficient of that linear term, somewhere between the conjectured $(m-2)/2$ and the proved $4(m-1)$. The next section takes up what the bound does and does not say about the \emph{shape} of an extremiser, which is a separate question answered by a weaker version of the same count.
-
-The route family the count uses is internally vertex-disjoint and not merely arc-disjoint, which is what lets the whole argument be re-run under the stricter separation. Whitney's inequality alone would not justify the transfer, since it points the other way.
-
-\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
-For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
-\]
-and consequently, for each fixed $m$,
-\[
-    k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
-\]
-\end{theorem}
-
-So the directed vertex problem, which \Cref{app:proofs} otherwise keeps separate from the arc one, has the same leading term and the same order of error. Whether the two agree exactly for $m \ge 3$ is open.
-
-Allowing parallel arcs, by contrast, closes the problem outright.
-
-\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
-For all $n \ge 2$ and $m \ge 2$,
-\[
-    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
-\]
-\end{theorem}
-
-The extremisers include the doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
+Allowing parallel arcs, by contrast, closes the problem outright: \Cref{thm:dir-multi-full} gives the exact value for every $n \ge 2$ and $m \ge 2$.
 
 \section{Two principal phenomena}
 
@@ -242,28 +219,7 @@ exceptions are in \Cref{thm:mader,thm:leonard,thm:sorensen-thomassen,prop:hyper-
 \subsection{Orientation models for the directed hypergraph}
 \label{sec:orientation-models}
 
-The directed hypergraph row of \Cref{tab:summary} rests on one bound, which pins the leading term where previously only a factor-of-four window was known.
-
-\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
-Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
-$\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
-\[
-    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2 (n-1).
-\]
-The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
-stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
-edge- and the vertex-disjoint maxima are
-$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
-of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
-\end{theorem}
-
-The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
-$u\to v$ records that some hyperedge has tail $u$ and head $v$.  A matching
-argument transfers the hypergraph route ceiling to the shadow's two-step route
-budget, after which \Cref{lem:two-step-budget} controls the shadow and a
-tail--head incidence count converts its arcs back to hyperedges. Since the
-bipartite construction already attains that leading term, it is asymptotically
-optimal.
+The directed hypergraph row of \Cref{tab:summary} rests on one bound, \Cref{thm:dir-hyper-constant}, which pins the leading term where previously only a factor-of-four window was known.
 
 The table uses the \emph{forward} convention of one tail and $r-1$ heads. More generally a hyperedge may split into non-empty tail and head sets. Reversal makes the one-head \emph{backward} model exactly equivalent to forward (\Cref{lem:dir-hyper-duality}), while \Cref{thm:dir-hyper-general-constant} proves that arbitrary splits share the same leading term under both separations. Thus the orientation choice does not add another asymptotic row to \Cref{tab:summary}.
 

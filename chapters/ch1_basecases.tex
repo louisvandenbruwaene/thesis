@@ -608,16 +608,61 @@ A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches 
 When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away and it must do this for every line simultaneously. 
 That bookkeeping is the one new piece of machinery the next chapter builds and it is why the hypergraph rejoins the family only once the checker is in place.
 
-
-\section{Conjectured bounds}
-
-\begin{conjecture}\label{conj:dir-arc}
-For simple digraphs and all $n \ge m \ge 2$,
+\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
+For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
-    \ell_m^{\mathrm{dir}}(n) = \max\!\left(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\right).
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
 \]
-\end{conjecture}
+so for each fixed $m$,
+\[
+    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
+\]
+and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
+\end{theorem}
 
-At $m = 2$ this is \Cref{thm:dir-arc-m2-exact}. The first branch is the directed hub of \Cref{const:directed-hub}. The second is the bipartite wall again, with the partition shifted towards the larger part and a short cycle added inside it so that each pair gains $m-2$ detours on top of its direct arc (\Cref{const:augmented-bipartite}). At $m = 3$, $n = 10$ that shape holds $30$ arcs, which is what refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$ and its prediction of $27$.
+The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the ceiling, and that alone forces the arc count down to the wall plus a linear correction.
+
+The route family the count uses is internally vertex-disjoint and not merely arc-disjoint, which is what lets the whole argument be re-run under the stricter separation. Whitney's inequality alone would not justify the transfer, since it points the other way.
+
+\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
+For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
+\[
+    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
+\]
+and consequently, for each fixed $m$,
+\[
+    k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
+\]
+\end{theorem}
+
+\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
+For all $n \ge 2$ and $m \ge 2$,
+\[
+    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
+\]
+\end{theorem}
+
+The extremisers include the doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
+
+\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
+Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
+$\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
+\[
+    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2 (n-1).
+\]
+The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
+stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
+edge- and the vertex-disjoint maxima are
+$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
+of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
+\end{theorem}
+
+The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
+$u\to v$ records that some hyperedge has tail $u$ and head $v$. A matching
+argument transfers the hypergraph route ceiling to the shadow's two-step route
+budget, after which \Cref{lem:two-step-budget} controls the shadow and a
+tail--head incidence count converts its arcs back to hyperedges. Since the
+bipartite construction already attains that leading term, it is asymptotically
+optimal.
 
 For fixed $m \ge 3$ the matching upper bound is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer.
