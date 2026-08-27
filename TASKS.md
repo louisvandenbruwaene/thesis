@@ -281,6 +281,13 @@ comments themselves are gone from ch4.
       vertex one is open for m >= 6. The caption defers to tab:summary, which is
       a weak defence for a figure meant to be read on its own. A fourth regime
       colour would fix the claim as well as the legend layout.
+- [ ] **One attribution still unverified against the paper.** Mader73 carries
+      two loads: thm:mader (edge problem solved) and "k_m(n) - mn/2 is
+      unbounded for m >= 6" in sec:simple-vertex-blocks. The second is now
+      history rather than load, since the Sorensen-Thomassen display refutes
+      the conjecture for every m >= 5 on its own, but confirm it if you get
+      library access. Leonard72b, Bartfai60 and Bollobas66 were resolved from
+      their titles on 2026-08-27 and are no longer in doubt.
 - [ ] **tab:summary.** "Is this table still needed, given tab:variant-values,
       which looks better? Perhaps move some of it into that one, or into
       tab:open-problems." Editorial call for the author. Note that tab:summary

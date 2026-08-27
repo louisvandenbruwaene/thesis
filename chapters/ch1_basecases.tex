@@ -444,9 +444,9 @@ For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
 \Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree. 
 The lower bound is a spanning tree with every edge thickened to $m-1$ parallel copies. 
 
-In simple graphs the edge and vertex problems give the same answer while $m$ stays small, and the small cases were settled one at a time. At $m = 2$ both problems count the edges of a spanning tree and there is nothing to prove. B\'{a}rtfai \cite{Bartfai60} did $m = 3$ and Bollob\'{a}s \cite{Bollobas66} did $m = 4$, each for the vertex problem, whose value then meets the edge value of \Cref{thm:mader} from below. Leonard \cite{Leonard72b} carried the \emph{edge} problem one step further, to $m = 5$, a year before \Cref{thm:mader} settled every $m$ at once.
+In simple graphs the edge and vertex problems give the same answer while $m$ stays small. At $m = 2$ both count the edges of a spanning tree. At $m = 3$ the vertex ceiling $\kap^{\max} \le 2$ forces every block to be a single edge or a cycle, which \Cref{app:proofs} turns into the value in a line. The substantial case is $m = 4$, settled by Bollob\'{a}s \cite{Bollobas66}, and the value there meets the edge value of \Cref{thm:mader} from below. On the \emph{edge} side the same small cases were done first and one at a time, $m = 3$ by B\'{a}rtfai \cite{Bartfai60} and $m = 5$ by Leonard \cite{Leonard72b}, before \Cref{thm:mader} covered every $m$ at once.
 
-\begin{theorem}[B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66}]\label{thm:leonard}
+\begin{theorem}[Bollob\'{a}s \cite{Bollobas66}]\label{thm:leonard}
 For all $n \ge m$ and $m \le 4$,
 \[
     k_m(n) = \ell_m(n) = \floorfrac{m(n-1)}{2}.

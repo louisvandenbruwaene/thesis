@@ -2,12 +2,12 @@
 % COMPREHENSIVE BIBLIOGRAPHY FOR ERDOS PROBLEM 915 THESIS
 % ============================================================================
 %
-% Twenty-seven of the entries below are cited by the current text and are the
-% only ones the printed bibliography carries, since bibtex emits cited entries
-% alone. The rest are retained deliberately: they supported passages that the
-% 2026-08 shortening passes cut (those passages are archived in offcuts.tex
-% with their restore anchors), and deleting them here would make a restore
-% silently lose its reference.
+% NOTE ON UNCITED ENTRIES. Twenty-seven of the entries below are cited by the
+% current text, and those are the only ones the printed bibliography carries,
+% since bibtex emits cited entries alone. The rest are retained deliberately:
+% they supported passages that the 2026-08 shortening passes cut, and those
+% passages are archived in offcuts.tex with their restore anchors, so deleting
+% the entries here would make a restore silently lose its reference.
 %
 % Retained but not cited as of the current text:
 %   AbboudKT21, AhujaMagnantiOrlin93, Berge89, Bollobas78, BollobasRandomGraphs,
@@ -17,10 +17,10 @@
 %   McKayRadziszowski95, Mulzer18, NagamochiIbaraki92, Orlin13, Razborov07,
 %   Schrijver03.
 %
-% Regenerate this list from the repository root with:
-%   grep -o '\\cite[a-zA-Z]*{[^}]*}' chapters/*.tex main.tex preamble.tex \
-%     | sed 's/.*{//;s/}//' | tr ',' '\n' | tr -d ' ' | sort -u > /tmp/cited
-%   grep -o '^@[a-z]*{[^,]*' ref.bib | sed 's/.*{//' | sort | comm -13 /tmp/cited -
+% To regenerate that list, compare the keys cited across chapters, main.tex and
+% preamble.tex against the entry keys in this file. Keep the recipe out of this
+% comment: bibtex scans for an at-sign anywhere outside an entry and treats what
+% follows as a new entry, so a shell one-liner mentioning one breaks the build.
 % ============================================================================
 
 % ============================================================================
@@ -112,7 +112,7 @@
     pages = {281--284},
     year = {1973},
     doi = {10.1007/BF02018594},
-    note = {Studies the Bollob\'as--Erd\H{o}s conjecture and gives the explicit $m=5$ counterexample on 57 vertices used in this thesis. Leonard's work also establishes the equality results through $m=4$}
+    note = {Gives the explicit $m = 5$ counterexample on 57 vertices used in this thesis. The $m \le 4$ equality is not from this paper: $m = 4$ is Bollob\'{a}s 1966 and $m = 3$ is elementary}
 }
 
 @article{Leonard72b,
@@ -122,7 +122,8 @@
     volume = {13},
     pages = {242--250},
     year = {1972},
-    doi = {10.1016/0095-8956(72)90059-7}
+    doi = {10.1016/0095-8956(72)90059-7},
+    note = {``Line-disjoint'' is edge-disjoint, and ``at most four'' is $\lambda^{\max} \le 4$, so this is the \emph{edge} problem at $m = 5$ in the notation of this thesis, not a vertex result}
 }
 
 @article{Leonard73,
@@ -158,7 +159,7 @@
     volume = {11},
     pages = {167--171},
     year = {1960},
-    note = {Establishes $k_3(n)$ for the vertex-disjoint case}
+    note = {Determines the $m = 3$ edge-disjoint value, one of the small cases later subsumed by Mader's theorem}
 }
 
 @article{Bollobas66,
@@ -182,7 +183,7 @@
     year = {2017},
     series = {Graduate Texts in Mathematics},
     volume = {173},
-    note = {Standard reference for graph theory; see Chapter 3 for Menger's theorem}
+    note = {Standard reference for graph theory. Chapter 3 carries Menger's theorem in both its local and its global form}
 }
 
 @book{BondyMurty08,
