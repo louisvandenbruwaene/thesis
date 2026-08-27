@@ -598,6 +598,51 @@ Before the search is pointed at the open cases, it is run on the settled ones. R
     \label{tab:rediscovery}
 \end{table}
 
-The graphs the search finds are the named constructions themselves, not merely graphs of the right size. The undirected simple run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every edge at multiplicity $m - 1$, an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}. The directed multigraph run settles on the same star, with both directions of every spoke at full multiplicity, the thickened tree of \Cref{const:dir-multi-lower}. The simple directed run finds the bidirected star at $n = 4$ and, at $n = 7$, the tying value of twelve arcs at which the hub and the one-directional wall meet, the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search carries none of these names. It lands on them because, under the connectivity ceiling, there is nowhere denser to go.
+\begin{figure}[ht]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+  % Panel 1: spanning tree, undirected simple, n=6, m=2, ell_2(6)=5
+  \begin{scope}[shift={(-7.5,0)}]
+    \foreach \i/\x in {1/0,2/1.0,3/2.0,4/3.0,5/4.0,6/5.0} {
+      \node[gvertex, minimum size=5mm] (t\i) at (\x,0) {};
+    }
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
+      \draw[gline] (t\i) -- (t\j);
+    }
+    \node[font=\footnotesize\itshape] at (2.5,-0.9) {spanning tree};
+    \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
+  \end{scope}
+  % Panel 2: undirected multigraph star, n=6, m=3, every spoke doubled, L_3(6)=10
+  \begin{scope}[shift={(0,0.3)}]
+    \node[gvhub, minimum size=6mm] (h2) at (0,0) {};
+    \foreach \ang in {90,162,234,306,18} {
+      \node[gvertex, minimum size=5mm] (l2\ang) at (\ang:1.5) {};
+      \draw[gline] (h2) to[gcurve]  (l2\ang);
+      \draw[gline] (h2) to[gcurveR] (l2\ang);
+    }
+    \node[font=\footnotesize\itshape] at (0,-2.0) {multigraph star};
+    \node[font=\scriptsize] at (0,-2.5) {$n=6$, $m=3$, $L_3(n)=10$};
+  \end{scope}
+  % Panel 3: directed multigraph double star, n=4, m=3, every spoke bidirected and doubled, L_3^dir(4)=12
+  \begin{scope}[shift={(5.2,0.3)}]
+    \node[gvhub, minimum size=6mm] (h3) at (0,0) {};
+    \foreach \ang in {90,210,330} {
+      \node[gvertex, minimum size=5mm] (l3\ang) at (\ang:1.9) {};
+      \draw[gdir] (h3)     to[bend left=30]  (l3\ang);
+      \draw[gdir] (h3)     to[bend left=11]  (l3\ang);
+      \draw[gdir] (l3\ang) to[bend left=30]  (h3);
+      \draw[gdir] (l3\ang) to[bend left=11]  (h3);
+    }
+    \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
+    \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\mathrm{dir}}(n)=12$};
+  \end{scope}
+\end{tikzpicture}%
+}
+\caption{Three of the shapes \Cref{tab:rediscovery} names, each drawn at the size the table reports. \Cref{fig:simple-digraph-m2} draws the fourth, the bidirected star tying the one-directional wall at $n=7$.}
+\label{fig:rediscovery-gallery}
+\end{figure}
 
-Past $n = 7$ the search reaches its own limit before the checker does. Repeated tabu runs at $n = 8$, $m = 2$ stall at the hub's arc count, because dismantling a finished hub and rebuilding the one-directional wall of \Cref{const:bipartite} is far more than the single-arc moves of the walk can tunnel through, and the true value there comes from the construction and the checker rather than from the search. The directed double star on seven vertices at $m = 4$ has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$, a further witness past where the search itself reaches. Neither is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the status every witness returns.
+The graphs the search finds are the named constructions themselves, not merely graphs of the right size. \Cref{fig:rediscovery-gallery} draws three of them. The undirected simple run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every spoke doubled to multiplicity $m - 1$, an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}. The directed multigraph run settles on the same star, bidirected and doubled to the same multiplicity, the thickened tree of \Cref{const:dir-multi-lower}. The simple directed run finds the bidirected star at $n = 4$ and, at $n = 7$, the tying value of twelve arcs at which the hub and the one-directional wall meet (\Cref{fig:simple-digraph-m2}), the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search carries none of these names. It lands on them because, under the connectivity ceiling, there is nowhere denser to go.
+
+Past $n = 7$ the search reaches its own limit before the checker does. Repeated tabu runs at $n = 8$, $m = 2$ stall at the hub's arc count, because dismantling a finished hub and rebuilding the one-directional wall (\Cref{fig:simple-digraph-m2}) is far more than the single-arc moves of the walk can tunnel through, and the true value there comes from the construction and the checker rather than from the search. The same double star of \Cref{fig:rediscovery-gallery}, at $n = 7$ and $m = 4$, has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$, a further witness past where the search itself reaches. Neither is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the status every witness returns.

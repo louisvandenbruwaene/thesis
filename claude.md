@@ -1012,3 +1012,39 @@ undefined refs, 0 occurrences of `??`. No em-dashes, en-dashes or prose
 semicolons in the diff (checked directly against `git diff`, not by eye). No
 duplicate labels introduced. All three executed comments deleted from the
 source (they no longer exist in `ch2_machine.tex`).
+
+**FOLLOW-UP, SAME SESSION: the rediscovery paragraphs named shapes with no
+picture.** The author pushed back on where the rediscovery prose lived (ch2
+vs ch4), which was the right call to leave alone (see the author's own
+answer, kept as a standing convention below), then separately objected to
+the prose itself: it named constructions ("thickened star", "double star")
+with no figure, reading as unmotivated jargon. Checked first whether a
+picture already existed: `fig:simple-digraph-m2` (ch1) already draws the
+bidirected star and the one-directional wall tying at $n=7$, so those two
+mentions now `\Cref` it directly instead of describing it blind. The other
+three named shapes (the spanning tree, the doubled undirected multigraph
+star, the doubled bidirected directed-multigraph double star) had no
+figure anywhere, so a new compact one, `fig:rediscovery-gallery`, draws all
+three side by side, each sized to the exact `(n,m)` that `tab:rediscovery`
+reports for it, reusing the shared TikZ vocabulary (`gvertex`, `gvhub`,
+`gline`, `gdir`, `gcurve`/`gcurveR`) so it matches the rest of the thesis's
+look rather than inventing a new one. The multiplicity-doubling convention
+(parallel bent lines, not a numeric label) follows `fig:scaling-reduction`'s
+existing precedent.
+
+**ONE ITERATION NEEDED ON THE NEW FIGURE.** The double-star panel's first
+draft used bend angles of $14°$ and $5°$ for the two arcs each direction,
+which is what the multigraph-star panel uses successfully for its two
+undirected arcs. Rendered and inspected: with four arcs instead of two, that
+spread was too tight, the four collapsed into what read as a single thick
+spoke with no visible multiplicity or direction. Widened to $30°$/$11°$,
+rendered again, and now all four arcs and both arrowheads per spoke are
+individually visible. The lesson generalizes: a bend spread tuned for a
+2-line pair does not automatically carry over to a 4-line bundle, check by
+rendering rather than by reusing a working angle from a lower-multiplicity
+panel.
+
+VERIFY: `latexmk -pdf` exit 0, 104pp, 0 overfull, 0 occurrences of `??`, 0
+undefined refs. New figure's page rendered at 110dpi and inspected directly,
+twice (before and after the bend-angle fix). No duplicate labels, no banned
+verdict phrases, no em/en-dashes or prose semicolons in the diff.
