@@ -826,3 +826,63 @@ undefined refs, 0 occurrences of `??`. The merged table's page rendered
 and inspected directly: all thirty-two rows fit on one page with room to
 spare, section headers and blank n=2 hypergraph cells both render as
 intended.
+
+## 2026-08-27 (Sonnet, fourth session) — moved conj:dir-arc and four theorems between chapters, then fixed the fallout of a half-finished author edit
+
+Two requests in one session. First, move `conj:dir-arc` (then in ch1's
+"Conjectured bounds" section) to the final chapter, and move the four
+theorems the final chapter stated (`thm:dir-arc-linear-error`,
+`thm:dir-vertex-linear-error`, `thm:dir-multi-full`,
+`thm:dir-hyper-constant`) to chapter 1's "Proven bounds", each moved with
+its explanatory prose rather than just the bare statement. ch4 keeps a
+one-sentence bridge at each former site, referencing the relocated result
+by label, so the surrounding synthesis argument still reads without
+restating what moved. Committed as `e166fab`.
+
+Second request, "fix all errors in the pdf". The build itself was already
+clean (0 `??`, 0 overfull), so the errors were in content coherence. The
+working tree held an uncommitted author edit that commented out ch2's
+"Results and evidential status" section with a note that it belongs in the
+final chapter and needs rephrasing, and the removal had been left
+half-done: `tab:variant-values`'s own caption said its $m=6,n=6,r=3$ claim
+was "established by the full enumeration in the paragraph above" with no
+such paragraph left above it (the 125,970-hypergraph exhaustion that
+justified it was inside the deleted block), and "certifier" / "replayable"
+were used in ch4 and the appendix without ever being defined anywhere
+still visible.
+
+**FOUND THIS IS DIFFERENT FROM STALE-AUX.** The first rebuild attempt after
+picking this up exited 12 with 121 undefined refs, matching the exact
+symptom this file already documents for stale `.aux` state. `latexmk -C`
+then a clean rebuild fixed it, confirming the source was never the cause,
+same as the two prior occurrences of this failure mode.
+
+Rather than restore the deleted block verbatim (much of it duplicated
+material already stated elsewhere: the crossover/counterexample recap now
+sits in ch4's own `conj:dir-arc` discussion, and the colour-code legend is
+already in each figure's own caption), split what remained genuinely
+missing by where it belongs. The evidential-status vocabulary
+(checker measures, exhaustion proves, certifier is a finite check without
+a replayable bound, search only witnesses) now sits in ch4's
+"Contributions and limitations" section, next to where that vocabulary was
+already being used undefined. The specific $m=3$ exhausted values
+($6,9,12,15$ for $n=3..6$) now back the `conj:dir-arc` discussion, replacing
+the vague "small $m=3$ cases". The hypergraph exhaustion fact is restored
+immediately above the table that cites it, so "the paragraph above" is true
+again.
+
+**TWO STANDING STYLE VIOLATIONS FOUND WHILE IN THERE**, both in
+`tab:variant-values`'s own caption: an en-dash (`--`) used as parenthetical
+punctuation, and a prose semicolon. Both fixed; neither was related to the
+comment-out.
+
+Also folded in a proofreading pass that was already sitting uncommitted in
+ch1/main.tex/ref.bib/this file when the session started (small wording
+fixes, a `\Cref` retarget, a `@misc` bibtex-type fix) since it was correct
+and the resulting whole-tree state needed committing together to stay
+buildable from a clean checkout.
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 104pp, 0 overfull/
+underfull, 0 occurrences of `??`, 0 undefined refs, no duplicate labels,
+no banned verdict-prose phrases, no new em-dashes/en-dashes/prose
+semicolons. Committed as `b17ae67`.
