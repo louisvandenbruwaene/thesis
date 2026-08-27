@@ -444,9 +444,9 @@ For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
 \Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree. 
 The lower bound is a spanning tree with every edge thickened to $m-1$ parallel copies. 
 
-Leonard proved that in simple graphs the edge and vertex problems give the same answer while $m$ stays small.
+In simple graphs the edge and vertex problems give the same answer while $m$ stays small, and the small cases were settled one at a time. At $m = 2$ both problems count the edges of a spanning tree and there is nothing to prove. B\'{a}rtfai \cite{Bartfai60} did $m = 3$ and Bollob\'{a}s \cite{Bollobas66} did $m = 4$, each for the vertex problem, whose value then meets the edge value of \Cref{thm:mader} from below. Leonard \cite{Leonard72b} carried the \emph{edge} problem one step further, to $m = 5$, a year before \Cref{thm:mader} settled every $m$ at once.
 
-\begin{theorem}[Leonard \cite{Leonard72b}]\label{thm:leonard}
+\begin{theorem}[B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66}]\label{thm:leonard}
 For all $n \ge m$ and $m \le 4$,
 \[
     k_m(n) = \ell_m(n) = \floorfrac{m(n-1)}{2}.

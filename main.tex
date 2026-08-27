@@ -42,7 +42,7 @@ Above all I thank my girlfriend Sara, whose patience and encouragement carried m
 All the work in this thesis is my own, except where I explicitly say otherwise. 
 I used artificial intelligence to implement the code, suggest and verify proofs, format \LaTeX{} and check spelling.
 Where a result comes from the literature I say so and cite it. 
-The theorems I use but do not claim as mine are those of Mader, Leonard, S{\o}rensen and Thomassen, Menger, Gomory and Hu, and Baranyai. 
+The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Whitney, Gomory and Hu, Mantel, Tutte, and Baranyai. 
 Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
 Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
 The summary of my original results is:
@@ -69,14 +69,14 @@ Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and, fo
 \[
 \ell_m(n)=\max\{|E(G)|:|V(G)|=n,\ \lambda_G^{\max}\le m-1\}.
 \]
-Mader proved that, for simple graphs and $n\ge m\ge2$,
+Mader proved that, for simple graphs and all $n\ge2$ and $m\ge2$,
 \[
 \ell_m(n)\le\left\lfloor \frac{m(n-1)}2\right\rfloor 
 \]
 and provided a construction achieving this bound when $(m-1)|(n-1)$.
 This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multi-hypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint) and the presence or absence of directions.
 The simple case for edge-disjoint paths is proven independently here using Gomory-Hu trees \cite{GomoryHu61} and a general extremal graph construction resolves this case for all $n$ and $m$.
-Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$ and the equality of the simple edge and vertex problems for $m\le4$ and their divergence at $m=5$, as shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
+Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, settled by B\'{a}rtfai \cite{Bartfai60} and Bollob\'{a}s \cite{Bollobas66}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
 The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. 
 
 

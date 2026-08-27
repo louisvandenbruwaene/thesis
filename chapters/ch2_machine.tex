@@ -421,7 +421,7 @@ They assign only one orientation to each edge, so they cannot represent the bidi
 or the repeated arc multiplicities that occur in the extremal graphs.
 
 \Cref{tab:generating-benchmark} times three ways of proving $\ell_2^{\mathrm{dir}}(n)$ for a simple digraph on a single core: a blind sweep over every matrix assignment with no pruning at all, the depth-first pruned search of \Cref{fig:prune}, and the geng-generated pipeline above.
-The blind sweep is left out past $n = 4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s and the next vertex would cost days, the same growth \Cref{fig:complexity} plots.
+The blind sweep is left out past $n = 4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s. Each further vertex multiplies the assignment count by $2^{2n}$, so $n = 5$ would run for about an hour and $n = 6$ for weeks, the same growth \Cref{fig:complexity} plots.
 Below $n = 5$ both remaining methods are dominated by fixed overhead, a Python call against a subprocess spawn, rather than by search cost, and neither number there is a meaningful comparison.
 From $n = 5$ the gap widens with every vertex: generation is $5.5$ times faster at $n = 5$, $20$ times faster at $n = 6$ and $68$ times faster at $n = 7$, where the pruned search takes $1156.6$\,s against the generated pipeline's $17.0$\,s.
 All three methods return the same proved value at every $n$ where they finish.
@@ -543,7 +543,7 @@ A move that would beat the best graph seen so far overrides the tabu flag regard
 an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, 
 and the walk perturbs itself when it stalls.
 
-Simulated annealing allows worsening moves with decreasing probability over time and is an alternative on the same energy and the same neighbourhood, 
+Simulated annealing \cite{KirkpatrickGelattVecchi83}, which accepts a worsening move with the probability of the Metropolis rule \cite{Metropolis53} and lowers that probability as the run cools, is an alternative on the same energy and the same neighbourhood, 
 but at equal wall-clock budget it is the weaker engine here. 
 Tabu always wins speedwise and closes hard problems faster: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
 Every discovery value this thesis reports therefore comes from tabu search. 

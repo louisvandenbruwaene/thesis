@@ -1,7 +1,8 @@
 % Times measured on the author's machine, single core (geng parallel=False),
 % directed simple digraphs, m=2, target arc count ell_2^dir(n). Blind sweep
-% omitted past n=4, where 2^(n(n-1)) assignments already cost 6.3s and the
-% next size would cost days. Reproduced by
+% omitted past n=4, where 2^(n(n-1)) assignments already cost 6.3s. Each
+% further vertex multiplies the assignment count by 2^(2n), so n=5 is roughly
+% an hour and n=6 is weeks. Reproduced by
 % research_notes/scripts/generating_search_benchmark.py against erdos915_unified.py.
 \begin{tabular}{rrrrr}
 \toprule

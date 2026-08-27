@@ -1,6 +1,27 @@
 % ============================================================================
 % COMPREHENSIVE BIBLIOGRAPHY FOR ERDOS PROBLEM 915 THESIS
 % ============================================================================
+%
+% Twenty-seven of the entries below are cited by the current text and are the
+% only ones the printed bibliography carries, since bibtex emits cited entries
+% alone. The rest are retained deliberately: they supported passages that the
+% 2026-08 shortening passes cut (those passages are archived in offcuts.tex
+% with their restore anchors), and deleting them here would make a restore
+% silently lose its reference.
+%
+% Retained but not cited as of the current text:
+%   AbboudKT21, AhujaMagnantiOrlin93, Berge89, Bollobas78, BollobasRandomGraphs,
+%   BollobasThomason85, BondyMurty08, BondySimonovits74, Dinic70, EdmondsKarp72,
+%   ErdosRenyi59, ErdosStone46, Frank11, GoldbergTarjan88, Heule18,
+%   HeuleKullmannMarek16, Karger00, KovariSosTuran54, Leonard73,
+%   McKayRadziszowski95, Mulzer18, NagamochiIbaraki92, Orlin13, Razborov07,
+%   Schrijver03.
+%
+% Regenerate this list from the repository root with:
+%   grep -o '\\cite[a-zA-Z]*{[^}]*}' chapters/*.tex main.tex preamble.tex \
+%     | sed 's/.*{//;s/}//' | tr ',' '\n' | tr -d ' ' | sort -u > /tmp/cited
+%   grep -o '^@[a-z]*{[^,]*' ref.bib | sed 's/.*{//' | sort | comm -13 /tmp/cited -
+% ============================================================================
 
 % ============================================================================
 % PRIMARY SOURCES

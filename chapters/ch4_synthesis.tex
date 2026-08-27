@@ -1,5 +1,5 @@
 This thesis began by proving certain variants using logical arguments,
-confirmed those results for small graphs and then searched the bigger graphs for dense examples.
+confirmed those results for small graphs and then searched bigger graphs for dense examples.
 This chapter collects the output of those programs, interprets it and provides conclusions for all variants.
 
 \section{The directed frontier and the missing decomposition}
@@ -29,7 +29,6 @@ Exhaustion proves the values $6,9,12,15$ for $n=3,4,5,6$ at $m=3$ under both sep
     \caption{The two lower-bound branches at $m=3$.}
     \label{fig:crossover}
     \end{subfigure}
-
     \bigskip
     \begin{subfigure}[b]{0.72\textwidth}
 \centering
@@ -73,7 +72,7 @@ Exhaustion proves the values $6,9,12,15$ for $n=3,4,5,6$ at $m=3$ under both sep
      {the route $b_3\to a_1\to b_2$\\now escapes $B$ through $A$};
 \end{scope}
 \end{tikzpicture}
-}
+}% no reason to use different shades of arcs, also: the prose is a bit convoluted
 \caption{Left, the desired $A\to B$ form. Right, one returning arc that breaks it.}
 \label{fig:backward-arc}
     \end{subfigure}
@@ -161,7 +160,7 @@ The quadratic term is what the directed upper bound has to account for. The argu
   \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (0,-2.9) {};
   \node[anchor=west, font=\scriptsize] at (0.9,-2.9) {leading constant proved, exact value open};
 \end{tikzpicture}%
-}
+}%
 \caption{Status of the sixteen variants. Blue marks a proved closed form in the ranges stated in \Cref{tab:summary}, red a conjectured exact formula with proved lower bound, and amber a proved leading term with unknown exact value. The table is authoritative for exceptions and conventions.}
 \label{fig:variant-tree-status}
 \end{figure}
@@ -176,7 +175,7 @@ Model & Edge/arc-disjoint & Vertex-disjoint \\
 \midrule
 undirected simple graph
   & $\floor{m(n-1)/2}$, exact
-  & edge value for $m\le4$, $\floor{8n/3}-4$ for $m=5$, $n\ne7,12$, open for $m\ge6$ \\
+  & edge value for $m\le4$, $\floor{8n/3}-4$ for $m=5$ with $n\ge6$, $n\ne7,12$, open for $m\ge6$ \\
 undirected multigraph
   & $(m-1)(n-1)$, exact
   & simple value, adjacency-count convention \\
@@ -201,11 +200,13 @@ directed $r$-hyper, multi
 \bottomrule
 \end{tabularx}
 \caption{The sixteen variants and the strongest result known for each.}
-\label{tab:summary}
-\end{table}
-
+\label{tab:summary}%
+\end{table}%
 Here $M(n)=\max(2(n-1),\floor{n^2/4})$. Simple-graph formulas assume
 $n\ge m$. Below that range the complete object gives the trivial maximum.
+The $m=5$ vertex formula is the one exception, needing $n\ge6$ rather than
+$n\ge m$: at $n=5$ it reads $9$ where $K_5$ is already feasible at
+$\kap^{\max}=4$ and gives $k_5(5)=10$.
 The edge-hypergraph bound is attained when $(r-1)\mid(n-1)$ for
 multihypergraphs, and for simple hypergraphs when $r\ge3$ and
 $m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained by a simple hypergraph when

@@ -265,3 +265,25 @@ Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
   rather than the orange/green route pair: the blue says "this is one of the
   bipartite layer's own arcs" and the prose names both colours twice. Left
   deliberately; note it if the prose is ever reworded.
+
+## OPEN -- three supervisor notes lifted out of chapters/ch4_synthesis.tex (2026-08-27)
+They were floating LaTeX comments in the source, invisible in the PDF and so
+invisible to any review of the built document. Recorded here instead; the
+comments themselves are gone from ch4.
+- [ ] **fig:crossover.** "Stop the graph at 15 vertices and remove the text
+      'Directed lower bound at m = 3', because that belongs in the caption."
+      Needs figures/directed_crossover.png regenerated from make_figures.py,
+      not a LaTeX edit.
+- [ ] **fig:variant-tree-status legend.** "Use a fourth colour for partially
+      solved, e.g. simple undirected vertex, and set the legend 2 by 2 rather
+      than one column of four." The substance behind it: the simple/undirected
+      node is filled regimeProved, but that node covers BOTH separations and the
+      vertex one is open for m >= 6. The caption defers to tab:summary, which is
+      a weak defence for a figure meant to be read on its own. A fourth regime
+      colour would fix the claim as well as the legend layout.
+- [ ] **tab:summary.** "Is this table still needed, given tab:variant-values,
+      which looks better? Perhaps move some of it into that one, or into
+      tab:open-problems." Editorial call for the author. Note that tab:summary
+      is currently the authority for every range and convention: the
+      hypergraph attainment ranges, the two multigraph vertex conventions, and
+      the m=5 n>=6 exception all live in its note and nowhere else.
