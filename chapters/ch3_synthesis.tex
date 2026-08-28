@@ -172,11 +172,11 @@ standard set in \Cref{ch:machine}.
   \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
   \node[vtleaf, fill=regimeConjectured!16] (l7)  at (8.4,0)  {vertex};
-  \node[vtleaf, fill=regimeProved!16]      (l8)  at (9.6,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l11) at (13.2,0) {vertex};
-  \node[vtleaf, fill=regimeProved!16]      (l12) at (14.4,0) {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l12) at (14.4,0) {edge};
   \node[vtleaf, fill=regimePartial!20]     (l13) at (15.6,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l14) at (16.8,0) {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l15) at (18.0,0) {vertex};
@@ -197,10 +197,10 @@ standard set in \Cref{ch:machine}.
   \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (9.4,-1.5) {};
   \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {leading constant proved, exact value open};
   \node[vtleaf, fill=regimePartial!20, minimum width=8mm]     (leg4) at (9.4,-2.5) {};
-  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {partially solved: proved for a range of $m$, open beyond it};
+  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
 \end{tikzpicture}%
 }
-\caption{Status of the sixteen variants. Colour marks the status of a leaf: blue a closed form proved for every $n$ and $m$, purple a value proved for a range of $m$ and open beyond it, red a conjectured exact formula with a proved lower bound, and amber a proved leading term with the exact value unknown. The model and direction rows are labels and carry no status, since each of them now covers two leaves that differ. \Cref{tab:summary} is authoritative for exceptions and conventions.}
+\caption{Status of the sixteen variants. Colour marks the status of a leaf: blue a closed form proved for every $n$ and $m$, purple an exact value proved on stated parameter ranges and open outside them, red a conjectured exact formula with a proved lower bound, and amber a proved leading term with the exact value unknown. The model and direction rows are labels and carry no status, since each of them now covers two leaves that differ. \Cref{tab:summary} is authoritative for exceptions and conventions.}
 \label{fig:variant-tree-status}
 \end{figure}
 
@@ -218,13 +218,13 @@ Model & Edge or arc-disjoint & Vertex-disjoint \\
 \addlinespace[2pt]
 simple graph
   & $\floor{m(n-1)/2}$, proved
-  & the edge value for $m \le 4$, and $\floor{8n/3}-4$ at $m=5$; open for $m \ge 6$ \\
+  & the edge value for $m \le 4$, and $\floor{8n/3}-4$ at $m=5$, while it is open for $m \ge 6$ \\
 multigraph
   & $(m-1)(n-1)$, proved
   & the simple value \\
 $r$-hypergraph
   & $\le \floor{(m-1)(n-1)/(r-1)}$, with equality in the range below
-  & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$; open for $m \ge 4$ \\
+  & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$, while it is open for $m \ge 4$ \\
 $r$-multi-hyper
   & the same bound, with equality when \mbox{$(r-1) \mid (n-1)$}
   & the same bounds, repeats closing cases the simple model misses at $m=3$ \\
@@ -234,8 +234,8 @@ $r$-multi-hyper
 \multicolumn{3}{@{}l}{\itshape Directed} \\
 \addlinespace[2pt]
 simple digraph
-  & $M(n)$ at $m=2$, proved; $n^2/4 + \Theta_m(n)$ for $m \ge 3$, exact value conjectured
-  & $M(n)$ at $m=2$, proved; $n^2/4 + \Theta_m(n)$ for $m \ge 3$, equality with the arc value open \\
+  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$ with the exact value conjectured
+  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$ with equality to the arc value open \\
 multigraph
   & $(m-1)M(n)$, proved
   & the simple digraph value \\
@@ -330,7 +330,7 @@ colour-matched to the four grids above.
     \resizebox{\textwidth}{!}{%
     \input{figures/variant_table_all.tex}%
     }
-    \caption{\Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} as numbers, one table for both $m$ and every model. Blue is proved, red conjectured, gold open, matching each figure's curves, and a bold green entry is machine-checked exact regardless of the row's colour. A plain (non-bold) proved entry is still the exact value for every $n$, since the closed form is a theorem there, not a bound reached only at small sizes, except the hypergraph and multihypergraph undirected rows, proved only as an upper bound (\Cref{prop:hyper-edge}): there a $\le$-prefixed entry bounds the true value without being known to equal it. A $\ge$-prefixed entry, in any conjectured or open row, is a verified construction rather than a proved optimum. At $m=6$, $n=6$ that is the hypergraph edge row's $\le12$, where the true maximum, $11$, is established by the full enumeration in the paragraph above rather than by the timed exhaustion behind this table's exact entries. A blank cell means the model does not exist at that $n$: no $r=3$ hyperedge exists on two vertices. Raising $m$ from $3$ to $6$ also moves the undirected simple vertex row, and its multigraph reduction, from proved to open (\Cref{thm:leonard}, valid only for $m\le4$).}
+    \caption{\Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} as numbers, one table for both $m$ and every model. Blue is proved, red conjectured, gold open, matching each figure's curves, and a bold green entry is machine-checked exact regardless of the row's colour. A plain (non-bold) proved entry is exact: either its closed form is a value theorem, or, in an undirected hypergraph row, a construction reaches the row's proved upper bound, by the attainment range of \Cref{prop:hyper-edge} where that range covers the point and by a search witness the checker verified where it does not. In the latter rows a $\le$-prefixed entry is a proved upper bound for which no matching construction is known at that point. A $\ge$-prefixed entry, in any conjectured or open row, is a verified construction rather than a proved optimum. At $m=6$, $n=6$ that is the hypergraph edge row's $\le12$, where the true maximum, $11$, is established by the full enumeration in the paragraph above rather than by the timed exhaustion behind this table's exact entries. A blank cell means the model does not exist at that $n$: no $r=3$ hyperedge exists on two vertices. Raising $m$ from $3$ to $6$ also moves the undirected simple vertex row, and its multigraph reduction, from proved to open (\Cref{thm:leonard}, valid only for $m\le4$).}
     \label{tab:variant-values}
 \end{table}
 
@@ -345,7 +345,7 @@ equivalent to it (\Cref{lem:dir-hyper-duality}), and
 \Cref{thm:dir-hyper-general-constant} extends the same leading term to every
 other way of splitting a hyperedge into tail and head sets, under both
 separations. The orientation therefore adds no asymptotic row to
-\Cref{tab:summary}. The conventions may still differ at few vertices, and
+\Cref{tab:summary}. The conventions may still differ for small numbers of vertices, and
 whether they agree exactly once $n > r$ is open.
 
 \section{Contributions and limitations of the program}
@@ -364,19 +364,18 @@ The checker measures a given graph exactly, and a complete search proves the bes
 The certifier is also a finite check, but it is not a reusable proof unless it comes with a replayable bound. 
 Heuristic search finds examples and lower bounds only. Thus, a value is settled only when the lower and upper bounds agree. 
 Directed vertex values were checked separately from arc values because Whitney's inequality gives a witness, but not an upper bound. 
-Every computational claim in this thesis can be rerun from \code{program/erdos915\_unified.py}. 
-Important values are also checked with independent implementations, except for two block sweeps in \Cref{app:proofs}. 
-Those sweeps use separate scripts in \code{research\_notes/scripts/}, which are named where their results appear. 
+Every computational claim in this thesis can be rerun from the repository.
+The principal checks run from \code{program/erdos915\_unified.py}. The two block sweeps in \Cref{app:proofs} use separate scripts in \code{research\_notes/scripts/}, which are named where their results appear and intentionally provide independent implementations.
 \Cref{app:verification-ladder,app:software-tests} gives the environment, commands, and audit evidence. 
 No theorem here depends only on an unchecked solver result.
 
 The program also has limits. The search finds examples but does not prove upper bounds. 
 The certifier proves upper bounds only for a fixed size, and only as a finite solver check rather than as a reusable certificate (\Cref{sec:certification-standard}). 
 The directed multigraph encoding works this way only up to $n = 6$. 
-For larger $n$, the value is instead established by the hand proof in \Cref{app:proofs}; at $n = 7$, the certifier ran out of time without giving an answer. 
+For larger $n$, the value is instead established by the hand proof in \Cref{app:proofs}. At $n = 7$, the certifier ran out of time without giving an answer.
 The generation enumerator's degree-capped classification at $n = 7$ (\Cref{rem:n7-classification}) is verified only for extremisers with maximum total degree at most $8$, not for all graphs. 
-These results do not close the structural gaps that remain open; the next section lists them. 
-Three of those gaps cannot be solved by computation alone. The decomposition in \Cref{open:decomposition} would prove \Cref{conj:dir-arc}; its backward-arc clause is only one part of that decomposition. 
+These results do not close the structural gaps that remain open. The next section lists them.
+Three of those gaps cannot be solved by computation alone. The decomposition in \Cref{open:decomposition} would prove \Cref{conj:dir-arc}. Its backward-arc clause is only one part of that decomposition.
 The directed vertex problem for $m \ge 3$ does not follow from Whitney's inequality and the arc case. 
 The undirected vertex-disjoint problem for $m \ge 6$ has been open for half a century, and the program can explore it but not solve it.
 

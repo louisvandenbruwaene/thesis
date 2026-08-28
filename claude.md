@@ -177,6 +177,25 @@ and only touch this summary if the *status* (proved/open) changes.
   without archiving it there first.
 - **Commit and push at the end of each session** (standing author
   preference).
+- **THE AI MEDAL. Every proof-carrying result the model wrote carries
+  `\aimedal` in its theorem head, and a new one must be stamped too.**
+  Author instruction, 2026-08-28: he has not verified them all and for some is
+  not qualified to, so the badge says "conjecture with a probably-correct proof
+  attached", not "theorem I vouch for". The macro is at the bottom of
+  `preamble.tex`; usage is `\begin{lemma}[Title,\aimedal]` for a named result
+  and `\begin{theorem}[\aimedal]` for an unnamed one. It goes on
+  theorem/proposition/lemma/corollary/claim only. It does NOT go on: results
+  quoted from the literature with a citation and no proof here (Menger,
+  Gomory--Hu, Baranyai, Mader, Leonard, Sorensen--Thomassen); the Gomory--Hu
+  double count of `sec:mader-gomory-hu` that proves `thm:mader` and
+  `thm:multigraph-edge` out of `lem:dist-1-count`, `lem:sum-dist` and
+  `lem:double-count`, which the author worked through himself; or definitions,
+  constructions, remarks, notation, conjectures and questions, which state
+  nothing a proof could settle. The rule is written out in three places that
+  must stay in step: the Contribution Statement, the abbreviations table, and
+  the appendix's "How to read this appendix" paragraph. `thm:hyper-gomory-hu`
+  IS badged even though it is a transported classical construction, because
+  the hypergraph statement is asserted here rather than quoted verbatim.
 - **`program/sync_code_appendix.py` is DEAD.** It kept Appendix C's verbatim
   source listing in step with hardcoded line ranges. Appendix C was removed in
   the 2026-08-24 shortening pass and no chapter inputs `app_code.tex` any more,
@@ -1136,3 +1155,64 @@ expected skip. Pages 31 to 33 and 38 rendered and inspected directly, plus the
 tree figure cropped at 250dpi to confirm the four legend tints are separable in
 print. No em-dashes, en-dashes or prose semicolons in the diff (every semicolon
 hit is TikZ or a table cell), no banned verdict-prose phrases.
+
+## 2026-08-28 (Opus) — the AI medal, and an audit of the uncommitted grammar pass
+
+Two jobs: check what was sitting uncommitted in the tree, then stamp every
+model-written proof with a provenance badge.
+
+**WHAT WAS UNCOMMITTED, AND WHETHER IT WAS RIGHT.** A grammar pass (semicolons
+split into sentences, "an arc", "the densest graph found") plus one real
+semantic change and its new test. The semantic change is in
+`_panel_cell`: a hypergraph row's `$\le$` prefix is now dropped where the
+`search` series already reaches the proved bound, since a construction that
+meets an upper bound makes the cell exact. **Verified rather than assumed**:
+regenerating `figures/variant_table_all.tex` from the cache reproduced the
+working-tree file byte for byte (452 hits, 0 computed, cache untouched), and
+every de-prefixed cell was checked against the attainment conditions by hand.
+At `m=6, r=3` the simple row drops the prefix at `n=7,8`, exactly where
+`m-1 <= C(n-2,1)` first holds, and keeps `<=12` at `n=6`, which is the cell
+where the true maximum is 11. The multihypergraph row drops it at `n=5,7`
+(where `2 | (n-1)`) and also at `n=8`, where the gate returns 0 and the number
+came from the timed search instead.
+
+**ONE DEFECT FOUND IN THAT PASS.** `tab:variant-values`'s new caption said a
+plain hypergraph entry is exact because "a proved construction reaches the
+row's upper bound". For several cells (`m=3` multihypergraph at even `n`,
+`m=6` multihypergraph at `n=8`) `attained_multihyper_edge` returns 0 and the
+attaining object is a checker-verified search witness, not the attainment
+theorem's own star hypertree. The caption now names both sources, and
+`_panel_cell`'s docstring says the same thing.
+
+Two other things checked and found CORRECT rather than defective: the new
+`(n,m)=(2,3)` exception to Mader slackness below `n<m` (the only equality
+there, since `floor(m(n-1)/2) = C(n,2)` forces `n=2`), and the new `r\ge3`
+qualifier on the "neither range contains the other" claim of
+`prop:hyper-vertex-lower-multi` (at `r=2` the simple gate is empty, so the
+unqualified claim was false, and for every `r\ge3` the two ranges separate at
+`n=r` and `n=r+1`).
+
+**THE MEDAL.** `\aimedal` (bottom of `preamble.tex`) is a violet badge inside
+the theorem head. 56 results carry it: 9 in `ch1_basecases.tex` and 47 in
+`app_proofs.tex`. The scope rule is a standing convention above. The four
+decisions the author was asked for, all confirmed: badge in the head rather
+than a right-flushed stamp or a tinted frame (nearly every result gets one, so
+it has to be light); no badge on cited classics; proof-carrying environments
+only; and the two Gomory--Hu proofs excluded as he asked.
+
+The explanation lives in the Contribution Statement, one line in the
+abbreviations table, and one sentence in "How to read this appendix". The
+appendix section holding the excluded proof gained a label,
+`sec:mader-gomory-hu`, so those sentences can point at it.
+
+The badge started at `\rb`'s 7pt, which rendered as an illegible violet
+smudge at 400dpi. It is its own 8pt box now. **Render and crop the badge
+before believing it, the way the bend angles and the sideways figures had to
+be.**
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 106pp, 0 overfull/underfull,
+0 undefined refs, 0 occurrences of `??`. All 56 badges present in the
+extracted PDF text. 129 tests OK, 1 expected skip. Self-check ALL CHECKS
+PASSED. Pages 4, 7, 41 and 42 rendered and inspected. No em-dashes, en-dashes
+or prose semicolons in the diff (every `--` hit is `Gomory--Hu`,
+`path--separator` or `$u$--$v$`, every `;` is TikZ).

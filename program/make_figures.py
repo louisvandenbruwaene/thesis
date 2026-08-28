@@ -932,13 +932,17 @@ def _panel_cell(panel, n):
 
     Mirrors the figure's own honesty rule (\\Cref{fig:variant-bounds-m3-graphs}
     et al.): a green bold number is machine-checked exact, exactly like a
-    filled square there.  Anything else takes the row's curve colour, with a
-    prefix that states what kind of claim the number is -- $\\le$ for the two
-    hypergraph rows whose blue curve is a proved bound rather than a proved
-    value (``proved_is_bound``, set by ``_reconcile_panel``), $\\ge$ for a
-    conjectured or open row, where the number is a verified construction but
-    optimality is not proved.  A proved GRAPH row gets no prefix: the closed
-    form is the exact value for every n, not merely a bound reached there.
+    filled square there.  Anything else takes the row's curve colour.  For a
+    hypergraph row whose blue curve is a proved upper bound rather than a
+    proved value (``proved_is_bound``, set by ``_reconcile_panel``), a matching
+    construction closes the gap and the cell is exact; otherwise the upper
+    bound is prefixed by $\\le$.  That construction is whichever the ``search``
+    series holds at this n: the attainment theorem's own object where
+    ``attained_hyper_*`` plants it, and the checker-verified witness the timed
+    search exhibited where it does not.  Conjectured and open rows are prefixed by
+    $\\ge$, since their numbers are verified constructions without proved
+    optimality.  A proved graph row needs no prefix because its closed form is
+    the exact value for every n.
     """
     exact_ns, exact_vals = panel["exact"]
     if n in exact_ns:
@@ -951,7 +955,12 @@ def _panel_cell(panel, n):
     value = curve_vals[curve_ns.index(n)]
     color = _CURVE_COLOR[key]
     if key == "proved":
-        prefix = r"$\le$" if panel.get("proved_is_bound") else ""
+        prefix = ""
+        if panel.get("proved_is_bound"):
+            search_ns, search_vals = panel.get("search", ([], []))
+            attained = dict(zip(search_ns, search_vals)).get(n)
+            if attained != value:
+                prefix = r"$\le$"
     else:
         prefix = r"$\ge$"
     return f"{prefix}{value}", color, False

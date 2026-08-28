@@ -30,7 +30,7 @@ Given $n$ and $m$, walk through every graph on $n$ vertices, measure the largest
 local connectivity $\lambda^{\max}$ or $\kap^{\max}$ of each with a max-flow computation and
 keep the densest graph that stays at or below the ceiling $m - 1$. 
 If the enumeration cannot finish within the time limit, the best graph so far is returned.
-It is therefore important to distinguish between the densest graph possible and found.
+It is therefore important to distinguish between the densest graph possible and the densest graph found.
 Here they are called exact (upper) bounds and lower bounds respectively.
 In the vertex-disjoint and hypergraph cases the graph will be transformed before the flow can be measured.
 This ensures that every variant shares the same integer max-flow engine no matter the implementation.
@@ -400,8 +400,8 @@ Only infeasible graphs and graphs that cannot beat the incumbent are ever discar
 \end{figure}
 
 \subsection{Generating search}
-Instead of iterating all possible graphs and measuring their connectivity which repeats many similar graphs,
-another method suggested by Prof.\ Jan Goedgebeur generates all non-isomorphic graphs. 
+Iterating over all possible graphs and measuring each one's connectivity repeats many isomorphic cases.
+Another method, suggested by Prof.\ Jan Goedgebeur, instead generates all non-isomorphic graphs.
 It uses the \texttt{geng} program from the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14} 
 to perform the difficult task of generating one representative of each isomorphism class. 
 The program is called as a subprocess, and its \texttt{graph6} output is decoded. 
@@ -545,7 +545,7 @@ and the walk perturbs itself when it stalls.
 
 Simulated annealing \cite{KirkpatrickGelattVecchi83}, which accepts a worsening move with the probability of the Metropolis rule \cite{Metropolis53} and lowers that probability as the run cools, is an alternative on the same energy and the same neighbourhood, 
 but at equal wall-clock budget it is the weaker engine here. 
-Tabu always wins speedwise and closes hard problems faster: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
+In the equal-budget comparisons reported here, tabu reaches denser candidates: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
 Every discovery value this thesis reports therefore comes from tabu search. 
 Annealing is kept only as an independent cross-check in the program's self-test, 
 where agreement between two unrelated walks is worth more than the speed of either.

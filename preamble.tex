@@ -906,3 +906,28 @@ for scientific awards or contests.
                  minimum width=12mm, minimum height=6.5mm, font=\scriptsize},
   vtedge/.style={KULblauw3b!55, line width=0.9pt},
 }
+
+% ============================================================================
+% THE AI MEDAL
+% ----------------------------------------------------------------------------
+% A result carries this badge when the proof written for it in this thesis was
+% produced by a large language model and has not been checked line by line by
+% the author. The badge is a provenance mark, not a verdict: the statement is
+% believed true and the argument is believed correct, but the reader should
+% treat it the way a conjecture with a plausible proof attached is treated,
+% not the way a refereed theorem is.
+%
+% It is NOT carried by results quoted from the literature, which rest on their
+% published proofs and are cited where they are stated, and it is NOT carried
+% by the Gomory--Hu double count that proves Mader's theorem and the
+% undirected multigraph edge value, which the author worked through in full.
+% Definitions, constructions, notation and conjectures assert nothing that
+% could be verified, so they carry no badge either.
+%
+% Usage: put it inside the theorem's optional argument, after a comma when
+% the result already has a name, alone when it does not.
+%   \begin{lemma}[Degree bound,\aimedal]\label{lem:degree-bound}
+%   \begin{theorem}[\aimedal]\label{thm:whatever}
+\definecolor{aiMedal}{HTML}{7A5AF8}     % violet: unused by every regime colour
+\newcommand{\aimedal}{\,\raisebox{-0.25pt}{\setlength{\fboxsep}{2pt}%
+    \colorbox{aiMedal}{\textcolor{white}{\sffamily\bfseries\fontsize{8}{8}\selectfont AI}}}}

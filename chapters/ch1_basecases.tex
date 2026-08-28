@@ -123,7 +123,7 @@ Each assumption made so far will be toggled to create a lattice of variants and 
 The first is \emph{arity}: an edge joins exactly two vertices and a \emph{hyperedge} joins $r \ge 2$ vertices.
 Hence such \emph{hypergraphs} use \emph{Berge paths}, which aligns with the path definition above.
 The second is \emph{multiplicity}: a \emph{simple} graph carries at most one copy of each edge, while a \emph{multigraph} allows parallel copies, recorded by a multiplicity $\mu(u, v)$.
-The third is \emph{direction}: a directed edge, called arc, is an ordered pair of vertices and a directed hyperedge has one tail and $r-1$ heads.
+The third is \emph{direction}: a directed edge, called an arc, is an ordered pair of vertices and a directed hyperedge has one tail and $r-1$ heads.
 These three toggles create a lattice of eight models, shown in \Cref{fig:eight-models}.
 
 \begin{figure}[ht]
@@ -475,7 +475,7 @@ while $k_5(7) = 15$ and $k_5(12) = 27$. The formula first exceeds the edge value
     \label{fig:divergence}
 \end{figure}
 
-\begin{theorem}[Directed arc value at $m = 2$]\label{thm:dir-arc-m2-exact}
+\begin{theorem}[Directed arc value at $m = 2$,\aimedal]\label{thm:dir-arc-m2-exact}
 For simple digraphs,
 \[
     \ell_2^{\mathrm{dir}}(n) = \max\!\left(2(n-1),\ \floorfrac{n^2}{4}\right).
@@ -484,7 +484,7 @@ For simple digraphs,
 
 Two shapes give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is an induction on $n$ (\Cref{app:proofs}): delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The same induction never mentions the separation, so it survives the change to $\kap$ verbatim once the base cases are re-run.
 
-\begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
+\begin{theorem}[Directed vertex value at $m = 2$,\aimedal]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 \end{theorem}
 
@@ -536,7 +536,7 @@ The hub leads for $n < 7$ and the bipartite wall leads for $n > 7$.
 Notice how the directed value is quadratic in $n$ for large $n$, while the undirected value is linear.
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
-\begin{proposition}[Hypergraph edge bound]\label{prop:hyper-edge}
+\begin{proposition}[Hypergraph edge bound,\aimedal]\label{prop:hyper-edge}
 An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has total hyperedge multiplicity at most $\floorfrac{(m-1)(n-1)}{r-1}$. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
 \end{proposition}
 
@@ -572,7 +572,7 @@ For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from
 \label{fig:hyper-star}
 \end{figure}
 
-\begin{theorem}[Hypergraph vertex value at $m = 2$]\label{thm:hyper-vertex-m2}
+\begin{theorem}[Hypergraph vertex value at $m = 2$,\aimedal]\label{thm:hyper-vertex-m2}
 For $r \ge 2$ and $n \ge 1$, the maximum number of hyperedges of an
 $r$-uniform multihypergraph on $n$ vertices with $\kap^{\max} \le 1$ is
 \[
@@ -584,7 +584,7 @@ problems agree at $m = 2$ for every uniformity, and repeated hyperedges never
 help.
 \end{theorem}
 
-\begin{theorem}[Hypergraph vertex value at $m = 3$]\label{thm:hyper-vertex-m3}
+\begin{theorem}[Hypergraph vertex value at $m = 3$,\aimedal]\label{thm:hyper-vertex-m3}
 For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
 $\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
 $r \ge 3$ with $2 \le \binom{n-2}{r-2}$ the bound is attained by a simple
@@ -608,7 +608,7 @@ A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches 
 When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away and it must do this for every line simultaneously. 
 That bookkeeping is the one new piece of machinery the next chapter builds and it is why the hypergraph rejoins the family only once the checker is in place.
 
-\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
+\begin{theorem}[The quadratic bound with a linear error,\aimedal]\label{thm:dir-arc-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -624,7 +624,7 @@ The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in 
 
 The route family the count uses is internally vertex-disjoint and not merely arc-disjoint, which is what lets the whole argument be re-run under the stricter separation. Whitney's inequality alone would not justify the transfer, since it points the other way.
 
-\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
+\begin{theorem}[Directed vertex problem, leading constant and order,\aimedal]\label{thm:dir-vertex-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -635,7 +635,7 @@ and consequently, for each fixed $m$,
 \]
 \end{theorem}
 
-\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
+\begin{theorem}[Directed multigraph value, every $n$ and $m$,\aimedal]\label{thm:dir-multi-full}
 For all $n \ge 2$ and $m \ge 2$,
 \[
     L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
@@ -644,7 +644,7 @@ For all $n \ge 2$ and $m \ge 2$,
 
 The extremisers include the doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
 
-\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
+\begin{theorem}[The directed hypergraph constant,\aimedal]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
 $\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
 \[

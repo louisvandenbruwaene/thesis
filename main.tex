@@ -29,7 +29,7 @@ Afterwards, computational research on small graphs confirms these values or prov
 This is accomplished by measuring connectivity with a maximum-flow routine and by searching for extremal graphs with metaheuristics.
 Completed computations either prove the extremal value in a finite search space or produce a lower bound, while unfinished searches provide only evidence for conjectures.
 At the end, the thesis synthesises the results and presents the open problems that remain.
-This work is theoretical in nature, but the computational methods and the resulting conjectures are of interest to anyone who uses networks and wants to understand the relationship between connectivity and the connections they entail.\\
+This work is theoretical in nature, but the computational methods and the resulting conjectures are of interest to anyone who uses networks and wants to understand the relationship between connectivity and the connections they entail.
 
 I am grateful to my supervisor, Prof.\ Stijn Cambie, for his day-to-day guidance, corrections, and mathematical feedback throughout the project.
 I could not ask for a more understanding and enthusiastic supervisor.
@@ -45,6 +45,14 @@ Where a result comes from the literature I say so and cite it.
 The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Whitney, Gomory and Hu, Mantel, Tutte, and Baranyai. 
 Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
 Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
+
+A result whose proof in this thesis was written by an AI model carries the badge \aimedal{} in its heading, both in \Cref{ch:basecases} where it is stated and in \Cref{app:proofs} where it is proved.
+I have not checked each of those proofs line by line, and for several of them I am not the right person to.
+A badged result should be read as a conjecture that comes with a proof attached which is likely correct, rather than as a theorem I can vouch for myself.
+Two proofs carry no badge because I worked through them in full: the Gomory-Hu double count for the simple undirected edge-disjoint case (\Cref{thm:mader}) and for the undirected multigraph edge-disjoint case (\Cref{thm:multigraph-edge}), together with the three counting lemmas they run on (\Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}).
+Results taken from the literature carry no badge either, since their proofs are published and are cited where the result is stated.
+Definitions, constructions, conjectures and open questions state nothing that a proof could settle, so they carry no badge.
+
 The summary of my original results is:
 
 \begin{center}
@@ -96,9 +104,10 @@ For fixed $r$ and $m$, the directed hypergraph, which had only bounds a factor o
 
 \chapter*{Abbreviations and Symbols}
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}
-\begin{tabular}{ll}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{0.78\linewidth}}
 MILP & mixed-integer linear program \\
 SPQR & the triconnected decomposition tree (S series, P parallel, Q single edge, R rigid) \\
+\aimedal & in a theorem heading: the proof of that result was written by an AI model and is not verified line by line by the author (Contribution Statement) \\
 \end{tabular}
 
 \bigskip
