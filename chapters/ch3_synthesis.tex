@@ -106,7 +106,7 @@ arcs where the hub branch gives twenty-seven.
   \node[font=\scriptsize, align=center, vertexorange!75!black] at (5.6,-2.55)
     {$6$ cyclic in-arcs inside $B$};
 \end{tikzpicture}
-\caption{The augmented bipartite digraph of \Cref{const:augmented-bipartite} at $m = 3$, $n = 10$. Every arc runs from $A$ to $B$, and inside $B$ each vertex takes one arc from its cyclic predecessor, which is $m - 2$ arcs per vertex. A pair $a_i, b_j$ then has the direct arc and one detour, so $\lec^{\max} = 2$, and the count is $24 + 6 = 30$ against the hub branch's $27$.}
+\caption{The augmented bipartite digraph of \Cref{const:augmented-bipartite} at $m = 3$, $n = 10$. Every cross-part arc runs from $A$ to $B$, and inside $B$ each vertex takes one arc from its cyclic predecessor, which is $m - 2$ arcs per vertex. A pair $a_i, b_j$ then has the direct arc and one detour, so $\lec^{\max} = 2$, and the count is $24 + 6 = 30$ against the hub branch's $27$.}
 \label{fig:augmented-wall}
 \end{figure}
 
@@ -128,10 +128,9 @@ The quadratic phenomenon is therefore the reason the directed and undirected pro
 \section{Summary of the sixteen variants}
 
 \Cref{fig:variant-tree-status} sorts all sixteen structural variants by how much
-is known, and \Cref{tab:summary} states the strongest result for each. An entry
-is proved by hand here or in \Cref{app:proofs}, cited to the literature,
-conjectured with a proved lower bound, or, where only the leading term is
-settled, proved asymptotically. Every value rests on a proof or on a completed
+is known, and \Cref{tab:summary} states the strongest result for each. Each entry
+is either proved here, supported by a result from the literature, conjectured
+with a proved lower bound, or proved asymptotically. Every value rests on a proof or on a completed
 exhaustion, never on a machine certificate alone, and the markings follow the
 standard set in \Cref{ch:machine}.
 
@@ -227,7 +226,7 @@ $r$-hypergraph
   & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$, while it is open for $m \ge 4$ \\
 $r$-multi-hyper
   & the same bound, with equality when \mbox{$(r-1) \mid (n-1)$}
-  & the same bounds, repeats closing cases the simple model misses at $m=3$ \\
+  & the same bounds, with repeated hyperedges settling cases missed by the simple model at $m=3$ \\
 \addlinespace[4pt]
 \midrule
 \addlinespace[1pt]
@@ -293,7 +292,7 @@ who wants a value instead.
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_hypergraphs.png}
-    \caption{The eight hypergraph-model variants at $m=3$, continuing \Cref{fig:variant-bounds-m3-graphs}: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key. The blue curve here is \Cref{prop:hyper-edge}, a proved upper bound rather than a proved value, which is why the key names it as one. It is attained only inside the ranges stated there, so a square or a circle below it marks a gap that is open rather than an error.}
+    \caption{The eight hypergraph-model variants at $m=3$, continuing \Cref{fig:variant-bounds-m3-graphs}: hypergraph and multihypergraph rows, undirected and directed columns, with the same colour and marker key. The blue curve here is \Cref{prop:hyper-edge}, a proved upper bound rather than a proved value, which is why the key names it as one. It is attained only inside the ranges stated there, so a square or a circle below it marks a gap that is open rather than an error.}
     \label{fig:variant-bounds-m3-hyper}
 \end{sidewaysfigure}
 

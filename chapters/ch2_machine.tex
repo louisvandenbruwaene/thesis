@@ -50,14 +50,14 @@ The program ships an optional compiled C helper that runs this same flow more ef
 This max-flow computation is built for directed multigraphs (including simple digraphs) with edge-disjoint paths.
 That is why the other variants will have to be transformed into such a flow network.
 Undirected multigraphs have a natural identification with a directed multigraph, obtained by replacing every edge with a pair of arcs going in opposite directions.
-Multi-hypergraphs need to replace their hyperedges with a helper gate, 
+To transform a multihypergraph, replace each distinct hyperedge with a helper gate,
 an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
 Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity, 
 so the one arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
 A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit, 
 which is what forces a route to cross it from tail to head.
 The directed hypergraph's flow network is just a restricted version of the undirected one.
-Another representation for multi-hypergraphs is a separate gate with capacity one for each hyperedge.
+Another representation for multihypergraphs is a separate gate with capacity one for each hyperedge.
 
 The hypergraph Menger theorem (\Cref{thm:menger-hyper}) proves that the resulting maximum flow is exactly the Berge connectivity. 
 \Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph. 
@@ -360,7 +360,7 @@ Rather than writing out whole choices one after another,
 fix an order on that list and decide the edges one at a time, 
 leaving the undecided ones absent. 
 Each partly built graph then stands for the whole family of graphs agreeing with it so far, 
-and a pruning discards that entire family if it is deemed to bear no fruit.
+and a pruning rule discards that entire family if it is deemed to bear no fruit.
 
 Adding an edge never lowers a connectivity, since a family of disjoint routes survives intact when more edges are laid around it (\Cref{prop:monotone}). Every completion of a partly built graph only ever adds, so the partly built graph is a floor under all of them. The moment it breaks the ceiling, so does every completion, and the branch is abandoned.
 
@@ -422,7 +422,7 @@ or the repeated arc multiplicities that occur in the extremal graphs.
 
 \Cref{tab:generating-benchmark} times three ways of proving $\ell_2^{\mathrm{dir}}(n)$ for a simple digraph on a single core: a blind sweep over every matrix assignment with no pruning at all, the depth-first pruned search of \Cref{fig:prune}, and the geng-generated pipeline above.
 The blind sweep is left out past $n = 4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s. Each further vertex multiplies the assignment count by $2^{2n}$, so $n = 5$ would run for about an hour and $n = 6$ for weeks, the same growth \Cref{fig:complexity} plots.
-Below $n = 5$ both remaining methods are dominated by fixed overhead, a Python call against a subprocess spawn, rather than by search cost, and neither number there is a meaningful comparison.
+Below $n = 5$ both remaining methods are dominated by fixed overhead, Python function-call overhead or subprocess start-up overhead, rather than by search cost, and neither number there is a meaningful comparison.
 From $n = 5$ the gap widens with every vertex: generation is $5.5$ times faster at $n = 5$, $20$ times faster at $n = 6$ and $68$ times faster at $n = 7$, where the pruned search takes $1156.6$\,s against the generated pipeline's $17.0$\,s.
 All three methods return the same proved value at every $n$ where they finish.
 
@@ -435,13 +435,12 @@ All three methods return the same proved value at every $n$ where they finish.
 \end{table}
 \section{Proving every \texorpdfstring{$m$}{m} at once}
 
-The search so far looks at one pair $(n,m)$ at a time, but for the directed multigraph a faster method can be used: 
-it rescaled the multiplicities by a factor of $m-1$ and then checked the relevant thresholds for a fixed $n$ in one pass.
+The search so far looks at one pair $(n,m)$ at a time, but for the directed multigraph a faster method can be used:
+it rescales the multiplicities by a factor of $m-1$ and then checks the relevant thresholds for a fixed $n$ in one pass.
 The general theorem of \Cref{thm:dir-multi-full} has now replaced this route in \code{solve}, but the older formulation is still a useful independent finite check.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
-This produces weights $w(u,v)\in[0,1]$, pairwise maximum flow at most one, 
-and a total weight equal to the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
+This produces weights $w(u,v)\in[0,1]$ for which every pairwise maximum flow is at most one and whose total weight equals the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
 Thus, with
 \[
     M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s \ne t\Bigr\}
@@ -543,7 +542,7 @@ A move that would beat the best graph seen so far overrides the tabu flag regard
 an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, 
 and the walk perturbs itself when it stalls.
 
-Simulated annealing \cite{KirkpatrickGelattVecchi83}, which accepts a worsening move with the probability of the Metropolis rule \cite{Metropolis53} and lowers that probability as the run cools, is an alternative on the same energy and the same neighbourhood, 
+Simulated annealing \cite{KirkpatrickGelattVecchi83}, which accepts a worsening move with the probability given by the Metropolis rule \cite{Metropolis53} and lowers that probability as the run cools, is an alternative on the same energy and the same neighbourhood,
 but at equal wall-clock budget it is the weaker engine here. 
 In the equal-budget comparisons reported here, tabu reaches denser candidates: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
 Every discovery value this thesis reports therefore comes from tabu search. 
@@ -568,7 +567,7 @@ to the empty graph and climbing a different slope, a detour far longer than the 
 Allowing a brief excursion above the ceiling lets the walk trade one load-bearing edge for a better one 
 in two moves rather than dozens. Going above the bound is never the goal. 
 It is the shortcut the walk takes on its way back down to it.
-A single walk depends on where it started, so either engine is run several times from a different seed until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
+A single walk depends on where it started, so either engine is run several times, each time from a different seed, until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
 
 \subsection{Measuring only on the possible bounds}
 Removing an edge, arc, or hyperedge can never raise $\lambda^{\max}$, while adding one raises it by at most one.

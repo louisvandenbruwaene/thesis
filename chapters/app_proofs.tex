@@ -279,7 +279,7 @@ The range likewise comes from the paper rather than from the database, which rec
 
 \subsection{The vertex problem is a block problem}\label{sec:simple-vertex-blocks}
 
-The \emph{vertex} problem $k_m(n)$ is the one open since 1974, and this short section records its block structure. It changes the object being searched: from graphs on $n$ vertices, with $n$ growing, to $2$-connected graphs alone.
+The \emph{vertex} problem $k_m(n)$ has been open since 1974, and this short section records its block structure. It changes the object being searched: from graphs on $n$ vertices, with $n$ growing, to $2$-connected graphs alone.
 
 \begin{theorem}[The vertex problem is a knapsack over blocks,\aimedal]\label{thm:simple-vertex-blocks}
 For $b \ge 2$ let
@@ -395,7 +395,7 @@ Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ t
     \qquad\text{and}\qquad
     \kap^{\max}(D - v_0) \le \kap^{\max}(D),
 \]
-since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates one, and it cannot make two surviving routes share anything they did not share before.
+since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates any, and it cannot make two surviving routes share anything they did not share before.
 \end{lemma}
 
 In words: deleting a vertex can never manufacture independent routes. Every route surviving in $D - v_0$ was already a route in $D$, so no pair comes out of the deletion better connected than it went in. This single guarantee is what every vertex-deletion induction in this section rests on, and it holds for both separations alike.
@@ -527,7 +527,7 @@ arc-disjoint $u$--$w$ routes, against $\lec(u,w)\le1$.}
 \node[apname, text=vertexred] at (0.05,1.65) {$v\!\to\! u\!\to\! w$};
 \end{tikzpicture}
 \caption{The counterexample $\{(u,v),(v,u),(u,w)\}$: $\lec^{\max}=1$,
-yet $w$ \emph{is} reachable from $v$, but only \emph{through} $u$.}
+yet $w$ \emph{is} reachable from $v$ only \emph{through} $u$.}
 \label{fig:mutual-unreach-counter}
 \end{subfigure}
 \caption[Mutually unreachable out-neighbourhoods]{Why
@@ -551,7 +551,7 @@ A common out-neighbour $w \ne u$ would give the two arc-disjoint routes $u \to v
 \end{proof}
 
 \begin{proposition}[Two-hop budget on bipartite partitions,\aimedal]\label{prop:two-hop-bipartite}
-Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
+Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ is present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
 \end{proposition}
 
 In words: once every arc from $A$ to $B$ is present, a vertex of $B$ can afford very few in-arcs from inside $B$. Each such arc creates a fresh two-step detour on top of the direct arc that every vertex of $A$ already has, and the ceiling allows only $m-2$ of them.
@@ -661,7 +661,7 @@ For any vertex $x$ of a digraph with total degree $d(x) = d^+(x) + d^-(x) > 0$,
 Write $\mu = \min(d^+(x), d^-(x))$ and $M = \max(d^+(x), d^-(x))$, so $\mu + M = d(x)$ and $\mu M = d^+(x)d^-(x)$. Since $\mu \le M$ we have $M \ge d(x)/2$, hence $d^+(x)d^-(x) = \mu M \ge \mu\, d(x)/2$, which rearranges to the claim.
 \end{proof}
 
-\Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:synthesis}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. The proof below assumes nothing about the shape of $D$.
+\Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:basecases}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. The proof below assumes nothing about the shape of $D$.
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
 Induction on $n$. For $n = 2$ a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4(m-1) \ge 5$, so the base holds. Let $n \ge 3$ and split on the minimum total degree.
@@ -801,7 +801,7 @@ Building $R$ takes three steps: handle the traffic \emph{inside} each strongly c
 
 The reason to thin $Q_0$ down to $Q$ is that $Q$'s \emph{underlying undirected graph}, meaning $Q$ with the arrows erased, has no triangle. Suppose three points $x, y, z$ of $Q$ were pairwise joined by some arc of $Q$. Since $Q \subseteq Q_0$ and $Q_0$ has no cycle, $Q$ has none either, so between any two of $x,y,z$ the arc runs in only one direction, never both. Three points pairwise joined with a consistent direction on each pair admit only one pattern, up to relabelling: a linear order, say $x \to y$, $y \to z$, and $x \to z$. But then $x \to z$ is redundant, since $x$ already reaches $z$ via $y$, so deleting it would leave the reachability relation of $Q$ unchanged, contradicting that $Q$ is inclusion-minimal. So no three points of $Q$ can be pairwise joined at all: that is triangle-freeness of the underlying graph.
 
-A triangle-free graph on $q$ vertices has at most $\floor{q^2/4}$ edges, Mantel's theorem \cite{Mantel07}, the $r = 2$ case of the more general theorem of Tur\'an \cite{Turan41}. Applied to $Q$,
+A triangle-free graph on $q$ vertices has at most $\floor{q^2/4}$ edges, by Mantel's theorem \cite{Mantel07}, the $r = 2$ case of the more general theorem of Tur\'an \cite{Turan41}. Applied to $Q$,
 \[
     |A(Q)| \;\le\; \floorfrac{q^2}{4}.
 \]
@@ -871,7 +871,7 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
   \node[font=\small] at (2.6,2.0) {$R$};
 \end{scope}
 \end{tikzpicture}}
-\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the two component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
+\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the three component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
 \label{fig:skeleton-example}
 \end{figure}
 
@@ -879,7 +879,7 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
 Let $D$ be a directed multigraph with $\lec^{\max}(D) \le k$ for some $k \ge 1$, and let $R$ be a reachability skeleton of $D$. Write $D - R$ for the multigraph obtained by deleting, from each multiplicity $\mu(u,v)$, the one copy (if any) that $R$ uses on that pair. Then $\lec^{\max}(D - R) \le k - 1$.
 \end{lemma}
 
-In words: subtracting one copy of each skeleton arc costs every pair at least one route (a single pair can lose more, if some of its own routes happened to run through the deleted arcs too). The skeleton preserves reachability, so however many arc-disjoint routes survive the deletion, one further route can always be run entirely inside the arcs that were deleted, and that extra route is what the original ceiling has to pay for.
+In words: subtracting one copy of each skeleton arc costs every reachable pair at least one route (a single pair can lose more, if some of its own routes happened to run through the deleted arcs too). The skeleton preserves reachability, so however many arc-disjoint routes survive the deletion, one further route can always be run entirely inside the arcs that were deleted, and that extra route is what the original ceiling has to pay for.
 
 \begin{proof}
 Fix an ordered pair $u \ne v$ and suppose $D - R$ carries $t \ge 1$ pairwise arc-disjoint $u$--$v$ paths. These use arcs of $D - R$ and hence of $D$, since $D - R \subseteq D$, so $u$ reaches $v$ in $D$. Because $R$ is a reachability skeleton, $u$ then also reaches $v$ in $R$: some directed path $P$ from $u$ to $v$ uses only arcs of $R$. Every arc of $R$ has been subtracted out of $D - R$, so $P$ shares no arc with any of the $t$ paths already found inside $D - R$. Together, $P$ and those $t$ paths are $t+1$ pairwise arc-disjoint $u$--$v$ paths in $D$, so $t + 1 \le \lec_D(u,v) \le k$, that is, $t \le k-1$. Pairs with $t=0$ trivially satisfy $t \le k-1$ once $k \ge 1$, so this holds for every pair, giving $\lec^{\max}(D-R) \le k-1$.
@@ -978,7 +978,7 @@ result is feasible and again everywhere-saturated: a route through $v$ must
 enter and leave through $u$, so it adds nothing to any flow between old
 vertices.  For every old $x \ne u$,
 $\lec_D(x, v) = \min\bigl(\lec_{D_0}(x, u), \mu(u, v)\bigr) = m-1$.
-for $x=u$, the $m-1$ parallel arcs $u \to v$ give the same conclusion
+For $x=u$, the $m-1$ parallel arcs $u \to v$ give the same conclusion
 directly.  Symmetrically, $\lec_D(v, x)=m-1$ for every old $x$.
 \end{proof}
 
@@ -1437,8 +1437,8 @@ graph, and $3$-connected means no two vertices do.
 Three named obstructions go with this. A \emph{cut vertex} is a vertex whose
 removal disconnects the graph, so a connected graph on at least three vertices is
 $2$-connected exactly when it has no cut vertex. A \emph{separating pair} is a set
-of two vertices whose removal disconnects the graph, the obstruction a
-$2$-connected graph must lack in order to be $3$-connected. Finally a \emph{block}
+of two vertices whose removal disconnects the graph: it is the obstruction that a
+$2$-connected graph must lack to be $3$-connected. Finally a \emph{block}
 is a maximal piece with no cut vertex of its own, hence either a single bridge edge
 or a maximal $2$-connected subgraph. Two blocks overlap in at most one vertex,
 always a cut vertex, and the blocks and cut vertices hang together in a tree, the
@@ -1611,7 +1611,7 @@ $m=4$ formula is claimed.
 
 \section{The directed hypergraph}\label{sec:dir-hyper}
 
-The remaining four of the sixteen variants orient the Berge edge. They are grouped here rather than with the undirected hypergraph bounds above because the questions they raise are different ones: not which decomposition controls the rank of an incidence graph, but how much a single edge with one tail and many heads can carry, and whether the way it is oriented changes the answer. The first result is a pair of bounds a factor of four apart, the last closes that factor for the model the program measures.
+The remaining four of the sixteen variants orient the Berge edge. They are grouped here rather than with the undirected hypergraph bounds above because the questions they raise are different ones: not which decomposition controls the rank of an incidence graph, but how much a single edge with one tail and many heads can carry, and whether the way it is oriented changes the answer. The first result gives a pair of bounds a factor of four apart, and the last closes that factor for the model the program measures.
 
 \begin{proposition}[Directed hypergraphs: first bounds,\aimedal]\label{prop:dir-hyper-first}
 Let $n\ge r\ge2$ and $m\ge2$. Model a directed $r$-uniform hyperedge as a
@@ -1669,7 +1669,7 @@ directed $r$-uniform hyperedge is a split of its $r$ vertices into a non-empty
 \emph{tail set} $T$ and a non-empty \emph{head set} $H$, a route entering at a
 tail and leaving at a head. The \emph{forward} model is $|T| = 1$, the
 \emph{backward} model is $|H| = 1$, and the \emph{general} model allows any split
-(genuinely mixed splits, both parts at least two, exist from $r \ge 4$). The next
+(genuinely mixed splits, both parts at least two, exist for $r \ge 4$). The next
 two results place all three. The first is that backward needs no separate study,
 and the second is that the general model, despite admitting more hyperedges on a
 single vertex set, obeys the very same first-order bound as forward.
@@ -1688,8 +1688,8 @@ In words: the backward model is the forward model seen in a mirror. Turning ever
 
 \begin{proof}
 Reversal sends a backward hyperarc ($|T| = r-1$, $|H| = 1$) to a forward one
-($|T| = 1$) and is its own inverse, so it is an edge-count-preserving bijection of
-the two families. Let $u = x_0, e_1, x_1, \dots, e_k, x_k = v$ be a directed Berge
+($|T| = 1$) and is its own inverse, so it is an edge-count-preserving bijection
+between the two families. Let $u = x_0, e_1, x_1, \dots, e_k, x_k = v$ be a directed Berge
 route in $\HH$, where $x_{i-1}$ is a tail and $x_i$ a head of $e_i$. The reversed
 edge $e_i^{R} = (H_i, T_i)$ has $x_i$ as a tail and $x_{i-1}$ as a head, so
 $v = x_k, e_k^{R}, x_{k-1}, \dots, e_1^{R}, x_0 = u$ is a directed Berge route
@@ -1777,7 +1777,7 @@ exactly when some hyperedge of $\HH$ has tail $u$ and $v$ among its heads. Write
 $\mathrm{cod}(u,v)$ for the number of hyperedges realising that arc.
 \end{definition}
 
-\Cref{thm:dir-hyper-constant}, stated in \Cref{ch:synthesis}, says in words that the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
+\Cref{thm:dir-hyper-constant}, stated in \Cref{ch:basecases}, says in words that the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
 \begin{proof}[Proof of \Cref{thm:dir-hyper-constant}]
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
@@ -1821,7 +1821,7 @@ pairwise distinct tails and so are distinct from each other, and no leaving
 hyperedge is an entering one, since the entering ones have tail $u$ and the
 leaving ones have tail a midpoint, which is not $u$. They are also internally
 vertex-disjoint, since the one-step route has empty interior and each two-step
-route has for interior the single vertex it is matched to, and $M$ matches
+route has as its interior the single vertex it is matched to, and $M$ matches
 distinct targets. Hence
 \[
     \frac{\mathbf{1}_{(u,v) \in A(R)} + p_2(u,v)}{r-1}
@@ -1844,8 +1844,8 @@ hyperedges, where the balanced split $\alpha = \floor{n/2}$ already attains the
 right-hand side on its own, and which is feasible for both separations at once,
 since it is $\lec$-feasible and $\kap \le \lec$. (The integer maximum is
 occasionally taken a little off balance, since the floor can favour an
-unbalanced split by a unit or two, but never by enough to move the $n^2$ term.) Upper and
-lower bound agree in their $n^2$ term, which is the asymptotic claim.
+unbalanced split by a unit or two, but never by enough to move the $n^2$ term.) The upper and
+lower bounds agree in their $n^2$ term, which is the asymptotic claim.
 \end{proof}
 
 Three remarks on the statement. First, the two upper bounds are not comparable
@@ -1959,8 +1959,8 @@ $|A(R)| \le \floor{n^2/4} + 4(2r+1)(m-1)(n-1)$, and substituting into Step 1 giv
 the stated bound. The hypothesis $\lec^{\max} \le m-1$ implies
 $\kap^{\max} \le m-1$ by Whitney, so the bound holds there too. For the lower
 bound, the bipartite family of \Cref{prop:dir-hyper-first} consists of general
-hyperedges, so it witnesses $\approx (m-1)n^2/(4(r-1))$ here as well, and upper
-and lower bound agree in their $n^2$ term.
+hyperedges, so it witnesses $\approx (m-1)n^2/(4(r-1))$ here as well, and the upper
+and lower bounds agree in their $n^2$ term.
 \end{proof}
 
 Two remarks on that proof. The constant $2r+1$ is not
@@ -2030,7 +2030,7 @@ By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connec
 \[
     \sum_{uv \in E(G_0)} \pi(u,v) \;<\; (m-1)\,\mathrm{rank}(G_0).
 \]
-The obvious guess is that cycles must always pay for themselves against this bound, each independent cycle costing $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
+The obvious guess is that cycles must always pay for themselves against this bound: each independent cycle costs $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
 
 \begin{theorem}[A bouquet of thickened cliques, and how it beats the thickened tree,\aimedal]\label{thm:clique-chain-vertex}
 Fix $3 \le r \le m$ and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex ceiling on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
@@ -2086,7 +2086,7 @@ Let $G$ be feasible, with underlying simple graph $G_0$.
 \emph{The simple problem is linearly bounded.} Suppose $G_0$ had average degree at least $4(m-1)$. By Mader's density theorem \cite{Mader72}, a graph of average degree at least $4k$ contains a $(k+1)$-connected subgraph, so with $k = m-1$ some subgraph $H \subseteq G_0$ is $m$-connected. An $m$-connected graph has more than $m$ vertices and, by the global form of Menger's theorem \cite[Ch.~3]{Diestel17}, any two of them are joined by $m$ internally disjoint paths inside $H$ and hence inside $G_0$. That contradicts $\kap^{\max}_{G_0} \le m-1$. So the average degree is below $4(m-1)$, that is $2|E(G_0)|/n < 4(m-1)$, giving $k_m(n) < 2(m-1)n$ and the second inequality.
 \end{proof}
 
-Combining the two directions, first letting $n/m\to\infty$ so that optimised blocks can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$,
+Combining the two directions, first letting $n/m\to\infty$ so that optimised blocks can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$, yields
 \[
     \Bigl(\tfrac{1}{8} + o_m(1)\Bigr) m^2 \, n
     \;\le\; K_m^{\mathrm{multi}}(n) \;<\; 2 m^2 n ,
@@ -2192,7 +2192,7 @@ between $3-2\sqrt2$ and $2$.
 % dangling reference hides from LaTeX.
 \section{The search's cheap connectivity bookkeeping}\label{sec:cheap-checker}
 
-\Cref{ch:certify} states that the search avoids most calls to the checker by tracking a bound on $\lambda^{\max}$ rather than recomputing it. This section records how, and how the shortcut is held to the value the naive implementation would have returned.
+\Cref{ch:certify} states that the search avoids most calls to the checker by tracking a bound on $\lambda^{\max}$ rather than recomputing it. This section records how the shortcut works and how it is checked against the value the naive implementation would have returned.
 
 \Cref{prop:monotone}'s two parts settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a capped pairwise sweep, stopping at the first pair for which it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
 
@@ -2217,7 +2217,7 @@ submission snapshot. From \code{program/},
 \code{python erdos915\_unified.py} runs the principal checks and
 \code{python -m unittest discover -s tests -v} runs the regression suite.
 \code{python make\_figures.py} regenerates the computational figures. The several hundred \code{solve} calls behind the four variant grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} are read from \code{figures/machine\_values.json}, a readable record of what each of those runs returned, so the grids redraw in seconds and the plotted points are the ones this document was built from rather than whatever a fresh timed search happens to reach. Deleting that file, or passing \code{-{}-refresh}, recomputes every entry, which is how the record is checked.
-With \code{-{}-refresh}, fresh outcomes are reconciled with the stored record: a rerun can confirm or improve an entry but cannot replace it with a weaker result merely because a timed search or exhaustion reached less on that machine. Deleting the file is the stronger operation that discards the record before recomputing from scratch.
+With \code{-{}-refresh}, fresh outcomes are reconciled with the stored record: a rerun can confirm or improve an entry but cannot replace it with a weaker result merely because a timed search or exhaustion achieved a weaker result on that machine. Deleting the file is the stronger operation that discards the record before recomputing from scratch.
 Two block sweeps are the one thing that does not run from this file. They live
 in \code{research\_notes/scripts/simple\_vertex\_blocks.py} and
 \code{research\_notes/scripts/multi\_vertex\_blocks.py}, are self-contained, and
@@ -2260,7 +2260,7 @@ The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n
   completed. The node counts coincide as a computed fact, not by
   construction: the feasibility prune switches between the arc and the vertex
   flow test with the separation, and at these sizes the two happen to cut the
-  tree in the same places. The wall times do not, the vertex run at $n = 7$ taking
+  tree in the same places. The wall times do not coincide, with the vertex run at $n = 7$ taking
   $3125$\,s against the arc run's $718$\,s. Full logs:
   \code{figures/basecase\_search\_log.txt} and
   \code{figures/basecase\_search\_vertex\_log.txt}.}

@@ -110,7 +110,7 @@ The proof given in \Cref{app:proofs} was discovered independently of Mader and u
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
 The very same Gomory-Hu tree returns for the multigraph and hypergraph variants (\Cref{thm:multigraph-edge}, \Cref{prop:hyper-edge}). 
 Hence its properties are recorded here.
-Every graph has a weighted, spanning tree such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
+Every graph has a weighted spanning tree such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
 All $\binom{n}{2}$ local connectivities are therefore encoded by just $n - 1$ weights. 
 The largest of them, $\lec_G^{\max}$, is simply the heaviest edge of the tree. 
 The proof (\Cref{app:proofs}) uses a double counting argument on that tree. 
@@ -181,7 +181,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \node[font=\itshape] at (0,-1.75) {hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges span $r\!\ge\!3$};
   \end{scope}
-  % (d) multi-hypergraph: one repeated hyperedge {A,B,C} (two parallel red lines
+  % (d) multihypergraph: one repeated hyperedge {A,B,C} (two parallel red lines
   %     side by side, the hypergraph counterpart of parallel edges) plus one
   %     ordinary, non-repeated hyperedge {B,C,D} drawn diagonally corner to
   %     corner. No central station.
@@ -194,7 +194,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
       \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);    % {B,C,D} diagonal, single
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
-    \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
+    \node[font=\itshape] at (0,-1.75) {multihypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
   % (a) simple digraph: directed triangle with one bidirected pair
@@ -250,7 +250,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \node[font=\itshape] at (0,-1.75) {directed hypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an edge};
   \end{scope}
-  % (d) directed multi-hypergraph: the SAME two hyperedges as fig:four-models,
+  % (d) directed multihypergraph: the SAME two hyperedges as fig:four-models,
   %     {A,B,C} red repeated and {B,C,D} blue, as metro stars on the same edges
   %     (tail = middle station). Each repeated arc is a parallel pair (same
   %     direction -> OPPOSITE bends, so the pair straddles the edge).
@@ -268,11 +268,11 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
       \draw[hstar, metroB] (Dm) to (Cm);
     \end{scope}
     \foreach \p in {Am,Bm,Cm,Dm} {\node[stn] at (\p) {};}
-    \node[font=\itshape] at (0,-1.75) {directed multi-hypergraph};
+    \node[font=\itshape] at (0,-1.75) {directed multihypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The eight models side by side, with the four undirected on top and the four directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multi-hypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}
+\caption{The eight models side by side, with the four undirected on top and the four directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}
 \label{fig:eight-models}
 \end{figure}
 
@@ -377,7 +377,7 @@ A directed \emph{Berge route} enters that edge at its tail and leaves at one of 
 \label{fig:directed-lambda}
 \end{figure}
 
-The final assumption that will be considered is \emph{separation}: routes may be required to avoid sharing an edge, as above, or the stricter \emph{internally vertex-disjoint}, sharing no intermediate vertex.
+The final assumption that will be considered is \emph{separation}: routes may be required either to avoid sharing edges, as above, or to be internally vertex-disjoint, sharing no intermediate vertex.
 This gives the local vertex-connectivity $\kap_G(u, v)$ and its maximum $\kap_G^{\max}$. 
 Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex.
 
@@ -402,15 +402,15 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \label{fig:edge-vs-vertex}
 \end{figure}
 
-In the vertex disjoint variants multiplicity of an edge is irrelevant compared to its existence, 
+In the vertex-disjoint variants, multiplicity of an edge is irrelevant compared to its existence,
 so parallel edges never raise $\kappa$.\label{sec:parallel-convention}
 Therefore they never break the connectivity constraints either.
 Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
 The multigraph vertex variants are thus posed on the underlying simple graph, 
 which is why those two rows of \Cref{tab:summary} reduce to their simple counterparts and why every figure in this thesis reports the reduced problem for them.
 
-With all this in mind, the thesis considers multi-hypergraphs and directed multi-hypergraphs for both edge- and vertex-disjoint routes, 
-where $r=2$ and no parallel edges are special cases. 
+With all this in mind, the thesis considers multihypergraphs and directed multihypergraphs for both edge- and vertex-disjoint routes.
+Ordinary graphs ($r=2$) and simple hypergraphs (no repeated hyperedges) are special cases.
 The final status map appears in \Cref{fig:variant-tree-status}. 
 The notation for all their extremal functions is summarised in \Cref{tab:notation}.
 
@@ -444,7 +444,7 @@ For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
 \Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree. 
 The lower bound is a spanning tree with every edge thickened to $m-1$ parallel copies. 
 
-In simple graphs the edge and vertex problems give the same answer while $m$ stays small, and three papers together say so. The vertex values came first, $k_3$ from B\'{a}rtfai \cite{Bartfai60} and $k_4$ from Bollob\'{a}s \cite{Bollobas66}. Leonard \cite{Leonard72b} then proved that the two separations agree throughout $2 \le m \le 4$, in the same paper that settled the edge value at $m = 5$, a year before \Cref{thm:mader} covered every $m$ at once.
+In simple graphs the edge and vertex problems give the same answer while $m$ stays small, and three papers together say so. The vertex values came first: $k_3$ from B\'{a}rtfai \cite{Bartfai60} and $k_4$ from Bollob\'{a}s \cite{Bollobas66}. Leonard \cite{Leonard72b} then proved that the two separations agree throughout $2 \le m \le 4$, in the same paper that settled the edge value at $m = 5$, a year before \Cref{thm:mader} covered every $m$ at once.
 
 \begin{theorem}[B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66}, Leonard \cite{Leonard72b}]\label{thm:leonard}
 For all $n \ge m$ and $m \le 4$,
@@ -455,7 +455,7 @@ For all $n \ge m$ and $m \le 4$,
 
 By Whitney's inequality every edge-feasible graph is vertex-feasible, so $k_m(n) \ge \ell_m(n)$ (\Cref{fig:divergence}).
 One is tempted to expect the equality forever. 
-This however is not the case, and S{\o}rensen and Thomassen proved that the vertex problem diverges from the edge problem at $m = 5$.
+This, however, is not the case, and S{\o}rensen and Thomassen proved that the vertex problem diverges from the edge problem at $m = 5$.
 
 \begin{theorem}[S{\o}rensen-Thomassen \cite{SorensenThomassen74}]\label{thm:sorensen-thomassen}
 For simple graphs and all $n \ge 6$ with $n \ne 7$ and $n \ne 12$,
