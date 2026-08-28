@@ -4,8 +4,10 @@
 %
 %  Same house style as the thesis: it inputs ../shared/colors.tex and
 %  ../shared/tikz-styles.tex, so colours and graph styles have one source.
-%  Every picture in both decks is a figure file already produced for the
-%  thesis and living in ../figures/.  Nothing here draws a new figure.
+%  Every picture in both decks is a figure that is in the thesis MAIN TEXT
+%  today: either a rendered file in ../figures/ that a chapter includes, or a
+%  TikZ picture copied into thesis-figures.tex with its source chapter and
+%  \label recorded beside it.  Nothing here invents a figure.
 % ============================================================================
 
 \usepackage[T1]{fontenc}
@@ -14,7 +16,9 @@
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{adjustbox}
 \usepackage{tikz}
 \usetikzlibrary{calc,arrows.meta,positioning,backgrounds,fit,shadows}
 
@@ -23,9 +27,21 @@
 \graphicspath{{../figures/}{../}}
 
 % ---- status colours, matching the thesis trichotomy ------------------------
+% These are the four regime colours of fig:variant-tree-status, under the names
+% the slides use.
 \colorlet{stProved}{KULblauw1}
+\colorlet{stPartial}{vertexpurple}
 \colorlet{stConj}{vertexred}
 \colorlet{stOpen}{vertexorange}
+
+% The five literal hex codes plot_variant_grid() uses, so a number's colour in
+% figures/variant_table_all.tex matches its curve or marker in the grids
+% exactly.  Copied from preamble.tex, where the thesis defines them.
+\definecolor{vtProved}{HTML}{1D8DB0}
+\definecolor{vtConjectured}{HTML}{E05050}
+\definecolor{vtOpen}{HTML}{E6B800}
+\definecolor{vtExact}{HTML}{3CA050}
+\definecolor{vtSearch}{HTML}{9B5DE5}
 
 % ---- notation shorthands, matching the thesis ------------------------------
 \newcommand{\Erdos}{Erd\H{o}s}
@@ -35,12 +51,16 @@
 \newcommand{\kmax}{\kappa^{\max}}
 \newcommand{\lec}{\lambda}
 \newcommand{\kap}{\kappa}
+\newcommand{\dir}{\mathrm{dir}}
 \newcommand{\code}[1]{{\ttfamily\small #1}}
 
-% a small coloured status chip, used in the twelve-variant table
+% a small coloured status chip, used in the sixteen-variant table
 \newcommand{\chip}[2]{\tikz[baseline=-0.55ex]{\node[rounded corners=2pt,
    fill=#1,text=white,inner xsep=4pt,inner ysep=1.5pt,
    font=\tiny\bfseries]{#2};}}
+
+% the TikZ pictures the thesis body draws, copied with their provenance
+\input{thesis-figures.tex}
 
 % ============================================================================
 %  THEME
@@ -83,7 +103,7 @@
 % ============================================================================
 %  FRAME BUILDERS
 %  Both decks are figures and tables with a title and one line underneath, so
-%  the two commands below are what almost every frame uses.
+%  the commands below are what almost every frame uses.
 % ============================================================================
 
 % \figframe{frame title}{figure file}{one-line reading}
@@ -91,7 +111,7 @@
   \begin{frame}{#1}
     \vfill
     \centering
-    \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{#2}
+    \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{#2}
 
     \vspace{3pt}
     {\footnotesize\color{black!60} #3}
@@ -99,14 +119,14 @@
   \end{frame}%
 }
 
-% \figframetall{...}: for the multi-panel grids (twelve small panels, or the
-% gallery), which are close to square and need every millimetre of height to
-% stay legible.  Its third argument must be a SHORT single line.
+% \figframetall{...}: for the multi-panel grids, which are close to square and
+% need every millimetre of height to stay legible.  Its third argument must be
+% a SHORT single line.
 \newcommand{\figframetall}[3]{%
   \begin{frame}{#1}
     \vspace{-2pt}
     \centering
-    \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{#2}
+    \includegraphics[width=\textwidth,height=0.75\textheight,keepaspectratio]{#2}
 
     \vspace{1pt}
     {\scriptsize\color{black!60} #3}
@@ -119,13 +139,36 @@
   \begin{frame}{#1}
     \vfill
     \centering
-    \includegraphics[width=\textwidth]{#2}
+    \adjustbox{max totalheight=0.66\textheight}{\includegraphics[width=\textwidth]{#2}}
 
     \vspace{6pt}
     {\footnotesize\color{black!60} #3}
     \vfill
   \end{frame}%
 }
+
+% \tikzframe{title}{\figmacro}{reading line}: the same layout for a TikZ
+% picture from thesis-figures.tex.  The picture is blown up to the text width
+% and then capped in height, so a wide one fills the slide and a tall one is
+% shrunk to fit rather than running off the bottom.
+\newcommand{\tikzframe}[3]{\tikzframescaled{#1}{#2}{#3}{1.0}}
+
+% \tikzframescaled{...}{fraction}: same, for a picture that would look absurd
+% stretched to the full text width.
+\newcommand{\tikzframescaled}[4]{%
+  \begin{frame}{#1}
+    \vfill
+    \centering
+    \adjustbox{max totalheight=0.64\textheight}{\resizebox{#4\textwidth}{!}{#2}}
+
+    \vspace{8pt}
+    {\footnotesize\color{black!60} #3}
+    \vfill
+  \end{frame}%
+}
+
+% kept as the name the decks were written against
+\newcommand{\tikzframesmall}[4]{\tikzframescaled{#1}{#2}{#3}{#4}}
 
 % a plain section divider
 \newcommand{\sectionframe}[2]{%
@@ -171,43 +214,102 @@
 }
 
 % ============================================================================
-%  THE TWELVE-VARIANT TABLE
-%  The content of tab:summary in the thesis, set for a slide: the cross
-%  references are replaced by short words and the status column by a chip.
+%  THE SIXTEEN-VARIANT TABLE
+%  The content of tab:summary in chapters/ch3_synthesis.tex, set for a slide:
+%  the cross references are replaced by short words and a status chip is added.
+%  It must be kept in step with tab:summary by hand.  The chips are the four
+%  regimes of fig:variant-tree-status: PROVED (closed form for every n and m),
+%  RANGE (proved for a range of m, open beyond it), CONJ (conjectured formula
+%  with a proved lower bound), and LEADING TERM (the n^2 term is a theorem, the
+%  exact value is not).
 % ============================================================================
-\newcommand{\twelvetable}{%
-\renewcommand{\arraystretch}{1.18}
+\newcommand{\sixteentable}{%
+\renewcommand{\arraystretch}{1.10}
 \scriptsize
-% The directed rows now carry two values apiece (the exact one at m=2 and the
-% unconditional asymptotic at every m), which pushes the natural width past the
-% slide.  Scale the tabular to the text block, exactly as the thesis does for
-% tab:summary, and keep the legend outside so it stays at its own size.
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llll@{}}
+\begin{tabular}{@{}lp{0.40\textwidth}p{0.40\textwidth}@{}}
 \toprule
-Separation & Model & Value & Status \\
+Model & Edge or arc-disjoint & Vertex-disjoint \\
 \midrule
-\multicolumn{4}{@{}l}{\color{KULblauw1}\bfseries Undirected} \\
-edge   & simple & $\floorfrac{m(n-1)}{2}$ & \chip{stProved}{PROVED} Mader \\
-edge   & multi  & $(m-1)(n-1)$            & \chip{stProved}{PROVED} \\
-edge   & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ & \chip{stProved}{PROVED} Gomory--Hu \\
-vertex & simple & $\floorfrac{m(n-1)}{2}$ $(m\le4)$, $\floor{8n/3}-4$ $(m=5,\,n\ge6,\,n\ne7,12)$ & \chip{stProved}{CITED} open $m\ge6$ \\
-vertex & multi  & adjacency count, so the simple value & convention \\
-vertex & hyper  & $\floorfrac{(m-1)(n-1)}{r-1}$ ($m=2$, and $m=3$ in the stated construction range) & \chip{stProved}{BOUND} $m=3$, open $m\ge4$ \\
+\multicolumn{3}{@{}l}{\color{KULblauw1}\bfseries Undirected} \\
+simple graph
+  & $\floorfrac{m(n-1)}{2}$ \ \chip{stProved}{PROVED} Mader
+  & the edge value for $m\le4$, and $\floor{8n/3}-4$ at $m=5$ \ \chip{stPartial}{RANGE} open $m\ge6$ \\
+multigraph
+  & $(m-1)(n-1)$ \ \chip{stProved}{PROVED}
+  & the simple value \ \chip{stPartial}{RANGE} parallel copies do not raise $\kap$ \\
+$r$-hypergraph
+  & $\le\floorfrac{(m-1)(n-1)}{r-1}$, equality in the stated range \ \chip{stProved}{PROVED}
+  & $\floorfrac{n-1}{r-1}$ at $m=2$, $\le\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \chip{stPartial}{RANGE} open $m\ge4$ \\
+$r$-multi-hyper
+  & the same bound, equality when $(r-1)\mid(n-1)$ \ \chip{stProved}{PROVED}
+  & the same bounds, repeats closing cases at $m=3$ \ \chip{stPartial}{RANGE} \\
+\addlinespace[2pt]
 \midrule
-\multicolumn{4}{@{}l}{\color{KULblauw1}\bfseries Directed} \\
-arc    & simple & $\max\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr)$ $(m=2)$, \ $n^2/4+\Theta_m(n)$ ($m\ge3$) & \chip{stProved}{PROVED} $m=2$, \chip{stConj}{CONJ} $m\ge3$ \\
-arc    & multi  & $(m-1)\max\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr)$ & \chip{stProved}{PROVED} every $n$ and $m$ \\
-arc    & hyper  & $(1+o(1))(m-1)n^2/(4(r-1))$ & \chip{stOpen}{LEADING TERM} exact value open \\
-vertex & simple & $\max\bigl(2(n-1),\ \floorfrac{n^2}{4}\bigr)$ $(m=2)$, \ $n^2/4+\Theta_m(n)$ ($m\ge3$) & \chip{stProved}{PROVED} $m=2$ separately, \chip{stConj}{CONJ} $m\ge3$ \\
-vertex & multi  & adjacency count, so the simple digraph value & convention \\
-vertex & hyper  & $(1+o(1))(m-1)n^2/(4(r-1))$ & \chip{stOpen}{LEADING TERM} exact value open \\
+\multicolumn{3}{@{}l}{\color{KULblauw1}\bfseries Directed} \\
+simple digraph
+  & $M(n)$ at $m=2$; $n^2/4+\Theta_m(n)$ for $m\ge3$ \ \chip{stProved}{PROVED} $m=2$ \ \chip{stConj}{CONJ} $m\ge3$
+  & $M(n)$ at $m=2$; $n^2/4+\Theta_m(n)$ for $m\ge3$ \ \chip{stProved}{PROVED} $m=2$ \ \chip{stConj}{CONJ} $m\ge3$ \\
+multigraph
+  & $(m-1)M(n)$ \ \chip{stProved}{PROVED} every $n$ and $m$
+  & the simple digraph value \ \chip{stConj}{CONJ} $m\ge3$ \\
+$r$-hypergraph
+  & $(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \chip{stOpen}{LEADING TERM}
+  & the same leading term \ \chip{stOpen}{LEADING TERM} \\
+$r$-multi-hyper
+  & the same leading term, repeats allowed \ \chip{stOpen}{LEADING TERM}
+  & the same leading term \ \chip{stOpen}{LEADING TERM} \\
 \bottomrule
 \end{tabular}%
 }
 
-\vspace{6pt}
-{\tiny\color{black!55} \chip{stProved}{PROVED} holds for every $n$. \
-\chip{stConj}{CONJ} conjectured formula, with a matching lower bound proved and the small cases exhausted. \
+\vspace{5pt}
+{\tiny\color{black!55} $M(n)=\max\bigl(2(n-1),\floor{n^2/4}\bigr)$, and the simple-graph formulas assume $n\ge m$. \
+\chip{stProved}{PROVED} closed form for every $n$ and $m$. \
+\chip{stPartial}{RANGE} proved for a range of $m$, open beyond it. \
+\chip{stConj}{CONJ} conjectured formula, lower bound proved and the small cases exhausted. \
 \chip{stOpen}{LEADING TERM} the $n^2$ term is a theorem, the exact value is not.}%
 }
+
+% ============================================================================
+%  THE NOTATION TABLE
+%  tab:notation in chapters/ch1_basecases.tex.
+% ============================================================================
+\newcommand{\notationtable}{%
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabular}{l|c|c}
+\toprule
+Model & edge-disjoint routes & internally vertex-disjoint routes \\
+\midrule
+Simple graph & $\ell_m(n)$ & $k_m(n)$ \\
+Multigraph & $L_m(n)$ & $K_m(n)$ \\
+$r$-uniform simple hypergraph & $\ell_m^{(r)}(n)$ & $k_m^{(r)}(n)$ \\
+$r$-uniform multihypergraph & $L_m^{(r)}(n)$ & $K_m^{(r)}(n)$ \\
+Simple digraph & $\ell_m^{\dir}(n)$ & $k_m^{\dir}(n)$ \\
+Directed multigraph & $L_m^{\dir}(n)$ & $K_m^{\dir}(n)$ \\
+Directed $r$-uniform simple hypergraph & $\ell_m^{\dir\,(r)}(n)$ & $k_m^{\dir\,(r)}(n)$ \\
+Directed $r$-uniform multihypergraph & $L_m^{\dir\,(r)}(n)$ & $K_m^{\dir\,(r)}(n)$ \\
+\bottomrule
+\end{tabular}}
+
+% ============================================================================
+%  THE OPEN-PROBLEM TABLE
+%  tab:open-problems in chapters/ch3_synthesis.tex, cross references dropped.
+% ============================================================================
+\newcommand{\openproblemstable}{%
+\renewcommand{\arraystretch}{1.25}
+\tiny
+\begin{tabular}{@{}p{0.21\textwidth}p{0.36\textwidth}p{0.36\textwidth}@{}}
+\toprule
+Problem & Known here & Remaining target \\
+\midrule
+Directed simple arc, $m\ge3$ & $\ell_m^{\dir}(n)=n^2/4+\Theta_m(n)$ & Prove the decomposition, or otherwise determine the linear coefficient. \\
+Directed simple vertex, $m\ge3$ & $k_m^{\dir}(n)=n^2/4+\Theta_m(n)$ & Decide whether it equals the arc value, given that an arc upper bound does not transfer. \\
+Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
+Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m=\lim_n k_m(n)/(n-1)$ & Determine $c_m$, whose likely next structure is triconnected rather than merely blockwise. \\
+Multigraph vertex, parallel copies distinct & Block-knapsack formulation and order $\Theta(m^2n)$, per-vertex constant between $3-2\sqrt{2}$ and $2$ & Determine the asymptotic constant and the optimal $2$-connected blocks. \\
+Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ & Locate the first failure for $r\ge3$ and replace the rank-two decomposition used at $m=3$. \\
+Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$, all orientations, both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
+\bottomrule
+\end{tabular}}

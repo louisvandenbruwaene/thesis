@@ -5,9 +5,11 @@
 %
 %  Build:  cd slides && latexmk -pdf talk_10.tex
 %
-%  Figure-led by design: every picture is a figure already produced for the
-%  thesis and stored in ../figures/.  No figure is drawn here.
-%  Ten frames, roughly one minute each.
+%  Figure-led by design.  Every picture is a figure the thesis main text shows
+%  today: either a rendered file in ../figures/ that a chapter includes, or a
+%  TikZ picture copied into thesis-figures.tex with its chapter and \label
+%  recorded beside it.  Every formula quoted is a theorem or a conjecture that
+%  Chapter 1 or Chapter 3 states.  Ten frames, roughly one minute each.
 % ============================================================================
 \documentclass[aspectratio=1610,11pt]{beamer}
 \input{thesis-beamer.tex}
@@ -30,58 +32,63 @@
 \vspace{18pt}
 \begin{minipage}{0.62\textwidth}
 \centering
-{\color{black!45}\small Mader settled it for simple graphs, $n\ge m$:}\\[6pt]
-{\color{KULblauw1}\Large $\displaystyle \ell_m(n)=\floorfrac{m(n-1)}{2}$}
+{\color{black!45}\small Mader, for simple graphs and all $n\ge2$, $m\ge2$:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle \ell_m(n)\le\floorfrac{m(n-1)}{2}$}
 \end{minipage}
 
 \vspace{18pt}
-{\footnotesize\color{black!60} This thesis moves that question along three axes: model, direction, separation. Twelve variants.}
+{\footnotesize\color{black!60} Proved here again from the Gomory--Hu tree, and a construction meets it for every $n\ge m$. Then three toggles on the model and one on the separation turn one question into sixteen.}
 \vfill
 \end{frame}
 
 % --- 3 -----------------------------------------------------------------------
-\figframe{Surprise one: edge and vertex routes part company}
-  {edge_vertex_divergence.png}
-  {Identical through $m=4$. At $m=5$ the vertex value pulls above the edge value, and past $m=5$ it has been open since 1974.}
+\tikzframe{Four models, two directions, two separations}
+  {\figvarianttree}
+  {Arity, multiplicity, direction, separation. Sixteen leaves, and after this thesis they sit in four regimes rather than one.}
 
 % --- 4 -----------------------------------------------------------------------
-\figframe{Surprise two: one-way traffic buys a quadratic}
-  {directed_crossover.png}
-  {Undirected graphs are stuck at $\Theta(n)$ edges. A digraph reaches $\Theta(n^2)$ arcs at the same connectivity ceiling. The two branches cross at $n=9$ when $m=3$.}
+\figframe{Surprise one: edge and vertex routes part company}
+  {edge_vertex_divergence.png}
+  {Identical through $m=4$. At $m=5$ the vertex value $\floor{8n/3}-4$ first passes the edge value at $n=14$, and for $m\ge6$ the vertex problem has stood open since 1974.}
 
 % --- 5 -----------------------------------------------------------------------
-\figframewide{Why a machine: enumeration detonates}
-  {complexity_growth.png}
-  {Checking every graph passes any reachable budget while $n$ is still in single digits. The directed cases, exactly the open ones, go first.}
+\figframe{Surprise two: one-way traffic buys a quadratic}
+  {directed_crossover.png}
+  {A hub carries $m(n-1)$ arcs, an augmented one-way bipartite wall carries $\floor{(n+m-2)^2/4}$. At $m=3$ the wall takes the lead near $n=9$, so the directed value is quadratic where the undirected one is linear.}
 
 % --- 6 -----------------------------------------------------------------------
-\figframe{What the machine does: cool a random graph into shape}
-  {temperature_trace.png}
-  {Every visited graph, coloured by step. Hot: it strays above the ceiling. Cool: it settles onto the densest feasible graph, here the proved optimum of $12$ arcs.}
+\figframewide{Why a machine: enumeration detonates}
+  {complexity_growth.png}
+  {Candidate counts on a logarithmic scale. Every model passes a generous $10^9$ budget while $n$ is still in single digits, and the directed cases, exactly the open ones, go first.}
 
 % --- 7 -----------------------------------------------------------------------
-\figframetall{All twelve variants at once}
-  {variant_bounds_m3.png}
-  {Blue proved for all $n$, red conjectured, yellow interpolated. Squares proved exactly, circles are lower bounds.}
-
-% --- 8 -----------------------------------------------------------------------
-\begin{frame}{Where each variant stands}
+\begin{frame}{What the machine is allowed to claim}
 \vfill
 \centering
-\twelvetable
+{\scriptsize\input{../figures/rediscovery_table.tex}}
+
+\vspace{12pt}
+\begin{minipage}{0.9\textwidth}
+{\footnotesize\color{black!60} Started from the empty graph and told only to pack in edges, the tabu search returns the named constructions: the spanning tree, the thickened star, the bidirected star, the double star, and the hub-versus-wall tie at $n=7$. It still only ever exhibits a graph, so it proposes a lower bound. A hand proof or a finished exhaustion disposes the upper bound, and only when the two meet is a value settled.}
+\end{minipage}
 \vfill
 \end{frame}
+
+% --- 8 -----------------------------------------------------------------------
+\figframetall{The eight graph-model variants at $m=3$}
+  {variant_bounds_m3_graphs.png}
+  {Blue a theorem, red a conjecture, yellow an interpolation. Filled squares are exact values, open circles are witnesses.}
 
 % --- 9 -----------------------------------------------------------------------
 \begin{frame}{What is new here}
 \vfill
-\begin{itemize}\setlength{\itemsep}{14pt}
-  \item[\color{KULblauw1}\textbf{1}] \textbf{Hypergraph vertex problem: settled at $m=2$ and sharp at $m=3$ in its construction range}\\
-        {\small\color{black!60} a universal $m=3$ upper bound follows from a new incidence-graph rank bound, with equality proved for $r\ge3$ when $2\le\binom{n-2}{r-2}$}
+\begin{itemize}\setlength{\itemsep}{13pt}
+  \item[\color{KULblauw1}\textbf{1}] \textbf{One-way multigraphs, solved for every $n$ and every $m$}\\
+        {\small\color{black!60} $L_m^{\dir}(n)=(m-1)\max\bigl(2(n-1),\floor{n^2/4}\bigr)$, by deleting a sparse reachability-preserving subgraph once per unit of $m-1$ rather than a vertex at a time. The quadratic extremisers are classified for $n\ge\max(8,2m)$.}
   \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: an unconditional quadratic bound}\\
-        {\small\color{black!60} $|A| \le \floorfrac{n^2}{4} + 4(m-1)(n-1)$, so the leading constant and the order of the next term are theorems, not conjectures}
-  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs, solved for every $n$ and every $m$}\\
-        {\small\color{black!60} $L_m^{\mathrm{dir}}(n)=(m-1)\max\bigl(2(n-1),\lfloor n^2/4\rfloor\bigr)$, by deleting a sparse subgraph that alone remembers who can reach whom, once per unit of $m-1$}
+        {\small\color{black!60} $|A(D)|\le\floorfrac{n^2}{4}+4(m-1)(n-1)$, with no hypothesis on the shape of the extremiser, so the leading constant and the order of the next term are theorems. The same count re-runs under the stricter separation.}
+  \item[\color{KULblauw1}\textbf{3}] \textbf{Hyperedge networks: the vertex problem at $m=2$ and $m=3$, and a directed leading term}\\
+        {\small\color{black!60} $\floor{2(n-1)/(r-1)}$ is a universal $m=3$ bound from a new incidence-graph rank lemma, attained for $r\ge3$ when $2\le\binom{n-2}{r-2}$. One-way, the leading term is $(m-1)n^2/\bigl(4(r-1)\bigr)$ under both separations.}
 \end{itemize}
 \vfill
 \end{frame}
@@ -90,15 +97,16 @@
 \begin{frame}{What is left}
 \vfill
 \begin{itemize}\setlength{\itemsep}{12pt}
-  \item {\color{stOpen}$\blacksquare$} The undirected \emph{vertex} problem at $m\ge6$, open since 1974
-  \item {\color{stConj}$\blacksquare$} The structural decomposition that would turn the directed conjecture into a theorem
-  \item {\color{stConj}$\blacksquare$} The exact values behind the leading terms now settled, one-way and for hyperedges alike
+  \item[{\color{stPartial}$\blacksquare$}] The undirected \emph{vertex} problem at $m\ge6$, open since 1974
+  \item[{\color{stConj}$\blacksquare$}] The decomposition that would turn the directed conjecture into a theorem: that every extremal non-hub digraph splits as $A\cup B$ with no arc coming back
+  \item[{\color{stConj}$\blacksquare$}] Whether the directed vertex value equals the arc value at $m\ge3$, which Whitney's inequality does not hand over
+  \item[{\color{stOpen}$\blacksquare$}] The exact values behind the leading terms now settled, one-way and for hyperedges alike
 \end{itemize}
 
 \vspace{22pt}
 \centering
-{\color{black!55}\small The search proposes a lower bound. A proof or a finished exhaustion disposes the upper bound.}\\[3pt]
-{\color{black!55}\small Only when the two meet is a value called settled.}
+{\color{black!55}\small The map is filled in where the arguments reached,}\\[3pt]
+{\color{black!55}\small and the blanks are marked where they did not.}
 \vfill
 \end{frame}
 

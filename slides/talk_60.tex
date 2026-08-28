@@ -5,10 +5,13 @@
 %
 %  Build:  cd slides && latexmk -pdf talk_60.tex
 %
-%  Figure-led by design: every picture is a figure already produced for the
-%  thesis and stored in ../figures/.  No figure is drawn here.  The tables are
-%  the thesis tables, with cross-references replaced by short words.
-%  Seven sections, roughly eight minutes each.
+%  Figure-led by design.  Every picture is a figure the thesis main text shows
+%  today: either a rendered file in ../figures/ that a chapter includes, or a
+%  TikZ picture copied into thesis-figures.tex with its chapter and \label
+%  recorded beside it.  The tables are the thesis tables with their cross
+%  references replaced by short words.  Every formula quoted is one of the
+%  thirteen theorems or the one conjecture that Chapter 1 or Chapter 3 states.
+%  Seven parts, roughly eight minutes each, plus backup.
 % ============================================================================
 \documentclass[aspectratio=1610,11pt]{beamer}
 \input{thesis-beamer.tex}
@@ -22,11 +25,11 @@
 \vfill
 \begin{itemize}\setlength{\itemsep}{9pt}
   \item[\color{KULblauw1}\textbf{1}] The question, and the one theorem it starts from
-  \item[\color{KULblauw1}\textbf{2}] Three axes, twelve variants
+  \item[\color{KULblauw1}\textbf{2}] Four axes, sixteen variants
   \item[\color{KULblauw1}\textbf{3}] What falls to a hand proof
   \item[\color{KULblauw1}\textbf{4}] The directed turn, where the hand proof stops
   \item[\color{KULblauw1}\textbf{5}] Why a machine, and what it is allowed to claim
-  \item[\color{KULblauw1}\textbf{6}] Discovery: cooling and tabu
+  \item[\color{KULblauw1}\textbf{6}] Discovery: tabu search
   \item[\color{KULblauw1}\textbf{7}] The landscape, the results, and what is left
 \end{itemize}
 \vfill
@@ -47,59 +50,94 @@
 \vspace{16pt}
 \begin{minipage}{0.66\textwidth}
 \centering
-{\color{black!45}\small Mader, for simple graphs and $n\ge m$:}\\[6pt]
-{\color{KULblauw1}\Large $\displaystyle \ell_m(n)=\floorfrac{m(n-1)}{2}$}
+{\color{black!45}\small Mader, for all $n\ge2$ and $m\ge2$:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle \ell_m(n)\le\floorfrac{m(n-1)}{2}$}
 \end{minipage}
 
 \vspace{16pt}
-{\footnotesize\color{black!60} Posed by Bollob\'{a}s and \Erdos. Menger turns ``many routes'' into ``costly cut'', and the whole thesis is built on that one exchange.}
+{\footnotesize\color{black!60} Posed by Bollob\'{a}s and \Erdos. The ceiling $\lmax_G\le m-1$ says every pair can be severed by fewer than $m$ edges, so Menger turns ``many routes'' into ``costly cut'', and the whole thesis is built on that one exchange.}
 \vfill
 \end{frame}
 
-\figframetall{What an extremal graph looks like}
-  {extremal_graphs_gallery.png}
-  {The named families, each sitting exactly on its variant's ceiling.}
+\tikzframesmall{Menger, on a five-vertex example}
+  {\figmenger}
+  {Three edge-disjoint $1$--$3$ routes meet the minimal three-edge cut around vertex $1$, so $\lec(1,3)=3$. A route count is a cut count.}
+  {0.42}
+
+\begin{frame}{The one tool: the Gomory--Hu tree}
+\vfill
+\centering
+\begin{minipage}{0.82\textwidth}
+{\large Every graph has a weighted spanning tree in which $\lec_G(u,v)$ is the \emph{lightest} edge on the tree path from $u$ to $v$.}
+\end{minipage}
+
+\vspace{20pt}
+{\color{KULblauw3b}\large All $\binom{n}{2}$ local connectivities, stored in $n-1$ numbers.}\\[6pt]
+{\color{KULblauw1}\large $\lmax_G$ is simply the heaviest edge of that tree.}
+
+\vspace{22pt}
+\begin{minipage}{0.86\textwidth}
+{\footnotesize\color{black!60} A double count on that tree proves Mader's bound, independently of Mader, and the same count returns for the multigraph value and for the hypergraph bound one edge size up. Digraphs have no Gomory--Hu tree, which is exactly where the hand proofs start to fail.}
+\end{minipage}
+\vfill
+\end{frame}
 
 % ============================================================================
-\sectionframe{Part 2}{Three axes, twelve variants}
+\sectionframe{Part 2}{Four axes, sixteen variants}
 
-\begin{frame}{The three axes}
+\begin{frame}{The four axes}
 \vfill
 \begin{columns}[T]
-\begin{column}{0.33\textwidth}
-  {\color{KULblauw1}\bfseries\large Model}\\[8pt]
-  {\small simple graph}\\
-  {\small multigraph}\\
-  {\small $r$-uniform hypergraph}\\[10pt]
-  {\scriptsize\color{black!55} arity and multiplicity, two independent toggles}
+\begin{column}{0.24\textwidth}
+  {\color{KULblauw1}\bfseries\large Arity}\\[8pt]
+  {\small edge, on $2$ vertices}\\
+  {\small hyperedge, on $r$}\\[10pt]
+  {\scriptsize\color{black!55} hypergraphs use Berge routes}
 \end{column}
-\begin{column}{0.33\textwidth}
+\begin{column}{0.24\textwidth}
+  {\color{KULblauw1}\bfseries\large Multiplicity}\\[8pt]
+  {\small simple}\\
+  {\small multi, with $\mu(u,v)$}\\[10pt]
+  {\scriptsize\color{black!55} the two model toggles are independent, so four models}
+\end{column}
+\begin{column}{0.24\textwidth}
   {\color{KULblauw1}\bfseries\large Direction}\\[8pt]
   {\small undirected}\\
   {\small directed}\\[10pt]
   {\scriptsize\color{black!55} direction breaks the degree symmetry that caps the undirected answer}
 \end{column}
-\begin{column}{0.33\textwidth}
+\begin{column}{0.24\textwidth}
   {\color{KULblauw1}\bfseries\large Separation}\\[8pt]
   {\small edge-disjoint, $\lmax$}\\
-  {\small internally vertex-disjoint, $\kmax$}\\[10pt]
+  {\small vertex-disjoint, $\kmax$}\\[10pt]
   {\scriptsize\color{black!55} Whitney: $\kap\le\lec$, so the vertex-feasible family is the \emph{larger} one}
 \end{column}
 \end{columns}
 
-\vspace{22pt}
+\vspace{20pt}
 \centering
-{\color{KULblauw3b}\large $3 \times 2 \times 2 = 12$ versions of one question}
+{\color{KULblauw3b}\large $4 \times 2 \times 2 = 16$ versions of one question}
 \vfill
 \end{frame}
 
-\figframetall{Twelve variants at $m=3$}
-  {variant_bounds_m3.png}
-  {Blue proved for all $n$, red conjectured, yellow interpolated. Squares proved exactly, circles are lower bounds.}
+\tikzframesmall{The separation axis}
+  {\figedgevertex}
+  {Two edge-disjoint $s$--$t$ routes both pass through $w$, so $\lec(s,t)=2$ but $\kap(s,t)=1$. Parallel copies never raise $\kap$, so the multigraph vertex rows are posed on the underlying simple graph.}
+  {0.60}
 
-\figframetall{The same twelve at $m=6$}
-  {variant_bounds_m6.png}
-  {Raising the threshold moves the curves, not the regime. The undirected vertex panels have now gone open.}
+\begin{frame}{Notation for the sixteen}
+\vfill
+\centering
+\adjustbox{max width=\textwidth}{\notationtable}
+
+\vspace{14pt}
+{\footnotesize\color{black!60} Lowercase for simple and uppercase for multi, with a $\mathrm{dir}$ superscript for one-way and an $(r)$ superscript for hyperedges.}
+\vfill
+\end{frame}
+
+\tikzframe{The sixteen leaves, and how much is known}
+  {\figvarianttree}
+  {Blue a closed form for every $n$ and $m$, purple proved for a range of $m$ and open beyond it, red a conjecture with a proved lower bound, amber a proved leading term.}
 
 % ============================================================================
 \sectionframe{Part 3}{What falls to a hand proof}
@@ -108,55 +146,131 @@
 \vfill
 \centering
 \renewcommand{\arraystretch}{1.7}
+\small
+\adjustbox{max width=\textwidth}{%
 \begin{tabular}{@{}ll@{}}
 \toprule
+Simple graphs, edge-disjoint & $\ell_m(n)\le\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (Mader, re-proved here, and attained for $n\ge m$)} \\
 Multigraphs, edge-disjoint & $L_m(n)=(m-1)(n-1)$ \\
-Simple graphs, vertex-disjoint at $m=2$ & $k_2(n)=n-1$, exactly the trees \\
-Simple graphs, $m\le4$, $n\ge m$ & $k_m(n)=\ell_m(n)=\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (Leonard)} \\
-Hypergraphs, edge-disjoint & $\ell_m^{(r)}(n)=\floorfrac{(m-1)(n-1)}{r-1}$ \\
-Random graphs & threshold $p^{*}=m/n$ \\
+Simple graphs, $m\le4$, $n\ge m$ & $k_m(n)=\ell_m(n)=\floorfrac{m(n-1)}{2}$ \quad {\scriptsize (B\'{a}rtfai, Bollob\'{a}s, Leonard)} \\
+Hypergraphs, edge-disjoint & $\le\floorfrac{(m-1)(n-1)}{r-1}$, attained in a stated range \\
+Hypergraphs, vertex-disjoint at $m=2$ & $K_2^{(r)}(n)=\floorfrac{n-1}{r-1}$, and the star hypertree is simple \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 
 \vspace{18pt}
-{\footnotesize\color{black!60} One argument serves the first and the fourth: charge every edge to the Gomory--Hu tree, a summary of all $\binom{n}{2}$ connectivities in $n-1$ numbers.}
+{\footnotesize\color{black!60} One argument serves the first, the second and the fourth: charge every edge to the Gomory--Hu tree.}
 \vfill
 \end{frame}
 
 \figframe{The first divergence, at $m=5$}
   {edge_vertex_divergence.png}
-  {Edge and vertex agree through $m=4$. At $m=5$ they part, and beyond it the vertex problem has stood open since 1974.}
+  {Edge and vertex agree through $m=4$. S{\o}rensen and Thomassen give $k_5(n)=\floor{8n/3}-4$ for $n\ge6$, $n\ne7,12$, which first passes the edge value at $n=14$. Beyond $m=5$ the vertex problem has stood open since 1974.}
 
-\figframe{The same split, visible in random graphs}
-  {edge_vertex_sampling.png}
-  {$G(16,p)$ at three densities. The vertex distribution never sits right of the edge one, which is Whitney across a whole population, and the gap closes as the graph fills in.}
+\tikzframesmall{The star hypertree}
+  {\fighyperstar}
+  {$r=3$, $n=9$: four hyperedges meeting only at the hub, Berge connectivity one, attaining $\floor{(n-1)/(r-1)}=4$. One colour is one hyperedge, a line stopping at all $r$ of its vertices and able to carry one route.}
+  {0.55}
 
-\figframewide{Where the forbidden pair appears}
-  {threshold_3d.png}
-  {Each model swept in units of its \emph{own} threshold, since a hypergraph vertex sits in $\binom{n-1}{r-1}$ hyperedges and so lives on a different density scale entirely.}
+\begin{frame}{The hypergraph vertex problem}
+\vfill
+\centering
+{\color{black!45}\small At $m=2$, for every $r\ge2$ and $n\ge1$:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle K_2^{(r)}(n)=\floorfrac{n-1}{r-1}$}\\[4pt]
+{\footnotesize\color{black!55} vertex and edge agree at $m=2$ for every uniformity, and repeated hyperedges never help}
+
+\vspace{10pt}
+{\color{black!45}\small At $m=3$, a universal upper bound for every $r$-uniform multihypergraph:}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle |E(\mathcal{H})|\le\floorfrac{2(n-1)}{r-1}$}\\[6pt]
+{\footnotesize\color{black!55} attained by a \emph{simple} hypergraph for $r\ge3$ once $2\le\binom{n-2}{r-2}$, so $k_3^{(r)}(n)=\ell_3^{(r)}(n)$ there, and by a multihypergraph whenever $(r-1)\mid(n-1)$}
+
+\vspace{8pt}
+\begin{minipage}{0.86\textwidth}
+{\footnotesize\color{black!60} Both read Berge routes as ordinary paths in the incidence graph. The $m=3$ case needs a new rank bound on that incidence graph, proved through Tutte's triconnected decomposition. At $m\ge4$ the route stops for want of a $4$-connectivity analogue, and the value is open.}
+\end{minipage}
+\vfill
+\end{frame}
 
 % ============================================================================
 \sectionframe{Part 4}{The directed turn}
 
-\figframe{Linear king against quadratic cabinet}
+\tikzframe{Two shapes tie at $n=7$}
+  {\figdigraphmtwo}
+  {The bidirected star holds $2(n-1)=12$ arcs, the one-directional wall $B_{3,4}$ holds $\floor{n^2/4}=12$, both at $\lec^{\max}=1$. Hence $\ell_2^{\dir}(n)=\max\bigl(2(n-1),\floor{n^2/4}\bigr)$, and $k_2^{\dir}(n)$ is the same value.}
+
+\figframe{Linear hub against quadratic wall}
   {directed_crossover.png}
-  {The hub spends its arcs on one centre and grows linearly. The one-directional bipartite wall grows quadratically and takes the lead at $n=9$ when $m=3$.}
+  {The hub spends its arcs on one centre and grows linearly. The augmented one-way wall grows quadratically and takes the lead near $n=9$ when $m=3$. No undirected graph can be this dense at a fixed connectivity ceiling.}
+
+\tikzframe{The construction that carries the quadratic to every $m$}
+  {\figaugmentedwall}
+  {At $m=3$, $n=10$: every arc runs $A\to B$, and inside $B$ each vertex takes $m-2$ arcs from its cyclic predecessors. A pair $a_i,b_j$ then has the direct arc and one detour, so $\lec^{\max}=2$, and $24+6=30$ beats the hub's $27$.}
 
 \begin{frame}{The directed conjecture, and what is unconditional}
 \vfill
 \centering
-{\color{black!45}\small Conjectured value, lower bound proved for all $m$:}\\[6pt]
-{\color{stConj}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\max\Bigl(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\Bigr)$}
+{\color{black!45}\small Conjectured value, lower bound proved for all $m$, exhausted at $n\le6$ when $m=3$:}\\[6pt]
+{\color{stConj}\large $\displaystyle \ell_m^{\dir}(n)=\max\Bigl(m(n-1),\ \floorfrac{(n+m-2)^2}{4}\Bigr)$}
 
-\vspace{20pt}
-{\color{black!45}\small Proved here with no hypothesis on the extremal shape:}\\[6pt]
+\vspace{18pt}
+{\color{black!45}\small Proved here with no hypothesis on the extremal shape, for both separations:}\\[6pt]
 {\color{KULblauw1}\large $\displaystyle |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1)$}\\[8pt]
-{\color{black!45}\small and therefore}\\[6pt]
-{\color{KULblauw1}\large $\displaystyle \ell_m^{\mathrm{dir}}(n)=\frac{n^2}{4}+\Theta_m(n)\qquad(m\ge3)$}
+{\color{black!45}\small and therefore, for each fixed $m\ge3$,}\\[6pt]
+{\color{KULblauw1}\large $\displaystyle \ell_m^{\dir}(n),\ k_m^{\dir}(n) \;=\; \frac{n^2}{4}+\Theta_m(n)$}
+
+\vspace{14pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} The engine is a two-step route count: a vertex cannot have many out-neighbours that reach one another, or the short detours breach the ceiling. Leading constant and order of the second term are both theorems. What is left is one coefficient, $(m-2)/2$ conjectured against $4(m-1)$ proved.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{Shape as well as size}
+\vfill
+\centering
+\begin{minipage}{0.88\textwidth}
+{\color{KULblauw1}\bfseries In size.} {\small The extremal value lies within $O_m(n)$ of the wall's count, so what is open is a constant inside the second-order term rather than the phenomenon.}
 
 \vspace{16pt}
-\begin{minipage}{0.86\textwidth}
-{\footnotesize\color{black!60} Leading constant and order of the second term: both now theorems. What is left is one coefficient, $(m-2)/2$ conjectured against $4(m-1)$ proved.}
+{\color{KULblauw1}\bfseries In shape.} {\small Every feasible digraph becomes a subgraph of a one-directional bipartite graph after deleting $O(\sqrt{m}\,n^{3/2})$ arcs. A weaker error term, because it comes from the count that does not induct on a low-degree vertex.}
+\end{minipage}
+
+\vspace{24pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} What a full upper bound still needs: find the partition, rule out the arcs running back, and control the internal structure of the larger part $B$. One returning arc alone breaks the count, since it lets a route leave $B$ through $A$ and exceed the internal budget of $m-2$. Ruling that arc out for every extremal example is the missing step.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{One-way multigraphs, solved outright}
+\vfill
+\centering
+{\color{KULblauw1}\Large $\displaystyle L_m^{\dir}(n)=(m-1)\,M(n), \qquad M(n)=\max\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr)$}\\[6pt]
+{\color{black!45}\small for every $n\ge2$ and every $m\ge2$}
+
+\vspace{22pt}
+\begin{minipage}{0.88\textwidth}
+{\small The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every pair at least one route. Peeling off $m-1$ such skeletons accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises.}
+
+\vspace{14pt}
+{\footnotesize\color{black!60} No parity split and no auxiliary conjecture. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$, while the linear-branch extremisers are exhibited rather than classified. The finite $n=7$ fact this problem once needed a solver for now follows in three lines.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{One-way hyperedge networks}
+\vfill
+\centering
+{\color{black!45}\small For every forward directed $r$-uniform multihypergraph with $\kmax_{\mathcal{H}}\le m-1$:}\\[8pt]
+{\color{KULblauw1}\Large $\displaystyle |E(\mathcal{H})| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2(n-1)$}
+
+\vspace{18pt}
+{\color{black!45}\small so for fixed $r$ and $m$, under \emph{both} separations,}\\[6pt]
+{\color{KULblauw1}\Large $\displaystyle \bigl(1+o(1)\bigr)\,\frac{(m-1)\,n^2}{4(r-1)}$}
+
+\vspace{20pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} The proof forms the one-step shadow digraph, whose arc $u\to v$ records that some hyperedge has tail $u$ and head $v$. A matching argument transfers the route ceiling to the shadow's two-step budget, and a tail--head incidence count converts shadow arcs back to hyperedges. The bipartite construction already attains that leading term, so it is asymptotically optimal. Before this, the bounds were a factor of four apart.}
 \end{minipage}
 \vfill
 \end{frame}
@@ -166,212 +280,227 @@ Random graphs & threshold $p^{*}=m/n$ \\
 
 \figframewide{Enumeration detonates}
   {complexity_growth.png}
-  {A simple graph offers $2^{E}$ candidates, a multigraph $m^{E}$. Every curve passes a generous budget while $n$ is in single digits, and the directed cases go first.}
+  {A simple graph offers $2^{E}$ candidates, a multigraph $m^{E}$, and a digraph decides both directions of a pair independently. Every curve passes a generous $10^9$ budget while $n$ is in single digits, and the directed cases go first.}
 
-\begin{frame}{Three jobs, kept apart}
+\tikzframesmall{Three jobs, kept apart}
+  {\figspine}
+  {One model, one exact measurement, two very different uses of it. The badge colours are the thesis's, and every code card in Chapter 2 carries the badge of the box it belongs to.}
+  {0.72}
+
+\begin{frame}{What each job is allowed to claim}
 \vfill
 \begin{columns}[T]
 \begin{column}{0.32\textwidth}
-  {\color{KULblauw1}\bfseries\large MEASURE}\\[8pt]
-  {\small One integer maximum flow, on one multiplicity matrix, for all twelve variants.}\\[8pt]
+  {\color{roleMeasure}\bfseries\large MEASURE}\\[8pt]
+  {\small One integer maximum flow, on one multiplicity matrix or one hyperedge list, for all sixteen variants.}\\[8pt]
   {\scriptsize\color{black!55} What it reports about a given graph is a fact.}
 \end{column}
 \begin{column}{0.32\textwidth}
-  {\color{stProved}\bfseries\large PROVE}\\[8pt]
-  {\small Exhaust every graph of a fixed size, or run the cut-counting program.}\\[8pt]
-  {\scriptsize\color{black!55} A finished sweep is an upper bound with the standing of a hand proof.}
+  {\color{roleProve}\bfseries\large PROVE}\\[8pt]
+  {\small Exhaust every graph of a fixed size, pruned, or seeded by \code{geng}.}\\[8pt]
+  {\scriptsize\color{black!55} A finished sweep is an upper bound at that size. It is a finite solver check, not a reusable certificate.}
 \end{column}
 \begin{column}{0.32\textwidth}
-  {\color{stOpen}\bfseries\large DISCOVER}\\[8pt]
-  {\small Cool a random graph, or climb greedily with a tabu list.}\\[8pt]
+  {\color{roleDiscover}\bfseries\large DISCOVER}\\[8pt]
+  {\small Climb with a tabu list, from the empty graph, restarted from many seeds.}\\[8pt]
   {\scriptsize\color{black!55} Only ever exhibits a graph. Lower bounds only. Never a proof.}
 \end{column}
 \end{columns}
 
 \vspace{24pt}
 \centering
-{\color{black!55}\small The honesty contract: the search proposes a lower bound, a proof or a finished exhaustion disposes the upper bound,}\\
-{\color{black!55}\small and only when the two meet is a value called settled.}
+{\color{black!55}\small The search proposes a lower bound, a proof or a finished exhaustion disposes the upper bound,}\\
+{\color{black!55}\small and only when the two meet is a value called settled. No theorem here rests on an unchecked solver result.}
 \vfill
 \end{frame}
 
-\figframe{The dial the search turns}
-  {sensitivity_mixed.png}
-  {Edge sensitivity $\sigma(e)=\lmax(G)-\lmax(G-e)$. Both $s\to a$ and $s\to b$ carry three parallel arcs, yet only $b$ is load-bearing. Multiplicity is not the same as carrying weight.}
+\tikzframe{One flow engine for sixteen variants}
+  {\figvertexsplit}
+  {Every vertex-disjoint question becomes an edge-disjoint one: split $v$ into $v^{\mathrm{in}}$ and $v^{\mathrm{out}}$ joined by a unit-capacity arc, so two routes through $v$ compete for that unit. Undirected edges become opposite arc pairs, and each hyperedge becomes a gate whose single internal arc carries its multiplicity.}
+
+\begin{frame}{Proving a fixed size, three ways}
+\vfill
+\centering
+{\small\input{../figures/generating_benchmark_table.tex}}
+
+\vspace{14pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} Wall-clock time to prove $\ell_2^{\dir}(n)$ on one core. The blind sweep walks every matrix assignment, and it is dropped past $n=4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s and each further vertex multiplies that by $2^{2n}$. The pruned search stops a branch the moment a pair exceeds the ceiling, since adding arcs never lowers connectivity. The generated pipeline calls \code{geng} from \code{nauty} for one representative per isomorphism class and decorates its edges with arc multiplicities, inheriting the isomorphism reduction. From $n=5$ the gap widens every vertex: $68$ times faster at $n=7$. All three return the same proved value wherever they finish.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{Proving every $m$ at once}
+\vfill
+\centering
+\begin{minipage}{0.86\textwidth}
+{\large Divide every multiplicity of a feasible directed multigraph by $m-1$.}
+\end{minipage}
+
+\vspace{18pt}
+{\color{KULblauw1}\large weights $w(u,v)\in[0,1]$, \quad pairwise maximum flow $\le1$,}\\[6pt]
+{\color{KULblauw1}\large total weight $=$ arc count $/\,(m-1)$}
+
+\vspace{22pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} One $m$-free optimisation therefore bounds every threshold at once, for a fixed $n$. The general theorem $L_m^{\dir}(n)=(m-1)M(n)$ has since replaced this route in the solver, but the older formulation is kept as an independent finite check, and the encoding is exact only up to $n=6$: at $n=7$ the certifier ran out of time without an answer.}
+\end{minipage}
+\vfill
+\end{frame}
 
 % ============================================================================
 \sectionframe{Part 6}{Discovery}
 
-\figframe{One cooling run}
-  {temperature_trace.png}
-  {Every visited graph by connectivity and size, coloured by step. Hot it strays above the ceiling and picks up arcs it may not keep, cool it is driven back onto the proved optimum.}
-
-\figframe{The same behaviour, undirected and simple}
-  {trace_simple_undirected_n7_m3.png}
-  {Simple undirected, $n=7$, $m=3$.}
-
-\figframe{And under the stricter separation}
-  {trace_multi_directed_n4_m3_vertex.png}
-  {Directed multigraph, $n=4$, $m=3$, vertex-disjoint. The walk lingers far longer on the infeasible side, which is what a harder constraint looks like from inside the search.}
-
-\begin{frame}{Cooling against tabu}
+\begin{frame}{One number per graph}
 \vfill
 \centering
-\includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{sa_vs_tabu_convergence.pdf}
+{\color{KULblauw3b}\Large $\displaystyle \Phi(G) \;=\; -|E(G)| \;+\; \Lambda\cdot\max\bigl(0,\ c^{\max}(G)-(m-1)\bigr)$}
 
-\vspace{4pt}
-{\scriptsize
-\begin{tabular}{@{}lllrrr@{}}
+\vspace{8pt}
+{\footnotesize\color{black!55} rewards edges, arcs or hyperedges, penalises any excess connectivity, with $c^{\max}$ standing for $\lmax$ or $\kmax$, whichever the run measures}
+
+\vspace{22pt}
+\begin{minipage}{0.88\textwidth}
+{\small \textbf{Tabu search.} Start from the empty graph and toggle one adjacency at a time. Among the moves not forbidden, always take the one that lowers $\Phi$ most, \emph{even when every candidate raises it}. The pair just changed goes on a tabu list for a fixed number of steps, so the walk cannot immediately undo itself and cycle back. A move that would beat the best graph seen overrides the tabu flag.}
+
+\vspace{12pt}
+{\footnotesize\color{black!60} Why the walk is allowed above the ceiling: a feasible graph can be locally maximal and still far below the densest one. Improving it needs an add and then a different removal, a swap whose first half is infeasible. Going above the bound is never the goal. It is the shortcut on the way back down to it. The checker is also skipped whenever monotonicity already fixes the answer, so a flow is computed only for an addition made \emph{at} the ceiling.}
+\end{minipage}
+\vfill
+\end{frame}
+
+\begin{frame}{Tabu against annealing}
+\vfill
+\centering
+\renewcommand{\arraystretch}{1.5}
+\small
+\begin{tabular}{@{}llcrr@{}}
 \toprule
-Variant & $n$ & $m$ & target & SA in $6$\,s & tabu in $6$\,s \\
+Variant & & target & tabu & annealing \\
 \midrule
-simple undirected   & 7 & 3 & $9$  & $9$  & $9$ \\
-simple directed     & 7 & 3 & $18$ & $16$ & $\mathbf{18}$ \\
-directed multigraph & 7 & 3 & $24$ & $20$ & $\mathbf{24}$ \\
+directed multigraph & $n=7$, $m=3$ & $24$ & $\mathbf{24}$ & $20$ \\
+simple digraph      & $n=7$, $m=3$ & $18$ & $\mathbf{18}$ & $16$ \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 
-{\footnotesize\color{black!60} Tabu takes fewer, better-aimed steps and assembles the structured extremiser the cooled walk cannot reach in budget. The values $9$ and $24$ are proved (Mader and the directed-multigraph theorem), while $18$ remains best known.}
+\vspace{20pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} Simulated annealing runs on the same energy and the same neighbourhood, accepting a worsening move by the Metropolis rule and cooling as it goes. At equal wall-clock budget it is the weaker engine here: tabu takes fewer, better-aimed steps and assembles the structured extremiser the cooled walk cannot reach. Every discovery value the thesis reports therefore comes from tabu search, and annealing is kept only as an independent cross-check in the self-test, where agreement between two unrelated walks is worth more than the speed of either.}
+\end{minipage}
+\vfill
 \end{frame}
 
 \begin{frame}{Validation by rediscovery}
 \vfill
 \centering
-{\scriptsize\input{../figures/rediscovery_table.tex}}
+{\small\input{../figures/rediscovery_table.tex}}
 
-\vspace{14pt}
-{\footnotesize\color{black!60} Pointed at the cases already settled and told only to pack in edges, the search returns the named constructions: the spanning tree, the thickened star, the double star, the bidirected star, and the hub-bipartite tie at $n=7$.}
+\vspace{16pt}
+\begin{minipage}{0.88\textwidth}
+{\footnotesize\color{black!60} Before the search is pointed at the open cases it is run on the settled ones. From scratch, with a handful of restarts, and told only to pack in edges without breaching the ceiling, it recovers the named constructions and matches the established value in every tested case.}
+\end{minipage}
 \vfill
 \end{frame}
+
+\tikzframe{The shapes it comes back with}
+  {\figrediscovery}
+  {Three of the constructions the table names, drawn at the size it reports. The fourth is the bidirected star that ties the one-directional wall at $n=7$.}
 
 % ============================================================================
 \sectionframe{Part 7}{The landscape, and what is left}
 
-\figframetall{Every graph at small $n$, and the frontier}
-  {scatter_lambda_edges.png}
-  {One point per graph. The blue staircase is the extremal envelope, and the theorems forbid everything above it.}
+\figframetall{The eight graph-model variants at $m=3$}
+  {variant_bounds_m3_graphs.png}
+  {Blue a theorem, red a conjecture, yellow an interpolation. Filled squares are exact, open circles are witnesses.}
 
-\figframetall{Inside each graph, pair by pair}
-  {pair_conn_dist.png}
-  {High-connectivity pairs are rare even inside the graphs that have one.}
+\figframetall{The eight hypergraph-model variants at $m=3$}
+  {variant_bounds_m3_hypergraphs.png}
+  {The blue curve here is a proved upper \emph{bound}, attained only in a stated range, so a marker below it is a gap and not an error.}
 
-\figframetall{The same graphs, by sheer size}
-  {edges_dist.png}
-  {The dotted line marks the densest low-connectivity graph. It sits far out in the sparse tail.}
+\figframetall{The same graph models at $m=6$}
+  {variant_bounds_m6_graphs.png}
+  {Raising the threshold widens every feasible band, and the exact squares thin out as enumeration falls behind the constructions.}
 
-\figframetall{The whole study as one surface}
-  {variant_surface_3d.png}
-  {Blue is machine-proved, purple is a search lower bound.}
+\figframetall{The same hypergraph models at $m=6$}
+  {variant_bounds_m6_hypergraphs.png}
+  {Here the bound runs visibly above what is reached: at $n=6$ the curve reads $12$ where the true maximum, by full enumeration, is $11$.}
 
 \begin{frame}{Where each variant stands}
-\vfill
+\vspace{2pt}
 \centering
-\twelvetable
-\vfill
+\resizebox{\textwidth}{!}{\parbox{1.06\textwidth}{\sixteentable}}
 \end{frame}
 
 \begin{frame}{What is new here}
 \vfill
 \small
-\begin{itemize}\setlength{\itemsep}{5pt}
-  \item[\color{KULblauw1}\textbf{1}] \textbf{The hypergraph vertex problem: settled at $m=2$ and sharp at $m=3$ in its construction range}\\
-        {\footnotesize\color{black!60} a universal $m=3$ upper bound follows from a new incidence-graph rank bound. Equality is proved for $r\ge3$ when $2\le\binom{n-2}{r-2}$.}
-  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: both separations are $n^2/4+\Theta_m(n)$ for fixed $m\ge3$}\\
-        {\footnotesize\color{black!60} no assumption about the extremal shape, which every earlier route to this bound needed. The two statements are separate: the vertex separation is not a corollary of the arc one. The exact linear coefficient remains open.}
-  \item[\color{KULblauw1}\textbf{3}] \textbf{One-way multigraphs, solved outright: $L_m^{\mathrm{dir}}(n)=(m-1)\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$}\\
-        {\footnotesize\color{black!60} every $n$ and every $m$, by peeling off one sparse reachability-preserving subgraph per unit of $m-1$. No parity split, no auxiliary conjecture, and the finite $n=7$ fact this problem once needed a solver for now follows in three lines.}
-  \item[\color{KULblauw1}\textbf{4}] \textbf{One-way hyperedge networks: the leading term settled}\\
-        {\footnotesize\color{black!60} $(1+o(1))(m-1)n^2/\bigl(4(r-1)\bigr)$, for edge- and vertex-disjoint routes alike, so the bipartite construction is asymptotically optimal.}
+\begin{itemize}\setlength{\itemsep}{4pt}
+  \item[\color{KULblauw1}\textbf{1}] \textbf{One-way multigraphs, solved outright: $L_m^{\dir}(n)=(m-1)\max\bigl(2(n-1),\floor{n^2/4}\bigr)$}\\
+        {\footnotesize\color{black!60} every $n$ and every $m$, by peeling off one sparse reachability-preserving subgraph per unit of $m-1$, with the quadratic-branch extremisers classified for $n\ge\max(8,2m)$.}
+  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: an unconditional $n^2/4+\Theta_m(n)$, arc and vertex alike}\\
+        {\footnotesize\color{black!60} no assumption about the extremal shape, plus an $O(\sqrt{m}\,n^{3/2})$ structural distance from a one-way bipartite graph. The vertex statement is not a corollary of the arc one.}
+  \item[\color{KULblauw1}\textbf{3}] \textbf{The hypergraph vertex problem: exact at $m=2$, and sharp at $m=3$ in its construction range}\\
+        {\footnotesize\color{black!60} a universal $m=3$ upper bound from a new incidence-graph rank lemma, with equality for $r\ge3$ once $2\le\binom{n-2}{r-2}$.}
+  \item[\color{KULblauw1}\textbf{4}] \textbf{Multigraph vertex routes with parallel copies counted as distinct}\\
+        {\footnotesize\color{black!60} exact at $m=2$, counterexamples to the thickened-tree guess for every $m\ge5$, matching order $\Theta(m^2n)$, and an exact block-knapsack formulation.}
+  \item[\color{KULblauw1}\textbf{5}] \textbf{One-way hyperedge networks: the leading term settled}\\
+        {\footnotesize\color{black!60} $(1+o(1))(m-1)n^2/\bigl(4(r-1)\bigr)$ for fixed $r,m$, under both separations and every orientation convention, so the bipartite construction is asymptotically optimal.}
 \end{itemize}
 \vfill
 \end{frame}
 
 \begin{frame}{What is left}
 \vfill
-\begin{itemize}\setlength{\itemsep}{11pt}
-  \item {\color{stOpen}$\blacksquare$} \textbf{The undirected vertex problem at $m\ge6$}, open since 1974, extremal structure genuinely unknown
-  \item {\color{stConj}$\blacksquare$} \textbf{The missing decomposition}: that an extremal non-hub digraph splits as $A\cup B$ with every arc from $A$ to $B$, none inside $A$, none coming back. Four hypotheses, of which the backward arc is the hardest.
-  \item {\color{stConj}$\blacksquare$} \textbf{The directed vertex problem at $m\ge3$}, which Whitney's inequality pointedly does \emph{not} hand over with the arc case. Its leading term is settled all the same, by borrowing the route family rather than the bound
-  \item {\color{stConj}$\blacksquare$} \textbf{The exact values} behind the settled leading terms: the linear coefficient one-way, and the hyperedge value at finite $n$
-\end{itemize}
-
-\vspace{18pt}
 \centering
-{\color{black!55}\small The map is filled in where honest mathematics could fill it,}\\
-{\color{black!55}\small and where it could not, the blanks are marked precisely.}
+\adjustbox{max width=\textwidth, max totalheight=0.72\textheight}{\openproblemstable}
+
+\vspace{10pt}
+{\color{black!55}\small The map is filled in where the arguments reached, and the blanks are marked where they did not.}
 \vfill
 \end{frame}
 
 % ============================================================================
-\sectionframe{Backup}{Further figures for the question round}
+\sectionframe{Backup}{Further material for the question round}
 
-\figframetall{The distribution at a higher threshold}
-  {conn_dist_m6.png}
-  {At $m=6$ the feasibility boundary sits out past the bulk of the distribution.}
-
-\figframe{Trace: directed multigraph}
-  {trace_multi_directed_n5_m3.png}
-  {Directed multigraph, $n=5$, $m=3$.}
-
-\figframe{Trace: simple directed}
-  {trace_simple_directed_n5_m3.png}
-  {Simple directed, $n=5$, $m=3$.}
-
-\figframe{Trace: multigraph undirected}
-  {trace_multi_undirected_n5_m3.png}
-  {Multigraph undirected, $n=5$, $m=3$.}
-
-\begin{frame}{Orientation models for the directed hypergraph}
+\begin{frame}{The sixteen variants as numbers}
 \vfill
 \centering
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{ccccc}
-\toprule
-$r$ & $m$ & $n$ & forward & general \\
-\midrule
-$3$ & $3$ & $3$ & $3$ & $4$ \\
-$3$ & $3$ & $4$ & $8$ & $8$ \\
-$4$ & $3$ & $4$ & $4$ & $6$ \\
-$4$ & $4$ & $4$ & $4$ & $8$ \\
-\bottomrule
-\end{tabular}
+\adjustbox{max width=\textwidth, max totalheight=0.70\textheight}{\input{../figures/variant_table_all.tex}}
 
-\vspace{16pt}
-\begin{minipage}{0.84\textwidth}
-{\footnotesize\color{black!60} Backward equals forward by arc reversal, and the general model obeys the same cap. The general model is strictly denser only while vertices are scarce, $n\approx r$. Once $n$ exceeds $r$ the computed gap closes, so the orientation axis appears to collapse (computational evidence, not proved) and Problem 915 stays a twelve-variant question.}
+\vspace{6pt}
+{\scriptsize\color{black!60} Blue proved, red conjectured and gold open, and a bold green entry is machine-checked exact regardless of the row's colour. A $\le$ prefix bounds a value not known to be attained, a $\ge$ prefix is a verified construction rather than a proved optimum, and a blank cell means the model does not exist at that $n$.}
+\vfill
+\end{frame}
+
+\begin{frame}{Orientations of a directed hyperedge}
+\vfill
+\centering
+\begin{minipage}{0.86\textwidth}
+{\small The tables use the \textbf{forward} convention: one tail and $r-1$ heads. Reversing every hyperedge makes the one-head \textbf{backward} convention equivalent to it. And the same leading term extends to \emph{every} other way of splitting a hyperedge into tail and head sets, under both separations.}
+\end{minipage}
+
+\vspace{22pt}
+{\color{KULblauw3b}\large The orientation therefore adds no asymptotic row.}
+
+\vspace{22pt}
+\begin{minipage}{0.86\textwidth}
+{\footnotesize\color{black!60} The conventions may still differ at few vertices, where $n\approx r$. Whether they agree exactly once $n>r$ is open, so Problem 915 stays a sixteen-variant question.}
 \end{minipage}
 \vfill
 \end{frame}
 
-\begin{frame}{The multigraph vertex problem, other convention}
+\begin{frame}{Limits of the program}
 \vfill
-\centering
-{\scriptsize
-\begin{tabular}{ll|cccccc}
-    & & $n=2$ & $3$ & $4$ & $5$ & $6$ & $7$ \\
-    \midrule
-    $m=2$ & value & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
-          & tree  & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ \\
-    \midrule
-    $m=3$ & value & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
-          & tree  & $2$ & $4$ & $6$ & $8$ & $10$ & $12$ \\
-    \midrule
-    $m=4$ & value &  & $6$ & $9$ & $12$ & $15$ &  \\
-          & tree  &  & $6$ & $9$ & $12$ & $15$ &  \\
-          & theta &  & $6$ & $9$ & $12$ &  &  \\
-    \midrule
-    $m=5$ & value &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
-          & tree  &  &  & $12$ & $16$ &  &  \\
-          & theta &  &  & $\mathbf{14}$ & $\mathbf{19}$ &  &  \\
-    \midrule
-    $m=6$ & value &  &  & $\mathbf{19}$ &  &  &  \\
-          & tree  &  &  & $15$ &  &  &  \\
-          & theta &  &  & $\mathbf{19}$ &  &  &  \\
-\end{tabular}}
+\begin{itemize}\setlength{\itemsep}{10pt}
+  \item[{\color{stOpen}$\blacksquare$}] The search finds examples. It never proves an upper bound.
+  \item[{\color{stOpen}$\blacksquare$}] The certifier proves an upper bound at one fixed size, as a finite solver check rather than a replayable certificate.
+  \item[{\color{stOpen}$\blacksquare$}] The directed multigraph encoding is exact only to $n=6$. At $n=7$ the certifier ran out of time, and the value comes from the hand proof instead.
+  \item[{\color{stOpen}$\blacksquare$}] The $n=7$ generation classification is verified only for extremisers of maximum total degree at most $8$.
+\end{itemize}
 
-\vspace{14pt}
-\begin{minipage}{0.84\textwidth}
-{\footnotesize\color{black!60} Reading parallel copies as distinct routes makes this a genuinely new problem. Bold entries beat the multigraph edge value. The natural guess, that a thickened tree wins once $n\ge m+2$, is false for every $m\ge5$: a bouquet of thickened cliques sharing one vertex beats it by a margin growing linearly in $n$.}
+\vspace{18pt}
+\begin{minipage}{0.9\textwidth}
+{\footnotesize\color{black!60} Three of the remaining gaps cannot be closed by computation at all: the decomposition behind the directed conjecture, the directed vertex problem at $m\ge3$, and the undirected vertex problem at $m\ge6$. Every computational claim can be rerun from \code{program/erdos915\_unified.py}, and the important values are checked by independent implementations.}
 \end{minipage}
 \vfill
 \end{frame}
