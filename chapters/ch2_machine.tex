@@ -295,7 +295,7 @@ On the small cases this exhaustive mode independently reproduces every value pro
     \label{fig:complexity}
 \end{figure}
 
-The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and cubically for hypergraphs. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
+The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and as $\binom{n}{r}=\Theta(n^r)$ for fixed-rank $r$-uniform hypergraphs---cubically in the $r=3$ experiments plotted here. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
 These are precisely the variants whose answers \Cref{ch:basecases} could not prove.

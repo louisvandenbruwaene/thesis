@@ -239,7 +239,7 @@ witness, n=r=m=3: simple maximum 1, multi maximum 2, exactly the split
 and `solve`; `_VARIANT_ENUM_CONFIGS` 12 -> 16; `gather_variant_grid` 12 -> 16
 panels; `_variant_panel_grid` 3x4 -> 4x4. Thesis: `tab:summary` 6 -> 8 rows,
 `fig:variant-tree-status` 3 -> 4 model blocks, and the count swept through ch2,
-ch4, app_proofs, both READMEs and this file.
+ch3, app_proofs, both READMEs and this file.
 
 **A BUG I INTRODUCED AND CAUGHT BEFORE PUBLISHING.** The new multihypergraph
 panels capped their curve at `C(n,r)`, the SIMPLE trivial maximum. A
@@ -367,8 +367,8 @@ complexity or house style, it is STANCE. Chapter 1 says what things are. The
 drafted material rates them as well, and the rating is what the author wanted
 gone. The rule is now a standing convention above.
 
-Fifty-seven passages rewritten across `ch2_machine.tex`, `ch4_synthesis.tex`
-and `app_proofs.tex`. The heaviest were chapter 4's opening participial
+Fifty-seven passages rewritten across `ch2_machine.tex`, `ch3_synthesis.tex`
+and `app_proofs.tex`. The heaviest were chapter 3's opening participial
 cascade, its closing "that, finally, is the use of building the microscope",
 "Its limits are as clear as its reach, and stating them is part of the honesty
 the thesis insists on", and the appendix's "Nothing here is deep" and "That is
@@ -414,7 +414,7 @@ MOVED OUT OF THE BODY (every one a move, no label deleted, `??` still 0):
   `fig:scaling-reduction`, which is the visual half.
 - ch2's "keeping the checker cheap" case analysis and regression-test detail
   into `sec:cheap-checker` in Part IV.
-- ch4's `thm:multi-vertex-blocks` statement, down to sit with its own proof.
+- ch3's `thm:multi-vertex-blocks` statement, down to sit with its own proof.
 
 REPETITION REMOVED: Menger was stated in full in ch1, again in ch2 and again in
 the appendix; ch2 now cites `thm:menger`. ch1 announced the $n=7$ tie three
@@ -512,7 +512,7 @@ the vocabulary was not. `tab:rediscovery`'s caption said the Search column came
 from annealing and called it "the temperature search", while ch2 two pages
 earlier said every discovery value comes from tabu, which is what `solve`
 actually defaults to for matrix models. Four more leftovers ("the cooled search"
-twice, "repeated cooling runs", ch4's "one cooled search"). ch2 cited
+twice, "repeated cooling runs", ch3's "one cooled search"). ch2 cited
 `const:directed-hub` for the doubled star the multigraph runs land on, but that
 construction is a SIMPLE digraph with m(n-1) arcs, 9 at n=4 m=3, where the table
 prints the thickened tree's 12. ch2 said a digraph has "twice as many
@@ -673,7 +673,7 @@ found by a background full-thesis pass since the two comments requesting it
 don't match the imperative-verb grep used to find the other three.
 
 **A FULL READ FOUND NOTHING ELSE.** A background pass read every remaining
-chapter (`ch1_basecases`, the rest of `ch2_machine`, `ch4_synthesis`,
+chapter (`ch1_basecases`, the rest of `ch2_machine`, `ch3_synthesis`,
 `app_proofs`) against its own cited definitions and theorems, the same
 diligence the double-star fix used, and confirmed no second case of that
 shape. Two items read but not re-derived line by line: the directed
@@ -834,7 +834,7 @@ Two requests in one session. First, move `conj:dir-arc` (then in ch1's
 theorems the final chapter stated (`thm:dir-arc-linear-error`,
 `thm:dir-vertex-linear-error`, `thm:dir-multi-full`,
 `thm:dir-hyper-constant`) to chapter 1's "Proven bounds", each moved with
-its explanatory prose rather than just the bare statement. ch4 keeps a
+its explanatory prose rather than just the bare statement. ch3 keeps a
 one-sentence bridge at each former site, referencing the relocated result
 by label, so the surrounding synthesis argument still reads without
 restating what moved. Committed as `e166fab`.
@@ -848,7 +848,7 @@ half-done: `tab:variant-values`'s own caption said its $m=6,n=6,r=3$ claim
 was "established by the full enumeration in the paragraph above" with no
 such paragraph left above it (the 125,970-hypergraph exhaustion that
 justified it was inside the deleted block), and "certifier" / "replayable"
-were used in ch4 and the appendix without ever being defined anywhere
+were used in ch3 and the appendix without ever being defined anywhere
 still visible.
 
 **FOUND THIS IS DIFFERENT FROM STALE-AUX.** The first rebuild attempt after
@@ -859,11 +859,11 @@ same as the two prior occurrences of this failure mode.
 
 Rather than restore the deleted block verbatim (much of it duplicated
 material already stated elsewhere: the crossover/counterexample recap now
-sits in ch4's own `conj:dir-arc` discussion, and the colour-code legend is
+sits in ch3's own `conj:dir-arc` discussion, and the colour-code legend is
 already in each figure's own caption), split what remained genuinely
 missing by where it belongs. The evidential-status vocabulary
 (checker measures, exhaustion proves, certifier is a finite check without
-a replayable bound, search only witnesses) now sits in ch4's
+a replayable bound, search only witnesses) now sits in ch3's
 "Contributions and limitations" section, next to where that vocabulary was
 already being used undefined. The specific $m=3$ exhausted values
 ($6,9,12,15$ for $n=3..6$) now back the `conj:dir-arc` discussion, replacing
@@ -965,7 +965,7 @@ star, thickened star, bidirected star, the $n=7$ tie) are stated nowhere
 else, so they were rewritten and printed. The second paragraph's headline
 numbers (the $n=8$ wall's $16$ against the hub's $14$, the $m=3,n=10$
 augmented-bipartite $30$ against $27$) turned out to be **already stated**
-in `ch4_synthesis.tex`'s "Two principal phenomena" section, so restating them
+in `ch3_synthesis.tex`'s "Two principal phenomena" section, so restating them
 here would have violated the thesis's own repetition-removed convention.
 Kept only what that section does not carry: the tabu search's own stall at
 $n=8,m=2$ (a fact about the search, which is this section's actual subject)
@@ -977,7 +977,7 @@ rule and the banned-verdict-phrase list.
 chapter, alongside their exlpanation` sat before the four
 `variant_bounds_m{3,6}_{graphs,hypergraphs}` grids. Moved them, their design-
 rationale comments, the `tab:variant-values` table, and the two paragraphs
-between them, out of ch2's rediscovery section and into ch4's own "Summary
+between them, out of ch2's rediscovery section and into ch3's own "Summary
 of the sixteen variants" section, right after `tab:summary` and
 `fig:variant-tree-status`, which is the coarse version of the exact same
 sixteen-variant status these four grids and this table give as numbers. One
@@ -1015,7 +1015,7 @@ source (they no longer exist in `ch2_machine.tex`).
 
 **FOLLOW-UP, SAME SESSION: the rediscovery paragraphs named shapes with no
 picture.** The author pushed back on where the rediscovery prose lived (ch2
-vs ch4), which was the right call to leave alone (see the author's own
+vs ch3), which was the right call to leave alone (see the author's own
 answer, kept as a standing convention below), then separately objected to
 the prose itself: it named constructions ("thickened star", "double star")
 with no figure, reading as unmotivated jargon. Checked first whether a
@@ -1048,3 +1048,91 @@ VERIFY: `latexmk -pdf` exit 0, 104pp, 0 overfull, 0 occurrences of `??`, 0
 undefined refs. New figure's page rendered at 110dpi and inspected directly,
 twice (before and after the bend-angle fix). No duplicate labels, no banned
 verdict phrases, no em/en-dashes or prose semicolons in the diff.
+
+## 2026-08-28 (Opus) — the author's inline comments in the last chapter, and ch4 -> ch3
+
+Eleven instructions left as source comments in what was `chapters/ch4_synthesis.tex`,
+executed, plus the rename the author asked for in the same message.
+
+**THE RENAME.** The chapter has been the THIRD `\chapter` in `main.tex` for some
+time, so `\Cref{ch:synthesis}` already printed "Chapter 3" and the PDF was never
+wrong. What still said four was the filename and the human-readable strings:
+`chapters/ch4_synthesis.tex` -> `chapters/ch3_synthesis.tex` (git mv, so history
+follows), and every `ch4` in `main.tex`, `offcuts.tex` provenance headers,
+`README.md`, `TASKS.md`, `REVIEW_STATUS.md`, `research_notes/`, `preamble.tex`
+comments and this file. **Left alone deliberately: `program/erdos915_unified.py`'s
+own CHAPTER 3 / CHAPTER 4 banners.** Those are the PROGRAM's internal divisions,
+not the thesis's, and `MachineValues`' cache fingerprint is defined as the hash of
+everything above the chapter 4 banner. Renaming them would have orphaned the
+cache for no gain.
+
+**THE BACKWARD-ARC PANEL, DELETED.** The author's objection was that it redraws
+the $A \to B$ construction the reader has already seen and adds one arc. The
+mathematical content, that a single returning arc lets a route escape $B$ through
+$A$ and blow the internal $m-2$ budget, is one sentence and is now one sentence.
+`fig:directed-frontier-pair` and `fig:backward-arc` are gone (nothing outside the
+chapter referenced either), and `fig:crossover` is now a plain figure.
+
+**THE CROSSOVER PLOT.** `plt.title` removed from `plot_directed_crossover` (the
+caption already carries it) and `make_figures.py` calls it with `max_n=15` instead
+of `24`. At $m = 3$ the crossover is at $n = 9$, so 15 leaves the transition in
+the middle of the frame instead of in the first third.
+
+**A NEW FIGURE WHERE THE OLD PANEL WAS.** The author asked for constructions of
+extremal graphs in this chapter, and `const:augmented-bipartite` is the shape the
+whole quadratic argument turns on and had never been drawn.
+`fig:augmented-wall` draws its $m = 3$, $n = 10$ instance: $|A| = 4$, $|B| = 6$,
+24 faint arcs $A \to B$, and the $m - 2 = 1$ cyclic in-arc per vertex of $B$.
+**FIRST DRAFT HAD B AS A SECOND COLUMN AND IT FAILED THE SAME WAY THE
+`fig:rediscovery-gallery` bend angles did.** Six arcs between consecutive vertices
+of a vertical column, all bending the same way, render as one thick orange stroke
+with no separable arrowheads. Redrawn with $B$ as an actual hexagonal ring, which
+is what a cyclic predecessor relation IS, and all six arcs and arrowheads are
+individually legible. Rendered and inspected both times.
+
+**THE EMPTY `\section{}`** is now "Why direction makes the value quadratic", and
+the chapter gained two subsections under the sixteen-variant summary, so its
+structure matches chapters 1 and 2. The commented-out "first phenomenon"
+(the $m = 5$ edge/vertex divergence) stays deleted: the author was right that
+`thm:sorensen-thomassen` and `fig:divergence` already carry it in chapter 1.
+
+**FAILED CONJECTURES, OUT.** Two places framed a result by what it refutes. The
+$m = 2$, $n = 8$ count is now stated as why the linear ceiling does not survive
+the change of model, in one sentence, with no naive guess named; and the summary
+intro no longer explains which status category was live in earlier drafts.
+
+**THE FOURTH REGIME COLOUR.** `regimePartial` (`vertexpurple`) in `preamble.tex`,
+and the legend of `fig:variant-tree-status` is now a 2x2 grid with it beside the
+amber entry, as asked. It is applied to the four UNDIRECTED VERTEX leaves, not
+just the simple one the author named: the multigraph row IS the simple value by
+`sec:parallel-convention`, and the hypergraph and multihypergraph vertex rows are
+exact at $m = 2$, bounded at $m = 3$ and open at $m \ge 4$, so colouring one of
+the four differently would contradict the table. **The direction row is now
+neutral.** It was coloured before, which forced a single status onto a pair of
+leaves that no longer share one, and it was already wrong in one place: the
+multigraph directed node was red while its edge child was blue.
+
+**`tab:summary` REBUILT.** Grouped under italic `Undirected` / `Directed`
+subheadings with a rule between, ragged-right X columns (the justified ones were
+stretching `at $m = 2$ and $\le$` across half a line), the Model column reduced to
+the model alone, and the two cells that broke mid-math or hyphenated as
+`multihy-pergraphs` fixed with `\mbox` and a reword.
+
+**WHAT I DID NOT REMOVE, and the author should confirm.** The comment
+"don't talk about problems we don't handle, remove text about multigraph vertex
+different version" sat on an already-commented-out subsection, which is deleted.
+But `K_m^multi(n)` is listed as one of the author's own contributions in the
+Contribution Statement, has three theorems in the appendix, and holds a row in
+`tab:open-problems`. Those are left standing, on the reading that the instruction
+was about the chapter's discussion of it and not about the result. Likewise the
+general tail/head split of a directed hyperedge: the orientation subsection no
+longer discusses the multiple-tail case, but `thm:dir-hyper-general-constant` is
+still named in one clause, because it is a listed contribution and
+`app_proofs.tex` cites `sec:orientation-models` for exactly that axis.
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 106pp, 0 overfull/underfull, 0
+undefined refs, 0 occurrences of `??`, no duplicate labels. 127 tests OK, 1
+expected skip. Pages 31 to 33 and 38 rendered and inspected directly, plus the
+tree figure cropped at 250dpi to confirm the four legend tints are separable in
+print. No em-dashes, en-dashes or prose semicolons in the diff (every semicolon
+hit is TikZ or a table cell), no banned verdict-prose phrases.

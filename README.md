@@ -19,7 +19,7 @@ what makes each one work; **every proof in the thesis lives in the appendix**, t
 with the supporting lemmas and propositions that no chapter states in its own right.
 
 ```
-chapters/             the thesis text (ch1_basecases, ch2_machine, ch4_synthesis,
+chapters/             the thesis text (ch1_basecases, ch2_machine, ch3_synthesis,
                       app_proofs appendix -- all proofs are here)
 offcuts.tex           every passage cut during the shortening pass, restore-ready
                       (not part of the thesis, never input by main.tex)
@@ -89,7 +89,7 @@ rests on a hand proof or a cited theorem. Computations are supporting evidence.
 
 ## Where to continue
 
-The open problems are stated precisely in **ch4 (`chapters/ch4_synthesis.tex`,
+The open problems are stated precisely in **ch3 (`chapters/ch3_synthesis.tex`,
 "Open problems")** and tracked in **`TASKS.md`**. The headline targets:
 
 - **The extremal decomposition.** Proving an extremal non-hub digraph splits as `A ∪ B`

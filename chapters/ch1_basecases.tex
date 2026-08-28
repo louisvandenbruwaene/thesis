@@ -537,7 +537,7 @@ Notice how the directed value is quadratic in $n$ for large $n$, while the undir
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
 \begin{proposition}[Hypergraph edge bound]\label{prop:hyper-edge}
-An $r$-uniform hypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has at most $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
+An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has total hyperedge multiplicity at most $\floorfrac{(m-1)(n-1)}{r-1}$. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
 \end{proposition}
 
 The proof is the multigraph argument again, run through the hypergraph Gomory-Hu tree, and \Cref{app:proofs} gives it. 

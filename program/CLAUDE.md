@@ -78,7 +78,7 @@ match, and ch1's "the thirty-arc counterexample was found the same way [by
 exhaustive search]" corrected too, since ten vertices put a blind sweep far out of
 reach and it was constructed and then checked.
   (4) `thm:sorensen-thomassen` correctly excludes n=7 and n=12, with k_5(7)=15 and
-k_5(12)=27, but the unconditional formula was printed in the Short Summary, the ch4
+k_5(12)=27, but the unconditional formula was printed in the Short Summary, the ch3
 discussion, `tab:summary`, the ch1 lineage paragraph, the divergence caption and
 the plot legend. At n=12 it gives 28 against the true 27, which contradicts the
 adjacent claim that edge and vertex agree through n=13. Exceptions added in all six.

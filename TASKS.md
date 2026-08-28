@@ -71,7 +71,7 @@ as it is copyrighted). Both open questions are settled from the primary source.
   (both sides move by one), so no internal check can catch this. Applied.
 
 ## RESOLVED 2026-08-14: uniqueness on the QUADRATIC branch (thm:dir-multi-uniqueness)
-ch4 had listed this as open because thm:dir-multi-full "is silent on it by
+ch3 had listed this as open because thm:dir-multi-full "is silent on it by
 design, since it never needs to know which digraph it is peeling apart". True of
 the proof read FORWARDS; read BACKWARDS from equality it is rigid.
 - f(q) = 2(n-q)+floor(q^2/4) is UNIQUELY maximised at q=n on the quadratic
@@ -235,7 +235,7 @@ Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
 
 ## WRITE-UP QUEUE
 - [x] Directed multigraph arc problem upgraded from conjecture/conditional to
-      THEOREM across tab:summary, ch4 open problems, the contribution
+      THEOREM across tab:summary, ch3 open problems, the contribution
       statement, and the lay summary's closing sentence (2026-08-11).
 
 ## Figure uniformity pass (2026-08-14) -- both deferred items resolved
@@ -266,10 +266,10 @@ Two upper bounds now coexist and neither dominates: prop:dir-hyper-first's
   bipartite layer's own arcs" and the prose names both colours twice. Left
   deliberately; note it if the prose is ever reworded.
 
-## OPEN -- three supervisor notes lifted out of chapters/ch4_synthesis.tex (2026-08-27)
+## OPEN -- three supervisor notes lifted out of chapters/ch3_synthesis.tex (2026-08-27)
 They were floating LaTeX comments in the source, invisible in the PDF and so
 invisible to any review of the built document. Recorded here instead; the
-comments themselves are gone from ch4.
+comments themselves are gone from ch3.
 - [ ] **fig:crossover.** "Stop the graph at 15 vertices and remove the text
       'Directed lower bound at m = 3', because that belongs in the caption."
       Needs figures/directed_crossover.png regenerated from make_figures.py,

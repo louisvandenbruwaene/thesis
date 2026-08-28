@@ -2892,7 +2892,6 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
 
     plt.xlabel("number of vertices $n$")
     plt.ylabel("arcs")
-    plt.title(f"Directed lower bound at $m = {m}$")
     plt.legend(loc="upper left")
     plt.grid(True, alpha=0.3)
     _save(path)

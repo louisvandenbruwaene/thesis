@@ -33,7 +33,7 @@ P2 useful, P3 nice to have.
   scaling reduction, the cut indicator.
 - ch3 (data only): complexity growth, one temperature trace, sensitivity on
   an 8-vertex multigraph, SA vs tabu convergence, two variant-bounds grids.
-- ch4 (data only): crossover, scatter landscape, pair-conn distribution,
+- ch3 (data only): crossover, scatter landscape, pair-conn distribution,
   edge-count distribution, 3D surface.
 - appendix: Gomory-Hu distance, Mader lower-bound constructions,
   mutual-unreachability + counterexample, attachment setup, P7-to-C8 seam,
@@ -134,10 +134,10 @@ P2 useful, P3 nice to have.
 
 ---
 
-## C. Chapter 4 (synthesis) schematics  (currently zero TikZ here)
+## C. Chapter 3 (synthesis) schematics  (currently zero TikZ here)
 
 ### C1. The directed frontier reduction and the forbidden backward arc  (P1)
-- Where: ch4, the single-open-lemma section (lines 16 to 18).
+- Where: ch3, the single-open-lemma section (lines 16 to 18).
 - Type: TikZ, two panels.
 - Draw: (a) an extremal-looking digraph split into part A (left) and part B
   (right), every arc running A to B, B lightly thickened with a few internal
@@ -145,12 +145,12 @@ P2 useful, P3 nice to have.
   one backward arc b -> a added in red, and the NEW third arc-disjoint route
   it manufactures between two vertices of B traced in green, pushing lambda
   over the ceiling. This is exactly the counterexample the checker refuted.
-- Purpose: ch4's whole open problem is "an extremiser has no backward arc".
+- Purpose: ch3's whole open problem is "an extremiser has no backward arc".
   The reader currently has only prose. This shows the partition the proof
   wants and precisely why a single backward arc breaks the count.
 
 ### C2. The quadratic phenomenon: undirected wall versus directed wall  (P2)
-- Where: ch4, "two principal phenomena", quadratic phenomenon (line ~44).
+- Where: ch3, "two principal phenomena", quadratic phenomenon (line ~44).
 - Type: TikZ, two panels.
 - Draw: (a) an undirected graph near Mader's ceiling, every vertex degree
   bounded, edge count linear, annotate floor(m(n-1)/2). (b) the directed
@@ -161,7 +161,7 @@ P2 useful, P3 nice to have.
   reason the directed cases are the hardest.
 
 ### C3. The m=3 reduction chain as a roadmap diagram  (P1)
-- Where: ch4, where the m=3 reduction to two n=7 facts is stated (lines 26-32).
+- Where: ch3, where the m=3 reduction to two n=7 facts is stated (lines 26-32).
 - Type: TikZ flow diagram (boxes and arrows), not a graph drawing.
 - Draw: boxes for lem:attachment and thm:odd-step feeding "value + extremal
   characterisation propagate through both parities (rem:odd-step-roadmap)",
@@ -169,7 +169,7 @@ P2 useful, P3 nice to have.
   24-arc extremisers. Side branches show the m>=4 uniqueness hole and the
   m>=5 value hole as dashed offshoots. Colour proved boxes blue (roleProve),
   open boxes red.
-- Purpose: ch4's hardest narrative is the dependency structure of the m=3
+- Purpose: ch3's hardest narrative is the dependency structure of the m=3
   result. A dependency diagram makes "the whole problem rests on two finite
   facts" legible at a glance.
 
@@ -237,7 +237,7 @@ P2 useful, P3 nice to have.
 ## E. Data figures from the research and coding (the brief invites these)
 
 ### E1. Gallery of extremal graphs across the variants  (P1)
-- Where: app_gallery (new section), or ch4 near the scarcity discussion.
+- Where: app_gallery (new section), or ch3 near the scarcity discussion.
 - Type: data-driven TikZ or matplotlib multi-panel, drawn from real output.
 - Draw: the actual extremal (densest feasible) graphs the program enumerated,
   one small panel per (variant, n) for a chosen slice, each annotated with
@@ -253,7 +253,7 @@ P2 useful, P3 nice to have.
   beginner. Directly answers "data from the research is allowed".
 
 ### E2. The linear extremal family is richer than the double star  (P2)
-- Where: ch4, the linear-branch paragraph (line ~34), or appendix near
+- Where: ch3, the linear-branch paragraph (line ~34), or appendix near
   rem:odd-step-roadmap.
 - Type: TikZ from enumerator output.
 - Draw: the complete extremal sets the enumerator found, the 2 doubled
@@ -266,7 +266,7 @@ P2 useful, P3 nice to have.
   the correction the new enumerator found, with the actual catalogue.
 
 ### E3. Proved versus open across the twelve variants, as a map  (P2)
-- Where: ch4 near tab:summary, or replacing part of the 3D surface story.
+- Where: ch3 near tab:summary, or replacing part of the 3D surface story.
 - Type: data, a coloured grid or small-multiples heatmap.
 - Draw: the (variant, n, m) cube collapsed to a readable map, each cell blue
   if the value is proved, green if certified, purple if only searched, using

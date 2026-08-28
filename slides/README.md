@@ -59,7 +59,7 @@ references replaced by short words, so they read on a slide. They are
 `../figures/rediscovery_table.tex`.
 
 `\twelvetable` lives in `thesis-beamer.tex`, not in either deck, so it must be
-kept in step with `tab:summary` in `chapters/ch4_synthesis.tex` by hand. Its
+kept in step with `tab:summary` in `chapters/ch3_synthesis.tex` by hand. Its
 status chips distinguish PROVED, CITED, BOUND, CONJ, and LEADING TERM. BOUND
 marks a proved upper bound whose stated construction does not attain it for
 every parameter; LEADING TERM marks the amber case where the `n^2` term is a

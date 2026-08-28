@@ -54,8 +54,8 @@ This appendix carries every proof in the thesis. The body states the results and
 
 We use two classical results in their capacitated form. Unit capacities represent simple graphs, integer capacities represent multiplicities, and cut capacity is the total capacity crossing the cut.
 
-\begin{theorem}[Menger, as max-flow min-cut \cite{Menger27}]\label{thm:menger}
-In any capacitated digraph, and for distinct vertices $u, v$, the maximum flow from $u$ to $v$ equals the minimum capacity of a cut separating $u$ from $v$. At unit capacities this is the combinatorial statement we cite throughout: the maximum number of pairwise edge-disjoint $u$--$v$ paths equals the minimum number of edges whose removal separates them,
+\begin{theorem}[Menger and max-flow/min-cut \cite{Menger27,FordFulkerson56}]\label{thm:menger}
+In any capacitated digraph, and for distinct vertices $u, v$, the maximum flow from $u$ to $v$ equals the minimum capacity of a cut separating $u$ from $v$. This is the max-flow/min-cut theorem; with integer capacities, integral flow decomposition recovers Menger's path--separator theorem. At unit capacities it gives the combinatorial statement we cite throughout: the maximum number of pairwise edge-disjoint $u$--$v$ paths equals the minimum number of edges whose removal separates them,
 \[
     \lec_G(u, v) = \min\{\, |C| : C \subseteq E(G),\ G - C \text{ has no } u\text{--}v \text{ path} \,\}.
 \]
@@ -81,7 +81,7 @@ Every edge-disjoint $u$--$v$ path uses a distinct edge at $u$, so there are at m
 \Cref{ch:machine} leans on two monotonicity facts to keep the search's connectivity checks cheap. Both follow directly from max-flow / min-cut.
 
 \begin{proposition}[Monotonicity of the binding connectivity]\label{prop:monotone}
-Let $G$ be a graph or directed multigraph, and let $G'$ be obtained from $G$ by changing one adjacency by a single unit of multiplicity. Then
+Let $G$ be any graph, digraph, hypergraph, or directed hypergraph model used in this thesis, simple or with multiplicities, and let $G'$ be obtained from $G$ by changing one edge, arc, or hyperedge by a single copy. Then
 % \Cref{ch:machine} cites these as "part (1)" and "part (2)", so this list
 % carries explicit numbers in place of the decorative global list icon.
 \begin{enumerate}[label=(\arabic*)]
@@ -92,13 +92,18 @@ Both statements hold verbatim for the vertex measure $\kappa^{\max}$.
 \end{proposition}
 
 \begin{proof}
-Fix an ordered pair $(s,t)$. By the max-flow / min-cut theorem $\lambda_G(s,t)$ is the smallest capacity of any cut separating $s$ from $t$, where the capacity of a cut is the total multiplicity of the arcs that cross it from the source side to the sink side.
+Write $G^+$ for $G$ with one edge, arc, or hyperedge copy added, and fix a pair $(s,t)$, ordered in a directed model. Removing a copy only removes routes, so neither local connectivity can increase under removal. This proves the monotonicity part after taking the maximum over all pairs.
 
-For part (1), reducing one adjacency by a unit lowers the capacity of every cut that the changed arc crosses and leaves all other cut capacities untouched, so no cut capacity rises. The smallest cut capacity therefore cannot rise either, which gives $\lambda_{G'}(s,t) \le \lambda_G(s,t)$. Taking the maximum over all pairs yields $\lambda^{\max}(G') \le \lambda^{\max}(G)$. Adding a unit is the same statement read backwards.
+For the unit step in edge connectivity, take a largest edge-, arc-, or hyperedge-disjoint family of $s$--$t$ routes in $G^+$. At most one member of the family uses the new copy. Discard that member if it exists; every remaining route lies in $G$, so
+\[
+    \lambda_G(s,t) \le \lambda_{G^+}(s,t) \le \lambda_G(s,t)+1.
+\]
 
-For part (2), write $G''$ for $G$ with one unit added to a single adjacency. That extra unit of capacity crosses any fixed cut at most once, so every cut has capacity at most one greater in $G''$ than in $G$. The smallest cut capacity thus grows by at most one, giving $\lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$, and together with part (1) we have $\lambda_G(s,t) \le \lambda_{G''}(s,t) \le \lambda_G(s,t) + 1$. The maximum over pairs gives $\lambda^{\max}(G'') \le \lambda^{\max}(G) + 1$.
-
-For $\kappa^{\max}$ the argument is identical on the vertex-split network of \Cref{fig:vertex-split}, where changing an adjacency changes the capacity of its single arc $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the same way. Parallel copies leave that capacity at one and so change $\kappa^{\max}$ not at all, which only strengthens both parts.
+The vertex measure has the same unit step, but it is safer to see it directly than through a split-network cut. In a graph or digraph, two internally vertex-disjoint routes cannot both use the new adjacency: if it is internal to both routes, they share its endpoints internally; if it meets $s$ or $t$, they share its other endpoint internally, except for the unique one-step $s$--$t$ route. In the hypergraph convention of \Cref{sec:hyper-vertex-proof}, the routes are also hyperedge-copy-disjoint, so again at most one uses the new copy. Deleting that route leaves a family in $G$ and gives
+\[
+    \kappa_G(s,t) \le \kappa_{G^+}(s,t) \le \kappa_G(s,t)+1.
+\]
+Taking the maximum over all pairs proves the two asserted unit-step bounds. If the new copy is parallel to an existing adjacency under the reduced convention of \Cref{sec:parallel-convention}, it changes $\kappa^{\max}$ by zero, which is already covered by the inequality.
 \end{proof}
 
 \section{Mader's theorem in full}
@@ -1120,42 +1125,48 @@ Connectivity in a hypergraph admits several inequivalent definitions, surveyed w
 
 The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem, which is the classical construction of Gomory and Hu \cite{GomoryHu61} run on a symmetric submodular cut function rather than on the edge-cut function, as set out by Hanifehnezhad and Dolati \cite{HanifehnezhadDolati20}.
 
-\begin{theorem}[Menger for hypergraphs]\label{thm:menger-hyper}
-For a multihypergraph $\HH$ and vertices $u, v$, the maximum number of hyperedge-disjoint Berge $u$--$v$ paths equals the minimum size of a set $C$ of hyperedges whose removal separates $u$ from $v$. Parallel copies count separately on both sides: two routes may not ride the same copy, and cutting a hyperedge means cutting every copy of it. A simple hypergraph is the case where every multiplicity is one.
+\begin{theorem}[Menger for multihypergraphs]\label{thm:menger-hyper}
+For a multihypergraph $\HH$ and vertices $u, v$, regard parallel hyperedge copies as distinct. The maximum number of hyperedge-copy-disjoint Berge $u$--$v$ paths equals the minimum number of individual copies whose deletion separates $u$ from $v$. Equivalently, if a cut $C$ is specified as a set of distinct hyperedge types, its cost is $\sum_{e\in C}\mu(e)$, because every copy of each selected type must be deleted. A simple hypergraph is the case where every multiplicity is one.
 \end{theorem}
 
 \begin{proof}
-Build the helper-point network of \Cref{fig:hyper-gadget}: for each distinct hyperedge $e$ a helper arc $e^- \to e^+$ whose capacity is the multiplicity $\mu(e)$, which is one for a simple hypergraph, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. The proof matches the number of disjoint Berge paths to the size of a minimum cut by translating between Berge-path language and flow language in each direction: a family of hyperedge-disjoint Berge paths becomes a family of arc-disjoint flow paths, and conversely a flow becomes a family of Berge paths, as the next two paragraphs spell out in turn.
+Build the helper-point network of \Cref{fig:hyper-gadget}: for each distinct hyperedge $e$ a helper arc $e^- \to e^+$ whose capacity is the multiplicity $\mu(e)$, which is one for a simple hypergraph, and arcs $x \to e^-$ and $e^+ \to x$ of unbounded capacity for each member $x \in e$. The proof matches the number of disjoint Berge paths to the size of a minimum cut by translating between Berge-path language and flow language in each direction: a family of hyperedge-copy-disjoint Berge paths becomes a feasible integral flow, and conversely such a flow becomes a family of Berge paths, as the next two paragraphs spell out in turn.
 
 \emph{Berge paths become flow.} A Berge path $u, e_1, v_1, \dots, e_k, v$ becomes the directed walk $u \to e_1^- \to e_1^+ \to v_1 \to \cdots \to v$, crossing one helper arc per hyperedge it uses, and carrying one unit of flow. The $e_i$ along a single Berge path are distinct, and a hyperedge-disjoint family rides no copy twice, so at most $\mu(e)$ of its paths cross the helper arc of $e$. Each helper arc therefore carries at most its own capacity and the family is a feasible flow of value $k$. Only at multiplicity one are these paths pairwise arc-disjoint, and the argument never needs them to be.
 
 \emph{Flow becomes Berge paths.} Conversely, because every capacity is an integer, a maximum flow may be taken integral, and an integral flow of value $k$ decomposes into $k$ unit paths. Reading a helper crossing $\cdots x \to e^- \to e^+ \to y \cdots$ back as the single hyperedge step $x, e, y$, that is, \emph{suppressing} the two helper nodes, turns each unit path into a Berge path. At most $\mu(e)$ of them cross the helper arc of $e$, since that is its capacity, so each may be given a copy of $e$ of its own and no copy serves two routes. The $k$ Berge paths are therefore hyperedge-disjoint.
 
-\emph{Cuts.} Finally, the member arcs are uncapped, so any cut of finite capacity uses helper arcs only, and a set of helper arcs separates $u$ from $v$ in the network exactly when the corresponding hyperedges separate them in $\HH$. Its capacity is $\sum \mu(e)$ over those hyperedges, which is the number of copies removed, so cut capacity and the size of $C$ are the same count. The max-flow min-cut theorem equates the largest number of arc-disjoint flow paths with the smallest helper-arc cut, which is precisely the claim.
+\emph{Cuts.} Finally, the member arcs are uncapped, so any cut of finite capacity uses helper arcs only, and a set of helper arcs separates $u$ from $v$ in the network exactly when the corresponding hyperedge types separate them in $\HH$. Its capacity is $\sum \mu(e)$ over those types, which is the number of copies removed. Conversely, deleting only some copies of a type while leaving another copy changes no reachability, so a minimum copy cut may be taken to delete either all copies of a type or none. Thus network-cut capacity and the minimum number of deleted copies are the same count. The integral max-flow/min-cut theorem equates the largest feasible integral flow value with this smallest cut capacity, which is precisely the claim.
 \end{proof}
 
 \begin{theorem}[Hypergraph Gomory--Hu]\label{thm:hyper-gomory-hu}
-Every $r$-uniform hypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$, its \emph{hypergraph Gomory--Hu tree}, such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path, and each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with $|\delta_\HH(S_t)| = c^*(t)$, where $\delta_\HH(S)$ is the set of hyperedges incident to both sides, that is, having at least one vertex in $S$ and at least one outside it.
+Every $r$-uniform multihypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$, its \emph{hypergraph Gomory--Hu tree}, such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path. Each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with
+\[
+    c_\HH(S_t)=c^*(t),
+    \qquad
+    c_\HH(S):=\sum_{e\in\delta_\HH(S)}\mu(e),
+\]
+where $\delta_\HH(S)$ is the set of distinct hyperedge types incident to both sides. Thus $c_\HH(S)$ counts crossing copies with multiplicity; for a simple hypergraph it is just $|\delta_\HH(S)|$.
 \end{theorem}
 
-This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedges straddling it, $|\delta_\HH(S)|$, in place of the edges. Gomory and Hu's construction \cite{GomoryHu61} needs nothing about the cut function beyond it being symmetric and submodular \cite{HanifehnezhadDolati20}, and the hyperedge-cut function $|\delta_\HH(\cdot)|$ has both properties exactly as the ordinary edge-cut function does, so the identical uncrossing construction builds this tree too. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $|\delta_\HH(S_t)| = c^*(t)$.
+This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedge copies straddling it, $c_\HH(S)$, in place of the edges. Gomory and Hu's construction \cite{GomoryHu61} needs nothing about the cut function beyond it being symmetric and submodular \cite{HanifehnezhadDolati20}, and the weighted hyperedge-cut function $c_\HH(\cdot)$ has both properties exactly as the ordinary edge-cut function does, so the identical uncrossing construction builds this tree too. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $c_\HH(S_t) = c^*(t)$.
 
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
-\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
+\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge copy to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
 
-\emph{Step 1: each hyperedge crosses at least $r-1$ tree cuts.} Fix a hyperedge $e$, a set of $r$ vertices, and let $\mathrm{ST}(e)$ be its \emph{smallest connected subtree}, the minimal subtree of $T^*$ that contains all $r$ of them (its Steiner tree). A tree spanning at least $r$ vertices has at least $r-1$ edges, so $\mathrm{ST}(e)$ has at least $r-1$ of them. Each such edge $t$ is a genuine cut for $e$: deleting $t$ from $T^*$ splits the vertices into the two sides $(S_t, V \setminus S_t)$, and because $t$ lies on $\mathrm{ST}(e)$ the hyperedge $e$ has at least one vertex on each side. So $e$ touches both sides, that is, $e \in \delta_\HH(S_t)$. Therefore
+\emph{Step 1: each hyperedge copy crosses at least $r-1$ tree cuts.} Fix a copy of a hyperedge $e$, a set of $r$ vertices, and let $\mathrm{ST}(e)$ be its \emph{smallest connected subtree}, the minimal subtree of $T^*$ that contains all $r$ of them (its Steiner tree). A tree spanning at least $r$ vertices has at least $r-1$ edges, so $\mathrm{ST}(e)$ has at least $r-1$ of them. Each such edge $t$ is a genuine cut for $e$: deleting $t$ from $T^*$ splits the vertices into the two sides $(S_t, V \setminus S_t)$, and because $t$ lies on $\mathrm{ST}(e)$ the hyperedge $e$ has at least one vertex on each side. So $e$ touches both sides. Therefore
 \[
-   \bigl|\{\, t \in E(T^*) : e \in \delta_\HH(S_t) \,\}\bigr| \;\ge\; r-1 \qquad\text{for every hyperedge } e.
+   \bigl|\{\, t \in E(T^*) : e \text{ straddles } S_t \,\}\bigr| \;\ge\; r-1
+   \qquad\text{for every hyperedge copy } e.
 \]
 
-\emph{Step 2: count the incidences two ways.} Sum that inequality over all hyperedges, then exchange the order of summation. This is legitimate because both of the middle sums below simply count the same pairs $(e,t)$ with $e \in \delta_\HH(S_t)$, once grouped by the hyperedge and once by the tree edge:
+\emph{Step 2: count the incidences two ways.} Sum that inequality over all hyperedge copies, then exchange the order of summation. This is legitimate because both of the middle sums below simply count the same pairs $(e,t)$ in which the copy $e$ straddles the cut of $t$, once grouped by the hyperedge copy and once by the tree edge:
 \[
-   (r-1)\,|E(\HH)| \;\le\; \sum_{e}\bigl|\{\, t : e \in \delta_\HH(S_t)\,\}\bigr|
-   \;=\; \sum_{t}\bigl|\{\, e : e \in \delta_\HH(S_t)\,\}\bigr|
-   \;=\; \sum_{t} |\delta_\HH(S_t)|.
+   (r-1)\,|E(\HH)| \;\le\; \sum_{e\text{ (with copies)}}\bigl|\{\, t : e \text{ straddles } S_t\,\}\bigr|
+   \;=\; \sum_{t} c_\HH(S_t).
 \]
 
-\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $|\delta_\HH(S_t)| = c^*(t)$. Moreover $c^*(t)$ is itself a local connectivity $\lec_\HH$ of $t$'s two endpoints: since those endpoints are adjacent in $T^*$, the $u$--$v$ tree path between them is the single edge $t$, so the path-minimum reading of \Cref{thm:hyper-gomory-hu} gives $\lec_\HH$ of that pair exactly $c^*(t)$, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t |\delta_\HH(S_t)| = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
+\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $c_\HH(S_t) = c^*(t)$. Moreover $c^*(t)$ is itself a local connectivity $\lec_\HH$ of $t$'s two endpoints: since those endpoints are adjacent in $T^*$, the $u$--$v$ tree path between them is the single edge $t$, so the path-minimum reading of \Cref{thm:hyper-gomory-hu} gives $\lec_\HH$ of that pair exactly $c^*(t)$, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t c_\HH(S_t) = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
 \[
    (r-1)\,|E(\HH)| \;\le\; (m-1)(n-1),
 \]
@@ -1197,7 +1208,7 @@ Put $e := \floorfrac{dn}{r} \le \frac{n}{r}\binom{n-1}{r-1} = \binom{n}{r}$. App
 \end{proof}
 
 
-\section{The hypergraph vertex problem}
+\section{The hypergraph vertex problem}\label{sec:hyper-vertex-proof}
 
 The whole vertex problem translates into a graph problem through one
 observation, the one the rest of this section rests on and which
@@ -2196,13 +2207,17 @@ Where the method is needed differs by variant. For undirected graphs one could r
 \label{app:software-reproduction}
 
 The authoritative code and audit instructions are maintained in the versioned
-repository at \url{https://github.com/louisvandenbruwaene/thesis}. The snapshot
-this document was built from is commit \thesiscommit, which is the immutable
-reference for every number reported here. Anything later in that repository is a
-continuation and not what was submitted. From \code{program/},
+repository at \url{https://github.com/louisvandenbruwaene/thesis}. A submitted
+build records its precise snapshot in \code{revision.tex}; the status in this
+build is: \thesiscommit. When that status contains a commit, the recorded commit
+is the immutable reference for every number reported here, and anything later in
+the repository is a continuation rather than part of the submission. A build
+whose status instead says that no revision was recorded is a working build, not a
+submission snapshot. From \code{program/},
 \code{python erdos915\_unified.py} runs the principal checks and
 \code{python -m unittest discover -s tests -v} runs the regression suite.
 \code{python make\_figures.py} regenerates the computational figures. The several hundred \code{solve} calls behind the four variant grids of \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} are read from \code{figures/machine\_values.json}, a readable record of what each of those runs returned, so the grids redraw in seconds and the plotted points are the ones this document was built from rather than whatever a fresh timed search happens to reach. Deleting that file, or passing \code{-{}-refresh}, recomputes every entry, which is how the record is checked.
+With \code{-{}-refresh}, fresh outcomes are reconciled with the stored record: a rerun can confirm or improve an entry but cannot replace it with a weaker result merely because a timed search or exhaustion reached less on that machine. Deleting the file is the stronger operation that discards the record before recomputing from scratch.
 Two block sweeps are the one thing that does not run from this file. They live
 in \code{research\_notes/scripts/simple\_vertex\_blocks.py} and
 \code{research\_notes/scripts/multi\_vertex\_blocks.py}, are self-contained, and

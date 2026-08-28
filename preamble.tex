@@ -435,7 +435,7 @@
   %      the hyperedge look is already shared across every figure that uses it. --
   %
   % Re-point the shared graph names the thesis body already uses (vertex,
-  % smallvertex, edge) onto the canonical look, so Chapter 2, Chapter 4, and any
+  % smallvertex, edge) onto the canonical look, so Chapter 2, Chapter 3, and any
   % figure using them cohere with the rest without per-figure edits. This is
   % thesis-local: the slides load shared/tikz-styles.tex directly and keep their
   % own sizes. smallvertex holds its size and small font so multi-character split
@@ -873,12 +873,17 @@ for scientific awards or contests.
 % --- the variant tree: root -> model (3) -> direction (2) -> separation (2) --
 % Drawn twice, from the same coordinates, so the two figures are visibly one
 % shape: plain in ch1 (a map before anything is proved), tinted by the
-% trichotomy regime in ch4 (the same map, resolved). regimeProved/Conjectured/
+% trichotomy regime in ch3 (the same map, resolved). regimeProved/Conjectured/
 % Open reuse the exact blue/red/amber the data figures already use for proved
 % all-n / conjectured-with-certified-cases / open-lower-bound-only.
 \colorlet{regimeProved}{KULblauw1}
 \colorlet{regimeConjectured}{vertexred}
 \colorlet{regimeOpen}{vertexorange}
+% A fourth regime for fig:variant-tree-status: proved inside a stated range of
+% m and open beyond it, which is where all four undirected vertex problems sit.
+% Purple rather than a fourth tint of blue or red, so the four leaf fills stay
+% apart from one another at the 16 to 28 percent opacity the tree draws them at.
+\colorlet{regimePartial}{vertexpurple}
 
 % --- the sixteen-variant VALUE tables (tab:variant-values-*): the literal hex
 % codes plot_variant_grid() uses in erdos915_unified.py (_KUL_BLUE, _RED,

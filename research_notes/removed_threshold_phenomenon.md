@@ -1,6 +1,6 @@
 # Removed from the thesis: the threshold-universality phenomenon (old Figure 4.2)
 
-Removed from `chapters/ch4_synthesis.tex` on 2026-06-20 at the author's request
+Removed from `chapters/ch3_synthesis.tex` on 2026-06-20 at the author's request
 ("not a fan of the whole story behind Figure 4.2"). This note preserves the
 prose, the figure caption, and the recipe to restore it, in case it should go
 back in.
@@ -41,7 +41,7 @@ What was KEPT:
        FIGURES / "degree_threshold.png", n=12, m=4, alpha=0.5, trials=70, seed=7)
    ```
 
-2. Re-insert the prose and figure into `chapters/ch4_synthesis.tex`, restore the
+2. Re-insert the prose and figure into `chapters/ch3_synthesis.tex`, restore the
    section title to "Three principal phenomena" and the two "two"->"three"
    wordings (chapter intro "genuine surprises" and the phenomena lead-in).
 

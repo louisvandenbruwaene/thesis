@@ -14,7 +14,7 @@ capped max-flow).
 (doubled bidirected trees). On the quadratic branch the only thing known was
 `rem:n7-classification`, a single machine classification at `n=7, m=3`.
 
-ch4 recorded the reason it looked hard: the reachability-skeleton proof "is
+ch3 recorded the reason it looked hard: the reachability-skeleton proof "is
 silent on it by design, since it never needs to know which digraph it is peeling
 apart".
 

@@ -248,7 +248,7 @@ program can prove exhaustively).
 
 ### Extremal uniqueness on the quadratic branch (PROVED for n >= 2m, 2026-08-14)
 `thm:dir-multi-full` settles the directed multigraph VALUE for every `n` and `m`,
-and ch4 recorded the uniqueness question as untouched by it, since the
+and ch3 recorded the uniqueness question as untouched by it, since the
 reachability-skeleton proof "never needs to know which digraph it is peeling
 apart". That is true of the proof read forwards. Read BACKWARDS from equality the
 same construction is rigid: the skeleton count is uniquely maximised at one value

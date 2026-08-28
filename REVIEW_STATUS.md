@@ -29,7 +29,7 @@ sometimes reworded, and two were extended by the rewrite rather than merely kept
 | 1 | `solve()` optimised multiplicity for the multigraph **vertex** variants | Closed and re-verified by running it: at `n=3, m=3` it now returns 3 undirected and 6 directed, in both exhaustive and discovery mode, was 6 and 12. `MultigraphVertexObjective` (6 tests) is in `tests/test_solve.py`. |
 | 2 | The `m=6` grid plotted a hypergraph witness that cannot exist | Closed. `attained_hyper_edge` / `attained_hyper_vertex` gate the witness by proved attainment, and the rewrite extended the same pattern to the new fourth model. Both grids were regenerated in `2829e47`. |
 | 3 | Short summary misreported what the search rediscovered | Closed. |
-| 4 | `k_5(n)` exceptions dropped in prominent summaries | Closed. `ch1_basecases.tex:457` states `k_5(7) = 15` and `k_5(12) = 27`; `ch4_synthesis.tex:116` and the summary table carry `n ≠ 7, 12`. |
+| 4 | `k_5(n)` exceptions dropped in prominent summaries | Closed. `ch1_basecases.tex:457` states `k_5(7) = 15` and `k_5(12) = 27`; `ch3_synthesis.tex:116` and the summary table carry `n ≠ 7, 12`. |
 | 5 | "All computational claims rerun from one program" | Closed. Both standalone block sweeps are named where their numbers are used and in the audit section. Both READMEs corrected. |
 | 6 | `Hypergraph` did not enforce `r`-uniformity | Closed. `r` is an optional constructor argument, enforced on every add when given, and the thesis says uniformity is a generator property rather than a container one. |
 | 7 | False reason for equal search-node counts | Closed. The caption now says the counts coincide as a computed fact. |
@@ -128,19 +128,27 @@ Appendix C was removed in the 2026-08-24 shortening pass, and a later session
 note said so while the rule itself still instructed the opposite. The rule is now
 corrected rather than contradicted.
 
-## Still open
+## Subsequently closed
 
-**1. The machine-value cache is the record, and it is machine-dependent.**
+**1. CLOSED 2026-08-28. The machine-value cache is the record, and it is
+machine-dependent.**
 
-Not a defect, a property worth stating once. The `exact` entries are exhaustions
-under a wall-clock budget and the `search` entries are timed heuristics, so what
-a given machine reaches is part of the answer. `MachineValues._reconcile` now
-makes a refresh unable to degrade the record, and the budget is set well clear of
-the boundary, so the failure mode is closed. What remains is a documentation
-question: `sec:transcripts` tells a reader that passing `--refresh` "is how the
-record is checked", and it is worth one clause there saying that a refresh
-confirms or improves the record and never replaces a recorded value with a worse
-one, since that is now what the code guarantees.
+The `exact` entries are exhaustions under a wall-clock budget and the `search`
+entries are timed heuristics, so what a given machine reaches is part of the
+answer. `MachineValues._reconcile` makes a refresh unable to degrade the record.
+The computational-audit section now states the exact distinction: `--refresh`
+recomputes every entry but confirms or improves the stored record, while deleting
+the cache is the stronger operation that starts again without that record.
+
+**2. CLOSED 2026-08-28. Second independent proof and reference pass.**
+
+The multihypergraph Menger proof's overview incorrectly called the translated
+flow paths arc-disjoint even when several paths use a helper arc of capacity
+`mu(e) > 1`; the detailed paragraph below already used the correct capacity
+argument. The overview now says that the Berge paths give a feasible integral
+flow. The computational-audit paragraph also no longer calls an unrecorded
+working build an immutable submission snapshot. Finally, the verified DOIs for
+Gomory--Hu, Chekuri--Xu, and Ford--Fulkerson were added to the bibliography.
 
 ## Not done, by choice
 
@@ -150,7 +158,8 @@ the author's call. The compatible half was done instead: the appendix is grouped
 into four signposted parts that appear in the contents, with a reading guide that
 names the flagship arguments.
 
-The `ErdosProblems` bib entry still lists Pál Erdős as the author of a website he
-cannot have written (erdosproblems.com is Thomas F. Bloom's). Flagged in the first
-batch, left alone because it could not be verified from here and neither review
-raised it.
+## Subsequent correction
+
+On 28 August 2026 the `ErdosProblems` entry was corrected to follow the website's
+recommended citation and credit Thomas F. Bloom. The same pass corrected the
+Bártfai source for the $m=3$ vertex result and the thesis-repository metadata.

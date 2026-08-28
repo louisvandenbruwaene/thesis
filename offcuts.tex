@@ -114,7 +114,7 @@ Item & What moved & From \\
 \midrule
 A1 & Appendix B.2, five search traces & \code{app\_gallery.tex} \\
 A2, C3 & Appendix B.3, the $m=6$ distribution and the 3D threshold & \code{app\_gallery.tex} \\
-A3 & Two population distributions and their paragraphs & \code{ch4\_synthesis.tex} \\
+A3 & Two population distributions and their paragraphs & \code{ch3\_synthesis.tex} \\
 A4 & Section 2.9 and the inventory in 2.9.1 & \code{ch2\_certify.tex} \\
 A5 & Appendix A.12, the self-test coverage list & \code{app\_proofs.tex} \\
 A6 (restored) & The twelve-variant grid at $m=6$, now paired compactly with $m=3$ & \code{ch3\_discover.tex} \\
@@ -129,10 +129,10 @@ C1 & The three-regimes walk through all twelve variants & \code{ch3\_discover.te
 C3 & The Chernoff primer and two setup paragraphs & \code{app\_proofs.tex}, \code{ch1\_basecases.tex} \\
 D1 & The remaining random-graph section and its proof & \code{ch1\_basecases.tex}, \code{app\_proofs.tex} \\
 D2 & Random-model references in the front matter, program spine, and software inventory & \code{main.tex}, \code{ch2\_certify.tex}, \code{preamble.tex}, \code{app\_code.tex} \\
-D3 & The redundant three-dimensional twelve-variant surface & \code{ch4\_synthesis.tex} \\
+D3 & The redundant three-dimensional twelve-variant surface & \code{ch3\_synthesis.tex} \\
 D4 & The one-figure supplementary gallery appendix & \code{app\_gallery.tex} \\
 E1 & Expanded interpretation of the twelve-variant grids & \code{ch3\_discover.tex} \\
-E2 & Expanded directed synthesis, orientation discussion, and open-problem essays & \code{ch4\_synthesis.tex} \\
+E2 & Expanded directed synthesis, orientation discussion, and open-problem essays & \code{ch3\_synthesis.tex} \\
 E3 & Full-size checker diagrams and the expanded flow explanation & \code{ch2\_certify.tex} \\
 E4 & The long-form original-contributions list & \code{main.tex} \\
 E5 & The expanded software and reproducibility appendix & \code{app\_code.tex} \\
@@ -152,12 +152,12 @@ G1 & The superseded MILP tutorial, crossing-case table, and solver history & \co
 G2 & Repeated evidence, certification, and reproducibility framing & \code{ch2\_machine.tex} \\
 G3 & Expanded textbook exposition around Menger, Gomory--Hu, and Mader & \code{app\_proofs.tex} \\
 G4 & Long-form captions for retained figures & \code{ch1\_basecases.tex}, \code{ch2\_machine.tex}, \code{app\_proofs.tex} \\
-H1--H4 & Redundant and single-case figures: variant tree, 2-tree, trace, landscape & \code{ch1\_basecases.tex}, \code{ch2\_machine.tex}, \code{ch4\_synthesis.tex} \\
-H5--H7 & Former summary layout, routine table, and finite orientation table & \code{ch4\_synthesis.tex} \\
+H1--H4 & Redundant and single-case figures: variant tree, 2-tree, trace, landscape & \code{ch1\_basecases.tex}, \code{ch2\_machine.tex}, \code{ch3\_synthesis.tex} \\
+H5--H7 & Former summary layout, routine table, and finite orientation table & \code{ch3\_synthesis.tex} \\
 H8--H10 & Mader, SPQR, and hyperedge-convention figures and exposition & \code{app\_proofs.tex} \\
 H11--H12 & Three finite-data tables and their setup (H12 restored) & \code{app\_proofs.tex} \\
 I1--I3 & The three implementation listings formerly printed in Chapter 2 & \code{ch2\_machine.tex} \\
-I4--I8 & Directed duplicate, repeated tables (I7 restored), annealing algorithm, tall summary layout & \code{ch2\_machine.tex}, \code{ch4\_synthesis.tex} \\
+I4--I8 & Directed duplicate, repeated tables (I7 restored), annealing algorithm, tall summary layout & \code{ch2\_machine.tex}, \code{ch3\_synthesis.tex} \\
 J1 (restored) & Alternative multigraph-vertex convention and its full proofs & \code{app\_proofs.tex} \\
 J2--J4 & Repeated transcripts, software appendix, and removed scope references (J4 partly restored) & \code{app\_proofs.tex}, \code{app\_code.tex}, front matter \\
 J5--J6 & Repeated representation displays and the SA--tabu benchmark & \code{ch2\_machine.tex} \\
@@ -246,7 +246,7 @@ This appendix shows the per-graph connectivity distribution at the fixed forbidd
 \end{figure}
 \end{offcut}
 
-\begin{offcut}{A3. The two population distributions}{A3}{chapters/ch4\_synthesis.tex, \code{pair\_conn\_dist.png} and \code{edges\_dist.png}, two full-page floats}{the extremal envelope paragraph ending ``a thin frontier with almost nothing pressed against it from below.''}{Both make the same point, that dense low-connectivity graphs are rare, and that point would hold for any extremal problem. \Cref{fig:scatter-landscape} stays because it carries the extremal envelope; the three-dimensional surface moved in the later D3 pass.}
+\begin{offcut}{A3. The two population distributions}{A3}{chapters/ch3\_synthesis.tex, \code{pair\_conn\_dist.png} and \code{edges\_dist.png}, two full-page floats}{the extremal envelope paragraph ending ``a thin frontier with almost nothing pressed against it from below.''}{Both make the same point, that dense low-connectivity graphs are rare, and that point would hold for any extremal problem. \Cref{fig:scatter-landscape} stays because it carries the extremal envelope; the three-dimensional surface moved in the later D3 pass.}
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{figures/pair_conn_dist.png}
@@ -262,7 +262,7 @@ This appendix shows the per-graph connectivity distribution at the fixed forbidd
 \end{figure}
 \end{offcut}
 
-\begin{offcutrewrite}{A3 (prose). The two paragraphs describing those figures}{A3}{chapters/ch4\_synthesis.tex, two paragraphs in the phenomena section}{the same anchor as A3 above}{Orphaned once the figures moved. Compressed to one sentence that keeps both observations.}
+\begin{offcutrewrite}{A3 (prose). The two paragraphs describing those figures}{A3}{chapters/ch3\_synthesis.tex, two paragraphs in the phenomena section}{the same anchor as A3 above}{Orphaned once the figures moved. Compressed to one sentence that keeps both observations.}
 \Cref{fig:pair-conn-dist} steps inside each graph to the level of individual pairs. For every graph in the full enumeration it records the connectivity of every vertex pair and pools all the observations, so the histogram counts not graphs but (graph, pair) observations. Each bar is split and stacked by the connectivity of the graph the pair came from: blue for pairs drawn from the lower-connectivity graphs, red for pairs from the higher-connectivity ones. The boundary between the two is set per variant at the midpoint of the connectivity range that variant's enumeration can reach, since the twelve variants span very different ranges and a single fixed boundary would leave some panels entirely one colour. A pair whose own connectivity exceeds the boundary can only come from a graph above it, so the bars to the right of the dashed line are wholly red, while to the left the two colours mix, since a high-connectivity graph still carries many low-connectivity pairs. The blue mass sits almost entirely at the lowest levels: high-connectivity pairs are rare even inside the graphs that have one.
 
 \Cref{fig:edge-dist} then shows how the same graphs distribute by sheer edge count, with the same per-variant stacked colouring. At each edge count the blue part counts the lower-connectivity graphs and the red part the higher-connectivity ones, so the bar height is the total number of graphs there and the split shows how the two populations separate. The red mass sits to the right, since denser graphs tend to carry higher connectivity, and the dotted line marks the densest graph still on the low-connectivity side, landing far out in the sparse tail. The densest low-connectivity graphs, the ones the extremal problem is about, are exceptional in every variant.
@@ -790,7 +790,7 @@ Monte Carlo sampling & An empirical distribution for the specified sampler and s
 The inventories now describe only the program roles exercised by the live thesis, and the evidence table ends with heuristic search.
 \end{offcutrewrite}
 
-\begin{offcut}{D3. The three-dimensional twelve-variant surface}{D3}{chapters/ch4\_synthesis.tex, former \code{variant\_surface\_3d.png} paragraph and figure}{the extremal-envelope figure, before ``Summary of the twelve variants''}{The twelve-row summary table and the paired $m=3/m=6$ grids state the same proved-versus-open information more legibly.}
+\begin{offcut}{D3. The three-dimensional twelve-variant surface}{D3}{chapters/ch3\_synthesis.tex, former \code{variant\_surface\_3d.png} paragraph and figure}{the extremal-envelope figure, before ``Summary of the twelve variants''}{The twelve-row summary table and the paired $m=3/m=6$ grids state the same proved-versus-open information more legibly.}
 Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at once, drawing the best feasible edge count as a bar surface across every variant. The four proved variants rise as smooth linear or quadratic sheets that the formulas describe exactly, while the open variants show a visible step between the machine-proved blue bars and the search's purple lower bounds, so the surface makes the proved-versus-open divide of the trichotomy a single readable shape. Reading along the $m$ axis recovers the linear scaling in the threshold, and reading along $n$ recovers each variant's growth rate, which is the whole of \Cref{tab:summary} compressed into one object.
 
 \begin{figure}[p]
@@ -801,7 +801,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
 \end{figure}
 \end{offcut}
 
-\begin{offcut}{D3 (repair). The random-threshold suffix in the summary-table caption}{D3}{chapters/ch4\_synthesis.tex, caption of the twelve-variant summary}{the surviving caption sentence ending ``in a divisibility case.''}{This suffix described a result that moved wholly into offcuts.}
+\begin{offcut}{D3 (repair). The random-threshold suffix in the summary-table caption}{D3}{chapters/ch3\_synthesis.tex, caption of the twelve-variant summary}{the surviving caption sentence ending ``in a divisibility case.''}{This suffix described a result that moved wholly into offcuts.}
 The appearance threshold $p^* = m/n$ of \Cref{thm:gnp-threshold} is deliberately not a column here: it is proved for the edge separation in $G(n,p)$ and extended to its undirected vertex separation in \Cref{rem:threshold-analogues}. No directed threshold is claimed, and the hypergraph models have a different natural density scale (\Cref{rem:threshold-scope}).
 \end{offcut}
 
@@ -878,7 +878,7 @@ A number found by the search is reported as a lower bound, and is marked as cert
 \end{computernote}
 \end{offcut}
 
-\begin{offcut}{E2a. The expanded directed-frontier discussion and separate figure layout}{E2}{chapters/ch4\_synthesis.tex, former opening section}{the heading The directed frontier and the missing decomposition}{The theorem, crossover, structural distinction, and classification remain live; repeated interpretation and the former full-width figure layout were compressed.}
+\begin{offcut}{E2a. The expanded directed-frontier discussion and separate figure layout}{E2}{chapters/ch3\_synthesis.tex, former opening section}{the heading The directed frontier and the missing decomposition}{The theorem, crossover, structural distinction, and classification remain live; repeated interpretation and the former full-width figure layout were compressed.}
 \section{The directed frontier and the missing decomposition}
 
 Two of the open directions are directed, and they share a structure worth stating exactly rather than hiding. The directed arc problem is a race between two constructions on different scales. The directed hub (\Cref{const:directed-hub}) reaches $m(n-1)$ arcs and grows linearly. The augmented bipartite construction (\Cref{const:augmented-bipartite}) packs $\floor{(n+m-2)^2/4}$ arcs and grows quadratically. Which leads depends on $n$, and the two cross at an order linear in $m$, near $n = 9$ at the $m = 3$ of \Cref{fig:crossover}. \Cref{conj:dir-arc} asserts that together they are the whole story.
@@ -982,7 +982,7 @@ The linear branch turns out to be richer than the double star first suggested. E
 It is worth naming what the closure removed, because the shape of the difficulty was misleading for a long time. The vertex-deletion route degraded as $m$ grew, yielding the value but not uniqueness at $m \ge 4$ and stalling on the value itself at $m \ge 5$, which made those look like harder regimes of the problem. They are not. That was a limitation of one method, and the reachability skeleton simply does not have it, treating every $m$ alike. The one question that genuinely survives is the uniqueness one above, stated in full among the open problems below: a finite, identified target rather than a mystery, and a natural goal for the next round of certified computation.
 \end{offcut}
 
-\begin{offcut}{E2b. The expanded orientation-model comparison}{E2}{chapters/ch4\_synthesis.tex, former orientation subsection}{the heading Orientation models for the directed hypergraph}{The definitions, common leading term, exact small table, and unresolved finite distinction remain in the live subsection.}
+\begin{offcut}{E2b. The expanded orientation-model comparison}{E2}{chapters/ch3\_synthesis.tex, former orientation subsection}{the heading Orientation models for the directed hypergraph}{The definitions, common leading term, exact small table, and unresolved finite distinction remain in the live subsection.}
 \subsection{Orientation models for the directed hypergraph}
 \offcutlabel{sec:orientation-models}
 
@@ -1009,7 +1009,7 @@ $4$ & $4$ & $4$ & $4$ & $8$ \\
 \end{table}
 \end{offcut}
 
-\begin{offcut}{E2c. Seven essay-form open problems}{E2}{chapters/ch4\_synthesis.tex, former Open problems section}{the heading Open problems}{Every problem, known result, and remaining target remains in the live compact table; this snapshot preserves the longer motivation and proposed routes.}
+\begin{offcut}{E2c. Seven essay-form open problems}{E2}{chapters/ch3\_synthesis.tex, former Open problems section}{the heading Open problems}{Every problem, known result, and remaining target remains in the live compact table; this snapshot preserves the longer motivation and proposed routes.}
 \section{Open problems}
 
 \begin{itemize}
@@ -2084,7 +2084,7 @@ When the search proposes a removal it draws the edge with probability proportion
 \end{figure}
 \end{offcut}
 
-\begin{offcut}{H4. The complete small-\(n\) landscape}{H4}{chapters/ch4\_synthesis.tex, former labelled-graph scatter figure and interpretation}{the end of Two principal phenomena}{The full population plot is a one-case enumeration exhibit rather than part of the synthesis argument.}
+\begin{offcut}{H4. The complete small-\(n\) landscape}{H4}{chapters/ch3\_synthesis.tex, former labelled-graph scatter figure and interpretation}{the end of Two principal phenomena}{The full population plot is a one-case enumeration exhibit rather than part of the synthesis argument.}
 That same scarcity of extremal graphs is the thread through the remaining figures. \Cref{fig:scatter-landscape} shows where the frontier runs: it plots every labelled graph at small $n$ as a single point, its binding connectivity $\lambda^{\max}$ on the horizontal axis and its edge count on the vertical, so the whole population of graphs is visible at once. The points crowd into the low-connectivity, low-edge corner and thin out upward, where the blue extremal envelope, an integer staircase carrying one dot per connectivity level, traces the densest graph available at each level. The empty region above that staircase is precisely the part the main theorems forbid a graph to occupy. The extremal problem is the question of where that staircase runs, and the figure shows it is a thin frontier with almost nothing pressed against it from below.
 
 Pooling the same enumeration by individual vertex pair and by sheer edge count tells the same story from two more angles: high-connectivity pairs are rare even inside the graphs that have one, and the densest low-connectivity graphs, the ones the extremal problem is about, sit far out in the sparse tail in every variant.
@@ -2099,7 +2099,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
 \end{figure}
 \end{offcut}
 
-\begin{offcutrewrite}{H5. The former compressed twelve-variant summary}{H5}{chapters/ch4\_synthesis.tex, former Table 3.1}{the status tree}{The content remains live, but the single-line layout shrank the type below body size. It was replaced by a normal-sized, wrapped three-column table and short notes.}
+\begin{offcutrewrite}{H5. The former compressed twelve-variant summary}{H5}{chapters/ch3\_synthesis.tex, former Table 3.1}{the status tree}{The content remains live, but the single-line layout shrank the type below body size. It was replaced by a normal-sized, wrapped three-column table and short notes.}
 \begin{table}[t]
     \centering
     % The natural width of this twelve-row summary exceeds the text block, so
@@ -2135,7 +2135,7 @@ Finally, \Cref{fig:surface-3d} lifts the whole study onto the $(n, m)$ grid at o
 The live Table~\ref{tab:summary} uses normal body type, three wrapped columns, a short caption, and concise qualifications below the table.
 \end{offcutrewrite}
 
-\begin{offcut}{H6. The routine cross-reference table}{H6}{chapters/ch4\_synthesis.tex, former Table 3.2}{the twelve-variant summary}{Routine names already appear where each piece of machinery is introduced.}
+\begin{offcut}{H6. The routine cross-reference table}{H6}{chapters/ch3\_synthesis.tex, former Table 3.2}{the twelve-variant summary}{Routine names already appear where each piece of machinery is introduced.}
 \Cref{tab:functions} answers a different question about the same twelve variants: not what is known, but which routine of the program knows it. Most variants share machinery rather than each needing its own, so the table is grouped by family, and every name in it has its own \code{codecard} box where it is built in \Cref{ch:certify,ch:discover}.
 
 \begin{table}[ht]
@@ -2159,7 +2159,7 @@ The live Table~\ref{tab:summary} uses normal body type, three wrapped columns, a
 \end{table}
 \end{offcut}
 
-\begin{offcut}{H7. The finite orientation table}{H7}{chapters/ch4\_synthesis.tex, former Table 3.3}{the orientation-model paragraph}{Four scarce-vertex cells do not materially support the asymptotic theorem.}
+\begin{offcut}{H7. The finite orientation table}{H7}{chapters/ch3\_synthesis.tex, former Table 3.3}{the orientation-model paragraph}{Four scarce-vertex cells do not materially support the asymptotic theorem.}
 Finite values can differ when \(n\) is close to \(r\). The former exact table was:
 \begin{table}[ht]
 \centering
@@ -2551,7 +2551,7 @@ $T \gets T_0$\;
 \emph{Restored to the thesis on 24 August 2026.} The table is live again as \Cref{tab:rediscovery} in the rediscovery section, whose prose refers to it.
 \end{offcut}
 
-\begin{offcut}{I8. Twelve-row summary-table layout}{I8}{chapters/ch4\_synthesis.tex, former Table 3.1 layout}{the twelve-variant status summary}{The data remain live, rearranged as six model rows with the two separation notions side by side so normal-sized text occupies much less vertical space.}
+\begin{offcut}{I8. Twelve-row summary-table layout}{I8}{chapters/ch3\_synthesis.tex, former Table 3.1 layout}{the twelve-variant status summary}{The data remain live, rearranged as six model rows with the two separation notions side by side so normal-sized text occupies much less vertical space.}
 \begin{table}[p]
 \centering
 \renewcommand{\arraystretch}{1.12}
@@ -2701,7 +2701,7 @@ Deposit the final PDF, a clean immutable source snapshot, dependencies and solve
 \end{offcut}
 
 
-\begin{offcut}{J4. Scope references removed with the alternative convention}{J4}{main.tex, chapters/ch2\_machine.tex, chapters/ch4\_synthesis.tex, chapters/app\_proofs.tex}{their former contribution, notation, convention, open-problem, and boundary passages}{These lines advertised or depended on J1 and therefore left the live thesis with that out-of-scope section.}
+\begin{offcut}{J4. Scope references removed with the alternative convention}{J4}{main.tex, chapters/ch2\_machine.tex, chapters/ch3\_synthesis.tex, chapters/app\_proofs.tex}{their former contribution, notation, convention, open-problem, and boundary passages}{These lines advertised or depended on J1 and therefore left the live thesis with that out-of-scope section.}
 \emph{Partly restored on 24 August 2026:} the contribution row, the $K_m^{\mathrm{multi}}$ symbol, and the open-problem row are live again alongside \Cref{sec:multi-vertex-standard}. Only the separate software-appendix declaration below stays cut.
 
 \begin{lstlisting}[language={[LaTeX]TeX},basicstyle=\ttfamily\scriptsize,breaklines=true]

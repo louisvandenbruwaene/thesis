@@ -1035,7 +1035,7 @@ def variant_value_tables() -> None:
 def main() -> None:
     FIGURES.mkdir(parents=True, exist_ok=True)
 
-    plot_directed_crossover(m=3, max_n=24, path=FIGURES / "directed_crossover.png")
+    plot_directed_crossover(m=3, max_n=15, path=FIGURES / "directed_crossover.png")
     print("wrote directed_crossover.png")
 
     plot_edge_vertex_divergence(max_n=35, path=FIGURES / "edge_vertex_divergence.png")
