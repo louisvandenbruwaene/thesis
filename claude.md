@@ -1274,12 +1274,14 @@ or "Assessor" without a template to check against).
 few more proofs himself while revising the appendix, `thm:dir-arc-m2-exact`
 (Theorem 1.6) in particular, which would drop its `\aimedal`. That is his call
 to make and not something a session can assert on his behalf, so the badge
-stands. **While checking it I found a contradiction that predates this
-session**: `app_proofs.tex` line 369 already says the proof of
+stands. **A contradiction that predates this session, RESOLVED on the author's
+call the same day**: `app_proofs.tex` line 369 said the proof of
 `thm:dir-arc-m2-exact` and its three supporting lemmas "are the author's own",
 yet all four carry the badge and the "How to read this appendix" paragraph says
 the badge is on everything except the cited classics and the Gomory--Hu double
-count. One of those two statements has to give. Flagged, not resolved.
+count. The author chose the badge, so that sentence now says the lemmas and the
+proof carry \aimedal{} like the rest of the appendix, and what remains the
+author's own there is the program run that verified the base cases.
 
 **REST OF THE LIST, ALL APPLIED:** the opening definition is now a
 `(multi)graph` with $\mu(u,v)$ and `size` defined up front and `simple` defined
