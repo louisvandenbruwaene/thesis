@@ -207,7 +207,6 @@
   {\color{black!40}\large EXTREMAL GRAPH THEORY}\\[10pt]
   {\color{KULblauw3b}\fontsize{32}{36}\selectfont\bfseries Erd\H{o}s{} Problem 915}\\[8pt]
   {\color{KULblauw1}\Large Maximizing Edge Density Subject to Connectivity Constraints}\\[4pt]
-  {\color{black!45}\small One-hour version}
 
   \vspace{1.4cm}
   {\large\bfseries Louis Vandenbruwaene}\\[3pt]
@@ -337,7 +336,7 @@
 \end{center}
 
 \vspace{2pt}
-\noindent{\tiny\color{black!60} The eight models side by side, undirected on top and directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}\par
+% \noindent{\tiny\color{black!60} The eight models side by side, undirected on top and directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}\par
 \end{frame}
 
 % ============================================================================
@@ -359,7 +358,7 @@
   \draw[pA] (s)--(a)--(w)--(b)--(t);
   \draw[pB] (s)--(c)--(w)--(d)--(t);
 \end{tikzpicture}}{%
-Two edge-disjoint $s$--$t$ routes both pass through $w$, so $\lec(s,t)=2$ but $\kap(s,t)=1$.}
+{\large$\lec(s,t)=2$ and $\kap(s,t)=1$.}}
 
 % ============================================================================
 %  original slide 7
@@ -399,15 +398,11 @@ Directed $r$-uniform multihypergraph & $L_m^{\mathrm{dir}\,(r)}(n)$ & $K_m^{\mat
   \draw[flow] (mod) -- (mea);
   \draw[flow] (mea) -- (pro);
   \draw[flow] (mea) -- (dis);
-\end{tikzpicture}}{%
-A single model feeds the exact max-flow checker. Certification turns that measurement into finite upper bounds, while heuristic search uses it to discover lower bounds.}
-
+\end{tikzpicture}}{}
 % ============================================================================
 %  original slide 22
 % ============================================================================
-\begin{frame}{The building blocks of the connectivity checker}
-\centering
-\begin{minipage}[t]{0.32\textwidth}
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -424,12 +419,11 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \draw[->, edge] (4.0, -0.6) -- (vi);
 \draw[->, edge] (vo) -- (8.0,  0.6);
 \draw[->, edge] (vo) -- (8.0, -0.6);
-\end{tikzpicture}}
+\end{tikzpicture}}%
+\end{frame}
 
-{\scriptsize\color{black!60} Split each vertex $v$ into $v^{\mathrm{in}}$ and $v^{\mathrm{out}}$ joined by a unit-capacity arc to transform vertex-disjointness into edge-disjointness.}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
+
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -452,11 +446,10 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \draw[gdir, line width=1.6pt, color=KULblauw3b] (em) -- node[right, font=\scriptsize]{cap $\mu$} (ep);
 \end{scope}
 \end{tikzpicture}}
+\end{frame}
 
-{\scriptsize\color{black!60} Transform a hyperedge into a gate with capacity equal to the multiplicity of the hyperedge.}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
+
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth, gatearc/.style={gdir}]
@@ -477,16 +470,12 @@ A single model feeds the exact max-flow checker. Certification turns that measur
   \draw[gdirfaint] (gp) -- node[right, pos = 0.3, font=\scriptsize, text=black!60]{$\infty$} (c2);
 \end{scope}
 \end{tikzpicture}}
-
-{\scriptsize\color{black!60} The directed hyperedge is transformed into a gate with one tail and two heads. This gate has capacity equal to the multiplicity of the hyperedge and every route must enter at the tail and leave at a head.}
-\end{minipage}
 \end{frame}
 
 % ============================================================================
 %  original slide 24
 % ============================================================================
-\figframe{Candidate counts}{complexity_growth.png}{%
-Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent entries to decide.}
+\figframe{Candidate counts}{complexity_growth.png}{}
 
 % ============================================================================
 %  original slide 28
@@ -575,34 +564,27 @@ $n$ & $\ell_2^{\mathrm{dir}}(n)$ & blind (s) & pruned (s) & generated (s) \\
 \end{tikzpicture}}}
 
 \end{center}
-
-\vspace{2pt}
-\noindent{\tiny\color{black!60} Status of the sixteen variants. Colour marks the status of a leaf: blue a closed form proved for every $n$ and $m$, purple an exact value proved on stated parameter ranges and open outside them, red a conjectured exact formula with a proved lower bound, and amber a proved leading term with the exact value unknown.}\par
 \end{frame}
 
 % ============================================================================
 %  original slide 36
 % ============================================================================
-\figframetall{Eight graph variants at $m=3$}{variant_bounds_m3_graphs.png}{%
-The eight graph-model variants at $m=3$: simple and multigraph rows, undirected and directed columns. A blue curve is a theorem, a red one a conjecture and a yellow one an interpolation, filled squares are exact finite values, and open circles are witnesses.}
+\figframetall{Eight graph variants at $m=3$}{variant_bounds_m3_graphs.png}{}
 
 % ============================================================================
 %  original slide 37
 % ============================================================================
-\figframetall{Eight hypergraph variants at $m=3$}{variant_bounds_m3_hypergraphs.png}{%
-The eight hypergraph-model variants at $m=3$: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key. The blue curve is a proved upper bound rather than a proved value, attained only inside the stated ranges, so a square or circle below it marks a gap that is open rather than an error.}
+\figframetall{Eight hypergraph variants at $m=3$}{variant_bounds_m3_hypergraphs.png}{}
 
 % ============================================================================
 %  original slide 38
 % ============================================================================
-\figframetall{Eight graph variants at $m=6$}{variant_bounds_m6_graphs.png}{%
-The same eight graph-model variants at $m=6$. Raising $m$ widens every feasible band, and the exact squares thin out as the enumeration range falls behind the constructions.}
+\figframetall{Eight graph variants at $m=6$}{variant_bounds_m6_graphs.png}{}
 
-% ============================================================================
+%=============================================================================
 %  original slide 39
 % ============================================================================
-\figframetall{Eight hypergraph variants at $m=6$}{variant_bounds_m6_hypergraphs.png}{%
-The same eight hypergraph-model variants at $m=6$. The blue curve is again the proved upper bound, and at this $m$ it runs visibly above what has been reached: the exact square at $n=5$ is $8$ against the curve's $10$, and at $n=6$ the curve reads $12$ where the true maximum is $11$.}
+\figframetall{Eight hypergraph variants at $m=6$}{variant_bounds_m6_hypergraphs.png}{}
 
 % ============================================================================
 %  original slide 40
@@ -746,17 +728,17 @@ Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all
 \begin{frame}{AI: curse or blessing?}
 \vspace{4pt}
 \begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
+\column{0.47\textwidth}
 {\large\color{vertexgreen!60!black}\bfseries Pros}
 \begin{itemize}
-\item \LaTeX{} typesetting
-\item length \& complexity of generated text
+\item \LaTeX{}
+\item length \& complexity of\\ generated text
 \end{itemize}
-\column{0.48\textwidth}
+\column{0.47\textwidth}
 {\large\color{vertexred}\bfseries Cons}
 \begin{itemize}
-\item length \& complexity of generated text
 \item control
+\item length \& complexity of\\ generated text
 \end{itemize}
 \end{columns}
 \vspace{8pt}

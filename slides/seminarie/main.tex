@@ -696,15 +696,12 @@ is asymptotically optimal for both.
   \draw[flow] (mod) -- (mea);
   \draw[flow] (mea) -- (pro);
   \draw[flow] (mea) -- (dis);
-\end{tikzpicture}}{%
-A single model feeds the exact max-flow checker. Certification turns that measurement into finite upper bounds, while heuristic search uses it to discover lower bounds.}
+\end{tikzpicture}}{}
 
 % ============================================================================
 %  fig:checker-gadgets  (three subfigures side by side)
 % ============================================================================
-\begin{frame}{The building blocks of the connectivity checker}
-\centering
-\begin{minipage}[t]{0.32\textwidth}
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -721,12 +718,11 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \draw[->, edge] (4.0, -0.6) -- (vi);
 \draw[->, edge] (vo) -- (8.0,  0.6);
 \draw[->, edge] (vo) -- (8.0, -0.6);
-\end{tikzpicture}}
+\end{tikzpicture}}%
+\end{frame}
 
-{\scriptsize\color{black!60} Split each vertex $v$ into $v^{\mathrm{in}}$ and $v^{\mathrm{out}}$ joined by a unit-capacity arc to transform vertex-disjointness into edge-disjointness.}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
+
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
@@ -749,11 +745,10 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \draw[gdir, line width=1.6pt, color=KULblauw3b] (em) -- node[right, font=\scriptsize]{cap $\mu$} (ep);
 \end{scope}
 \end{tikzpicture}}
+\end{frame}
 
-{\scriptsize\color{black!60} Transform a hyperedge into a gate with capacity equal to the multiplicity of the hyperedge.}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
+
+\begin{frame}{Transformations}
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth, gatearc/.style={gdir}]
@@ -774,16 +769,12 @@ A single model feeds the exact max-flow checker. Certification turns that measur
   \draw[gdirfaint] (gp) -- node[right, pos = 0.3, font=\scriptsize, text=black!60]{$\infty$} (c2);
 \end{scope}
 \end{tikzpicture}}
-
-{\scriptsize\color{black!60} The directed hyperedge is transformed into a gate with one tail and two heads. This gate has capacity equal to the multiplicity of the hyperedge and every route must enter at the tail and leave at a head.}
-\end{minipage}
 \end{frame}
 
 % ============================================================================
 %  fig:complexity
 % ============================================================================
-\figframe{Candidate counts}{complexity_growth.png}{%
-Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent entries to decide.}
+\figframe{Candidate counts}{complexity_growth.png}{}
 
 % ============================================================================
 %  fig:matrix-rep
@@ -1085,17 +1076,13 @@ The augmented bipartite digraph at $m = 3$, $n = 10$. Every cross-part arc runs 
 % ============================================================================
 %  the four sideways variant-bounds grids
 % ============================================================================
-\figframetall{Eight graph variants at $m=3$}{variant_bounds_m3_graphs.png}{%
-The eight graph-model variants at $m=3$: simple and multigraph rows, undirected and directed columns. A blue curve is a theorem, a red one a conjecture and a yellow one an interpolation, filled squares are exact finite values, and open circles are witnesses.}
+\figframetall{Eight graph variants at $m=3$}{variant_bounds_m3_graphs.png}{}
 
-\figframetall{Eight hypergraph variants at $m=3$}{variant_bounds_m3_hypergraphs.png}{%
-The eight hypergraph-model variants at $m=3$: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key. The blue curve is a proved upper bound rather than a proved value, attained only inside the stated ranges, so a square or circle below it marks a gap that is open rather than an error.}
+\figframetall{Eight hypergraph variants at $m=3$}{variant_bounds_m3_hypergraphs.png}{}
 
-\figframetall{Eight graph variants at $m=6$}{variant_bounds_m6_graphs.png}{%
-The same eight graph-model variants at $m=6$. Raising $m$ widens every feasible band, and the exact squares thin out as the enumeration range falls behind the constructions.}
+\figframetall{Eight graph variants at $m=6$}{variant_bounds_m6_graphs.png}{}
 
-\figframetall{Eight hypergraph variants at $m=6$}{variant_bounds_m6_hypergraphs.png}{%
-The same eight hypergraph-model variants at $m=6$. The blue curve is again the proved upper bound, and at this $m$ it runs visibly above what has been reached: the exact square at $n=5$ is $8$ against the curve's $10$, and at $n=6$ the curve reads $12$ where the true maximum is $11$.}
+\figframetall{Eight hypergraph variants at $m=6$}{variant_bounds_m6_hypergraphs.png}{}
 
 % ============================================================================
 %  tab:summary
