@@ -177,11 +177,16 @@ and only touch this summary if the *status* (proved/open) changes.
   without archiving it there first.
 - **Commit and push at the end of each session** (standing author
   preference).
-- **THE AI MEDAL. Every proof-carrying result the model wrote carries
-  `\aimedal` in its theorem head, and a new one must be stamped too.**
-  Author instruction, 2026-08-28: he has not verified them all and for some is
-  not qualified to, so the badge says "conjecture with a probably-correct proof
-  attached", not "theorem I vouch for". The macro is at the bottom of
+- **THE AI MEDAL marks what the author has NOT checked, and he curates the
+  list himself.** A new proof-carrying result the model writes is stamped with
+  `\aimedal` by default, and the badge comes off only when the author says he
+  has worked through that proof. Author instruction, 2026-08-28, narrowed
+  2026-08-29 when he named the 25 appendix results that keep it (A.13, A.27,
+  A.29, A.33, A.38, A.39, A.40, A.43, A.46, A.47, A.48, A.50, A.51, A.52, A.58,
+  A.60, A.61, A.62, A.64, A.65, A.67, A.68, A.69, A.70, A.71) and unbadged the
+  other 22. **Never remove a badge on your own reasoning, and never add one to a
+  result he has cleared.** The badge says "conjecture with a probably-correct
+  proof attached", not "theorem I vouch for". The macro is at the bottom of
   `preamble.tex`; usage is `\begin{lemma}[Title,\aimedal]` for a named result
   and `\begin{theorem}[\aimedal]` for an unnamed one. It goes on
   theorem/proposition/lemma/corollary/claim only. It does NOT go on: results
@@ -1323,3 +1328,47 @@ occurrences of `??`. 129 tests OK, 1 expected skip. `k_5` recomputed at
 $n = 6, 7, 12, 13, 14, 15$ against the paper's own $f_5$ values minus one.
 Pages 13, 14, 15, 22 and 23 rendered and inspected. No em-dashes, en-dashes or
 prose semicolons in the diff (every semicolon hit is TikZ).
+
+
+## 2026-08-29 (Opus, second session) — the author curated the AI badges
+
+The author named the appendix results that keep `\aimedal` and asked for it off
+everything else: **A.13, A.27, A.29, A.33, A.38, A.39, A.40, A.43, A.46, A.47,
+A.48, A.50, A.51, A.52, A.58, A.60, A.61, A.62, A.64, A.65, A.67, A.68, A.69,
+A.70, A.71**, twenty-five of the forty-seven that carried it. The other 22 lost
+theirs (A.3, A.4, A.9, A.10, A.11, A.18, A.19, A.20, A.21, A.24, A.25, A.26,
+A.30, A.34, A.35, A.41, A.42, A.49, A.55, A.56, A.57, A.66). Applied by mapping
+`main.aux`'s `\newlabel` numbers back to the environments rather than by
+counting headings by hand.
+
+**TWO ENTRIES OF HIS LIST CARRY NO BADGE AND CANNOT.** A.28 is
+`open:decomposition`, a conjecture, and A.54 is Baranyai's theorem, cited from
+the literature. Both sit exactly in the gaps of the badged numbering, which is
+also the check that his list is not shifted by one against the printed numbers.
+The standing rule keeps badges off conjectures and cited classics, so nothing
+was done for those two.
+
+**CHAPTER 1'S NINE BADGES WERE LEFT ALONE.** His list names only `A.*` numbers,
+which are the appendix's own results, and chapter 1's theorems are numbered
+`1.x`. Leaving them also keeps the instruction he gave an hour earlier, that
+`thm:dir-arc-m2-exact` (Theorem 1.6) stays badged. The consequence to be aware
+of: several ch1 theorems now keep a badge while some of the appendix lemmas
+their proofs run on have lost theirs, which is coherent under the badge's
+meaning (he has checked those lemmas, not the assembly) but is worth a
+deliberate second pass.
+
+**THE BADGE'S MEANING SHIFTED, AND THE THREE EXPLANATIONS FOLLOWED IT.** It used
+to read "written by an AI model", with two hand-checked exceptions named. It now
+reads "a proof the author has not checked line by line", which is what a curated
+list makes it. Rewritten in the Contribution Statement, in the appendix's "How to
+read this appendix" paragraph, and in the sentence opening `sec:dir-arc-m2`,
+which had just been rewritten the other way in the previous session and now says
+the three lemmas carry no badge while the induction they support keeps one at its
+statement. The abbreviations-table line already said "not verified line by line
+by the author" and needed no change.
+
+VERIFY: `latexmk -pdf` exit 0, 108pp, 0 overfull/underfull, 0 undefined refs, 0
+occurrences of `??`. 37 `[AI]` marks in the extracted text, which is 25 appendix
+headings plus 9 chapter 1 headings plus the three prose mentions. The badged set
+was re-derived from the rebuilt `main.aux` and compared against his list
+programmatically rather than by eye.
