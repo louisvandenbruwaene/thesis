@@ -197,6 +197,10 @@
 \begin{document}
 
 % ============================================================================
+
+% ============================================================================
+%  original slide 1
+% ============================================================================
 \begin{frame}[plain]
 \vspace{1.9cm}
 \hspace*{0.5cm}\begin{minipage}{0.9\textwidth}
@@ -217,111 +221,7 @@
 \end{frame}
 
 % ============================================================================
-%  fig:k5-example
-% ============================================================================
-\tikzframe{The graph $K_5 - \{04,13\}$}{%
-\begin{tikzpicture}[scale=1.4,
-    mv/.style={gvertex},
-    me/.style={gline}]
-  \foreach \i in {0,...,4} {
-    \pgfmathsetmacro{\ang}{90 + 72*\i}
-    \coordinate (v\i) at (\ang:1.4);
-  }
-  \draw[me] (v0)--(v1) (v0)--(v2) (v0)--(v3)
-            (v1)--(v2) (v1)--(v4)
-            (v2)--(v3) (v2)--(v4)
-            (v3)--(v4);
-  \foreach \i in {0,...,4} {
-    \pgfmathsetmacro{\ang}{90 + 72*\i}
-    \node[mv] at (\ang:1.4) {$\i$};
-  }
-\end{tikzpicture}}{%
-The simple graph $K_5-\{04,13\}$ has five vertices and eight edges, where $K_n$ is the complete graph on $n$ vertices.}
-
-% ============================================================================
-%  fig:menger
-% ============================================================================
-\tikzframe{Menger's theorem}{%
-\begin{tikzpicture}[scale=1.6,
-    mv/.style={gvertex},
-    me/.style={gline},
-    rA/.style={grA},
-    rB/.style={grB},
-    rC/.style={grC},
-    cut/.style={gcutedge}]
-  \foreach \i in {0,...,4} {
-    \pgfmathsetmacro{\ang}{90 + 72*\i}
-    \coordinate (v\i) at (\ang:1.5);
-  }
-  \draw[me] (v0)--(v1) (v0)--(v2) (v0)--(v3)
-            (v1)--(v2) (v1)--(v4)
-            (v2)--(v3) (v2)--(v4)
-            (v3)--(v4);
-  \draw[rA] (v1)--(v0)--(v3);
-  \draw[rB] (v1)--(v2)--(v3);
-  \draw[rC] (v1)--(v4)--(v3);
-  \draw[cut] (v1) circle (0.6);
-  \node[vertexred, font=\scriptsize] at (-1.35,1.55) {cut: $3$ edges};
-  \foreach \i in {0,...,4} {
-    \pgfmathsetmacro{\ang}{90 + 72*\i}
-    \node[mv] at (\ang:1.5) {$\i$};
-  }
-\end{tikzpicture}}{%
-Menger's theorem on $K_5-\{04,13\}$: three edge-disjoint $1$--$3$ routes (coloured) meet the minimal three-edge cut around vertex $1$, so $\lec(1,3)=3$.}
-
-% ============================================================================
-%  fig:directed-lambda
-% ============================================================================
-\tikzframe{Directed connectivity}{%
-\begin{tikzpicture}[>=Stealth, scale=1.4,
-    mv/.style={gvertex},
-    me/.style={gdirfaint, shorten >=3.5mm},
-    rA/.style={grAd, shorten >=3.5mm},
-    rB/.style={grBd, shorten >=3.5mm},
-    rC/.style={grCd, shorten >=3.5mm},
-    cut/.style={gcutedge}]
-\foreach \i in {0,...,4}{
-    \pgfmathsetmacro{\ang}{90+72*\i}
-    \coordinate (v\i) at (\ang:1.6);
-}
-\draw[me] (v1) to[bend right=12] (v0);
-\draw[me] (v1) to[bend right=12] (v2);
-\draw[me] (v1) to[bend right=12] (v4);
-\draw[me] (v0) to[bend right=12] (v4);
-\draw[me] (v2) to[bend right=12] (v4);
-\draw[me] (v3) to[bend right=12] (v4);
-\draw[me] (v0) to[bend right=12] (v2);
-\draw[me] (v0) to[bend right=12] (v3);
-\draw[me] (v3) to[bend right=12] (v0);
-\draw[me] (v2) to[bend right=12] (v3);
-\draw[rA] (v1) to[bend right=12] (v4);
-\draw[me] (v0) to[bend right=12] (v1);
-\draw[rB] (v1) to[bend right=12] (v0);
-\draw[rB] (v0) to[bend right=12] (v4);
-\draw[rC] (v1) to[bend right=12] (v2);
-\draw[rC] (v2) to[bend right=12] (v4);
-\tikzset{cuttick/.style={postaction={decorate, decoration={markings,
-   mark=at position 0.62cm with {\draw[vertexred, line width=1.6pt]
-        (0,-3.6pt) -- (0,3.6pt);}}}}}
-\path[cuttick] (v1) to[bend right=12] (v4);
-\path[cuttick] (v1) to[bend right=12] (v0);
-\path[cuttick] (v1) to[bend right=12] (v2);
-\node[vertexred, font=\scriptsize, anchor=east]
-  at (-2.25, 0.2) {cut: $3$ arcs};
-\node[font=\scriptsize, KULblauw1, anchor=east]
-  at (-2.25, 0.85) {$d^{+}(u)=3$};
-\node[font=\scriptsize, KULblauw1, anchor=west]
-  at (2.0, 0.9) {$d^{-}(v)=4$};
-\node[mv] at (v0) {};
-\node[mv] at (v1) {$u$};
-\node[mv] at (v2) {};
-\node[mv] at (v3) {};
-\node[mv] at (v4) {$v$};
-\end{tikzpicture}}{%
-Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directed cut (red) in a simple digraph. Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
-
-% ============================================================================
-%  fig:eight-models
+%  original slide 5
 % ============================================================================
 \begin{frame}{The eight models}
 \vspace{-4pt}
@@ -441,7 +341,7 @@ Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directe
 \end{frame}
 
 % ============================================================================
-%  fig:edge-vs-vertex
+%  original slide 6
 % ============================================================================
 \tikzframe{The separation axis}{%
 \begin{tikzpicture}[>=Stealth, scale=1.3,
@@ -462,7 +362,7 @@ Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directe
 Two edge-disjoint $s$--$t$ routes both pass through $w$, so $\lec(s,t)=2$ but $\kap(s,t)=1$.}
 
 % ============================================================================
-%  tab:notation
+%  original slide 7
 % ============================================================================
 \begin{frame}{Notation for the extremal functions}
 \centering
@@ -485,204 +385,7 @@ Directed $r$-uniform multihypergraph & $L_m^{\mathrm{dir}\,(r)}(n)$ & $K_m^{\mat
 \end{frame}
 
 % ============================================================================
-%  thm:multigraph-edge + thm:leonard, merged: both are one-line undirected
-%  bounds and neither carries the AI medal (the multigraph value is the
-%  author's own Gomory-Hu double count, Leonard is a cited classical result)
-% ============================================================================
-\begin{frame}{Undirected bounds: multigraphs and Leonard}
-\vfill
-\begin{theorem}
-For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
-\end{theorem}
-\vspace{12pt}
-\begin{theorem}[B\'artfai, Bollob\'as, Leonard]
-For all $n \ge m$ and $m \le 4$,
-\[
-    k_m(n) = \ell_m(n) = \floorfrac{m(n-1)}{2}.
-\]
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  fig:divergence
-% ============================================================================
-\figframe{Edge and vertex diverge}{edge_vertex_divergence.png}{%
-The edge and vertex extremal functions for $m = 2, 3, 4$ (blue shades, single curve per $m$ since they agree) and $m = 5$ (dashed blue for edge, solid orange for vertex). The vertex function diverges from the edge function at $n = 14$ and grows faster thereafter.}
-
-% ============================================================================
-%  thm:dir-arc-m2-exact + thm:dir-vertex-m2-exact, merged
-% ============================================================================
-\begin{frame}{Directed values at $m=2$}
-\vfill
-\begin{theorem}[Directed arc value at $m = 2$,\aimedal]
-For simple digraphs,
-\[
-    \ell_2^{\mathrm{dir}}(n) = \max\!\left(2(n-1),\ \floorfrac{n^2}{4}\right).
-\]
-\end{theorem}
-\vspace{12pt}
-\begin{theorem}[Directed vertex value at $m = 2$,\aimedal]
-For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  prop:hyper-edge
-% ============================================================================
-\begin{frame}{Hypergraph edge bound}
-\vfill
-\begin{proposition}[Hypergraph edge bound,\aimedal]
-An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has total hyperedge multiplicity at most $\floorfrac{(m-1)(n-1)}{r-1}$. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
-\end{proposition}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  fig:simple-digraph-m2
-% ============================================================================
-\tikzframe{The two branches tie at $n=7$}{%
-\begin{tikzpicture}[>=Stealth, scale=1.0,
-    smallleftvertex/.style={gvertex}, smallrightvertex/.style={gvsink},
-    hubvertex/.style={gvhub}, leftvertex/.style={gvertex},
-    arc/.style={gdir},
-    carc/.style={gdir, vertexorange!80!black}]
-  \begin{scope}[shift={(-5.4,1.0)}, scale=0.92]
-    \node[hubvertex, minimum size=7mm] (h) at (0,0) {$h$};
-    \foreach \i/\ang in {0/90, 1/150, 2/210, 3/270, 4/330, 5/30} {
-      \node[leftvertex, minimum size=7mm] (v\i) at (\ang:2.2) {$\i$};
-    }
-    \foreach \i in {0,...,5} {
-      \draw[arc] (h) to[bend left=13] (v\i);
-      \draw[arc] (v\i) to[bend left=13] (h);
-    }
-  \end{scope}
-  \begin{scope}[on background layer]
-    \node[draw=KULblauw1!25, fill=KULblauw1!6, rounded corners=10pt,
-          fit={(0,-0.6) (0,2.6)}, inner sep=8pt, minimum width=12pt] {};
-    \node[draw=vertexred!25, fill=vertexred!6, rounded corners=10pt,
-          fit={(4,-0.6) (4,2.6)}, inner sep=8pt, minimum width=12pt] {};
-  \end{scope}
-  \foreach \i in {1,...,3} {
-    \node[smallleftvertex]  (a\i) at (0, {2.0-1.0*(\i-1)}) {$a_{\i}$};
-  }
-  \foreach \j in {1,...,4} {
-    \node[smallrightvertex] (b\j) at (4, {2.5-1.0*(\j-1)}) {$b_{\j}$};
-  }
-  \foreach \i in {1,...,3} {
-    \foreach \j in {1,...,4} {
-      \draw[arc] (a\i) -- (b\j);
-    }
-  }
-  \node[font=\small] at (0,-1.3) {$A$};
-  \node[font=\small] at (4,-1.3) {$B$};
-\end{tikzpicture}}{%
-The two branches tie at $n=7$, where each holds $12$ arcs at $\lec^{\max}=1$. Left: the bidirected star, a hub joined to six spokes both ways, $2(n-1)=12$. Right: the one-directional complete bipartite digraph $B_{3,4}$, every arc from $A$ to $B$, $\floor{n^2/4}=12$.}
-
-% ============================================================================
-%  thm:hyper-vertex-m2
-% ============================================================================
-\begin{frame}{Hypergraph vertices at $m=2$}
-\vfill
-\begin{theorem}[Hypergraph vertex value at $m = 2$,\aimedal]
-For $r \ge 2$ and $n \ge 1$, the maximum number of hyperedges of an
-$r$-uniform multihypergraph on $n$ vertices with $\kap^{\max} \le 1$ is
-\[
-    K_2^{(r)}(n) \;=\; \floorfrac{n-1}{r-1},
-\]
-attained by the star hypertree, which is simple. In
-particular $K_2^{(r)}(n) = k_2^{(r)}(n) = \ell_2^{(r)}(n)$: the vertex and edge
-problems agree at $m = 2$ for every uniformity, and repeated hyperedges never
-help.
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  thm:hyper-vertex-m3
-% ============================================================================
-\begin{frame}{Hypergraph vertices at $m=3$}
-\vfill
-\begin{theorem}[Hypergraph vertex value at $m = 3$,\aimedal]
-For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
-$\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
-$r \ge 3$ with $2 \le \binom{n-2}{r-2}$ the bound is attained by a simple
-hypergraph, so
-\[
-    k_3^{(r)}(n) \;=\; \floorfrac{2(n-1)}{r-1} \;=\; \ell_3^{(r)}(n).
-\]
-A multihypergraph attains it whenever $(r-1) \mid (n-1)$ instead, by repeating one
-hyperedge rather than needing $\binom{n-2}{r-2}$ distinct ones, so
-$K_3^{(r)}(n)$ takes the same value on that range.
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  thm:dir-arc-linear-error + thm:dir-vertex-linear-error, merged: the two
-%  hypotheses (lambda vs kappa) drive the SAME inequality, stated once
-% ============================================================================
-\begin{frame}{The quadratic bound: directed arcs and vertices}
-\small
-\vfill
-\begin{theorem}[The quadratic bound with a linear error,\aimedal]
-For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
-\[
-    |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
-\]
-so for each fixed $m$,
-\[
-    \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
-\]
-and, for $m\ge3$, both the leading constant $\tfrac14$ and the order of the second-order term hold unconditionally. At $m=2$, $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
-\end{theorem}
-\vspace{8pt}
-\begin{theorem}[Directed vertex problem, leading constant and order,\aimedal]
-The same bound holds under the weaker hypothesis $\kap^{\max}_D \le m-1$, and consequently, for each fixed $m$,
-\[
-    k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
-\]
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  thm:dir-multi-full
-% ============================================================================
-\begin{frame}{Directed multigraphs, closed}
-\vfill
-\begin{theorem}[Directed multigraph value, every $n$ and $m$,\aimedal]
-For all $n \ge 2$ and $m \ge 2$,
-\[
-    L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
-\]
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  thm:dir-hyper-constant
-% ============================================================================
-\begin{frame}{The directed hypergraph constant}
-\vfill
-\begin{theorem}[The directed hypergraph constant,\aimedal]
-Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
-$\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
-\[
-    |E(\HH)| \;\le\; \frac{m-1}{r-1}\floorfrac{n^2}{4} \;+\; 4(m-1)^2 (n-1).
-\]
-The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
-stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
-edge- and the vertex-disjoint maxima are
-$\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
-is asymptotically optimal for both.
-\end{theorem}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  fig:spine
+%  original slide 21
 % ============================================================================
 \tikzframe{The architecture}{%
 \begin{tikzpicture}[>=Stealth,
@@ -700,7 +403,7 @@ is asymptotically optimal for both.
 A single model feeds the exact max-flow checker. Certification turns that measurement into finite upper bounds, while heuristic search uses it to discover lower bounds.}
 
 % ============================================================================
-%  fig:checker-gadgets  (three subfigures side by side)
+%  original slide 22
 % ============================================================================
 \begin{frame}{The building blocks of the connectivity checker}
 \centering
@@ -780,82 +483,13 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \end{frame}
 
 % ============================================================================
-%  fig:complexity
+%  original slide 24
 % ============================================================================
 \figframe{Candidate counts}{complexity_growth.png}{%
 Candidate counts for blind enumeration on a logarithmic scale. Every model crosses the generous $10^9$ budget in single-digit order, and directed objects grow fastest because they have more independent entries to decide.}
 
 % ============================================================================
-%  fig:matrix-rep
-% ============================================================================
-\tikzframescaled{The two encodings}{%
-\begin{tikzpicture}[>=Stealth]
-\node[vertex] (A) at (0,   0)   {$1$};
-\node[vertex] (B) at (2.0, 0)   {$2$};
-\node[vertex] (C) at (1.0, 1.7) {$3$};
-\draw[arc] (A) to[bend left=15]  (B);
-\draw[arc] (A) to[bend right=15] (B);
-\draw[arc] (B) to[bend left=15]  (C);
-\draw[arc] (C) to[bend left=15] (B);
-\draw[arc] (A) -- (C);
-\node[font=\small] at (1.0, -0.8) {directed multigraph $G$};
-\node at (3.3, 0.55) {$\xrightarrow{\;\mu\;}$};
-\node at (5.4, 0.55) {$\begin{pmatrix} {\color{vertexred}\mathbf 0} & 2 & 1 \\ 0 & {\color{vertexred}\mathbf 0} & 1 \\ 0 & 1 & {\color{vertexred}\mathbf 0} \end{pmatrix}$};
-\node[font=\small] at (5.4, -0.8) {multiplicity matrix $\mu$};
-\node[font=\scriptsize, vertexred] at (5.4, -1.3) {Diag($\mu$)$=0$ (no loops)};
-\begin{scope}[yshift=-3.5cm]
-  \coordinate (p1) at (0.0, 0.6);
-  \coordinate (p2) at (0.0,-0.6);
-  \coordinate (p3) at (1.1, 0.0);
-  \coordinate (p4) at (2.2, 0.6);
-  \coordinate (p5) at (2.2,-0.6);
-  \begin{scope}[on background layer]
-    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p1);
-    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p2);
-    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p4);
-    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p5);
-  \end{scope}
-  \foreach \p/\lbl in {p1/1,p2/2,p3/3,p4/4,p5/5} {\node[smallvertex] at (\p) {$\lbl$};}
-  \node[font=\small] at (1.1,-1.25) {directed hypergraph $H$};
-  \node at (3.3, 0.0) {$\longrightarrow$};
-  \node[font=\small, align=left] at (5.9, 0.0)
-    {list of hyperedges:\\[3pt] $e_1: \{3\ |\ 1,2\}$\\[1pt] $e_2:\{3\ |\ 4,5\}$};
-\end{scope}
-\end{tikzpicture}}{%
-The two encodings, for the directed variants. The digraph is the multiplicity matrix $\mu$, where $\mu_{ij}$ counts arcs from $i$ to $j$. The directed hypergraph is a list of hyperedges, with the tail of each isolated. Multihypergraphs repeat at least one entry in the list.}{0.72}
-
-% ============================================================================
-%  fig:prune
-% ============================================================================
-\tikzframe{Branch and bound}{%
-\begin{tikzpicture}[scale=1.35, >=Stealth,
-   live/.style={gvertex, minimum size=5.5mm},
-   dead/.style={gvsink, minimum size=5.5mm},
-   bnd/.style={gvhub, minimum size=5.5mm},
-   best/.style={gvertex, draw=vertexgreen!70!black, fill=vertexgreen!18, minimum size=5.5mm},
-   br/.style={gline}]
-  \node[live] (r) at (0,0) {};
-  \node[live] (l) at (-2.2,-1.3) {};
-  \node[live] (rr) at (2.2,-1.3) {};
-  \draw[br] (r) -- node[above left, font=\scriptsize, pos=0.55]{add arc} (l);
-  \draw[br] (r) -- node[above right, font=\scriptsize, pos=0.55]{skip arc} (rr);
-  \node[best] (l1) at (-3.1,-2.7) {};
-  \node[dead] (l2) at (-1.4,-2.7) {};
-  \draw[br] (l)--(l1);
-  \draw[line width=1pt, vertexred!60] (l)--(l2);
-  \node[dead] (r1) at (1.3,-2.7) {};
-  \node[bnd]  (r2) at (3.1,-2.7) {};
-  \draw[line width=1pt, vertexred!60] (rr)--(r1);
-  \draw[line width=1pt, vertexorange!70] (rr)--(r2);
-  \node[font=\scriptsize, vertexgreen!50!black, align=center] at (-3.1,-3.5) {best\\feasible};
-  \node[font=\scriptsize, vertexred, align=center] at (-1.4,-3.5) {infeasible\\(prune)};
-  \node[font=\scriptsize, vertexred, align=center] at (1.3,-3.5) {infeasible\\(prune)};
-  \node[font=\scriptsize, vertexorange!80!black, align=center] at (3.1,-3.5) {cannot beat\\best (prune)};
-\end{tikzpicture}}{%
-Each level of the partially built graph fixes one adjacency. Infeasible partial graphs (red) and branches unable to beat the incumbent (orange) are discarded.}
-
-% ============================================================================
-%  generating-search benchmark table
+%  original slide 28
 % ============================================================================
 \begin{frame}{Generating search: a benchmark}
 \centering
@@ -874,143 +508,7 @@ $n$ & $\ell_2^{\mathrm{dir}}(n)$ & blind (s) & pruned (s) & generated (s) \\
 \end{frame}
 
 % ============================================================================
-%  fig:scaling-reduction
-% ============================================================================
-\tikzframe{Scaling out $m$}{%
-\begin{tikzpicture}[>=Stealth, font=\small]
-    \node[vertex] (A1) at (-4.2, 0)   {$A$};
-    \node[vertex] (B1) at (-2.4, 1.1) {$B$};
-    \node[vertex] (C1) at (-2.4,-1.1) {$C$};
-    \draw[->, arc] (A1) to[bend left=22]  node[above, font=\scriptsize]{$2$} (B1);
-    \draw[->, arc] (A1) to[bend right=5]  (B1);
-    \draw[->, arc] (A1) -- node[below, font=\scriptsize]{$1$} (C1);
-    \draw[->, arc, color=gray!50, dashed] (B1) -- node[right, font=\scriptsize, color=gray!60]{$0$} (C1);
-    \node[above, font=\footnotesize\itshape] at (-3.3, 1.8) {multigraph ($m=3$)};
-    \draw[->, very thick] (-1.2, 0) -- (1.2, 0);
-    \node[above, font=\small] at (0, 0.1) {$\div\,(m-1)\;=\;\div\,2$};
-    \node[vertex] (A2) at (2.4, 0)   {$A$};
-    \node[vertex] (B2) at (4.2, 1.1) {$B$};
-    \node[vertex] (C2) at (4.2,-1.1) {$C$};
-    \draw[->, arc] (A2) -- node[above, font=\scriptsize]{$1$} (B2);
-    \draw[->, arc] (A2) -- node[below, font=\scriptsize]{$\tfrac{1}{2}$} (C2);
-    \draw[->, arc, color=gray!50, dashed] (B2) -- node[right, font=\scriptsize, color=gray!60]{$0$} (C2);
-    \node[above, font=\footnotesize\itshape] at (3.3, 1.8) {weight matrix ($M^*$)};
-\end{tikzpicture}}{%
-Scaling at $m=3$: dividing multiplicities by $m-1=2$ turns the integer multigraph into a weight matrix with entries in $[0,1]$ and pairwise maximum flow at most one. Hence one $m$-free optimisation bounds every threshold.}
-
-% ============================================================================
-%  energy function
-% ============================================================================
-\begin{frame}{The search: an energy function}
-\vfill
-To implement the metaheuristic, give each graph one number: its energy
-\[
-    \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ c^{\max}(G) - (m - 1)\bigr).
-\]
-\vfill
-\end{frame}
-
-% ============================================================================
-%  what the search rediscovers (table)
-% ============================================================================
-\begin{frame}{What the search rediscovers}
-\centering
-\scriptsize
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{llccrr}
-\toprule
-Construction & Variant & $n$ & $m$ & Search & Theory \\
-\midrule
-spanning tree (simple undirected) & $\ell_m(n)$ & 6 & 2 & 5 & 5 \\
-multiplicity-$(m{-}1)$ star (multi undirected) & $L_m(n)$ & 6 & 3 & 10 & 10 \\
-bidirected star (simple directed) & $\ell_m^{\mathrm{dir}}(n)$ & 4 & 2 & 6 & 6 \\
-bidirected star (simple directed) & $\ell_m^{\mathrm{dir}}(n)$ & 6 & 2 & 10 & 10 \\
-hub--bipartite tie (simple directed) & $\ell_m^{\mathrm{dir}}(n)$ & 7 & 2 & 12 & 12 \\
-double star (multi directed) & $L_m^{\mathrm{dir}}(n)$ & 4 & 3 & 12 & 12 \\
-double star (multi directed) & $L_m^{\mathrm{dir}}(n)$ & 5 & 3 & 16 & 16 \\
-\bottomrule
-\end{tabular}
-\end{frame}
-
-% ============================================================================
-%  fig:rediscovery-gallery
-% ============================================================================
-\tikzframescaled{Three rediscovered shapes}{%
-\begin{tikzpicture}[>=Stealth]
-  \begin{scope}[shift={(-7.5,0)}]
-    \foreach \i/\x in {1/0,2/1.0,3/2.0,4/3.0,5/4.0,6/5.0} {
-      \node[gvertex, minimum size=5mm] (t\i) at (\x,0) {};
-    }
-    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
-      \draw[gline] (t\i) -- (t\j);
-    }
-    \node[font=\footnotesize\itshape] at (2.5,-0.9) {spanning tree};
-    \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
-  \end{scope}
-  \begin{scope}[shift={(0,0.3)}]
-    \node[gvhub, minimum size=6mm] (h2) at (0,0) {};
-    \foreach \ang in {90,162,234,306,18} {
-      \node[gvertex, minimum size=5mm] (l2\ang) at (\ang:1.5) {};
-      \draw[gline] (h2) to[gcurve]  (l2\ang);
-      \draw[gline] (h2) to[gcurveR] (l2\ang);
-    }
-    \node[font=\footnotesize\itshape] at (0,-2.0) {multigraph star};
-    \node[font=\scriptsize] at (0,-2.5) {$n=6$, $m=3$, $L_3(n)=10$};
-  \end{scope}
-  \begin{scope}[shift={(5.2,0.3)}]
-    \node[gvhub, minimum size=6mm] (h3) at (0,0) {};
-    \foreach \ang in {90,210,330} {
-      \node[gvertex, minimum size=5mm] (l3\ang) at (\ang:1.9) {};
-      \draw[gdir] (h3)     to[bend left=30]  (l3\ang);
-      \draw[gdir] (h3)     to[bend left=11]  (l3\ang);
-      \draw[gdir] (l3\ang) to[bend left=30]  (h3);
-      \draw[gdir] (l3\ang) to[bend left=11]  (h3);
-    }
-    \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
-    \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\mathrm{dir}}(n)=12$};
-  \end{scope}
-\end{tikzpicture}}{%
-Three of the shapes the search rediscovers, each drawn at the size the table reports. The fourth, the bidirected star tying the one-directional wall at $n=7$, was shown earlier.}{0.95}
-
-% ============================================================================
-%  fig:crossover
-% ============================================================================
-\figframe{The directed crossover}{directed_crossover.png}{%
-The two lower-bound branches of the directed-arc conjecture at $m = 3$, and the maximum they define.}
-
-% ============================================================================
-%  fig:augmented-wall
-% ============================================================================
-\tikzframe{The augmented bipartite digraph}{%
-\begin{tikzpicture}[>=Stealth, scale=1.0,
-    wallarc/.style={gdirfaint},
-    cyc/.style={-{Stealth[length=2.4mm]}, line width=1.3pt, vertexorange!85!black}]
-  \foreach \i/\y in {1/1.65, 2/0.55, 3/-0.55, 4/-1.65} {
-    \node[smallvertex] (a\i) at (0,\y) {$a_{\i}$};
-  }
-  \foreach \j/\ang in {1/90, 2/30, 3/-30, 4/-90, 5/-150, 6/150} {
-    \node[smallvertex] (b\j) at ($(5.6,0)+(\ang:1.85)$) {$b_{\j}$};
-  }
-  \begin{scope}[on background layer]
-    \node[draw=KULblauw1!25, fill=KULblauw1!6, rounded corners=10pt,
-          fit={(a1) (a4)}, inner sep=9pt] {};
-    \node[draw=vertexorange!35, fill=vertexorange!5, circle,
-          fit={(b1) (b2) (b3) (b4) (b5) (b6)}, inner sep=1pt] {};
-  \end{scope}
-  \node[font=\scriptsize, KULblauw1] at (0,2.55) {part $A$};
-  \node[font=\scriptsize, vertexorange!75!black] at (5.6,2.55) {part $B$};
-  \foreach \i in {1,...,4}{\foreach \j in {1,...,6}{\draw[wallarc] (a\i) -- (b\j);}}
-  \foreach \j/\k in {1/2, 2/3, 3/4, 4/5, 5/6, 6/1} {
-    \draw[cyc] (b\j) -- (b\k);
-  }
-  \node[font=\scriptsize] at (0,-2.55) {$24$ arcs $A \to B$};
-  \node[font=\scriptsize, align=center, vertexorange!75!black] at (5.6,-2.55)
-    {$6$ cyclic in-arcs inside $B$};
-\end{tikzpicture}}{%
-The augmented bipartite digraph at $m = 3$, $n = 10$. Every arc runs from $A$ to $B$, and inside $B$ each vertex takes one arc from its cyclic predecessor, which is $m - 2$ arcs per vertex. A pair $a_i, b_j$ then has the direct arc and one detour, so $\lec^{\max} = 2$, and the count is $24 + 6 = 30$ against the hub branch's $27$.}
-
-% ============================================================================
-%  fig:variant-tree-status
+%  original slide 35
 % ============================================================================
 \begin{frame}{Status of the sixteen variants}
 \vspace{-4pt}
@@ -1083,22 +581,31 @@ The augmented bipartite digraph at $m = 3$, $n = 10$. Every arc runs from $A$ to
 \end{frame}
 
 % ============================================================================
-%  the four sideways variant-bounds grids
+%  original slide 36
 % ============================================================================
 \figframetall{Eight graph variants at $m=3$}{variant_bounds_m3_graphs.png}{%
 The eight graph-model variants at $m=3$: simple and multigraph rows, undirected and directed columns. A blue curve is a theorem, a red one a conjecture and a yellow one an interpolation, filled squares are exact finite values, and open circles are witnesses.}
 
+% ============================================================================
+%  original slide 37
+% ============================================================================
 \figframetall{Eight hypergraph variants at $m=3$}{variant_bounds_m3_hypergraphs.png}{%
 The eight hypergraph-model variants at $m=3$: hypergraph and multihypergraph rows, undirected and directed columns, same colour and marker key. The blue curve is a proved upper bound rather than a proved value, attained only inside the stated ranges, so a square or circle below it marks a gap that is open rather than an error.}
 
+% ============================================================================
+%  original slide 38
+% ============================================================================
 \figframetall{Eight graph variants at $m=6$}{variant_bounds_m6_graphs.png}{%
 The same eight graph-model variants at $m=6$. Raising $m$ widens every feasible band, and the exact squares thin out as the enumeration range falls behind the constructions.}
 
+% ============================================================================
+%  original slide 39
+% ============================================================================
 \figframetall{Eight hypergraph variants at $m=6$}{variant_bounds_m6_hypergraphs.png}{%
 The same eight hypergraph-model variants at $m=6$. The blue curve is again the proved upper bound, and at this $m$ it runs visibly above what has been reached: the exact square at $n=5$ is $8$ against the curve's $10$, and at $n=6$ the curve reads $12$ where the true maximum is $11$.}
 
 % ============================================================================
-%  tab:summary
+%  original slide 40
 % ============================================================================
 \begin{frame}{The sixteen variants, summarised}
 \centering
@@ -1146,7 +653,7 @@ $r$-multi-hyper
 \end{frame}
 
 % ============================================================================
-%  the exact-value tables, split at m=3 / m=6
+%  original slide 41
 % ============================================================================
 \begin{frame}{Exact values, $m=3$}
 \centering
@@ -1178,6 +685,9 @@ Model & Variant & $n=2$ & $n=3$ & $n=4$ & $n=5$ & $n=6$ & $n=7$ & $n=8$ \\
 \end{tabular}}
 \end{frame}
 
+% ============================================================================
+%  original slide 42
+% ============================================================================
 \begin{frame}{Exact values, $m=6$}
 \centering
 \adjustbox{max width=\textwidth,max totalheight=0.82\textheight}{%
@@ -1209,7 +719,7 @@ Model & Variant & $n=2$ & $n=3$ & $n=4$ & $n=5$ & $n=6$ & $n=7$ & $n=8$ \\
 \end{frame}
 
 % ============================================================================
-%  tab:open-problems
+%  original slide 43
 % ============================================================================
 \begin{frame}{What remains open}
 \centering
