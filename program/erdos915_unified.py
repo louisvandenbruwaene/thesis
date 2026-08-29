@@ -400,20 +400,22 @@ def simple_undirected_vertex_le4(n: int, m: int) -> int:
 
 
 def simple_undirected_vertex_m5(n: int) -> int:
-    """``k_5(n) = floor(8n/3) - 4`` for ``n >= 6``, ``n != 7``, ``n != 12``.
+    """``k_5(n)``: the edge value through ``n = 13``, then ``floor(8n/3) - 4``.
 
-    Cited (Sorensen-Thomassen, Theorem 4).  Their paper counts the least edge
-    total that FORCES a 5-rail and prints ``floor(8n/3) - 3``; this thesis
-    counts the largest that avoids one, which is exactly one less.  The two
-    sizes the closed form misses are given there separately, and below n = 6
-    the formula is not claimed at all.
+    Cited (Sorensen-Thomassen, Theorem 4 and its closing line).  Their paper
+    counts the least edge total that FORCES a 5-rail and prints
+    ``floor(8n/3) - 3``; this thesis counts the largest that avoids one, which
+    is exactly one less.  Stated in these two ranges the result has no
+    exceptions: the paper's own closing line gives
+    ``f_5(n) = floor(5(n-1)/2) + 1`` throughout ``6 <= n <= 13``, which covers
+    the two sizes (``n = 7`` and ``n = 12``) that its Theorem 4 sets aside, and
+    the closed form takes over from ``n = 14``.  Below ``n = 6`` nothing is
+    claimed.
     """
     if n < 6:
         raise ValueError("k_5(n) is only determined for n >= 6")
-    if n == 7:
-        return 15
-    if n == 12:
-        return 27
+    if n <= 13:
+        return simple_undirected_edge(n, 5)
     return (8 * n) // 3 - 4
 
 
@@ -2930,7 +2932,7 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
              label=r"$m=5$: edge $\ell_5(n)=\lfloor 5(n-1)/2\rfloor$")
     plt.plot(ns5, vert5, "-",  color=_WARM,     linewidth=2.4,
              label=r"$m=5$: vertex $k_5(n)=\lfloor 8n/3\rfloor-4$ "
-                   r"($n\neq7,12$)")
+                   r"($n\geq14$)")
     # shade only where the gap is positive
     plt.fill_between(ns5, edge5, vert5, where=[v > e for v, e in zip(vert5, edge5)],
                      alpha=0.15, color=_WARM)

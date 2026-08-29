@@ -4,7 +4,7 @@ This chapter will serve as a sanity check for the given theorems by testing them
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
 Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those statements are naive because they are based on small graphs only.
 Larger graph spaces will be scoured by a heuristic, namely tabu search.
-A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the ceiling.
+A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the cap.
 The archive is the repository at \url{https://github.com/louisvandenbruwaene/thesis} and every file path quoted in this thesis is relative to it, with the commands and the audit trail collected in \Cref{sec:transcripts}.
 Below is a diagram of the program's architecture, showing how the modelled graphs are fed to the checker and how the results are used to either certify or discover bounds.
 \begin{figure}[ht]
@@ -28,7 +28,7 @@ Notice how depth-first search is memory-efficient.
 \section{Measuring}
 Given $n$ and $m$, walk through every graph on $n$ vertices, measure the largest
 local connectivity $\lambda^{\max}$ or $\kap^{\max}$ of each with a max-flow computation and
-keep the densest graph that stays at or below the ceiling $m - 1$. 
+keep the densest graph that stays at or below the cap $m - 1$. 
 If the enumeration cannot finish within the time limit, the best graph so far is returned.
 It is therefore important to distinguish between the densest graph possible and the densest graph found.
 Here they are called exact (upper) bounds and lower bounds respectively.
@@ -203,7 +203,7 @@ the gates aren't split by this step.
 \draw[->, very thick, color=KULblauw3b] (2.8, 0) -- (3.8, 0);
 \node[smallvertex, minimum size=8mm] (vi) at (5.0, 0) {$v^{\mathrm{in}}$};
 \node[smallvertex, minimum size=8mm] (vo) at (7.0, 0) {$v^{\mathrm{out}}$};
-\draw[->, edge, color=KULblauw3b] (vi) -- node[above, font=\scriptsize]{cap $1$} (vo);
+\draw[->, edge, color=KULblauw3b] (vi) -- node[above, font=\scriptsize]{capacity $1$} (vo);
 \draw[->, edge] (4.0,  0.6) -- (vi);
 \draw[->, edge] (4.0, -0.6) -- (vi);
 \draw[->, edge] (vo) -- (8.0,  0.6);
@@ -239,7 +239,7 @@ the gates aren't split by this step.
 \draw[gdirfaint] (ep) to[bend left=10] (b2);
 \draw[gdirfaint] (ep) to[bend left=8]  node[below, font=\scriptsize, text=black!55, pos=0.45]{$\infty$} (c2);
 % the one bottleneck
-\draw[gdir, line width=1.6pt, color=KULblauw3b] (em) -- node[right, font=\scriptsize]{cap $\mu$} (ep);
+\draw[gdir, line width=1.6pt, color=KULblauw3b] (em) -- node[right, font=\scriptsize]{capacity $\mu$} (ep);
 \end{scope}
 \end{tikzpicture}}
 \caption{Transform a hyperedge into a gate with capacity equal to the multiplicity of the hyperedge.}
@@ -263,7 +263,7 @@ the gates aren't split by this step.
   \node[hnode, fill=metroB!70, minimum size=15pt] (gp) at (0.0, -0.62) {$e^+$};
   \node[smallvertex] (b2) at (-1.05, -1.55) {$b$}; \node[smallvertex] (c2) at (1.05, -1.55) {$c$};
   \draw[gdirfaint] (a2) -- node[right, font=\scriptsize, text=black!60]{$\infty$} (gm);
-  \draw[gdir, line width=1.6pt, color=KULblauw3b] (gm) -- node[right, font=\scriptsize]{cap $\mu$} (gp);
+  \draw[gdir, line width=1.6pt, color=KULblauw3b] (gm) -- node[right, font=\scriptsize]{capacity $\mu$} (gp);
   \draw[gdirfaint] (gp) -- node[left, pos = 0.3, font=\scriptsize, text=black!60]{$\infty$} (b2);
   \draw[gdirfaint] (gp) -- node[right, pos = 0.3, font=\scriptsize, text=black!60]{$\infty$} (c2);
 \end{scope}
@@ -295,7 +295,7 @@ On the small cases this exhaustive mode independently reproduces every value pro
     \label{fig:complexity}
 \end{figure}
 
-The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and as $\binom{n}{r}=\Theta(n^r)$ for fixed-rank $r$-uniform hypergraphs---cubically in the $r=3$ experiments plotted here. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
+The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and as $\binom{n}{r}=\Theta(n^r)$ for fixed-rank $r$-uniform hypergraphs, cubically in the $r=3$ experiments plotted here. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
 These are precisely the variants whose answers \Cref{ch:basecases} could not prove.
@@ -362,7 +362,7 @@ leaving the undecided ones absent.
 Each partly built graph then stands for the whole family of graphs agreeing with it so far, 
 and a pruning rule discards that entire family if it is deemed to bear no fruit.
 
-Adding an edge never lowers a connectivity, since a family of disjoint routes survives intact when more edges are laid around it (\Cref{prop:monotone}). Every completion of a partly built graph only ever adds, so the partly built graph is a floor under all of them. The moment it breaks the ceiling, so does every completion, and the branch is abandoned.
+Adding an edge never lowers a connectivity, since a family of disjoint routes survives intact when more edges are laid around it (\Cref{prop:monotone}). Every completion of a partly built graph only ever adds, so the partly built graph is a floor under all of them. The moment it breaks the cap, so does every completion, and the branch is abandoned.
 
 A second pruning method takes the edges already placed and adds the most the undecided ones could ever contribute, which is how many are left times the largest multiplicity allowed. 
 That sum is an upper bound on every completion, so if even it cannot beat the best feasible graph found so far, 
@@ -549,12 +549,12 @@ Every discovery value this thesis reports therefore comes from tabu search.
 Annealing is kept only as an independent cross-check in the program's self-test, 
 where agreement between two unrelated walks is worth more than the speed of either.
 
-It is fair to ask why the walk is allowed above the ceiling at all. 
+It is fair to ask why the walk is allowed above the cap at all. 
 Reaching every feasible graph does not require it. 
 Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, 
 so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. 
 From any feasible target we can therefore delete edges one at a time down to the empty graph 
-without ever crossing the ceiling, and reading that path backward builds the target up the same way. 
+without ever crossing the cap, and reading that path backward builds the target up the same way. 
 The feasible region is connected through the empty graph by single-edge moves that stay inside it, 
 so a walk that never went infeasible could in principle visit every feasible graph there is.
 We let it go infeasible anyway, because reachability and efficiency are different things. 
@@ -564,7 +564,7 @@ To improve such a graph the walk has to add an edge and then remove a different 
 a swap whose first half is infeasible. 
 A walk confined to feasible graphs could only find that better graph by retreating most of the way back 
 to the empty graph and climbing a different slope, a detour far longer than the budget allows. 
-Allowing a brief excursion above the ceiling lets the walk trade one load-bearing edge for a better one 
+Allowing a brief excursion above the cap lets the walk trade one load-bearing edge for a better one 
 in two moves rather than dozens. Going above the bound is never the goal. 
 It is the shortcut the walk takes on its way back down to it.
 A single walk depends on where it started, so either engine is run several times, each time from a different seed, until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
@@ -576,10 +576,10 @@ This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}.
 Therefore the max-flow algorithm only needs to be run every once in a while,
 depending on how close to the constraint the graph sits.
 A removal applied to a feasible graph leaves it feasible, 
-and an addition made while the graph sits strictly below the ceiling can 
+and an addition made while the graph sits strictly below the cap can 
 lift $\lambda^{\max}$ by at most one, 
 so in both cases the energy is known without measuring anything. 
-Only an addition made at the ceiling itself needs the checker. 
+Only an addition made at the cap itself needs the checker. 
 The search therefore carries a running upper bound on $\lambda^{\max}$ and 
 resynchronises it exactly only when that bound is what a step turns on. 
 \Cref{sec:cheap-checker} gives the bookkeeping, 
@@ -587,7 +587,7 @@ and the regression test that holds the fast walk to the naive one step for step.
 
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
-Before the search is pointed at the open cases, it is run on the settled ones. Run from the empty graph on the cases settled in \Cref{ch:basecases} or by the exact methods above, and told only to pack in edges without breaching the connectivity ceiling, the tabu search arrives unprompted at the named constructions and matches the established value in every tested case. \Cref{tab:rediscovery} reports the densest graph it found against the value the theory predicts.
+Before the search is pointed at the open cases, it is run on the settled ones. Run from the empty graph on the cases settled in \Cref{ch:basecases} or by the exact methods above, and told only to pack in edges without breaching the connectivity cap, the tabu search arrives unprompted at the named constructions and matches the established value in every tested case. \Cref{tab:rediscovery} reports the densest graph it found against the value the theory predicts.
 
 \begin{table}[ht]
     \centering
@@ -642,6 +642,6 @@ Before the search is pointed at the open cases, it is run on the settled ones. R
 \label{fig:rediscovery-gallery}
 \end{figure}
 
-The graphs the search finds are the named constructions themselves, not merely graphs of the right size. \Cref{fig:rediscovery-gallery} draws three of them. The undirected simple run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every spoke doubled to multiplicity $m - 1$, an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}. The directed multigraph run settles on the same star, bidirected and doubled to the same multiplicity, the thickened tree of \Cref{const:dir-multi-lower}. The simple directed run finds the bidirected star at $n = 4$ and, at $n = 7$, the tying value of twelve arcs at which the hub and the one-directional wall meet (\Cref{fig:simple-digraph-m2}), the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search carries none of these names. It lands on them because, under the connectivity ceiling, there is nowhere denser to go.
+The graphs the search finds are the named constructions themselves, not merely graphs of the right size. \Cref{fig:rediscovery-gallery} draws three of them. The undirected simple run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every spoke doubled to multiplicity $m - 1$, an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}. The directed multigraph run settles on the same star, bidirected and doubled to the same multiplicity, the thickened tree of \Cref{const:dir-multi-lower}. The simple directed run finds the bidirected star at $n = 4$ and, at $n = 7$, the tying value of twelve arcs at which the hub and the one-directional wall meet (\Cref{fig:simple-digraph-m2}), the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search carries none of these names. It lands on them because, under the connectivity cap, there is nowhere denser to go.
 
 Past $n = 7$ the search reaches its own limit before the checker does. Repeated tabu runs at $n = 8$, $m = 2$ stall at the hub's arc count, because dismantling a finished hub and rebuilding the one-directional wall (\Cref{fig:simple-digraph-m2}) is far more than the single-arc moves of the walk can tunnel through, and the true value there comes from the construction and the checker rather than from the search. The same double star of \Cref{fig:rediscovery-gallery}, at $n = 7$ and $m = 4$, has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$, a further witness past where the search itself reaches. Neither is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the status every witness returns.

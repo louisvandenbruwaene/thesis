@@ -52,13 +52,13 @@ If parallel arcs are allowed, the problem is completely solved:
 \section{Why direction makes the value quadratic}
 
 In an undirected graph every edge contributes to the degree of both its
-endpoints, and Mader's theorem turns this symmetry into a hard ceiling of
+endpoints, and Mader's theorem turns this symmetry into a hard cap of
 $\floor{m(n-1)/2}$ edges, linear in $n$. A digraph does not have this symmetry.
 In \Cref{const:bipartite} all arcs go from one part of the vertices to the other
 and none come back, so a route can cross from the first part to the second only
 once. That construction holds $\floor{n^2/4}$ arcs at $\lec^{\max} = 1$, and no
 undirected graph can carry so many edges at connectivity one once $n$ is large.
-The linear ceiling therefore does not survive the change of model: already at
+The linear cap therefore does not survive the change of model: already at
 $m = 2$ and $n = 8$ the one-directional construction holds $16$ arcs against the
 hub's $14$, so the directed value follows the larger of the two branches rather
 than the linear one alone.
@@ -217,7 +217,7 @@ Model & Edge or arc-disjoint & Vertex-disjoint \\
 \addlinespace[2pt]
 simple graph
   & $\floor{m(n-1)/2}$, proved
-  & the edge value for $m \le 4$, and $\floor{8n/3}-4$ at $m=5$, while it is open for $m \ge 6$ \\
+  & the edge value for $m \le 4$, and at $m=5$ the edge value up to $n=13$ then $\floor{8n/3}-4$ from $n=14$, while it is open for $m \ge 6$ \\
 multigraph
   & $(m-1)(n-1)$, proved
   & the simple value \\
@@ -246,7 +246,7 @@ $r$-multi-hyper
   & the same leading term for fixed $r, m$ \\
 \bottomrule
 \end{tabularx}
-\caption{The sixteen variants and the strongest result known for each. The two multigraph vertex rows read ``the simple value'' because parallel copies do not raise $\kap$, under the counting convention of \Cref{sec:parallel-convention}. Ranges of validity and the exceptions at $m=5$ are stated below the table.}
+\caption{The sixteen variants and the strongest result known for each. The two multigraph vertex rows read ``the simple value'' because parallel copies do not raise $\kap$, under the counting convention of \Cref{sec:parallel-convention}. Ranges of validity, including the one at $m=5$, are stated below the table.}
 \label{tab:summary}
 \end{table}
 
@@ -258,7 +258,7 @@ $\kap^{\max}=4$ and gives $k_5(5)=10$.
 The edge-hypergraph bound is attained when $(r-1)\mid(n-1)$ for
 multihypergraphs, and for simple hypergraphs when $r\ge3$ and
 $m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained by a simple hypergraph when
-$r\ge3$ and $2\le\binom{n-2}{r-2}$, and by a multihypergraph whenever
+$2<r<n$, and by a multihypergraph whenever
 $(r-1)\mid(n-1)$ (\Cref{prop:hyper-vertex-lower-multi}). Full statements and
 exceptions are in 
 \Cref{thm:mader,thm:leonard,thm:sorensen-thomassen,prop:hyper-edge,thm:simple-hyper-edge,thm:hyper-vertex-m2,thm:hyper-vertex-m3,thm:dir-multi-full,thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}.

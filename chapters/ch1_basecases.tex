@@ -6,10 +6,12 @@ This chapter gives the foundation for the question and its variants and goes ove
 \section{Graphs and routes}
 
 To state the question precisely we need only a few ideas. 
-A \emph{graph} $G$ is a finite set of points, called \emph{vertices}, together with a (multi)set of \emph{edges}, each joining two distinct vertices.
-We write $V(G)$ for the set of vertices and $E(G)$ for the (multi)set of edges. 
-Therefore $|E(G)|$ is the number of edges, which is the very quantity this thesis tries to make as large as possible under certain constraints.
-If $E(G)$ is a set and its edges join exactly two vertices, $G$ is a \emph{simple graph}.
+A \emph{(multi)graph} $G$ is a finite set of points, called \emph{vertices}, together with a multiset of \emph{edges}, each joining two distinct vertices.
+Asking the two ends to be distinct rules out loops, which some texts do admit and which play no role in anything below.
+We write $V(G)$ for the set of vertices, $E(G)$ for the multiset of edges, and $\mu(u,v)$ for the \emph{multiplicity} of a pair, the number of copies of the edge joining $u$ and $v$.
+The \emph{size} $|E(G)| = \sum_{u \ne v} \mu(u,v)$ counts the edges with their multiplicity, and it is the very quantity this thesis tries to make as large as possible under certain constraints.
+If $\mu(u,v) \le 1$ for every pair, so that no edge is repeated, $G$ is a \emph{simple graph}.
+A repeated edge joins two vertices exactly as a single edge does, so what separates the two notions is the multiplicity rather than the number of ends.
 One pictures such a simple graph by representing the vertices as dots and the edges as lines between them.
 
 \begin{figure}[ht]
@@ -39,12 +41,12 @@ Unless specified otherwise, graphs are simple.
 A \emph{path} from a vertex $u$ to a vertex $v$ is a sequence of distinct vertices that starts at $u$, ends at $v$, and joins each consecutive pair by an edge. 
 Two paths between the same endpoints are \emph{edge-disjoint} if no edge belongs to both.
 The largest number of pairwise edge-disjoint paths between $u$ and $v$ is their \emph{local edge-connectivity} $\lec_G(u, v)$. 
-The pair with the most such paths sets the ceiling for the whole graph:
+The pair with the most such paths determines the value for the whole graph:
 \[
     \lec_G^{\max} = \max_{u \ne v} \lec_G(u, v).
 \]
 A theorem of Menger \cite{Menger27}, recalled in \Cref{app:proofs}, gives this quantity a second face: $\lec_G(u, v)$ also equals the least number of edges one must remove to cut every route from $u$ to $v$ (\Cref{fig:menger}). 
-The maximum number of edge-disjoint paths between a pair is exactly the size of the minimum cut between them when every edge has unit capacity.
+The maximum number of edge-disjoint paths between a pair is exactly the number of edges in the minimum cut between them when every edge has unit capacity.
 
 \begin{figure}[ht]
 \centering
@@ -82,9 +84,9 @@ The maximum number of edge-disjoint paths between a pair is exactly the size of 
 
 \section{Erd\H{o}s Problem 915}
 
-The constraint at the heart of this thesis is a ceiling on connectivity. 
-Requiring $\lec_G^{\max} \le m - 1$ says that no pair of vertices is joined by as many as $m$ edge-disjoint paths, or equivalently that every pair can be severed by removing fewer than $m$ edges. 
-The question is how many edges a graph can hold while staying under that ceiling.
+The constraint at the heart of this thesis is a cap on connectivity. 
+Requiring $\lec_G^{\max} \le m - 1$ says that no pair of vertices is joined by as many as $m$ edge-disjoint paths, or equivalently that every pair can be separated by removing fewer than $m$ edges.
+The question is how many edges a graph can hold while staying under that cap.
 
 \begin{ques}[Erd\H{o}s Problem 915 \cite{ErdosProblems}]
 How many edges can a graph on $n$ vertices have if no two of its vertices are joined by $m$ edge-disjoint paths?
@@ -94,8 +96,8 @@ Writing the answer as an extremal function,
 \[
     \ell_m(n) = \max\{\, |E(G)| : |V(G)| = n,\ \lec_G^{\max} \le m - 1 \,\},
 \]
-the problem asks for $\ell_m(n)$, the most edges possible under the ceiling. 
-Mader proved that no graph under the ceiling has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case and provided the shared-clique construction, which achieves the (lower) bound but is only defined when $m-1$ divides $n-1$.
+the problem asks for $\ell_m(n)$, the most edges possible under the cap. 
+Mader proved that no graph under the cap has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case and provided the shared-clique construction, which achieves the (lower) bound but is only defined when $m-1$ divides $n-1$.
 The brackets $\floor{\,\cdot\,}$ round their content down to the nearest whole number and their ceiling counterpart $\ceil{\,\cdot\,}$ rounds up. Both recur throughout, because an edge count is always an integer while the formulas that bound it need not be.
 
 \begin{theorem}[Mader \cite{Mader73}]\label{thm:mader}
@@ -122,7 +124,8 @@ Each assumption made so far will be toggled to create a lattice of variants and 
 
 The first is \emph{arity}: an edge joins exactly two vertices and a \emph{hyperedge} joins $r \ge 2$ vertices.
 Hence such \emph{hypergraphs} use \emph{Berge paths}, which aligns with the path definition above.
-The second is \emph{multiplicity}: a \emph{simple} graph carries at most one copy of each edge, while a \emph{multigraph} allows parallel copies, recorded by a multiplicity $\mu(u, v)$.
+The size of a hypergraph counts its hyperedges with their multiplicity, exactly as the size of a graph counts its edges.
+The second is \emph{multiplicity}: a \emph{simple} graph or hypergraph carries at most one copy of each edge, so $\mu \le 1$ throughout, while a \emph{multigraph} allows parallel copies.
 The third is \emph{direction}: a directed edge, called an arc, is an ordered pair of vertices and a directed hyperedge has one tail and $r-1$ heads.
 These three toggles create a lattice of eight models, shown in \Cref{fig:eight-models}.
 
@@ -190,7 +193,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);   % {A,B,C}
-      \draw[ml, metroA] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} repeated
+      \draw[ml, metroA!55!black] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);   % {A,B,C} second copy, darker shade of the same red
       \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);    % {B,C,D} diagonal, single
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
@@ -260,9 +263,9 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \begin{scope}[on background layer]
       % red {A,B,C}, tail B, repeated: B->A and B->C, each a straddling pair
       \draw[hstar, metroA] (Bm) to[bend left=16] (Am);
-      \draw[hstar, metroA] (Bm) to[bend right=16] (Am);
+      \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Am);
       \draw[hstar, metroA] (Bm) to[bend left=16] (Cm);
-      \draw[hstar, metroA] (Bm) to[bend right=16] (Cm);
+      \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Cm);
       % blue {B,C,D}, tail D: D->B (diagonal) + D->C (top)
       \draw[hstar, metroB] (Dm) to (Bm);
       \draw[hstar, metroB] (Dm) to (Cm);
@@ -272,7 +275,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}
-\caption{The eight models side by side, with the four undirected on top and the four directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}
+\caption{The eight models side by side, with the four undirected on top and the four directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges. In the two multihypergraph panels the two shades of red are the two copies of one hyperedge, not two different hyperedges.}
 \label{fig:eight-models}
 \end{figure}
 
@@ -373,7 +376,7 @@ A directed \emph{Berge route} enters that edge at its tail and leaves at one of 
 
 \end{tikzpicture}
 
-\caption{Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directed cut (red) in a \emph{simple} digraph. Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
+\caption{Three arc-disjoint $u\to v$ routes (coloured) and the corresponding three-arc directed cut (red) in a \emph{simple} digraph. Thus $\lambda(u,v)=3$, meeting the degree bound $\min(d^+(u),d^-(v))=3$.}
 \label{fig:directed-lambda}
 \end{figure}
 
@@ -441,10 +444,10 @@ Directed $r$-uniform multihypergraph & $L_m^{\mathrm{dir}\,(r)}(n)$ & $K_m^{\mat
 For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
 \end{theorem}
 
-\Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree. 
-The lower bound is a spanning tree with every edge thickened to $m-1$ parallel copies. 
+\Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree.
+The lower bound is attained by a spanning tree with every edge thickened to $m-1$ parallel copies.
 
-In simple graphs the edge and vertex problems give the same answer while $m$ stays small, and three papers together say so. The vertex values came first: $k_3$ from B\'{a}rtfai \cite{Bartfai60} and $k_4$ from Bollob\'{a}s \cite{Bollobas66}. Leonard \cite{Leonard72b} then proved that the two separations agree throughout $2 \le m \le 4$, in the same paper that settled the edge value at $m = 5$, a year before \Cref{thm:mader} covered every $m$ at once.
+In simple graphs the edge and vertex problems give the same answer for $m \le 4$, and three papers together say so. The vertex values came first: $k_3$ from B\'{a}rtfai \cite{Bartfai60} and $k_4$ from Bollob\'{a}s \cite{Bollobas66}. Leonard \cite{Leonard72b} then proved that the two separations agree throughout $2 \le m \le 4$, in the same paper that settled the edge value at $m = 5$, a year before \Cref{thm:mader} covered every $m$ at once.
 
 \begin{theorem}[B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66}, Leonard \cite{Leonard72b}]\label{thm:leonard}
 For all $n \ge m$ and $m \le 4$,
@@ -458,15 +461,16 @@ One is tempted to expect the equality forever.
 This, however, is not the case, and S{\o}rensen and Thomassen proved that the vertex problem diverges from the edge problem at $m = 5$.
 
 \begin{theorem}[S{\o}rensen-Thomassen \cite{SorensenThomassen74}]\label{thm:sorensen-thomassen}
-For simple graphs and all $n \ge 6$ with $n \ne 7$ and $n \ne 12$,
+For simple graphs,
 \[
-    k_5(n) = \floorfrac{8n}{3} - 4 ,
+    k_5(n) = \floorfrac{5(n-1)}{2} = \ell_5(n) \quad (6 \le n \le 13),
+    \qquad
+    k_5(n) = \floorfrac{8n}{3} - 4 \quad (n \ge 14).
 \]
-while $k_5(7) = 15$ and $k_5(12) = 27$. The formula first exceeds the edge value at $n = 14$: for $6 \le n \le 13$ one has $k_5(n) = \floorfrac{5(n-1)}{2} = \ell_5(n)$, and for every $n \ge 14$,
-\[
-    k_5(n) \;>\; \floorfrac{5(n-1)}{2} = \ell_5(n).
-\]
+The two separations therefore part company at $n = 14$, and $k_5(n) > \ell_5(n)$ for every $n \ge 14$.
 \end{theorem}
+
+S{\o}rensen and Thomassen state the second formula for every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supply those two values separately. On the small range the two formulas agree except at exactly those points, where the second reads one too few at $n = 7$ and one too many at $n = 12$, so splitting the statement by range removes both exceptions. \Cref{rem:threshold-convention} records the counting convention that turns their numbers into these.
 
 \begin{figure}[h]
     \centering
@@ -482,7 +486,7 @@ For simple digraphs,
 \]
 \end{theorem}
 
-Two shapes give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is an induction on $n$ (\Cref{app:proofs}): delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The same induction never mentions the separation, so it survives the change to $\kap$ verbatim once the base cases are re-run.
+Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is an induction on $n$, proved in \Cref{sec:dir-arc-m2} together with the three lemmas it runs on: delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The same induction never mentions the separation, so it survives the change to $\kap$ verbatim once the base cases are re-run.
 
 \begin{theorem}[Directed vertex value at $m = 2$,\aimedal]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
@@ -537,10 +541,11 @@ Notice how the directed value is quadratic in $n$ for large $n$, while the undir
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
 \begin{proposition}[Hypergraph edge bound,\aimedal]\label{prop:hyper-edge}
-An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has total hyperedge multiplicity at most $\floorfrac{(m-1)(n-1)}{r-1}$. A simple hypergraph attains the bound whenever $m - 1 \le \binom{n-2}{r-2}$, and a multihypergraph attains it whenever $(r-1) \mid n - 1$.
+An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
 \end{proposition}
 
-The proof is the multigraph argument again, run through the hypergraph Gomory-Hu tree, and \Cref{app:proofs} gives it. 
+The proof is the multigraph argument again, run through the hypergraph Gomory-Hu tree, and \Cref{app:proofs} gives it.
+It has to be re-run rather than deduced from \Cref{thm:multigraph-edge}, because the obvious reduction points the wrong way. Replacing every hyperedge by a spanning star on its $r$ vertices gives a multigraph of size $(r-1)|E(\HH)|$, but two routes may then take two different star edges of one hyperedge, which a family of Berge routes forbids. The star multigraph can therefore carry more connectivity than the hypergraph it came from, and a feasible hypergraph need not produce a feasible multigraph to count.
 The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one everywhere, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
 For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
 That is a real difference between the two edge sizes. 
@@ -587,12 +592,12 @@ help.
 \begin{theorem}[Hypergraph vertex value at $m = 3$,\aimedal]\label{thm:hyper-vertex-m3}
 For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
 $\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
-$r \ge 3$ with $2 \le \binom{n-2}{r-2}$ the bound is attained by a simple
-hypergraph, so
+$2 < r < n$, which is exactly the range where $2 \le \binom{n-2}{r-2}$, the bound
+is attained by a simple hypergraph, so
 \[
     k_3^{(r)}(n) \;=\; \floorfrac{2(n-1)}{r-1} \;=\; \ell_3^{(r)}(n).
 \]
-A multihypergraph attains it whenever $(r-1) \mid (n-1)$ instead, by repeating one
+There are multihypergraphs attaining it when $(r-1) \mid (n-1)$ instead, by repeating one
 hyperedge rather than needing $\binom{n-2}{r-2}$ distinct ones, so
 $K_3^{(r)}(n)$ takes the same value on that range
 (\Cref{prop:hyper-vertex-lower-multi}).
@@ -601,7 +606,7 @@ $K_3^{(r)}(n)$ takes the same value on that range
 Both proofs read Berge routes as ordinary paths in the incidence graph, and \Cref{app:proofs} gives them. 
 The $m = 3$ case is the harder one and needs a rank bound proved through Tutte's triconnected decomposition. 
 At $m \ge 4$ that route stops for want of a $4$-connectivity analogue, and the value is open.
-The proposition counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part. 
+\Cref{prop:hyper-edge} counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part.
 The metro picture shows why. 
 An ordinary edge is a one-stop link between a single pair, so policing edge-disjointness means watching each pair on its own. 
 A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches $\binom{r}{2}$ pairs at once, yet like a line that can run only one train at a time it may serve only one route. 
@@ -620,9 +625,9 @@ so for each fixed $m$,
 and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
 \end{theorem}
 
-The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the ceiling, and that alone forces the arc count down to the wall plus a linear correction.
+The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to the wall plus a linear correction.
 
-The route family the count uses is internally vertex-disjoint and not merely arc-disjoint, which is what lets the whole argument be re-run under the stricter separation. Whitney's inequality alone would not justify the transfer, since it points the other way.
+The routes this count produces are internally vertex-disjoint, not merely arc-disjoint. That is what lets the whole argument be re-run under the stricter separation, and Whitney's inequality alone would not justify the transfer, since it points the other way.
 
 \begin{theorem}[Directed vertex problem, leading constant and order,\aimedal]\label{thm:dir-vertex-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
@@ -659,7 +664,7 @@ of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
 
 The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
 $u\to v$ records that some hyperedge has tail $u$ and head $v$. A matching
-argument transfers the hypergraph route ceiling to the shadow's two-step route
+argument transfers the hypergraph route cap to the shadow's two-step route
 budget, after which \Cref{lem:two-step-budget} controls the shadow and a
 tail--head incidence count converts its arcs back to hyperedges. Since the
 bipartite construction already attains that leading term, it is asymptotically

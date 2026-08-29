@@ -1216,3 +1216,108 @@ extracted PDF text. 129 tests OK, 1 expected skip. Self-check ALL CHECKS
 PASSED. Pages 4, 7, 41 and 42 rendered and inspected. No em-dashes, en-dashes
 or prose semicolons in the diff (every `--` hit is `Gomory--Hu`,
 `path--separator` or `$u$--$v$`, every `;` is TikZ).
+
+## 2026-08-29 (Opus) — Stijn's first-section review actioned, and the k_5 statement corrected
+
+Twenty-odd points from the promotor's read of the front matter and the first
+section of chapter 1. Most were wording. One was mathematics.
+
+**THE ONE REAL CONTENT FIX: `thm:sorensen-thomassen` IS NOW STATED IN TWO
+RANGES AND HAS NO EXCEPTIONS.** Stijn found it odd that the two exceptional
+sizes deviate in OPPOSITE directions ($k_5(7) = 15$ against the formula's 14,
+$k_5(12) = 27$ against its 28) and guessed the statement should be split by
+range instead. Checked against `sorensen.pdf` itself rather than against the
+old note: their Theorem 4 gives $f_5(n) = \floor{8n/3} - 3$ for $n \ge 6$ apart
+from $n = 7, 12$, supplies $f_5(7) = 16$ and $f_5(12) = 28$ separately, and
+then closes with $f_5(n) = \floor{5(n-1)/2} + 1$ throughout $6 \le n \le 13$,
+which covers both. Converted to this thesis's avoiding convention that is
+\[ k_5(n) = \floor{5(n-1)/2} = \ell_5(n) \ (6 \le n \le 13), \qquad
+   k_5(n) = \floor{8n/3} - 4 \ (n \ge 14). \]
+The two exceptions are then not exceptions at all, they are the only two points
+of the small range where the large-$n$ formula misses the small-$n$ one. Every
+value is unchanged, so this is a restatement and not a correction of numbers.
+Swept through `ch1_basecases.tex` (statement plus a new paragraph naming where
+the paper's own two forms come from), `ch3_synthesis.tex` (`tab:summary` cell
+and caption), `app_proofs.tex` (`rem:threshold-convention`'s closing
+paragraph), and `program/erdos915_unified.py`'s
+`simple_undirected_vertex_m5`, which is now written as the same two ranges and
+returns identical values at every $n$ (the four existing tests in
+`tests/test_bounds.py` pin both readings and still pass unchanged).
+`figures/edge_vertex_divergence.png` regenerated for its legend.
+
+**TWO OTHER MATHEMATICAL POINTS HE RAISED, BOTH CHECKED.**
+$2 \le \binom{n-2}{r-2} \iff 2 < r < n$, so `thm:hyper-vertex-m3` and the three
+places that restate its hypothesis now carry the readable form. And
+`prop:hyper-edge` does NOT follow from `thm:multigraph-edge`: replacing each
+hyperedge by a spanning star gives a multigraph of size $(r-1)|E(\HH)|$, but
+two routes may then take two star edges of one hyperedge, which Berge
+disjointness forbids, so the star multigraph can carry MORE connectivity than
+the hypergraph and feasibility does not transfer. A short paragraph in ch1 now
+says so, because a reader will try the same reduction.
+
+**THE `ceiling` METAPHOR IS NOW `cap`,** 31 occurrences across four files plus
+`offcuts.tex`. It clashed with $\ceil{\cdot}$, which is introduced two
+sentences after one of its uses. The word `ceiling` now appears exactly once in
+the thesis, where the rounding brackets are defined. The three flow-gadget
+labels in `fig:vertex-split` and `fig:hyper-gadget` moved the other way, from
+`cap $1$` and `cap $\mu$` to `capacity`, so the figures cannot be read as the
+connectivity cap. Rendered both pages to confirm the longer labels do not
+collide.
+
+**FRONT MATTER.** Cover and foreword: Promotor is Dr. Stijn Cambie, Reader is
+Prof. Jan Goedgebeur (the roles were swapped and Stijn was given the wrong
+title). "the connections they entail" became "size". **The exact faculty label
+for Jan's role is the author's to confirm** ("Reader" was chosen over "Lezer"
+or "Assessor" without a template to check against).
+
+**WHAT I DID NOT DO, DELIBERATELY.** Stijn suggested the author work through a
+few more proofs himself while revising the appendix, `thm:dir-arc-m2-exact`
+(Theorem 1.6) in particular, which would drop its `\aimedal`. That is his call
+to make and not something a session can assert on his behalf, so the badge
+stands. **While checking it I found a contradiction that predates this
+session**: `app_proofs.tex` line 369 already says the proof of
+`thm:dir-arc-m2-exact` and its three supporting lemmas "are the author's own",
+yet all four carry the badge and the "How to read this appendix" paragraph says
+the badge is on everything except the cited classics and the Gomory--Hu double
+count. One of those two statements has to give. Flagged, not resolved.
+
+**REST OF THE LIST, ALL APPLIED:** the opening definition is now a
+`(multi)graph` with $\mu(u,v)$ and `size` defined up front and `simple` defined
+as $\mu \le 1$ (a parallel edge also joins exactly two vertices, so the old
+wording did not separate the two notions), loops named as excluded, "severed"
+to "separated", `fig:directed-lambda`'s "matching" cut to "corresponding" (the
+thesis uses "matching" in its technical sense elsewhere), "The lower bound is a
+spanning tree" to "is attained by", "while $m$ stays small" to "for $m \le 4$",
+"Two shapes" to "Two constructions" plus the non-uniqueness of the linear
+branch (any bidirected tree reaches $2(n-1)$, the star is one case),
+`prop:hyper-edge` stated in terms of `size` with "there are simple hypergraphs
+attaining it when" rather than "a simple hypergraph attains it whenever", the
+bare "The proposition counts hyperedges" pointed at `\Cref{prop:hyper-edge}`
+(it sat three theorems downstream of the proposition it names), and the
+"route family the count uses" sentence split in two.
+
+`fig:eight-models`' repeated hyperedge is drawn in two shades of the same red
+in both multihypergraph panels, with a caption line saying they are two copies
+of one hyperedge, since one colour read as a single thick line undirected and
+as two different hyperedges directed. Rendered and inspected.
+
+Theorem 1.6's proof now points at `\Cref{sec:dir-arc-m2}` (a new label on the
+appendix section that holds it) rather than at the appendix as a whole, at the
+author's request.
+
+**ONE PRE-EXISTING STYLE VIOLATION FIXED IN PASSING:** an em-dash in
+`ch2_machine.tex`'s complexity paragraph. **ONE FLAGGED, NOT FIXED:** the same
+paragraph calls a matrix entry a "cell", which the author's own word-choice
+rule rules out.
+
+**EXPECTED NEW NOISE:** editing `simple_undirected_vertex_m5` changes the
+source hash above the chapter 4 banner, so figure regeneration now prints the
+`machine_values.json was written by a different version` note. The cached
+values are unaffected (that helper is a cited closed form, `solve` never calls
+it) and the note clears on the next `--refresh`.
+
+VERIFY: `latexmk -pdf` exit 0, 108pp, 0 overfull/underfull, 0 undefined refs, 0
+occurrences of `??`. 129 tests OK, 1 expected skip. `k_5` recomputed at
+$n = 6, 7, 12, 13, 14, 15$ against the paper's own $f_5$ values minus one.
+Pages 13, 14, 15, 22 and 23 rendered and inspected. No em-dashes, en-dashes or
+prose semicolons in the diff (every semicolon hit is TikZ).

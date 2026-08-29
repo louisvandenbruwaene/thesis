@@ -197,7 +197,7 @@ Rearranging gives $2|E(G)| \le m(n-1)$, and since $|E(G)|$ is an integer, $|E(G)
 The factor two comes from charging all but at most $n-1$ edges to at least two tree cuts. Parallel edges destroy that refinement, leaving the multigraph bound $(m-1)(n-1)$ of \Cref{thm:multigraph-edge}.
 
 \begin{proof}[Proof of \Cref{thm:multigraph-edge}]
-For the lower bound, take a spanning tree of $K_n$, that is, a connected cycle-free subgraph that touches all $n$ vertices and so has exactly $n-1$ edges, and give every tree edge multiplicity $m - 1$, meaning $m-1$ parallel copies. The result has $(m-1)(n-1)$ edges. Any two vertices are joined by a unique path in the tree, of some length $k \ge 1$. To separate them one must cut some edge of that path, and the cheapest choice is the lightest tree edge on it, which still carries $m-1$ copies, so $\lec(u, v) = m - 1$ for every pair and $\lec^{\max} = m - 1$. The graph sits right at the ceiling.
+For the lower bound, take a spanning tree of $K_n$, that is, a connected cycle-free subgraph that touches all $n$ vertices and so has exactly $n-1$ edges, and give every tree edge multiplicity $m - 1$, meaning $m-1$ parallel copies. The result has $(m-1)(n-1)$ edges. Any two vertices are joined by a unique path in the tree, of some length $k \ge 1$. To separate them one must cut some edge of that path, and the cheapest choice is the lightest tree edge on it, which still carries $m-1$ copies, so $\lec(u, v) = m - 1$ for every pair and $\lec^{\max} = m - 1$. The graph sits right at the cap.
 
 For the upper bound, suppose $\lec_G^{\max} \le m - 1$ and build a Gomory--Hu tree $T$ of $G$ (\Cref{thm:gomory-hu}), the same $(n-1)$-edge summary of all connectivities used for Mader's theorem. Each tree edge $e$ stands for a minimum cut of $G$, of capacity $c(e) = \lec_G(u,v) \le m-1$ for the pair $(u,v)$ it represents. Now charge each edge of $G$ to a tree edge: an edge $\{x,y\}$ crosses the cut of the lightest tree edge on the tree path from $x$ to $y$, so it is counted inside that tree edge's capacity. Summing the $n-1$ capacities therefore counts every edge of $G$ at least once, which already gives $|E(G)| \le \sum_{e \in T} c(e) \le (m-1)(n-1)$. Unlike Mader's simple-graph count there is no second charge to halve, because parallel edges are now allowed and nothing forces an edge to be counted twice. The tree-of-multiplicity-$(m-1)$ construction above meets this bound exactly, which is why the answer is the clean product $(m-1)(n-1)$ and not a floor.
 \end{proof}
@@ -274,7 +274,7 @@ The conjecture is the one entry that must keep its vertex count attached, and an
 
 A second trap is worth naming, because an earlier draft fell into that one too. The comparison $k_5 > \ell_5$ is invariant under the shift, since \emph{both} functions move by one, so no internal check can detect a half-converted statement. What does detect it is evaluating the two sides in different conventions, which manufactures a spurious divergence one size early. Reading $\floor{8 \cdot 13/3} - 3 = 31$ against this thesis's $\ell_5(13) = 30$ appears to separate the two problems at $n = 13$, but the $31$ is a forcing count and the $30$ is an avoiding count. Done consistently, $k_5(13) = 30 = \ell_5(13)$ and the separation begins at $n = 14$, which is also what \cite{SorensenThomassen74} proves directly by showing $f_5(n) = \floor{5(n-1)/2} + 1$ throughout $6 \le n \le 13$.
 
-The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there covers every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies those two values separately, which is where the $k_5(7) = 15$ and $k_5(12) = 27$ of \Cref{thm:sorensen-thomassen} come from.
+The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there states $f_5(n) = \floor{8n/3} - 3$ for every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies $f_5(7) = 16$ and $f_5(12) = 28$ separately. Its closing line then covers the whole small range at once, $f_5(n) = \floor{5(n-1)/2} + 1$ for $6 \le n \le 13$. That is why \Cref{thm:sorensen-thomassen} is stated in two ranges and needs no exceptions: the two sizes the paper sets aside are the only points of $6 \le n \le 13$ at which the large-$n$ formula misses the small-$n$ one, low by one at $n = 7$ and high by one at $n = 12$.
 \end{remark}
 
 \subsection{The vertex problem is a block problem}\label{sec:simple-vertex-blocks}
@@ -364,7 +364,7 @@ The only in-arcs of a $b \in B$ that an $a \in A$ can reach are the direct arc $
 
 At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$. Here $|B| = \ceil{11/2} = 6$ and $|A| = 4$, so its $24$ arcs from $A$ to $B$ carry a six-cycle inside $B$, one arc per $b_j$ since $m-2 = 1$, giving every $b_j$ one extra in-arc, so each pair $a_i, b_j$ has the direct arc and one detour and $\lec^{\max} = 2$. That is $24 + 6 = 30$ arcs against the guess of $27$, and the correction is the shift of the partition away from a balanced split of $n$, which the guess assumes, towards a balanced split of $n + m - 2$. At this size that quantity is $11$ and odd, so $|B| = 6$ and $|B| = 5$ tie, the latter giving $25 + 5 = 30$ as well.
 
-\section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}
+\section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}\label{sec:dir-arc-m2}
 
 Three short lemmas feed the induction. The first shows a hub forces a linear bound for every $m$, and is the proof behind the hub branch of \Cref{conj:dir-arc}. The three lemmas below and the proof of \Cref{thm:dir-arc-m2-exact} that they support are the author's own, and its finite base cases $2 \le n \le 7$ were verified by the author's program, through the exhaustive search of \Cref{ch:certify} whose completed range is recorded in \Cref{tab:basecase-search}.
 
@@ -447,7 +447,7 @@ Write $M(n) = \max(2(n-1), \floor{n^2/4})$ as before.
 
 \emph{Lower bound.} The directed hub and the one-directional bipartite construction both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem. Hence $k_2^{\mathrm{dir}}(n) \ge M(n)$.
 
-\emph{Upper bound.} We show by strong induction on $n$ that $\kap^{\max}_D \le 1$ forces $|A(D)| \le M(n)$. The induction is the one that proved \Cref{thm:dir-arc-m2-exact}, and every step of it survives the change of separation, because the only two properties of the ceiling that argument uses are that it is inherited by vertex deletion and that it holds at the base sizes.
+\emph{Upper bound.} We show by strong induction on $n$ that $\kap^{\max}_D \le 1$ forces $|A(D)| \le M(n)$. The induction is the one that proved \Cref{thm:dir-arc-m2-exact}, and every step of it survives the change of separation, because the only two properties of the cap that argument uses are that it is inherited by vertex deletion and that it holds at the base sizes.
 
 The base cases $2 \le n \le 7$ are settled by the same pruned exhaustive search of \Cref{ch:certify}, run with the vertex feasibility test in place of the arc one. It walks every simple digraph with $\kap^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. \Cref{tab:basecase-search} records this run beside the arc one.
 
@@ -554,7 +554,7 @@ A common out-neighbour $w \ne u$ would give the two arc-disjoint routes $u \to v
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ is present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
 \end{proposition}
 
-In words: once every arc from $A$ to $B$ is present, a vertex of $B$ can afford very few in-arcs from inside $B$. Each such arc creates a fresh two-step detour on top of the direct arc that every vertex of $A$ already has, and the ceiling allows only $m-2$ of them.
+In words: once every arc from $A$ to $B$ is present, a vertex of $B$ can afford very few in-arcs from inside $B$. Each such arc creates a fresh two-step detour on top of the direct arc that every vertex of $A$ already has, and the cap allows only $m-2$ of them.
 
 \begin{proof}
 Fix $a \in A$ and $b \in B$, and let $b'_1, \dots, b'_d$ be the in-neighbours of $b$ inside $B$, where $d = \deg^-_B(b)$. The direct arc $a \to b$ together with the two-step detours $a \to b'_i \to b$ are $1 + d$ arc-disjoint $a$-to-$b$ routes, all present because $A \to B$ is complete. Feasibility forces $1 + d \le m - 1$, so $d \le m - 2$, and summing over $B$ bounds the internal arcs by $(m-2)|B|$.
@@ -879,7 +879,7 @@ At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ ev
 Let $D$ be a directed multigraph with $\lec^{\max}(D) \le k$ for some $k \ge 1$, and let $R$ be a reachability skeleton of $D$. Write $D - R$ for the multigraph obtained by deleting, from each multiplicity $\mu(u,v)$, the one copy (if any) that $R$ uses on that pair. Then $\lec^{\max}(D - R) \le k - 1$.
 \end{lemma}
 
-In words: subtracting one copy of each skeleton arc costs every reachable pair at least one route (a single pair can lose more, if some of its own routes happened to run through the deleted arcs too). The skeleton preserves reachability, so however many arc-disjoint routes survive the deletion, one further route can always be run entirely inside the arcs that were deleted, and that extra route is what the original ceiling has to pay for.
+In words: subtracting one copy of each skeleton arc costs every reachable pair at least one route (a single pair can lose more, if some of its own routes happened to run through the deleted arcs too). The skeleton preserves reachability, so however many arc-disjoint routes survive the deletion, one further route can always be run entirely inside the arcs that were deleted, and that extra route is what the original cap has to pay for.
 
 \begin{proof}
 Fix an ordered pair $u \ne v$ and suppose $D - R$ carries $t \ge 1$ pairwise arc-disjoint $u$--$v$ paths. These use arcs of $D - R$ and hence of $D$, since $D - R \subseteq D$, so $u$ reaches $v$ in $D$. Because $R$ is a reachability skeleton, $u$ then also reaches $v$ in $R$: some directed path $P$ from $u$ to $v$ uses only arcs of $R$. Every arc of $R$ has been subtracted out of $D - R$, so $P$ shares no arc with any of the $t$ paths already found inside $D - R$. Together, $P$ and those $t$ paths are $t+1$ pairwise arc-disjoint $u$--$v$ paths in $D$, so $t + 1 \le \lec_D(u,v) \le k$, that is, $t \le k-1$. Pairs with $t=0$ trivially satisfy $t \le k-1$ once $k \ge 1$, so this holds for every pair, giving $\lec^{\max}(D-R) \le k-1$.
@@ -1053,7 +1053,7 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 
 \emph{Step 3: $D$ has no arc outside $R$.} $R$ has the same reachability as $D$, and in a one-directional bipartite digraph the only ordered pairs joined by a directed path are the pairs $(a,b) \in A \times B$, each by the single arc $a \to b$. So if $D$ had an arc $(u,x)$, then $u$ reaches $x$ in $R$, forcing $(u,x) \in A \times B$, and $R$ already contains that arc. Hence $D$ and $R$ use exactly the same $\alpha\beta = \floor{n^2/4}$ ordered pairs.
 
-\emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the ceiling. Hence $D$ is the multiplicity-$(m-1)$ one-directional complete bipartite digraph on these two parts, and their product $\floor{n^2/4}$ forces their sizes to be $\ceil{n/2}$ and $\floor{n/2}$. Either size may be the source size, giving exactly the two displayed possibilities (which coincide up to isomorphism when $n$ is even).
+\emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the cap. Hence $D$ is the multiplicity-$(m-1)$ one-directional complete bipartite digraph on these two parts, and their product $\floor{n^2/4}$ forces their sizes to be $\ceil{n/2}$ and $\floor{n/2}$. Either size may be the source size, giving exactly the two displayed possibilities (which coincide up to isomorphism when $n$ is even).
 \end{proof}
 
 Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. Nothing in the argument suggests a boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
@@ -1181,11 +1181,11 @@ Let $r \ge 3$, $n \ge r$, and $2 \le m$ with $m-1 \le \binom{n-2}{r-2}$. Then th
 \end{theorem}
 
 \begin{proof}
-The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multihypergraph. For the lower bound, fix a hub $h$ and let $V' = V \setminus \{h\}$. By \Cref{lem:sparse-hypergraph} applied with rank $r-1$ and degree ceiling $d = m-1$ on the $n-1$ vertices of $V'$, there is an $(r-1)$-uniform simple hypergraph $\mathcal{G}^*$ on $V'$ with maximum degree at most $m-1$ and exactly $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. Adding $h$ to each hyperedge produces distinct $r$-sets, so the result $\HH$ is simple, and every non-hub vertex $w$ lies in $\deg_{\mathcal{G}^*}(w) \le m-1$ hyperedges, which form a cut isolating $w$. By \Cref{thm:menger-hyper}, $\lec^{\max}_\HH \le m-1$.
+The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multihypergraph. For the lower bound, fix a hub $h$ and let $V' = V \setminus \{h\}$. By \Cref{lem:sparse-hypergraph} applied with rank $r-1$ and degree cap $d = m-1$ on the $n-1$ vertices of $V'$, there is an $(r-1)$-uniform simple hypergraph $\mathcal{G}^*$ on $V'$ with maximum degree at most $m-1$ and exactly $\floorfrac{(m-1)(n-1)}{r-1}$ hyperedges. Adding $h$ to each hyperedge produces distinct $r$-sets, so the result $\HH$ is simple, and every non-hub vertex $w$ lies in $\deg_{\mathcal{G}^*}(w) \le m-1$ hyperedges, which form a cut isolating $w$. By \Cref{thm:menger-hyper}, $\lec^{\max}_\HH \le m-1$.
 \end{proof}
 
 \begin{remark}[The hypothesis is not decorative]\label{rem:simple-hyper-necessary}
-Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the identical hypothesis for the vertex separation, for the same reason. \Cref{tab:summary} splits the simple and multi hypergraph rows on exactly this distinction, and the program enumerates the two models separately for the same reason, stated where each formula is used.
+Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the same hypothesis at $m - 1 = 2$, where it reduces to $2 < r < n$, for the same reason. \Cref{tab:summary} splits the simple and multi hypergraph rows on exactly this distinction, and the program enumerates the two models separately for the same reason, stated where each formula is used.
 \end{remark}
 
 The sparse hypergraph the construction needs is a corollary of a classical partition theorem, which we state before using it.
@@ -1387,7 +1387,7 @@ taken at multiplicity $m-1$. At $m = 3$ this meets the upper bound of
     \qquad\text{whenever } (r-1) \mid (n-1).
 \]
 For $r\ge3$, that range neither contains nor is contained in the simple model's
-$2 \le \binom{n-2}{r-2}$, so the two models close different cases.
+$2 < r < n$, so the two models close different cases.
 \end{proposition}
 
 \begin{proof}
@@ -1461,7 +1461,7 @@ Induction on $|V| + |E|$. The proof peels $G$ down to a core that cannot
 exist. Step~1 handles a cut vertex by arguing block by block. Steps~2 and~3
 remove a degree-two $Z$-vertex or $X$-vertex without changing the bound.
 What survives is $2$-connected with minimum degree at least three, and
-Step~4 shows that such a graph already violates the connectivity ceiling
+Step~4 shows that such a graph already violates the connectivity cap
 (iv), so it never arises. \emph{Base $|V| \le 2$.} A single vertex has degree $0$, too little for the
 degree-at-least-$2$ floor (iii) imposes on a $Z$-vertex, so it cannot lie in
 $Z$ and must lie in $X$, giving $0 \le |X| - 1$. On two vertices the same
@@ -1552,7 +1552,7 @@ it connected, exactly as already used in Step~3. The concatenation
 visits $x$ only first and $x'$ only last, so it contains an $x$--$x'$ path
 with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
 (iv). If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
-two vertices of $X$ would violate the ceiling $\kap(x, x') \le 2$ that (iv)
+two vertices of $X$ would violate the cap $\kap(x, x') \le 2$ that (iv)
 imposes on every pair drawn from $X$, forcing $|X| \le 1$, and then every $z$
 has degree at most $1$ by (i), absurd.
 
@@ -1580,7 +1580,7 @@ most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
 \end{proof}
 
 The rank bound now yields \Cref{thm:hyper-vertex-m3}, stated in
-\Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $r \ge 3$ and $2 \le \binom{n-2}{r-2}$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
+\Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $2 < r < n$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
 
 \begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}]
 Apply \Cref{lem:incidence-rank} to each connected component of the incidence
@@ -2033,7 +2033,7 @@ By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connec
 The obvious guess is that cycles must always pay for themselves against this bound: each independent cycle costs $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
 
 \begin{theorem}[A bouquet of thickened cliques, and how it beats the thickened tree,\aimedal]\label{thm:clique-chain-vertex}
-Fix $3 \le r \le m$ and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex ceiling on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
+Fix $3 \le r \le m$ and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex cap on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
 \[
     (m-1)(n-1) \;+\; k \cdot \mathrm{gain}(r,m),
     \qquad
@@ -2092,7 +2092,7 @@ Combining the two directions, first letting $n/m\to\infty$ so that optimised blo
     \;\le\; K_m^{\mathrm{multi}}(n) \;<\; 2 m^2 n ,
 \]
 where the $o_m(1)$ vanishes as $m$ grows,
-so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$ in that large-$n$ regime. This qualification is necessary: for example $K_m^{\mathrm{multi}}(2)=m-1$, so no estimate of order $m^2n$ can hold uniformly when $n$ is fixed. The bouquet of \Cref{thm:clique-chain-vertex} has the right joint order once many blocks fit, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$. The first inequality, $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$, is the more informative half. It says that this variant can never outrun the simple vertex problem by more than the multiplicity ceiling, which ties the least understood of the sixteen to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
+so $K_m^{\mathrm{multi}}(n) = \Theta(m^2 n)$ in that large-$n$ regime. This qualification is necessary: for example $K_m^{\mathrm{multi}}(2)=m-1$, so no estimate of order $m^2n$ can hold uniformly when $n$ is fixed. The bouquet of \Cref{thm:clique-chain-vertex} has the right joint order once many blocks fit, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$. The first inequality, $K_m^{\mathrm{multi}}(n) \le (m-1)k_m(n)$, is the more informative half. It says that this variant can never outrun the simple vertex problem by more than the multiplicity cap, which ties the least understood of the sixteen to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$.
 
 \subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
 
@@ -2166,7 +2166,7 @@ Write $S$ and $T$ for the two sides, $|S| = s$ and $|T| = t$.
 
 \emph{The connectivities of $K_{s,t}$.} For $u \ne u'$ in $S$, the $u$-$u'$ paths of length at least two are the $t$ two-step routes through the vertices of $T$, and $T$ is a cut of size $t$, so $\kap(u,u') = \pi(u,u') = t$. Symmetrically $\kap(v,v') = s$ for $v \ne v'$ in $T$. For adjacent $u \in S$ and $v \in T$, delete the edge $uv$: the sets $T \setminus \{v\}$ and $S \setminus \{u\}$ both separate $u$ from $v$, so $\pi(u,v) \le \min(s-1, t-1) = s-1$, and the $s-1$ routes $u, v_i, u_i, v$ through distinct $u_i \in S \setminus \{u\}$ and distinct $v_i \in T \setminus \{v\}$ attain it, which needs $s-1 \le t-1$. So $\pi(u,v) = s-1$ and $\kap(u,v) = s$.
 
-\emph{Feasibility and count.} By \Cref{lem:multi-vertex-split} the multigraph has $\kap = (m-s) + (s-1) = m-1$ on an edge, and $\kap = t \le m-1$ or $s \le m-1$ on a non-adjacent pair, so nothing exceeds the ceiling. The count is $st$ edges at multiplicity $m-s$. Equivalently, by \Cref{lem:multi-vertex-objective}, $W_m(K_{s,t}) = st(m - s)$.
+\emph{Feasibility and count.} By \Cref{lem:multi-vertex-split} the multigraph has $\kap = (m-s) + (s-1) = m-1$ on an edge, and $\kap = t \le m-1$ or $s \le m-1$ on a non-adjacent pair, so nothing exceeds the cap. The count is $st$ edges at multiplicity $m-s$. Equivalently, by \Cref{lem:multi-vertex-objective}, $W_m(K_{s,t}) = st(m - s)$.
 
 \emph{The bouquet.} If $s\ge2$, then $K_{s,t}$ is $2$-connected, so \Cref{thm:multi-vertex-blocks} applies and $k$ copies at one shared vertex are feasible with total $k\,st(m-s)$ on $n = k(s+t-1)+1$ vertices. If $s=1$, then $K_{1,t}$ is a tree (a single edge when $t=1$), and after thickening every edge to multiplicity $m-1$, sharing vertices among copies still produces a thickened tree and is feasible directly. Its count is again $k\,t(m-1)=k\,st(m-s)$. Thus the displayed rate holds throughout the theorem's full range $1\le s\le t$.
 
@@ -2179,7 +2179,7 @@ and $h(\alpha) = \alpha(1-\alpha)/(1+\alpha)$ has $h'(\alpha) = (1 - 2\alpha - \
 \end{proof}
 
 The optimum is lopsided: one side has size about $0.41m$ and the other reaches
-the ceiling $m-1$. Finite block sweeps also show that adding a few edges inside
+the cap $m-1$. Finite block sweeps also show that adding a few edges inside
 the small side can improve this clean family. Thus the answer is a block
 problem with dense bipartite-like blocks, and its asymptotic constant lies
 between $3-2\sqrt2$ and $2$.
