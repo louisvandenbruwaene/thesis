@@ -376,7 +376,7 @@ Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directe
       \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
-    \node[font=\itshape] at (0,-1.75) {multi-hypergraph};
+    \node[font=\itshape] at (0,-1.75) {multihypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
   \begin{scope}[shift={(0,-4.5)}]
@@ -430,14 +430,14 @@ Three arc-disjoint $u\to v$ routes (coloured) and the matching three-arc directe
       \draw[hstar, metroB] (Dm) to (Cm);
     \end{scope}
     \foreach \p in {Am,Bm,Cm,Dm} {\node[stn] at (\p) {};}
-    \node[font=\itshape] at (0,-1.75) {directed multi-hypergraph};
+    \node[font=\itshape] at (0,-1.75) {directed multihypergraph};
     \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
 
 \vspace{2pt}
-\noindent{\tiny\color{black!60} The eight models side by side, undirected on top and directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multi-hypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}\par
+\noindent{\tiny\color{black!60} The eight models side by side, undirected on top and directed below. The simple graph is a triangle, the multigraph has parallel edges, the hypergraph has three hyperedges, and the multihypergraph has one repeated hyperedge. The directed versions have arcs instead of edges, with the same pattern of repetition and hyperedges.}\par
 \end{frame}
 
 % ============================================================================
@@ -775,7 +775,7 @@ A single model feeds the exact max-flow checker. Certification turns that measur
 \end{scope}
 \end{tikzpicture}}
 
-{\scriptsize\color{black!60} The directed hyperedge becomes a gate with one tail and two heads; capacity equal to the multiplicity, and every route must enter at the tail and leave at a head.}
+{\scriptsize\color{black!60} The directed hyperedge is transformed into a gate with one tail and two heads. This gate has capacity equal to the multiplicity of the hyperedge and every route must enter at the tail and leave at a head.}
 \end{minipage}
 \end{frame}
 
@@ -1007,7 +1007,7 @@ The two lower-bound branches of the directed-arc conjecture at $m = 3$, and the 
   \node[font=\scriptsize, align=center, vertexorange!75!black] at (5.6,-2.55)
     {$6$ cyclic in-arcs inside $B$};
 \end{tikzpicture}}{%
-The augmented bipartite digraph at $m = 3$, $n = 10$. Every arc runs from $A$ to $B$, and inside $B$ each vertex takes one arc from its cyclic predecessor, which is $m - 2$ arcs per vertex. A pair $a_i, b_j$ then has the direct arc and one detour, so $\lec^{\max} = 2$, and the count is $24 + 6 = 30$ against the hub branch's $27$.}
+The augmented bipartite digraph at $m = 3$, $n = 10$. Every cross-part arc runs from $A$ to $B$, and inside $B$ each vertex takes one arc from its cyclic predecessor, which is $m - 2$ arcs per vertex. A pair $a_i, b_j$ then has the direct arc and one detour, so $\lec^{\max} = 2$, and the count is $24 + 6 = 30$ against the hub branch's $27$.}
 
 % ============================================================================
 %  fig:variant-tree-status
@@ -1050,11 +1050,11 @@ The augmented bipartite digraph at $m = 3$, $n = 10$. Every arc runs from $A$ to
   \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
   \node[vtleaf, fill=regimeConjectured!16] (l7)  at (8.4,0)  {vertex};
-  \node[vtleaf, fill=regimeProved!16]      (l8)  at (9.6,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l11) at (13.2,0) {vertex};
-  \node[vtleaf, fill=regimeProved!16]      (l12) at (14.4,0) {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l12) at (14.4,0) {edge};
   \node[vtleaf, fill=regimePartial!20]     (l13) at (15.6,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l14) at (16.8,0) {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l15) at (18.0,0) {vertex};
@@ -1073,13 +1073,13 @@ The augmented bipartite digraph at $m = 3$, $n = 10$. Every arc runs from $A$ to
   \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (9.4,-1.5) {};
   \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {leading constant proved, exact value open};
   \node[vtleaf, fill=regimePartial!20, minimum width=8mm]     (leg4) at (9.4,-2.5) {};
-  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {partially solved: proved for a range of $m$, open beyond it};
+  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
 \end{tikzpicture}}}
 
 \end{center}
 
 \vspace{2pt}
-\noindent{\tiny\color{black!60} Status of the sixteen variants. Colour marks the status of a leaf: blue a closed form proved for every $n$ and $m$, purple a value proved for a range of $m$ and open beyond it, red a conjectured exact formula with a proved lower bound, and amber a proved leading term with the exact value unknown.}\par
+\noindent{\tiny\color{black!60} Status of the sixteen variants. Colour marks the status of a leaf: blue a closed form proved for every $n$ and $m$, purple an exact value proved on stated parameter ranges and open outside them, red a conjectured exact formula with a proved lower bound, and amber a proved leading term with the exact value unknown.}\par
 \end{frame}
 
 % ============================================================================
@@ -1165,15 +1165,15 @@ Model & Variant & $n=2$ & $n=3$ & $n=4$ & $n=5$ & $n=6$ & $n=7$ & $n=8$ \\
  & directed, arc ($L_m^{\mathrm{dir}}(n)$), \textcolor{vtProved}{proved} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtExact}{\textbf{12}} & \textcolor{vtExact}{\textbf{16}} & \textcolor{vtProved}{20} & \textcolor{vtProved}{24} & \textcolor{vtProved}{32} \\
  & directed, vertex ($k_m^{\mathrm{dir}}(n)$), \textcolor{vtConjectured}{= simple, conjectured} & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{6}} & \textcolor{vtExact}{\textbf{9}} & \textcolor{vtExact}{\textbf{12}} & \textcolor{vtExact}{\textbf{15}} & \textcolor{vtConjectured}{$\ge$18} & \textcolor{vtConjectured}{$\ge$21} \\
 \midrule
-\multirow{4}{*}{hypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtProved}{$\le$5} & \textcolor{vtProved}{$\le$6} & \textcolor{vtProved}{$\le$7} \\
- & undirected, vertex, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtProved}{$\le$5} & \textcolor{vtProved}{$\le$6} & \textcolor{vtProved}{$\le$7} \\
+\multirow{4}{*}{hypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtProved}{5} & \textcolor{vtProved}{6} & \textcolor{vtProved}{7} \\
+ & undirected, vertex, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtProved}{5} & \textcolor{vtProved}{6} & \textcolor{vtProved}{7} \\
  & directed, arc, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtOpen}{$\ge$10} & \textcolor{vtOpen}{$\ge$12} & \textcolor{vtOpen}{$\ge$14} & \textcolor{vtOpen}{$\ge$16} \\
  & directed, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtOpen}{$\ge$10} & \textcolor{vtOpen}{$\ge$12} & \textcolor{vtOpen}{$\ge$14} & \textcolor{vtOpen}{$\ge$16} \\
 \midrule
-\multirow{4}{*}{multihypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtProved}{$\le$4} & \textcolor{vtProved}{$\le$5} & \textcolor{vtProved}{$\le$6} & \textcolor{vtProved}{$\le$7} \\
- & undirected, vertex, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtProved}{$\le$4} & \textcolor{vtProved}{$\le$5} & \textcolor{vtProved}{$\le$6} & \textcolor{vtProved}{$\le$7} \\
+\multirow{4}{*}{multihypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtProved}{4} & \textcolor{vtProved}{5} & \textcolor{vtProved}{6} & \textcolor{vtProved}{7} \\
+ & undirected, vertex, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtProved}{4} & \textcolor{vtProved}{5} & \textcolor{vtProved}{6} & \textcolor{vtProved}{7} \\
  & directed, arc, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{6}} & \textcolor{vtOpen}{$\ge$8} & \textcolor{vtOpen}{$\ge$10} & \textcolor{vtOpen}{$\ge$12} & \textcolor{vtOpen}{$\ge$14} & \textcolor{vtOpen}{$\ge$16} \\
- & directed, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{6}} & \textcolor{vtOpen}{$\ge$8} & \textcolor{vtOpen}{$\ge$11} & \textcolor{vtOpen}{$\ge$12} & \textcolor{vtOpen}{$\ge$14} & \textcolor{vtOpen}{$\ge$16} \\
+ & directed, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{6}} & \textcolor{vtOpen}{$\ge$8} & \textcolor{vtOpen}{$\ge$10} & \textcolor{vtOpen}{$\ge$12} & \textcolor{vtOpen}{$\ge$14} & \textcolor{vtOpen}{$\ge$16} \\
 \bottomrule
 \end{tabular}}
 \end{frame}
@@ -1195,12 +1195,12 @@ Model & Variant & $n=2$ & $n=3$ & $n=4$ & $n=5$ & $n=6$ & $n=7$ & $n=8$ \\
  & directed, arc ($L_m^{\mathrm{dir}}(n)$), \textcolor{vtProved}{proved} & \textcolor{vtExact}{\textbf{10}} & \textcolor{vtExact}{\textbf{20}} & \textcolor{vtExact}{\textbf{30}} & \textcolor{vtExact}{\textbf{40}} & \textcolor{vtProved}{50} & \textcolor{vtProved}{60} & \textcolor{vtProved}{80} \\
  & directed, vertex ($k_m^{\mathrm{dir}}(n)$), \textcolor{vtConjectured}{= simple, conjectured} & \textcolor{vtExact}{\textbf{2}} & \textcolor{vtExact}{\textbf{6}} & \textcolor{vtExact}{\textbf{12}} & \textcolor{vtExact}{\textbf{20}} & \textcolor{vtExact}{\textbf{30}} & \textcolor{vtConjectured}{$\ge$36} & \textcolor{vtConjectured}{$\ge$42} \\
 \midrule
-\multirow{4}{*}{hypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtProved}{$\le$12} & \textcolor{vtProved}{$\le$15} & \textcolor{vtProved}{$\le$17} \\
+\multirow{4}{*}{hypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtProved}{$\le$12} & \textcolor{vtProved}{15} & \textcolor{vtProved}{17} \\
  & undirected, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{1}} & \textcolor{vtExact}{\textbf{4}} & \textcolor{vtExact}{\textbf{8}} & \textcolor{vtOpen}{$\ge$11} & \textcolor{vtOpen}{$\ge$15} & \textcolor{vtOpen}{$\ge$17} \\
  & directed, arc, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{12}} & \textcolor{vtOpen}{$\ge$25} & \textcolor{vtOpen}{$\ge$30} & \textcolor{vtOpen}{$\ge$35} & \textcolor{vtOpen}{$\ge$40} \\
  & directed, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{3}} & \textcolor{vtExact}{\textbf{12}} & \textcolor{vtOpen}{$\ge$25} & \textcolor{vtOpen}{$\ge$30} & \textcolor{vtOpen}{$\ge$35} & \textcolor{vtOpen}{$\ge$40} \\
 \midrule
-\multirow{4}{*}{multihypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{5}} & \textcolor{vtExact}{\textbf{7}} & \textcolor{vtProved}{$\le$10} & \textcolor{vtProved}{$\le$12} & \textcolor{vtProved}{$\le$15} & \textcolor{vtProved}{$\le$17} \\
+\multirow{4}{*}{multihypergraph $r=3$} & undirected, edge, \textcolor{vtProved}{proved} &  & \textcolor{vtExact}{\textbf{5}} & \textcolor{vtExact}{\textbf{7}} & \textcolor{vtProved}{10} & \textcolor{vtProved}{$\le$12} & \textcolor{vtProved}{15} & \textcolor{vtProved}{17} \\
  & undirected, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{5}} & \textcolor{vtExact}{\textbf{7}} & \textcolor{vtOpen}{$\ge$10} & \textcolor{vtOpen}{$\ge$11} & \textcolor{vtOpen}{$\ge$13} & \textcolor{vtOpen}{$\ge$16} \\
  & directed, arc, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{15}} & \textcolor{vtOpen}{$\ge$20} & \textcolor{vtOpen}{$\ge$25} & \textcolor{vtOpen}{$\ge$30} & \textcolor{vtOpen}{$\ge$35} & \textcolor{vtOpen}{$\ge$40} \\
  & directed, vertex, \textcolor{vtOpen}{open} &  & \textcolor{vtExact}{\textbf{15}} & \textcolor{vtOpen}{$\ge$20} & \textcolor{vtOpen}{$\ge$26} & \textcolor{vtOpen}{$\ge$30} & \textcolor{vtOpen}{$\ge$35} & \textcolor{vtOpen}{$\ge$40} \\
