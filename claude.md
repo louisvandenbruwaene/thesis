@@ -1372,3 +1372,69 @@ occurrences of `??`. 37 `[AI]` marks in the extracted text, which is 25 appendix
 headings plus 9 chapter 1 headings plus the three prose mentions. The badged set
 was re-derived from the rebuilt `main.aux` and compared against his list
 programmatically rather than by eye.
+
+## 2026-08-31 (Opus) — checked the four appendix proof replacements, then fixed six loose ends around them
+
+The author asked for a check of the uncommitted appendix work, which turned out
+to be the four replacements in `SIMPLIFIED_AI_PROOFS.md` plus one archiving.
+Each one trades a cited heavyweight theorem for a self-contained argument:
+hypergraph Gomory-Hu becomes `lem:hyper-cut-induction`, Baranyai becomes a
+degree-smoothing exchange proof of `lem:sparse-hypergraph`, Tutte's
+triconnected decomposition leaves Step 4 of `lem:incidence-rank` in favour of a
+direct separating-pair split into two torsos, and the Baranyai-based directed
+construction in `prop:dir-hyper-first` becomes a cyclic-word block
+construction. The historical `m`-free MILP subsection moved to
+`research_notes/historical_m_free_optimization.tex`.
+
+**ALL FOUR PROOFS VERIFIED LINE BY LINE, INCLUDING THE ARITHMETIC.** The three
+worth recording. `lem:hyper-cut-induction` is deliberately stated for
+non-uniform multihypergraphs, because the traces `H[S]` and `H[S-bar]` stop
+being `r`-uniform the moment a hyperedge is cut, so a uniform statement could
+not induct. In Step 4 of `lem:incidence-rank` all three torso cases give
+`r_U = |E_U| - n_U`, recomputed here independently, and the strict decrease in
+`|V| + |E|` holds because the far side keeps a vertex of degree at least three,
+which forces `|E_W| >= 3`, enough even for case three's extra vertex and two
+extra edges. The cyclic-word construction needs `k <= b` for distinct vertices
+per block and `ek <= db` for the degree cap, and both are supplied.
+
+**THE NUMBERS IN SECTION 9 OF THE DOSSIER WERE WRONG AND ARE NOW MEASURED.** It
+claimed a 51-page appendix at physical pages 43 to 93. The build gives 53 pages
+at 43 to 95, so the saving is one page, not three. Worth knowing that the
+working-tree `main.pdf` rebuilt byte for byte identical here, so the build is
+deterministic and this measurement is not an environment difference.
+
+**APPENDIX NUMBERING SHIFTED BY UP TO TWO FROM A.49 ONWARDS.** Removing
+`thm:hyper-gomory-hu` and `thm:baranyai` moved `lem:incidence-rank` from A.58 to
+A.56, `lem:sparse-hypergraph` from A.55 to A.53, and `prop:dir-hyper-first` from
+A.60 to A.58. Badges live on the environments, not on the numbers, so the
+curated set itself is intact, but **the numeric badge list in the 2026-08-29
+entry above no longer indexes the same results** and must not be replayed
+against this build. The same entry's note that A.54 is Baranyai and cannot carry
+a badge is now obsolete, since Baranyai is gone.
+
+**THE SIX FIXES.** (1) `lem:sparse-hypergraph` got `\aimedal`: its proof is
+newly written and an unbadged heading asserts the author checked it. It is the
+only new proof that lacked one, the other three headings already carried it.
+(2) `research_notes/historical_m_free_optimization.tex` was untracked and is now
+committed, verbatim apart from a two-line header. (3) The Contribution Statement
+had dropped Tutte from its list while `Tutte66` and `HopcroftTarjan73` are still
+cited at `app_proofs.tex:327`, so it now says they are cited once as a signpost
+and used in no proof. Baranyai and `HanifehnezhadDolati20` are genuinely
+uncited and correctly absent from the printed bibliography. (4) `ch2_machine.tex`
+promised a finite optimisation the thesis no longer prints, and now points at
+`sec:transcripts`, which does describe it. (5) `REVIEW_STATUS.md` still listed
+the SPQR `Q` symbol and the Hanifehnezhad-Dolati citation as present, and now
+records both as retired. (6) Section 9 corrected as above.
+
+**ONE STALE SENTENCE WAS ALREADY FIXED BY THE AUTHOR'S PASS.** "Part IV holds
+one self-contained extension" was wrong at `e38a8fa` too, since Part IV has had
+only two sections since the alternate-convention appendix was archived.
+
+VERIFY: `latexmk -pdf` exit 0, 100pp, 0 overfull, 0 underfull, 0 undefined refs,
+0 undefined citations, 0 LaTeX warnings, 0 occurrences of `??`. 32 `[AI]` marks
+in the extracted text, being 20 appendix headings plus 9 chapter 1 headings plus
+the three prose mentions, up from 31 before, the net `+1` being the new
+`lem:sparse-hypergraph` badge after the Gomory-Hu removal and the cut-induction
+addition cancelled. Note for future sessions: `grep -c` returned blank output in
+this shell even on matching input, so every count above was taken with
+`grep | wc -l` instead.

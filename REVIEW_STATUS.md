@@ -19,7 +19,8 @@ sometimes reworded, and two were extended by the rewrite rather than merely kept
 | 4 | Augmented-bipartite case split | Closed. |
 | 5 | "The extremisers are doubled trees" overclaim | Closed. |
 | 6 | `solve` code card did not match the dispatch | Closed. |
-| — | `c_m` and `h_m(b)` in the symbols table, SPQR `Q` component, Metropolis / Kirkpatrick-Gelatt-Vecchi / Glover / Hanifehnezhad-Dolati citations, `ChekuriXu17` and `DewarPikeProos18` now behind real claims, appendix grouped into four signposted parts | All present. |
+| — | `c_m` and `h_m(b)` in the symbols table, Metropolis / Kirkpatrick-Gelatt-Vecchi / Glover citations, `ChekuriXu17` and `DewarPikeProos18` now behind real claims, appendix grouped into four signposted parts | All present. |
+| — | SPQR `Q` component in the symbols table, Hanifehnezhad-Dolati citation | Both retired on 2026-08-31, when the triconnected decomposition and the hypergraph Gomory-Hu theorem left the appendix. |
 | — | `record_revision.sh`, `program/requirements-lock.txt`, PDF metadata | All present. |
 
 ## Batch 2 — all closed

@@ -42,7 +42,7 @@ Above all I thank my girlfriend Sara, whose patience and encouragement carried m
 All the work in this thesis is my own, except where I explicitly say otherwise. 
 I used artificial intelligence to implement the code, suggest and verify proofs, format \LaTeX{} and check spelling.
 Where a result comes from the literature I say so and cite it. 
-The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Whitney, Gomory and Hu, Mantel, Tutte, and Baranyai. 
+The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Whitney, Gomory and Hu, and Mantel. Tutte's triconnected decomposition and its algorithmic form due to Hopcroft and Tarjan are cited once as a signpost for further work and are used in no proof.
 Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
 Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
 
@@ -98,7 +98,7 @@ When these optimisations are exhausted and the computation becomes intractable, 
 
 
 The hypergraph vertex problem is settled completely at $m=2$. 
-At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by way of Tutte's triconnected decomposition. 
+At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by induction over blocks and separating pairs.
 On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time. 
 For every fixed $m\ge3$, the extremal value for simple digraphs, arc and vertex alike, is $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser, and at $m=2$ it differs from $n^2/4$ by only an $O(1)$ correction.
 For fixed $r$ and $m$, the directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
@@ -107,7 +107,6 @@ For fixed $r$ and $m$, the directed hypergraph, which had only bounds a factor o
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}
 \begin{tabular}{l>{\raggedright\arraybackslash}p{0.78\linewidth}}
 MILP & mixed-integer linear program \\
-SPQR & the triconnected decomposition tree (S series, P parallel, Q single edge, R rigid) \\
 \aimedal & in a theorem heading: the proof of that result was written by an AI model and is not verified line by line by the author (Contribution Statement) \\
 \end{tabular}
 

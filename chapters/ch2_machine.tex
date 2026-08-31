@@ -473,7 +473,7 @@ maximum number of arcs in a directed multigraph with pairwise maximum flow at
 most $m-1$ is exactly $(m-1)M^*(n)$: scaling that integral maximiser by
 $m-1$ gives the lower bound, and the preceding scaling argument gives the
 upper bound.
-The finite optimisation is retained only as an independent check of the cases $n\le6$.
+The finite optimisation is retained only as an independent check of the cases $n\le6$, and \Cref{sec:transcripts} records what it ran.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
@@ -513,9 +513,6 @@ The finite optimisation is retained only as an independent check of the cases $n
 \caption{Scaling at $m=3$: dividing multiplicities by $m-1=2$ turns the integer multigraph into a weight matrix with entries in $[0,1]$ and pairwise maximum flow at most one. Hence one $m$-free optimisation bounds every threshold.}
 \label{fig:scaling-reduction}
 \end{figure}
-
-The model itself is a mixed-integer program with one chosen cut per ordered pair, and it is written out, 
-with the theorem it settled and the record of what was run, in \Cref{sec:mstar-model}.
 
 \section{The heuristic search}
 So far, iterating all graphs of a fixed size that meet the connectivity constraint and counting their edges was a blind walk.

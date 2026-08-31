@@ -1,6 +1,6 @@
 This appendix carries every proof in the thesis. The body states the results and says in a few sentences what makes each one work, and the argument itself is here, together with the supporting lemmas and propositions that no chapter states in its own right, and with figures beside the arguments that need them.
 
-\paragraph{How to read this appendix.} It runs in four parts, and they are not of equal weight. \textsc{Part I} is classical machinery, \Cref{thm:menger,thm:gomory-hu} and Mader's theorem, and may be skipped by a reader who trusts the cited results. \textsc{Parts II} and \textsc{III} carry the original arguments, and a reader with time for three of them should read \Cref{thm:dir-multi-full} (the directed multigraph value, closed for every $n$ and $m$ by deleting a reachability skeleton rather than a vertex), \Cref{lem:incidence-rank} with \Cref{thm:hyper-vertex-m3} (the incidence rank bound proved through Tutte's triconnected decomposition, which settles the hypergraph vertex problem at $m = 3$), and \Cref{lem:two-step-budget} with the three theorems it drives, \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}, which pin six of the sixteen variants asymptotically with no hypothesis on the shape of the extremiser. \textsc{Part IV} holds one self-contained extension, the search's connectivity bookkeeping, and the computational audit. Every construction the body refers to by name is defined here, the directed ones in \Cref{sec:dir-constructions}. A heading carrying the badge \aimedal{} means that the proof under it was written by an AI model and is not verified line by line by the author, as the Contribution Statement sets out. In this appendix a heading without the badge is a cited classical result, the Gomory--Hu double count of \Cref{sec:mader-gomory-hu} which proves \Cref{thm:mader,thm:multigraph-edge} out of \Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}, or an argument the author has read and checked.
+\paragraph{How to read this appendix.} It runs in four parts, and they are not of equal weight. \textsc{Part I} is classical machinery, \Cref{thm:menger,thm:gomory-hu} and Mader's theorem, and may be skipped by a reader who trusts the cited results. \textsc{Parts II} and \textsc{III} carry the original arguments, and a reader with time for three of them should read \Cref{thm:dir-multi-full} (the directed multigraph value, closed for every $n$ and $m$ by deleting a reachability skeleton rather than a vertex), \Cref{lem:incidence-rank} with \Cref{thm:hyper-vertex-m3} (the incidence rank bound proved by induction over blocks and separating pairs, which settles the hypergraph vertex problem at $m = 3$), and \Cref{lem:two-step-budget} with the three theorems it drives, \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}, which pin six of the sixteen variants asymptotically with no hypothesis on the shape of the extremiser. \textsc{Part IV} holds the search's connectivity bookkeeping and the computational audit. Every construction the body refers to by name is defined here, the directed ones in \Cref{sec:dir-constructions}. A heading carrying the badge \aimedal{} means that the proof under it was written by an AI model and is not verified line by line by the author, as the Contribution Statement sets out. In this appendix a heading without the badge is a cited classical result, the Gomory--Hu double count of \Cref{sec:mader-gomory-hu} which proves \Cref{thm:mader,thm:multigraph-edge} out of \Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}, or an argument the author has read and checked.
 
 % ---------------------------------------------------------------------------
 % These appendix figures use the SHARED thesis TikZ styles (../shared/tikz-
@@ -66,7 +66,7 @@ Undirected graphs become symmetric networks, multigraph multiplicities become ca
 Every \emph{undirected} capacitated graph $G$ has a weighted tree $T$ on the same vertex set, its \emph{Gomory--Hu tree}, such that for all $u, v$ the value $\lec_G(u, v)$ equals the minimum edge weight on the $u$--$v$ path in $T$, and each tree edge $e$ corresponds to a minimum cut of $G$ whose capacity is the weight of $e$. All $\binom{n}{2}$ pairwise values are thereby stored in the $n-1$ weights of a single tree.
 \end{theorem}
 
-The theorem applies to undirected simple graphs, multigraphs, and hyperedge cuts (\Cref{thm:hyper-gomory-hu}), but not to asymmetric directed cuts or vertex connectivity. Its standard submodular-cut construction is proved in \cite{GomoryHu61}. Here we use only the displayed path-minimum identity.
+The theorem applies to undirected simple graphs and multigraphs, but not to asymmetric directed cuts or vertex connectivity. Its standard construction is proved in \cite{GomoryHu61}. Here we use only the displayed path-minimum identity.
 
 We also use the immediate endpoint bound.
 
@@ -324,7 +324,7 @@ so the conjectured rate is wrong, but only by a constant. That display alone ref
 \]
 which is positive exactly when $m > 4$, so the S\o{}rensen--Thomassen rate exceeds $m/2$ from $m = 5$ onwards.
 
-Their witness is built by a recursion, described here in the language of this section, since it says why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The arrangement is cyclic, and three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the triconnected one, along $2$-cuts rather than cut vertices, which is the same Tutte/SPQR machinery \Cref{lem:incidence-rank} already uses on incidence graphs. That is the concrete next step this reformulation points at, and it is pointing somewhere the answer is already known: S\o{}rensen and Thomassen prove in the same paper that the Bollob\'{a}s--Erd\H{o}s bound \emph{does} hold for $3$-connected graphs \cite{SorensenThomassen74}. So the rate $m/2$ survives exactly one refinement past the block decomposition, and what a triconnected version of \Cref{thm:simple-vertex-blocks} would have to supply is not a new bound on the rigid pieces but the bookkeeping that assembles them, which is where the recursion above hides.
+Their witness is built by a recursion, described here in the language of this section, since it says why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The arrangement is cyclic, and three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the classical triconnected one along separating pairs \cite{Tutte66,HopcroftTarjan73}. That is the concrete next step this reformulation points at, and it is pointing somewhere the answer is already known: S\o{}rensen and Thomassen prove in the same paper that the Bollob\'{a}s--Erd\H{o}s bound \emph{does} hold for $3$-connected graphs \cite{SorensenThomassen74}. So the rate $m/2$ survives exactly one refinement past the block decomposition, and what a triconnected version of \Cref{thm:simple-vertex-blocks} would have to supply is not a new bound on the rigid pieces but the bookkeeping that assembles them, which is where the recursion above hides.
 
 It also explains the sizes. The recursion beats the rate $m/2$ only once $j > 2/(m-4)$, so the smallest member of the family that outruns a bouquet of $K_m$'s has $26$ vertices at $m = 5$, $24$ at $m = 6$ and $18$ at $m = 7$, against the nine that exhaustive enumeration reaches. The construction was rebuilt and checked here at $m = 5, 6, 7$ and $j \le 3$: the vertex and edge counts match the formulas exactly, every member is $2$-connected, and every member has $\kap^{\max} = m-1$, so each is feasible and none contains the forbidden $m$ internally disjoint paths.
 
@@ -748,7 +748,7 @@ The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as th
 
 \section{The directed multigraph problem, solved in full}
 
-An optimisation that scales $m$ out of the problem entirely gives $L_m^{\mathrm{dir}}(n) = 2(n-1)(m-1)$ for $n \le 6$ (\Cref{thm:dir-multi-small}, recorded in \Cref{sec:mstar-model} below), and the section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. The same argument almost settles the multigraph case at every $m$. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
+The section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. The same argument almost settles the multigraph case at every $m$. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
 This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every pair's connectivity by at least one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
@@ -1058,72 +1058,14 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 
 Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the theorem is not proved, and it is not known to fail either. Nothing in the argument suggests a boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
 
-\subsection{The historical \texorpdfstring{$m$}{m}-free model}\label{sec:mstar-model}
 
-\Cref{ch:certify} reduces the directed multigraph problem at every $m$ to one $m$-free optimisation, $M^{*}(n)$, by dividing multiplicities by $m-1$. This subsection writes out the model that computed it, the theorem it settled and the record of what was run. \Cref{cor:mstar-integral} above has since replaced it, so nothing below is load-bearing.
-
-By max-flow/min-cut, $\mathrm{maxflow}(s,t)\le1$ exactly when some $s$--$t$ cut has capacity at most one. The optimisation therefore chooses one cut per ordered pair. A binary label $x^{st}_u$ records its side, and $p^{st}_{uv}$ counts $w(u,v)$ only when $u\to v$ crosses from source to sink (\Cref{fig:cut}). This describes the exact feasible region. The archived wrapper retained an \texttt{OPTIMAL} status and primal witness but no independently replayable matching bound, so the runs are finite solver checks rather than formal certificates.
-
-With scaled weights $w$, binary side labels $x$, and non-negative crossing weights $p$, the model is
-\begin{align*}
-    \text{maximise} \quad & \sum_{u \ne v} w(u, v) \\
-    \text{subject to} \quad & x^{st}_s = 1, \quad x^{st}_t = 0 && \text{for all } (s,t), \\
-    & p^{st}_{uv} \ge w(u, v) + x^{st}_u - x^{st}_v - 1 && \text{for all } (s,t),\ (u,v), \\
-    & \sum_{u \ne v} p^{st}_{uv} \le 1 && \text{for all } (s,t), \\
-    & w(s,t) + \sum_{x} \min\bigl(w(s,x), w(x,t)\bigr) \le 1 && \text{for all } (s,t), \\
-    & d(v_0) \le d(v_1) \le \dots \le d(v_{n-1}), && \text{with } d(v) = \textstyle\sum_{u \ne v} \bigl(w(u,v) + w(v,u)\bigr), \\
-    & w \in [0,1], \quad x \in \{0,1\}.
-\end{align*}
-
-The first line is what makes the labelling an $s$--$t$ cut rather than an arbitrary bipartition, and it is not optional. Without it the all-zero labelling $x \equiv 0$ is admissible, no ordered pair $(u,v)$ ever crosses, every $p^{st}_{uv}$ rests at $0$, and the cut constraint below is satisfied by every weight matrix whatsoever. Pinning the source side of $s$ and the sink side of $t$ removes that escape and leaves the remaining $n-2$ labels free, which is precisely the choice of an $s$--$t$ cut. The implementation supplies these two values as constants rather than as variables (\code{program/erdos915\_unified.py}, in \code{\_cut\_counting\_model}), which is the same restriction imposed one step earlier.
-
-Because $w\le1$, the second constraint forces $p^{st}_{uv}\ge w(u,v)$ only in the crossing case $(x^{st}_u,x^{st}_v)=(1,0)$. In the other three cases its right-hand side is non-positive. The third constraint then caps the chosen cut at one. The remaining two lines are redundant accelerators: the first counts the direct arc and all two-step detours, and the second removes equivalent vertex relabellings.
-
-The $\min$ in the two-step line is written as a minimum for readability only. A linear program cannot take one directly. It is linearised in the usual way, by an auxiliary variable $z^{sxt} \in [0,1]$ held below both arguments, $z^{sxt} \le w(s,x)$ and $z^{sxt} \le w(x,t)$, together with a binary selector $b^{sxt}$ and the two big-$M$ inequalities $z^{sxt} \ge w(s,x) - (1 - b^{sxt})$ and $z^{sxt} \ge w(x,t) - b^{sxt}$, which force $z^{sxt}$ up to whichever argument is the smaller. The displayed $\min$ is then the value of $z^{sxt}$.
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
-    plab/.style={edgelabel}]
-    % the dashed cut line
-    \draw[dashed, thick, color=KULblauw3b] (0,-2.3) -- (0,2.3);
-    \node[color=KULblauw3b] at (0,2.65) {cut};
-    \node at (-2.4,2.65) {source side ($x=1$)};
-    \node at ( 2.4,2.65) {sink side ($x=0$)};
-    % source-side vertices
-    \node[vertex] (s)  at (-2.6, 1.1) {$s$};
-    \node[vertex] (a)  at (-1.3,-1.1) {$a$};
-    % sink-side vertices
-    \node[vertex] (t)  at ( 2.6,-1.1) {$t$};
-    \node[vertex] (b)  at ( 1.3, 1.1) {$b$};
-    % non-crossing arcs (p = 0): labels pushed to the outer side, white-filled
-    \draw[->, edge, color=gray] (s) -- node[plab, left=2pt]{$p=0$} (a);
-    \draw[->, edge, color=gray] (b) -- node[plab, right=2pt]{$p=0$} (t);
-    % crossing arcs source -> sink (p = w), highlighted
-    \draw[->, edge, very thick, color=KULblauw1] (s) -- node[plab, above]{$p=w$} (b);
-    \draw[->, edge, very thick, color=KULblauw1] (a) -- node[plab, below]{$p=w$} (t);
-    % a back-crossing arc sink -> source (p = 0), not counted; label on the apex
-    \draw[->, edge, color=gray] (b) to[bend left=28] node[plab, pos=0.30, below=1pt]{$p=0$} (a);
-\end{tikzpicture}
-\caption{One chosen $s$--$t$ cut. Only the two thick source-to-sink arcs contribute crossing weight $p=w$, while same-side and backward arcs have $p=0$.}
-\label{fig:cut}
-\end{figure}
-\begin{theorem}[Directed multigraph value, small $n$]\label{thm:dir-multi-small}
-For $n \le 6$, $\;M^{*}(n) = 2(n-1)$, and the optimum is attained by a $\{0,1\}$ weight matrix. Hence for all $m \ge 2$, $\;L_m^{\mathrm{dir}}(n) = 2(n - 1)(m - 1)$, attained by the double star.
-\end{theorem}
-
-Historical runs gave $M^{*}(n)=2(n-1)$ with status \texttt{OPTIMAL} for $3\le n\le6$, 
-and $n=7$ did not close. Their archived output lacks a separately checkable bound or gap, 
-and no theorem now depends on it: \Cref{app:proofs} proves the value for all $n,m$ by hand 
-and \Cref{sec:transcripts} retains the solver record.
-
-\apppart{Part III. The hypergraph results}{The edge bound through a hypergraph Gomory--Hu tree, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
+\apppart{Part III. The hypergraph results}{The edge bound through an elementary cut induction, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
 
 \section{The hypergraph bounds}
 
 Connectivity in a hypergraph admits several inequivalent definitions, surveyed with their cut algorithms by Chekuri and Xu \cite{ChekuriXu17} and by Dewar, Pike and Proos \cite{DewarPikeProos18}. This thesis fixes on the Berge notion throughout, which is the one the checker of \Cref{ch:certify} measures and the one the bounds below are stated for.
 
-The body's hypergraph claims rest on two theorems: a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}, and a hypergraph Gomory--Hu theorem, which is the classical construction of Gomory and Hu \cite{GomoryHu61} run on a symmetric submodular cut function rather than on the edge-cut function, as set out by Hanifehnezhad and Dolati \cite{HanifehnezhadDolati20}.
+The body's hypergraph claims first need a Menger theorem for Berge routes, which also certifies the helper-point checker of \Cref{ch:certify}. Its cut formulation then supplies the separator used by the elementary induction for the edge bound.
 
 \begin{theorem}[Menger for multihypergraphs,\aimedal]\label{thm:menger-hyper}
 For a multihypergraph $\HH$ and vertices $u, v$, regard parallel hyperedge copies as distinct. The maximum number of hyperedge-copy-disjoint Berge $u$--$v$ paths equals the minimum number of individual copies whose deletion separates $u$ from $v$. Equivalently, if a cut $C$ is specified as a set of distinct hyperedge types, its cost is $\sum_{e\in C}\mu(e)$, because every copy of each selected type must be deleted. A simple hypergraph is the case where every multiplicity is one.
@@ -1139,38 +1081,55 @@ Build the helper-point network of \Cref{fig:hyper-gadget}: for each distinct hyp
 \emph{Cuts.} Finally, the member arcs are uncapped, so any cut of finite capacity uses helper arcs only, and a set of helper arcs separates $u$ from $v$ in the network exactly when the corresponding hyperedge types separate them in $\HH$. Its capacity is $\sum \mu(e)$ over those types, which is the number of copies removed. Conversely, deleting only some copies of a type while leaving another copy changes no reachability, so a minimum copy cut may be taken to delete either all copies of a type or none. Thus network-cut capacity and the minimum number of deleted copies are the same count. The integral max-flow/min-cut theorem equates the largest feasible integral flow value with this smallest cut capacity, which is precisely the claim.
 \end{proof}
 
-\begin{theorem}[Hypergraph Gomory--Hu,\aimedal]\label{thm:hyper-gomory-hu}
-Every $r$-uniform multihypergraph $\HH$ on vertex set $V$ has a weighted tree $T^*$ on $V$, its \emph{hypergraph Gomory--Hu tree}, such that $\lec_\HH(u,v)$ equals the minimum weight on the $u$--$v$ tree path. Each tree edge $t$ induces a vertex partition $(S_t, V \setminus S_t)$ with
+\begin{lemma}[Cut induction for multihypergraphs,\aimedal]\label{lem:hyper-cut-induction}
+Let $\HH$ be a multihypergraph on $n \ge 1$ vertices, not assumed uniform, with
+$\lec^{\max}_\HH \le k$. Then, the sum running over hyperedge copies,
 \[
-    c_\HH(S_t)=c^*(t),
-    \qquad
-    c_\HH(S):=\sum_{e\in\delta_\HH(S)}\mu(e),
+    \sum_{e} \bigl(|e| - 1\bigr) \;\le\; k\,(n-1).
 \]
-where $\delta_\HH(S)$ is the set of distinct hyperedge types incident to both sides. Thus $c_\HH(S)$ counts crossing copies with multiplicity. For a simple hypergraph it is just $|\delta_\HH(S)|$.
-\end{theorem}
+\end{lemma}
 
-This is the exact hypergraph echo of \Cref{thm:gomory-hu}, the same tree-of-cuts summary of all pairwise connectivities, with the single change that the capacity of a cut now counts the hyperedge copies straddling it, $c_\HH(S)$, in place of the edges. Gomory and Hu's construction \cite{GomoryHu61} needs nothing about the cut function beyond it being symmetric and submodular \cite{HanifehnezhadDolati20}, and the weighted hyperedge-cut function $c_\HH(\cdot)$ has both properties exactly as the ordinary edge-cut function does, so the identical uncrossing construction builds this tree too. We use only the two properties in the statement, the path-minimum reading of $\lec_\HH$ and the identity $c_\HH(S_t) = c^*(t)$.
+\begin{proof}
+Induction on $n$. At $n = 1$ every hyperedge is a single vertex and both sides
+are $0$.
+
+Let $n \ge 2$ and fix any two vertices $u \ne v$. By \Cref{thm:menger-hyper}
+some set $F$ of at most $\lec_\HH(u,v) \le k$ hyperedge copies separates them.
+Let $S$ be the set of vertices reachable from $u$ in $\HH - F$ and write
+$\bar S = V \setminus S$, so $u \in S$, $v \in \bar S$, and every copy meeting
+both sides lies in $F$. Both sides are non-empty and at most $k$ copies cross.
+
+Form the two \emph{trace} multihypergraphs $\HH[S]$ and $\HH[\bar S]$ by
+replacing every copy $e$ by $e \cap S$, respectively $e \cap \bar S$, and
+discarding the intersections of size $0$ or $1$. A Berge route of a trace lifts,
+copy by copy, to a Berge route of $\HH$ on the corresponding original copies,
+and distinct trace copies come from distinct original copies, so a
+hyperedge-disjoint family in a trace lifts to one of the same size in $\HH$.
+Hence $\lec^{\max} \le k$ on both traces and the induction hypothesis applies to
+each.
+
+Now split the copies of $\HH$. A copy lying wholly inside one side contributes
+its whole $|e| - 1$ to that side's trace sum. A crossing copy splits as
+\[
+    |e| - 1 \;=\; \bigl(|e \cap S| - 1\bigr)
+              \;+\; \bigl(|e \cap \bar S| - 1\bigr) \;+\; 1,
+\]
+each bracket being the contribution its trace makes, and zero exactly when that
+trace was discarded. Summing over all copies,
+\[
+    \sum_e \bigl(|e|-1\bigr)
+    \;\le\; k\bigl(|S| - 1\bigr) + k\bigl(|\bar S| - 1\bigr)
+            + \bigl|\{\text{crossing copies}\}\bigr|
+    \;\le\; k(n-2) + k \;=\; k(n-1). \qedhere
+\]
+\end{proof}
 
 \begin{proof}[Proof of \Cref{prop:hyper-edge}]
-\emph{Upper bound.} Let $\HH$ be $r$-uniform with $\lec^{\max}_\HH \le m-1$, and let $T^*$ be its hypergraph Gomory--Hu tree (\Cref{thm:hyper-gomory-hu}), a weighted tree on the same $n$ vertices with weights $c^*$. The plan is to charge each hyperedge copy to tree edges and count the charges two ways, exactly as in the Mader proof, with the one change that a hyperedge spans $r$ vertices rather than two.
+\emph{Upper bound.} Every hyperedge copy has $|e| = r$, so
+\Cref{lem:hyper-cut-induction} at $k = m-1$ reads
+$(r-1)|E(\HH)| \le (m-1)(n-1)$. Dividing and rounding down, because
+$|E(\HH)|$ is an integer, gives the stated floor.
 
-\emph{Step 1: each hyperedge copy crosses at least $r-1$ tree cuts.} Fix a copy of a hyperedge $e$, a set of $r$ vertices, and let $\mathrm{ST}(e)$ be its \emph{smallest connected subtree}, the minimal subtree of $T^*$ that contains all $r$ of them (its Steiner tree). A tree spanning at least $r$ vertices has at least $r-1$ edges, so $\mathrm{ST}(e)$ has at least $r-1$ of them. Each such edge $t$ is a genuine cut for $e$: deleting $t$ from $T^*$ splits the vertices into the two sides $(S_t, V \setminus S_t)$, and because $t$ lies on $\mathrm{ST}(e)$ the hyperedge $e$ has at least one vertex on each side. So $e$ touches both sides. Therefore
-\[
-   \bigl|\{\, t \in E(T^*) : e \text{ straddles } S_t \,\}\bigr| \;\ge\; r-1
-   \qquad\text{for every hyperedge copy } e.
-\]
-
-\emph{Step 2: count the incidences two ways.} Sum that inequality over all hyperedge copies, then exchange the order of summation. This is legitimate because both of the middle sums below simply count the same pairs $(e,t)$ in which the copy $e$ straddles the cut of $t$, once grouped by the hyperedge copy and once by the tree edge:
-\[
-   (r-1)\,|E(\HH)| \;\le\; \sum_{e\text{ (with copies)}}\bigl|\{\, t : e \text{ straddles } S_t\,\}\bigr|
-   \;=\; \sum_{t} c_\HH(S_t).
-\]
-
-\emph{Step 3: read off the bound.} By the Gomory--Hu property each tree edge has $c_\HH(S_t) = c^*(t)$. Moreover $c^*(t)$ is itself a local connectivity $\lec_\HH$ of $t$'s two endpoints: since those endpoints are adjacent in $T^*$, the $u$--$v$ tree path between them is the single edge $t$, so the path-minimum reading of \Cref{thm:hyper-gomory-hu} gives $\lec_\HH$ of that pair exactly $c^*(t)$, hence at most $m-1$ by feasibility. Summing over the $n-1$ tree edges, $\sum_t c_\HH(S_t) = \sum_t c^*(t) \le (m-1)(n-1)$. Chaining Steps 2 and 3,
-\[
-   (r-1)\,|E(\HH)| \;\le\; (m-1)(n-1),
-\]
-and dividing by $r-1$, then rounding down because $|E(\HH)|$ is an integer, gives $|E(\HH)| \le \floorfrac{(m-1)(n-1)}{r-1}$.
 \emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the star hypertree whose hyperedges are $\{h\} \cup G_i$, one per group, and give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges.
 \end{proof}
 
@@ -1188,25 +1147,33 @@ The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multih
 Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the same hypothesis at $m - 1 = 2$, where it reduces to $2 < r < n$, for the same reason. \Cref{tab:summary} splits the simple and multi hypergraph rows on exactly this distinction, and the program enumerates the two models separately for the same reason, stated where each formula is used.
 \end{remark}
 
-The sparse hypergraph the construction needs is a corollary of a classical partition theorem, which we state before using it.
+The sparse hypergraph needed by the construction follows from a direct
+degree-smoothing argument.
 
-\begin{theorem}[Baranyai \cite{Baranyai75}]\label{thm:baranyai}
-If $r$ divides $n$, the $\binom{n}{r}$ distinct $r$-subsets of an $n$-element set can be partitioned into $\binom{n-1}{r-1}$ classes, each a \emph{perfect matching}, meaning a family of $n/r$ disjoint $r$-sets that together cover every vertex exactly once. More generally, for any prescribed class sizes $a_1 + \dots + a_t = \binom{n}{r}$, and with no divisibility assumed, the $r$-subsets can be partitioned into classes of exactly those sizes so that in the class of size $a_i$ every vertex lies in either $\floor{r a_i / n}$ or $\ceil{r a_i / n}$ of the sets, as evenly balanced as the size permits.
-\end{theorem}
-
-The first statement is the memorable one. When $r$ divides $n$ the complete $r$-uniform hypergraph, the one holding every $r$-set, comes apart into $\binom{n-1}{r-1}$ perfect matchings, the exact hypergraph analogue of splitting a regular bipartite graph into perfect matchings by K\"onig's theorem. The proof is an induction that keeps the partial partition as balanced as possible at every step, an integer-flow argument in the spirit of Hall's marriage theorem rather than an explicit construction, and its full form is in Baranyai \cite{Baranyai75}. We need only the general equitable form, and only its conclusion about degrees.
-
-\begin{lemma}[Sparse uniform hypergraphs exist]\label{lem:sparse-hypergraph}
-Let $r \ge 1$, $n \ge r$, and $0 \le d \le \binom{n-1}{r-1}$. There exists an $r$-uniform simple hypergraph on $n$ vertices with maximum degree at most $d$ and exactly $\floorfrac{dn}{r}$ hyperedges.
+\begin{lemma}[Sparse uniform hypergraphs exist,\aimedal]\label{lem:sparse-hypergraph}
+Let $r \ge 1$, $n \ge r$ and $0 \le d \le \binom{n-1}{r-1}$. There is a simple
+$r$-uniform hypergraph on $n$ vertices with exactly $\floorfrac{dn}{r}$
+hyperedges and maximum degree at most $d$.
 \end{lemma}
 
 \begin{proof}
-For $r=1$ the hypotheses force $d\in\{0,1\}$, and the empty family or the
-family of all $n$ singleton edges, respectively, has the required size and
-degree. Assume henceforth that $r\ge2$.
-Put $e := \floorfrac{dn}{r} \le \frac{n}{r}\binom{n-1}{r-1} = \binom{n}{r}$. Apply the equitable form of \Cref{thm:baranyai} with two classes, of sizes $e$ and $\binom{n}{r} - e$. Within each class every vertex is covered either $\floor{re/n}$ or $\ceil{re/n}$ times, so the class of size $e$ is a simple $r$-uniform hypergraph with $e = \floorfrac{dn}{r}$ hyperedges and maximum degree at most $\ceil{re/n} \le \lceil d \rceil = d$, the last step because $re/n \le r(dn/r)/n = d$ and $d$ is an integer.
+Put $e := \floorfrac{dn}{r} \le \frac{n}{r}\binom{n-1}{r-1} = \binom{n}{r}$, so
+$e$ distinct $r$-sets are available. Among all families of exactly $e$ distinct
+$r$-sets choose one minimising $\sum_x \deg(x)^2$. Suppose two vertices had
+$\deg(x) \ge \deg(y) + 2$. Write $a$ for the number of family edges containing
+$x$ but not $y$ and $b$ for the number containing $y$ but not $x$, so
+$a \ge b + 2$. The injection $A \mapsto A - x + y$ sends the first kind into the
+second, so if every image were present we would have $b \ge a$. Hence some $A$
+in the family has $A - x + y$ absent, and exchanging them keeps the family
+simple and of size $e$ while changing the objective by
+\[
+(\deg(x)-1)^2 + (\deg(y)+1)^2 - \deg(x)^2 - \deg(y)^2
+ = 2\bigl(\deg(y) - \deg(x)\bigr) + 2 \le -2,
+\]
+contradicting minimality. So all degrees differ by at most one, and since they
+sum to $re$ the largest is $\ceil{re/n} \le d$, the last step because
+$re \le dn$ and $d$ is an integer.
 \end{proof}
-
 
 \section{The hypergraph vertex problem}\label{sec:hyper-vertex-proof}
 
@@ -1457,12 +1424,12 @@ $\mathrm{rank}(G) \le |X| - 1$.
 In words: this is the engine behind the $m = 3$ hypergraph result, stated for a bipartite graph rather than for a hypergraph. Read $X$ as the vertices of a hypergraph and $Z$ as its hyperedges, so that $G$ is the incidence graph and $\mathrm{rank}(G)$, the number of independent cycles it carries, is the quantity the hyperedge count is eventually read off from. The four hypotheses say in turn that the picture really is an incidence graph (i), that no hyperedge repeats a vertex (ii), that no hyperedge dangles as a leaf (iii), and that the hypergraph is feasible at $m = 3$ (iv). The conclusion caps the independent cycles by the number of vertices.
 
 \begin{proof}
-Induction on $|V| + |E|$. The proof peels $G$ down to a core that cannot
-exist. Step~1 handles a cut vertex by arguing block by block. Steps~2 and~3
-remove a degree-two $Z$-vertex or $X$-vertex without changing the bound.
-What survives is $2$-connected with minimum degree at least three, and
-Step~4 shows that such a graph already violates the connectivity cap
-(iv), so it never arises. \emph{Base $|V| \le 2$.} A single vertex has degree $0$, too little for the
+Induction on $|V| + |E|$. Step~1 handles a cut vertex by arguing block by
+block. Steps~2 and~3 remove a degree-two $Z$-vertex or $X$-vertex without
+changing the bound. What survives is $2$-connected with minimum degree at
+least three. Step~4 shows that it is simple, excludes a $3$-connected core,
+then splits at a separating pair and applies induction to two smaller torsos.
+\emph{Base $|V| \le 2$.} A single vertex has degree $0$, too little for the
 degree-at-least-$2$ floor (iii) imposes on a $Z$-vertex, so it cannot lie in
 $Z$ and must lie in $X$, giving $0 \le |X| - 1$. On two vertices the same
 reasoning applies to either one: a vertex in $Z$ could reach only the other
@@ -1542,7 +1509,7 @@ repeats, hence have degree at most $1$, against (iii). The smaller graph
 satisfies the hypotheses, so induction gives
 $\mathrm{rank}(G) - 1 \le (|X| - 1) - 1$, that is $\mathrm{rank}(G) \le |X| - 1$.
 
-\emph{Step 4: the remaining case is impossible.} Now $G$ is $2$-connected
+\emph{Step 4: the remaining core.} Now $G$ is $2$-connected
 with $|V| \ge 3$ and every degree at least $3$. First, $G$ is simple: a
 parallel class lies inside $X$ by (ii), and if $\mu(x, x') \ge 2$ then a
 third internally disjoint route exists: walk from $x$ to any third vertex
@@ -1551,32 +1518,54 @@ available because deleting a single vertex from a $2$-connected graph leaves
 it connected, exactly as already used in Step~3. The concatenation
 visits $x$ only first and $x'$ only last, so it contains an $x$--$x'$ path
 with at least one interior vertex, giving $\kap(x, x') \ge 3$, against
-(iv). If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
+(iv). Thus $G$ is simple, and its minimum degree at least three forces
+$|V| \ge 4$. If $G$ is $3$-connected, Menger puts every pair at $\kap \ge 3$, so
 two vertices of $X$ would violate the cap $\kap(x, x') \le 2$ that (iv)
 imposes on every pair drawn from $X$, forcing $|X| \le 1$, and then every $z$
 has degree at most $1$ by (i), absurd.
 
-Otherwise $G$ is $2$-connected but not $3$-connected. Tutte's triconnected
-decomposition \cite{Tutte66}, whose algorithmic form is the SPQR tree of
-Hopcroft and Tarjan \cite{HopcroftTarjan73}, expresses it as a tree of cycle, bond, and
-$3$-connected pieces joined along virtual edges. For a leaf piece $L$ its
-unique virtual edge $\{a,b\}$ represents a real $a$--$b$ path through the rest
-of $G$, internally outside $L$. Vertices of $L$ away from that edge keep their
-degree in $G$. These are the only properties of the decomposition used below.
+Otherwise $G$ has a separating pair $\{a, b\}$. Delete it and gather the
+remaining components into two non-empty groups with vertex sets $U$ and $W$.
+Since $G$ is $2$-connected, each of $a$ and $b$ has a neighbour in $U$ and one
+in $W$, and each side carries an $a$--$b$ path. Write $s = |X \cap \{a,b\}|$ and
+build two \emph{torsos} $G_U$ and $G_W$, where $G_U$ is the subgraph induced on
+$U \cup \{a,b\}$ carrying one temporary $a$--$b$ connection, and $G_W$ likewise:
 
-Now $G$ itself is none of the three piece types, since it is not a single
-cycle (its degrees are at least three), not a bond (it is simple), and not
-$3$-connected (the case just handled), so the tree has at least two leaves.
-Let $L$ be one, with unique virtual edge $\{a, b\}$.
-If $L$ is a cycle, a vertex of $L$ off $\{a, b\}$ has degree $2$ in $G$,
-absurd. If $L$ is a bond, it holds at least two real parallel edges, absurd
-in a simple graph. If $L$ is $3$-connected, then any two of its vertices are
-joined by three internally disjoint paths inside $L$, at most one through
-the virtual edge, which the far-side path replaces: so $\kap_G(u, v) \ge 3$
-for \emph{all} $u, v \in V(L)$, forcing $|X \cap V(L)| \le 1$ by (iv).
-But $|V(L)| \ge 4$ leaves a $Z$-vertex $z^* \notin \{a, b\}$. Its
-neighbours lie in $X \cap V(L)$ by (i), at most one vertex, reached by at
-most one edge since $G$ is simple, giving degree at most $1$, which is absurd.
+\begin{itemize}
+    \item if $ab \in E(G)$, retain that edge on both sides.
+    \item if $ab \notin E(G)$ and $s \ge 1$, add one new edge $ab$ to each side.
+    \item if $s = 0$, add to each side a fresh $X$-vertex together with the two
+          edges joining it to $a$ and to $b$.
+\end{itemize}
+
+The three cases are exhaustive, since $Z$ is independent by (i), so
+$ab \in E(G)$ already forces $s \ge 1$. In that case $s = 1$ exactly: two
+endpoints in $X$ would give $\kap(a,b) \ge 3$, counting the edge together with
+one $a$--$b$ path through each side, against (iv).
+
+\emph{Each torso satisfies (i) to (iv).} Condition (i) holds because every
+temporary edge has at least one endpoint in $X$, a fresh vertex in the third
+case. Condition (ii) holds because a temporary edge joins a pair that carried no
+edge at all. For (iii), a $Z$-vertex inside $U$ keeps all its neighbours, and a
+separator vertex in $Z$ keeps at least one neighbour on its own side and gains
+the temporary connection. For (iv), a fresh $X$-vertex has degree two, so its
+local connectivity is at most two, and for two old $X$-vertices any internally
+disjoint family uses the temporary connection at most once, since internally
+disjoint $x$--$x'$ paths can share no edge but $xx'$ itself. Replacing that one
+path's temporary connection by an $a$--$b$ path through the opposite side turns
+three internally disjoint paths in a torso into three in $G$, which (iv)
+forbids. Both torsos are smaller in $|V| + |E|$, since the opposite side retains
+at least one vertex, of degree at least three.
+
+\emph{The bookkeeping.} Write $r_U, r_W$ for the two ranks and $X_U, X_W$ for
+the two $X$-sets. Direct calculation from $\mathrm{rank} = |E| - |V| + 1$ gives
+$\mathrm{rank}(G) = r_U + r_W$ and $|X_U| + |X_W| = |X| + 1$ in the first case,
+where the retained edge is counted twice, and
+$\mathrm{rank}(G) = r_U + r_W - 1$ with $|X_U| + |X_W| = |X| + s$ in the second
+and $|X| + 2$ in the third. Feeding in the two inductive bounds
+$r_U \le |X_U| - 1$ and $r_W \le |X_W| - 1$ gives $\mathrm{rank}(G) \le |X| - 1$
+in the first and third cases, and $\mathrm{rank}(G) \le |X| + s - 3 \le |X| - 1$
+in the second, since $s \le 2$. This exhausts the cases.
 \end{proof}
 
 The rank bound now yields \Cref{thm:hyper-vertex-m3}, stated in
@@ -1602,11 +1591,15 @@ At $r = 2$ the theorem speaks of multigraphs under the hyperedge-as-gate
 convention, in which parallel edges are distinct one-step routes, giving
 the multigraph value $2(n-1)$ of \Cref{thm:multigraph-edge}, complementing the body's convention for graphs,
 where parallel adjacencies count once. The proof of
-\Cref{lem:incidence-rank} leans on the triconnected decomposition exactly
-where $\kap \le 2$ lives. For $m = 4$, the analogous question asks for a rank
-bound relative to $\kap \le 3$, where no comparably clean decomposition
-exists. Thus the proof is confined to $m\le3$, and no general
-$m=4$ formula is claimed.
+\Cref{lem:incidence-rank} is calibrated to the cap $\kap \le 2$ at every step
+rather than at one. Two parallel edges beside a single detour already exceed
+it, which is what forces the surviving core to be simple, and three internally
+disjoint paths exceed it, which is what rules out a $3$-connected core. The
+conclusion is the cap-two number too: at $\kap \le 3$ it is already false,
+since two $X$-vertices joined by three parallel edges have cycle rank two
+against $|X| - 1 = 1$. For $m = 4$ the analogous question asks for a different
+bound relative to $\kap \le 3$, taken apart along $3$-cuts rather than along
+separating pairs, and none is supplied here.
 \end{remark}
 
 \section{The directed hypergraph}\label{sec:dir-hyper}
@@ -1644,24 +1637,26 @@ $(r-1)|E| \le (m-1) n(n-1)$.
 
 For the lower bound, split $V$ into tails $A$, $|A|=\alpha$, and heads $B$,
 where $b:=|B|=n-\alpha\ge r-1$. Put $k:=r-1$, $d:=m-1$ and
-$C:=\binom{b-1}{k-1}$, the degree of a vertex in the complete $k$-uniform
-hypergraph on $B$. Write $d=qC+s$ with $0\le s<C$. Take $q$ copies of that
-complete hypergraph and, by \Cref{lem:sparse-hypergraph}, a simple
-$k$-uniform hypergraph on $B$ of maximum degree at most $s$ and with
-$\floor{sb/k}$ edges. Their multiset union $\mathcal G^*$ has maximum degree
-at most $qC+s=d$ and
+$e:=\floorfrac{db}{k}$. Label the vertices of $B$ by $0,1,\dots,b-1$ and read
+the infinite cyclic word
 \[
- q\binom{b}{k}+\floorfrac{sb}{k}
- =q\frac{bC}{k}+\floorfrac{sb}{k}
- =\floorfrac{db}{k}
+    0,1,\dots,b-1,0,1,\dots
 \]
-hyperedges. Give every tail $a\in A$ the hyperedges $(a,H)$ for
-$H\in\mathcal G^*$, with the same multiplicities. No vertex of $B$ is a tail,
-so every route is a single step and
-$\lec(a,b)=\deg_{\mathcal G^*}(b)\le m-1$, while pairs inside $A$ or starting
-in $B$ have no routes. If $d\le C$, the auxiliary hypergraph can instead be
-taken directly from \Cref{lem:sparse-hypergraph}, so the resulting directed
-hypergraph is simple.
+in consecutive blocks of length $k$. Take the first $e$ blocks as the
+hyperedge copies of a $k$-uniform multihypergraph $\mathcal G^*$ on $B$.
+Because $k\le b$, each block contains $k$ distinct vertices. Those blocks
+consume $ek$ consecutive positions of the cyclic word, so every vertex occurs
+either $\floor{ek/b}$ or $\ceil{ek/b}$ times. Since $ek\le db$, the maximum
+degree is at most $d$.
+
+Give every tail $a\in A$ the hyperedges $(a,H)$ for $H\in\mathcal G^*$, with
+the same multiplicities. No vertex of $B$ is a tail, so every route is a single
+step and $\lec(a,b)=\deg_{\mathcal G^*}(b)\le m-1$, while pairs inside $A$ or
+starting in $B$ have no routes. The count is
+$\alpha e=\alpha\floorfrac{(m-1)(n-\alpha)}{r-1}$. If
+$d\le\binom{b-1}{k-1}$, use \Cref{lem:sparse-hypergraph} instead of the cyclic
+multihypergraph. Its edges are distinct, so the resulting directed hypergraph
+is simple.
 \end{proof}
 
 The forward model is one of three ways to orient a Berge edge. In general a

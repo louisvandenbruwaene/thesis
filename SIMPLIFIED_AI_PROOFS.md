@@ -1,13 +1,13 @@
-# Recommended simplifications for the AI-labelled proofs
+# Applied simplifications for the AI-labelled proofs
 
-This file is a standalone revision dossier. It is not included by `main.tex` and
-does not change the thesis. It records only the replacements that make the
-appendix genuinely shorter or remove difficult machinery. Existing proofs not
-named here should be retained: shortening them further mostly removes the
+This file is a standalone revision dossier and is not included by `main.tex`.
+It records the four replacements now applied to the thesis because they make
+the appendix genuinely shorter or remove difficult machinery. Existing proofs
+not named here were retained: shortening them further mostly removes the
 explanation a reader needs without changing the underlying argument.
 
-The recommendations incorporate the independent review in
-`SIMPLIFIED_AI_PROOFS_REVIEW.md` and all six repairs identified there.
+The applied versions incorporate the independent review and its second-pass
+corrections in `SIMPLIFIED_AI_PROOFS_REVIEW.md`.
 
 ## 1. Scope and citation policy
 
@@ -269,10 +269,12 @@ Write `r_U,r_W` for the torso ranks.
 
 This exhausts the cases. ∎
 
-The proof of Theorem 1.10 from this rank bound remains unchanged. The scope
-remark should say that the separating-pair split is specific to the cap two:
-one temporary connection can replace at most one member of an internally
-disjoint family. At `m=4` no analogous rank bound is supplied.
+The proof of Theorem 1.10 from this rank bound remains unchanged. The cap two
+enters numerically throughout the rank proof. Two parallel edges plus a detour
+already exceed it, as do three internally disjoint paths. The conclusion itself
+fails at cap three: two `X`-vertices joined by three parallel edges have rank
+two, exceeding `|X|-1=1`. Thus the `m=4` problem needs a different bound rather
+than a stronger version of the same torso argument.
 
 ## 6. Round-robin construction for A.60
 
@@ -339,17 +341,17 @@ classifies the extremisers, not merely the extremal value, on the quadratic
 branch of the directed-multigraph theorem. It should stay until the author
 decides whether that extra uniqueness result is worth its space.
 
-The historical optimization section records the older fractional/cut-counting
-MILP and solver history. It is not load-bearing for any theorem, but most of it
-is historical explanation rather than an AI-labelled proof. Under the present
-AI-only shortening rule it stays in the thesis unless the author makes a
-separate scope decision.
+The historical optimization section recorded the older fractional/cut-counting
+MILP and solver history. It was not load-bearing for any theorem and has now
+been preserved verbatim in
+`research_notes/historical_m_free_optimization.tex`, outside the compiled
+thesis.
 
-## 9. Expected length effect
+## 9. Measured length effect
 
-The clean build after removing former Appendix A.10 has a 53-page appendix,
-down from 59 pages, without affecting the main sixteen variants. The four
-recommended AI-proof replacements should save roughly another two pages, for a
-projected appendix length of about 51 pages. Mader's proof, the quadratic
-classification, and the historical optimization discussion are not included
-in that saving and remain in the thesis.
+At commit `e38a8fa`, after former Appendix A.10 had been archived, the appendix
+occupied 54 pages, physical pages 43--96 of the PDF. After applying the four
+proof replacements and archiving the historical optimization subsection, the
+clean build occupies 53 pages, physical pages 43--95. The measured saving is
+one page, against the two projected before the replacements were written.
+Mader's proof and the quadratic classification remain in the thesis.

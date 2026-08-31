@@ -544,7 +544,7 @@ This is because digraphs can be lopsided in one direction without creating route
 An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
 \end{proposition}
 
-The proof is the multigraph argument again, run through the hypergraph Gomory-Hu tree, and \Cref{app:proofs} gives it.
+The proof is an elementary induction on a hyperedge cut, and \Cref{app:proofs} gives it.
 It has to be re-run rather than deduced from \Cref{thm:multigraph-edge}, because the obvious reduction points the wrong way. Replacing every hyperedge by a spanning star on its $r$ vertices gives a multigraph of size $(r-1)|E(\HH)|$, but two routes may then take two different star edges of one hyperedge, which a family of Berge routes forbids. The star multigraph can therefore carry more connectivity than the hypergraph it came from, and a feasible hypergraph need not produce a feasible multigraph to count.
 The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one everywhere, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
 For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
@@ -604,7 +604,7 @@ $K_3^{(r)}(n)$ takes the same value on that range
 \end{theorem}
 
 Both proofs read Berge routes as ordinary paths in the incidence graph, and \Cref{app:proofs} gives them. 
-The $m = 3$ case is the harder one and needs a rank bound proved through Tutte's triconnected decomposition. 
+The $m = 3$ case is the harder one and needs a rank bound proved by induction over blocks and separating pairs.
 At $m \ge 4$ that route stops for want of a $4$-connectivity analogue, and the value is open.
 \Cref{prop:hyper-edge} counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part.
 The metro picture shows why. 
