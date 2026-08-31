@@ -360,3 +360,151 @@ thesis states with a citation and does not lean on structurally.
 
 The numerical checks in this review are in
 `research_notes/scripts/review_simplified_proofs.py`.
+
+---
+
+# Second pass, 2026-08-31
+
+`SIMPLIFIED_AI_PROOFS.md` was replaced between the two passes. It is now a
+355-line revision dossier that keeps only the four replacements this review
+endorsed, adds a "what should not be replaced" section, and carries the repairs
+listed in section 3 above. Separately, commit `b07c577` archived the alternate
+multigraph vertex convention out of the appendix into
+`research_notes/alternate_multigraph_vertex_convention.tex`.
+
+All four replacements were re-derived against the new wording. They remain
+correct. What follows is only what is new.
+
+## A. The repairs landed
+
+Repairs 1 and 2, the two load-bearing ones, are in. The cut induction now fixes
+its pair first and takes the reachable component of `u` after deleting the
+separating copies, and the incidence-rank proof restores the simplicity step and
+concludes `|V| >= 4` from it, which is what closes the three-vertex hole.
+
+Repairs 3 to 6 are moot rather than outstanding: they concerned the
+directed-multigraph classification, the simple vertex block theorem and the
+alternate-convention section, none of which the new dossier proposes to replace,
+and the last of which is no longer in the thesis.
+
+## B. The incidence-rank proof, executed rather than read
+
+The dossier's proof was implemented as an algorithm that walks its own case
+analysis on real instances and asserts every claim it makes: that each recursive
+sub-instance still satisfies (1) to (4), that the rank and `|X|` identities hold
+in each branch, and that the bound comes out. Over 7365 instances, every
+connected multigraph on at most five vertices with multiplicities up to three
+satisfying (1) to (4), nothing fires.
+
+Two harness bugs surfaced first and are worth recording, because both are traps
+for anyone checking this again. Condition (iv) is the **non-collapsing** kappa,
+as the lemma's own two-vertex base case shows when it caps a multiplicity at
+two, whereas `local_connectivity(..., vertex_split=True)` collapses parallel
+copies under `sec:parallel-convention` and returns 1 for any multiplicity. It
+has to be computed as `mu(u,v) + pi(u,v)` through `lem:multi-vertex-split`. And
+a block decomposition cannot be built by unioning edges that share a non-cut
+vertex: the four-cycle with a pendant at two opposite vertices splits into two
+false blocks that way.
+
+## C. The replaced case is unreachable, so no computation can ever exercise it
+
+In all 7365 instances the "2-connected, minimum degree at least three" core was
+reached zero times. The three earlier reductions always fire first. That is
+expected rather than alarming: the thesis's Tutte/SPQR step proves the case
+**empty**. Confirmed independently with `geng` over every 2-connected graph of
+minimum degree three on 4 to 9 vertices, 86904 graphs, no labelling of any of
+them satisfies (1) to (4) with `|X| >= 2`.
+
+So the two proofs differ in kind. The thesis derives a contradiction and stops.
+The dossier recurses through the case along a separating pair, which is a valid
+proof, since the induction measure strictly decreases, but it handles a
+configuration that provably never arises. The practical consequence is that the
+new argument cannot be tested by any computation, and its correctness rests
+entirely on the hand derivation. The three torso branches were therefore checked
+symbolically instead, and the rank and `|X|` identities are right in all three.
+
+## D. The replacement touches two sites, not one
+
+The dossier flags `rem:hyper-vertex-m3-scope`. There is a second site it misses.
+`chapters/app_proofs.tex:327`, inside the simple vertex block discussion, reads
+
+> the decomposition that would see it is the triconnected one, along 2-cuts
+> rather than cut vertices, which is the same Tutte/SPQR machinery
+> `\Cref{lem:incidence-rank}` already uses on incidence graphs.
+
+If the SPQR case goes, that clause becomes false, and since the label still
+resolves, LaTeX will not say so. It should become a forward reference to the
+Tutte/SPQR literature directly rather than to `lem:incidence-rank`.
+
+## E. A correction to this review's own first pass
+
+Section 1.1 above said `thm:hyper-gomory-hu` is "cited from nowhere else". That
+is wrong. `chapters/app_proofs.tex:69`, in the Part I statement of the ordinary
+Gomory--Hu theorem, says the theorem "applies to undirected simple graphs,
+multigraphs, and hyperedge cuts (`\Cref{thm:hyper-gomory-hu}`)". That clause
+sits outside the `prop:hyper-edge` orbit and needs editing too. It is one
+clause, not a blocker, but the removal is a three-site edit and not a two-site
+one.
+
+## F. The proposed scope-remark rewrite gives the wrong reason
+
+The dossier proposes that the scope remark say
+
+> the separating-pair split is specific to the cap two: one temporary connection
+> can replace at most one member of an internally disjoint family.
+
+The named step is not cap-specific. At any cap, at most one path of an
+internally disjoint family can use a single temporary connection, because
+internally disjoint paths between two fixed vertices share no edge other than
+the direct one. The step would survive unchanged at `kappa <= 3`.
+
+Where the cap really enters is numerical, and it enters before any decomposition
+is reached. At `kappa <= 3` the conclusion itself is false: two `X`-vertices
+joined by three parallel edges satisfy (1) to (3) vacuously and (4) with
+`kappa = 3`, yet have `rank = 2 > |X| - 1 = 1`. The cap also fixes the two
+contradictions the proof runs on, that two parallel edges plus one detour are
+too many and that three internally disjoint paths are too many.
+
+Suggested replacement for `rem:hyper-vertex-m3-scope`'s middle sentences:
+
+```latex
+The proof of \Cref{lem:incidence-rank} is calibrated to the cap
+$\kap \le 2$ at every step rather than at one. Two parallel edges beside a
+single detour already exceed it, which is what forces the surviving core to be
+simple, and three internally disjoint paths exceed it, which is what rules out a
+$3$-connected core. The conclusion is the cap-two number too: at $\kap \le 3$ it
+is already false, since two $X$-vertices joined by three parallel edges have
+cycle rank two against $|X| - 1 = 1$. For $m = 4$ the analogous question asks
+for a different bound relative to $\kap \le 3$, taken apart along $3$-cuts
+rather than along separating pairs, and none is supplied here.
+```
+
+## G. One scope caution on the multigraph edge bound
+
+The dossier's observation that the cut induction also yields
+`thm:multigraph-edge`'s upper bound at `r = 2` is correct and worth a sentence.
+It must stay an observation. That proof is unbadged and is one of the two the
+author wrote out himself through the Gomory--Hu double count, so replacing it
+would breach both the dossier's own scope rule in its section 1 and the standing
+convention in `claude.md`.
+
+## H. The archiving is clean, and the length claims are slightly off
+
+Verified after `b07c577`: `latexmk` exit 0, 100 pages, 0 occurrences of `??` in
+the extracted text, 0 undefined references, 0 overfull boxes. No dangling
+reference to any of the seven archived labels, the `tab:open-problems` row and
+the contribution-statement entry went with the section, and the badge count fell
+from 37 to 31, exactly the six badged results archived (A.65, A.67 to A.71).
+
+The dossier's section 9 says the appendix is 53 pages, down from 59. Measured,
+the appendix now runs pages 43 to 96, so 54. The "59" is the 2026-08-26 figure,
+recorded when the thesis was 104 pages; at `a402744` it was 108. The document
+lost 8 pages, not 6.
+
+## I. Reproduction
+
+`research_notes/scripts/review_simplified_proofs.py` now carries five checks:
+the three from the first pass, the executable incidence-rank proof, and the
+core-vacuity sweep. The vacuity sweep defaults to 7 vertices, which runs in
+about a minute; it was also run to 9 vertices, 86904 graphs, which takes
+roughly ten.
