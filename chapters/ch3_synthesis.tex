@@ -28,12 +28,15 @@ branches at $m = 3$ and the size at which the second overtakes the first.
 Exhaustive search proves the values $6,9,12,15$ for $n=3,4,5,6$ when $m=3$, for
 both separation conditions (\Cref{rem:dir-vertex-m3}), and does not settle
 $n = 7$. Past the sizes exhaustion reaches, a general upper bound would follow
-from the structural claim of \Cref{open:decomposition}: that every extremal
-example other than the hub splits into a part $A$ and a part $B$ with every arc
-running from $A$ to $B$ and none returning. One returning arc is enough to break
-the count, since it lets a route leave $B$ through $A$ and exceed the internal
-budget of $m-2$. Ruling that arc out for every extremal example is the step that
-is missing.
+from \Cref{open:decomposition}. It asks that every extremal digraph split into
+two parts $A$ and $B$. Every arc from $A$ to $B$ is present, $A$ holds no arcs,
+and nothing runs from $B$ back to $A$. It asks this only once $n$ is large
+enough for the quadratic branch to overtake the linear one. That size condition
+is needed. On the linear branch every bidirected tree is extremal, and none of
+them splits this way. Given the three conditions the arcs come in two kinds, the
+$|A||B|$ crossing ones and at most $(m-2)|B|$ inside $B$, and the count follows.
+An arc from $B$ back to $A$ would add a third kind. Proving all three for every
+extremal digraph is the missing step.
 
 The conjecture is therefore correct in its leading term and in the size of its error. 
 This is proved in \Cref{thm:dir-arc-linear-error}, without any assumptions about the shape of the extremal graph. 

@@ -1522,3 +1522,77 @@ en-dashes or prose semicolons in the diff; `git diff --check` clean. Pages 61-62
 rendered and inspected. Zero `.py` files in the diff, so the program is
 untouched; the suite was run anyway and gives 129 tests OK, 1 expected skip,
 in 522s, matching the recorded baseline.
+
+## 2026-09-01 (Opus, second session) — an external review's seven findings checked, five actioned in the body
+
+An external review listed two substantive textual mistakes and five smaller
+consistency issues. **All seven checked out against the source, the code and the
+appendix**, and one further item it raised was already a documented non-defect.
+The author gave permission per chapter and made one call that reversed the
+proposed fix.
+
+**THE TWO SUBSTANTIVE ONES SHARE A ROOT CAUSE: a body gloss left behind when the
+appendix proof under it was repaired.** ch3's `open:decomposition` gloss still
+carried the exact error the 2026-09-01 appendix pass had just corrected, that a
+returning arc breaches the internal `m-2` budget. It does not. The budget comes
+from `prop:two-hop-bipartite`, and the absence of backward arcs supplies the
+*next* step, that the two kinds of arc are the only kinds. The gloss also said
+"every extremal example other than the hub", which is the phrasing the appendix
+explicitly calls too narrow (on the linear branch every bidirected tree is
+extremal), and it dropped two of the conjecture's four conditions. Rewritten to
+the size hypothesis plus all three structural conditions.
+
+ch2's checker-shortcut paragraph said "only an addition made at the cap needs the
+checker" and that the bound resynchronises "only when that bound is what a step
+turns on". **Checked against `erdos915_unified.py:1562` rather than against the
+appendix**: the capped predicate also runs on a removal when `feasible_current`
+is false and on an addition when `lam_ub >= m-1`, and the resync is at the
+`bias_refresh` cadence (line 1702). The appendix at `sec:cheap-checker` already
+described this correctly. ch2 now matches both.
+
+**THE AUTHOR REVERSED ONE FIX, AND HIS CALL IS THE BETTER ONE.** The review found
+that `main.tex`'s Contribution Statement promises the badge appears "both in
+ch:basecases where it is stated and in app:proofs where it is proved", while the
+nine badged ch1 results are proved under bare `\begin{proof}[Proof of \Cref{...}]`
+headings carrying no badge. The proposed fix weakened the sentence. The author
+instead said "ai proofs should carry the badge and their theorems should carry it
+also", so the NINE PROOF HEADINGS GAINED `\aimedal` and the sentence stands
+unchanged. The nine named proof headings in the appendix that map to badged ch1
+results are exactly those nine; the other two (`thm:mader` upper bound and
+`thm:multigraph-edge`) are the two the Contribution Statement names as the
+author's own and stay unbadged. `[AI]` marks 34 -> 43.
+
+**A GOOD AUTHOR QUESTION THAT THE PROOF SURVIVES.** He asked whether
+$\lambda^{\max}$ really rises by at most one for hypergraphs and for vertex
+disjointness, and whether it is proved. It is, `prop:monotone`, stated for every
+model and both separations, with three distinct arguments: copy-disjointness for
+the edge measure, a direct case split for the graph/digraph vertex measure, and
+copy-disjointness again for the hypergraph vertex measure. **The last one only
+works because `sec:hyper-vertex-proof` defines $\kappa_\HH$ as the hybrid
+measure**, routes sharing neither a hyperedge nor an intermediate vertex. Under
+pure internal-vertex-disjointness the unit step is FALSE: adding one hyperedge
+$e$ with $u, x_1, x_2 \in e$ creates $u, e, x_1, f_1, v$ and $u, e, x_2, f_2, v$,
+internally disjoint and both new, a jump of two. The convention is load-bearing,
+which is why the appendix says "both halves are needed" where it defines it.
+
+**THE THREE SMALLER ONES.** ch1 line 113 credited the Gomory--Hu tree for
+`prop:hyper-edge`, which has used `lem:hyper-cut-induction` since 2026-08-31, and
+ch1 therefore contradicted its own line 553 four hundred lines later. ch1's "one
+edge size higher the two are equal" dropped the attainment condition the appendix
+keeps, so it now names $m-1\le\binom{n-2}{r-2}$ and gives the $n=r=m=3$ case. The
+appendix's block-knapsack proof wrote $\max_b$ where only $\sup_b$ is known, and
+the Part I divider claimed the cited results were "reproved here" when
+`thm:menger` and `thm:gomory-hu` are stated and cited and only Mader is reproved.
+
+**ONE REVIEW ITEM REJECTED AS ALREADY KNOWN.** The machine-value cache's
+source-hash warning is the documented consequence of the 2026-08-29 edit to
+`simple_undirected_vertex_m5`, a cited closed form `solve` never calls. It clears
+on the next `--refresh` and no value depends on it.
+
+VERIFY: `latexmk -C` then `latexmk -pdf` exit 0, 98pp (unchanged from HEAD), 0
+overfull, 0 underfull, 0 undefined refs, 0 LaTeX warnings, 0 occurrences of `??`.
+All nine new badged proof headings confirmed in the extracted text as Theorems
+1.6, 1.7, 1.9-1.14 and Proposition 1.8. Self-check ALL CHECKS PASSED. Zero `.py`
+files in the diff. No em-dashes, en-dashes or prose semicolons in the diff (the
+one `--` is `Gomory--Hu`), no banned verdict phrases, `git diff --check` clean.
+All four rewritten passages read back out of the built PDF, not just the source.

@@ -110,7 +110,7 @@ For all $n \ge 2$ and $m \ge 2$,
 Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
 The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory-Hu tree (\Cref{thm:gomory-hu}). 
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
-The very same Gomory-Hu tree returns for the multigraph and hypergraph variants (\Cref{thm:multigraph-edge}, \Cref{prop:hyper-edge}). 
+The very same Gomory-Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) is proved by an elementary induction on a hyperedge cut instead.
 Hence its properties are recorded here.
 Every graph has a weighted spanning tree such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
 All $\binom{n}{2}$ local connectivities are therefore encoded by just $n - 1$ weights. 
@@ -549,7 +549,7 @@ It has to be re-run rather than deduced from \Cref{thm:multigraph-edge}, because
 The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one everywhere, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
 For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
 That is a real difference between the two edge sizes. 
-For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$, and one edge size higher the two are equal.
+For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the two are equal, but only while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
 
 \begin{figure}[h]
 \centering

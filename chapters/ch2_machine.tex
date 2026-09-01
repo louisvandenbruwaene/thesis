@@ -572,13 +572,16 @@ The same holds for $\kappa^{\max}$.
 This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}. 
 Therefore the max-flow algorithm only needs to be run every once in a while,
 depending on how close to the constraint the graph sits.
-A removal applied to a feasible graph leaves it feasible, 
-and an addition made while the graph sits strictly below the cap can 
-lift $\lambda^{\max}$ by at most one, 
-so in both cases the energy is known without measuring anything. 
-Only an addition made at the cap itself needs the checker. 
-The search therefore carries a running upper bound on $\lambda^{\max}$ and 
-resynchronises it exactly only when that bound is what a step turns on. 
+Most steps need no measurement at all.
+A removal from a feasible graph leaves it feasible.
+An addition made while the graph sits strictly below the cap lifts
+$\lambda^{\max}$ by at most one, so it lands at worst on the cap.
+Every other step calls the checker.
+There are two of those: an addition whose running bound sits at or above
+the cap, and a removal from a graph already above it.
+The search keeps that running bound and raises it by one for each addition
+it accepts.
+At a fixed step interval it measures the exact value again.
 \Cref{sec:cheap-checker} gives the bookkeeping, 
 and the regression test that holds the fast walk to the naive one step for step.
 

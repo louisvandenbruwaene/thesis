@@ -48,7 +48,7 @@ This appendix carries every proof in the thesis. The body states the results and
   \vspace{2pt}\noindent{\color{KULblauw1}\rule{\linewidth}{0.4pt}}\par\nobreak
   \addvspace{0.4\baselineskip}}
 
-\apppart{Part I. Classical machinery}{The two theorems every later argument runs on, and Mader's theorem proved in full through the Gomory--Hu tree. Cited results, reproved here so the thesis stands on its own.}
+\apppart{Part I. Classical machinery}{The two theorems every later argument runs on, stated with their citations and not reproved, and Mader's theorem proved here in full through the Gomory--Hu tree.}
 
 \section{Menger, Gomory--Hu, and the degree bound}
 
@@ -330,7 +330,7 @@ $n-1$, meaning $a_{p+q-1} \ge a_p+a_q$. Fekete's lemma says that the ratios of
 a superadditive sequence converge to the supremum of those ratios, so
 $a_n/(n-1) \to \sup_n a_n/(n-1)$. Also
 $a_n/(n-1) \ge h_m(b)/(b-1)$ whenever $(b-1) \mid (n-1)$, while
-$a_n \le \max_b h_m(b)/(b-1) \cdot (n-1)$ from the display. Hence the limit is
+$a_n \le \sup_b h_m(b)/(b-1) \cdot (n-1)$ from the display. Hence the limit is
 $\sup_b h_m(b)/(b-1)$.
 \end{proof}
 
@@ -469,7 +469,7 @@ Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vert
 and an upper bound for the arc problem says nothing at all about the vertex problem. The gap is not vacuous: two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$, so there really are digraphs in the difference of the two families. Whitney therefore gives one thing, that an arc construction is a vertex \emph{lower} bound, and the vertex upper bound has to be proved separately. The proof below does that, and \Cref{ch:synthesis} treats the two separations the same way for $m \ge 3$, where the vertex problem stays open even though the arc conjecture is stated.
 \end{remark}
 
-\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}]
+\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}\aimedal]
 Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \ge \floor{n^2/4}$ exactly for $n \le 7$, with equality at $n = 7$, so $M(n) = 2(n-1)$ for $n \le 7$ and $M(n) = \floor{n^2/4}$ for $n \ge 7$.
 
 \emph{Lower bound.} The directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}) both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem as well. Between them they witness $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ and $k_2^{\mathrm{dir}}(n) \ge M(n)$ at once.
@@ -501,7 +501,7 @@ The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for eve
 
 The arc value now costs two lines, because the vertex family is the larger of the two.
 
-\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
+\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}\aimedal]
 The two constructions of the previous proof give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
 \[
     M(n) \;\le\; \ell_2^{\mathrm{dir}}(n) \;\le\; k_2^{\mathrm{dir}}(n) \;\le\; M(n),
@@ -692,7 +692,7 @@ and \Cref{lem:smaller-half-deletion} converts that into the claim.
 
 \Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:basecases}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. Neither proof below assumes anything about the shape of $D$.
 
-\begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
+\begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}\aimedal]
 By \Cref{lem:feasible-budgeted} a simple digraph with $\lec^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
 
 For the two-sided asymptotic statement, \Cref{const:augmented-bipartite} gives
@@ -705,7 +705,7 @@ so the second-order term is linear in $n$ from both sides.
 
 The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} settles it at $m = 2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
 
-\begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}]
+\begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}\aimedal]
 By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple digraph with $\kap^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
 
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
@@ -912,7 +912,7 @@ $\lec_D(u,v) \le k$ for every pair and $k \ge 1$, maximising gives
 $\lec^{\max}(D-R) \le k-1$.
 \end{proof}
 
-\begin{proof}[Proof of \Cref{thm:dir-multi-full}]
+\begin{proof}[Proof of \Cref{thm:dir-multi-full}\aimedal]
 The lower bound is \Cref{const:dir-multi-lower}. For the upper bound, fix $n$ and prove by induction on $k = m-1 \ge 0$ that every directed multigraph $D$ on $n$ vertices with $\lec^{\max}(D) \le k$ has $|A(D)| \le k\,M(n)$. At $k=0$, every pair has $\lec_D(u,v) \le 0$, so no arc $(u,v)$ can even be present, since a single arc is already one route, and $|A(D)| = 0 = 0 \cdot M(n)$.
 
 For $k \ge 1$, take $D$ with $\lec^{\max}(D) \le k$ and let $R$ be a reachability skeleton, which exists with $|A(R)| \le M(n)$ by \Cref{lem:reach-skeleton}. By \Cref{lem:reach-delete}, $D - R$ has $\lec^{\max}(D-R) \le k-1$, and it is again a directed multigraph on the same $n$ vertices, so the induction hypothesis gives $|A(D-R)| \le (k-1)M(n)$. Since $R$ uses at most one copy of each arc it touches, the arcs of $D$ split exactly into those of $R$ and those left in $D-R$, so
@@ -1102,7 +1102,7 @@ For a hypergraph, its \emph{incidence graph} is the bipartite graph joining
 each vertex to the hyperedges that contain it. A \emph{hypertree} is a
 hypergraph whose incidence graph is a tree.
 
-\begin{proof}[Proof of \Cref{prop:hyper-edge}]
+\begin{proof}[Proof of \Cref{prop:hyper-edge}\aimedal]
 \emph{Upper bound.} Every hyperedge copy has $|e| = r$, so
 \Cref{lem:hyper-cut-induction} at $k = m-1$ reads
 $(r-1)|E(\HH)| \le (m-1)(n-1)$. Dividing and rounding down, because
@@ -1285,7 +1285,7 @@ drawn in both. \textbf{(bottom)} The star hypertree of
 \Cref{thm:hyper-vertex-m2}, stated in \Cref{ch:basecases}, follows at once from
 the incidence translation.
 
-\begin{proof}[Proof of \Cref{thm:hyper-vertex-m2}]
+\begin{proof}[Proof of \Cref{thm:hyper-vertex-m2}\aimedal]
 We claim $\kap^{\max}_\HH \le 1$ holds if and only if $I(\HH)$ is a forest.
 If $I(\HH)$ contains a cycle $v_1, e_1, v_2, e_2, \dots, v_\ell, e_\ell, v_1$
 (it alternates classes, so $\ell \ge 2$, all $v_i$ and $e_i$ distinct), then
@@ -1554,7 +1554,7 @@ in the second, since $s \le 2$. This exhausts the cases.
 The rank bound now yields \Cref{thm:hyper-vertex-m3}, stated in
 \Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $2 < r < n$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
 
-\begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}]
+\begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}\aimedal]
 Apply \Cref{lem:incidence-rank} to each connected component of the incidence
 graph $I(\HH)$, with $X$ the vertex class and $Z$ the hyperedge class:
 $Z$ is independent, incidences are simple even when hyperedges repeat,
@@ -1757,7 +1757,7 @@ $\mathrm{cod}(u,v)$ for the number of hyperedges realising that arc.
 
 \Cref{thm:dir-hyper-constant}, stated in \Cref{ch:basecases}, says in words that the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
-\begin{proof}[Proof of \Cref{thm:dir-hyper-constant}]
+\begin{proof}[Proof of \Cref{thm:dir-hyper-constant}\aimedal]
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
 hyperedge's tail is not one of its heads.
 
