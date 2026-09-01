@@ -286,7 +286,7 @@ The range likewise comes from the paper rather than from the database, which rec
 
 \subsection{The vertex problem is a block problem}\label{sec:simple-vertex-blocks}
 
-The \emph{vertex} problem $k_m(n)$ has been open since 1974, and this short section records its block structure. It changes the object being searched: from graphs on $n$ vertices, with $n$ growing, to $2$-connected graphs alone.
+The general \emph{vertex} problem $k_m(n)$, from $m \ge 6$ onwards, has remained open since the 1970s, and this short section records its block structure. It changes the object being searched: from graphs on $n$ vertices, with $n$ growing, to $2$-connected graphs alone.
 
 More generally, a graph on more than $k$ vertices is \emph{$k$-connected} if
 deleting any set of at most $k-1$ vertices leaves it connected. Thus a graph is
@@ -373,9 +373,18 @@ A general density bound is $k_m(n) < 2(m-1)n$: Mader's density theorem \cite{Mad
 
 The natural strengthening is that a feasible graph always has a vertex of degree at most $m-1$. Since feasibility passes to induced subgraphs, that would make every feasible graph $(m-1)$-degenerate, meaning that every non-empty induced subgraph has a vertex of degree at most $m-1$, and give
 \[
-    k_m(n) \;\le\; (m-1)n - \binom{m}{2},
+    k_m(n) \;\le\; (m-1)n - \binom{m}{2}
+    \qquad (n \ge m-1),
 \]
-halving the constant in the only general upper bound known. It holds for
+halving the constant in the only general upper bound known. The range is where
+that count applies. Ordering the vertices by repeated deletion of one of degree
+at most $m-1$ gives $\sum_i \min(i-1,\,m-1) = (m-1)n - \binom{m}{2}$ once
+$n \ge m$, and at $n = m-1$ the same expression collapses to $\binom{n}{2}$,
+which is the complete graph's count and so still correct. Below $n = m-1$ the
+display drops under $\binom{n}{2}$, and for small enough $n$ under zero, so
+$\binom{n}{2}$ is the bound there instead.
+
+The degeneracy statement itself holds for
 $m = 3$, where it is classical: a graph of minimum degree at least three
 contains a \emph{subdivision} of $K_4$, obtained by replacing its edges with
 internally disjoint paths. The four vertices corresponding to those of $K_4$
@@ -531,74 +540,6 @@ For the connectivity, fix $a \in A$ and $b \in B$. Two kinds of route run from $
 \section{Structural propositions on the directed frontier}
 
 These are the proved ingredients of the reduction discussed in \Cref{ch:synthesis}. What the reduction still assumes is stated as \Cref{open:decomposition}, and \Cref{sec:two-step-budget} then closes the section with the bounds that assume nothing at all: one counting lemma, \Cref{lem:two-step-budget}, and the four results it drives, of which \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error} and \Cref{prop:dir-arc-stability} are proved here and \Cref{thm:dir-hyper-constant} in \Cref{sec:dir-hyper}.
-
-\begin{proposition}[Mutually unreachable out-neighbourhoods]\label{prop:mutual-unreachability}
-Let $D$ be a simple digraph with $\lec^{\max}_D \le 1$. For any vertex $u$ and distinct out-neighbours $v, w$ of $u$, there is no directed path from $v$ to $w$ in $D - u$.
-\end{proposition}
-
-\begin{proof}
-If $P$ were a directed $v$--$w$ path avoiding $u$, then $u \to w$ and $u \to v \xrightarrow{P} w$ would be two arc-disjoint $u$-to-$w$ routes: the first uses only the arc $(u,w)$, the second starts with $(u,v)$ and continues along $P$, none of whose arcs touch $u$. This contradicts $\lec_D(u, w) \le 1$. The restriction to $D - u$ is not cosmetic, and \Cref{fig:mutual-unreach} draws both the argument and the reason for the restriction: in the digraph with arcs $(u,v)$, $(v,u)$, $(u,w)$ every local connectivity is $1$, yet $v \to u \to w$ reaches $w$ from $v$ through $u$.
-\end{proof}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}[b]{0.55\textwidth}
-\centering
-\begin{tikzpicture}[scale=1.0]
-\node[apxlab] (u) at (0,0) {u};
-\node[apxlab] (v) at (-1.7,1.3) {v};
-\node[apxlab] (w) at (1.7,1.3) {w};
-% out-arcs of u
-\draw[aparc] (u)--(v);
-\draw[aparc] (u)--(w);
-% a forbidden v->w path through D-u (apex x as a full labelled node, like u,v,w)
-\node[apxlab] (x) at (0,2.5) {x};
-\draw[apredarc] (v)--(x);
-\draw[apredarc] (x)--(w);
-% label the two routes
-\node[apname, text=KULblauw1!85] at (1.25,0.45) {$u\!\to\! w$};
-\node[apname, text=vertexred, align=center] at (-2.35,2.55)
-  {forbidden\\$v\rightsquigarrow w$};
-\end{tikzpicture}
-\caption{If a directed $v\rightsquigarrow w$ path (red) existed in $D-u$,
-then $u\!\to\! w$ and $u\!\to\! v\rightsquigarrow w$ would be two
-arc-disjoint $u$--$w$ routes, against $\lec(u,w)\le1$.}
-\label{fig:mutual-unreach-main}
-\end{subfigure}\hfill
-\begin{subfigure}[b]{0.40\textwidth}
-\centering
-\begin{tikzpicture}[scale=1.0]
-\node[apxlab] (u) at (0,0) {u};
-\node[apxlab] (v) at (-1.4,1.4) {v};
-\node[apxlab] (w) at (1.4,1.4) {w};
-\draw[aparc] (u) to[bend left=14] (v);
-\draw[aparc] (v) to[bend left=14] (u);
-\draw[aparc] (u)--(w);
-\node[apname, text=vertexred] at (0.05,1.65) {$v\!\to\! u\!\to\! w$};
-\end{tikzpicture}
-\caption{The counterexample $\{(u,v),(v,u),(u,w)\}$: $\lec^{\max}=1$,
-yet $w$ \emph{is} reachable from $v$ only \emph{through} $u$.}
-\label{fig:mutual-unreach-counter}
-\end{subfigure}
-\caption[Mutually unreachable out-neighbourhoods]{Why
-\Cref{prop:mutual-unreachability} must exclude paths through $u$.
-\textbf{(a)} For out-neighbours $v,w$ of $u$ in a digraph with
-$\lec^{\max}\le1$, no $v\rightsquigarrow w$ path can avoid $u$: such a path
-would combine with the lone arc $u\!\to\! w$ into two arc-disjoint routes.
-\textbf{(b)} The restriction to $D-u$ is essential. In the three-vertex
-digraph $\{(u,v),(v,u),(u,w)\}$ we have $\lec^{\max}=1$, yet $v$
-reaches $w$ via $v\!\to\! u\!\to\! w$, a route that reuses the vertex $u$,
-which the proposition allows.}
-\label{fig:mutual-unreach}
-\end{figure}
-
-\begin{proposition}[Disjoint second out-neighbourhoods]\label{prop:disjoint-second-nbhd}
-Let $D$ be a simple digraph with $\lec^{\max}_D \le 1$, let $u \in V$, and let $v_1 \ne v_2$ be out-neighbours of $u$. Then $(N^+(v_1) \setminus \{u\}) \cap (N^+(v_2) \setminus \{u\}) = \emptyset$.
-\end{proposition}
-
-\begin{proof}
-A common out-neighbour $w \ne u$ would give the two arc-disjoint routes $u \to v_1 \to w$ and $u \to v_2 \to w$, contradicting $\lec_D(u, w) \le 1$.
-\end{proof}
 
 \begin{proposition}[Two-hop budget on bipartite partitions,\aimedal]\label{prop:two-hop-bipartite}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ is present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
@@ -793,10 +734,10 @@ Conversely, fix $m$ and take $n$ large. Assign $t=n/4$ to as many abstract verti
 The crude per-vertex bound therefore loses nothing within this relaxation, and the reason is that its two sources of slack close at that very point. \Cref{lem:small-side} is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the profile the relaxed optimum concentrates on. Cutting the constant therefore needs a second and independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
 \end{remark}
 
-One thing \Cref{thm:dir-arc-linear-error} does not say is how far a feasible digraph is from the bipartite shape, since its dense case deletes arcs but its sparse case argues by induction instead. \Cref{lem:smaller-half-deletion} gives that structural statement directly, at the cost of a weaker bound, and the two are not comparable: at $m = n = 3$ the display below reads $11$ against the theorem's $18$, and the theorem only becomes the smaller of the two past $n \approx 16(m-1)^2/m$, which is between $19$ and $20$ at $m = 3$ and between $33$ and $34$ at $m = 4$. The word \emph{stability} names the second conclusion, that the digraph can be changed into the extremal bipartite shape by a lower-order number of deletions.
+One thing \Cref{thm:dir-arc-linear-error} does not say is how far a feasible digraph is from the bipartite shape, since its dense case deletes arcs but its sparse case argues by induction instead. \Cref{lem:smaller-half-deletion} gives that structural statement directly, at the cost of a weaker bound, and the two are not comparable: at $m = n = 3$ the display below reads $11$ against the theorem's $18$, and the theorem only becomes the smaller of the two past the crossover of its $4(m-1)(n-1)$ with the $\sqrt{m}\,n^{3/2}$ below. Dropping the lower-order terms puts that crossover near $16(m-1)^2/m$, a rough estimate reading $21.3$ at $m = 3$ and $36$ at $m = 4$. Solved exactly, it falls between $19$ and $20$ at $m = 3$ and between $33$ and $34$ at $m = 4$. The second conclusion is a \emph{bipartisation} bound: a lower-order number of deletions leaves the digraph a subgraph of a one-directional bipartite digraph. It does not say that the partition is balanced or that the surviving arcs fill it, so it stops short of a stability statement in the usual sense, which would need a near-extremality hypothesis to start from.
 
-\begin{proposition}[Unconditional quadratic bound and stability,\aimedal]\label{prop:dir-arc-stability}
-Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. Then $D$ can be made one-directional bipartite by deleting at most $\sqrt{m}\, n^{3/2}$ arcs, and
+\begin{proposition}[Unconditional quadratic bound and bipartisation,\aimedal]\label{prop:dir-arc-stability}
+Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. Then deleting at most $\sqrt{m}\, n^{3/2}$ arcs leaves $D$ a subgraph of a one-directional bipartite digraph, and
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; \sqrt{m}\, n^{3/2}.
 \]
@@ -1035,81 +976,9 @@ This settles the integrality question \Cref{ch:certify} raises when it introduce
 At $m=2$ (so $k=1$), \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, matching \Cref{thm:dir-arc-m2-exact} exactly, and this is not a coincidence. A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints, so at $m=2$ the multigraph problem and the simple digraph problem are literally the same problem. \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case, rather than needing it as a separate input.
 \end{corollary}
 
-\Cref{thm:dir-multi-full} settles the value at every $n$ and $m$, but a value is not a full description of the extremal digraphs, and on the linear branch a companion fact about \emph{which} multigraphs attain it follows from the same argument. Call a directed multigraph \emph{everywhere-saturated} at level $m$ when every ordered pair of distinct vertices has local connectivity exactly $m-1$. The doubled bidirected spanning trees at multiplicity $m-1$ form an extremal family on the linear branch and are everywhere-saturated: the $m-1$ routes between two vertices run along the doubled tree path, and cutting one doubled edge of that path is a cut of $m-1$ arcs.
-
-\begin{lemma}[Saturated attachment,\aimedal]\label{lem:saturated-attachment}
-Let $m \ge 2$ and let $D_0$ be a directed multigraph on at least two vertices
-with $\lec_{D_0}(x, y) = m-1$ for every ordered pair of distinct vertices.
-Let $D$ be obtained from $D_0$ by adding one new vertex $v$ together with any
-multiset of arcs incident to $v$. If $\lec^{\max}_D \le m-1$, then
-$d(v) \le 2(m-1)$. If $d(v) = 2(m-1)$, then every arc at $v$ joins $v$ to
-one single vertex $u$, with $\mu(v, u) = \mu(u, v) = m-1$, and $D$ is again
-everywhere-saturated.
-\end{lemma}
-
-\begin{proof}
-\emph{No mixed pair.} Suppose $v$ has an in-arc from $u$ and an out-arc to
-$w$ with $u \ne w$. By Menger and saturation $D_0$ carries $m-1$ pairwise
-arc-disjoint $u$-to-$w$ routes, and the route $u \to v \to w$ uses only arcs
-incident to $v$, so it is arc-disjoint from all of them and
-$\lec_D(u, w) \ge m$, a contradiction. Here a \emph{pure source} has only
-outgoing incident arcs and a \emph{pure sink} only incoming ones. Hence $v$ is
-a pure source, a pure sink, or every arc at $v$ touches one single vertex $u$.
-
-\emph{A pure source has $d(v) \le m-1$.} Let $t = \sum_x \mu(v, x)$ and fix
-$u$ with $\mu(v, u) \ge 1$. Any cut $(S, \bar S)$ with $v \in S$ and
-$u \in \bar S$ has capacity
-$\sum_{x \in \bar S} \mu(v, x) + e_{D_0}(S \setminus \{v\}, \bar S)$. There are
-two kinds. If $S = \{v\}$ the capacity is exactly $t$. If $S$ also contains a
-vertex $x$ of $D_0$, then $S \setminus \{v\}$ and $\bar S$ separate $x$ from $u$
-inside $D_0$, so the second term is at least $\lec_{D_0}(x, u) = m-1$, while the
-first is at least $\mu(v, u)$. Every cut therefore has capacity at least
-$\min\bigl(t,\ \mu(v,u) + m-1\bigr)$, and by max-flow min-cut so does
-$\lec_D(v, u)$, which feasibility caps at $m-1$. Since $\mu(v,u) \ge 1$, the
-second argument of that minimum exceeds $m-1$, so the minimum is $t$ and
-$t \le m-1$.
-
-\emph{A pure sink has $d(v) \le m-1$.} Reverse every arc: the reverse of an
-everywhere-saturated multigraph is everywhere-saturated, a pure sink becomes
-a pure source, and the previous step applies.
-
-\emph{A single partner.} If every arc at $v$ touches one vertex $u$, then
-parallel arcs are already that many arc-disjoint one-step routes, so
-$\mu(v, u) \le m-1$ and $\mu(u, v) \le m-1$, giving $d(v) \le 2(m-1)$.
-
-\emph{Equality.} Since $2(m-1) > m-1$, a degree of $2(m-1)$ rules out the
-pure cases, so $v$ has a single partner at full multiplicity both ways. The
-result is feasible and again everywhere-saturated: a route through $v$ must
-enter and leave through $u$, so it adds nothing to any flow between old
-vertices.  For every old $x \ne u$,
-$\lec_D(x, v) = \min\bigl(\lec_{D_0}(x, u), \mu(u, v)\bigr) = m-1$.
-For $x=u$, the $m-1$ parallel arcs $u \to v$ give the same conclusion
-directly.  Symmetrically, $\lec_D(v, x)=m-1$ for every old $x$.
-\end{proof}
-
-\begin{remark}[The linear branch grows one leaf at a time]
-\label{rem:saturated-closure}
-The equality case of \Cref{lem:saturated-attachment} attaches a new leaf to
-an arbitrary vertex at full multiplicity, and that is the only attachment
-reaching $2(m-1)$. Iterating from a single doubled edge, itself
-everywhere-saturated on two vertices, generates all doubled bidirected
-spanning trees. Thus this extremal family is closed under maximal attachment
-and grows one leaf at a time. The lemma does not assert that every
-linear-branch extremiser admits such a leaf-deletion sequence. The program
-confirms the lemma exhaustively at $m = 3$: over every doubled tree on five
-and six vertices and every one of the $3^{2n}$ possible attachment patterns,
-the densest feasible attachment has degree exactly $4 = 2(m-1)$, and the
-degree-$4$ patterns are precisely the single-partner attachments at full
-multiplicity, one per choice of partner.
-\end{remark}
-
-\begin{remark}[The degree-capped $24$-arc extremisers at $n=7$]\label{rem:n7-classification}
-\Cref{lem:saturated-attachment} proves rigidity for maximal one-vertex attachments to an everywhere-saturated graph, but it does not classify every extremiser on the linear branch. At $n=7$, $m=3$, the two branches tie at $24$ arcs, and every doubled bidirected tree is already an extremiser, giving eleven tree isomorphism classes before the bipartite examples are counted. The separate machine run discussed here answered only a degree-capped question relevant to extension arguments. The tool was the sound generation enumerator of \Cref{ch:certify}, in the call \code{enumerate\_\allowbreak extremal\_\allowbreak directed\_\allowbreak multigraphs\_\allowbreak via\_\allowbreak generation(7, 3, 24, max\_degree=8)}, which prunes only with proved bounds and is therefore complete within the imposed maximum-total-degree cap. It ran for about seven hours across ten processor cores and returned exactly three isomorphism classes satisfying that cap. Two of them are the bipartite shapes $2 \cdot B_{3,4}$ and $2 \cdot B_{4,3}$. The third is the doubled bidirected path $P_7$, the one non-star tree whose maximum degree ($2$) is compatible with an $8$-regular graph one vertex up. Each of the three was re-verified by the exact checker. This is a restricted classification, not a classification of all $24$-arc extremisers. The reachability-skeleton induction proves the value $24$ without it, and the unrestricted extremal family at this tie size is substantially larger.
-\end{remark}
-
 \subsection{Extremal classification on the quadratic branch}\label{sec:quadratic-uniqueness}
 
-The classification above is one finite data point, and \Cref{lem:saturated-attachment} settles only the maximal one-vertex attachments on the linear branch, not every linear-branch extremiser. The next question addressed here is the quadratic branch at a general $n$. The reachability-skeleton proof looks unpromising for this, since it is designed never to need to know which multigraph it is taking apart. But that indifference is only in the direction of the \emph{bound}. Run backwards, from the assumption that the bound is met exactly, the same construction is unexpectedly rigid: it pins down the number of strongly connected components, then the shape of the skeleton, and finally the multigraph.
+\Cref{thm:dir-multi-full} settles the value at every $n$ and $m$, but a value is not a full description of the extremal digraphs. The question addressed here is which multigraphs attain it on the quadratic branch at a general $n$. The reachability-skeleton proof looks unpromising for this, since it is designed never to need to know which multigraph it is taking apart. But that indifference is only in the direction of the \emph{bound}. Run backwards, from the assumption that the bound is met exactly, the same construction is unexpectedly rigid: it pins down the number of strongly connected components, then the shape of the skeleton, and finally the multigraph.
 
 Two consequences of equality do the work, and both come from reading the count of \Cref{lem:reach-skeleton} as an equation rather than an inequality.
 
@@ -1239,7 +1108,7 @@ hypergraph whose incidence graph is a tree.
 $(r-1)|E(\HH)| \le (m-1)(n-1)$. Dividing and rounding down, because
 $|E(\HH)|$ is an integer, gives the stated floor.
 
-\emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the hypergraph whose hyperedges are $\{h\} \cup G_i$, one per group. Its incidence graph is a tree, so this shape is called a \emph{star hypertree}. Give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges.
+\emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the hypergraph whose hyperedges are $\{h\} \cup G_i$, one per group. Its incidence graph is a tree, so this shape is called a \emph{star hypertree}. Give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges. That theorem assumes $r \ge 3$, which leaves only $r = 2$, and there the hypothesis reads $m-1 \le \binom{n-2}{0} = 1$, forcing $m = 2$. The floor is then $n-1$ and a spanning tree attains it, with no repeated edge and every local edge-connectivity equal to one.
 \end{proof}
 
 The multiplicities in the lower bound can in fact be avoided throughout the range of the next theorem: for $r \ge 3$ and $m-1\le\binom{n-2}{r-2}$, \emph{simple} $r$-uniform hypergraphs already attain the same bound. This is in sharp contrast to the graph case $r = 2$, where simplicity costs the factor that separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$.
@@ -2108,7 +1977,7 @@ one violating pair is found. The \emph{energy} is the numerical objective used
 by the search to compare two proposed states. Its connectivity penalty is
 defined in the next paragraph.
 
-\Cref{prop:monotone}'s two parts settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip the graph over, and only there does the search run a capped pairwise sweep, stopping at the first pair for which it finds one route too many. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
+\Cref{prop:monotone}'s two parts settle almost every step without a flow. The energy depends on $\lambda^{\max}$ only through the excess $\max(0,\ \lambda^{\max} - (m-1))$, which is zero exactly when the graph is feasible. So a removal applied to a feasible graph leaves it feasible by part~(1), with excess still zero, and needs no measurement at all. An addition made while the graph sits strictly below the bound, at $\lambda^{\max} \le m - 2$, also stays feasible. Part~(2) caps the rise from a single added unit at one, so the graph can climb at most to $\lambda^{\max} = m - 1$, which is still inside the feasible region. The excess is zero again, and again no measurement is needed. Only an addition made right at the boundary $\lambda^{\max} = m - 1$ can tip a feasible graph over. What the implementation tests is the two shortcuts rather than that boundary, so it runs a capped pairwise sweep, stopping at the first pair for which it finds one route too many, on every proposal clearing neither: an addition whose maintained bound has not been resynchronised down to $\lambda_{\mathrm{ub}} \le m-2$, and a removal applied to a graph that is already infeasible. Both are supersets of the steps that can actually be infeasible, so the sweep is sometimes run where monotonicity would have settled the step, never the reverse. The exact connectivity value is recomputed only on the rare step whose proposal is genuinely infeasible, where the penalty term needs it.
 
 To know which case applies, the search carries a running upper bound on $\lambda^{\max}$, raised by one whenever it accepts an addition (part~(2)) and left untouched when it accepts a removal (part~(1)), and resynchronised to the exact value at a fixed step cadence. The bound can only ever sit at or above the truth, so any step it clears is certainly feasible.
 

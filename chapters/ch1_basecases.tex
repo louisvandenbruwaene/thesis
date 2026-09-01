@@ -9,7 +9,7 @@ To state the question precisely we need only a few ideas.
 A \emph{(multi)graph} $G$ is a finite set of points, called \emph{vertices}, together with a multiset of \emph{edges}, each joining two distinct vertices.
 Asking the two ends to be distinct rules out loops, which some texts do admit and which play no role in anything below.
 We write $V(G)$ for the set of vertices, $E(G)$ for the multiset of edges, and $\mu(u,v)$ for the \emph{multiplicity} of a pair, the number of copies of the edge joining $u$ and $v$.
-The \emph{size} $|E(G)| = \sum_{u \ne v} \mu(u,v)$ counts the edges with their multiplicity, and it is the very quantity this thesis tries to make as large as possible under certain constraints.
+The \emph{size} $|E(G)| = \sum_{\{u,v\}} \mu(u,v)$, the sum running over unordered pairs of distinct vertices, counts the edges with their multiplicity, and it is the very quantity this thesis tries to make as large as possible under certain constraints.
 If $\mu(u,v) \le 1$ for every pair, so that no edge is repeated, $G$ is a \emph{simple graph}.
 A repeated edge joins two vertices exactly as a single edge does, so what separates the two notions is the multiplicity rather than the number of ends.
 One pictures such a simple graph by representing the vertices as dots and the edges as lines between them.
