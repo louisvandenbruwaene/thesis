@@ -138,10 +138,10 @@ was produced; rerun those calls to check it.
 | `figures/temperature_trace.png` | a cooling run (Ch.2) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (offcut only) |
 | `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
-| `figures/variant_bounds_m3_graphs.png` | proved / conjectured / guessed, the eight graph-model variants at m = 3 (Ch.2) |
-| `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Ch.2) |
-| `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Ch.2) |
-| `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Ch.2) |
+| `figures/variant_bounds_m3_graphs.png` | proved / conjectured / open, the eight graph-model variants at m = 3 (Appendix audit) |
+| `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Appendix audit) |
+| `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Appendix audit) |
+| `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Appendix audit) |
 | `figures/machine_values.json` | the cached `solve` results those four grids plot (not a figure) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |

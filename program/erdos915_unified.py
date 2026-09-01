@@ -2846,9 +2846,8 @@ _WARM = "#DC8C28"        # feasibility boundary, certain interval
 _RED = "#E05050"         # infeasible bars
 _GREEN = "#3CA050"       # machine-checked exact markers
 _VIOLET = "#9B5DE5"      # search lower-bound markers
-_GUESS = "#E6B800"       # "guess" interpolation: a clear yellow/gold, kept well
-                         # apart from the red conjecture curve (proved=blue,
-                         # conjectured=red, guess=yellow)
+_OPEN = "#E6B800"        # open status: a clear yellow/gold, kept apart from
+                         # proved blue and conjectured red
 
 # Four-level sensitivity palette: cool (sigma=0) -> hot (sigma=max).
 _SIGMA_PALETTE = ["#52BDEC", "#F9C74F", "#F4914B", "#DC8C28"]  # 0,1,2,3+
@@ -2892,8 +2891,8 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
                      fontsize=9.5, color="black", ha="center",
                      arrowprops=dict(arrowstyle="->", color="gray", lw=1.1))
 
-    plt.xlabel("number of vertices $n$")
-    plt.ylabel("arcs")
+    plt.xlabel(r"number of vertices $n=|V(D)|$")
+    plt.ylabel(r"number of arcs $|A(D)|$")
     plt.legend(loc="upper left")
     plt.grid(True, alpha=0.3)
     _save(path)
@@ -3698,13 +3697,13 @@ def _status_colour(status: str):
     """Colour of the curve a panel's status word refers to.
 
     Matched on substrings rather than on equality because a row that inherits its
-    value from another one says so first ("= simple, conjectured").
+    value from another one says so first (for example, "= simple, open").
     """
     low = status.lower()
     if "conj" in low:
         return _RED
     if "open" in low:
-        return _GUESS
+        return _OPEN
     if "proved" in low:
         return _KUL_BLUE
     return _KUL_DARK
@@ -3715,7 +3714,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                       row_range: tuple[int, int] | None = None,
                       fontsize_scale: float = 1.0,
                       subtitle: str | None = None) -> None:
-    """All sixteen variants on one grid, in the proved/conjectured/guessed language.
+    """All sixteen variants on one grid, with proved, conjectured, and open cases.
 
     ``panels`` is a row-major list of sixteen dictionaries (rows = model simple,
     multi, hyper, multihyper; columns = undirected edge, undirected vertex,
@@ -3723,10 +3722,6 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
 
     ``proved`` ``(xs, ys)`` solid blue line, a theorem holding for all ``n``;
     ``conj``   ``(xs, ys)`` solid red line, a conjecture formula;
-    ``guess``  ``(xs, ys)`` solid yellow line, a bare extrapolation of the
-               machine points where no formula is known;
-    ``band``   ``(xs, lo, hi)`` the certain interval, an easy construction below
-               and the trivial maximum edge count above;
     ``exact``  ``(xs, ys)`` filled squares, sizes the machine proved;
     ``search`` ``(xs, ys)`` open circles, the search lower bounds;
     ``status`` the one word this panel's value has earned ("proved",
@@ -3734,9 +3729,9 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                in the colour of the curve it refers to;
     ``ylabel`` what is being counted (edges, arcs, hyperedges, hyperarcs).
 
-    Every panel is drawn from the same vocabulary, with no per-variant extras:
-    a blue line is settled, a red line is conjectured, a yellow line is a guess,
-    and the shaded band is the interval we are certain the truth lies in.  The
+    Every panel is drawn from the same vocabulary, with no per-variant extras.
+    A blue line is settled and a red line is conjectured.  Open cases have no
+    interpolated curve: they show only exact values and verified witnesses.  The
     directed arc panel used to add its two competing sub-branches as dotted
     lines, which made one panel of sixteen carry a mark the others did not.
     Where a conjecture is a maximum of two counts, the curve plotted is that
@@ -3768,19 +3763,11 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
         return any(panel.get(key) is not None and len(panel[key][0])
                    for panel in panels)
 
-    drawn = {"band": _uses("band"),
-             "proved": _uses("proved"), "conj": _uses("conj"),
-             "guess": _uses("guess"),
+    drawn = {"proved": _uses("proved"), "conj": _uses("conj"),
              "exact": _uses_points("exact"), "search": _uses_points("search")}
 
     def draw_panel(ax, panel):
-        band = panel.get("band")
-        if band is not None:
-            xs, lo, hi = band
-            ax.fill_between(xs, lo, hi, color=_WARM, alpha=0.10, linewidth=0)
-            ax.plot(xs, hi, "-", color=_WARM, linewidth=0.7, alpha=0.55)
-        for key, colour in (("proved", _KUL_BLUE), ("conj", _RED),
-                            ("guess", _GUESS)):
+        for key, colour in (("proved", _KUL_BLUE), ("conj", _RED)):
             if panel.get(key) is not None:
                 xs, ys = panel[key]
                 ax.plot(xs, ys, "-", color=colour, linewidth=2.0,
@@ -3803,7 +3790,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
         if status:
             colour = _status_colour(status)
             # A row that inherits its value from another one says so first, and
-            # the two facts stack rather than run: "= simple, conjectured" on one
+            # the two facts stack rather than run: "= simple, open" on one
             # line is wider than the panel it has to sit inside.
             ax.text(0.045, 0.945, status.replace(", ", "\n"),
                     transform=ax.transAxes,
@@ -3847,8 +3834,6 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
     key_specs = [
         ("proved", dict(color=_KUL_BLUE, lw=2.0, label=_proved_label)),
         ("conj", dict(color=_RED, lw=2.0, label="conjectured")),
-        ("guess", dict(color=_GUESS, lw=2.0, label="guess (interpolated)")),
-        ("band", dict(color=_WARM, lw=4, alpha=0.35, label="certain interval")),
         ("exact", dict(color=_GREEN, marker="s", ls="none", markersize=4.4,
                        label="machine-checked (exact)")),
         ("search", dict(color=_VIOLET, marker="o", ls="none", markersize=5.2,

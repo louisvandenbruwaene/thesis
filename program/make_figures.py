@@ -263,10 +263,10 @@ MACHINE_VALUES = MachineValues(MACHINE_CACHE_PATH,
 
 
 # ----------------------------------------------------------------------
-#  The all-variant grid: proved / conjectured / guessed, with machine points.
+#  The all-variant grid: proved / conjectured / open, with machine points.
 #  Every number below comes from one driver, ``solve``: exhaustive for an exact
 #  point, discovery for a search lower bound.  The formula curves come from the
-#  closed forms; the guess is a fit; the band is [construction LB, trivial max].
+#  proved or conjectured closed forms.  Open cases show discrete points only.
 # ----------------------------------------------------------------------
 
 def _exact_points(ns, m, budget, **kw):
@@ -299,19 +299,6 @@ def _search_points(ns, m, budget, **kw):
         xs.append(n)
         ys.append(MACHINE_VALUES.get_or_run("search", n, m, budget, kw, run))
     return xs, ys
-
-
-def _band(search, trivial_max, ns):
-    """The certain interval: an easy construction below, the trivial maximum above.
-
-    The lower edge is the densest feasible graph the search exhibited (a real
-    lower bound); the upper edge is the most edges any graph on n vertices can
-    hold at all (a loose but certain upper bound).  The truth lies in between.
-    """
-    found = dict(zip(search[0], search[1]))
-    lower = [min(found.get(n, 0), trivial_max(n)) for n in ns]
-    upper = [trivial_max(n) for n in ns]
-    return list(ns), lower, upper
 
 
 def _extend_lower_bounds(search, lb_fn, ns):
@@ -359,11 +346,11 @@ def _reconcile_panel(panel: dict) -> dict:
        vertices stays feasible on ``n+1`` (add an isolated vertex), so the best
        feasible edge count can never *drop* as ``n`` grows.  We take a running
        maximum, which is exactly that extend-by-an-isolated-vertex bound.
-    3. **No certain-interval band, and the guess interpolates rather than
-       overshoots.**  The loose [construction, trivial-max] band dwarfed the
-       data and is dropped (axes rescale to the data).  On an open panel the
-       dotted guess is the piecewise-linear interpolation *through* the search
-       points -- never a fitted curve riding above points it should pass through.
+    3. **Open cases show points, not interpolated functions.**  The loose
+       [construction, trivial-max] band dwarfed the data and is dropped.  A
+       line through lower-bound points repeated the same information and made
+       parity effects look like a proposed formula.  Open panels therefore
+       show exact values and verified witnesses as discrete points only.
     """
     panel.pop("band", None)  # invariant 3a: no shaded certain interval
 
@@ -397,11 +384,6 @@ def _reconcile_panel(panel: dict) -> dict:
             running = max(running, y)
             mono.append(running)
         panel["search"] = (sx, mono)
-
-    # invariant 3b: the open-panel guess is the interpolation through those
-    # (monotone, exact-capped) points, so it can never ride above them.
-    if panel.get("guess") == "search":
-        panel["guess"] = panel.get("search")
 
     return panel
 
@@ -467,15 +449,6 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     # 2 vertices), a structural degeneracy rather than a data point, so the
     # hypergraph panels start where the first hyperedge can.
     hyper_ns = list(range(3, 13))    # all hypergraph panels, n = 3..12
-
-    def tri_undirected(n):
-        return n * (n - 1) // 2
-
-    def tri_hyper(n, r=3):
-        return math.comb(n, r)
-
-    def tri_dir_hyper(n, r=3):
-        return n * math.comb(n - 1, r - 1)
 
     # Construction lower bounds (verified, proved-or-conjectured values), each
     # capped at the trivial maximum for its model.  The cap matters at small n:
@@ -618,11 +591,9 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         # flat plateau at large n (the "cut off" look); the search may still beat
         # the edge value where the vertex problem is genuinely richer.
         se2 = _extend_lower_bounds(se2, lb_simple_edge, matrix_ns)
-        band2 = _band(se2, tri_undirected, matrix_ns)
         panels.append(dict(
             status="open", ylabel="edges",
-            guess="search",
-            band=band2, exact=ex2, search=se2))
+            exact=ex2, search=se2))
 
     # (3) simple directed arc -- conjectured.
     # The shared exact_budget (60s) is calibrated for the hypergraph panels
@@ -650,14 +621,15 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
         exact=ex3, search=se3))
 
-    # (4) simple directed vertex -- conjectured (= arc).
+    # (4) simple directed vertex -- exact value open.  The arc construction is
+    # an honest lower bound, but equality with the arc value is not a stated
+    # conjecture and an arc upper bound does not transfer through Whitney.
     ex4 = _exact_points(range(2, 7), m, dir_simple_exact_budget,
                         directed=True, simple=True, separation="vertex")
     se4 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="vertex")
     panels.append(dict(
-        status="conjectured", ylabel="arcs",
-        conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
+        status="open", ylabel="arcs",
         exact=ex4, search=se4))
 
     # ----- row 2: multigraph -------------------------------------------
@@ -681,8 +653,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     else:
         panels.append(dict(
             status=multi_vert_label, ylabel="edges",
-            guess="search",
-            band=_band(se2, tri_undirected, matrix_ns), exact=ex2, search=se2))
+            exact=ex2, search=se2))
 
     # (7) multigraph directed arc -- proved for all n and m (thm:dir-multi-full).
     ex7 = _exact_points(range(2, 6), m, 10.0,
@@ -694,10 +665,10 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
-    # (8) multigraph directed vertex -- conjectured (reduces to simple digraph).
+    # (8) multigraph directed vertex -- reduces exactly to the open simple
+    # digraph value under the thesis's vertex-counting convention.
     panels.append(dict(
-        status="= simple, conjectured", ylabel="arcs",
-        conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
+        status="= simple, open", ylabel="arcs",
         exact=ex4, search=se4))
 
     # ----- row 3: hypergraph (r=3) -------------------------------------
@@ -736,8 +707,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         se10 = _extend_lower_bounds(se10, attained_hyper_edge, hyper_ns)
         panels.append(dict(
             status="open", ylabel="hyperedges",
-            guess="search",
-            band=_band(se10, tri_hyper, hyper_ns), exact=ex10, search=se10))
+            exact=ex10, search=se10))
 
     # (11) hypergraph directed arc -- OPEN (new directed Berge model).
     ex11 = _exact_points(range(3, 6), m, exact_budget,
@@ -749,8 +719,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
-        guess="search",
-        band=_band(se11, tri_dir_hyper, hyper_ns), exact=ex11, search=se11))
+        exact=ex11, search=se11))
 
     # (12) hypergraph directed vertex -- OPEN (new directed Berge model).
     ex12 = _exact_points(range(3, 6), m, exact_budget,
@@ -762,8 +731,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
-        guess="search",
-        band=_band(se12, tri_dir_hyper, hyper_ns), exact=ex12, search=se12))
+        exact=ex12, search=se12))
 
     # ----- row 4: multihypergraph (r=3), hyperedges may repeat ----------
     # This row is NOT a relabelling of row 3.  Parallel copies of a hyperedge are
@@ -815,8 +783,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         se14 = _extend_lower_bounds(se14, attained_multihyper_vertex, hyper_ns)
         panels.append(dict(
             status="open", ylabel="hyperedges",
-            guess="search",
-            band=_band(se14, tri_hyper, hyper_ns), exact=ex14, search=se14))
+            exact=ex14, search=se14))
 
     # (15) multihypergraph directed arc -- OPEN.  thm:dir-hyper-constant is stated
     # for forward directed r-uniform MULTIhypergraphs, so the proved leading term
@@ -830,8 +797,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se15 = _extend_lower_bounds(se15, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
-        guess="search",
-        band=_band(se15, tri_dir_hyper, hyper_ns), exact=ex15, search=se15))
+        exact=ex15, search=se15))
 
     # (16) multihypergraph directed vertex -- OPEN, same construction and bound.
     ex16 = _exact_points(range(3, 5), m, exact_budget,
@@ -843,8 +809,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se16 = _extend_lower_bounds(se16, lb_dir_hyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
-        guess="search",
-        band=_band(se16, tri_dir_hyper, hyper_ns), exact=ex16, search=se16))
+        exact=ex16, search=se16))
 
     return [_reconcile_panel(p) for p in panels]
 
@@ -914,14 +879,16 @@ _TABLE_NS = list(range(2, 9))
 
 
 def _panel_curve_key(panel):
-    """Which of the three curve kinds this panel carries: proved, conjectured, or open."""
-    for key in ("proved", "conj", "guess"):
+    """Source and status of the numbers printed for one panel."""
+    for key in ("proved", "conj"):
         if panel.get(key) is not None:
             return key
-    raise ValueError("panel carries no curve")
+    if panel.get("search") is not None:
+        return "search"
+    raise ValueError("panel carries no formula or lower-bound points")
 
 
-_CURVE_COLOR = {"proved": "vtProved", "conj": "vtConjectured", "guess": "vtOpen"}
+_CURVE_COLOR = {"proved": "vtProved", "conj": "vtConjectured", "search": "vtOpen"}
 
 
 def _panel_cell(panel, n):

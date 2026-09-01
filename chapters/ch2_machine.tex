@@ -20,7 +20,7 @@ Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices 
 \Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
 Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
 All possible graphs of a given size will later be checked to see if they are extremal for the given size and connectivity restraint.
-Matrices are iterated as a depth-first search with cells taking values between $0$ and $m-1$, and the diagonal is always zero.
+Matrices are iterated as a depth-first search with entries taking values between $0$ and $m-1$, and the diagonal is always zero.
 Hypergraphs are implemented similarly from the ground up as there are no matrix tools for them.
 Notice how depth-first search is memory-efficient.
 
@@ -295,7 +295,17 @@ On the small cases this exhaustive mode independently reproduces every value pro
     \label{fig:complexity}
 \end{figure}
 
-The vertex count dominates every other factor. The candidate count is (values per cell)$^{\text{(number of cells)}}$, and raising $n$ grows the number of cells itself, quadratically for graphs and as $\binom{n}{r}=\Theta(n^r)$ for fixed-rank $r$-uniform hypergraphs, cubically in the $r=3$ experiments plotted here. Raising the connectivity budget only enlarges the base (two states per cell for a simple graph, more for a multigraph), and adding direction only multiplies the number of cells: it decides both directions of a pair independently, turning that pair's two states (edge or none) into four rather than doubling them. Which of the latter two costs more depends on $m$ and the model rather than following one fixed order.
+The vertex count dominates every other factor.
+The candidate count has the form (values per entry)$^{\text{(number of entries)}}$.
+For graphs, the number of entries grows quadratically with $n$.
+For fixed-rank $r$-uniform hypergraphs, it grows as $\binom{n}{r}=\Theta(n^r)$.
+The $r=3$ experiments plotted here therefore have cubic growth in the exponent.
+
+Raising the connectivity budget enlarges the number of values available in each entry.
+A simple graph has two states per entry, while a multigraph has more.
+Adding direction instead increases the number of entries.
+It decides both directions of a pair independently, turning two undirected states into four directed states.
+Which change costs more depends on $m$ and on the model.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
 These are precisely the variants whose answers \Cref{ch:basecases} could not prove.
@@ -339,7 +349,7 @@ search the same graphs and differ only in output.
     {list of hyperedges:\\[3pt] $e_1: \{3\ |\ 1,2\}$\\[1pt] $e_2:\{3\ |\ 4,5\}$};
 \end{scope}
 \end{tikzpicture}
-\caption{The two encodings, shown for the directed variants. The digraph is represented by the multiplicity matrix $\mu$, where $\mu_{ij}$ counts arcs from $i$ to $j$. The directed hypergraph is a list of hyperedges instead, where the tail of each is isolated. Multihypergraphs repeat at least one entry in the list of hyperedges. Since a matrix (or tensor) representation would need $n^r$ entries and those would be almost all zero, it is avoided for efficiency.}
+\caption{The two encodings for directed variants. The multiplicity matrix $\mu$ represents a digraph, with $\mu_{ij}$ arcs from $i$ to $j$. A list of hyperedges represents a directed hypergraph and records each tail separately. A multihypergraph repeats entries in that list. A tensor representation would require $n^r$ entries, almost all zero, and is therefore avoided.}
 \label{fig:matrix-rep}
 \end{figure}
 
@@ -351,7 +361,9 @@ The enumeration is exact wherever it finishes and it does so only for the smalle
 
 \subsection{Pruned search}
 The enumeration step will skip whole families of hopeless graphs, via a pruned search. 
-The base cases $n \le 7$ of the directed $m = 2$ vertex theorem (\Cref{thm:dir-vertex-m2-exact}) are the finite checks the induction of \Cref{app:proofs} depends on, the arc theorem following from it there, and they sit just past where blind enumeration of digraphs is tractable.
+The induction proving the directed $m=2$ vertex theorem depends on finite checks through $n=7$ (\Cref{thm:dir-vertex-m2-exact}).
+The arc theorem then follows from the vertex theorem.
+These base cases lie just beyond the range where blind digraph enumeration is practical.
 They can be reached by enumerating more cleverly.
 Every variant offers a fixed list of edges its graphs are allowed to use, 
 whether those are pairs, ordered pairs, or oriented sets of $r$ vertices, 
@@ -362,11 +374,16 @@ leaving the undecided ones absent.
 Each partly built graph then stands for the whole family of graphs agreeing with it so far, 
 and a pruning rule discards that entire family if it is deemed to bear no fruit.
 
-Adding an edge never lowers a connectivity, since a family of disjoint routes survives intact when more edges are laid around it (\Cref{prop:monotone}). Every completion of a partly built graph only ever adds, so the partly built graph is a floor under all of them. The moment it breaks the cap, so does every completion, and the branch is abandoned.
+Adding an edge never lowers connectivity because every existing family of disjoint routes survives (\Cref{prop:monotone}).
+Every completion of a partly built graph only adds edges.
+The partial graph is therefore a lower bound on the connectivity of every completion.
+If it already breaks the cap, every completion does too.
+The entire branch can then be abandoned.
 
-A second pruning method takes the edges already placed and adds the most the undecided ones could ever contribute, which is how many are left times the largest multiplicity allowed. 
-That sum is an upper bound on every completion, so if even it cannot beat the best feasible graph found so far, 
-the branch is dropped unexplored (\Cref{fig:prune}).
+A second pruning method starts with the edges already placed.
+It then adds the largest possible contribution from the undecided edges: their number times the largest allowed multiplicity.
+The resulting sum is an upper bound on every completion.
+If this upper bound cannot beat the best feasible graph found so far, the branch is discarded without further exploration (\Cref{fig:prune}).
 Only infeasible graphs and graphs that cannot beat the incumbent are ever discarded, so a run that finishes returns exactly the maximum the basic walk would have returned. 
 
 \begin{figure}[ht]
@@ -420,59 +437,70 @@ The related orientation tools \texttt{directg} and \texttt{watercluster2} are no
 They assign only one orientation to each edge, so they cannot represent the bidirected edges
 or the repeated arc multiplicities that occur in the extremal graphs.
 
-\Cref{tab:generating-benchmark} times three ways of proving $\ell_2^{\mathrm{dir}}(n)$ for a simple digraph on a single core: a blind sweep over every matrix assignment with no pruning at all, the depth-first pruned search of \Cref{fig:prune}, and the geng-generated pipeline above.
-The blind sweep is left out past $n = 4$, where $2^{n(n-1)}$ assignments already cost $6.3$\,s. Each further vertex multiplies the assignment count by $2^{2n}$, so $n = 5$ would run for about an hour and $n = 6$ for weeks, the same growth \Cref{fig:complexity} plots.
-Below $n = 5$ both remaining methods are dominated by fixed overhead, Python function-call overhead or subprocess start-up overhead, rather than by search cost, and neither number there is a meaningful comparison.
-From $n = 5$ the gap widens with every vertex: generation is $5.5$ times faster at $n = 5$, $20$ times faster at $n = 6$ and $68$ times faster at $n = 7$, where the pruned search takes $1156.6$\,s against the generated pipeline's $17.0$\,s.
+\Cref{tab:generating-benchmark} compares three single-core methods for proving $\ell_2^{\mathrm{dir}}(n)$.
+The first is a blind sweep over every matrix assignment.
+The second is the pruned depth-first search of \Cref{fig:prune}.
+The third is the pipeline seeded by \texttt{geng}.
+
+The blind sweep is omitted after $n=4$, where $2^{n(n-1)}$ assignments already take $6.3$\,s.
+Each additional vertex multiplies the assignment count by $2^{2n}$.
+The estimated runtime is about an hour at $n=5$ and several weeks at $n=6$.
+This is the growth shown in \Cref{fig:complexity}.
+
+Below $n=5$, fixed overhead dominates the two remaining methods.
+The main costs there are Python function calls and subprocess start-up.
+Those timings do not give a meaningful comparison of search performance.
+From $n=5$ onwards, the gap widens with every vertex.
+Generation is $5.5$ times faster at $n=5$, $20$ times faster at $n=6$, and $68$ times faster at $n=7$.
+At $n=7$, the pruned search takes $1156.6$\,s and the generated pipeline takes $17.0$\,s.
 All three methods return the same proved value at every $n$ where they finish.
 
 \begin{table}[ht]
     \centering
     \small
     \input{figures/generating_benchmark_table.tex}
-    \caption{Wall-clock time to prove $\ell_2^{\mathrm{dir}}(n)$ by three methods, single core. The blind sweep has no pruning. The pruned search is \Cref{fig:prune}'s depth-first branch and bound. The generated pipeline is the geng-seeded search above. A dash marks a run not attempted at that size.}
+    \caption{Wall-clock time to prove $\ell_2^{\mathrm{dir}}(n)$ by three methods, single core. The blind sweep has no pruning. The pruned search is \Cref{fig:prune}'s depth-first branch and bound. The generated pipeline is the geng-seeded search above. A dash marks a run not attempted at that size. These times come from a separate execution of the same pruned-search method, so the pruned column at $n=7$ does not match the $718$\,s that \Cref{tab:basecase-search} records for the same search.}
     \label{tab:generating-benchmark}
 \end{table}
 \section{Proving every \texorpdfstring{$m$}{m} at once}
 
-The search so far looks at one pair $(n,m)$ at a time, but for the directed multigraph a faster method can be used:
-it rescales the multiplicities by a factor of $m-1$ and then checks the relevant thresholds for a fixed $n$ in one pass.
+The search so far treats one pair $(n,m)$ at a time.
+For a directed multigraph, scaling can instead check every threshold at a fixed $n$ in one pass.
+It divides all multiplicities by $m-1$.
 The general theorem of \Cref{thm:dir-multi-full} has now replaced this route in \code{solve}, but the older formulation is still a useful independent finite check.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
-This produces weights $w(u,v)\in[0,1]$ for which every pairwise maximum flow is at most one and whose total weight equals the arc count of $D$ divided by $m-1$, as \Cref{fig:scaling-reduction} illustrates.
-Thus, with
+The resulting weights satisfy $w(u,v)\in[0,1]$.
+Every pairwise maximum flow is at most one.
+Their total weight is the arc count of $D$ divided by $m-1$ (\Cref{fig:scaling-reduction}).
+Let
 \[
     M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s \ne t\Bigr\}
 \]
-for the largest total weight of such a matrix, scaling gives
+denote the largest total weight of such a matrix.
+Scaling then gives
 \[
     L_m^{\mathrm{dir}}(n) \;\le\; (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
 \]
 
-For the reverse inequality, an integral matrix is needed whose weight equals
-$M^{*}(n)$, since a $\{0,1\}$ matrix survives multiplication by $m-1$ as
-integer arc multiplicities untouched. \Cref{const:dir-multi-lower}'s spanning
-tree taken to be a star already supplies one on the linear branch: the
-\emph{double star}, one hub bidirected to every other vertex, $2(n-1)$ arcs
-at multiplicity one. For $n\le6$ the linear branch $2(n-1)$ is the larger
-term of $M(n)$, so the double star already realises $M^{*}(n)$ there, and the
-historical optima for those $n$ take exactly this form. Past the crossover
-at $n=7$ (\Cref{thm:dir-arc-m2-exact}) the quadratic branch $\floor{n^2/4}$
-catches up and then overtakes it, and the maximiser becomes
-\Cref{const:dir-multi-lower}'s other half, the bipartite digraph, instead: no
-single shape witnesses $M^{*}(n)$ at every $n$. What generalises is not one
-construction but the fact that \emph{some} $\{0,1\}$ matrix always attains
-$M^{*}(n)$, which \Cref{cor:mstar-integral} proves for every $n$ by a
-different route: an explicit $\{0,1\}$ construction gives attainment, and
-clearing denominators from a rational optimum rules out any fractional
-matrix doing better, rather than exhibiting a shape for the optimum itself.
-Consequently, for every $n$ and every $m\ge2$, the
-maximum number of arcs in a directed multigraph with pairwise maximum flow at
-most $m-1$ is exactly $(m-1)M^*(n)$: scaling that integral maximiser by
-$m-1$ gives the lower bound, and the preceding scaling argument gives the
-upper bound.
+The reverse inequality needs a $\{0,1\}$ matrix of weight $M^{*}(n)$.
+Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
+
+On the linear branch, \Cref{const:dir-multi-lower} supplies the double star.
+It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
+For $n\le6$, this is the larger term of $M(n)$ and realises $M^{*}(n)$.
+At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
+It then overtakes it.
+The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
+Thus no single shape witnesses $M^{*}(n)$ at every order.
+
+What does generalise is integrality.
+\Cref{cor:mstar-integral} proves that some $\{0,1\}$ matrix always attains $M^{*}(n)$.
+An explicit construction gives attainment.
+Clearing denominators from a rational optimum rules out a better fractional matrix.
+Scaling the integral maximiser by $m-1$ gives the lower bound $(m-1)M^{*}(n)$.
+The preceding scaling argument gives the matching upper bound.
 The finite optimisation is retained only as an independent check of the cases $n\le6$, and \Cref{sec:transcripts} records what it ran.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
@@ -539,9 +567,12 @@ A move that would beat the best graph seen so far overrides the tabu flag regard
 an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, 
 and the walk perturbs itself when it stalls.
 
-Simulated annealing \cite{KirkpatrickGelattVecchi83}, which accepts a worsening move with the probability given by the Metropolis rule \cite{Metropolis53} and lowers that probability as the run cools, is an alternative on the same energy and the same neighbourhood,
-but at equal wall-clock budget it is the weaker engine here. 
-In the equal-budget comparisons reported here, tabu reaches denser candidates: at $n = 7$, $m = 3$ it reaches the $24$-arc directed multigraph extremiser against annealing's $20$, and the $18$-arc simple digraph extremiser against annealing's $16$.
+Simulated annealing is an alternative on the same energy and neighbourhood \cite{KirkpatrickGelattVecchi83}.
+It accepts worsening moves with the probability given by the Metropolis rule \cite{Metropolis53}.
+That probability decreases as the run cools.
+At an equal wall-clock budget, annealing is the weaker engine here.
+For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph extremiser, while annealing reaches $20$ arcs.
+For the simple digraph, tabu reaches $18$ arcs and annealing reaches $16$.
 Every discovery value this thesis reports therefore comes from tabu search. 
 Annealing is kept only as an independent cross-check in the program's self-test, 
 where agreement between two unrelated walks is worth more than the speed of either.
@@ -554,17 +585,17 @@ From any feasible target we can therefore delete edges one at a time down to the
 without ever crossing the cap, and reading that path backward builds the target up the same way. 
 The feasible region is connected through the empty graph by single-edge moves that stay inside it, 
 so a walk that never went infeasible could in principle visit every feasible graph there is.
-We let it go infeasible anyway, because reachability and efficiency are different things. 
-A feasible graph can be locally maximal, meaning every edge we might add creates a forbidden pair, 
-and yet still sit far below the densest feasible graph. 
-To improve such a graph the walk has to add an edge and then remove a different one, 
-a swap whose first half is infeasible. 
-A walk confined to feasible graphs could only find that better graph by retreating most of the way back 
-to the empty graph and climbing a different slope, a detour far longer than the budget allows. 
-Allowing a brief excursion above the cap lets the walk trade one load-bearing edge for a better one 
-in two moves rather than dozens. Going above the bound is never the goal. 
-It is the shortcut the walk takes on its way back down to it.
-A single walk depends on where it started, so either engine is run several times, each time from a different seed, until the wall-clock budget runs out, and the densest witness of all the runs is kept. Independent restarts share nothing, so they can also be spread across processor cores.
+We let the walk become infeasible because reachability and efficiency are different questions.
+A feasible graph can be locally maximal even when it is far from globally optimal.
+Escaping it may require exchanging one edge for another.
+Removing first and then adding stays feasible, but the removal temporarily worsens the objective.
+Reversing the order keeps the edge count high, but the addition may temporarily violate the connectivity cap.
+Allowing both orders gives the walk another short route across a local barrier.
+Infeasibility is a search device, not a target.
+A single walk depends on its starting point and random seed.
+The program therefore runs several independent restarts until the wall-clock budget expires.
+It keeps the densest witness found by any restart.
+The restarts share no state and can run on separate processor cores.
 
 \subsection{Measuring only on the possible bounds}
 Removing an edge, arc, or hyperedge can never raise $\lambda^{\max}$, while adding one raises it by at most one.
@@ -587,7 +618,12 @@ and the regression test that holds the fast walk to the naive one step for step.
 
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
-Before the search is pointed at the open cases, it is run on the settled ones. Run from the empty graph on the cases settled in \Cref{ch:basecases} or by the exact methods above, and told only to pack in edges without breaching the connectivity cap, the tabu search arrives unprompted at the named constructions and matches the established value in every tested case. \Cref{tab:rediscovery} reports the densest graph it found against the value the theory predicts.
+Before addressing open cases, the search is tested on settled ones.
+Each run starts from the empty graph.
+The search is told only to add edges without breaching the connectivity cap.
+It receives no description of the known extremal construction.
+In every tested case, it nevertheless reaches the established value and recovers a named construction.
+\Cref{tab:rediscovery} compares the densest witness with the theoretical value.
 
 \begin{table}[ht]
     \centering
@@ -609,7 +645,7 @@ Before the search is pointed at the open cases, it is run on the settled ones. R
     \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
       \draw[gline] (t\i) -- (t\j);
     }
-    \node[font=\footnotesize\itshape] at (2.5,-0.9) {spanning tree};
+    \node[font=\footnotesize\itshape] at (2.5,-0.9) {example tree: the path $P_6$};
     \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
   \end{scope}
   % Panel 2: undirected multigraph star, n=6, m=3, every spoke doubled, L_3(6)=10
@@ -642,6 +678,31 @@ Before the search is pointed at the open cases, it is run on the settled ones. R
 \label{fig:rediscovery-gallery}
 \end{figure}
 
-The graphs the search finds are the named constructions themselves, not merely graphs of the right size. \Cref{fig:rediscovery-gallery} draws three of them. The undirected simple run at $m = 2$ settles on a spanning tree, the only shape with $n - 1$ edges and no cycle. The undirected multigraph run settles on a star with every spoke doubled to multiplicity $m - 1$, an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}. The directed multigraph run settles on the same star, bidirected and doubled to the same multiplicity, the thickened tree of \Cref{const:dir-multi-lower}. The simple directed run finds the bidirected star at $n = 4$ and, at $n = 7$, the tying value of twelve arcs at which the hub and the one-directional wall meet (\Cref{fig:simple-digraph-m2}), the crossover \Cref{thm:dir-arc-m2-exact} predicts. The search carries none of these names. It lands on them because, under the connectivity cap, there is nowhere denser to go.
+The search recovers the named constructions, not merely their edge counts.
+\Cref{fig:rediscovery-gallery} draws three examples.
+The undirected simple run at $m = 2$ settles on a tree. The example drawn is the path $P_6$.
+Every tree on $n$ vertices has $n-1$ edges and local edge-connectivity at most one.
+The search therefore recovers an extremal family rather than a unique shape.
 
-Past $n = 7$ the search reaches its own limit before the checker does. Repeated tabu runs at $n = 8$, $m = 2$ stall at the hub's arc count, because dismantling a finished hub and rebuilding the one-directional wall (\Cref{fig:simple-digraph-m2}) is far more than the single-arc moves of the walk can tunnel through, and the true value there comes from the construction and the checker rather than from the search. The same double star of \Cref{fig:rediscovery-gallery}, at $n = 7$ and $m = 4$, has $36$ arcs at $\lambda^{\max} = 3$, matching $2(n-1)(m-1)$, a further witness past where the search itself reaches. Neither is a proof of optimality. Each is an exactly measured feasible graph, and therefore a lower bound, the status every witness returns.
+The undirected multigraph run settles on a star whose spokes have multiplicity $m-1$.
+This is an instance of the multi-tree extremiser of \Cref{thm:multigraph-edge}.
+The directed multigraph run finds the same star with both directions present at that multiplicity.
+It is the thickened tree of \Cref{const:dir-multi-lower}.
+
+The simple directed run finds a bidirected star at $n=4$.
+At $n=7$ it finds twelve arcs, where the hub and the one-directional wall tie (\Cref{fig:simple-digraph-m2}).
+This is the crossover predicted by \Cref{thm:dir-arc-m2-exact}.
+The search carries none of these names.
+It finds the constructions solely by optimising under the connectivity cap.
+
+Past $n=7$, the heuristic search reaches its limit before the checker does.
+At $n=8$ and $m=2$, repeated tabu runs stall at the hub's arc count.
+Moving from a completed hub to the one-directional wall requires many coordinated arc changes (\Cref{fig:simple-digraph-m2}).
+Single-arc moves do not cross that barrier within the available budget.
+The value at this order therefore comes from the explicit construction and the exact checker, not from the search.
+
+The double star of \Cref{fig:rediscovery-gallery} provides another witness beyond the search range.
+At $n=7$ and $m=4$, it has $36$ arcs and $\lambda^{\max}=3$.
+Its count equals $2(n-1)(m-1)$.
+Neither witness alone proves optimality.
+Each is an exactly measured feasible graph and therefore a lower bound.
