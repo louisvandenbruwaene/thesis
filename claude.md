@@ -1438,3 +1438,86 @@ the three prose mentions, up from 31 before, the net `+1` being the new
 addition cancelled. Note for future sessions: `grep -c` returned blank output in
 this shell even on matching input, so every count above was taken with
 `grep | wc -l` instead.
+
+## 2026-09-01 (Opus) — an appendix review, five corrections, and two proofs that were being run twice
+
+The author asked for a check of the appendix for mistakes and for proofs that
+could be shortened. Everything below was checked against the arithmetic rather
+than skimmed, apart from the author-verified Menger/Mader block.
+
+**FIVE LOCAL ERRORS.** (1) `lem:augmented-feasible` bounded a pair inside `B`
+"by the in-degree `m-2`", but that in-degree is `|A| + m - 2`, so
+`lem:degree-bound` does not give it. The real reason is that nothing leaves `B`
+towards `A`. (2) The proof of `thm:dir-vertex-m2-exact` and the audit paragraph
+both called the two separations agreeing at `m=2` "a computed coincidence ...
+not a formal consequence of Whitney's inequality". It is a formal consequence,
+of Whitney *plus the proved bounds*: `M(n) <= l_2 <= k_2 <= M(n)`. (3) The count
+after `prop:two-hop-bipartite` attributed its `(m-2)b` term to the absence of
+backward arcs, which is needed one step later instead. (4) The roadmap named
+three theorems driven by `lem:two-step-budget` where one of the three did not
+cite it and a fourth that does was missing. (5) "Three short lemmas feed the
+induction" (appendix and ch1) counted three where only `lem:subdigraph-monotone`
+is load-bearing.
+
+**THE `m=2` DIRECTED SECTION WAS PROVING ITS INDUCTION TWICE.** `rem:whitney-direction`
+correctly warns that an arc bound says nothing about the vertex problem. The
+converse was never used: a **vertex** upper bound settles the arc problem for
+free. The section now proves `thm:dir-vertex-m2-exact` in full and derives
+`thm:dir-arc-m2-exact` in four lines, deleting one copy of the min-degree
+induction and the two-parity arithmetic. Only the vertex sweep at `n<=7` is
+load-bearing now; the arc sweep is kept as corroboration and labelled as such in
+`tab:basecase-search`, `sec:transcripts` and `ch2_machine.tex`.
+
+**THE TWO-STEP COUNT WAS PROVING ITS INDUCTION THREE TIMES**, and the appendix's
+own subsection heading ("What that proof actually used") said so without acting
+on it. `prop:dir-arc-stability` ran Steps 1-4, `thm:dir-arc-linear-error` reran
+the induction while reaching into "Step 2" and "Step 4" of that proposition **by
+name**, and `lem:two-step-budget` then reproved it in general form. New
+`sec:two-step-budget` states the shared pieces first (`lem:feasible-budgeted`,
+`lem:budget-degree-sum`, `lem:small-side`, `lem:floor-identity` moved up from the
+multigraph section, `lem:smaller-half-deletion`, then `lem:two-step-budget`), and
+the two theorems are three lines each. **Extracting the degree-sum lemma alone
+would not have been enough**: it removes the cross-proof references but the
+induction itself is still the duplicated part, so both moves were needed.
+
+**`prop:dir-arc-stability` IS NOT UNIFORMLY DOMINATED, ONLY ASYMPTOTICALLY.**
+The first draft of this review called its `sqrt(m) n^{3/2}` bound strictly weaker
+than `4(m-1)(n-1)` and proposed demoting it. Measured: at `m=n=3` it reads 11
+against 18, and the linear-error bound only overtakes it past
+`n ~ 16(m-1)^2/m`, between `n=19,20` at `m=3` and `33,34` at `m=4`, which is
+above every `n` any exhaustive sweep in this thesis reaches. It keeps its
+statement, its stability conclusion and a sentence saying which is smaller where.
+
+**ONE REVIEW FINDING WAS WRONG AND WAS REJECTED.** `rem:case2-tight`'s
+`t = n/4 - O_m(sqrt n)` was called loose, on the reading `c(t) = t^2`. That is
+the SECOND branch of `c(t)`, and the leftover `t` lies in `[0, n/4]`, hence on
+the first, where `c(n/4 - d) = n^2/16 - d^2`. A remainder of `n^2/16 - O_m(n)`
+therefore gives `d = O_m(sqrt n)` exactly as the appendix said, and `d =
+sqrt((m-1)n)` for large `n`. **When a proof defines a two-branch minimum, check
+which branch the witness lands on before calling the estimate loose.**
+
+**FOUND UNUSED, NOT CUT.** `prop:disjoint-second-nbhd` is cited nowhere in the
+thesis and `prop:mutual-unreachability` only by its own figure caption, which
+also costs `fig:mutual-unreach` and its 50 lines of TikZ. They are expository
+frontier material rather than proof dependencies. The author chose to keep them
+absent length pressure; if the appendix ever needs half a page, they are it.
+
+**INDEPENDENT VERIFICATION RUN FOR THIS REVIEW**, all clean:
+`const:augmented-bipartite` at `lambda^max = m-1` and `floor((n+m-2)^2/4)` arcs
+for `2<=m<=6, m<=n<=11` by max-flow; `lem:incidence-rank` over every connected
+simple graph on `<=6` vertices under every `X`/`Z` split satisfying (i)-(iv), no
+counterexample; `thm:hyper-vertex-m3` attained and never exceeded at
+`(r,n)=(3,4),(3,5)`. Also recomputed `f_5(n)` for `6<=n<=14` against
+`rem:threshold-convention`'s conversion table, the `lem:reach-skeleton` convexity
+and Mantel bookkeeping, all three torso cases of `lem:incidence-rank` Step 4, and
+the `(2r+1)` count in `thm:dir-hyper-general-constant`.
+
+**BADGES 32 -> 35.** The three new lemmas are extractions from proofs that
+already carried `\aimedal`, so they carry it by the standing default. They are
+candidates for the author's next curation pass, not decisions made for him.
+
+VERIFY: `latexmk -pdf` exit 0, 100pp, 0 overfull/underfull, 0 undefined refs, 0
+occurrences of `??`. No label removed, three added, no duplicates. No em-dashes,
+en-dashes or prose semicolons in the diff; `git diff --check` clean. Pages 61-62
+rendered and inspected. Zero `.py` files in the diff, so the program and its
+test suite are untouched.
