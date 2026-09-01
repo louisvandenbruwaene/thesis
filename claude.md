@@ -1519,5 +1519,6 @@ candidates for the author's next curation pass, not decisions made for him.
 VERIFY: `latexmk -pdf` exit 0, 100pp, 0 overfull/underfull, 0 undefined refs, 0
 occurrences of `??`. No label removed, three added, no duplicates. No em-dashes,
 en-dashes or prose semicolons in the diff; `git diff --check` clean. Pages 61-62
-rendered and inspected. Zero `.py` files in the diff, so the program and its
-test suite are untouched.
+rendered and inspected. Zero `.py` files in the diff, so the program is
+untouched; the suite was run anyway and gives 129 tests OK, 1 expected skip,
+in 522s, matching the recorded baseline.
