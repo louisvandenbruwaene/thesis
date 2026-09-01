@@ -67,11 +67,11 @@ green rather than reporting failures for tools it was never asked to have.
 From this `program/` directory:
 
 ```bash
-python erdos915_unified.py            # run the built-in invariant self-check
-python -m unittest discover -s tests  # run the full suite (no third-party test runner)
-python make_figures.py                # regenerate the figures in ../figures/
-python make_figures.py --grids-only   # just the four sixteen-variant bound grids
-python make_figures.py --refresh      # ignore the cached machine values, recompute
+../.venv/bin/python3 erdos915_unified.py            # run the built-in invariant self-check
+../.venv/bin/python3 -m unittest discover -s tests  # run the full suite
+../.venv/bin/python3 make_figures.py                 # regenerate every figure
+../.venv/bin/python3 make_figures.py --grids-only    # regenerate the four bound grids
+../.venv/bin/python3 make_figures.py --refresh       # recompute the cached machine values
 ```
 
 ### The machine-value cache

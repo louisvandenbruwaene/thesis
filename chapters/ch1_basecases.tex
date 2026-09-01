@@ -38,7 +38,12 @@ One pictures such a simple graph by representing the vertices as dots and the ed
 
 We write $n\coloneq|V(G)|$ for the number of vertices and define the \emph{degree} of a vertex as the number of edges meeting it. 
 Unless specified otherwise, graphs are simple.
-A \emph{path} from a vertex $u$ to a vertex $v$ is a sequence of distinct vertices that starts at $u$, ends at $v$, and joins each consecutive pair by an edge. 
+A \emph{path} from a vertex $u$ to a vertex $v$ is an alternating sequence
+$v_0,e_1,v_1,\ldots,e_q,v_q$ of distinct vertices and specified edge copies,
+where $v_0=u$, $v_q=v$ and each $e_i$ joins $v_{i-1}$ to $v_i$. Thus parallel
+copies give distinct one-edge paths. In a simple graph the edge copies are
+determined by their endpoints, so a path may be written as a sequence of
+vertices alone.
 Two paths between the same endpoints are \emph{edge-disjoint} if no edge belongs to both.
 The largest number of pairwise edge-disjoint paths between $u$ and $v$ is their \emph{local edge-connectivity} $\lec_G(u, v)$. 
 The pair with the most such paths determines the value for the whole graph:
@@ -380,9 +385,16 @@ A directed \emph{Berge route} enters that edge at its tail and leaves at one of 
 \label{fig:directed-lambda}
 \end{figure}
 
-The final assumption that will be considered is \emph{separation}: routes may be required either to avoid sharing edges, as above, or to be internally vertex-disjoint, sharing no intermediate vertex.
-This gives the local vertex-connectivity $\kap_G(u, v)$ and its maximum $\kap_G^{\max}$. 
-Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex.
+The final assumption that will be considered is \emph{separation}. For graphs
+and digraphs, routes may be required either to avoid sharing edges, as above,
+or to be internally vertex-disjoint, sharing no intermediate vertex. This gives
+the local vertex-connectivity $\kap_G(u, v)$ and its maximum
+$\kap_G^{\max}$. For hypergraphs, this thesis uses the incidence-graph
+convention: the Berge routes counted by $\kap_\HH(u,v)$ share neither an
+intermediate vertex nor a hyperedge copy. Repeated copies count as distinct
+hyperedges. This extra condition is needed because two Berge routes can use the
+same hyperedge without sharing an intermediate vertex.
+Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex. The same inequality holds for the hypergraph convention because every family counted by $\kap_\HH$ is hyperedge-copy-disjoint.
 
 \begin{figure}[ht]
 \centering
@@ -405,7 +417,7 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \label{fig:edge-vs-vertex}
 \end{figure}
 
-In the vertex-disjoint variants, multiplicity of an edge is irrelevant compared to its existence,
+In the graph and digraph vertex-disjoint variants, multiplicity of an edge or arc is irrelevant compared to its existence,
 so parallel edges never raise $\kappa$.\label{sec:parallel-convention}
 Therefore they never break the connectivity constraints either.
 Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
@@ -420,11 +432,12 @@ The notation for all their extremal functions is summarised in \Cref{tab:notatio
 
 \begin{table}[ht]
 \centering
-\caption{Notation for the extremal functions.}
+\caption{Notation for the extremal functions. For hypergraphs, the third
+column uses the incidence convention defined above.}
 \label{tab:notation}
 \begin{tabular}{l|c|c}
 \toprule
-Model & edge-disjoint routes & internally vertex-disjoint routes \\
+Model & edge-disjoint routes & vertex-disjoint routes \\
 \midrule
 Simple graph & $\ell_m(n)$ & $k_m(n)$ \\
 Multigraph & $L_m(n)$ & $K_m(n)$ \\

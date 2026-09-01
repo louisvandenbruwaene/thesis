@@ -590,7 +590,7 @@ This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. T
 Let $n$ be large enough that the quadratic branch of \Cref{conj:dir-arc} strictly exceeds the linear one, that is, $\floor{(n+m-2)^2/4} > m(n-1)$. Then every extremal digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ admits a partition $V(D) = A \cup B$ into two non-empty parts such that every arc from $A$ to $B$ is present, no arc lies inside $A$, and no arc runs from $B$ to $A$.
 \end{conjecture}
 
-The hypothesis on $n$ has to be there, because the obvious phrasing is too narrow. On the linear branch the extremisers are \emph{not} just the hub. At $m = 2$, every bidirected spanning tree is feasible and has exactly $2(n-1)$ arcs, since between two vertices the only route follows the unique tree path, so the whole extremal set on that branch is the set of bidirected trees. An exhaustive classification confirms it: at $n = 5$ and $n = 6$ there are exactly $3$ and $6$ extremal digraphs up to isomorphism, which are precisely the numbers of trees on $5$ and $6$ vertices, and none of them admits the decomposition. Excluding ``the hub'' would leave all the other trees behind, so the hypothesis is on the size rather than on the shape.
+The hypothesis on $n$ has to be there, because the obvious phrasing is too narrow. On the linear branch the extremisers are \emph{not} just the hub. At $m = 2$, every bidirected spanning tree is feasible and has exactly $2(n-1)$ arcs, since between two vertices the only route follows the unique tree path. An exhaustive classification confirms that at $n = 5$ and $n = 6$ these are all the extremal digraphs: there are exactly $3$ and $6$ up to isomorphism, which are precisely the numbers of trees on $5$ and $6$ vertices, and none admits the decomposition. At the tie $n=7$, the one-directional bipartite digraph is extremal as well. Excluding ``the hub'' would therefore leave other extremisers behind, so the hypothesis is on the size rather than on the shape.
 
 Given \Cref{open:decomposition} the count above closes \Cref{conj:dir-arc} for $m \ge 3$. The backward-arc clause is the part where the natural delete-and-compensate exchange fails to be monotone, which is why it is the clause usually named, but the partition itself is not free either, and \Cref{ch:synthesis} states the position that way. Testing the conjecture by exhaustion is harder than it looks: the crossover sits at $n = 8$ for $m = 2$ and at $n = 9$ for $m = 3$, so every size an exhaustive sweep can reach at $m = 3$ still lies on the linear branch, where the statement says nothing. That is the practical reason this conjecture has resisted a computational probe rather than a proof.
 
@@ -2018,18 +2018,17 @@ Where the method is needed differs by variant. For undirected graphs one could r
 \label{app:software-reproduction}
 
 The authoritative code and audit instructions are maintained in the versioned
-repository at \url{https://github.com/louisvandenbruwaene/thesis}. A submitted
-build records its precise snapshot in \code{revision.tex}. The status in this
-build is: \thesiscommit. When this status contains a commit, that commit is the
-immutable reference for every number reported here. Later repository changes
-are then continuations rather than part of the submission. A build with no
-recorded revision is a working build, not a submission snapshot.
+repository at \url{https://github.com/louisvandenbruwaene/thesis}. Its Git
+history records the development of the code, data and thesis sources.
 
-Three commands cover the main audit. From \code{program/},
-\code{python erdos915\_unified.py} runs the principal checks.
-The command \code{python -m unittest discover -s tests -v} runs the regression
-suite. The command \code{python make\_figures.py} regenerates the computational
-figures.
+Three commands cover the main audit. Run them from \code{program/}.
+The first performs the principal checks, the second runs the regression suite
+and the third regenerates the computational figures.
+\begin{lstlisting}[language=bash,numbers=none,basicstyle=\ttfamily\small]
+../.venv/bin/python3 erdos915_unified.py
+../.venv/bin/python3 -m unittest discover -s tests -v
+../.venv/bin/python3 make_figures.py
+\end{lstlisting}
 
 The four variant grids require several hundred \code{solve} calls. Their values
 are stored in \code{figures/machine\_values.json}. This readable file records

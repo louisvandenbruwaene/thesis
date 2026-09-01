@@ -84,7 +84,9 @@ Mader proved that, for simple graphs and all $n\ge2$ and $m\ge2$,
 \ell_m(n)\le\left\lfloor \frac{m(n-1)}2\right\rfloor 
 \]
 and provided a construction achieving this bound when $(m-1)|(n-1)$.
-This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multihypergraphs), the path-separation notion (edge-disjoint or internally vertex-disjoint) and the presence or absence of directions.
+This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multihypergraphs), the path-separation notion and the presence or absence of directions.
+For graphs and digraphs, the two separation notions are edge-disjointness and internal vertex-disjointness.
+For hypergraphs, the vertex version uses the incidence-graph convention: its Berge routes share neither an intermediate vertex nor a hyperedge copy.
 The simple edge-disjoint case is proved independently here using Gomory-Hu trees \cite{GomoryHu61}, and a general extremal construction resolves it for all $n$ and $m$.
 Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, due to B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66} and Leonard \cite{Leonard72b}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
 The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. 
@@ -129,7 +131,7 @@ $k_m(n)$ & simple undirected vertex-disjoint extremal function \\
 $\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
 $L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
 $k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
-$\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform hypergraph edge- and vertex-disjoint extremal functions \\
+$\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform hypergraph edge-disjoint and incidence-graph vertex-disjoint extremal functions \\
 $M(n)$ & $\max\bigl(2(n-1), \floor{n^2/4}\bigr)$, the directed multigraph value per unit of $m-1$ \\
 $M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$, equal to $M(n)$ by \Cref{cor:mstar-integral} \\
 $B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
