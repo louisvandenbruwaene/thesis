@@ -7,7 +7,15 @@
 #
 # Run this AFTER the last content change and BEFORE the final build:
 #
-#     ./record_revision.sh && latexmk -pdf main.tex
+#     ./record_revision.sh && latexmk -pdf -g main.tex
+#
+# The -g is not optional on the first recorded build after a clean one, and
+# leaving it off fails silently rather than loudly. preamble.tex pulls the file
+# in with \InputIfFileExists{revision.tex}, so a build made while the file was
+# absent records a lookup that FAILED, not a file to watch. Creating a file that
+# was previously missing is therefore invisible to latexmk's up-to-date check,
+# which returns exit 0 in a twentieth of a second and leaves a PDF still saying
+# "not recorded" while the tag already exists. -g forces the pass that reads it.
 #
 # The build then carries the hash of the source commit it was built from. Pass a
 # tag name to override the default.
@@ -58,5 +66,5 @@ TEX
 git tag "$tag" "$commit"
 
 echo "revision.tex written: $short (tag $tag, $date)"
-echo "Now rebuild:  latexmk -pdf main.tex"
+echo "Now rebuild:  latexmk -pdf -g main.tex   (-g is required, see the header)"
 echo "Then push the tag:  git push origin $tag"
