@@ -8,13 +8,13 @@
 > a non-source of in-degree 2. So "the extremiser family" below is incomplete, and
 > the attachment refutation of the `+1` even case rested on (H) and no longer
 > applies. Kept for the record. Reproduce the refutation with
-> `python3 research_notes/scripts/h_counterexample.py`.
+> `python3 program/scripts/h_counterexample.py`.
 
 Companion to [`directed_arc_m3_reduction.md`](directed_arc_m3_reduction.md).
 Describes exactly which digraphs attain the conjectured quadratic value, and
 refutes the residual `+1` even case from the min-degree reduction.
 
-Reproduce: `python3 research_notes/scripts/attach_check_all_perms.py`.
+Reproduce: `python3 program/scripts/attach_check_all_perms.py`.
 
 ---
 

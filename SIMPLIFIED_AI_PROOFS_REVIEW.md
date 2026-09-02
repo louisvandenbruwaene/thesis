@@ -359,7 +359,7 @@ thesis states with a citation and does not lean on structurally.
 ## 6. Reproduction
 
 The numerical checks in this review are in
-`research_notes/scripts/review_simplified_proofs.py`.
+`program/scripts/review_simplified_proofs.py`.
 
 ---
 
@@ -503,7 +503,7 @@ lost 8 pages, not 6.
 
 ## I. Reproduction
 
-`research_notes/scripts/review_simplified_proofs.py` now carries five checks:
+`program/scripts/review_simplified_proofs.py` now carries five checks:
 the three from the first pass, the executable incidence-rank proof, and the
 core-vacuity sweep. The vacuity sweep defaults to 7 vertices, which runs in
 about a minute; it was also run to 9 vertices, 86904 graphs, which takes

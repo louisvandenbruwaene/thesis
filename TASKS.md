@@ -22,9 +22,10 @@ problem and the section is live in the appendix. Older wording below predates th
       is now secondary (still useful data, but no longer tests a live
       conjecture) -- check its PID before relaunching.
 - [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** Command:
-      max_multigraph_vertex(n, m) (renamed 2026-09-02). RUNNING as of 2026-07-30 22:50,
-      PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
-      (5,6),(5,7),(4,7) each capped at 5400s.
+      max_multigraph_vertex(n, m) (renamed 2026-09-02). NOT RUNNING: a sweep of
+      (3,7),(4,6),(6,5),(5,6),(5,7),(4,7) capped at 5400s each was launched
+      2026-07-30 22:50 as PID 79194 and that process is long gone, with no
+      result recorded. Relaunch from scratch if the rows are wanted.
 - [x] **The value is a BLOCK problem (2026-08-14), thm:multi-vertex-blocks.**
       Recovering the discarded -sum(pi) correction exactly gives the closed form
       K_m(n) = max over feasible simple G0 of sum_{uv in E}(m - kappa_{G0}(u,v)),

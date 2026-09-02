@@ -35,6 +35,9 @@ program/
                         call behind the four variant grids
   logs/                 run transcripts the computational audit cites
   README.md             this file
+  CLAUDE.md             development history of this program, kept for future
+                        work on it. Not part of the submission and cited by
+                        nothing in the thesis
 ```
 
 The thesis hands a reader two things, `main.pdf` and this directory, so

@@ -26,7 +26,7 @@ extremiser characterisation to one structural hypothesis:
 > never exceeds it); what is refuted is the characterisation and the (H)-based
 > kill of the even case.
 
-Reproduce: `python3 research_notes/scripts/h_counterexample.py` (the refutation),
+Reproduce: `python3 program/scripts/h_counterexample.py` (the refutation),
 `characterisation_checks.py` (arc partition, the source lemma, the conditional
 bound), `attach_check.py` (the min-degree arithmetic).
 
@@ -34,7 +34,7 @@ bound), `attach_check.py` (the min-degree arithmetic).
 
 ## 0. (H) IS FALSE: an infinite family of non-augmented-bipartite extremisers
 
-Reproduce: `python3 research_notes/scripts/h_counterexample.py` (verified with a
+Reproduce: `python3 program/scripts/h_counterexample.py` (verified with a
 self-contained max-flow AND the thesis program's `max_edge_connectivity`).
 
 For every odd `n = 2k - 1` with `k >= 5` (so `n >= 9`, the quadratic regime), put
@@ -167,7 +167,7 @@ the extremisers to the augmented-bipartite family.**
 ## 2.4 Self-similarity and the complete-layer case (PROVED, 2026-06-30)
 
 Two unconditional facts that locate (H) precisely. Reproduce with
-`research_notes/scripts/lemma_check.py` (partition, the lemma, the proposition)
+`program/scripts/lemma_check.py` (partition, the lemma, the proposition)
 and the overshoot table below (`probe_overshoot.py`).
 
 ### 2.4.1 Self-similarity lemma (PROVED)
@@ -219,7 +219,7 @@ not a way around it.
 
 ## 2.5 The summed coupling, and why counting alone cannot work (2026-06-30)
 
-Reproduce with `research_notes/scripts/coupling_inequality.py`.
+Reproduce with `program/scripts/coupling_inequality.py`.
 
 ### 2.5.1 The summed-coupling inequality (PROVED)
 Summing the source-neighbourhood Lemma (2.2) over all sources gives one global

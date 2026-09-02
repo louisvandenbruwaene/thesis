@@ -1473,8 +1473,8 @@ The computational material is deliberately divided by responsibility:
   behind $c_m$ and the second generates \Cref{tab:multi-vertex-exact} and solves
   its knapsack. From the repository root the archived runs are
   \begin{verbatim}
-  BMAX=9 .venv/bin/python3 research_notes/scripts/simple_vertex_blocks.py
-  BMAX=8 .venv/bin/python3 research_notes/scripts/multi_vertex_blocks.py
+  BMAX=9 .venv/bin/python3 program/scripts/simple_vertex_blocks.py
+  BMAX=8 .venv/bin/python3 program/scripts/multi_vertex_blocks.py
   \end{verbatim}
   The second script's terminal output is retained as
   \path{figures/multi_vertex_blocks_log.txt}.
@@ -2625,8 +2625,8 @@ Path & Role \\
 \code{program/erdos915\_unified.py} & Model, exact connectivity, enumeration, certification, heuristic search, and the public \code{solve} interface. \\
 \code{program/tests/} & Independent regression tests for representations, connectivity, constructions, certification, and search invariants. \\
 \code{program/make\_figures.py} & Regenerates the computational figures it owns and their underlying data with fixed seeds; \path{figures/rediscovery_table.tex} is hand-kept. \\
-\path{research_notes/scripts/simple_vertex_blocks.py} & Runs the finite $2$-connected block sweep behind the statement about $c_m$ in \Cref{thm:simple-vertex-blocks}. \\
-\path{research_notes/scripts/multi_vertex_blocks.py} & Runs the finite block-knapsack checks used in \Cref{sec:multi-vertex-blocks}; its retained output is \path{figures/multi_vertex_blocks_log.txt}. \\
+\path{program/scripts/simple_vertex_blocks.py} & Runs the finite $2$-connected block sweep behind the statement about $c_m$ in \Cref{thm:simple-vertex-blocks}. \\
+\path{program/scripts/multi_vertex_blocks.py} & Runs the finite block-knapsack checks used in \Cref{sec:multi-vertex-blocks}; its retained output is \path{figures/multi_vertex_blocks_log.txt}. \\
 \code{figures/*.txt}, \code{*.json}, \code{*.pkl} & Run transcripts, human-readable data, and Python caches. Pickles must not be loaded from an untrusted source. \\
 \bottomrule
 \end{tabularx}

@@ -159,14 +159,27 @@ path the thesis prints begins with `program/`.
 
 ## Known loose ends, flagged not fixed
 
-- `ref.bib`'s `ErdosProblems` entry credits Paul Erdős as the author of
-  erdosproblems.com, which is Thomas Bloom's site. Left for the author.
-- `gurobi_handoff/` is vestigial since `thm:dir-multi-full` closed by hand.
+- Git stamps every commit in this repository as `chief@mba.local`, because
+  neither `user.name` nor `user.email` is set and git falls back to
+  username@hostname. Setting them fixes future commits only. Rewriting the past
+  is not an option: `main.pdf` prints `47ba4a0bd9ba` and the tag `submitted-2`
+  in its computational audit, and a rewrite changes that hash.
+- `program/CLAUDE.md` is development history and sits inside `program/`, which
+  is the hand-in directory. `program/README.md` now says it is not part of the
+  submission, but a careless copy of the directory still ships it.
 
 ## Recent sessions
 
 One line each. `git log` has the full message for every one of them.
 
+- **2026-09-03.** A full-repository consistency review: six defects in the PDF,
+  none mathematical. `sec:incidence-convention` was a bare `\label` mid-paragraph
+  resolving to section 1.3 with a figure-caption anchor, and is now subsection
+  1.3.1; the `m=6, n=6, r=3` hypergraph cell was described three ways in one
+  subsection and now reads the same in caption, legend and table; one badged
+  theorem had an unbadged proof heading; ten name compounds took en dashes. Then
+  the stale internal notes were cleared, `research_notes/scripts/` having moved
+  to `program/scripts/` when the hand-in was reduced.
 - **2026-09-02, second session.** An external code audit: six defects, all
   reproduced, two of its claims narrower than stated. One `_require_integer`
   primitive now guards every integer input, after finding two laundering paths

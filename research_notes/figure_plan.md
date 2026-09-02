@@ -308,7 +308,7 @@ P2 useful, P3 nice to have.
   optimum at n=7. (c) optional, the nauty generation pipeline versus the DFS
   at n=5 (about 17x).
 - Data source: certificate_log.txt, the speedup numbers in the dev logs, and
-  tabu_vs_sa / nauty_pipeline scripts in research_notes/scripts.
+  tabu_vs_sa / nauty_pipeline scripts in program/scripts.
 - Purpose: substantiates the engineering claims with measured numbers. Note
   timings are machine-specific and should be regenerated on the reference
   machine before inclusion.

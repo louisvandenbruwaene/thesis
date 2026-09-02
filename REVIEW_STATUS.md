@@ -1,5 +1,10 @@
 # Review status, checked against `3b353ea` on 2026-08-26
 
+**This is a dated snapshot, not current state.** Every entry below describes the
+repository at `3b353ea`. Two later changes superseded parts of it, and the
+details that moved are listed under "Superseded since" at the end. Re-verify
+before replaying any number from this file.
+
 Two external review batches were actioned. This file records what is verified
 closed, what is still open, and the one thing I deliberately did not do.
 
@@ -164,3 +169,32 @@ names the flagship arguments.
 On 28 August 2026 the `ErdosProblems` entry was corrected to follow the website's
 recommended citation and credit Thomas F. Bloom. The same pass corrected the
 Bártfai source for the $m=3$ vertex result and the thesis-repository metadata.
+
+## Superseded since
+
+Two changes after 2026-08-26 invalidated details recorded above. The findings
+themselves stay closed; the numbers and names attached to them moved.
+
+**The incidence convention (2026-09-02).** Batch 2's entry says `solve()` "now
+returns 3 undirected and 6 directed" at `n=3, m=3`. Those are the values of the
+collapsing convention, under which the multigraph vertex problem was the simple
+one in disguise. The thesis now measures vertex separation in the incidence
+graph in every model, so `q` parallel copies are `q` separated routes and the
+multigraph vertex problems are their own. The recorded values at `n=3, m=3` are
+now **4 undirected and 8 directed** (`program/data/machine_values.json`, keys
+carrying `convention=incidence-1`), and 3 and 6 are the simple-graph values. The
+test class was renamed with the convention: it is
+`MultigraphVertexIncidenceConvention` in `program/tests/test_solve.py`, and it
+carries 9 tests, not the 6 recorded above under the old name
+`MultigraphVertexObjective`.
+
+**The two-range Sorensen-Thomassen statement (2026-08-29).** Batch 1's entry 4
+records the `k_5` exceptions being carried as `n != 7, 12` in the summaries.
+`thm:sorensen-thomassen` was afterwards restated in two ranges, the edge value
+for `6 <= n <= 13` and `floor(8n/3) - 4` from `n = 14`, which has no exceptions
+at all. The exception notation that entry describes is gone from the thesis.
+
+**Already fixed, previously listed as a loose end.** `ref.bib`'s
+`ErdosProblems` entry credits Thomas F. Bloom and has done since 2026-08-28, and
+`gurobi_handoff/` no longer exists. Both were still listed as open in
+`claude.md` until 2026-09-03.
