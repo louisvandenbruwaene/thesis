@@ -2314,9 +2314,9 @@ Three commands cover the main audit. Run them from \code{program/}.
 The first performs the principal checks, the second runs the regression suite
 and the third regenerates the computational figures.
 \begin{lstlisting}[language=bash,numbers=none,basicstyle=\ttfamily\small]
-../.venv/bin/python3 erdos915_unified.py
-../.venv/bin/python3 -m unittest discover -s tests -v
-../.venv/bin/python3 make_figures.py
+python3 erdos915_unified.py
+python3 -m unittest discover -s tests -v
+python3 make_figures.py
 \end{lstlisting}
 
 The four variant grids require several hundred \code{solve} calls. Their values
@@ -2334,11 +2334,13 @@ recomputing everything from scratch.
 The block sweep is independent of that file and of the main program. Its
 self-contained implementation is
 \code{program/scripts/simple\_vertex\_blocks.py}. It requires nauty's
-\code{geng} on the path. From the repository root, the quoted range is reproduced
-by \code{BMAX=9 .venv/bin/python3
-program/scripts/simple\_vertex\_blocks.py}. The recorded environment
-used nauty 2.9.3.
+\code{geng} on the path. From \code{program/}, the quoted range is reproduced
+by \code{BMAX=9 python3 scripts/simple\_vertex\_blocks.py}. The recorded
+environment used nauty 2.9.3.
 
+The three commands assume an interpreter with the dependencies installed, which
+the repository provides as a virtual environment at its root and which
+\code{program/} alone reproduces from its lock file.
 The required dependency ranges are listed in
 \code{program/requirements.txt}. The exact verified versions are pinned in
 \code{program/requirements-lock.txt}. They are Python 3.14.6, NumPy 2.4.6,
