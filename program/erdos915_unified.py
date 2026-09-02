@@ -16,9 +16,14 @@ vertices in which no pair of vertices has ``m`` independent routes between them.
 "Independent" can mean edge-disjoint or internally vertex-disjoint; the object
 can be a simple graph, a multigraph, a digraph, or a hypergraph; and forbidding
 ``m`` routes is exactly the constraint that the largest *local* connectivity
-stays at or below ``m - 1``.  Twelve concrete variants fall out of these
-choices, and this program treats all of them with one representation and one
-search.
+stays at or below ``m - 1``.  Four models (simple graph, multigraph,
+hypergraph, multihypergraph) times two directions times two separations give
+SIXTEEN concrete variants, and this program treats all of them with one
+representation and one search.  ``_VARIANT_ENUM_CONFIGS`` is that list and is
+the canonical one.  Two figure families cover only twelve of the sixteen:
+:func:`gallery_extremal_graphs` and ``_SURFACE_VARIANT_CONFIGS`` both predate
+the multihypergraph model and were never extended to its four rows.  Their own
+docstrings say twelve and mean it.
 
 ----------------------------------------------------------------------------
 The epistemic spine: measure / prove / discover
@@ -74,11 +79,11 @@ which chapter's machinery you are reading. Each section keeps its own banner.
 # ==================================================================
 from __future__ import annotations
 
+import ast
 import copy
 import hashlib
 import json
 import math
-import pickle
 import random
 import shutil
 import statistics
@@ -86,11 +91,13 @@ import subprocess
 import time
 import warnings
 from collections import Counter, deque
-from collections.abc import Iterable
+# ``from __future__ import annotations`` makes every annotation a string, so the
+# abstract base classes serve as type hints on this Python and typing's aliases
+# are not needed for any of the three.
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
 from itertools import combinations, combinations_with_replacement, permutations, product
 from pathlib import Path
-from typing import Callable, Iterator
 
 import concurrent.futures
 
@@ -119,6 +126,18 @@ def _require_networkx(feature: str):
             f"measures do not: they run on numpy + scipy alone."
         )
 
+
+# A capacity large enough never to be the bottleneck of any cut this program
+# builds, and small enough that summing a few of them cannot overflow the int32
+# the capacity matrices are cast to (_c_flat).  The largest real capacity here is
+# a total multiplicity, bounded by n^2 (m-1), which for the sizes this program
+# reaches is in the hundreds, so a million has an enormous margin either way.  It
+# was 10**9 before, where two saturated uncapped arcs sum to 2e9 against int32's
+# 2147483647, a 7% margin on a silent-wraparound failure rather than a crash.
+# Defined here, ahead of every network builder, because the hypergraph gadget,
+# the vertex-split matrix and the capped predicate all read it.
+_UNBOUNDED = 10 ** 6
+
 # pulp is OPTIONAL.  It backs the MILP certifier (prove_directed_multigraph and
 # prove_integral_arc_bound): one solver-agnostic cut-counting model that CBC (pulp's
 # bundled solver) runs by default and Gurobi runs by a one-line switch.  The model,
@@ -128,9 +147,8 @@ try:
     # pulp 3.x emits migration notices for its 4.0 API (LpVariable construction,
     # the PULP_CBC_CMD name).  We use the stable 3.x API on purpose and pin it in
     # requirements.txt, so silence that forward-looking noise.
-    import warnings as _warnings
-    _warnings.filterwarnings("ignore", message=r".*PuLP 4\.0.*",
-                             category=DeprecationWarning)
+    warnings.filterwarnings("ignore", message=r".*PuLP 4\.0.*",
+                            category=DeprecationWarning)
     PULP_AVAILABLE = True
 except ImportError:
     pulp = None
@@ -492,6 +510,20 @@ def _hyper_vertex_simple_proved(n: int, m: int, r: int) -> int | None:
     return None
 
 
+def _mstar(k: int) -> int:
+    """``M*(k) = max(2(k-1), floor(k^2/4))``, the proved per-vertex-count optimum.
+
+    The unscaled form of :func:`directed_multigraph_arc`, which is ``(m-1)``
+    times this.  It is also the bound the cut-counting MILP's deletion cuts and
+    the extremal enumerators' prefix prunings read, so it lives here, ahead of
+    all three, rather than beside any one of them.  thm:dir-multi-full proves it
+    at every ``k``.  Until that theorem landed the program carried a five-entry
+    table of values certified only to ``k = 6``, which left every larger induced
+    subgraph uncut and every longer search prefix unpruned.
+    """
+    return max(2 * (k - 1), (k * k) // 4)
+
+
 def directed_multigraph_arc(n: int, m: int) -> int:
     """``L_m^dir(n) = (m-1) max(2(n-1), floor(n^2/4))``.  Proved, all n and m.
 
@@ -501,9 +533,7 @@ def directed_multigraph_arc(n: int, m: int) -> int:
     reachability-preserving subgraph per unit of ``m-1``), which superseded the
     earlier route that was certified only for ``n <= 6`` by counting cuts.
     """
-    double_star_branch = 2 * (n - 1) * (m - 1)
-    bipartite_branch = (m - 1) * ((n * n) // 4)
-    return max(double_star_branch, bipartite_branch)
+    return (m - 1) * _mstar(n)
 
 
 # --- HYPERGRAPH: stored as incidence list; Berge-path connectivity via helper-node max-flow ---
@@ -913,9 +943,6 @@ def star_hypertree(n: int, r: int) -> Hypergraph:
 
 # --- CHECKER: exact max-flow connectivity; vertex_split=True gives kappa^max ---
 
-# A capacity large enough to never be the bottleneck of any cut we build.
-_UNBOUNDED = 10 ** 9
-
 
 # ------------------------------------------------------------------
 # One flow network and one measure, parameterised by edge vs vertex
@@ -938,9 +965,16 @@ def local_connectivity(graph: Graph, source: int, target: int,
         # scipy.sparse.csgraph.maximum_flow is a C implementation; faster than
         # NetworkX for the small integer capacity matrices we use.
         return int(_csgraph_maxflow(_csr(graph.mu, dtype=int), source, target).flow_value)
-    # Vertex mode: the same scipy max-flow on the split matrix.  Uncapping the two
-    # endpoints' own in->out gates makes Menger count internally vertex-disjoint
-    # routes (only interior vertices stay capacity-capped at one).
+    # Vertex mode: the same scipy max-flow on the split matrix.  Only the INTERIOR
+    # vertices stay capped at one, which is what makes Menger count internally
+    # vertex-disjoint routes.
+    #
+    # The two endpoint gates are uncapped for readability, not for the answer: the
+    # flow starts at 2*source+1 (past source's gate) and ends at 2*target (before
+    # target's), so neither gate arc lies on any s-t path and its capacity cannot
+    # bind.  Differentially confirmed by rebuilding the matrix with both gates set
+    # to 0 instead and re-measuring every pair of 200 random multigraphs: 0
+    # mismatches.  Left uncapped so all three builders read the same way.
     cap, _ = _split_capacity_matrix(graph)
     cap[2 * source, 2 * source + 1] = _UNBOUNDED
     cap[2 * target, 2 * target + 1] = _UNBOUNDED
@@ -1036,7 +1070,13 @@ def _pairs(obj):
 # far cheaper: each pair's flow halts after k+1 augmenting paths, and the pair
 # loop halts at the first violating pair.  The exact value is recomputed only on
 # the rare step where the search genuinely needs it (an infeasible proposal).
-# DEPENDENCIES: _pairs (above), _tiny_maxflow (Section ENUMERATE), _UNBOUNDED.
+# DEPENDENCIES, and the file's only forward references.  ``_pairs`` and
+# ``_UNBOUNDED`` are defined above.  ``_c_flat`` and ``_tiny_maxflow`` are NOT:
+# they are the optional C accelerator's glue and live with the rest of it in
+# Chapter 4, some four thousand lines below, because they are an implementation
+# detail of speed rather than a step in the argument.  Python resolves them at
+# call time, so the order is legal; it is flagged here because a reader working
+# top to bottom will meet the calls first.
 
 def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
     """The ``2n x 2n`` capacity matrix of the vertex-split network.
@@ -1212,9 +1252,17 @@ class ProofResult:
     solve_seconds: float
     weight_matrix: np.ndarray | None  # a witnessing matrix w, if one was found
 
-    def value_for(self, m: int) -> int:
-        """The proved directed multigraph value ``L_m^dir(n) = (m-1) M*(n)``."""
+    def value_for(self, m: int) -> int | None:
+        """The proved directed multigraph value ``L_m^dir(n) = (m-1) M*(n)``.
+
+        ``None`` when the solve did not return OPTIMAL, since ``scaled_optimum``
+        is then NaN and there is no proved value to scale.  Returning it rather
+        than raising keeps a caller that sweeps several ``n`` from dying on the
+        first cell whose solve timed out.
+        """
         # Undo the (m-1) scaling: one proved M*(n) yields every m.
+        if not math.isfinite(self.scaled_optimum):
+            return None
         return (m - 1) * int(round(self.scaled_optimum))
 
     def solver_claims_optimal(self) -> bool:
@@ -1225,8 +1273,21 @@ class ProofResult:
         return self.status == "OPTIMAL" and self.solver_reported_optimal
 
 
-def _ordered_pairs(n: int) -> list[tuple[int, int]]:
-    return [(u, v) for u in range(n) for v in range(n) if u != v]
+def _matrix_cells(n: int, directed: bool) -> list[tuple[int, int]]:
+    """The off-diagonal matrix cells a graph of this kind may fill.
+
+    Directed graphs vary every ordered pair; undirected graphs vary only the
+    upper triangle, since ``set_multiplicity`` mirrors the lower half for us.
+
+    THE one place this program decides "ordered if directed, upper triangle if
+    not".  Three separate functions used to re-derive it (the MILP's ordered
+    pairs, the annealer's addable pairs, and this) and they agreed only by
+    coincidence; the tabu neighbourhood and the pair sweep read it too, so the
+    rule now has one definition and lives ahead of every reader.
+    """
+    if directed:
+        return [(u, v) for u in range(n) for v in range(n) if u != v]
+    return [(u, v) for u in range(n) for v in range(n) if u < v]
 
 
 def _two_hop_triples(n: int) -> list[tuple[int, int, int]]:
@@ -1237,9 +1298,8 @@ def _two_hop_triples(n: int) -> list[tuple[int, int, int]]:
             for x in range(n) if x != s and x != t]
 
 
-# Proved values of M*(k) for the deletion cuts below (proved: M*(k) =
-# 2(k-1) for k <= 6, reproduced by this optimisation and proved independently).
-_PROVEN_MSTAR = {2: 2, 3: 4, 4: 6, 5: 8, 6: 10}
+# M*(k) itself is defined beside directed_multigraph_arc, above: the deletion
+# cuts here and the prefix prunings in the enumerators all read the same bound.
 
 
 # ------------------------------------------------------------------
@@ -1301,7 +1361,7 @@ def _cut_counting_model(n: int, *, cap: float, integer: bool, two_hop: bool,
     M*(k)), and ``symmetry`` (a degree ordering that prunes relabelled duplicates).
     Returns ``(prob, w)`` with ``w`` the weight variables keyed by ordered pair.
     """
-    pairs = _ordered_pairs(n)
+    pairs = _matrix_cells(n, directed=True)
     prob = pulp.LpProblem("erdos915", pulp.LpMaximize)
     category = "Integer" if integer else "Continuous"
     w = {(u, v): pulp.LpVariable(f"w_{u}_{v}", 0, cap, cat=category)
@@ -1350,9 +1410,9 @@ def _cut_counting_model(n: int, *, cap: float, integer: bool, two_hop: bool,
 
     if deletion:
         for k, holes in ((n - 1, 1), (n - 2, 2)):
-            if k not in _PROVEN_MSTAR:
+            if k < 2:
                 continue
-            bound = cap * _PROVEN_MSTAR[k]      # induced subgraph on k vertices
+            bound = cap * _mstar(k)             # induced subgraph on k vertices
             for gone in combinations(range(n), holes):
                 prob += pulp.lpSum(w[(a, b)] for (a, b) in pairs
                                    if a not in gone and b not in gone) <= bound
@@ -1495,8 +1555,18 @@ class SearchResult:
 
     best_graph: Graph
     best_edge_count: int
-    feasible_found: bool
     history: list[SearchStep] = field(default_factory=list)
+
+    @property
+    def feasible_found(self) -> bool:
+        """Whether the search bettered the empty graph.
+
+        Both engines start from the empty graph, which is feasible in every
+        variant, so a stored flag could only ever read ``True`` and carried no
+        information.  Read as "found something", it distinguishes a run that
+        never landed a feasible edge from one that did.
+        """
+        return self.best_edge_count > 0
 
     def acceptance_rate(self) -> float:
         """Fraction of proposed moves that were accepted."""
@@ -1563,14 +1633,7 @@ def _proposal_energy(
 
 def _candidate_pairs(graph: Graph) -> list[tuple[int, int]]:
     """All ordered pairs (directed) or unordered pairs (undirected)."""
-    n = graph.num_vertices
-    pairs = []
-    for u in range(n):
-        start = 0 if graph.variant.directed else u + 1
-        for v in range(start, n):
-            if u != v:
-                pairs.append((u, v))
-    return pairs
+    return _matrix_cells(graph.num_vertices, graph.variant.directed)
 
 
 def _propose_removal(
@@ -1590,10 +1653,20 @@ def _propose_removal(
         return rng.choice(present)  # no guidance: uniform removal
     # exp(-sigma/T): big sigma (load-bearing) is suppressed, and the suppression
     # sharpens as T -> 0.  max(T, eps) guards against division by zero.
-    weights = [
-        math.exp(-cached_sensitivity.get((u, v), 0) / max(temperature, 1e-9))
-        for (u, v) in present
-    ]
+    #
+    # Shift by the smallest sigma before exponentiating.  Without it, every weight
+    # underflows to 0.0 once sigma/T exceeds about 745, which happens below
+    # T = 0.00134 at sigma = 1, and rng.choices raises "Total of weights must be
+    # greater than zero" whenever no present edge happens to be slack.  The
+    # default schedule stops at T = 0.0074, but a deadline-bounded run with a
+    # large step count (plot_sa_vs_tabu_convergence passes 10**7) cools past the
+    # cliff on a fast machine.  Shifting is free, since rng.choices normalises,
+    # and it pins the freest edge's weight at 1.0 instead of at zero.
+    sigmas = [cached_sensitivity.get((u, v), 0) for (u, v) in present]
+    coldest = min(sigmas)
+    scale = max(temperature, 1e-9)
+    weights = [max(math.exp(-(sigma - coldest) / scale), 1e-300)
+               for sigma in sigmas]
     return rng.choices(present, weights=weights, k=1)[0]
 
 
@@ -1668,7 +1741,6 @@ def search_for_dense_graph(
 
     best_graph = current.copy()
     best_edges = 0
-    feasible_found = True  # the empty graph is feasible
 
     # State carried across steps so the energy can avoid recomputing connectivity
     # from scratch (see the trajectory-preserving note in the docstring):
@@ -1742,7 +1814,6 @@ def search_for_dense_graph(
             # here, so the witness is certified with no extra flow.
             if feasible and current.edge_count() > best_edges:
                 best_graph, best_edges = current.copy(), current.edge_count()
-                feasible_found = True
 
         # The connectivity field feeds fig:trace only.  Log the exact value when the
         # figure asks for it (or in reference_mode), else the maintained upper bound.
@@ -1771,7 +1842,7 @@ def search_for_dense_graph(
         if deadline is not None and step % 100 == 99 and time.time() > deadline:
             break
 
-    return SearchResult(best_graph, best_edges, feasible_found, history)
+    return SearchResult(best_graph, best_edges, history)
 
 
 def _neighbour_moves(graph: Graph, cap: int) -> list[tuple[int, int, int]]:
@@ -1860,15 +1931,36 @@ def tabu_search_for_dense_graph(
         best_move: tuple[int, int, int] | None = None
         best_move_energy: float | None = None
         best_move_global = False
+        current_edges = current.edge_count()
         for (u, v, d) in _neighbour_moves(current, cap):
+            is_tabu = tabu.get((u, v), 0) > step
+            # Aspiration is the only thing that lets a tabu move through, and it
+            # needs a NEW global best, so the resulting arc count alone rules most
+            # tabu moves out.  Checking it first skips both the copy and the
+            # max-flow underneath, which the old order paid for and discarded.
+            if is_tabu and current_edges + d <= best_edges:
+                continue
             trial = current.copy()
-            trial.add_edge(u, v) if d > 0 else trial.remove_edge(u, v)
+            if d > 0:
+                trial.add_edge(u, v)
+            else:
+                trial.remove_edge(u, v)
             trial_energy, trial_feasible = trial_energy_and_feasibility(trial)
             improves_global = trial_feasible and trial.edge_count() > best_edges
-            if tabu.get((u, v), 0) > step and not improves_global:
+            if is_tabu and not improves_global:
                 continue                   # tabu, with no aspiration to override
-            if (best_move_energy is None or trial_energy < best_move_energy
-                    or (improves_global and not best_move_global)):
+            # Strictly lexicographic: an aspiration move outranks every ordinary
+            # one and energy only breaks ties within a rank.  Ranking on energy
+            # first let a dense infeasible trial (energy -|E| + 6*excess can dip
+            # below a feasible move's) displace a held aspiration move and drop
+            # the global improvement it carried.
+            if best_move_energy is None:
+                better = True
+            elif improves_global != best_move_global:
+                better = improves_global
+            else:
+                better = trial_energy < best_move_energy
+            if better:
                 best_move, best_move_energy = (u, v, d), trial_energy
                 best_move_global = improves_global
         if best_move is None:              # every move tabu: clear the list, retry
@@ -1876,7 +1968,10 @@ def tabu_search_for_dense_graph(
             continue
 
         u, v, d = best_move
-        current.add_edge(u, v) if d > 0 else current.remove_edge(u, v)
+        if d > 0:
+            current.add_edge(u, v)
+        else:
+            current.remove_edge(u, v)
         tabu[(u, v)] = step + tenure
 
         connectivity = measure(current)    # computed anyway for best-tracking
@@ -1900,11 +1995,14 @@ def tabu_search_for_dense_graph(
                 kicks = _neighbour_moves(current, cap)
                 if kicks:
                     a, b, dd = rng.choice(kicks)
-                    current.add_edge(a, b) if dd > 0 else current.remove_edge(a, b)
+                    if dd > 0:
+                        current.add_edge(a, b)
+                    else:
+                        current.remove_edge(a, b)
             tabu.clear()
             stall = 0
 
-    return SearchResult(best_graph, best_edges, feasible_found=True, history=history)
+    return SearchResult(best_graph, best_edges, history=history)
 
 
 def _run_one_search(args: tuple) -> SearchResult:
@@ -2005,17 +2103,6 @@ def _variant_for(directed: bool, simple: bool) -> Variant:
     if directed:
         return SIMPLE_DIRECTED if simple else MULTI_DIRECTED
     return SIMPLE_UNDIRECTED if simple else MULTI_UNDIRECTED
-
-
-def _matrix_cells(n: int, directed: bool) -> list[tuple[int, int]]:
-    """The off-diagonal matrix cells a graph of this kind may fill.
-
-    Directed graphs vary every ordered pair; undirected graphs vary only the
-    upper triangle, since ``set_multiplicity`` mirrors the lower half for us.
-    """
-    if directed:
-        return [(u, v) for u in range(n) for v in range(n) if u != v]
-    return [(u, v) for u in range(n) for v in range(n) if u < v]
 
 
 def _directed_witness(n: int, m: int, simple: bool) -> Graph | None:
@@ -2205,11 +2292,17 @@ def _brute_force_hypergraph(
         if tick % 256 == 0 and time.time() > deadline:
             completed = False
             break
+        # Size first, and from the multiplicities alone.  A candidate that cannot
+        # beat the incumbent needs neither the Hypergraph object nor the all-pairs
+        # Berge flow, and most candidates cannot: at n=4, r=3 that is 75% of them.
+        # Testing feasibility first, as this loop used to, paid for every one.
+        total = sum(mult)
+        if total <= best_count:
+            continue
         chosen = [candidates[i] for i, q in enumerate(mult) for _ in range(q)]
         hypergraph = Hypergraph(n, chosen, directed=directed)
-        if (max_hyper_connectivity(hypergraph, vertex_split=vertex_split) <= m - 1
-                and hypergraph.edge_count() > best_count):
-            best_count, best_h = hypergraph.edge_count(), hypergraph
+        if max_hyper_connectivity(hypergraph, vertex_split=vertex_split) <= m - 1:
+            best_count, best_h = total, hypergraph
     return best_count, best_h, completed
 
 
@@ -2423,7 +2516,7 @@ def _exhaustive_directed(
 def solve(
     n: int, m: int, *,
     directed: bool = False, simple: bool = True,
-    hypergraph: bool = False, r: int = 3,
+    hypergraph: bool = False, r: int = 3, kind: str = "forward",
     exhaustive: bool = False, separation: str = "edge",
     max_seconds: float = 60.0, seed: int = 0, method: str | None = None,
 ) -> SolveResult:
@@ -2444,6 +2537,13 @@ def solve(
             not a relabelling, since repeated hyperedges change which values are
             attainable (``prop:hyper-edge``).
         hypergraph, r: switch to the ``r``-uniform hypergraph model instead.
+        kind: for a DIRECTED hypergraph, which orientation model a hyperarc uses.
+            ``"forward"`` (one tail, ``r-1`` heads) is the form the rest of the
+            thesis states; ``"backward"`` is its arc-reversal dual and gives the
+            same extremal numbers; ``"general"`` allows any non-empty tail/head
+            split and is strictly stronger where vertices are scarce, reaching 8
+            at ``n = r = 4, m = 4`` where forward reaches 4.  Ignored by every
+            matrix model and by undirected hypergraphs.
         exhaustive: ``True`` to PROVE the optimum, ``False`` to DISCOVER one.
         separation: ``"edge"`` or ``"vertex"`` disjointness (matrix models).
             Under ``"vertex"`` the routes are internally disjoint paths of the
@@ -2474,13 +2574,19 @@ def solve(
     # Same driver, a different internal measure: the edge/vertex separation and
     # the direction pick which of the four Berge measures decides feasibility.
     if hypergraph:
+        if kind not in ("forward", "backward", "general"):
+            raise ValueError("kind must be 'forward', 'backward' or 'general'")
         vertex_split = (separation == "vertex")
+        # Name the orientation model in the label whenever it is not the default,
+        # so a result carrying the stronger "general" value cannot be mistaken for
+        # a forward one.
         label = (f"{r}-uniform {'directed ' if directed else ''}"
-                 f"{'' if simple else 'multi'}hypergraph")
+                 f"{'' if simple else 'multi'}hypergraph"
+                 + (f" ({kind})" if directed and kind != "forward" else ""))
         if exhaustive:
             value, witness, done = _brute_force_hypergraph(
                 n, r, m, deadline, directed=directed, vertex_split=vertex_split,
-                simple=simple)
+                kind=kind, simple=simple)
             bound = "exact" if done else "lower"
             method = "brute-force enumeration"
             note = "" if done else "budget ran out; value is only a lower bound"
@@ -2491,7 +2597,7 @@ def solve(
                     "'sa' and 'tabu' are matrix-model methods")
             value, witness = _random_hypergraph_search(
                 n, r, m, deadline, seed, directed=directed,
-                vertex_split=vertex_split, simple=simple)
+                vertex_split=vertex_split, kind=kind, simple=simple)
             bound, done, method = "lower", False, "randomised greedy search"
             note = "discovery only ever yields a lower bound"
         return SolveResult(n, m, label, separation, value, bound, method,
@@ -2699,7 +2805,13 @@ def sample_random_multigraph(
     decays exponentially with rate ``alpha`` and ``alpha = 0`` recovers simple
     ``G(n, p)``.  With ``cap`` set (use ``m - 1``) a single fat edge cannot
     trivially break feasibility, so the panel stays a structural question.
+
+    ``alpha`` must stay below one: the geometric tail has mean ``1/(1 - alpha)``,
+    and at ``alpha = 1`` the copy loop never terminates, since ``random()``
+    returns values strictly below one.
     """
+    if not 0.0 <= alpha < 1.0:
+        raise ValueError(f"alpha must lie in [0, 1), got {alpha}")
     variant = MULTI_DIRECTED if directed else MULTI_UNDIRECTED
     graph = Graph(n, variant)
     for u in range(n):
@@ -2716,16 +2828,41 @@ def sample_random_multigraph(
 
 def sample_random_hypergraph(
     n: int, p: float, r: int, directed: bool, rng: random.Random,
+    *, alpha: float = 0.0, cap: int | None = None,
 ) -> Hypergraph:
-    """Random ``r``-uniform hypergraph: each candidate hyperedge included w.p. ``p``."""
-    chosen = [c for c in _hyperedge_candidates(n, r, directed) if rng.random() < p]
+    """Random ``r``-uniform (multi)hypergraph: each candidate included w.p. ``p``.
+
+    With ``alpha = 0`` (the default) an included candidate appears exactly once,
+    which is the simple hypergraph.  With ``alpha > 0`` it carries one copy plus a
+    Geometric(``alpha``) number of further copies, the same hurdle-geometric tail
+    :func:`sample_random_multigraph` uses, so the multihypergraph rows sample the
+    model they name rather than repeating the simple one.  Pass ``cap = m - 1``
+    (:func:`_hyper_multiplicity_cap`) to keep a single fat hyperedge from
+    trivially breaking feasibility.
+    """
+    if not 0.0 <= alpha < 1.0:
+        raise ValueError(f"alpha must lie in [0, 1), got {alpha}")
+    chosen: list = []
+    for candidate in _hyperedge_candidates(n, r, directed):
+        if rng.random() >= p:
+            continue
+        copies = 1
+        while rng.random() < alpha:
+            copies += 1
+        if cap is not None:
+            copies = min(copies, cap)
+        chosen.extend([candidate] * copies)
     return Hypergraph(n, chosen, directed=directed)
 
 
 def _sample_variant(n, p, *, directed, simple, hypergraph, r, alpha, cap, rng):
     """Draw one sample of whichever generative model the flags select."""
     if hypergraph:
-        return sample_random_hypergraph(n, p, r, directed, rng)
+        # A simple hypergraph takes each candidate at most once, so its tail rate
+        # is zero however the caller set ``alpha`` for the matrix models.
+        return sample_random_hypergraph(n, p, r, directed, rng,
+                                        alpha=0.0 if simple else alpha,
+                                        cap=1 if simple else cap)
     if simple:
         return sample_random_graph(n, p, directed, rng)
     return sample_random_multigraph(n, p, alpha, directed, rng, cap=cap)
@@ -2772,35 +2909,6 @@ def _p_for_target_degree(target_deg, n, *, directed, simple, hypergraph, r, alph
     return min(1.0, target_deg / ((n - 1) * copies))
 
 
-# Twelve sampled panels, mirroring _VARIANT_ENUM_CONFIGS but at sampling sizes
-# well past the enumeration wall (n=6).  ``sample_n`` is chosen per variant so
-# the binding-connectivity sweep stays a few minutes overall.
-_VARIANT_SAMPLE_CONFIGS: list[dict] = [
-    dict(key="simple_undirected_edge",   title="simple undirected edge",
-         directed=False, simple=True,  hypergraph=False, r=3, separation="edge",  sample_n=26),
-    dict(key="simple_undirected_vertex", title="simple undirected vertex",
-         directed=False, simple=True,  hypergraph=False, r=3, separation="vertex", sample_n=18),
-    dict(key="simple_directed_edge",     title="simple directed arc",
-         directed=True,  simple=True,  hypergraph=False, r=3, separation="edge",  sample_n=14),
-    dict(key="simple_directed_vertex",   title="simple directed vertex",
-         directed=True,  simple=True,  hypergraph=False, r=3, separation="vertex", sample_n=14),
-    dict(key="multi_undirected_edge",    title="multigraph undirected edge",
-         directed=False, simple=False, hypergraph=False, r=3, separation="edge",  sample_n=22),
-    dict(key="multi_undirected_vertex",  title="multigraph undirected vertex",
-         directed=False, simple=False, hypergraph=False, r=3, separation="vertex", sample_n=16),
-    dict(key="multi_directed_edge",      title="multigraph directed arc",
-         directed=True,  simple=False, hypergraph=False, r=3, separation="edge",  sample_n=12),
-    dict(key="multi_directed_vertex",    title="multigraph directed vertex",
-         directed=True,  simple=False, hypergraph=False, r=3, separation="vertex", sample_n=12),
-    dict(key="hyper_undirected_edge",    title="hypergraph undirected edge",
-         directed=False, simple=True,  hypergraph=True,  r=3, separation="edge",  sample_n=12),
-    dict(key="hyper_undirected_vertex",  title="hypergraph undirected vertex",
-         directed=False, simple=True,  hypergraph=True,  r=3, separation="vertex", sample_n=12),
-    dict(key="hyper_directed_edge",      title="hypergraph directed arc",
-         directed=True,  simple=True,  hypergraph=True,  r=3, separation="edge",  sample_n=9),
-    dict(key="hyper_directed_vertex",    title="hypergraph directed vertex",
-         directed=True,  simple=True,  hypergraph=True,  r=3, separation="vertex", sample_n=9),
-]
 
 
 # --- FIGURES: headless matplotlib PNGs; each function takes a path and writes a file ---
@@ -3318,8 +3426,10 @@ def plot_sa_vs_tabu_convergence(
             ax.step(xs, ys, where="post", label=label, color=colour, linewidth=2.0)
             settle = max(settle, _settle_time(xs, ys))
         opt = directed_multigraph_arc(n, m)
+        # The subscript is the panel's own m, not a literal 3: `cases` is a
+        # parameter and a caller passing m != 3 was getting a mislabelled line.
         ax.axhline(opt, linestyle=":", color=_KUL_DARK, linewidth=1.6,
-                   label=f"optimum $L_3^{{\\mathrm{{dir}}}}({n}) = {opt}$")
+                   label=f"optimum $L_{{{m}}}^{{\\mathrm{{dir}}}}({n}) = {opt}$")
         ax.set_title(f"directed multigraph, $n = {n}$, $m = {m}$", fontsize=11)
         ax.set_xlabel("wall-clock seconds", fontsize=9.5)
         ax.set_ylabel("densest feasible arc count", fontsize=9.5)
@@ -3933,22 +4043,29 @@ def _all_objects_of_variant(
 ):
     """Yield every labeled object of one variant on ``n`` vertices, one at a time.
 
-    The single enumeration the two sweeps below share.  For a hypergraph each
-    candidate hyperedge is present or absent; for a matrix model each cell runs
-    over ``{0, 1}`` when simple and ``{0, ..., max_mult}`` when multi.  Isomorphic
-    copies are included, which is what a distribution over the search space wants.
-    Yielding rather than collecting keeps the whole space out of memory.
+    The single enumeration the two sweeps below share.  Every model runs each of
+    its slots over ``{0, ..., max_mult}``, capped at one when ``simple``: a matrix
+    model's slots are its off-diagonal cells, a hypergraph's are its candidate
+    hyperedges.  So the multihypergraph rows really do vary multiplicity, exactly
+    as :func:`_brute_force_hypergraph` does, rather than collapsing onto the
+    simple rows.  Isomorphic copies are included, which is what a distribution
+    over the search space wants.  Yielding rather than collecting keeps the whole
+    space out of memory.
     """
+    span = 2 if simple else (max_mult + 1)
     if hypergraph:
         candidates = _hyperedge_candidates(n, r, directed)
-        for mask in product((0, 1), repeat=len(candidates)):
-            chosen = [candidates[i] for i, flag in enumerate(mask) if flag]
+        # ``q`` copies of one hyperedge are ``q`` Berge routes with empty
+        # interiors, so multiplicity is a real axis here under BOTH separations
+        # (_hyper_multiplicity_cap).  Presence-only would make the four
+        # multihypergraph panels duplicates of the four simple hypergraph ones.
+        for mult in product(range(span), repeat=len(candidates)):
+            chosen = [candidates[i] for i, q in enumerate(mult) for _ in range(q)]
             yield Hypergraph(n, chosen, directed=directed)
         return
 
     variant = _variant_for(directed, simple)
     cells = _matrix_cells(n, directed)
-    span = 2 if simple else (max_mult + 1)
     base = Graph(n, variant)
     for values in product(range(span), repeat=len(cells)):
         candidate = base.copy()
@@ -3970,9 +4087,11 @@ def enumerate_all_graphs(
     """Return ``(edge_count, lambda_max)`` for every labeled graph of this type on ``n`` vertices.
 
     For simple graphs each cell is 0/1; for multigraphs each cell ranges over
-    ``{0,...,max_mult}``.  For hypergraphs each candidate hyperedge is present or
-    absent.  The list covers the full labeled graph space (isomorphic copies
-    included), which is what we want for the distribution over the search space.
+    ``{0,...,max_mult}``.  A hypergraph's candidate hyperedges are its cells and
+    run over the same range, so a multihypergraph sweep varies multiplicity
+    rather than repeating the simple one.  The list covers the full labeled graph
+    space (isomorphic copies included), which is what we want for the
+    distribution over the search space.
     """
     if hypergraph:
         vertex_split = (separation == "vertex")
@@ -4022,7 +4141,7 @@ def enumerate_pair_connectivities(
     threshold ``T`` splits each pair-connectivity column into observations from
     graphs that stay at ``lambda^max <= T`` and those that exceed it.  Much
     smaller than the raw observation list (a few dozen entries per variant), so
-    it pickles compactly even though the sweep itself enumerates every graph.
+    it serialises compactly even though the sweep itself enumerates every graph.
     """
     table: Counter = Counter()
     for obj in _all_objects_of_variant(n, directed=directed, simple=simple,
@@ -4034,23 +4153,100 @@ def enumerate_pair_connectivities(
     return dict(table)
 
 
-_CACHE_SCHEMA_VERSION = 2
+# Bumped to 3 when the hypergraph enumeration gained its multiplicity axis: the
+# four multihypergraph keys of the enumeration caches were duplicates of the four
+# simple hypergraph ones before that, so every cache written earlier is stale.
+_CACHE_SCHEMA_VERSION = 3
+
+
+def _source_fingerprint() -> str:
+    """Hash this file's CODE, ignoring comments, docstrings and formatting.
+
+    These caches take hours to fill, and hashing the raw bytes threw all of it
+    away whenever a docstring gained a comma.  Round-tripping through ``ast``
+    normalises away everything that cannot change a computed value, so a prose
+    edit keeps the cache and a real code edit still invalidates it.  This is the
+    same trade ``MachineValues`` already makes by hashing only the part of the
+    file its own values depend on.
+
+    Conservative on failure: any parse trouble falls back to the raw bytes, which
+    over-invalidates rather than serving a stale cache.
+    """
+    source = Path(__file__).read_bytes()
+    try:
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Module, ast.ClassDef,
+                                     ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            body = node.body
+            if (body and isinstance(body[0], ast.Expr)
+                    and isinstance(body[0].value, ast.Constant)
+                    and isinstance(body[0].value.value, str)):
+                # Drop the docstring, but never leave an empty body behind.
+                node.body = body[1:] or [ast.Pass()]
+        normalised = ast.unparse(ast.fix_missing_locations(tree)).encode()
+    except (SyntaxError, ValueError, RecursionError):
+        normalised = source
+    return hashlib.sha256(normalised).hexdigest()
 
 
 def _cache_metadata(namespace: str, **settings) -> dict:
     """Fingerprint a cache by schema, source revision, and run configuration."""
     normalised = json.loads(json.dumps(settings, sort_keys=True, default=str))
-    source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     return {
         "schema": _CACHE_SCHEMA_VERSION,
         "namespace": namespace,
-        "source_sha256": source_hash,
+        "source_sha256": _source_fingerprint(),
         "settings": normalised,
     }
 
 
+def _load_cache(cache_path: Path, meta: dict) -> dict:
+    """Return a JSON cache's payload when its fingerprint matches, else ``{}``.
+
+    JSON rather than pickle: these files are committed and a reader is meant to
+    be able to open them, and unpickling a file from the repository would execute
+    whatever it contains.  Both caches nest their payload under ``"data"`` beside
+    the ``"_meta"`` fingerprint, which is also the shape ``compute_surface_cache``
+    now uses, so all three read the same way.
+    """
+    if not cache_path.exists():
+        return {}
+    try:
+        with open(cache_path) as f:
+            payload = json.load(f)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return {}          # unreadable or from the retired pickle era: recompute
+    if not isinstance(payload, dict) or payload.get("_meta") != meta:
+        return {}
+    data = payload.get("data")
+    return data if isinstance(data, dict) else {}
+
+
+def _dump_cache(cache_path: Path, meta: dict, data: dict) -> None:
+    """Write a cache and its fingerprint, creating the directory if needed."""
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(cache_path, "w") as f:
+        json.dump({"_meta": meta, "data": data}, f)
+
+
+def _encode_pair_table(table: dict[tuple[int, int], int]) -> dict[str, int]:
+    """``{(lambda_max, pair_conn): count}`` to JSON's string-keyed form."""
+    return {f"{lmax},{conn}": count for (lmax, conn), count in table.items()}
+
+
+def _decode_pair_table(table: dict[str, int]) -> dict[tuple[int, int], int]:
+    """Inverse of :func:`_encode_pair_table`."""
+    out: dict[tuple[int, int], int] = {}
+    for key, count in table.items():
+        lmax, conn = key.split(",")
+        out[(int(lmax), int(conn))] = count
+    return out
+
+
 def compute_pair_enumeration_cache(
-    cache_path: str | Path = "figures/pair_enumeration_cache.pkl",
+    cache_path: str | Path = "figures/pair_enumeration_cache.json",
     configs: list[dict] | None = None,
 ) -> dict[str, dict[tuple[int, int], int]]:
     """Per-variant pooled pair-connectivity tables, loading from cache if present.
@@ -4064,14 +4260,8 @@ def compute_pair_enumeration_cache(
         configs = _VARIANT_ENUM_CONFIGS
 
     meta = _cache_metadata("pair-enumeration", configs=configs)
-    if cache_path.exists():
-        with open(cache_path, "rb") as f:
-            payload = pickle.load(f)
-        cached = (payload.get("data", {})
-                  if isinstance(payload, dict) and payload.get("_meta") == meta
-                  else {})
-    else:
-        cached = {}
+    cached = {key: _decode_pair_table(table)
+              for key, table in _load_cache(cache_path, meta).items()}
 
     changed = False
     for cfg in configs:
@@ -4087,20 +4277,19 @@ def compute_pair_enumeration_cache(
         changed = True
 
     if changed:
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(cache_path, "wb") as f:
-            pickle.dump({"_meta": meta, "data": cached}, f)
+        _dump_cache(cache_path, meta,
+                    {key: _encode_pair_table(table) for key, table in cached.items()})
 
     return cached
 
 
 def compute_enumeration_cache(
-    cache_path: str | Path = "figures/enumeration_cache.pkl",
+    cache_path: str | Path = "figures/enumeration_cache.json",
     configs: list[dict] | None = None,
 ) -> dict[str, list[tuple[int, int]]]:
     """Return the full enumeration for every variant, loading from cache if available.
 
-    On first run this takes several minutes; subsequent runs load the pickle
+    On first run this takes several minutes; subsequent runs load the cache
     instantly.  The cache lives at ``cache_path`` relative to the caller's
     working directory.
     """
@@ -4109,14 +4298,10 @@ def compute_enumeration_cache(
         configs = _VARIANT_ENUM_CONFIGS
 
     meta = _cache_metadata("enumeration", configs=configs)
-    if cache_path.exists():
-        with open(cache_path, "rb") as f:
-            payload = pickle.load(f)
-        cached = (payload.get("data", {})
-                  if isinstance(payload, dict) and payload.get("_meta") == meta
-                  else {})
-    else:
-        cached = {}
+    # JSON has no tuples, so the (edge_count, lambda_max) pairs come back as
+    # two-element lists.  Restore them, since callers unpack and compare them.
+    cached = {key: [tuple(pair) for pair in rows]
+              for key, rows in _load_cache(cache_path, meta).items()}
 
     changed = False
     for cfg in configs:
@@ -4137,9 +4322,7 @@ def compute_enumeration_cache(
         changed = True
 
     if changed:
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(cache_path, "wb") as f:
-            pickle.dump({"_meta": meta, "data": cached}, f)
+        _dump_cache(cache_path, meta, cached)
 
     return cached
 
@@ -4224,8 +4407,8 @@ def _variant_panel_grid(draw_panel, *, suptitle: str, path: str | Path,
     labels and the suptitle, and saves.  Only the per-panel drawing and the panel
     configs differ between the grids, so the caller supplies both; everything else
     (layout, row labels, save) lives here once.  ``configs`` defaults to the
-    sixteen enumeration variants but may be any 16-item list (e.g. the sampled
-    configs or a precomputed ``panels`` list).
+    sixteen enumeration variants but may be any 16-item list (e.g. a precomputed
+    ``panels`` list).
 
     ``col_headers`` names the four columns once above the top row, for grids whose
     columns ask the same four questions of every model row.  Repeating that naming
@@ -4494,7 +4677,9 @@ def plot_edge_dist_grid(
 
 # --- 3-D BOUND SURFACE: cache solve() over (variant, n, m) grid; plot_variant_3d_surfaces draws it ---
 
-# 12 variant configs for the surface computation.
+# 12 variant configs for the surface computation: the four multihypergraph rows
+# of _VARIANT_ENUM_CONFIGS have no surface panel, so this list is deliberately
+# NOT the canonical sixteen and the 3x4 layout below matches its length.
 _SURFACE_VARIANT_CONFIGS: list[dict] = [
     dict(key="simple_undirected_edge",   title="simple undirected edge",
          directed=False, simple=True,  hypergraph=False, r=3, separation="edge"),
@@ -4580,15 +4765,12 @@ def compute_surface_cache(
     meta = _cache_metadata(
         "surface", n_range=n_range, m_range=m_range,
         max_seconds=max_seconds, seed=0)
-    invalidated = False
-    if cache_path.exists():
-        with open(cache_path) as f:
-            cache = json.load(f)
-        if cache.pop("_meta", None) != meta:
-            cache = {}
-            invalidated = True
-    else:
-        cache = {}
+    # Same nested {"_meta": ..., "data": ...} shape as the two enumeration
+    # caches.  This one used to splice the fingerprint into the payload's own
+    # namespace and pop it back out on read, so a variant key called "_meta"
+    # would have collided with it and the three caches read two different ways.
+    cache = _load_cache(cache_path, meta)
+    invalidated = not cache and cache_path.exists()
 
     changed = invalidated
     ns = list(range(n_range[0], n_range[1] + 1))
@@ -4632,9 +4814,7 @@ def compute_surface_cache(
                 changed = True
 
     if changed:
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(cache_path, "w") as f:
-            json.dump({"_meta": meta, **cache}, f)
+        _dump_cache(cache_path, meta, cache)
 
     return cache
 
@@ -4643,13 +4823,19 @@ def plot_variant_3d_surfaces(
     cache_path: str | Path,
     path: str | Path,
 ) -> None:
-    """3-D bar chart of the optimal bound over the (n, m) grid, all sixteen variants.
+    """3-D bar chart of the optimal bound over the (n, m) grid, twelve variants.
 
     Each bar's height is the bound value; exact points are blue, lower-bound
-    points are purple.  The 3x4 layout matches the flat grid figure.
+    points are purple.  The 3x4 layout is ``_SURFACE_VARIANT_CONFIGS``, which is
+    the twelve variants that predate the multihypergraph model, NOT the sixteen
+    of ``_VARIANT_ENUM_CONFIGS`` that the flat 4x4 grids draw.
     """
     with open(cache_path) as f:
-        cache = json.load(f)
+        payload = json.load(f)
+    # The payload nests under "data" beside its "_meta" fingerprint.  Reading it
+    # here does not re-check the fingerprint: this function draws whatever
+    # compute_surface_cache last wrote, which is the file's own contract.
+    cache = payload.get("data", payload)
 
     fig = plt.figure(figsize=(20, 13))
     row_names = ("simple", "multigraph", "hypergraph $r=3$")
@@ -4823,7 +5009,12 @@ def plot_conn_threshold_3d(
 
         # x is the density in units of this panel's own threshold.
         xs = [p / p_star for p, _ in dist_by_p]
-        width = 0.9 * min((b - a) for a, b in zip(xs, xs[1:])) if len(xs) > 1 else 0.1
+        # Consecutive ratios can collide once p clamps at 1.0 (any p_star above
+        # 1/max(ratios), so any n below about 4m here), and a zero gap made every
+        # bar in the panel zero-width and invisible.  Ignore repeated positions
+        # when sizing, and keep a positive fallback if they all coincide.
+        gaps = [b - a for a, b in zip(xs, xs[1:]) if b > a]
+        width = 0.9 * min(gaps) if gaps else 0.1
         for x, (_, conn_list) in zip(xs, dist_by_p):
             total = len(conn_list)
             for lv in levels:
@@ -5056,9 +5247,14 @@ def _canonical_form(mu: np.ndarray) -> bytes:
 
     The key is the lexicographically smallest flattened multiplicity matrix over
     all vertex relabellings: two multiplicity matrices have the same key iff one
-    is a vertex permutation of the other.  This is the SOURCE OF TRUTH for
-    isomorphism here, with no dependency on any external library, so the
-    enumeration's correctness never rests on an outside binary.  For ``n=7`` it is
+    is a vertex permutation of the other.  "Lexicographically smallest" is over
+    the int32 byte encoding, which orders the same way as the integer sequence
+    exactly while every multiplicity stays below 256.  That holds throughout
+    here, since feasibility caps multiplicity at ``m - 1``.  Either way the key
+    is a canonical form and the C and Python paths agree on it (differentially
+    checked over 300 random graphs at n=5, 0 mismatches).  This is the SOURCE OF
+    TRUTH for isomorphism here, with no dependency on any external library, so
+    the enumeration's correctness never rests on an outside binary.  For ``n=7`` it is
     5040 permutations per graph, which is cheap on CPU; storing one key per class
     is what bounds the enumeration's memory to the number of classes rather than
     the number of labelled copies.
@@ -5090,20 +5286,22 @@ def enumerate_extremal_directed_multigraphs(
     multiplicities in {0..m-1}, ``lambda^max <= m-1``, exactly ``target_arcs``
     arcs and (optionally) maximum total degree at most ``max_degree``.
 
-    This is the finite-base tool for the m = 3 chain (see claude.md and the
-    commented rem:odd-step-roadmap): the characterisations at n = 4, 5 feed
-    the recursion behind statement (b) at n = 7.  DFS in vertex-block order
-    with three prunings: multiplicity capacity, the induced-subgraph arc bound
-    on every completed prefix, and exact flow checks on completed prefixes
-    (induced flows only grow, so a violation is final).
+    This is the finite-base tool for the m = 3 chain: the characterisations at
+    n = 4, 5 feed the recursion behind statement (b) at n = 7.  That chain has
+    since been superseded by thm:dir-multi-full, which proves the value outright
+    at every n and m, and the tool is kept as an independent structural check.
+    DFS in vertex-block order with three prunings: multiplicity capacity, the
+    induced-subgraph arc bound on every completed prefix, and exact flow checks
+    on completed prefixes (induced flows only grow, so a violation is final).
 
-    SOUNDNESS: the induced-subgraph bound is a PROVED upper bound for j <= 6
-    (from the cut-counting MILP; see ``known`` dict below).  For j >= 7 it
-    falls back to the CONJECTURED bipartite bound floor(j^2/4), which is not
-    yet proved.  Therefore this function is a sound complete search only for
-    n <= 6.  For n >= 7 it is a heuristic lower-bound search: it may miss
-    extremal graphs whose j=7 prefix exceeds the bipartite bound (if the
-    conjecture is false) or whose search branch was pruned by it.
+    SOUNDNESS: the induced-subgraph bound is :func:`directed_multigraph_arc`,
+    which thm:dir-multi-full proves for EVERY j, so pruning at it is safe at
+    every n and this is a sound complete search throughout.  Until that theorem
+    landed the cap was proved only for j <= 6 (by the cut-counting MILP) and fell
+    back to the conjectured floor(j^2/4) above it, which made completeness
+    uncertifiable for n >= 7.  The two agree at every j, floor(j^2/4) being the
+    larger branch from j = 7 on and tying with 2(j-1) exactly at j = 7, so no
+    pruning decision changes: what changed is that the bound is now proved.
     Returns multiplicity matrices, deduplicated up to vertex permutation when
     ``up_to_iso`` is set.  Deduplication is STREAMED through a canonical form
     (:func:`_canonical_form`) as graphs are found, so peak memory is bounded by
@@ -5118,16 +5316,11 @@ def enumerate_extremal_directed_multigraphs(
             order.append((i, j))
             order.append((j, i))
     block_end = {j: 2 * ((j + 1) * j // 2) for j in range(1, n)}  # prefix length
-    # SOUNDNESS NOTE: for j <= 6 the prefix cap (m-1)*M*(j) is a PROVED upper
-    # bound, so pruning at that cap is safe.  For j >= 7, _PROVEN_MSTAR.get(j, 0) == 0
-    # and we fall back to (m-1)*floor(j^2/4), which equals the conjectured
-    # bipartite bound and is NOT yet proved.  Any call with n >= 7 therefore
-    # uses an unverified pruning at the j=7 boundary: the enumeration is sound
-    # as a lower-bound search but cannot certify completeness for n >= 7.
-    # To produce a proof for n=7 the j=7 pruning must be disabled or replaced
-    # by a proved bound (e.g. from the MILP once M*(7) is confirmed).
-    prefix_cap = {j: (m - 1) * max(_PROVEN_MSTAR.get(j, 0), (j * j) // 4)
-                  for j in range(2, n + 1)}
+    # The prefix cap is the proved value (m-1)*max(2(j-1), floor(j^2/4)) on the
+    # j vertices already placed, so pruning at it discards only branches that
+    # cannot reach the target.  thm:dir-multi-full proves it at every j, which is
+    # what makes this a complete search at every n rather than only up to 6.
+    prefix_cap = {j: directed_multigraph_arc(j, m) for j in range(2, n + 1)}
 
     mu = np.zeros((n, n), dtype=int)
     total_pairs = len(order)
@@ -5224,6 +5417,14 @@ def _graph6_edges(data: bytes) -> list[tuple[int, int]]:
     """
     values = [byte - 63 for byte in data]
     n = values[0]
+    # graph6 switches to a multi-byte header at n >= 63 (a 126 marker followed by
+    # three or six more bytes).  We only ever generate n <= 12 supports, so that
+    # form is unimplemented; refuse it rather than silently decode the marker as
+    # a vertex count and return a garbage edge list.
+    if n >= 63:
+        raise ValueError(
+            f"graph6 header byte encodes n = {n}; only the single-byte header "
+            "(n <= 62) is implemented, and this program never generates more")
     bits = [(value >> shift) & 1 for value in values[1:] for shift in range(5, -1, -1)]
     index = 0
     edges: list[tuple[int, int]] = []
@@ -5308,9 +5509,11 @@ def _decorate_support_worker(task: tuple) -> list[np.ndarray]:
             out_deg[v] += b; in_deg[u] += b
             ok = True
             if j is not None:     # block boundary: prefix {0..j-1} is complete
-                cap = _PROVEN_MSTAR.get(j)        # j == prefix size
-                if cap is not None and arcs + s > (m - 1) * cap:
-                    ok = False                    # PROVED induced-arc bound
+                # PROVED induced-arc bound (thm:dir-multi-full), available at
+                # every prefix size.  It used to come from a table that stopped
+                # at 6, which left prefixes of 7 or more entirely unpruned.
+                if arcs + s > directed_multigraph_arc(j, m):
+                    ok = False
                 elif not feasible_prefix(j):
                     ok = False
             if ok:
@@ -5747,7 +5950,11 @@ def gallery_extremal_graphs(
                     best_val = max(best_val, res.best_edge_count)
                     seed += 1
                 # Step 2: enumerate all graphs at that value.
-                enum_deadline = min(case_deadline, time.time() + 2.0)
+                # Two thirds of the case budget, leaving the rest for the search
+                # above.  A hardcoded 2.0 gave a caller who raised time_per_case
+                # the same two seconds of enumeration however long the case ran.
+                enum_deadline = min(case_deadline,
+                                    time.time() + 2.0 * time_per_case / 3.0)
                 reps, timed_out = _enum_matrix_extremals(
                     variant, n, m, separation, best_val, enum_deadline)
                 # Step 3: count automorphisms and labelled copies.
@@ -5783,7 +5990,11 @@ def gallery_extremal_graphs(
                     }
                     continue
                 # Enumerate all achieving best_val.
-                enum_deadline = min(case_deadline, time.time() + 2.0)
+                # Two thirds of the case budget, leaving the rest for the search
+                # above.  A hardcoded 2.0 gave a caller who raised time_per_case
+                # the same two seconds of enumeration however long the case ran.
+                enum_deadline = min(case_deadline,
+                                    time.time() + 2.0 * time_per_case / 3.0)
                 hyper_reps, timed_out = _enum_hyper_extremals(
                     directed, vertex_split, r, n, m, best_val, enum_deadline)
                 fn = math.factorial(n)
@@ -5833,7 +6044,10 @@ def prove_integral_arc_bound(n: int, m: int, target: int, *,
         symmetry=True, deletion=True, degree_pair=True,
     )
     prob += pulp.lpSum(w.values()) >= target        # the arc target
-    prob += 0                                        # feasibility, no objective
+    # A pure feasibility model: the question is whether ANY assignment satisfies
+    # the constraints, so the objective is empty.  Spelled with setObjective
+    # rather than the `prob += 0` idiom, which reads like a constraint.
+    prob.setObjective(pulp.lpSum([]))
 
     prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
     status = pulp.LpStatus[prob.status]
@@ -5954,6 +6168,9 @@ def fractional_search(n: int, objective: str = "min_degree", steps: int = 6000,
 
 # --- SELF-CHECK: python erdos915_unified.py runs every invariant; exits 0 on all-PASS ---
 
+# Failures of the CURRENT _run_checks call.  Reset at the top of every run, so
+# calling _run_checks twice in one process reports each run's own count instead
+# of the running total the module-level tally used to accumulate.
 _failures = 0
 
 
@@ -5976,6 +6193,8 @@ def _run_checks() -> int:
     This is the program checking itself end to end, using the bare top-level
     names defined above in this single file.
     """
+    global _failures
+    _failures = 0        # this run's tally, not the process's running total
     section("Checker: the directed m=2 values ell_2^dir(n) = 2, 4, 6, 8")
     for n, expected in [(2, 2), (3, 4), (4, 6), (5, 8)]:
         graph = double_star(n, m=2, directed=True)
@@ -6243,13 +6462,17 @@ def _run_checks() -> int:
     # Short n=5 runs (the conjectured bipartite point is rigid).  The
     # min_degree score carries a 1e-3 * total-weight tie-breaker, so its
     # comparison allows that slack; a genuine refutation would clear the
-    # ceiling by a full unit, far above it.
-    _, total_best = fractional_search(5, "total", steps=1500, seed=1)
+    # ceiling by a full unit, far above it.  The tie-breaker's largest possible
+    # value is 1e-3 times the largest total weight, which is one per ORDERED
+    # pair, so n(n-1) and not n^2: the diagonal carries no weight.
+    fractional_n = 5
+    tie_break_slack = 1e-3 * fractional_n * (fractional_n - 1)
+    _, total_best = fractional_search(fractional_n, "total", steps=1500, seed=1)
     check(f"fractional total weight at n=5 stays <= 8: {total_best:.3f}",
           total_best <= 8 + 1e-6)
-    _, deg_best = fractional_search(5, "min_degree", steps=1500, seed=1)
+    _, deg_best = fractional_search(fractional_n, "min_degree", steps=1500, seed=1)
     check(f"fractional min degree at n=5 stays <= k=2 (+tie-break slack): {deg_best:.3f}",
-          deg_best <= 2 + 1e-3 * 5 * 5)
+          deg_best <= 2 + tie_break_slack)
 
     print(f"\n{'ALL CHECKS PASSED' if _failures == 0 else f'{_failures} CHECK(S) FAILED'}")
     return 1 if _failures else 0

@@ -1,3 +1,153 @@
+## 2026-09-02 (Opus, second session) -- a code audit: 24 findings verified, 2 retracted, all fixed
+
+A review of `erdos915_unified.py` produced 27 claimed defects. Every one was
+re-checked against the file before anything was changed, which is how two of them
+turned out to be wrong, and the check itself found a stale figure cache nobody
+had asked about.
+
+**THE ONE THAT WAS SHIPPING WRONG FIGURES.** `_all_objects_of_variant` took
+`simple` and `max_mult` and ignored both on its hypergraph branch, sweeping
+presence only (`product((0,1), ...)`). So the four multihypergraph panels of every
+4x4 grid were byte-identical to the four simple hypergraph ones under a
+multihypergraph label. Proved before fixing:
+`_all_objects_of_variant(4, simple=True, max_mult=1)` and the same call with
+`simple=False, max_mult=2` returned the same 16 objects, while the matrix branch
+correctly gave 8 against 27. The config's own comment said row 4 "does NOT
+collapse onto the simple rows", so the intent was documented and unimplemented.
+Fixed to mirror `_brute_force_hypergraph`: each candidate hyperedge runs over
+`{0..cap}` and is emitted `q` times. 16 -> 81 objects at n=4, and the regenerated
+`edges_dist.png` multihypergraph row now reaches 8 edges where it used to stop at
+4. `sample_random_hypergraph` had the same hole (it did not even take `simple`,
+which `_sample_variant` was passing it) and now carries the hurdle-geometric tail
+`sample_random_multigraph` uses.
+
+**A STALE CACHE FOUND WHILE MIGRATING, NOT REPORTED BY THE REVIEW.**
+`figures/surface_cache.json` was written 2026-08-25, before the incidence
+convention landed on 2026-09-02, and its two multigraph VERTEX rows still held
+values from the collapsing convention: `K_3(3)` cached as 3 where the current
+proved value is 4, and so on for 14 exact cells. Checking all 206 exact cells
+against `_surface_known_value` is what surfaced it. Both keys dropped so they
+recompute. The other 178 exact cells verified with 0 mismatches and were kept.
+**Re-stamping a migrated cache is only safe if you verify the values first.**
+
+**THE j >= 7 SOUNDNESS NOTE WAS STALE, AND THE CODE WAS ALREADY RIGHT.**
+`directed_multigraph_arc` said "Proved, all n and m" while
+`enumerate_extremal_directed_multigraphs` carried a long warning that its j >= 7
+pruning used the CONJECTURED floor(j^2/4) and "cannot certify completeness for
+n >= 7". Both cannot hold. `thm:dir-multi-full` proves the value at every n
+(`app_proofs.tex:940`), and the arithmetic already agreed:
+`max(_PROVEN_MSTAR.get(j,0), j^2/4)` equals `max(2(j-1), j^2/4)` at every j from 2
+to 13, the two branches tying exactly at j=7. So nothing computational changed and
+only the claim did. The five-entry `_PROVEN_MSTAR` table is replaced by `_mstar(k)`
+(`max(2(k-1), floor(k^2/4))`), defined once beside `directed_multigraph_arc`, which
+is now `(m-1) * _mstar(n)`. Both warnings deleted. The generation twin's prefix
+prune read the same table and so pruned nothing at all above j=6, and it now prunes at
+every prefix size.
+
+**A CRASH THAT HAS NOT FIRED AND NOW CANNOT.** `_propose_removal` weights removals
+by `exp(-sigma/T)`, which underflows to exactly 0.0 once `sigma/T > 745`, so
+`rng.choices` raises "Total of weights must be greater than zero" below T=0.00134
+whenever no present edge is slack. The default schedule stops at T=0.0074, but
+`plot_sa_vs_tabu_convergence` passes `steps=10**7` under an 8s deadline and this
+machine runs 5400 to 6100 steps, crossing the cliff at step 5139. It survives only
+because the minimum sigma was 0 in 446 of 446 low-T removals, and a sweep over 96
+(variant, n, m, separation, seed) combinations found no all-load-bearing state.
+Fixed by shifting by the minimum sigma before exponentiating and flooring at
+1e-300. `rng.choices` normalises, so the freest edge is pinned at weight 1.0
+instead of collapsing to zero with everything else.
+
+**THE OTHER NINETEEN.** Tabu ranked candidate moves on energy first, so an
+ordinary move with lower energy could displace a held aspiration move and drop the
+global improvement it carried (energy is `-|E| + 6*excess`, so a dense infeasible
+trial can undercut a feasible one). Now strictly lexicographic, aspiration first.
+Tabu also evaluated every trial's max-flow BEFORE testing the tabu list, and the
+resulting arc count alone rules most tabu moves out, so the test moved above the
+flow. `ProofResult.value_for` raised `ValueError: cannot convert float NaN` on any
+non-OPTIMAL solve and returns `None`. `plot_sa_vs_tabu_convergence` hardcoded
+`L_3` in a label on a parameterised `m`. `_graph6_edges` silently misparsed the
+n >= 63 multi-byte header and now refuses it. `plot_conn_threshold_3d` sized its
+bars by the smallest gap between x positions, which is 0 once `min(1.0, r*p_star)`
+clamps twice, making every bar in the panel invisible (fires at n <= 10 with m=3,
+not at the default n=30). `_brute_force_hypergraph` ran an all-pairs Berge flow
+before checking whether the candidate could beat the incumbent at all, which at
+n=4, r=3 is 75% of candidates wasted. Reordered, values identical, 1.0x to 4.0x
+faster on the cases timed. `sample_random_multigraph` looped forever at
+`alpha=1.0`. `solve` never passed `kind`, so the "general" orientation model was
+unreachable through the public driver even though the self-check shows it doubling
+forward's value at n=r=4, m=4. Now threaded, and the label names it when it is not
+the default. `SearchResult.feasible_found` was a stored field that both engines set
+to True and never anything else, so it carried no information. It is now a property
+meaning "bettered the empty graph". `_VARIANT_SAMPLE_CONFIGS` was 12 dead entries
+that `_variant_panel_grid`'s docstring advertised as a drop-in for a 16-panel grid,
+now deleted. The module docstring opened with "Twelve concrete variants" against
+sixteen everywhere else, and `plot_variant_3d_surfaces` claimed sixteen while
+drawing twelve. Both corrected, with the twelve-variant subsets named as such.
+`_UNBOUNDED` was 10**9 against an int32 cast, leaving two saturated arcs at 2e9
+inside 7% of a silent wraparound. Now 10**6, still enormous against real
+capacities. The endpoint gate uncapping in three flow builders is a genuine no-op
+(the flow starts past one gate and ends before the other, confirmed by rebuilding
+with both set to 0 and re-measuring every pair of 200 random multigraphs, 0
+mismatches) and now says so instead of reading as load-bearing. Five near-duplicate
+pair generators collapsed onto `_matrix_cells`, moved up so it precedes all of
+them. `_failures` never reset, so a second `_run_checks` in one process
+double-counted. Plus the small ones: the double `warnings` import, `Callable` and
+`Iterator` moved to `collections.abc` beside `Iterable`, three conditional
+expressions used as statements, `prob += 0` for an empty objective, a hardcoded 2s
+enumeration budget that ignored `time_per_case`, and a self-check slack written
+`1e-3 * 5 * 5` where the tie-breaker maxes at `1e-3 * n(n-1)`.
+
+**THE CACHES ARE JSON NOW, AND A DOCSTRING NO LONGER COSTS HOURS.**
+`enumeration_cache` and `pair_enumeration_cache` were pickles: unreadable in a repo
+a reader is meant to inspect, and `pickle.load` on a committed file is arbitrary
+code execution. Both are JSON, nested `{"_meta": ..., "data": ...}` like the
+surface cache, which itself spliced its fingerprint into the payload's own
+namespace and now does not. The twelve unaffected keys were migrated rather than
+recomputed. Separately, `_cache_metadata` hashed the whole 300KB source, so fixing
+a typo in a docstring threw away hours of enumeration. `_source_fingerprint` now
+round-trips through `ast` with docstrings stripped, so comment and prose edits keep
+the cache and real code edits still invalidate it. Verified in both directions: a
+docstring-and-comment-only edit leaves the fingerprint unchanged while the raw-byte
+hash moves, and changing `_UNBOUNDED` still invalidates. Same trade `MachineValues`
+already makes.
+
+**TWO REVIEW FINDINGS RETRACTED.** The claim that the docstrings cite tests that
+are not shipped is false: `program/tests/` holds 13 files and all three cited tests
+exist (`test_search.py:89 test_fast_path_matches_exact`, `test_solve.py:361`'s
+blind product sweep, `test_solve.py:139`'s geng equality). The claim that
+`_canonical_form`'s C and Python paths may disagree is also false: differentially
+tested over 300 random graphs at n=5, 0 mismatches. Only a documentation nit
+survived, that "lexicographically smallest" is over the int32 byte encoding and
+coincides with integer order while multiplicities stay under 256, which
+feasibility guarantees.
+
+**THE SEARCH CHANGES MOVE NO PUBLISHED VALUE, AND THIS WAS MEASURED.** The tabu
+aspiration fix and the annealer weight fix both touch trajectories, and the four
+`variant_bounds_*` grids the thesis actually prints read `machine_values.json`,
+which is search-derived. So the old and new modules were loaded side by side and
+run against each other on 16 fixed-step cases (both engines, both separations,
+four variants, same seeds): 0 differences. `machine_values.json` therefore needs
+no refresh and the printed figures are unaffected. Worth knowing for the next
+person who changes a search engine: load the two modules with
+`importlib.util.spec_from_file_location` and diff them directly, and use FIXED
+STEP COUNTS rather than deadlines, so the comparison is deterministic and CPU
+contention cannot skew it.
+
+**WHICH FIGURES THIS TOUCHED, AND WHICH THE THESIS PRINTS.** The multihypergraph
+enumeration bug corrupted `edges_dist`, `scatter_lambda_edges`, `pair_conn_dist`
+and `conn_dist_m6`, and `main.tex` includes NONE of them: the thesis prints seven
+figures and those four are not among them. The bug was real and the on-disk PNGs
+were wrong, but the submitted PDF never showed them. Checked by extracting every
+`includegraphics` path from the chapters rather than by assuming.
+
+VERIFY: 132 tests OK with 1 expected skip, matching the pre-change baseline
+exactly. Self-check ALL CHECKS PASSED. Every fix re-tested individually.
+`enumeration_cache.json` and `pair_enumeration_cache.json` regenerated at 16 keys
+each, `surface_cache.json` rebuilt after its two stale rows were dropped, and
+`scatter_lambda_edges`, `pair_conn_dist`, `edges_dist`, `conn_dist_m6`,
+`sa_vs_tabu_convergence`, `threshold_3d` and `variant_surface_3d` redrawn. The
+multihypergraph row of `edges_dist.png` was cropped and inspected directly to
+confirm it now carries its own data rather than the simple hypergraph's.
+
 
 ## 2026-09-02 (Opus) -- one convention for vertex separation, and the two multigraph problems it restores
 

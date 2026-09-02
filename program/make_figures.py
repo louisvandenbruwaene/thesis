@@ -1179,10 +1179,10 @@ def main() -> None:
 
     # --------------------------------------------------------------
     # Full-enumeration scatter and distribution figures.
-    # The enumeration cache is written once to figures/enumeration_cache.pkl.
+    # The enumeration cache is written once to figures/enumeration_cache.json.
     # --------------------------------------------------------------
     print("building enumeration cache (slow on first run, cached thereafter)...")
-    enum_cache_path = FIGURES / "enumeration_cache.pkl"
+    enum_cache_path = FIGURES / "enumeration_cache.json"
     enum_data = compute_enumeration_cache(cache_path=enum_cache_path)
     print("enumeration cache ready")
 
@@ -1192,7 +1192,7 @@ def main() -> None:
     # Pooled per-pair connectivity: every vertex pair of every enumerated graph,
     # tagged with its graph's lambda^max.  Slow first run, cached thereafter.
     print("building pair-connectivity cache (slow on first run, cached thereafter)...")
-    pair_cache_path = FIGURES / "pair_enumeration_cache.pkl"
+    pair_cache_path = FIGURES / "pair_enumeration_cache.json"
     pair_data = compute_pair_enumeration_cache(cache_path=pair_cache_path)
     print("pair-connectivity cache ready")
 
