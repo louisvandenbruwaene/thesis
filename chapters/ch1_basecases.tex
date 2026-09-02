@@ -418,7 +418,7 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \end{figure}
 
 In the graph and digraph vertex-disjoint variants, multiplicity of an edge or arc is irrelevant compared to its existence,
-so parallel edges never raise $\kappa$.\label{sec:parallel-convention}
+so parallel edges never raise $\kappa$.\label{sec:incidence-convention}
 Therefore they never break the connectivity constraints either.
 Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
 The multigraph vertex variants are thus posed on the underlying simple graph, 
@@ -691,4 +691,4 @@ tail--head incidence count converts its arcs back to hyperedges. Since the
 bipartite construction already attains that leading term, it is asymptotically
 optimal.
 
-For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer.
+For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.

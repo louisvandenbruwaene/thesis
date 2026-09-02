@@ -127,11 +127,11 @@ For the unit step in edge connectivity, take a largest edge-, arc-, or hyperedge
     \lambda_G(s,t) \le \lambda_{G^+}(s,t) \le \lambda_G(s,t)+1.
 \]
 
-The vertex measure has the same unit step, but it is safer to see it directly than through a split-network cut. In a graph or digraph, two internally vertex-disjoint routes cannot both use the new adjacency. If it is internal to both routes, they share its endpoints internally. If it meets $s$ or $t$, they share its other endpoint internally, except for the unique one-step $s$--$t$ route. In the hypergraph convention of \Cref{sec:hyper-vertex-proof}, the routes are also hyperedge-copy-disjoint, so again at most one uses the new copy. Deleting that route leaves a family in $G$ and gives
+The vertex measure has the same unit step, and under the incidence convention of \Cref{sec:incidence-convention} it has the same one-line proof in every model. A route is a path of the incidence graph, and every copy the route uses is an interior node of that path, so two internally disjoint routes never share a copy. At most one member of a largest family therefore uses the new copy. Deleting that route leaves a family in $G$ and gives
 \[
     \kappa_G(s,t) \le \kappa_{G^+}(s,t) \le \kappa_G(s,t)+1.
 \]
-Taking the maximum over all pairs proves the two asserted unit-step bounds. If the new copy is parallel to an existing adjacency under the reduced convention of \Cref{sec:parallel-convention}, it changes $\kappa^{\max}$ by zero, which is already covered by the inequality.
+Taking the maximum over all pairs proves the two asserted unit-step bounds. A copy parallel to an existing adjacency is one of the cases, not an exception to it: a new copy of $uv$ is one further route from $u$ to $v$, so it raises $\kappa(u,v)$ by exactly one, and by at most one at every other pair.
 \end{proof}
 
 \section{Mader's theorem in full}\label{sec:mader-gomory-hu}
@@ -1598,10 +1598,11 @@ The lower bound is \Cref{prop:hyper-vertex-lower} at $m = 3$.
 
 \begin{remark}[Edges as gates at $r = 2$, and the boundary of the method]
 \label{rem:hyper-vertex-m3-scope}
-At $r = 2$ the theorem speaks of multigraphs under the hyperedge-as-gate
-convention, in which parallel edges are distinct one-step routes, giving
-the multigraph value $2(n-1)$ of \Cref{thm:multigraph-edge}, complementing the body's convention for graphs,
-where parallel adjacencies count once. The proof of
+At $r = 2$ the theorem speaks of multigraphs, where the incidence convention of
+\Cref{sec:incidence-convention} makes $q$ parallel edges $q$ distinct one-step
+routes. It gives $K_3(n) = 2(n-1)$, the same number as the multigraph edge value
+of \Cref{thm:multigraph-edge}, and \Cref{cor:multi-vertex-m3} below records that
+specialisation. The proof of
 \Cref{lem:incidence-rank} is calibrated to the cap $\kap \le 2$ at every step
 rather than at one. Two parallel edges beside a single detour already exceed
 it, which is what forces the surviving core to be simple, and three internally
@@ -1612,6 +1613,289 @@ against $|X| - 1 = 1$. For $m = 4$ the analogous question asks for a different
 bound relative to $\kap \le 3$, taken apart along $3$-cuts rather than along
 separating pairs, and none is supplied here.
 \end{remark}
+
+\section{The multigraph incidence problems}\label{sec:multi-vertex}
+
+The theorem above is about hyperedge networks, and at $r = 2$ a hyperedge network is a multigraph, so the two multigraph vertex questions are the $r = 2$ case of the two hypergraph vertex questions and not restatements of their simple counterparts. This section works them out. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally disjoint $u$-$v$ routes, since a single edge is a path with no interior, which is the incidence convention of \Cref{sec:incidence-convention}. Write $K_m(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$, as in \Cref{tab:notation}.
+
+The two kinds of route never interfere, which splits the measure in two.
+
+\begin{lemma}[Splitting the vertex measure,\aimedal]\label{lem:multi-vertex-split}
+Let $G$ be a multigraph with multiplicity function $\mu$ and underlying simple graph $G_0$. For any two vertices $u \ne v$, write $\pi(u,v)$ for the largest number of pairwise internally disjoint $u$-$v$ paths of length at least two in $G_0$. Then
+\[
+    \kap_G(u,v) \;=\; \mu(u,v) \;+\; \pi(u,v).
+\]
+\end{lemma}
+
+\begin{proof}
+A parallel copy of $uv$ is a path with empty interior, so any two copies are internally disjoint from each other and from every longer route. A maximum family may therefore be assumed to contain all $\mu(u,v)$ copies, and what it can add to them is a family of pairwise internally disjoint routes of length at least two, whose interiors are disjoint sets of vertices. Since parallel copies are irrelevant to a route of length at least two, which is determined by its vertex sequence, the largest such family has size $\pi(u,v)$, computed in $G_0$.
+\end{proof}
+
+So feasibility says exactly that $\mu(u,v) \le m-1-\pi(u,v)$ on every edge, and that $\pi(u,v) \le m-1$ on every pair. At $m = 2$ this is already decisive.
+
+\begin{theorem}[The multigraph incidence value at $m = 2$]\label{thm:multi-vertex-m2}
+$K_2(n) = n-1$, attained exactly by the spanning trees.
+\end{theorem}
+
+\begin{proof}
+By \Cref{lem:multi-vertex-split}, $\kap^{\max} \le 1$ forces $\mu(u,v) + \pi(u,v) \le 1$ on every edge. If $G_0$ contained a cycle, an edge $uv$ of that cycle would have $\mu(u,v) \ge 1$ and $\pi(u,v) \ge 1$ from the rest of the cycle, a contradiction, so $G_0$ is a forest and every multiplicity is one. A forest has at most $n-1$ edges, and a spanning tree attains it.
+\end{proof}
+
+\begin{remark}[Why $m = 2$ is not a multigraph question at all]\label{rem:multi-vertex-m2-simple}
+The proof shows more than the count. At $m = 2$ the cap $m-1$ is one, so a second copy of any edge is a second route on its own, and every feasible multigraph is simple. The multigraph problem is therefore the simple problem, $K_2(n) = k_2(n) = n-1$, which is also what \Cref{thm:hyper-vertex-m2} says at $r = 2$. This is the one value of $m$ at which the two coincide for a reason rather than by accident, and \Cref{cor:dir-multi-incidence} makes the same observation in the directed model.
+\end{remark}
+
+The next value is the one the hypergraph theorem supplies, and no separate argument is needed for it.
+
+\begin{corollary}[The multigraph incidence value at $m = 3$,\aimedal]\label{cor:multi-vertex-m3}
+$K_3(n) = 2(n-1)$ for every $n \ge 2$.
+\end{corollary}
+
+\begin{proof}
+The upper bound is \Cref{thm:hyper-vertex-m3} at $r = 2$, where the displayed bound $q(r-1) \le 2(n-1)$ reads $q \le 2(n-1)$ and $q$ is the total multiplicity. Its proof asks only that hyperedge-nodes have degree $r \ge 2$, which holds at $r = 2$. For the lower bound take a spanning tree and give every edge multiplicity two. A tree edge $uv$ has $\pi(u,v) = 0$, so $\kap(u,v) = 2$ by \Cref{lem:multi-vertex-split}, and a non-adjacent pair is joined by the unique tree path, so $\kap = 1$. Nothing exceeds $2 = m-1$, and the count is $2(n-1)$.
+\end{proof}
+
+At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The two separations part company at $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+
+\begin{itemize}
+    \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
+    \item \emph{The thickened complete graph.} Give every edge of $K_n$ the same multiplicity $q$. Here $\pi(u,v) = n-2$, so feasibility asks $q \le m+1-n$, and the count is $\binom{n}{2}(m+1-n)$, positive only when $n \le m+1$.
+    \item \emph{The thickened theta.} Choose two \emph{poles} and join each of the $n-2$ remaining vertices to both of them at multiplicity $m-2$, then join the poles to each other at multiplicity $m+1-n$ when that is positive. A pole and a middle vertex have $\pi = 1$, two middle vertices have $\pi = 2$, and the two poles have $\pi = n-2$, so this is feasible exactly when $n \le m+1$, and it carries $2(n-2)(m-2) + \max(0,\, m+1-n)$ edges.
+\end{itemize}
+
+The theta family is what makes this problem different from the edge problem, and it was found by the search rather than by hand. Whenever it is feasible, which is to say for $n \le m+1$, it matches the thickened tree exactly at $m = 4$ and, for $n\ge3$, beats it for every $m \ge 5$. It accounts for the first cells in which the direct exhaustion exceeds the tree, although the later block sweep finds still better blocks in some larger parameter cells. Comparing these three constructions, the tree leads once $n \ge m+2$, where the other two die for lack of route budget.
+
+An exhaustive include-or-exclude search, independently checked by a separate
+implementation on the cells where both completed, confirms these constructions
+at the small sizes used below. The statements below are structural rather than
+cell-by-cell.
+
+The small-$n$ regime $n \le m+1$, where the complete graph is feasible for the simple problems too, is tempting to read as the \emph{only} place a cycle pays for itself, with the thickened tree optimal once $n \ge m+2$. It is not: a single triangle grafted anywhere onto the thickened tree already beats it, for every $m \ge 5$ and every such $n$, which the next theorem makes precise.
+
+By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connected simple graph $G_0$ maximises its total multiplicity by setting $\mu(u,v) = m-1-\pi(u,v)$ on every edge, giving total $(m-1)\,|E(G_0)| - \sum_{uv \in E(G_0)} \pi(u,v)$. Writing $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$, the thickened tree is beaten by any $G_0$ with
+\[
+    \sum_{uv \in E(G_0)} \pi(u,v) \;<\; (m-1)\,\mathrm{rank}(G_0).
+\]
+The obvious guess is that cycles must always pay for themselves against this bound: each independent cycle costs $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
+
+\begin{theorem}[A bouquet of thickened cliques, and how it beats the thickened tree,\aimedal]\label{thm:clique-chain-vertex}
+Fix $3 \le r \le m$ and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex cap on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
+\[
+    (m-1)(n-1) \;+\; k \cdot \mathrm{gain}(r,m),
+    \qquad
+    \mathrm{gain}(r,m) := \frac{(r-1)(r-2)(m-1-r)}{2}.
+\]
+The count therefore exceeds the thickened tree's $(m-1)(n-1)$ exactly when
+$\mathrm{gain}(r,m) > 0$, that is when $r \le m-2$, which is possible for some $r$
+in range precisely when $m \ge 5$.
+\end{theorem}
+
+\begin{proof}
+Write $G_0$ for the underlying simple graph.
+
+\emph{Feasibility.} The shared vertex is a cut vertex of $G_0$, and so is every vertex along the pendant path, since the blocks meet only there. So a path of length $\ge 2$ between two vertices of the same block cannot leave that block and come back: to do so it would have to pass through the shared vertex twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside its $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally-disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or nonadjacent with either endpoint on the pendant path, a single cut vertex separates them, so $\kap_G(u,v) \le 1$. If $u,v$ are adjacent along the pendant path, then the edge lies on no cycle, and \Cref{lem:multi-vertex-split} gives $\kap_G(u,v)=\mu(u,v)+\pi(u,v)=(m-1)+0=m-1$.
+
+\emph{Count.} Since $q \ge 1$, every block edge is present, so $G_0$ is connected and $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$. This is where the hypothesis $r \le m$ is used: at $r = m+1$ the multiplicity $q$ would drop to zero, the blocks would carry no edges at all, and $G_0$ would fall apart into isolated vertices. Only the $k$ blocks contribute to $\mathrm{rank}(G_0)$ or to $\sum \pi$, since the pendant edges have $\pi = 0$ and lie in no cycle. Each $K_r$ has rank $(r-1)(r-2)/2$ and contributes $\binom{r}{2}(r-2)$ to the sum, since each of its $\binom{r}{2}$ edges has $\pi = r-2$. Substituting into $(m-1)(n-1+\mathrm{rank}(G_0)) - \sum \pi$,
+\[
+    (m-1)\Bigl[n-1+k\tfrac{(r-1)(r-2)}{2}\Bigr] - k\tfrac{r(r-1)(r-2)}{2}
+    \;=\; (m-1)(n-1) + k\,\mathrm{gain}(r,m),
+\]
+using $(m-1)\tfrac{(r-1)(r-2)}{2} - \tfrac{r(r-1)(r-2)}{2} = \tfrac{(r-1)(r-2)\bigl[(m-1)-r\bigr]}{2} = \mathrm{gain}(r,m)$.
+\end{proof}
+
+At $r = 3$, $\mathrm{gain}(3,m) = m-4$: zero at $m = 4$, matching the exhaustive finding that $m \le 4$ has no counterexample, and strictly positive for every $m \ge 5$. So the guess that the thickened tree is optimal once $n \ge m+2$ is false for every $m \ge 5$: it held only within the reach of the exhaustive table, $m \le 4$. The smallest witness is small enough to check by hand. Take $m = 5$ and $n = 7$, the first size the guess covers. Put a triangle on $\{u_1, u_2, u_3\}$ at multiplicity $3$ and hang a path of four further vertices off $u_1$ at multiplicity $4$. Two triangle vertices have three parallel copies plus one route through the third vertex, so $\kap = 4$, and every other pair is separated by a single cut vertex or joined only by its own parallel copies, so nothing exceeds $4 = m-1$. The total multiplicity is $3 \cdot 3 + 4 \cdot 4 = 25$, one more than the $(m-1)(n-1) = 24$ the guess allows. Packing $k$ blocks instead of one multiplies the excess by $k$, and $k$ may be taken as large as $\lfloor (n-1)/(r-1) \rfloor$, so the gap over the thickened tree grows linearly in $n$.
+
+Sharing a vertex is what buys that count. Disjoint blocks joined by bridges would fit only $\lfloor n/r \rfloor$ of them, since each bridge spends a vertex on nothing but the join, and the difference is real rather than cosmetic: at $m = 10$, $r = 6$ and $n = 11$ the shared-vertex form carries $150$ against the bridged form's $120$.
+
+Optimising $r$ widens the gap further. Treated as continuous, the gain per vertex $\mathrm{gain}(r,m)/(r-1)$ peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$. Packing blocks of that size therefore gives $K_m(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1-O(m))$. In particular the per-vertex rate is quadratic in $m$ once $n/m\to\infty$, a different order from the tree's linear rate.
+
+Even this is not the truth. At $m = 5$, $n = 7$ the construction above gives
+$27$ and the exact block computation below gives $29$.
+What is not open is the order, and to say that the bouquet is
+a lower bound of the right order there has to be a matching upper bound. There
+is one, and it comes from the underlying simple graph rather than cycle rank.
+
+\begin{proposition}[An upper bound of the same order,\aimedal]\label{prop:multi-vertex-upper}
+For all $m \ge 2$ and $n \ge 2$,
+\[
+    K_m(n) \;\le\; (m-1)\,k_m(n) \;<\; 2(m-1)^2\,n .
+\]
+\end{proposition}
+
+\begin{proof}
+Let $G$ be feasible, with underlying simple graph $G_0$.
+
+\emph{Every multiplicity is at most $m-1$.} By \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = \mu(u,v) + \pi(u,v) \ge \mu(u,v)$, so feasibility gives $\mu(u,v) \le m-1$ on every pair and the total is at most $(m-1)|E(G_0)|$.
+
+\emph{$G_0$ is itself feasible for the simple vertex problem.} Take two vertices $u \ne v$. If they are adjacent in $G_0$ then $\mu(u,v) \ge 1$, and the routes of $G_0$ between them are the single edge together with the internally disjoint routes of length at least two, so $\kap_{G_0}(u,v) = 1 + \pi(u,v) \le \mu(u,v) + \pi(u,v) \le m-1$. If they are not adjacent then $\kap_{G_0}(u,v) = \pi(u,v) \le m-1$ directly. So $\kap^{\max}_{G_0} \le m-1$ and $|E(G_0)| \le k_m(n)$ by definition of $k_m$, which gives the first inequality.
+
+\emph{The simple problem is linearly bounded.} Suppose $G_0$ had average degree at least $4(m-1)$. By Mader's density theorem \cite{Mader72}, a graph of average degree at least $4k$ contains a $(k+1)$-connected subgraph, so with $k = m-1$ some subgraph $H \subseteq G_0$ is $m$-connected. An $m$-connected graph has more than $m$ vertices and, by the global form of Menger's theorem \cite[Ch.~3]{Diestel17}, any two of them are joined by $m$ internally disjoint paths inside $H$ and hence inside $G_0$. That contradicts $\kap^{\max}_{G_0} \le m-1$. So the average degree is below $4(m-1)$, that is $2|E(G_0)|/n < 4(m-1)$, giving $k_m(n) < 2(m-1)n$ and the second inequality.
+\end{proof}
+
+Combining the two directions, first letting $n/m\to\infty$ so that optimised blocks can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$, yields
+\[
+    \Bigl(\tfrac{1}{8} + o_m(1)\Bigr) m^2 \, n
+    \;\le\; K_m(n) \;<\; 2 m^2 n ,
+\]
+where the $o_m(1)$ vanishes as $m$ grows,
+so $K_m(n) = \Theta(m^2 n)$ in that large-$n$ regime. This qualification is necessary: for example $K_m(2)=m-1$, so no estimate of order $m^2n$ can hold uniformly when $n$ is fixed. The bouquet of \Cref{thm:clique-chain-vertex} has the right joint order once many blocks fit, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$. The first inequality, $K_m(n) \le (m-1)k_m(n)$, is the more informative half. It says that this variant can never outrun the simple vertex problem by more than the multiplicity cap, which ties the least understood of the sixteen to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$ by \Cref{rem:multi-vertex-m2-simple}.
+
+\subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
+
+The lower bounds above are constructions and the upper bound is a density count, and neither says what an extremiser looks like. This section reduces the whole question to one about $2$-connected graphs: the number of vertices in play stops being $n$ and becomes the size of a single block.
+
+Two observations do it. The first is already in the section, one line further than it was taken.
+
+\begin{lemma}[The objective in closed form,\aimedal]\label{lem:multi-vertex-objective}
+For a simple graph $G_0$ on $n$ vertices with $\kap^{\max}_{G_0} \le m-1$, the largest total multiplicity of a feasible multigraph with underlying simple graph exactly $G_0$ is
+\[
+    W_m(G_0) \;:=\; \sum_{uv \in E(G_0)} \bigl(m - \kap_{G_0}(u,v)\bigr) ,
+\]
+and every simple graph arising as the underlying graph of a feasible multigraph satisfies $\kap^{\max}_{G_0} \le m-1$. Hence
+\[
+    K_m(n) \;=\; \max\bigl\{\, W_m(G_0) \;:\; G_0 \text{ simple on } n \text{ vertices},\ \kap^{\max}_{G_0} \le m-1 \,\bigr\} .
+\]
+\end{lemma}
+
+\begin{proof}
+By \Cref{lem:multi-vertex-split} feasibility reads $\mu(u,v) \le m-1-\pi(u,v)$ on every edge, so the best choice is $\mu(u,v) = m-1-\pi(u,v)$, which is what the paragraph before \Cref{thm:clique-chain-vertex} records. On an edge $\kap_{G_0}(u,v) = 1 + \pi(u,v)$, since the routes of $G_0$ between adjacent $u$ and $v$ are the single edge together with the routes of length at least two. Substituting turns $m-1-\pi(u,v)$ into $m - \kap_{G_0}(u,v)$ and the total into $W_m(G_0)$.
+
+Two things have to be checked for that maximum to be attained by a multigraph over $G_0$ itself. Feasibility of $G_0$ is the middle step of \Cref{prop:multi-vertex-upper}. And the chosen multiplicities are all at least one, so the underlying graph really is $G_0$ and no edge silently disappears: $\kap_{G_0}(u,v) \le m-1$ on an edge gives $\pi(u,v) \le m-2$, hence $\mu(u,v) = m-1-\pi(u,v) \ge 1$. Conversely any feasible multigraph is one of the multigraphs considered over its own underlying graph, so nothing is lost by maximising over $G_0$ first.
+\end{proof}
+
+That the objective is a sum over edges of a \emph{local} quantity is what makes the second observation bite. Recall that a \emph{block} of a graph is a maximal connected subgraph with no cut vertex of its own, so every block is either $2$-connected or a single edge, every edge lies in exactly one block, and two blocks meet in at most one vertex.
+
+\begin{theorem}[The multigraph incidence problem is a knapsack over blocks,\aimedal]\label{thm:multi-vertex-blocks}
+For a $2$-connected graph $B$, or a single edge, write
+\[
+    g_m(b) \;:=\; \max\bigl\{\, W_m(B) \;:\; B \text{ $2$-connected or an edge, } |V(B)| = b,\ \kap^{\max}_B \le m-1 \,\bigr\} ,
+\]
+with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n \ge 2$,
+\[
+    K_m(n)
+    \;=\; \max\Bigl\{\, \sum_{i} g_m(b_i) \;:\; b_i \ge 2,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} ,
+\]
+the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
+\end{theorem}
+
+\begin{proof}[Proof of \Cref{thm:multi-vertex-blocks}]
+\emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
+\[
+    W_m(G_0) \;=\; \sum_{\text{blocks } B} W_m(B) .
+\]
+Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ by the same identity, so $W_m(B) \le g_m(|V(B)|)$.
+
+\emph{The sizes fit.} Suppose $G_0$ has $c$ components and blocks $B_1, \dots, B_t$. Within a single component, contracting the block tree makes $\sum (|V(B_i)|-1)$ equal to the number of vertices of that component minus one. Isolated components contribute zero to both sides, so summing gives $\sum_i (|V(B_i)| - 1) = n-c \le n-1$. With \Cref{lem:multi-vertex-objective} this proves $\le$.
+
+\emph{Every multiset is realised.} Given blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, take one common vertex and attach the $B_i$ to it, pairwise disjoint otherwise, leaving any spare vertices isolated. The result uses $1 + \sum (b_i-1) \le n$ vertices. Its blocks are exactly the $B_i$, so by the first paragraph its $\kap$ agrees with $\kap_{B_i}$ on pairs inside a block and equals at most $1$ on pairs split between two blocks, which the shared vertex separates. So the graph is feasible and scores $\sum_i W_m(B_i)$, and choosing each $B_i$ optimal gives $\sum_i g_m(b_i)$. This proves $\ge$.
+\end{proof}
+
+The reduction changes what has to be searched: enumerate $2$-connected simple
+graphs, evaluate $W_m$, and solve the resulting knapsack. A sweep through eight
+vertices agrees with the independent exhaustive routine wherever both finish.
+It shows that the winning blocks are unbalanced and bipartite-like rather than
+complete, which motivates the family below. It too runs from a standalone script,
+\code{research\_notes/scripts/multi\_vertex\_blocks.py}, and its retained
+transcript is \path{figures/multi_vertex_blocks_log.txt} in the repository named
+in \Cref{sec:transcripts}.
+
+\begin{theorem}[Thickened complete bipartite blocks,\aimedal]\label{thm:multi-vertex-bipartite}
+Let $1 \le s \le t \le m-1$. Thicken every edge of $K_{s,t}$ to multiplicity $m-s$. The result is feasible, $\kap^{\max} \le m-1$, on $s+t$ vertices with total multiplicity $st(m-s)$. Hanging $k$ such blocks off one shared vertex gives, for $n = k(s+t-1)+1$,
+\[
+    K_m(n) \;\ge\; \frac{st\,(m-s)}{s+t-1}\,(n-1) .
+\]
+Optimised over $s$ and $t$ this rate is $\bigl(3 - 2\sqrt{2} + o_m(1)\bigr)m^2$, attained at $t = m-1$ and $s \sim (\sqrt{2}-1)m$, against the $\bigl(\tfrac18 + o_m(1)\bigr)m^2$ of \Cref{thm:clique-chain-vertex}. The improvement is by a factor $8(3-2\sqrt{2}) = 24 - 16\sqrt{2} \approx 1.373$.
+\end{theorem}
+
+\begin{proof}
+Write $S$ and $T$ for the two sides, $|S| = s$ and $|T| = t$.
+
+\emph{The connectivities of $K_{s,t}$.} For $u \ne u'$ in $S$, the $u$-$u'$ paths of length at least two are the $t$ two-step routes through the vertices of $T$, and $T$ is a cut of size $t$, so $\kap(u,u') = \pi(u,u') = t$. Symmetrically $\kap(v,v') = s$ for $v \ne v'$ in $T$. For adjacent $u \in S$ and $v \in T$, delete the edge $uv$: the sets $T \setminus \{v\}$ and $S \setminus \{u\}$ both separate $u$ from $v$, so $\pi(u,v) \le \min(s-1, t-1) = s-1$, and the $s-1$ routes $u, v_i, u_i, v$ through distinct $u_i \in S \setminus \{u\}$ and distinct $v_i \in T \setminus \{v\}$ attain it, which needs $s-1 \le t-1$. So $\pi(u,v) = s-1$ and $\kap(u,v) = s$.
+
+\emph{Feasibility and count.} By \Cref{lem:multi-vertex-split} the multigraph has $\kap = (m-s) + (s-1) = m-1$ on an edge, and $\kap = t \le m-1$ or $s \le m-1$ on a non-adjacent pair, so nothing exceeds the cap. The count is $st$ edges at multiplicity $m-s$. Equivalently, by \Cref{lem:multi-vertex-objective}, $W_m(K_{s,t}) = st(m - s)$.
+
+\emph{The bouquet.} If $s\ge2$, then $K_{s,t}$ is $2$-connected, so \Cref{thm:multi-vertex-blocks} applies and $k$ copies at one shared vertex are feasible with total $k\,st(m-s)$ on $n = k(s+t-1)+1$ vertices. If $s=1$, then $K_{1,t}$ is a tree (a single edge when $t=1$), and after thickening every edge to multiplicity $m-1$, sharing vertices among copies still produces a thickened tree and is feasible directly. Its count is again $k\,t(m-1)=k\,st(m-s)$. Thus the displayed rate holds throughout the theorem's full range $1\le s\le t$.
+
+\emph{The optimum.} For fixed $s>1$, the factor $t/(s+t-1)$ is strictly increasing in $t$, and for $s=1$ it is constant. Thus some optimum has $t=m-1$, its largest permitted value. Put $s = \alpha m$. The rate becomes
+\[
+    \frac{s\,(m-1)(m-s)}{s+m-2}
+    \;=\; \frac{\alpha(1-\alpha)}{1+\alpha}\,m^2 \;+\; O(m) ,
+\]
+and $h(\alpha) = \alpha(1-\alpha)/(1+\alpha)$ has $h'(\alpha) = (1 - 2\alpha - \alpha^2)/(1+\alpha)^2$, vanishing at $\alpha = \sqrt{2}-1$, where $h = 3 - 2\sqrt{2}$. Since $3 - 2\sqrt{2} > \tfrac18$, the family beats the clique bouquet, by the stated factor.
+\end{proof}
+
+The optimum is lopsided: one side has size about $0.41m$ and the other reaches
+the cap $m-1$. Finite block sweeps also show that adding a few edges inside
+the small side can improve this clean family. Thus the answer is a block
+problem with dense bipartite-like blocks, and its asymptotic constant lies
+between $3-2\sqrt2$ and $2$.
+
+\subsection{The directed problem}\label{sec:multi-vertex-dir}
+
+Everything above splits the measure into copies and detours, and that split does not
+use the absence of orientation. The directed statement is the same one with directed
+routes, and it is worth writing down because it is what carries the arc results across
+to $K_m^{\mathrm{dir}}(n)$ without any asymptotic argument.
+
+\begin{lemma}[Splitting the directed vertex measure,\aimedal]\label{lem:multi-vertex-split-dir}
+Let $D$ be a multidigraph with multiplicity function $\mu$ and underlying simple
+digraph $D_0$. For an ordered pair $u \ne v$, write $\pi(u,v)$ for the largest number
+of pairwise internally disjoint directed $u$-$v$ paths of length at least two in
+$D_0$. Then $\kap_D(u,v) = \mu(u,v) + \pi(u,v)$, and consequently
+\[
+    K_m^{\mathrm{dir}}(n) \;\le\; (m-1)\,k_m^{\mathrm{dir}}(n) .
+\]
+\end{lemma}
+
+\begin{proof}
+A directed $u$-$v$ route of length one is a parallel copy of the arc $uv$ and has empty
+interior, so the argument of \Cref{lem:multi-vertex-split} applies verbatim: a maximum
+family may be assumed to contain all $\mu(u,v)$ copies, and the longest family it can
+be extended by is a set of internally disjoint directed routes of length at least two,
+which are determined by their vertex sequences and so live in $D_0$. Note that a
+directed $u$-$v$ path uses no copy of the arc $vu$, so the reverse multiplicity plays
+no part.
+
+For the bound, let $D$ be feasible. The identity gives $\mu(u,v) \le \kap_D(u,v) \le m-1$
+on every ordered pair, so the total multiplicity is at most $(m-1)|A(D_0)|$. And $D_0$
+is itself feasible: on an arc, $\kap_{D_0}(u,v) = 1 + \pi(u,v) \le \mu(u,v) + \pi(u,v)
+\le m-1$, and on a pair with no arc from $u$ to $v$, $\kap_{D_0}(u,v) = \pi(u,v) \le m-1$
+directly. So $|A(D_0)| \le k_m^{\mathrm{dir}}(n)$ by definition.
+\end{proof}
+
+\begin{corollary}[The directed multigraph incidence value,\aimedal]\label{cor:dir-multi-incidence}
+For every $n \ge 2$,
+\[
+    K_2^{\mathrm{dir}}(n) \;=\; k_2^{\mathrm{dir}}(n) \;=\; \ell_2^{\mathrm{dir}}(n)
+    \;=\; \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr) ,
+\]
+and for each fixed $m \ge 2$,
+\[
+    (m-1)M(n) \;\le\; K_m^{\mathrm{dir}}(n)
+    \;\le\; (m-1)\floorfrac{n^2}{4} + 4(m-1)^2(n-1) ,
+\]
+so that $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$ and the bipartite digraph of
+\Cref{thm:dir-multi-full} is asymptotically optimal for this variant too.
+\end{corollary}
+
+\begin{proof}
+At $m = 2$ the cap is one, so \Cref{lem:multi-vertex-split-dir} forces $\mu(u,v) \le 1$
+on every ordered pair and every feasible multidigraph is simple. Hence
+$K_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n)$, which is $\ell_2^{\mathrm{dir}}(n)$ by
+\Cref{thm:dir-vertex-m2-exact} and the displayed value by \Cref{thm:dir-arc-m2-exact}.
+
+For general $m$ the lower bound is the arc extremiser. \Cref{thm:dir-multi-full} supplies
+a multidigraph with $(m-1)M(n)$ arcs and $\lec^{\max} \le m-1$, and $\kap \le \lec$, so
+that same multidigraph is feasible here. The upper bound is \Cref{thm:dir-hyper-constant}
+at $r = 2$, where a forward directed $2$-uniform multihypergraph is a multidigraph and
+the displayed bound reads as stated. Both sides have leading term $(m-1)n^2/4$, since
+$M(n) = \floor{n^2/4}$ for $n \ge 4$, and the difference is linear in $n$ for fixed $m$.
+\end{proof}
+
+The exhaustive values agree and stay strictly inside these bounds where both are known:
+$K_6^{\mathrm{dir}}(3) = 24$ against the lower bound $(m-1)M(3) = 20$, so the arc
+extremiser read through $\kap \le \lec$ is a lower bound for the incidence problem and
+not its value.
 
 \section{The directed hypergraph}\label{sec:dir-hyper}
 

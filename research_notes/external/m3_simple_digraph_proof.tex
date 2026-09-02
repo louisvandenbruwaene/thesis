@@ -1,0 +1,565 @@
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\A}{A}
+\newcommand{\C}{C}
+\newcommand{\B}{B}
+\newcommand{\Hh}{H}
+\newcommand{\indeg}{d^-}
+\newcommand{\outdeg}{d^+}
+\newcommand{\lamax}{\lambda^{\max}}
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+
+\title{The simple directed connectivity problem at three paths}
+\author{}
+\date{}
+
+\begin{document}
+\begin{abstract}
+For a simple digraph $D$, let $\lambda_D(u,v)$ be the maximum number of
+arc-disjoint directed $u$--$v$ paths.  We determine the largest number of
+arcs in an $n$-vertex simple digraph satisfying $\lambda_D(u,v)\le 2$ for
+all ordered pairs.  The answer is
+\[
+ \max\left\{3(n-1),\floor{\frac{(n+1)^2}{4}}\right\}.
+\]
+The proof is human except for an exact finite verification through order
+$10$.  Its main ingredients are a safe directed splitting operation and a
+sharp counting lemma for posets in which every interval has at most three
+elements.
+\end{abstract}
+
+\maketitle
+
+\section{Statement and constructions}
+
+For $n\ge 3$, write
+\[
+ g(n)=\max\bigl\{|A(D)|:\ |V(D)|=n,\ \lamax(D)\le 2\bigr\}
+\]
+and put
+\[
+ Q(n)=\floor{\frac{(n+1)^2}{4}},
+ \qquad
+ F(n)=\max\{3(n-1),Q(n)\}.
+\]
+A digraph is \emph{simple} here if it has no loops and at most one arc in
+each direction on an unordered pair; digons are allowed.
+
+\begin{theorem}\label{thm:main}
+For every $n\ge 3$,
+\[
+ \boxed{g(n)=F(n)
+ =\max\left\{3(n-1),\floor{\frac{(n+1)^2}{4}}\right\}.}
+\]
+\end{theorem}
+
+Both lower bounds are immediate.  For the linear one, take a hub joined in
+both directions to all other vertices and put a directed cycle on the
+$n-1$ non-hub vertices.  There are $3(n-1)$ arcs, and every ordered pair
+has one endpoint of in-degree or out-degree at most $2$.
+
+For the quadratic one, split the vertices into sets $X,Y$, put every arc
+from $X$ to $Y$, and put a directed cycle on $Y$.  Taking
+$|Y|\in\{\lfloor(n+1)/2\rfloor,\lceil(n+1)/2\rceil\}$ gives
+\[
+ |Y|(|X|+1)=Q(n).
+\]
+A path ending at $y\in Y$ can use only the direct arc from its initial
+vertex in $X$ or the unique cycle arc entering $y$; hence the maximum local
+arc-connectivity is at most $2$.
+
+It remains to prove the upper bound.  Notice that $Q(n)>3(n-1)$ from
+$n=9$ onward.  Thus the induction below concerns the quadratic branch,
+with the finite seam $3\le n\le 10$ treated exactly in
+Section~\ref{sec:computer}.
+
+\section{Safe splitting}
+
+\begin{definition}
+Let $v$ be a vertex of a simple digraph $D$.  A pair
+\[
+ x\to v,\qquad v\to y
+\]
+is \emph{legal} if $x\ne y$ and $x\to y\notin A(D)$.  Splitting this pair
+means deleting the two displayed arcs and adding $x\to y$.
+
+The \emph{split graph} at $v$ is the bipartite graph with left class
+$N^-(v)$, right class $N^+(v)$, and an edge $xy$ precisely when the pair
+$x\to v, v\to y$ is legal.  Let $\nu(v)$ be its matching number.
+\end{definition}
+
+\begin{lemma}[Safe splitting]\label{lem:splitting}
+Let $M$ be a matching of size $r$ in the split graph at $v$.  Split all
+pairs represented by $M$ and then delete $v$ and all its remaining incident
+arcs.  The resulting simple digraph $D'$ satisfies
+\[
+ |A(D')|=|A(D)|-d(v)+r,
+ \qquad
+ \lamax(D')\le \lamax(D).
+\]
+\end{lemma}
+
+\begin{proof}
+The matching condition gives distinct incoming arcs and distinct outgoing
+arcs at $v$.  The new arcs are pairwise distinct, are not loops, and were
+absent before, so $D'$ is simple.
+
+Take arc-disjoint directed paths in $D'$.  Replace every new arc $x\to y$
+by the two-arc passage $x\to v\to y$ from which it arose.  Because the
+split pairs form a matching, the lifted directed walks are still
+arc-disjoint.  Erasing directed closed subwalks turns each of them into a
+path without introducing an arc intersection.  Thus every family of
+arc-disjoint paths in $D'$ lifts to one of the same size in $D$.
+The arc count is immediate.
+\end{proof}
+
+The following consequence is the reason for introducing the operation.
+
+\begin{corollary}\label{cor:split-bound}
+Suppose Theorem~\ref{thm:main} is known for $n-1$, and let $D$ be an
+$n$-vertex counterexample with exactly $F(n)+1$ arcs.  Then every vertex
+$v$ satisfies
+\[
+ \nu(v)\le d(v)-\bigl(F(n)+1-F(n-1)\bigr).
+\]
+In particular, equality
+$d(v)=F(n)+1-F(n-1)$ forces $\nu(v)=0$; equivalently,
+\[
+ x\to v,\ v\to y,\ x\ne y
+ \quad\Longrightarrow\quad x\to y.
+ \tag{\(*\)}\label{eq:transitive-vertex}
+\]
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:splitting} to a maximum matching and then use the
+$(n-1)$-vertex upper bound.
+\end{proof}
+
+We call a vertex satisfying \eqref{eq:transitive-vertex}
+\emph{transitive}.
+
+\section{A poset lemma}
+
+The low-degree vertices in a minimal even counterexample will all be
+transitive.  Their induced digraph is therefore the comparability digraph
+of a poset of height at most three, with a stronger interval restriction.
+We isolate the exact estimate needed later.
+
+\begin{lemma}[Rectangle packing]\label{lem:rectangles}
+Let $A,C$ be sets of sizes $a,c$, and let
+$X_i\times Y_i\subseteq A\times C$ $(1\le i\le b)$ be nonempty,
+pairwise edge-disjoint rectangles.  Then
+\[
+ \sum_{i=1}^b (|X_i|+|Y_i|)
+ \le \max\{a+bc,\ c+ab\}.
+\]
+If $c\ge a$, the right-hand side is $a+bc$.
+\end{lemma}
+
+\begin{proof}
+Assume $c\ge a$ and put $x_i=|X_i|$, $y_i=|Y_i|$.
+Edge-disjointness gives $\sum_i x_i y_i\le ac$.  Hence
+\[
+ c\Bigl(\sum_i x_i-a\Bigr)
+ \le \sum_i x_i(c-y_i)
+ \le c\sum_i(c-y_i).
+\]
+After cancelling $c$, this is
+$\sum_i(x_i+y_i)\le a+bc$.  The other inequality follows by symmetry.
+\end{proof}
+
+\begin{lemma}[Posets with short intervals]\label{lem:poset}
+Let $P$ be a finite poset on $N$ non-isolated elements such that every
+interval contains at most three elements.  Let $A$ be its minimal elements,
+$C$ its maximal elements, and $B$ the remaining elements, with respective
+sizes $a,c,b$.  Then $B$ is an antichain.  For $z\in B$, put
+\[
+ X_z=\{x\in A:x<z\},
+ \qquad
+ Y_z=\{y\in C:z<y\}.
+\]
+The rectangles $X_z\times Y_z$ are nonempty and pairwise edge-disjoint.
+After replacing $P$ by its dual if necessary, we may assume $c\ge a$, and
+then
+\begin{equation}\label{eq:poset-bound}
+ e(P)\le c(N-c)+a.
+\end{equation}
+Moreover, the following near-equality statements hold.  Write
+\[
+ \delta=c(N-c)+a-e(P).
+\]
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=2.4em]
+\item If $\delta=0$ and $c>a$, then all relations from $A$ to $C$ are
+present, every $Y_z=C$, and the sets $X_z$ partition $A$.
+\item If $\delta=0$, $c=a$, and $b\ge2$, the same conclusion holds after
+possibly dualising $P$.
+\item Suppose $b=2$, $\delta=1$, and $c-a\ge2$.  Then all relations from
+$A$ to $C$ are present, the two sets $X_1,X_2$ are disjoint, and precisely
+one of the following occurs:
+\begin{enumerate}[label=\textup{(\alph*)}]
+\item $Y_1=Y_2=C$ and $A\setminus(X_1\cup X_2)$ has one element;
+\item $X_1\cup X_2=A$, one of $Y_1,Y_2$ equals $C$, and the other misses
+one element of $C$.
+\end{enumerate}
+The same conclusion, after duality, holds when $c=a$.
+\item If $b=1$, with middle element $z$, set
+\[
+ \alpha=a-|X_z|,
+ \quad \beta=c-|Y_z|,
+ \quad \gamma=ac-e(A,C).
+\]
+Then $\delta=\alpha+\beta+\gamma$; if $\delta>0$, then
+$\alpha+\beta\ge1$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+If $z<z'$ with $z,z'\in B$, choose $x<z$ minimal and $y>z'$ maximal.
+Then $[x,y]$ has at least four elements, impossible.  Thus $B$ is an
+antichain.  Every $X_z$ and $Y_z$ is nonempty.  If
+$(x,y)\in(X_z\times Y_z)\cap(X_{z'}\times Y_{z'})$ for distinct $z,z'$,
+then $[x,y]$ again contains four elements.  The rectangles are therefore
+edge-disjoint.
+
+Every comparability is either from $A$ to $C$, from $A$ to $B$, or from
+$B$ to $C$, so
+\[
+ e(P)=e(A,C)+\sum_{z\in B}(|X_z|+|Y_z|).
+\]
+Equation~\eqref{eq:poset-bound} now follows from
+$e(A,C)\le ac$ and Lemma~\ref{lem:rectangles}.
+
+For the refinements, put
+\[
+ \gamma=ac-e(A,C),
+ \qquad
+ \rho=a+bc-\sum_{z\in B}(|X_z|+|Y_z|).
+\]
+Then $\delta=\gamma+\rho$, with $\gamma,\rho\ge0$.
+Equality in the proof of Lemma~\ref{lem:rectangles} shows that if
+$\rho=0$ and $c>a$, then every $Y_z=C$ and the $X_z$ partition $A$.
+When $c=a$, rectangles of the two possible equality types cannot coexist,
+so duality gives the same conclusion.  This proves (i) and (ii).
+
+For (iii), if $X_1\cap X_2\ne\varnothing$, then
+$Y_1\cap Y_2=\varnothing$, and consequently
+\[
+ \sum_{i=1}^2(|X_i|+|Y_i|)\le2a+c,
+\]
+which is at least $c-a\ge2$ below $a+2c$.  Hence $X_1,X_2$ are disjoint.
+Now
+\[
+ \rho=\bigl(a-|X_1|-|X_2|\bigr)
+       +(c-|Y_1|)+(c-|Y_2|).
+\]
+The case $\rho=0$ would force the rectangles to cover $A\times C$, and
+then $\gamma=0$; thus $\delta=1$ forces $\rho=1$ and $\gamma=0$.
+The two displayed alternatives are exactly the two ways in which three
+nonnegative integers can sum to one.  If $c=a$, dualise first when the
+$X_i$ are not disjoint.
+
+Finally, when $b=1$, the identity in (iv) is immediate.  If
+$\alpha=\beta=0$, then $X_z\times Y_z=A\times C$ forces
+$e(A,C)=ac$, so also $\gamma=0$.
+\end{proof}
+
+For orientation arguments we use one more elementary obstruction.
+
+\begin{lemma}[Saturated rectangle obstruction]\label{lem:saturated}
+Let $L$ be a set of transitive vertices in a simple digraph with
+$\lamax\le2$, and let $A_0,C_0\subseteq L$.  Suppose that for every
+$a\in A_0$ there is $z(a)\in L$ such that, for every $c\in C_0$,
+\[
+ a\to c,
+ \qquad a\to z(a),
+ \qquad z(a)\to c.
+ \tag{\(**\)}\label{eq:saturated}
+\]
+Let $H=V(D)\setminus L$.  Then for every $h\in H$,
+\[
+ h\not\to a,\qquad c\not\to h,
+ \qquad\text{and}\qquad
+ \{a\to h,\ h\to c\}\not\subseteq A(D)
+\]
+for all $a\in A_0$, $c\in C_0$.  In particular, if all arcs between
+$H$ and $a,c$ are incident in the forced directions, then
+\begin{equation}\label{eq:external-sum}
+ d_H(a)+d_H(c)\le |H|.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+If $h\to a$, transitivity at $a$ and \eqref{eq:saturated} give
+$h\to z(a)$ and $h\to c$.  The direct path $h\to c$ and the paths through
+$a$ and $z(a)$ are three arc-disjoint $h$--$c$ paths.  Thus $h\not\to a$.
+The assertion $c\not\to h$ follows dually, using transitivity at $c$.
+Finally, $a\to h\to c$ cannot coexist with the direct path and the path
+through $z(a)$.  Therefore the out-neighbours of $a$ in $H$ and the
+in-neighbours of $c$ in $H$ are disjoint, proving
+\eqref{eq:external-sum}.
+\end{proof}
+
+\section{Induction: the odd step}
+
+We now prove the upper bound, assuming the finite verification of
+Section~\ref{sec:computer}.
+
+\begin{lemma}[Odd step]\label{lem:odd}
+Let $k\ge5$.  If $g(2k)=k(k+1)$, then
+\[
+ g(2k+1)=(k+1)^2.
+\]
+\end{lemma}
+
+\begin{proof}
+The construction gives the lower bound.  Suppose an $(2k+1)$-vertex
+feasible digraph has $(k+1)^2+1$ arcs.  Deleting any vertex leaves at most
+$k(k+1)$ arcs, so every vertex has degree at least $k+2$.  But
+\[
+ \frac{2((k+1)^2+1)}{2k+1}<k+2
+\]
+for $k\ge5$, contradicting the average-degree bound.
+\end{proof}
+
+\section{Induction: the even step}
+
+\begin{lemma}[Even step]\label{lem:even}
+Let $k\ge6$.  If Theorem~\ref{thm:main} holds at every order below $2k$,
+then
+\[
+ g(2k)=k(k+1).
+\]
+\end{lemma}
+
+\begin{proof}
+Suppose that a feasible digraph $D$ on $2k$ vertices has
+\[
+ E=k(k+1)+1
+\]
+arcs.  Since $g(2k-1)=k^2$, deletion gives $d(v)\ge k+1$ for every
+vertex.  As
+\[
+ \sum_v d(v)=2E=2k(k+1)+2,
+\]
+exactly one of the following degree patterns occurs:
+\begin{align*}
+\text{(A)}&\quad (k+1)^{2k-1},\ k+3;\\
+\text{(B)}&\quad (k+1)^{2k-2},\ (k+2)^2.
+\end{align*}
+Let $L$ be the vertices of degree $k+1$ and let $H=V(D)\setminus L$.
+Corollary~\ref{cor:split-bound} gives $\nu(v)=0$ for every $v\in L$, so
+all vertices of $L$ are transitive.
+
+There is no digon inside $L$.  Indeed, deleting its two endpoints would
+leave
+\[
+ E-2(k+1)+2=k(k-1)+1
+\]
+arcs on $2k-2$ vertices, whereas the induction hypothesis gives
+$g(2k-2)=k(k-1)$.  Thus $D[L]$ is the comparability digraph of a poset
+$P$.  Every interval of $P$ has at most three elements: two distinct
+strict intermediate elements, together with the direct arc, would give
+three arc-disjoint paths.  No vertex of $P$ is isolated, since a vertex of
+$L$ can be incident with at most $2|H|\le4$ arcs outside $L$, while
+$k+1\ge7$.
+
+Let $A,B,C$ be the minimal, middle, and maximal levels from
+Lemma~\ref{lem:poset}, with sizes $a,b,c$, after dualising so that $c\ge a$.
+The set $B$ is nonempty.  Indeed, if $b=0$, then
+$e(P)\le\floor{|L|^2/4}$, which is smaller than the value of $e(P)$ in
+either degree pattern below.
+
+\smallskip
+\noindent\emph{Pattern (A): one exceptional vertex.}
+Here $|H|=1$ and
+\[
+ N=|L|=2k-1,
+ \qquad e(P)=E-(k+3)=k^2-2.
+\]
+Write
+\[
+ c=k-1+s,
+ \qquad a=k-s-b.
+\]
+Lemma~\ref{lem:poset} gives
+\[
+ k^2-2\le c(N-c)+a=k^2-s^2-b,
+\]
+so $s^2+b\le2$.  The condition $c\ge a$ leaves exactly
+\[
+ (s,b)=(1,1),\ (0,1),\ (0,2).
+\]
+
+For $(1,1)$, the deficit in Lemma~\ref{lem:poset} is zero and the unique
+middle vertex has internal degree $a+c=2k-2>k+1$, impossible.  For
+$(0,1)$, the deficit is one; part (iv) of that lemma shows that the middle
+vertex has internal degree at least $a+c-1=2k-3>k+1$.
+
+It remains that $(s,b)=(0,2)$.  Then
+$a=k-2$, $c=k-1$, and equality holds in
+Lemma~\ref{lem:poset}.  Hence all $A\to C$ relations are present,
+$Y_1=Y_2=C$, and $X_1,X_2$ partition $A$.  Each middle vertex has internal
+degree $c+|X_i|\le k+1$, so $|X_i|\le2$.  Therefore $k=6$ and
+$|X_1|=|X_2|=2$.  Every vertex of $A$ and $C$ then has internal degree
+$6$ and exactly one incident arc to the exceptional vertex, whereas the
+middle vertices have no external arc.  Conditions
+\eqref{eq:saturated} hold with $A_0=A$, $C_0=C$ and the unique middle
+vertex assigned to each $a$.  Equation~\eqref{eq:external-sum} gives
+$1+1\le1$, a contradiction.
+
+\smallskip
+\noindent\emph{Pattern (B): two exceptional vertices.}
+Let $r\in\{0,1,2\}$ be the number of arcs between the two vertices of $H$.
+Then
+\[
+ N=|L|=2k-2,
+ \qquad
+ e(P)=E-\bigl(2(k+2)-r\bigr)=k(k-1)-3+r.
+\]
+Write
+\[
+ c=k-1+s,
+ \qquad a=k-1-s-b.
+\]
+The poset bound becomes
+\begin{equation}\label{eq:case-constraint}
+ s^2+s+b\le3-r.
+\end{equation}
+Together with $c\ge a$, this gives precisely the cases in
+Table~\ref{tab:cases}.  The symbol ``degree'' means that one middle vertex
+already has internal degree greater than $k+1$.  The symbol
+$(p,q)$ means that Lemma~\ref{lem:saturated} applies to nonempty sets
+$A_0,C_0$ whose vertices have respectively $p$ and $q$ incident arcs to
+$H$; then \eqref{eq:external-sum} says $p+q\le2$, a contradiction.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{c c c c c}
+\toprule
+$r$ & $(s,b)$ & $(a,c)$ & $\delta$ & obstruction \\
+\midrule
+2 & $(0,1)$  & $(k-2,k-1)$ & 0 & degree \\
+\midrule
+1 & $(0,1)$  & $(k-2,k-1)$ & 1 & degree \\
+1 & $(0,2)$  & $(k-3,k-1)$ & 0 & $(1,2)$ \\
+1 & $(-1,2)$ & $(k-2,k-2)$ & 0 & $(2,1)$ \\
+\midrule
+0 & $(1,1)$  & $(k-3,k)$   & 0 & degree \\
+0 & $(0,3)$  & $(k-4,k-1)$ & 0 & $(1,2)$ \\
+0 & $(-1,3)$ & $(k-3,k-2)$ & 0 & $(2,1)$ \\
+0 & $(0,2)$  & $(k-3,k-1)$ & 1 & $(1,2)$ \\
+0 & $(-1,2)$ & $(k-2,k-2)$ & 1 & $(2,1)$ \\
+0 & $(0,1)$  & $(k-2,k-1)$ & 2 & degree, except $k=6$ \\
+\bottomrule
+\end{tabular}
+\caption{All integer solutions of \eqref{eq:case-constraint}.}
+\label{tab:cases}
+\end{table}
+
+We justify the table entries.  In each zero-deficit row with $b\ge2$,
+parts (i)--(ii) of Lemma~\ref{lem:poset} give, after duality when needed,
+all $A\to C$ relations, $Y_z=C$, and a partition of $A$ by the sets $X_z$.
+Consequently an $A$-vertex has internal degree $c+1$ and a $C$-vertex has
+internal degree $a+b$.  Their external degrees are exactly the pair shown
+in the final column, and Lemma~\ref{lem:saturated} applies.
+
+The two one-deficit rows with $b=2$ follow from part (iii) of
+Lemma~\ref{lem:poset}.  If one $A$-vertex is unused, take
+$A_0=X_1\cup X_2$ and $C_0=C$.  If one middle vertex misses one maximal
+element, take $A_0=A$ and delete that maximal element from $C_0$.  The
+same external degrees, $(1,2)$ or $(2,1)$ after duality, hold on these
+sets.
+
+For the last row, let $z$ be the unique middle element and use the notation
+$\alpha,\beta,\gamma$ from Lemma~\ref{lem:poset}(iv).  Its internal degree
+is
+\[
+ a+c-(\alpha+\beta)\ge2k-5.
+\]
+This exceeds $k+1$ when $k>6$.  If $k=6$, equality forces
+$\alpha+\beta=2$ and $\gamma=0$.  Put $A_0=X_z$, $C_0=Y_z$.
+Every $a\in A_0$ has internal degree $6$ and external degree $1$, while
+every $c\in C_0$ has internal degree $5$ and external degree $2$.
+Lemma~\ref{lem:saturated} again gives $1+2\le2$, impossible.
+
+All cases lead to a contradiction, proving the even step.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+The lower bounds were given in Section~1.  The finite verification in
+Section~\ref{sec:computer} proves the theorem for $3\le n\le10$.
+For $n\ge11$, use strong induction.  Lemma~\ref{lem:odd} proves every odd
+order from the preceding even order, and Lemma~\ref{lem:even} proves every
+even order at least $12$ from the smaller orders.
+\end{proof}
+
+\section{The finite verification}\label{sec:computer}
+
+For completeness, we describe the exact finite calculation on which the
+proof rests.  It checks that no feasible digraph has $F(n)+1$ arcs for
+$3\le n\le10$; deleting arcs shows that this also excludes every larger
+arc count.
+
+There is one Boolean variable $a_{uv}$ for every possible arc $u\to v$.
+For each ordered pair $(s,t)$, independent Boolean variables
+$x_u^{st}$ choose a cut, with $x_s^{st}=1$ and $x_t^{st}=0$, and the model
+imposes
+\begin{equation}\label{eq:cut-encoding}
+ \sum_{\substack{u\ne v\\x_u^{st}=1,\ x_v^{st}=0}} a_{uv}\le2.
+\end{equation}
+By directed max-flow/min-cut, the existence of such a cut for every
+$(s,t)$ is exactly the condition $\lamax\le2$; this is not a relaxation.
+
+For a target $K=F(n)+1$, deletion of one vertex gives
+$d(v)\ge K-F(n-1)$.  The program enumerates all nondecreasing degree
+sequences with this lower bound and sum $2K$.  It also inserts the valid
+splitting inequalities from Corollary~\ref{cor:split-bound}: a vertex of
+degree $d$ cannot have a legal-pair matching of size
+$d-(K-F(n-1))+1$.  The remaining symmetry is broken by ordering
+outdegrees inside equal-degree blocks.  At $n=9$, reversing every arc if
+necessary lets one additionally assume that the first degree-$5$ vertex
+has outdegree $0$, $1$, or $2$, and these three cases are checked
+separately.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{c c c c}
+\toprule
+$n$ & forbidden target $F(n)+1$ & degree sequences & verdict \\
+\midrule
+7 & 19 & 36 & all UNSAT \\
+8 & 22 & 68 & all UNSAT \\
+9 & 26 & 15 (45 reversal branches) & all UNSAT \\
+10 & 31 & 2 & all UNSAT \\
+\bottomrule
+\end{tabular}
+\caption{The nontrivial finite checks.  Orders $3$--$6$ are immediate
+exhaustive cases.}
+\label{tab:computer}
+\end{table}
+
+The accompanying file \texttt{verify\_m3\_bases.py} writes the exact
+SMT-LIB instances and invokes Z3.  The source and the branch logs are part
+of the supplementary material.  Thus the finite input to the induction is
+fully reproducible.  The present verification records exact UNSAT solver
+verdicts; it does not claim an independently replayable DRAT/LRAT proof
+certificate.
+
+\end{document}

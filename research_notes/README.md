@@ -293,6 +293,48 @@ Scripts: `simple_vertex_blocks.py` (block table via geng), `st_construction.py`
 (rebuilds the Sorensen-Thomassen witness and checks counts, 2-connectivity and
 feasibility), `vertex_min_degree.py` (the degeneracy search).
 
+### Two external drafts on the directed problem (UNVERIFIED, arrived 2026-09-02)
+
+Three files in [`external/`](external/), drafted with GPT and passed on by Stijn.
+They are recorded as received. Neither has been proof-checked here, and the
+second one is missing the program its proof depends on.
+
+**1. The two-path bound (folded into the thesis as a citation).** A digraph with
+`lambda^max <= m-1`, or with `kappa^max <= m-1`, has at most `m-1` directed
+two-step routes between any ordered pair, so it contains no `P_{m,2}`, `m` such
+routes with common endpoints. The Turan number for that family is a published
+theorem of Huang and Lyu (Discrete Appl. Math. **388** (2026) 1-10,
+doi:10.1016/j.dam.2026.02.043), and it turns the error term of
+`thm:dir-arc-linear-error` and `thm:dir-vertex-linear-error` from
+`4(m-1)(n-1)` into `(m-1)n + O_m(1)`, at the price of a threshold
+`n >= N(m-1)` that is cubic in `m` (121 at `m=3`, 390 at `m=6`). The thesis
+bound stays the uniform one, holds from `n = 2`, and is the one that carries
+over to hypergraphs, which this does not. ch1 cites the paper in one sentence
+where the linear coefficient is discussed. The formula `g(n,t)` and the journal
+metadata were checked against the arXiv abstract (2406.16101) and Crossref. The
+threshold `N(t)` was NOT checked, and neither was whether Huang and Lyu allow
+digons: if their digraphs forbid opposite arcs, their class is smaller than the
+thesis's and the bound does not transfer. Check both before this becomes
+anything more than a citation.
+  Files: `directed_connectivity_two_path_improvement.tex` (with the sandwich
+  against the conjectured `(m-2)/2`), `directed_connectivity_huang_lyu_short.tex`
+  (the same result, shorter).
+
+**2. `conj:dir-arc` at m = 3, claimed in full (NOT in the thesis).**
+`m3_simple_digraph_proof.tex` claims `ell_3^dir(n) = max(3(n-1), floor((n+1)^2/4))`
+for every `n >= 3`, by induction on `n` from a machine-checked base range
+`n <= 10`. The machinery is a safe arc-splitting operation, a counting lemma for
+posets whose intervals hold at most three elements, and a nine-row case table.
+Nothing in it contradicts the thesis: the exhaustive values at `n <= 6` and the
+searched values at `n = 7, 8` all sit on the claimed formula.
+  It is out of the thesis for two reasons. The proof is long and its base cases
+are a computer run, which makes it read as confirmation that the conjecture
+looks right rather than as a clean argument, and `verify_m3_bases.py`, the Z3
+script that runs those base cases, was never handed over. Without that script
+the finite half of the proof cannot be replayed at all, so it could not enter
+the thesis under the honesty contract even if the human half checked out.
+Ask for the script first, then check the case table.
+
 ## How to add an entry
 
 One topic per file (or a small folder if it grows). Lead with the formal
