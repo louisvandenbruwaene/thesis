@@ -113,9 +113,9 @@ For all $n \ge 2$ and $m \ge 2$,
 \end{theorem}
 
 Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
-The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory-Hu tree (\Cref{thm:gomory-hu}). 
+The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory--Hu tree (\Cref{thm:gomory-hu}). 
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
-The very same Gomory-Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) is proved by an elementary induction on a hyperedge cut instead.
+The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) is proved by an elementary induction on a hyperedge cut instead.
 Hence its properties are recorded here.
 Every graph has a weighted spanning tree such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
 All $\binom{n}{2}$ local connectivities are therefore encoded by just $n - 1$ weights. 
@@ -284,7 +284,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
 \label{fig:eight-models}
 \end{figure}
 
-The digraphs do not have a Gomory-Hu tree, but they do have a directed analogue of Menger's theorem.
+The digraphs do not have a Gomory--Hu tree, but they do have a directed analogue of Menger's theorem.
 A digraph has three degree counts at each vertex. The \emph{out-degree} $d^+(v)$ counts the arcs leaving $v$ and the vertices they reach are its \emph{out-neighbours}. 
 The \emph{in-degree} $d^-(v)$ counts the arcs entering $v$ and the vertices they come from are its \emph{in-neighbours}. 
 The \emph{total degree} $d(v) = d^+(v) + d^-(v)$ adds the two. 
@@ -413,8 +413,10 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \label{fig:edge-vs-vertex}
 \end{figure}
 
+\subsection{The incidence convention}\label{sec:incidence-convention}
+
 Every model in this thesis measures vertex separation in the same place, the
-incidence graph.\label{sec:incidence-convention}
+incidence graph.
 The incidence graph $I(\HH)$ has one node for each vertex and one node for each
 edge copy, and it joins an edge copy to each of the vertices it contains. A route
 from $u$ to $v$ is a path of $I(\HH)$, and two routes are separated when they
@@ -490,7 +492,7 @@ By Whitney's inequality every edge-feasible graph is vertex-feasible, so $k_m(n)
 One is tempted to expect the equality forever. 
 This, however, is not the case, and S{\o}rensen and Thomassen proved that the vertex problem diverges from the edge problem at $m = 5$.
 
-\begin{theorem}[S{\o}rensen-Thomassen \cite{SorensenThomassen74}]\label{thm:sorensen-thomassen}
+\begin{theorem}[S{\o}rensen--Thomassen \cite{SorensenThomassen74}]\label{thm:sorensen-thomassen}
 For simple graphs,
 \[
     k_5(n) = \floorfrac{5(n-1)}{2} = \ell_5(n) \quad (6 \le n \le 13),

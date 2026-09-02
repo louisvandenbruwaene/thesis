@@ -300,7 +300,7 @@ Those two quantities are adjacent integers by construction: if $k$ is the larges
 
 What follows is the bookkeeping that convention forces on every constant quoted from the literature.
 
-The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ \cite{Leonard73} against $3n-3$, and it writes the Bollob\'{a}s-Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ \emph{on $1 + (m-1)n$ vertices} against $\binom{m}{2}n$ here. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
+The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ \cite{Leonard73} against $3n-3$, and it writes the Bollob\'{a}s--Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ \emph{on $1 + (m-1)n$ vertices} against $\binom{m}{2}n$ here. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
 
 The conjecture is the one entry that must keep its vertex count attached, and an earlier draft of this thesis lost it. On $N = 1 + (m-1)n$ vertices the conjectured value is $\binom{m}{2}\frac{N-1}{m-1} = \frac{m(N-1)}{2}$, which is the rate $c_m = m/2$ of \Cref{thm:simple-vertex-blocks}. Read instead as a count on $n$ vertices, $\binom{m}{2}n$ overstates it by a factor of $m-1$, giving $3n$ at $m = 3$ where the true value is about $3n/2$.
 
@@ -769,7 +769,7 @@ Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. 
 \end{proposition}
 
 \begin{proof}
-$D$ is $(m-1)$-budgeted by \Cref{lem:feasible-budgeted}. Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy-Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$, \Cref{lem:budget-degree-sum} gives
+$D$ is $(m-1)$-budgeted by \Cref{lem:feasible-budgeted}. Since $\min(a,b) \le \sqrt{ab}$ for non-negative $a, b$, and by the Cauchy--Schwarz inequality in the form $\sum_x \sqrt{a_x} \le \sqrt{n \sum_x a_x}$, \Cref{lem:budget-degree-sum} gives
 \[
 \begin{aligned}
     \sum_{x \in V} \min\bigl(d^+(x), d^-(x)\bigr)
@@ -783,7 +783,7 @@ $D$ is $(m-1)$-budgeted by \Cref{lem:feasible-budgeted}. Since $\min(a,b) \le \s
 \Cref{lem:smaller-half-deletion} turns that count into both conclusions at once.
 \end{proof}
 
-The Cauchy-Schwarz step is what costs the $\sqrt n$, and it is tight only if $d^+(x)d^-(x)$ is about $(m-1)n$ at every vertex, which forces every degree down to about $\sqrt{mn}$. A digraph with $\Theta(n^2)$ arcs has average degree $\Theta(n)$, and at a vertex of large degree the constraint $d^+(x) d^-(x) \le (m-1)n$ bites much harder: with $d^+ + d^-$ of order $n$, the smaller of the two must be of order $m$ rather than $\sqrt{mn}$. The dense case and the tight case of Cauchy-Schwarz are therefore incompatible, and \Cref{lem:two-step-budget} exploits that with a dichotomy on the minimum degree, using vertex deletion on the sparse side, which is how it reaches a linear error term.
+The Cauchy--Schwarz step is what costs the $\sqrt n$, and it is tight only if $d^+(x)d^-(x)$ is about $(m-1)n$ at every vertex, which forces every degree down to about $\sqrt{mn}$. A digraph with $\Theta(n^2)$ arcs has average degree $\Theta(n)$, and at a vertex of large degree the constraint $d^+(x) d^-(x) \le (m-1)n$ bites much harder: with $d^+ + d^-$ of order $n$, the smaller of the two must be of order $m$ rather than $\sqrt{mn}$. The dense case and the tight case of Cauchy--Schwarz are therefore incompatible, and \Cref{lem:two-step-budget} exploits that with a dichotomy on the minimum degree, using vertex deletion on the sparse side, which is how it reaches a linear error term.
 
 The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as the arc problem rather than in the wide one. Its leading constant is $\tfrac14$ unconditionally, the term after it is linear in $n$, and since $\ell_m^{\mathrm{dir}}(n) \le k_m^{\mathrm{dir}}(n)$ with both now inside $n^2/4 + \Theta_m(n)$, the two values agree to first order. What is left is the coefficient of the linear term, the same quantity \Cref{open:decomposition} is needed for on the arc side, together with the conjecture that the two values coincide exactly.
 
@@ -1778,7 +1778,7 @@ with $g_m(b) := -\infty$ when no such $B$ exists. Then for all $m \ge 2$ and $n 
 the maximum over all finite multisets of block sizes. In particular the value is determined by the finitely many numbers $g_m(2), \dots, g_m(n)$.
 \end{theorem}
 
-\begin{proof}[Proof of \Cref{thm:multi-vertex-blocks}]
+\begin{proof}
 \emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
 \[
     W_m(G_0) \;=\; \sum_{\text{blocks } B} W_m(B) .
@@ -2392,7 +2392,7 @@ This keeps parity effects in the discrete data from looking like a proposed form
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6_hypergraphs.png}
-    \caption{The eight hypergraph-model variants at $m=6$. In the simple undirected edge panel, the proved upper bound is $10$ at $n=5$ and $12$ at $n=6$. The exact values are $8$ and $11$.}
+    \caption{The eight hypergraph-model variants at $m=6$. In the simple undirected edge panel the proved upper bound is $10$ at $n=5$ and $12$ at $n=6$, while the true maxima are $8$ and $11$. Only the $8$ is drawn as a square: the exhaustive solve finished at $n=5$ and not at $n=6$, where the twelve-hyperedge enumeration below supplies the value.}
     \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}
 
@@ -2406,9 +2406,11 @@ A simple hypergraph then has one hyperedge, while a multihypergraph attains the 
 \Cref{tab:variant-values} gives the same data numerically.
 Blue entries are proved, red entries belong to \Cref{conj:dir-arc}, and gold entries are open.
 A bold green entry is machine-checked exact.
-The prefix $\le$ marks a proved upper bound without a matching construction at that point.
+The prefix $\le$ marks a proved upper bound that no recorded exact value matches at that point.
 The prefix $\ge$ marks a verified construction without a matching upper bound.
 A blank cell means that the model does not exist at that order.
+The simple hypergraph cell at $m=6$, $n=6$ is such a $\le$ point.
+It reads $\le 12$ because the exhaustive solve did not finish there, while the twelve-hyperedge enumeration above fixes the true maximum at $11$.
 
 \begin{table}[p]
     \centering
