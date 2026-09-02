@@ -2,8 +2,13 @@
 __pycache__/
 *.pyc
 
-# Program run logs (regenerated; not part of the deliverable)
+# Program run logs.  The four transcripts the thesis cites are tracked already,
+# so this rule only keeps the scratch logs of later runs out of the repository.
 program/logs/
+
+# A rebuild in progress. Scratch state, promoted into machine_values.json by
+# --promote once it has been reviewed, and of no use to anyone else.
+program/data/machine_values.candidate.json
 
 # LaTeX build artifacts (the built main.pdf IS committed on purpose)
 *.aux
@@ -17,6 +22,7 @@ program/logs/
 *.loa
 *.lof
 *.lot
+revision.tex
 *.synctex.gz
 *.nav
 *.snm

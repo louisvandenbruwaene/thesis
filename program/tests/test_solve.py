@@ -38,6 +38,38 @@ from erdos915_unified import (
 )
 
 
+class Domain(unittest.TestCase):
+    """Out-of-domain input is refused, not answered.
+
+    Every one of these used to return a confident exact 0 from an enumeration
+    with nothing in it, which is indistinguishable in a SolveResult from a
+    computed answer.
+    """
+
+    def test_m_below_two_forbids_nothing_and_is_refused(self):
+        for m in (0, 1, -3):
+            with self.subTest(m=m):
+                with self.assertRaises(ValueError):
+                    solve(3, m, exhaustive=True)
+
+    def test_uniformity_outside_two_to_n_is_refused(self):
+        for r in (1, 99):
+            with self.subTest(r=r):
+                with self.assertRaises(ValueError):
+                    solve(3, 3, hypergraph=True, r=r, exhaustive=True)
+
+    def test_non_integer_sizes_are_refused(self):
+        with self.assertRaises(TypeError):
+            solve(True, 3, exhaustive=True)
+        with self.assertRaises(TypeError):
+            solve(3.5, 3, exhaustive=True)
+
+    def test_the_degenerate_single_vertex_case_is_a_real_question(self):
+        """n = 1 has no edge to place, so 0 is the answer and not an error."""
+        result = solve(1, 3, exhaustive=True)
+        self.assertEqual((result.value, result.bound), (0, "exact"))
+
+
 class Solve(unittest.TestCase):
     def test_exhaustive_simple_directed_is_exact(self):
         r = solve(4, 2, directed=True, simple=True, exhaustive=True, max_seconds=120.0)

@@ -343,3 +343,61 @@ asks for.]
 
 VERIFY: 115 pp, 0 overfull, 4 underfull, 0 undefined, 0 warnings. Full suite green
 with the stale skip gone. Both grids regenerated from the gated code.
+
+## 2026-09-02 (Opus, second session) — input validation, and the cache split into render vs rebuild
+
+An external audit listed six defects. All six reproduced against the code before
+anything was changed, and two of its claims were narrower than stated: SciPy
+already rejects equal endpoints in EDGE mode (only the split matrix returned 1
+for a self-pair), and an out-of-range hypergraph endpoint is only silently
+accepted while the index lands inside the gate block, since a larger one falls
+off the network and raises. Neither weakens the fix, because validation that
+depends on where a bad index happens to land is not validation.
+
+VALIDATION. One primitive, `_require_integer(name, value, minimum, maximum,
+range_error)`, is now the only place an integer is checked, because the part that
+gets forgotten is the first line: `bool` is a subclass of `int`, so `True` passes
+every naive test and means vertex 1 or multiplicity 1. It is wired into both
+`__init__`s, `_require_vertex`, `_assign`, `add_edge`/`remove_edge`, the new
+`Hypergraph._vertex_set`, both connectivity endpoint guards, and `solve`'s domain
+(n >= 1, m >= 2, 2 <= r <= n; n = 1 is admitted because 0 is its true answer).
+
+**TWO LAUNDERING PATHS, BOTH FOUND BY WRITING THE FIX AND NOT BY READING THE
+AUDIT.** A guard on `_assign` alone does NOT catch `add_edge(0, 1, 1.9)` on a
+simple graph: the saturation `min(mu + 1.9, 1)` returns a clean integer 1 and the
+bad input is gone before the assignment sees it. And `frozenset([0, 1, True])` is
+`{0, 1}`, because `True == 1`, so a bad member does not survive to be rejected,
+it disappears and leaves a hyperedge one vertex short. A declared uniformity
+catches that by accident, as a size error; `r=None` does not catch it at all.
+Both fixes are therefore ordered: check before the normalising step, never after.
+
+CACHE, REBUILT AS RENDER VS REBUILD. The old `--refresh` reconciled a rerun
+against the published record and kept the better value, which meant a "successful"
+refresh could stamp the new program's hash onto values the old program computed.
+Fixing that by hand ran into the deeper problem: the fingerprint answers "did any
+byte change", never "did any answer change", so a fail-closed check fires on a
+validation edit that provably changes nothing. Rendering now never computes (a
+missing key is an error), `--rebuild` recomputes everything from scratch into
+`data/machine_values.candidate.json` and draws nothing, `--compare` lists every
+departure, and `--promote` is the only act that writes the record. Provenance
+(program hash, source commit, python, platform, date) is recorded and never
+enforced. `_reconcile`, `--accept-stale` and the compatibility-list idea are all
+gone, and about eighty lines with them.
+
+MEASURED, NOT ESTIMATED. A full rebuild is about an hour: 46.5 min for the 129
+exact entries plus 10 min of timed searches. Two entries are 46 percent of it
+(directed simple n=6 m=3, 930s vertex and 357s edge). The 1800s budgets are pure
+headroom, never spent, and larger m is CHEAPER, not dearer, because a weaker
+constraint lets the incumbent climb and the search prune. All 129 exact values
+recomputed identically under the new code, which is the evidence that the
+validation edits changed no answer. The same two entries were recorded at 1423s
+and 544s earlier, 1.5x slower on the same machine, which is exactly the
+machine-dependence the render/rebuild split exists to contain.
+
+RECORD_REVISION. `git diff` ignored untracked files, so an untracked figure the
+PDF was built from read as clean; now `git status --porcelain`. `git tag -f` could
+move a tag already printed inside a handed-in PDF; now it refuses, and options are
+parsed rather than read as a tag name.
+
+VERIFY: full suite green, self-check ALL CHECKS PASSED, both variant grids
+gathered from the record with nothing computed and no candidate written.

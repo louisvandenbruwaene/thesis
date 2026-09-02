@@ -120,10 +120,14 @@ def check_cyclic_word(max_b: int = 11, max_d: int = 11) -> None:
 #
 # TWO TRAPS, both hit while writing this:
 #  * condition (iv) is the NON-COLLAPSING kappa, as the lemma's own two-vertex
-#    base case shows when it caps a multiplicity at two.  The program's
-#    vertex mode collapses parallel copies (sec:parallel-convention) and returns
-#    1 for every multiplicity, so kappa has to be rebuilt as mu + pi through
-#    lem:multi-vertex-split.
+#    base case shows when it caps a multiplicity at two.  The program's vertex
+#    mode agrees: under the incidence convention (sec:incidence-convention) q
+#    parallel copies are q routes, so local_connectivity(..., vertex_split=True)
+#    already returns this kappa.  It is rebuilt here as mu + pi through
+#    lem:multi-vertex-split anyway, so that this review computes the quantity
+#    the lemma names from the lemma's own decomposition rather than by calling
+#    the code it is meant to be reviewing.  An earlier convention did collapse
+#    the copies, which is why the rebuild was once the only way to get it.
 #  * blocks cannot be found by unioning edges that share a non-cut vertex: a
 #    four-cycle with a pendant at two opposite vertices splits into two false
 #    blocks that way.  Use a real biconnected-components routine.
@@ -164,8 +168,10 @@ def kappa(G, u, v):
 
     By lem:multi-vertex-split, kappa(u,v) = mu(u,v) + pi(u,v), where pi counts
     internally disjoint routes of length at least two in the underlying SIMPLE
-    graph.  The program's own vertex mode collapses parallel copies
-    (sec:parallel-convention), so it cannot be called directly here.
+    graph.  The program's own vertex mode now returns the same number under the
+    incidence convention (sec:incidence-convention); this is an independent
+    implementation of it, kept deliberately, so a review of the lemma does not
+    rest on the checker whose agreement it is reporting.
     """
     idx = {w: i for i, w in enumerate(G.V)}
     g = Graph(len(G.V), UND)

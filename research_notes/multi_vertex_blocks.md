@@ -77,7 +77,7 @@ Sweeping all 2-connected graphs on `b <= 8` vertices (1, 1, 3, 10, 56, 468,
 | 8 | 7 | 18 | 30 | 42 | 54 | 66 | 79 |
 
 Cross-checked against the thesis program's own exhaustive
-`max_multigraph_vertex_standard`, which shares no reasoning with the block
+`max_multigraph_vertex`, which shares no reasoning with the block
 argument. It **proved** 23 of these cells within its time limit, namely every
 `(m,n)` with `m=2` and `n<=7`, `m=3` and `n<=6`, and `m in {4,5,6}` with `n<=5`,
 and all 23 agree exactly. The five that hit the cap returned lower bounds, all

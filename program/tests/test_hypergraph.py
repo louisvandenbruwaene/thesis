@@ -5,6 +5,7 @@ import random
 import unittest
 
 import numpy as np
+import erdos915_unified as unified
 
 from erdos915_unified import (
     Hypergraph,
@@ -24,6 +25,47 @@ from erdos915_unified import (
 
 
 class BergeConnectivity(unittest.TestCase):
+    def test_invalid_container_dimensions_are_rejected(self):
+        with self.assertRaises(ValueError):
+            Hypergraph(-5, [])
+        with self.assertRaises(ValueError):
+            Hypergraph(3, [], r=0)
+        with self.assertRaises(ValueError):
+            Hypergraph(3, [], r=99)
+
+    def test_an_endpoint_outside_the_vertex_set_is_refused(self):
+        """A stray index used to land on an internal gate and answer anyway.
+
+        The Berge network holds two helper nodes per hyperedge after the n real
+        ones, so ``n`` itself is a valid node of the flow network and the max-flow
+        happily returned a route count for something that is not a vertex.
+        """
+        h = Hypergraph(3, [{0, 1}])
+        for source, target in [(3, 0), (0, 3), (-1, 0)]:
+            with self.subTest(pair=(source, target)):
+                with self.assertRaises(IndexError):
+                    hyper_connectivity(h, source, target)
+        with self.assertRaises(ValueError):
+            hyper_connectivity(h, 0, 0)
+
+    def test_a_member_is_checked_before_the_set_collapses_it(self):
+        """``True == 1``, so ``frozenset([0, 1, True])`` silently loses a member.
+
+        With a declared uniformity the missing vertex is caught by accident, as
+        a hyperedge of the wrong size. With ``r=None`` nothing notices at all, so
+        the check has to happen before the frozenset is built.
+        """
+        for r in (3, None):
+            with self.subTest(r=r):
+                with self.assertRaises(TypeError):
+                    Hypergraph(4, [], r=r).add_hyperedge([0, 1, True])
+                with self.assertRaises(TypeError):
+                    Hypergraph(4, [], r=r).add_hyperedge([0, 1, 2.0])
+
+    def test_a_member_outside_the_vertex_set_is_refused(self):
+        with self.assertRaises(ValueError):
+            Hypergraph(3, []).add_hyperedge([0, 1, 7])
+
     def test_single_hyperedge_carries_one_route(self):
         h = Hypergraph(3, [[0, 1, 2]])
         self.assertEqual(h.edge_count(), 1)
@@ -230,6 +272,19 @@ class MergedGateMatchesPerCopy(unittest.TestCase):
             h = Hypergraph(3, [triple] * copies)
             self.assertEqual(hyperedge_connectivity(h, 0, 1), copies)
             self.assertEqual(hyper_connectivity(h, 0, 1, vertex_split=True), copies)
+
+    def test_membership_capacity_is_not_a_global_answer_ceiling(self):
+        # A small patched sentinel reproduces the old million-copy bug cheaply:
+        # membership arcs must derive their capacity from this instance instead.
+        old = unified._UNBOUNDED
+        try:
+            unified._UNBOUNDED = 3
+            edge = frozenset({0, 1})
+            h = Hypergraph(2, [edge] * 4)
+            self.assertEqual(hyper_connectivity(h, 0, 1), 4)
+            self.assertEqual(hyper_connectivity(h, 0, 1, vertex_split=True), 4)
+        finally:
+            unified._UNBOUNDED = old
 
 
 

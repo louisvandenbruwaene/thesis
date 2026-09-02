@@ -59,7 +59,15 @@ LaTeX (needs a TeX Live with `latexmk`):
 latexmk -pdf main.tex
 ```
 
-Figures (needs Python 3 with numpy, scipy, networkx, matplotlib):
+Create the local environment with Python 3.14.6 (the interpreter used for the
+recorded runs), then install the pinned packages:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python3 -m pip install -r program/requirements-lock.txt
+```
+
+Figures:
 
 ```bash
 cd program && ../.venv/bin/python3 make_figures.py   # writes into ../figures/
@@ -74,9 +82,8 @@ BMAX=9 .venv/bin/python3 program/scripts/simple_vertex_blocks.py
 BMAX=8 .venv/bin/python3 program/scripts/multi_vertex_blocks.py
 ```
 
-The bundled `.venv` was created before the repo moved, so its `activate` script and
-console entry points still point at the old path. Call `.venv/bin/python3` directly,
-as above, or recreate the environment.
+The virtual environment is deliberately untracked and is not included in a clone.
+Use `.venv/bin/python3` directly after creating it as above; activation is optional.
 
 Figure sizes are deliberate: each plot is drawn at close to the width the thesis
 gives it, so the point sizes in the plotting code survive to paper unshrunk. Enlarging

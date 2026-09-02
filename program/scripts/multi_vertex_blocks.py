@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The multigraph vertex problem (other convention) as a BLOCK problem.
+"""The multigraph vertex problem (incidence convention) as a BLOCK problem.
 
 Backs research_notes/multi_vertex_blocks.md and the thesis results
 lem:multi-vertex-objective, thm:multi-vertex-blocks, thm:multi-vertex-bipartite
@@ -20,7 +20,7 @@ Two claims.
     shared vertex.
 
 Needs nauty's geng on PATH and networkx.  Cross-checks against the thesis
-program's own exhaustive max_multigraph_vertex_standard where that finishes.
+program's own exhaustive max_multigraph_vertex where that finishes.
 
 Run:  python3 program/scripts/multi_vertex_blocks.py
 """
@@ -128,7 +128,7 @@ def main() -> None:
         print(f"    m={m}  " + "  ".join(f"{c:>6}" for c in cells))
 
     print("\n[3] cross-check against the thesis program's exhaustive routine")
-    from erdos915_unified import max_multigraph_vertex_standard      # noqa: E402
+    from erdos915_unified import max_multigraph_vertex      # noqa: E402
     import time
     # The default list is the fast one.  FULL=1 runs the wider sweep, which
     # proves 23 cells (m=2 to n=7, m=3 to n=6, m in {4,5,6} to n=5) and leaves
@@ -140,7 +140,7 @@ def main() -> None:
         cells = [(m, n) for m in range(2, 7) for n in range(2, 8)]
     for (m, n) in cells:
         k = knapsack(m, n, BMAX)
-        ex, _, done = max_multigraph_vertex_standard(n, m, deadline=time.time() + 300)
+        ex, _, done = max_multigraph_vertex(n, m, deadline=time.time() + 300)
         print(f"    m={m} n={n}: knapsack {k}, exhaustive {ex} "
               f"({'proved' if done else 'lower bound'}) -> "
               f"{'AGREE' if k == ex else 'DISAGREE'}")

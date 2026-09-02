@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 "..", "..", "program"))
 
 from erdos915_unified import (  # noqa: E402
-    solve, verify_hyper_vertex_value, max_multigraph_vertex_standard,
+    solve, verify_hyper_vertex_value, max_multigraph_vertex,
     hyper_vertex_feasible_exists,
 )
 
@@ -156,9 +156,9 @@ def main():
                        tgt, tgt if good else -1, True,
                        "" if good else "verify_hyper_vertex_value returned False")
 
-    print("\nthm:multi-vertex-m2  K_2^multi(n) = n-1  (other convention)")
+    print("\nthm:multi-vertex-m2  K_2(n) = n-1  (incidence convention)")
     for n in range(2, 7):
-        v, _, done = max_multigraph_vertex_standard(n, 2, deadline=time.time() + BUDGET)
+        v, _, done = max_multigraph_vertex(n, 2, deadline=time.time() + BUDGET)
         if not done:
             continue
         record("thm:multi-vertex-m2", f"n={n} m=2", n - 1, v, True)
@@ -166,7 +166,7 @@ def main():
     print("\nthm:clique-chain-vertex  K_m^multi(n) > (m-1)(n-1) for m >= 5")
     for m in (4, 5, 6):
         for n in (4, 5):
-            v, _, done = max_multigraph_vertex_standard(
+            v, _, done = max_multigraph_vertex(
                 n, m, deadline=time.time() + BUDGET)
             if not done:
                 continue

@@ -9,6 +9,7 @@ from erdos915_unified import (
     MULTI_UNDIRECTED,
     SIMPLE_DIRECTED,
     SIMPLE_UNDIRECTED,
+    local_connectivity,
     thickened_one_directional_bipartite,
 )
 
@@ -101,6 +102,29 @@ class DirectedModel(unittest.TestCase):
         self.assertEqual(sorted(g.edges()), [(0, 1, 1), (1, 0, 1)])
 
 
+class Endpoints(unittest.TestCase):
+    """A connectivity call names two distinct vertices, or it is not a question."""
+
+    def setUp(self):
+        self.g = Graph(3, MULTI_UNDIRECTED)
+        self.g.add_edge(0, 1)
+
+    def test_equal_endpoints_are_refused_in_both_separations(self):
+        for vertex_split in (False, True):
+            with self.subTest(vertex_split=vertex_split):
+                with self.assertRaises(ValueError):
+                    local_connectivity(self.g, 0, 0, vertex_split=vertex_split)
+
+    def test_an_index_outside_the_graph_is_refused(self):
+        for source, target in [(-1, 0), (0, -1), (3, 0), (0, 3)]:
+            with self.subTest(pair=(source, target)):
+                with self.assertRaises(IndexError):
+                    local_connectivity(self.g, source, target)
+
+    def test_a_real_pair_still_answers(self):
+        self.assertEqual(local_connectivity(self.g, 0, 1), 1)
+
+
 class Mutation(unittest.TestCase):
     def test_remove_never_goes_below_zero(self):
         g = Graph(3, MULTI_UNDIRECTED)
@@ -155,6 +179,46 @@ class Mutation(unittest.TestCase):
         g = Graph(3, MULTI_UNDIRECTED)
         with self.assertRaises(ValueError):
             g.add_edge(1, 1)
+
+    def test_vertex_indices_do_not_wrap_through_numpy(self):
+        g = Graph(3, MULTI_UNDIRECTED)
+        for u, v in [(-1, 0), (0, -1), (3, 0), (0, 3)]:
+            with self.subTest(pair=(u, v)):
+                with self.assertRaises(IndexError):
+                    g.add_edge(u, v)
+        self.assertEqual(g.edge_count(), 0)
+
+    def test_a_fractional_count_is_rejected_before_it_is_laundered(self):
+        """The trap: a simple graph saturates at one, so min(mu + 1.9, 1) is 1.
+
+        The bad input is a clean integer by the time it reaches the matrix, so a
+        guard on the assignment alone cannot see it. Both counts are therefore
+        checked before the arithmetic that normalises them.
+        """
+        for variant in (SIMPLE_UNDIRECTED, MULTI_UNDIRECTED):
+            with self.subTest(variant=variant.name):
+                with self.assertRaises(TypeError):
+                    Graph(3, variant).add_edge(0, 1, 1.9)
+                with self.assertRaises(TypeError):
+                    Graph(3, variant).remove_edge(0, 1, 1.9)
+                self.assertEqual(Graph(3, variant).edge_count(), 0)
+
+    def test_booleans_are_not_accepted_as_numbers(self):
+        """``True`` is an ``int`` in Python, so it passes every naive check."""
+        g = Graph(3, MULTI_UNDIRECTED)
+        with self.assertRaises(TypeError):
+            g.add_edge(0, 1, True)
+        with self.assertRaises(TypeError):
+            g.set_multiplicity(0, 1, True)
+        with self.assertRaises(TypeError):
+            g.add_edge(True, 0)
+        with self.assertRaises(TypeError):
+            Graph(True, MULTI_UNDIRECTED)
+        self.assertEqual(g.edge_count(), 0)
+
+    def test_a_non_integer_multiplicity_is_rejected(self):
+        with self.assertRaises(TypeError):
+            Graph(3, MULTI_UNDIRECTED).set_multiplicity(0, 1, 2.5)
 
     def test_copy_is_independent(self):
         g = Graph(3, MULTI_UNDIRECTED)

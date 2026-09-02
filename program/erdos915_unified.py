@@ -127,15 +127,12 @@ def _require_networkx(feature: str):
         )
 
 
-# A capacity large enough never to be the bottleneck of any cut this program
-# builds, and small enough that summing a few of them cannot overflow the int32
-# the capacity matrices are cast to (_c_flat).  The largest real capacity here is
-# a total multiplicity, bounded by n^2 (m-1), which for the sizes this program
-# reaches is in the hundreds, so a million has an enormous margin either way.  It
-# was 10**9 before, where two saturated uncapped arcs sum to 2e9 against int32's
-# 2147483647, a 7% margin on a silent-wraparound failure rather than a crash.
-# Defined here, ahead of every network builder, because the hypergraph gadget,
-# the vertex-split matrix and the capped predicate all read it.
+# A capacity large enough for the matrix-model endpoint gates and small enough
+# that the C helper's int32 arithmetic cannot overflow.  Those endpoint gates do
+# not lie on the measured source--target path, so their value cannot cap the
+# answer.  Hypergraph membership arcs are different: they do lie on every path,
+# and therefore use a data-dependent capacity equal to the total number of
+# hyperedge copies (see _hyper_capacity_matrix) rather than this sentinel.
 _UNBOUNDED = 10 ** 6
 
 # pulp is OPTIONAL.  It backs the MILP certifier (prove_directed_multigraph and
@@ -221,6 +218,48 @@ except ImportError:
 # --- VARIANT: mu[u,v] = multiplicity from u to v; simple = {0,1}; undirected = symmetric ---
 
 
+def _require_integer(name: str, value, *, minimum: int | None = None,
+                     maximum: int | None = None,
+                     range_error: type = ValueError) -> int:
+    """Accept only a genuine integer in range, and name the argument that failed.
+
+    One primitive rather than a check per call site, because the easy part to
+    forget is the first line: ``bool`` is a subclass of ``int`` in Python, so
+    ``True`` passes every naive integer test and then silently means vertex 1 or
+    multiplicity 1.  A float is worse still, since NumPy truncates it on
+    assignment and the wrong value looks exactly like a right one.
+
+    ``range_error`` is ``IndexError`` for anything that indexes the matrix, which
+    keeps an out-of-range vertex raising the error a caller already expects.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
+        raise TypeError(f"{name} must be an integer, not {value!r}")
+    number = int(value)
+    if minimum is not None and number < minimum:
+        raise range_error(f"{name} must be at least {minimum}, not {number}")
+    if maximum is not None and number > maximum:
+        raise range_error(f"{name} must be at most {maximum}, not {number}")
+    return number
+
+
+def _require_endpoints(num_vertices: int, source, target) -> None:
+    """Reject endpoints a max-flow call would otherwise misread.
+
+    Without this a stray index is not an error but a different question: in the
+    hypergraph network it lands on an internal gate node and returns a route
+    count for something that is not a vertex, and in the split matrix a repeated
+    endpoint returns 1 rather than refusing.  SciPy rejects some of these by
+    accident, depending on where the index falls in the generated network, which
+    is not a property to rely on.
+    """
+    _require_integer("source", source, minimum=0, maximum=num_vertices - 1,
+                     range_error=IndexError)
+    _require_integer("target", target, minimum=0, maximum=num_vertices - 1,
+                     range_error=IndexError)
+    if int(source) == int(target):
+        raise ValueError("source and target must differ")
+
+
 @dataclass(frozen=True)
 class Variant:
     """Which kind of graph object we are working with.
@@ -266,8 +305,11 @@ class Graph:
     """
 
     def __init__(self, num_vertices: int, variant: Variant):
-        if num_vertices < 0:
-            raise ValueError("number of vertices must be non-negative")
+        # The container permits n = 0; it is ``solve`` that needs a vertex to
+        # put an edge on.  Checked here so a bad n fails as this model's own
+        # ValueError rather than as whatever NumPy happens to say downstream.
+        num_vertices = _require_integer("number of vertices", num_vertices,
+                                        minimum=0)
         self.variant = variant
         # The whole graph is this one matrix; integer dtype keeps it exact.
         self.mu = np.zeros((num_vertices, num_vertices), dtype=int)
@@ -285,10 +327,14 @@ class Graph:
 
     def multiplicity(self, u: int, v: int) -> int:
         """Number of parallel edges or arcs from ``u`` to ``v``."""
+        self._require_vertex(u)
+        self._require_vertex(v)
         return int(self.mu[u, v])
 
     def has_edge(self, u: int, v: int) -> bool:
         """Whether at least one edge or arc joins ``u`` to ``v``."""
+        self._require_vertex(u)
+        self._require_vertex(v)
         return self.mu[u, v] > 0
 
     def edge_count(self) -> int:
@@ -305,10 +351,12 @@ class Graph:
 
     def out_degree(self, v: int) -> int:
         """Number of edges or arcs leaving ``v`` (with multiplicity)."""
+        self._require_vertex(v)
         return int(self.mu[v, :].sum())
 
     def in_degree(self, v: int) -> int:
         """Number of edges or arcs entering ``v`` (with multiplicity)."""
+        self._require_vertex(v)
         return int(self.mu[:, v].sum())
 
     def degree(self, v: int) -> int:
@@ -344,8 +392,10 @@ class Graph:
         graph updates both matrix entries to stay symmetric.
         """
         self._require_distinct(u, v)
-        if count < 0:
-            raise ValueError("edge count must be non-negative")
+        # Checked BEFORE the arithmetic: for a simple graph the saturation below
+        # is min(mu + count, 1), which turns a fractional count into a clean
+        # integer 1 and would hide the bad input from the guard in _assign.
+        count = _require_integer("edge count", count, minimum=0)
         new_value = self.mu[u, v] + count
         if self.variant.simple:
             new_value = min(new_value, 1)  # enforce the 0/1 simple-graph cap
@@ -354,18 +404,15 @@ class Graph:
     def remove_edge(self, u: int, v: int, count: int = 1) -> None:
         """Remove ``count`` parallel edges or arcs (never below zero)."""
         self._require_distinct(u, v)
-        if count < 0:
-            raise ValueError("edge count must be non-negative")
+        # Before the arithmetic for the same reason as add_edge: max(0, ...)
+        # would launder a fractional count away from the guard in _assign.
+        count = _require_integer("edge count", count, minimum=0)
         new_value = max(0, self.mu[u, v] - count)
         self._assign(u, v, new_value)
 
     def set_multiplicity(self, u: int, v: int, value: int) -> None:
         """Set the multiplicity from ``u`` to ``v`` directly."""
         self._require_distinct(u, v)
-        if value < 0:
-            raise ValueError("multiplicity must be non-negative")
-        if self.variant.simple and value > 1:
-            raise ValueError("a simple graph cannot have multiplicity above one")
         self._assign(u, v, value)
 
     def copy(self) -> "Graph":
@@ -378,8 +425,9 @@ class Graph:
 
     def _assign(self, u: int, v: int, value: int) -> None:
         """Write ``value`` into the matrix, mirroring it when undirected."""
-        if value < 0:
-            raise ValueError("multiplicity must be non-negative")
+        # The single place a number reaches the matrix, so the type and sign
+        # checks live here and cover every mutator that routes through it.
+        value = _require_integer("multiplicity", value, minimum=0)
         if self.variant.simple and value > 1:
             raise ValueError("a simple graph cannot have multiplicity above one")
         self.mu[u, v] = value
@@ -388,8 +436,15 @@ class Graph:
             self.mu[v, u] = value
 
     def _require_distinct(self, u: int, v: int) -> None:
+        self._require_vertex(u)
+        self._require_vertex(v)
         if u == v:
             raise ValueError("self-loops are not allowed in this model")
+
+    def _require_vertex(self, v: int) -> None:
+        """Reject indices outside ``0..n-1`` instead of letting NumPy wrap them."""
+        _require_integer("vertex index", v, minimum=0,
+                         maximum=self.num_vertices - 1, range_error=IndexError)
 
     def __repr__(self) -> str:
         return (f"Graph(n={self.num_vertices}, variant={self.variant.describe()!r}, "
@@ -571,9 +626,14 @@ class Hypergraph:
         container permits.  Pass ``r`` wherever a caller depends on that and wants
         it checked rather than assumed.
         """
-        self.num_vertices = num_vertices
+        num_vertices = _require_integer("number of vertices", num_vertices,
+                                        minimum=0)
+        if r is not None:
+            r = _require_integer("uniformity r", r, minimum=2,
+                                 maximum=num_vertices)
+        self.num_vertices = int(num_vertices)
         self.directed = directed
-        self.r = r
+        self.r = int(r) if r is not None else None
         # Each entry is a frozenset, or a ``(tail, frozenset(heads))`` pair.
         self.hyperedges: list = []
         for edge in hyperedges:
@@ -590,31 +650,42 @@ class Hypergraph:
         if self.directed:
             first, raw_heads = edge
             if isinstance(first, (set, frozenset)):     # general (tails, heads)
-                tails, heads = frozenset(first), frozenset(raw_heads)
+                tails = self._vertex_set(first)
+                heads = self._vertex_set(raw_heads)
                 members = tails | heads
                 if (tails & heads) or not tails or not heads or len(members) < 2:
                     raise ValueError("a directed hyperedge needs disjoint, non-empty tail and head sets")
-                if any(v < 0 or v >= self.num_vertices for v in members):
-                    raise ValueError("hyperedge refers to a vertex outside the graph")
                 self._check_uniform(members)
                 self.hyperedges.append((tails, heads))
                 return
-            tail, heads = first, frozenset(raw_heads)    # legacy forward (tail, heads)
+            tail = _require_integer("hyperedge vertex", first, minimum=0,
+                                    maximum=self.num_vertices - 1)
+            heads = self._vertex_set(raw_heads)          # legacy forward (tail, heads)
             members = heads | {tail}
             if tail in heads or len(members) < 2:
                 raise ValueError("a directed hyperedge needs a tail and a distinct head")
-            if any(v < 0 or v >= self.num_vertices for v in members):
-                raise ValueError("hyperedge refers to a vertex outside the graph")
             self._check_uniform(members)
             self.hyperedges.append((tail, heads))
         else:
-            vertices = frozenset(edge)  # a hyperedge is a set of distinct vertices
+            vertices = self._vertex_set(edge)  # a hyperedge is a set of distinct vertices
             if len(vertices) < 2:
                 raise ValueError("a hyperedge must contain at least two vertices")
-            if any(v < 0 or v >= self.num_vertices for v in vertices):
-                raise ValueError("hyperedge refers to a vertex outside the graph")
             self._check_uniform(vertices)
             self.hyperedges.append(vertices)
+
+    def _vertex_set(self, raw) -> frozenset:
+        """Validate every member, THEN collapse the duplicates.
+
+        The order is the point.  ``True == 1`` in Python, so ``frozenset([0, 1,
+        True])`` is ``{0, 1}``: a bad member does not survive to be caught, it
+        disappears and leaves a well-formed hyperedge one vertex short.  A
+        declared uniformity notices the missing vertex by accident; an
+        unenforced one (``r=None``) does not notice at all.
+        """
+        return frozenset(
+            _require_integer("hyperedge vertex", v, minimum=0,
+                             maximum=self.num_vertices - 1)
+            for v in raw)
 
     def _check_uniform(self, members) -> None:
         """Reject a hyperedge of the wrong size, when a uniformity was declared."""
@@ -687,6 +758,11 @@ def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False
     """
     n = hypergraph.num_vertices
     base = 2 * n if vertex_split else n
+    # Every route consumes at least one hyperedge copy, so no flow can exceed
+    # the total number of copies.  Using that exact instance-dependent ceiling
+    # on membership arcs behaves as infinity without imposing a hidden global
+    # limit on answers (the former fixed 10**6 sentinel did exactly that).
+    membership_capacity = max(1, hypergraph.edge_count())
     # Group the copies.  The key normalises the two directed storage forms, so a
     # legacy forward tuple and its general spelling share one gate; an unmergeable
     # spelling would only split a gate back into parallel ones, which the
@@ -712,13 +788,13 @@ def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False
         if hypergraph.directed:
             tails, heads = _dir_tails_heads(edge)
             for tail in tails:                   # enter the gate from any tail
-                cap[leave(tail), gate_in] = _UNBOUNDED
+                cap[leave(tail), gate_in] = membership_capacity
             for head in heads:                   # leave the gate toward any head
-                cap[gate_out, enter(head)] = _UNBOUNDED
+                cap[gate_out, enter(head)] = membership_capacity
         else:
             for vertex in edge:
-                cap[leave(vertex), gate_in] = _UNBOUNDED
-                cap[gate_out, enter(vertex)] = _UNBOUNDED
+                cap[leave(vertex), gate_in] = membership_capacity
+                cap[gate_out, enter(vertex)] = membership_capacity
     return cap, size, leave, enter
 
 
@@ -729,6 +805,7 @@ def hyper_connectivity(hypergraph: Hypergraph, source: int, target: int,
     A single scipy integer max-flow on the matrix above.  An isolated endpoint
     (in no hyperedge) has no incident arcs, so the flow is then zero.
     """
+    _require_endpoints(hypergraph.num_vertices, source, target)
     cap, _, leave, enter = _hyper_capacity_matrix(hypergraph, vertex_split=vertex_split)
     if vertex_split:
         # Endpoints must not be the bottleneck: only interior vertices are capped.
@@ -961,6 +1038,7 @@ def local_connectivity(graph: Graph, source: int, target: int,
     Edge-disjoint with ``vertex_split=False``; internally vertex-disjoint with
     ``vertex_split=True``.  An isolated endpoint yields zero (no augmenting path).
     """
+    _require_endpoints(graph.num_vertices, source, target)
     if not vertex_split:
         # scipy.sparse.csgraph.maximum_flow is a C implementation; faster than
         # NetworkX for the small integer capacity matrices we use.
@@ -2566,6 +2644,15 @@ def solve(
     """
     if separation not in ("edge", "vertex"):
         raise ValueError("separation must be 'edge' or 'vertex'")
+    # The domain of the problem, not of the containers.  n = 1 is a real question
+    # with the answer 0, so it is admitted; m <= 1 forbids every route and asks
+    # nothing, and r outside 2..n has no r-uniform hyperedge to place.  Without
+    # these an out-of-domain call returns a confident exact 0 from an empty
+    # enumeration, which reads exactly like a computed result.
+    n = _require_integer("n", n, minimum=1)
+    m = _require_integer("m", m, minimum=2)
+    if hypergraph:
+        r = _require_integer("uniformity r", r, minimum=2, maximum=n)
 
     start = time.time()
     deadline = start + max_seconds
@@ -2604,10 +2691,10 @@ def solve(
                            time.time() - start, done, witness, note)
 
     # ----- the matrix models -----------------------------------------------
-    # The multigraph variants are the same problem in both separations: the
-    # objective is the size (multiplicity counted) and every multiplicity is
-    # capped at m - 1, because m parallel copies are already m disjoint routes,
-    # edge-disjoint and internally disjoint alike (_split_capacity_matrix).
+    # Both multigraph separations use the same multiplicity-counted objective
+    # and the same per-pair cap m - 1: m parallel copies alone already give m
+    # routes under either separation.  Their feasible families, and hence their
+    # optima, can nevertheless differ (for example K_5(4)=14 while L_5(4)=12).
     variant = _variant_for(directed, simple)
     label = variant.describe()
 
@@ -5555,14 +5642,11 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     supports are non-isomorphic, and every isomorphism class with a given
     support class has a labelling whose support equals geng's representative, so
     decorating every representative and canonical-deduplicating returns exactly
-    one matrix per isomorphism class.  Crucially the induced-arc bound is used
-    ONLY for ``j <= 6``, where ``M*(j)`` is proved; for ``j >= 7`` no arc bound
-    is applied (only the global ``target_arcs`` and feasibility).  This is the
-    difference from :func:`enumerate_extremal_directed_multigraphs`, which falls
-    back to the CONJECTURED ``floor(j^2/4)`` at ``j >= 7`` and is therefore a
-    complete search only for ``n <= 6``.  This generator is complete for all
-    ``n`` (it never assumes an unproved value), so it can certify the finite
-    ``n = 7`` classification once it finishes.
+    one matrix per isomorphism class.  The induced-arc bound is the proved value
+    ``(m-1) M*(j)`` at every prefix size ``j`` by ``thm:dir-multi-full``.  The
+    direct DFS enumerator uses the same bound, so both searches are complete for
+    every ``n``; this generator differs by enumerating non-isomorphic supports
+    with ``geng`` and decorating those supports in parallel.
 
     Requires nauty's ``geng`` on PATH.  For ``n <= 6`` it returns the same set
     of isomorphism classes as :func:`enumerate_extremal_directed_multigraphs`;
@@ -5587,9 +5671,8 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     # geng emits each undirected support iso-class once, and decorating one
     # support is independent of the others (two non-isomorphic supports can never
     # yield the same multigraph), so the supports fan out across processes, each
-    # with its own scratch arrays inside _decorate_support_worker.  The PROVED
-    # M*(j) bound is applied there only for j <= 6; j >= 7 gets no arc bound, so
-    # the search stays sound at every n.
+    # with its own scratch arrays inside _decorate_support_worker.  The proved
+    # M*(j) bound is applied at every completed prefix size.
     tasks = [(n, m, target_arcs, max_degree, up_to_iso, edges)
              for edges in _geng_support_graphs(n, min_edges, max_edges, geng_path)]
 

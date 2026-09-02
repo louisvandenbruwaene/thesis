@@ -18,6 +18,13 @@
    Belgium
 }
 
+% A recorded build may supply revision.tex via record_revision.sh.  Keep an
+% explicit fallback so ordinary working builds remain valid and identify
+% themselves honestly rather than silently looking like recorded snapshots.
+\newcommand{\thesistag}{unrecorded}
+\newcommand{\thesiscommit}{not recorded}
+\InputIfFileExists{revision.tex}{}{}
+
 % ============================================================================
 % BASIC PACKAGES
 % ============================================================================

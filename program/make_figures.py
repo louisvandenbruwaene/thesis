@@ -16,7 +16,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import datetime
 import math
+import platform
+import subprocess
 import sys
 from pathlib import Path
 
@@ -70,14 +73,32 @@ DATA = Path(__file__).resolve().parent / "data"
 
 
 # ----------------------------------------------------------------------
-#  The machine-value cache.
+#  The machine-value record.
 #  Every number the variant grids plot comes from a ``solve`` call, and there
 #  are several hundred of them: exhaustive enumerations that run to a timeout,
-#  and timed searches. That is nearly all the wall clock in this script, and
-#  none of it changes between runs, so the results are kept on disk.
+#  and timed searches.  That is nearly all the wall clock in this script.
+#
+#  Those numbers are an EXPERIMENT, and this file is its result.  The two acts
+#  are kept apart:
+#
+#    * rendering (no flag) reads the frozen record and never calls ``solve``.
+#      It is a reproducible drawing operation: the same file draws the same
+#      figures on any machine, in seconds.
+#    * rebuilding (``--rebuild``) recomputes every value from scratch, consults
+#      nothing, and writes a CANDIDATE beside the record.  ``--compare`` then
+#      shows what moved, and only a deliberate ``--promote`` replaces the
+#      published file.
+#
+#  Keeping them apart is what makes the figures reproducible.  A timed search
+#  finds what that machine reached in that budget, so a render that quietly
+#  recomputed would redraw the thesis differently on a busier laptop.
 # ----------------------------------------------------------------------
 
 MACHINE_CACHE_PATH = DATA / "machine_values.json"
+# A rebuild in progress writes here, never over the published record.  It also
+# survives an interruption: a twelve-hour recomputation that dies at hour eleven
+# resumes from this file instead of starting again.
+MACHINE_CANDIDATE_PATH = DATA / "machine_values.candidate.json"
 
 
 # How the vertex separation counts parallel edges in the two multigraph cells.
@@ -88,68 +109,53 @@ MACHINE_CACHE_PATH = DATA / "machine_values.json"
 VERTEX_CONVENTION = "incidence-1"
 
 
+class MissingMachineValue(KeyError):
+    """A render asked for a value the frozen record does not hold.
+
+    Raised rather than computed, because computing it would make this render
+    disagree with the published figures for reasons no reader could see.
+    """
+
+
 class MachineValues:
-    """Remembered results of the ``solve`` calls behind the variant grids.
+    """The frozen record of what the machine returned, and the rebuild that makes it.
 
     One entry per ``(kind, n, m, budget, variant)``, holding the value that run
     produced, or ``null`` where an exhaustion did not finish inside its budget.
-    ``--refresh`` recomputes every one of them, which is the check that the file
-    is still telling the truth.
+    A ``null`` is a result too: without it every later render would pay for the
+    same timeout again.
 
-    A recompute can confirm the record or improve it, and cannot make it worse:
-    see :meth:`_reconcile`. That guard matters because these are *timed*
-    measurements, so a slower or busier machine returns worse numbers for
-    reasons that have nothing to do with the mathematics. Without it a refresh
-    on a loaded machine silently downgraded four completed exhaustions to "did
-    not finish", and since :func:`_exact_points` stops at the first one, four
-    further sizes were dropped behind them.
-
-    Deleting the file is therefore a *stronger* reset than ``--refresh``: it
-    removes the record the guard compares against, so whatever the run reaches is
-    what gets written. Use ``--refresh`` to audit the file and deletion only to
-    rebuild it from nothing deliberately.
-
-    Caching a *timed* search is not only a speed-up. A search given four seconds
-    finds what four seconds of that particular machine will reach, so recomputing
-    it elsewhere can legitimately return a different (still honest) lower bound
-    and move a plotted circle. Recording the value fixes the published figure to
-    the run that produced it, which is the stronger reproducibility claim.
-
-    The program's own hash is stored beside the values as provenance. A mismatch
-    is reported rather than acted on: it means the values were computed by an
-    earlier version of ``erdos915_unified.py``, and whether that matters is a
-    judgement about what changed, so the run says so and leaves the decision
-    (rerun with ``--refresh``, or not) to the reader.
+    The record carries provenance beside the values, saying which program, which
+    commit and which interpreter produced them.  It is recorded, not enforced:
+    nothing here refuses to draw because a fingerprint moved.  Whether a change
+    to the program invalidates the experiment is a judgement about what changed,
+    and the honest way to settle it is ``--rebuild`` followed by ``--compare``,
+    which answers with the numbers themselves rather than with a hash.
     """
 
-    def __init__(self, path: Path, *, refresh: bool = False):
+    def __init__(self, path: Path, *, rebuild: bool = False,
+                 candidate: Path | None = None):
         self.path = Path(path)
+        self.candidate = Path(candidate) if candidate is not None else (
+            self.path.with_name(self.path.stem + ".candidate.json"))
+        self.rebuilding = rebuild
         self.values: dict[str, int | None] = {}
+        self.published: dict[str, int | None] = {}
         self.meta: dict = {}
         self.hits = 0
         self.misses = 0
-        # The published record, kept even under --refresh, which is exactly when
-        # it is needed: it is what a recomputed value is held against so that a
-        # refresh can confirm or improve the figures but never degrade them.
-        self.published: dict[str, int | None] = {}
-        self.kept: list[str] = []          # recompute was worse, record stands
-        self.improved: list[str] = []      # recompute was better, record moves
-        self.contradictions: list[str] = []  # two different exact values
-        stored_hash = None
+        self.resumed = 0
         if self.path.exists():
             blob = json.loads(self.path.read_text())
             self.published = blob.get("values", {})
-            if not refresh:
+            self.meta = blob.get("meta", {})
+            if not rebuild:
                 self.values = dict(self.published)
-                self.meta = blob.get("meta", {})
-            stored_hash = blob.get("meta", {}).get("program_sha256")
         self.program_hash = self._program_hash()
-        if stored_hash is not None and stored_hash != self.program_hash:
-            print(f"NOTE: {self.path.name} was written by a different version of "
-                  f"erdos915_unified.py ({stored_hash[:12]} vs "
-                  f"{self.program_hash[:12]}).\n"
-                  f"      Cached values are being reused. Rerun with --refresh "
-                  f"to recompute them all.")
+        if rebuild:
+            self._resume()
+
+    # -- provenance ----------------------------------------------------------
 
     # Where the value-determining half of the program ends.  Everything above
     # this banner is the model, the checker, the provers, the search and
@@ -158,37 +164,60 @@ class MachineValues:
 
     @classmethod
     def _program_hash(cls) -> str:
-        """Fingerprint of the code that can change a cached value.
+        """Fingerprint of the code that can change a value.
 
         Deliberately NOT the whole file. Hashing all six thousand lines would
-        make every edit to the plotting code below invalidate a cache of search
-        results the plotting code cannot possibly affect, and a warning that
-        fires on every unrelated edit is one nobody reads. The cut is at the
+        make every edit to the plotting code below invalidate a fingerprint on
+        results the plotting code cannot possibly affect.  The cut is at the
         chapter 4 banner: above it is everything ``solve`` runs, below it is the
         figures.
+
+        This is provenance and nothing more.  It records which program produced
+        a number, which a reader can check; it cannot tell a change that alters
+        an answer from one that cannot, so it is never used to decide whether a
+        value may be drawn.
         """
         source = (Path(__file__).resolve().parent
                   / "erdos915_unified.py").read_text()
         head, sep, _ = source.partition(cls._VALUE_CODE_ENDS_AT)
         if not sep:                      # banner renamed: fall back to the lot
             print("NOTE: could not find the chapter 4 banner in "
-                  "erdos915_unified.py; fingerprinting the whole file, so the "
-                  "machine-value cache will report a mismatch after any edit.")
+                  "erdos915_unified.py; fingerprinting the whole file.")
             head = source
         return hashlib.sha256(head.encode()).hexdigest()
+
+    def _provenance(self) -> dict:
+        """What produced these numbers, recorded so a reader can check it."""
+        try:
+            commit = subprocess.run(
+                ["git", "rev-parse", "--short=12", "HEAD"],
+                cwd=Path(__file__).resolve().parent, capture_output=True,
+                text=True, timeout=10)
+            source_commit = commit.stdout.strip() if commit.returncode == 0 else None
+        except (OSError, subprocess.SubprocessError):
+            source_commit = None
+        return {
+            "program_sha256": self.program_hash,
+            "source_commit": source_commit,
+            "python": platform.python_version(),
+            "platform": platform.platform(terse=True),
+            "computed": datetime.date.today().isoformat(),
+            "entries": len(self.values),
+        }
+
+    # -- keys ----------------------------------------------------------------
 
     @staticmethod
     def key(kind: str, n: int, m: int, budget: float, kwargs: dict) -> str:
         """A canonical, human-readable key, so the JSON can be read and audited.
 
-        A multigraph value in the vertex separation carries the convention it was
-        measured under (``VERTEX_CONVENTION``).  Those are the only entries whose
-        meaning depends on how parallel edges are counted: the edge separation
+        The vertex convention is stamped on exactly the entries whose value
+        depends on it (the two multigraph vertex cells), so a convention change
+        orphans those and leaves every other entry addressable.  Which entries
+        those are is settled by the model, not by taste: the edge separation
         never depended on it, the hypergraph checker has always given a repeated
         hyperedge one gate of capacity ``mu``, and a simple graph has every
-        multiplicity at most one.  Changing the convention therefore orphans
-        exactly the entries it changes and no others, so ``--refresh`` cannot
-        reconcile a stale value against a record measured under the old one.
+        multiplicity at most one.
         """
         parts = [kind, f"n={n}", f"m={m}", f"budget={budget:g}"]
         parts += [f"{name}={kwargs[name]}" for name in sorted(kwargs)]
@@ -197,96 +226,106 @@ class MachineValues:
             parts.append(f"convention={VERTEX_CONVENTION}")
         return "|".join(parts)
 
+    # -- the two paths -------------------------------------------------------
+
     def get_or_run(self, kind, n, m, budget, kwargs, run):
+        """Read the frozen value, or compute it when rebuilding."""
         cache_key = self.key(kind, n, m, budget, kwargs)
-        if cache_key in self.values:
+        if not self.rebuilding:
+            if cache_key not in self.values:
+                raise MissingMachineValue(
+                    f"{self.path.name} has no entry for\n  {cache_key}\n"
+                    f"Rendering never computes a missing value, because a figure "
+                    f"drawn from a fresh timed run would not match the published "
+                    f"ones. Run 'make_figures.py --rebuild' to recompute the "
+                    f"record, then --compare and --promote it.")
             self.hits += 1
             return self.values[cache_key]
+        if cache_key in self.values:
+            self.hits += 1                 # recovered from an interrupted rebuild
+            return self.values[cache_key]
         self.misses += 1
-        self.values[cache_key] = self._reconcile(kind, cache_key, run())
-        # Written after every miss, not once at the end: a full refresh of the
-        # four grids takes minutes, and an interrupted one should keep whatever
-        # it had already paid for.
+        self.values[cache_key] = run()
+        # Written after every value, not once at the end: a rebuild takes hours
+        # and an interrupted one should keep what it has already paid for.
         self.save()
         return self.values[cache_key]
 
-    def _reconcile(self, kind, cache_key, fresh):
-        """Hold a freshly computed value against the published one.
-
-        A recompute is a *timed* measurement, so it carries the speed and the
-        load of the machine that ran it as well as the mathematics. Both kinds of
-        entry here are one-directional, which is what makes a safe rule possible.
-
-        An ``exact`` entry is a completed exhaustion, so its value is the true
-        maximum and cannot legitimately change. ``None`` means only that the run
-        ran out of budget, which is a fact about the machine, not about the
-        graph. So a ``None`` never overwrites a recorded value, and two different
-        numbers are a contradiction that gets reported rather than applied.
-
-        A ``search`` entry is a lower bound witnessed by a graph that was
-        actually exhibited, so a larger value is always the better knowledge and
-        a smaller one only says this run had less time. The record therefore
-        moves up and never down.
-
-        A refresh can consequently confirm the figures or improve them, and has
-        no path by which it can make them worse. Every departure is recorded and
-        printed, so nothing is quietly kept either.
-        """
-        if cache_key not in self.published:
-            return fresh                       # genuinely new entry
-        old = self.published[cache_key]
-        if fresh == old:
-            return old
-        if kind == "exact":
-            if fresh is None:
-                self.kept.append(f"{cache_key}: did not finish this time, "
-                                 f"keeping the recorded {old}")
-                return old
-            if old is None:
-                self.improved.append(f"{cache_key}: finished this time, "
-                                     f"None -> {fresh}")
-                return fresh
-            self.contradictions.append(f"{cache_key}: recorded {old}, "
-                                       f"recomputed {fresh}")
-            return old
-        # search: a lower bound, so keep the better of the two
-        if old is not None and (fresh is None or fresh < old):
-            self.kept.append(f"{cache_key}: this run reached {fresh}, "
-                             f"keeping the recorded {old}")
-            return old
-        self.improved.append(f"{cache_key}: {old} -> {fresh}")
-        return fresh
+    def _resume(self) -> None:
+        """Pick an interrupted rebuild back up, or ignore work this program did not do."""
+        if not self.candidate.exists():
+            return
+        blob = json.loads(self.candidate.read_text())
+        if blob.get("meta", {}).get("program_sha256") != self.program_hash:
+            print(f"NOTE: ignoring {self.candidate.name}; it was computed by a "
+                  f"different version of the program. Starting from nothing.")
+            return
+        self.values = dict(blob.get("values", {}))
+        self.resumed = len(self.values)
+        if self.resumed:
+            print(f"NOTE: resuming an interrupted rebuild; {self.resumed} values "
+                  f"recovered from {self.candidate.name}.")
 
     def save(self) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.meta = dict(self.meta)
-        self.meta["program_sha256"] = self.program_hash
-        self.meta["entries"] = len(self.values)
-        blob = {"meta": self.meta,
+        """Write the candidate. Only :meth:`promote` ever writes the record."""
+        self.candidate.parent.mkdir(parents=True, exist_ok=True)
+        blob = {"meta": self._provenance(),
                 "values": dict(sorted(self.values.items()))}
+        self.candidate.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
+
+    # -- reviewing a rebuild -------------------------------------------------
+
+    def compare(self) -> list[str]:
+        """Every way the candidate departs from the published record.
+
+        Nothing is applied and nothing is judged here.  A rebuild is a rerun of
+        a timed experiment on whatever machine happened to run it, so a moved
+        number can mean a corrected program, a faster machine or a slower one,
+        and only a person reading the list can tell which.
+        """
+        if not self.candidate.exists():
+            return []
+        fresh = json.loads(self.candidate.read_text()).get("values", {})
+        report = []
+        for cache_key in sorted(set(self.published) | set(fresh)):
+            was, now = self.published.get(cache_key, "absent"), fresh.get(cache_key, "absent")
+            if was == now:
+                continue
+            kind = cache_key.split("|")[0]
+            note = ""
+            if kind == "exact" and isinstance(was, int) and isinstance(now, int):
+                note = "  <-- TWO COMPLETED EXHAUSTIONS DISAGREE"
+            elif kind == "exact" and now is None:
+                note = "  (did not finish this time; a fact about the machine)"
+            elif kind == "search" and isinstance(was, int) and isinstance(now, int):
+                note = ("  (search reached less this time)" if now < was
+                        else "  (search reached more this time)")
+            report.append(f"{cache_key}: {was!r} -> {now!r}{note}")
+        return report
+
+    def promote(self) -> None:
+        """Replace the published record with the reviewed candidate."""
+        if not self.candidate.exists():
+            raise SystemExit(f"ERROR: there is no {self.candidate.name} to promote.")
+        blob = json.loads(self.candidate.read_text())
         self.path.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
+        self.candidate.unlink()
+        print(f"promoted {len(blob.get('values', {}))} machine values into "
+              f"{self.path.name}")
 
     def report(self) -> str:
-        lines = [f"machine values: {self.hits} from cache, {self.misses} computed "
-                 f"({self.path.name}, {len(self.values)} entries)"]
-        if self.improved:
-            lines.append(f"  {len(self.improved)} entries improved on the record:")
-            lines += [f"    {line}" for line in self.improved]
-        if self.kept:
-            lines.append(f"  {len(self.kept)} recomputes came back worse and were "
-                         f"NOT applied (the record stands):")
-            lines += [f"    {line}" for line in self.kept]
-        if self.contradictions:
-            lines.append(f"  {len(self.contradictions)} CONTRADICTIONS: a completed "
-                         f"exhaustion disagrees with the recorded one. The record "
-                         f"was kept. This is a real defect, not a timing artefact, "
-                         f"and needs investigating before the figures are trusted:")
-            lines += [f"    {line}" for line in self.contradictions]
-        return "\n".join(lines)
+        if self.rebuilding:
+            return (f"machine values: {self.misses} computed, {self.resumed} "
+                    f"recovered from an interrupted run "
+                    f"({self.candidate.name}, {len(self.values)} entries)")
+        return (f"machine values: {self.hits} read from the record "
+                f"({self.path.name}, {len(self.values)} entries)")
+
 
 
 MACHINE_VALUES = MachineValues(MACHINE_CACHE_PATH,
-                               refresh="--refresh" in sys.argv)
+                               rebuild="--rebuild" in sys.argv,
+                               candidate=MACHINE_CANDIDATE_PATH)
 
 
 # ----------------------------------------------------------------------
@@ -425,7 +464,7 @@ def _reconcile_panel(panel: dict) -> dict:
 
 
 # The exhaustion budget was 4s, which was below what the record itself needed:
-# four completed exhaustions in it take about 8.4s on this machine, so a refresh
+# four completed exhaustions in it take about 8.4s on this machine, so a rerun
 # downgraded them to "did not finish" and _exact_points dropped four more sizes
 # behind them.  All 23 unfinished entries were then probed at 45s to find where
 # the real boundary is.  Two of them finish, at 24.3s and 28.6s, and the other 21
@@ -1262,13 +1301,75 @@ def main() -> None:
     print(f"wrote {gallery_path.name}  ({total_classes} iso-classes across all variants)")
 
 
+def rebuild_machine_values() -> None:
+    """Recompute every machine value from scratch. Draws nothing.
+
+    A rebuild is the experiment, not the drawing: it calls the same gatherers the
+    grids call, which is what puts every key the figures ask for into the
+    candidate file, and stops there.  Reviewing the result and publishing it are
+    separate deliberate acts (--compare, --promote).
+    """
+    print("rebuilding every machine value from scratch (hours, resumable)")
+    for m_val in (3, 6):
+        print(f"  gathering all-variant grid m={m_val}...")
+        gather_variant_grid(m=m_val)
+    print(MACHINE_VALUES.report())
+    print(f"\nwrote {MACHINE_VALUES.candidate.name}. Nothing published yet.\n"
+          f"Review it with   python3 make_figures.py --compare\n"
+          f"then publish it  python3 make_figures.py --promote")
+
+
+def compare_machine_values() -> None:
+    """Show every departure of the candidate from the published record."""
+    if not MACHINE_VALUES.candidate.exists():
+        raise SystemExit(f"ERROR: there is no {MACHINE_VALUES.candidate.name}. "
+                         f"Run --rebuild first.")
+    changes = MACHINE_VALUES.compare()
+    if not changes:
+        print(f"{MACHINE_VALUES.candidate.name} agrees with "
+              f"{MACHINE_VALUES.path.name} on every entry.")
+        return
+    print(f"{len(changes)} entries differ from {MACHINE_VALUES.path.name}:")
+    for line in changes:
+        print(f"  {line}")
+    disagreements = [c for c in changes if "DISAGREE" in c]
+    if disagreements:
+        print(f"\n{len(disagreements)} of them are two completed exhaustions "
+              f"disagreeing. That is a defect in one of the two programs, not a "
+              f"timing artefact, and it needs investigating before either number "
+              f"is published.")
+
+
+def _render(entry) -> None:
+    """Draw from the frozen record, saying plainly when a value is missing."""
+    try:
+        entry()
+    except MissingMachineValue as exc:
+        raise SystemExit(f"ERROR: {exc.args[0]}")
+
+
 if __name__ == "__main__":
-    # --grids-only reruns just the four variant grids (the layout-heavy ones);
-    # --tables-only reruns just their number-table companions;
-    # --refresh ignores figures/machine_values.json and recomputes every solve.
-    if "--grids-only" in sys.argv:
-        variant_grid_figures()
+    # Rendering (no flag, --grids-only, --tables-only) reads the frozen record in
+    # program/data/machine_values.json and never computes; --rebuild recomputes
+    # every value into a candidate file; --compare shows what moved; --promote
+    # publishes the candidate.
+    if "--rebuild" in sys.argv:
+        rebuild_machine_values()
+    elif "--compare" in sys.argv:
+        compare_machine_values()
+    elif "--promote" in sys.argv:
+        MACHINE_VALUES.promote()
+    elif "--refresh" in sys.argv or "--accept-stale" in sys.argv:
+        raise SystemExit(
+            "ERROR: --refresh no longer exists. Recomputing and publishing are "
+            "now separate acts, because a timed rerun on a different machine can "
+            "legitimately return different numbers:\n"
+            "  --rebuild   recompute every value from scratch into a candidate\n"
+            "  --compare   show how the candidate departs from the record\n"
+            "  --promote   publish the reviewed candidate")
+    elif "--grids-only" in sys.argv:
+        _render(variant_grid_figures)
     elif "--tables-only" in sys.argv:
-        variant_value_tables()
+        _render(variant_value_tables)
     else:
-        main()
+        _render(main)

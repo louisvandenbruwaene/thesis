@@ -81,10 +81,12 @@ From this `program/` directory:
 ../.venv/bin/python3 -m unittest discover -s tests  # run the full suite
 ../.venv/bin/python3 make_figures.py                 # regenerate every figure
 ../.venv/bin/python3 make_figures.py --grids-only    # regenerate the four bound grids
-../.venv/bin/python3 make_figures.py --refresh       # recompute the cached machine values
+../.venv/bin/python3 make_figures.py --rebuild       # recompute every machine value from scratch
+../.venv/bin/python3 make_figures.py --compare       # show how the rebuild departs from the record
+../.venv/bin/python3 make_figures.py --promote       # publish the reviewed rebuild
 ```
 
-### The machine-value cache
+### The machine-value record
 
 The four sixteen-variant bound grids are built from several hundred `solve`
 calls, exhaustive enumerations run to a timeout and timed searches, and that is
@@ -92,27 +94,36 @@ almost all the wall clock in `make_figures.py`. Their results are kept in
 `data/machine_values.json`, one readable entry per
 `(kind, n, m, budget, variant)`, holding the value that run produced or `null`
 where an exhaustion did not finish inside its budget. With the file present the
-grids redraw in about three seconds instead of half an hour.
+grids redraw in about three seconds.
 
-Caching a *timed* search is not only a speed-up. A search given four seconds
-finds what four seconds of one particular machine reaches, so recomputing it
-elsewhere can legitimately return a different (still honest) lower bound and
-move a plotted circle. Recording the value pins the published figure to the run
-that produced it.
+Those numbers are an experiment and the file is its result, so **rendering and
+recomputing are separate acts**:
 
-A cached value is only reusable while its key still means the same question, so
-the key of a multigraph *incidence* entry carries a convention stamp
-(`VERTEX_CONVENTION` in `make_figures.py`). The fingerprint below reports a
-changed program and reuses the values anyway, which is right for a faster search
-or a new figure and wrong for a redefinition of the objective. Bumping the stamp
-retires exactly the entries whose meaning moved and leaves the rest alone.
+| command | what it does |
+| --- | --- |
+| no flag | reads the record and draws. Never calls `solve`. A missing entry is an error, not a fresh run. |
+| `--rebuild` | recomputes every value from scratch, consulting nothing, into `data/machine_values.candidate.json`. Draws nothing. Resumable: an interrupted run picks up where it stopped. |
+| `--compare` | lists every way the candidate departs from the record, and calls out two completed exhaustions that disagree. |
+| `--promote` | replaces the record with the reviewed candidate. |
 
-Delete the file, or pass `--refresh`, to recompute every entry from scratch;
-that is the check that the file is still telling the truth. The fingerprint
-stored beside the values covers the program above its chapter 4 banner, which is
-everything `solve` runs, so editing the plotting code below does not raise a
-false alarm. A mismatch is reported and the values are reused, since whether it
-matters is a judgement about what changed.
+The separation is what makes the figures reproducible. A search given four
+seconds finds what four seconds of one particular machine reaches, so a render
+that quietly recomputed would redraw the thesis differently on a busier laptop.
+A rebuild is therefore a deliberate act with a review step, and the record is
+what the published figures are drawn from.
+
+Provenance sits beside the values: the program fingerprint, the source commit,
+the interpreter version, the platform and the date. It is recorded, not
+enforced. A fingerprint answers "did any byte change", never "did any answer
+change", so nothing refuses to draw because it moved; `--rebuild` followed by
+`--compare` settles that question with the numbers themselves. The fingerprint
+covers the program above its chapter 4 banner, which is everything `solve`
+runs, so editing the plotting code below does not move it.
+
+A recorded value is only meaningful while its key still means the same
+question, so the key of a multigraph *incidence* entry carries a convention
+stamp (`VERTEX_CONVENTION` in `make_figures.py`). Bumping the stamp retires
+exactly the entries whose meaning moved and leaves the rest alone.
 
 The test suite needs no third-party test runner: it uses the standard library
 `unittest`. If you do have `pytest` installed, `pytest tests` discovers the same
@@ -168,7 +179,7 @@ was produced; rerun those calls to check it.
 | `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Appendix audit) |
 | `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Appendix audit) |
 | `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Appendix audit) |
-| `figures/machine_values.json` | the cached `solve` results those four grids plot (not a figure) |
+| `program/data/machine_values.json` | the cached `solve` results those four grids plot (not a figure) |
 | `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
 | `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (offcut only) |
