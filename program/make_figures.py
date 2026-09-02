@@ -381,6 +381,45 @@ def _extend_lower_bounds(search, lb_fn, ns):
     return xs, [found[n] for n in xs]
 
 
+# Panels are appended row-major, four columns per model row, in the order
+# simple graph, multigraph, hypergraph, multihypergraph.  So a simple panel's
+# multi counterpart sits exactly one model row later, and the two model-row
+# pairs are (0..3, 4..7) and (8..11, 12..15).
+_PANELS_PER_MODEL_ROW = 4
+_SIMPLE_MODEL_ROW_STARTS = (0, 8)
+
+
+def _lift_multi_above_simple(panels):
+    """Raise every multi panel's search points to its simple counterpart's.
+
+    A simple object IS the multi object with every multiplicity one, so a simple
+    witness is a multi witness and the multi lower bound can never legitimately
+    sit below the simple one.  Where the raw walk puts it there, the cause is the
+    search rather than the mathematics: the multi space is ``m - 1`` times larger
+    per edge, so at ``m = 6`` the same budget explores far less of it, and the
+    multihypergraph vertex panel came back weaker than the simple hypergraph one
+    at six of its ten sizes (n = 7..12, 13 against 15 up to 22 against 27).
+    Plotted unlifted, that reads as the richer model doing worse, which no
+    hypergraph can do.
+
+    This is the cross-model twin of :func:`_extend_lower_bounds`.  That function
+    raises a search to a named construction inside one panel; this one raises it
+    to an object another panel actually exhibited, which is the same argument
+    with a different witness.  It runs BEFORE :func:`_reconcile_panel`, so the
+    monotone running-max there applies to the lifted series rather than to a
+    series the lift would then contradict.
+    """
+    for start in _SIMPLE_MODEL_ROW_STARTS:
+        for column in range(_PANELS_PER_MODEL_ROW):
+            simple = panels[start + column]
+            multi = panels[start + _PANELS_PER_MODEL_ROW + column]
+            floor = dict(zip(*simple["search"]))
+            xs, ys = multi["search"]
+            multi["search"] = (xs, [max(y, floor[n]) if n in floor else y
+                                    for n, y in zip(xs, ys)])
+    return panels
+
+
 def _reconcile_panel(panel: dict) -> dict:
     """Make a panel internally consistent before plotting.
 
@@ -932,7 +971,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         status="open", ylabel="hyperarcs",
         exact=ex16, search=se16))
 
-    return [_reconcile_panel(p) for p in panels]
+    return [_reconcile_panel(p) for p in _lift_multi_above_simple(panels)]
 
 
 def variant_grid_figures() -> None:

@@ -1,7 +1,13 @@
 # The exact environment the reported values, figures and test suite were last
-# verified in (2026-08-25). Reproduce it with
+# verified in (2026-09-02, a from-scratch rebuild of all 529 machine values).
+# Reproduce it FROM THE REPOSITORY ROOT, which is where the environment lives
+# and where every command the thesis prints expects to find it as ../.venv:
 #
-#     python3 -m venv .venv && ./.venv/bin/pip install -r requirements-lock.txt
+#     python3 -m venv .venv
+#     .venv/bin/python3 -m pip install -r program/requirements-lock.txt
+#
+# Running this from program/ instead would build the environment one level too
+# deep and leave ../.venv missing.
 #
 # Python 3.14.6 on macOS (darwin, arm64).
 #
