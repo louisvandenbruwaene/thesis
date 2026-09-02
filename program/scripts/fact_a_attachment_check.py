@@ -34,6 +34,7 @@ Usage:
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 import time
 from collections import deque
 
@@ -206,7 +207,7 @@ def run_case(npz_path: str, dmin: int, label: str,
 def _crosscheck_classes(data, keys, dmin) -> None:
     """Every loaded class must be feasible with the right arc count, per BOTH
     this script's checker and the thesis program's."""
-    sys.path.insert(0, "/Users/chief/Projects/thesis/program")
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from erdos915_unified import Graph, Variant, max_edge_connectivity
 
     target = 25 - dmin

@@ -25,7 +25,8 @@ offcuts.tex           every passage cut during the shortening pass, restore-read
                       (not part of the thesis, never input by main.tex)
 main.tex, preamble.tex, ref.bib, kulakreport.cls, *.pdf/*.png   LaTeX sources + logos
 figures/              all figures: matplotlib PNGs + their data caches
-program/
+program/              EVERYTHING the thesis refers to. main.pdf and this
+                      directory are the two things a reader is handed.
   erdos915_unified.py one Python driver: the model, exact max-flow checker,
                       cut-counting certifier, simulated-annealing search, and
                       the proof-support solvers.
@@ -33,15 +34,19 @@ program/
                       by build_fast.sh. Correctness does not depend on it.
   make_figures.py     regenerates every figure from the program (fixed seeds)
   tests/              unit tests
+  scripts/            standalone checks: the two block sweeps the thesis cites
+                      (simple_vertex_blocks.py behind c_m, multi_vertex_blocks.py)
+                      and the conjecture checks behind research_notes/. All are
+                      deliberately written apart from the main program so they
+                      corroborate it rather than share its code.
+  data/               machine_values.json, the recorded value of every solve
+                      call behind the variant grids
+  logs/               run transcripts the computational audit cites
 popularising_summary/ lay summary
 research_notes/       conjectures and supposed proofs mostly NOT in the thesis:
                       too specific or unfinished for the text, kept for future
-                      work (AI or human). Self-contained, with reproducible
-                      scripts. Two exceptions the thesis does cite, both
-                      deliberately written apart from the main program so they
-                      corroborate it rather than share its code:
-                      scripts/simple_vertex_blocks.py (the 2-connected block
-                      sweep behind c_m) and scripts/multi_vertex_blocks.py.
+                      work (AI or human). Prose only; their scripts live in
+                      program/scripts/.
 claude.md, TASKS.md   operating notes and the prioritized open-problem queue
 main.pdf              the compiled thesis
 ```
@@ -65,8 +70,8 @@ The two independent block sweeps additionally need nauty's `geng` on `PATH`
 commands matching the ranges quoted in the thesis are:
 
 ```bash
-BMAX=9 .venv/bin/python3 research_notes/scripts/simple_vertex_blocks.py
-BMAX=8 .venv/bin/python3 research_notes/scripts/multi_vertex_blocks.py
+BMAX=9 .venv/bin/python3 program/scripts/simple_vertex_blocks.py
+BMAX=8 .venv/bin/python3 program/scripts/multi_vertex_blocks.py
 ```
 
 The bundled `.venv` was created before the repo moved, so its `activate` script and
@@ -106,8 +111,9 @@ The open problems are stated precisely in **ch3 (`chapters/ch3_synthesis.tex`,
   two values agree exactly.
 - **The hypergraph vertex problem at `m ≥ 4`.** This needs a 4-connectivity analogue of the
   triconnected (Tutte/SPQR) decomposition used for `m = 3`.
-- **The exact constant in `Kₘᵐᵘˡᵗⁱ(n)`**, the multigraph vertex problem under the
-  convention that parallel copies are distinct routes (thesis Appendix A.9). In the large-`n` block-packing regime, `Kₘᵐᵘˡᵗⁱ(n) = Θ(m²n)` is now a
+- **The exact constant in `Kₘ(n)`**, the multigraph vertex problem, where `q` parallel
+  copies are `q` separated routes under the incidence convention (thesis Appendix A.9).
+  In the large-`n` block-packing regime, `Kₘ(n) = Θ(m²n)` is now a
   theorem on both sides, and the value is exactly a block problem: a knapsack over the
   best 2-connected block of each size, which settles it outright for every `n ≤ 8`,
   `m ≤ 8` (at `m = 5`, `n = 7` the value is 29, not the bouquet's 27). The winning

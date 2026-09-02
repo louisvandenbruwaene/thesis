@@ -27,8 +27,18 @@ program/
   build_fast.sh         builds the optional _erdos_fast.so accelerator
   make_figures.py       regenerates every thesis figure into ../figures/
   tests/                an extensive unittest suite covering the whole program
+  scripts/              standalone checks written apart from this program so
+                        they corroborate it rather than share its code: the two
+                        block sweeps the thesis cites and the conjecture checks
+                        behind research_notes/
+  data/                 machine_values.json, the recorded result of every solve
+                        call behind the four variant grids
+  logs/                 run transcripts the computational audit cites
   README.md             this file
 ```
+
+The thesis hands a reader two things, `main.pdf` and this directory, so
+everything the text points at is inside it.
 
 ## Requirements
 
@@ -79,7 +89,7 @@ From this `program/` directory:
 The four sixteen-variant bound grids are built from several hundred `solve`
 calls, exhaustive enumerations run to a timeout and timed searches, and that is
 almost all the wall clock in `make_figures.py`. Their results are kept in
-`../figures/machine_values.json`, one readable entry per
+`data/machine_values.json`, one readable entry per
 `(kind, n, m, budget, variant)`, holding the value that run produced or `null`
 where an exhaustion did not finish inside its budget. With the file present the
 grids redraw in about three seconds instead of half an hour.

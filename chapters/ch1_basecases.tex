@@ -389,12 +389,8 @@ The final assumption that will be considered is \emph{separation}. For graphs
 and digraphs, routes may be required either to avoid sharing edges, as above,
 or to be internally vertex-disjoint, sharing no intermediate vertex. This gives
 the local vertex-connectivity $\kap_G(u, v)$ and its maximum
-$\kap_G^{\max}$. For hypergraphs, this thesis uses the incidence-graph
-convention: the Berge routes counted by $\kap_\HH(u,v)$ share neither an
-intermediate vertex nor a hyperedge copy. Repeated copies count as distinct
-hyperedges. This extra condition is needed because two Berge routes can use the
-same hyperedge without sharing an intermediate vertex.
-Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex. The same inequality holds for the hypergraph convention because every family counted by $\kap_\HH$ is hyperedge-copy-disjoint.
+$\kap_G^{\max}$.
+Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records that avoiding shared vertices is at least as demanding as avoiding shared edges and \Cref{fig:edge-vs-vertex} shows the gap on a graph where two routes are edge-disjoint yet forced through one common vertex. The same inequality holds under the convention of \Cref{sec:incidence-convention} because every family counted by $\kap$ is edge-copy-disjoint.
 
 \begin{figure}[ht]
 \centering
@@ -417,12 +413,25 @@ Whitney's inequality $\kap_G(u, v) \le \lec_G(u, v)$ \cite{Whitney32} records th
 \label{fig:edge-vs-vertex}
 \end{figure}
 
-In the graph and digraph vertex-disjoint variants, multiplicity of an edge or arc is irrelevant compared to its existence,
-so parallel edges never raise $\kappa$.\label{sec:incidence-convention}
-Therefore they never break the connectivity constraints either.
-Counted with multiplicity, the maximum number of edges could simply be infinite and the extremal question would be empty.
-The multigraph vertex variants are thus posed on the underlying simple graph, 
-which is why those two rows of \Cref{tab:summary} reduce to their simple counterparts and why every figure in this thesis reports the reduced problem for them.
+Every model in this thesis measures vertex separation in the same place, the
+incidence graph.\label{sec:incidence-convention}
+The incidence graph $I(\HH)$ has one node for each vertex and one node for each
+edge copy, and it joins an edge copy to each of the vertices it contains. A route
+from $u$ to $v$ is a path of $I(\HH)$, and two routes are separated when they
+share no interior node. Interior nodes come in both kinds, so separated routes
+share neither an intermediate vertex nor an edge copy. The second half of that is
+what the hypergraph needs, since two Berge routes can run through the same
+hyperedge without ever meeting at a vertex, and a hyperedge that may carry only
+one route at a time is the whole difficulty of the model.
+For a simple graph the definition changes nothing, because an edge lies on a
+route exactly when both of its endpoints do. For a multigraph it says that $q$
+parallel copies of $uv$ are $q$ separated routes, exactly as $q$ copies of a
+hyperedge are, since a single edge is a path with nothing in its interior. So the
+two multigraph vertex variants are questions of their own, written $K_m(n)$ and
+$K_m^{\mathrm{dir}}(n)$, rather than the simple problems under another name. They
+are finite for the same reason the edge variants are: $m$ parallel copies are
+already $m$ separated routes, so no multiplicity in a feasible network can exceed
+$m-1$.
 
 With all this in mind, the thesis considers multihypergraphs and directed multihypergraphs for both edge- and vertex-disjoint routes.
 Ordinary graphs ($r=2$) and simple hypergraphs (no repeated hyperedges) are special cases.
@@ -432,8 +441,8 @@ The notation for all their extremal functions is summarised in \Cref{tab:notatio
 
 \begin{table}[ht]
 \centering
-\caption{Notation for the extremal functions. For hypergraphs, the third
-column uses the incidence convention defined above.}
+\caption{Notation for the extremal functions. The third column uses the
+incidence convention defined above, in every model.}
 \label{tab:notation}
 \begin{tabular}{l|c|c}
 \toprule
@@ -634,6 +643,22 @@ A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches 
 When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away and it must do this for every line simultaneously. 
 That bookkeeping is the one new piece of machinery the next chapter builds and it is why the hypergraph rejoins the family only once the checker is in place.
 
+At $r = 2$ these two theorems speak about multigraphs. \Cref{thm:hyper-vertex-m2}
+gives $K_2(n) = n-1$, where the cap leaves every multiplicity at one and the
+extremisers are the spanning trees, and \Cref{thm:hyper-vertex-m3} gives
+$K_3(n) = 2(n-1)$, attained by a spanning tree with every edge doubled
+(\Cref{cor:multi-vertex-m3}). From $m = 5$ the multigraph vertex problem parts
+company both with its edge counterpart, $K_5(4) = 14$ against $L_5(4) = 12$, and
+with the thickened tree, which a single grafted triangle already beats
+(\Cref{thm:clique-chain-vertex}). \Cref{app:proofs} works the problem out. The
+measure splits into parallel copies plus longer detours
+(\Cref{lem:multi-vertex-split}), which turns the whole question into a knapsack
+over the blocks of the underlying simple graph (\Cref{thm:multi-vertex-blocks}).
+In the block-packing regime, complete bipartite blocks give an asymptotic rate of
+$(3-2\sqrt{2}+o_m(1))m^2$ per added vertex (\Cref{thm:multi-vertex-bipartite}),
+while the underlying simple graph gives the upper bound $K_m(n) < 2(m-1)^2n$
+(\Cref{prop:multi-vertex-upper}).
+
 \begin{theorem}[The quadratic bound with a linear error,\aimedal]\label{thm:dir-arc-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
@@ -690,5 +715,13 @@ budget, after which \Cref{lem:two-step-budget} controls the shadow and a
 tail--head incidence count converts its arcs back to hyperedges. Since the
 bipartite construction already attains that leading term, it is asymptotically
 optimal.
+
+The same specialisation to $r = 2$ carries the directed arc results across to the
+directed multigraph vertex problem. At $m = 2$ the cap leaves every multiplicity
+at one, so $K_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
+For fixed $m$ the arc extremiser of \Cref{thm:dir-multi-full} is feasible here as
+well, since $\kap \le \lec$, and the theorem above at $r = 2$ is the matching
+upper bound, so $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$
+(\Cref{cor:dir-multi-incidence}).
 
 For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.

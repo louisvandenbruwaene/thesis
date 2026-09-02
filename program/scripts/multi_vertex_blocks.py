@@ -22,7 +22,7 @@ Two claims.
 Needs nauty's geng on PATH and networkx.  Cross-checks against the thesis
 program's own exhaustive max_multigraph_vertex_standard where that finishes.
 
-Run:  python3 research_notes/scripts/multi_vertex_blocks.py
+Run:  python3 program/scripts/multi_vertex_blocks.py
 """
 from __future__ import annotations
 

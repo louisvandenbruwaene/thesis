@@ -22,7 +22,7 @@ right (it says exactly this, and n=3 m=3 r=3 is the smallest case). Those
 cells are now recorded out of range. Before believing any future mismatch,
 check which family the routine behind it actually searches.
 
-Run from program/:  python3 ../research_notes/scripts/audit_closed_forms.py
+Run from program/:  python3 ../program/scripts/audit_closed_forms.py
 """
 
 import math

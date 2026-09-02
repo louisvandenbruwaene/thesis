@@ -6,7 +6,7 @@ agrees with a constrained nonlinear solver (scipy SLSQP, multi-start), and that
 both agree asymptotically with the theorem's crude bound 4(m-1)(n-1).
 
 Self-contained: numpy + scipy only, no dependency on the thesis program.
-Run: python3 research_notes/scripts/case2_tightness_check.py
+Run: python3 program/scripts/case2_tightness_check.py
 """
 
 import numpy as np

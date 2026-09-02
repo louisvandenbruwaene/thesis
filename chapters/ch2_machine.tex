@@ -70,6 +70,12 @@ Every arc $u \to v$ of the digraph becomes $u^{\mathrm{out}} \to v^{\mathrm{in}}
 Routing through $v$ now consumes the one unit of capacity on its internal arc, 
 so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow. 
 A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network therefore equals the number of internally vertex-disjoint $u$-$v$ paths in the original graph.
+For a multigraph the arc carrying an adjacency keeps its full capacity
+$\mu(u,v)$, and only the internal arc of a vertex is a unit. That is the
+incidence convention of \Cref{sec:incidence-convention} written as a network:
+parallel copies stay separate routes while the vertex they run through does not,
+so the split network measures $K_m(n)$ and $K_m^{\mathrm{dir}}(n)$ rather than
+the value of the underlying simple graph.
 Notice how the undirected or hypergraph transformation is done beforehand and 
 the gates aren't split by this step.
 
@@ -209,7 +215,7 @@ the gates aren't split by this step.
 \draw[->, edge] (vo) -- (8.0,  0.6);
 \draw[->, edge] (vo) -- (8.0, -0.6);
 \end{tikzpicture}}
-\caption{Split each vertex $v$ into $v^{\mathrm{in}}$ and $v^{\mathrm{out}}$ joined by a unit-capacity arc to transform vertex-disjointness into edge-disjointness.}
+\caption{Split each vertex $v$ into $v^{\mathrm{in}}$ and $v^{\mathrm{out}}$ joined by a unit-capacity arc to transform vertex-disjointness into edge-disjointness. Only this internal arc is a unit: an adjacency keeps capacity $\mu(u,v)$ and a hyperedge keeps its gate.}
 \label{fig:vertex-split}
 \end{subfigure}
 

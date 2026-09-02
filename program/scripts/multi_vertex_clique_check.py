@@ -6,7 +6,7 @@ multi_vertex_clique_chains.md, checks feasibility TWO independent ways
 (the thesis program's exceeds_bound, and a from-scratch networkx max-flow on
 a hand-built split network), and confirms the exact gain formula.
 
-Run: python3 research_notes/scripts/multi_vertex_clique_check.py
+Run: python3 program/scripts/multi_vertex_clique_check.py
 Needs the thesis program on the path (run from program/, or adjust sys.path)
 and networkx (only used for the independent cross-check).
 """

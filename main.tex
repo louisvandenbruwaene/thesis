@@ -66,6 +66,7 @@ Variant & Contribution \\
 \midrule
 Hypergraph, vertex separation & Exact value at $m=2$. The $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
 Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
+Multigraph, incidence separation & The two multigraph vertex variants posed as problems of their own: exact values at $m\le3$, the reduction to a knapsack over $2$-connected blocks, thickened bipartite blocks against an upper bound of the same order, and the directed value to its leading term (\Cref{thm:multi-vertex-m2,cor:multi-vertex-m3,thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper,cor:dir-multi-incidence}). Every result in this row carries the badge except the $m=2$ value. \\
 Directed simple graph, arc separation & Unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
 Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and, for fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
 \bottomrule
@@ -85,14 +86,14 @@ Mader proved that, for simple graphs and all $n\ge2$ and $m\ge2$,
 \]
 and provided a construction achieving this bound when $(m-1)|(n-1)$.
 This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multihypergraphs), the path-separation notion and the presence or absence of directions.
-For graphs and digraphs, the two separation notions are edge-disjointness and internal vertex-disjointness.
-For hypergraphs, the vertex version uses the incidence-graph convention: its Berge routes share neither an intermediate vertex nor a hyperedge copy.
+The two separation notions are edge-disjointness and internal vertex-disjointness, the second read in the incidence graph, so that separated routes share neither an intermediate vertex nor an edge copy.
+Parallel copies are therefore separate routes, which makes the two multigraph vertex variants problems of their own rather than restatements of the simple ones.
 The simple edge-disjoint case is proved independently here using Gomory-Hu trees \cite{GomoryHu61}, and a general extremal construction resolves it for all $n$ and $m$.
 Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, due to B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66} and Leonard \cite{Leonard72b}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
 The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved by a long induction and for $m\ge3$ the hand proof gives way to a conjecture, after an explicit ten-vertex graph rules out the naive guess. 
 
 
-The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity matrix and converts the vertex-disjoint problem to an edge-disjoint one by a standard vertex-splitting construction.
+The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity matrix and converts the vertex-disjoint problem to an edge-disjoint one by building the capacity network of the vertex-splitting construction, in which a vertex is a unit gate while an adjacency keeps its multiplicity.
 The hypergraphs are handled as a list of hyperedges, which may use head and tail sets to represent directed hyperedges.
 Then a maximum-flow algorithm measures connectivity between all pairs of vertices and reports the maximum local connectivity.
 At each point of the program, optimisations are applied to reduce the search space and traverse it more efficiently.
@@ -131,6 +132,7 @@ $k_m(n)$ & simple undirected vertex-disjoint extremal function \\
 $\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
 $L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
 $k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
+$K_m(n)$, $K_m^{\mathrm{dir}}(n)$ & undirected and directed multigraph vertex-disjoint extremal functions, multiplicity counted (\Cref{sec:incidence-convention}) \\
 $\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform hypergraph edge-disjoint and incidence-graph vertex-disjoint extremal functions \\
 $M(n)$ & $\max\bigl(2(n-1), \floor{n^2/4}\bigr)$, the directed multigraph value per unit of $m-1$ \\
 $M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$, equal to $M(n)$ by \Cref{cor:mstar-integral} \\

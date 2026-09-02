@@ -61,6 +61,12 @@ from erdos915_unified import (  # noqa: E402
 )
 
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
+# The record of what the machine returned is evidence, not a drawing, so it
+# lives beside the code that produced it: the thesis hands the reader main.pdf
+# and this program/ directory, and everything the audit section names has to be
+# inside one of the two.  The offcut-only caches (surface, enumeration) stay in
+# ../figures/, since nothing outside the offcuts document refers to them.
+DATA = Path(__file__).resolve().parent / "data"
 
 
 # ----------------------------------------------------------------------
@@ -71,7 +77,7 @@ FIGURES = Path(__file__).resolve().parent.parent / "figures"
 #  none of it changes between runs, so the results are kept on disk.
 # ----------------------------------------------------------------------
 
-MACHINE_CACHE_PATH = FIGURES / "machine_values.json"
+MACHINE_CACHE_PATH = DATA / "machine_values.json"
 
 
 # How the vertex separation counts parallel edges in the two multigraph cells.

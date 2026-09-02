@@ -371,7 +371,7 @@ $k_3(n) = 3\floor{(n-1)/2} + ((n-1) \bmod 2) = \floorfrac{3(n-1)}{2}$.
 
 At $m = 4$ the picture is $h_4(b) = 2(b-1)$ for every $b \ge 4$, so the rate $h_4(b)/(b-1)$ reaches $2$ at $b = 4$ and stays there, against $1$ at $b = 2$ and $3/2$ at $b = 3$. The knapsack therefore spends its whole budget on blocks of size at least four as soon as one fits, giving $k_4(n) = 2(n-1)$ for $n \ge 4$. Below that only the small blocks are available and the formula overshoots, $k_4(2) = 1$ against its $2$ and $k_4(3) = 3$ against its $4$, which is where the hypothesis $n \ge m$ of \Cref{thm:leonard} earns its place. This one is a repackaging rather than a second proof. The upper bound $h_4(b) \le k_4(b) = 2(b-1)$ is \Cref{thm:leonard} itself read on a block, so it cannot turn round and reprove it, and nothing as elementary as the theta argument above is on offer for the blocks with $\kap^{\max} \le 3$. What the reformulation adds is the extremal block, one the appendix has already built: the hub-and-spokes graph $H_{4,b}$ of \Cref{const:hub-spokes}, a hub joined to every other vertex with a cycle on the rest. Unlike the shared-clique graph it is a single block, and it meets $2(b-1)$ at every size. An exhaustive sweep of the $2$-connected graphs confirms that it is optimal, and the unique optimum, at every $b$ from $4$ to $8$.
 
-At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, as many copies of $K_m$ sharing one vertex as fit, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. That sweep runs from its own standalone script, \code{research\_notes/scripts/simple\_vertex\_blocks.py}, rather than from the main program, so it corroborates the checker instead of sharing code with it. A \emph{bouquet} is a collection of blocks sharing one common vertex and otherwise disjoint. Since its rate is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
+At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, as many copies of $K_m$ sharing one vertex as fit, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. That sweep runs from its own standalone script, \code{program/scripts/simple\_vertex\_blocks.py}, rather than from the main program, so it corroborates the checker instead of sharing code with it. A \emph{bouquet} is a collection of blocks sharing one common vertex and otherwise disjoint. Since its rate is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
 
 The reason the computation does not reach further is structural rather than a matter of processor time. The conjecture is false. Leonard disproved it first, at $m = 5$, with an explicit graph on $57$ vertices \cite{Leonard73BE}, and Mader showed that the difference $k_m(n) - mn/2$ is unbounded for $m \ge 6$ \cite{Mader73}. What replaces it, and what the rest of this section leans on, is a lower bound of S\o{}rensen and Thomassen \cite{SorensenThomassen74}: for each fixed $m$,
 \[
@@ -1795,8 +1795,8 @@ graphs, evaluate $W_m$, and solve the resulting knapsack. A sweep through eight
 vertices agrees with the independent exhaustive routine wherever both finish.
 It shows that the winning blocks are unbalanced and bipartite-like rather than
 complete, which motivates the family below. It too runs from a standalone script,
-\code{research\_notes/scripts/multi\_vertex\_blocks.py}, and its retained
-transcript is \path{figures/multi_vertex_blocks_log.txt} in the repository named
+\code{program/scripts/multi\_vertex\_blocks.py}, and its retained
+transcript is \path{program/logs/multi_vertex_blocks_log.txt} in the repository named
 in \Cref{sec:transcripts}.
 
 \begin{theorem}[Thickened complete bipartite blocks,\aimedal]\label{thm:multi-vertex-bipartite}
@@ -2304,6 +2304,11 @@ Where the method is needed differs by variant. For undirected graphs one could r
 The authoritative code and audit instructions are maintained in the versioned
 repository at \url{https://github.com/louisvandenbruwaene/thesis}. Its Git
 history records the development of the code, data and thesis sources.
+Everything this thesis refers to sits in one directory, \code{program/}: the
+unified program and its test suite, the standalone scripts behind the block
+sweeps and the conjecture checks (\code{program/scripts/}), the recorded machine
+values (\code{program/data/}) and the run transcripts (\code{program/logs/}).
+This document and that directory are the whole of it.
 
 Three commands cover the main audit. Run them from \code{program/}.
 The first performs the principal checks, the second runs the regression suite
@@ -2315,7 +2320,7 @@ and the third regenerates the computational figures.
 \end{lstlisting}
 
 The four variant grids require several hundred \code{solve} calls. Their values
-are stored in \code{figures/machine\_values.json}. This readable file records
+are stored in \code{program/data/machine\_values.json}. This readable file records
 what each run returned. It lets the grids redraw in seconds. It also ensures
 that the document uses the recorded points rather than the outcome of a new
 timed search.
@@ -2328,10 +2333,10 @@ recomputing everything from scratch.
 
 The block sweep is independent of that file and of the main program. Its
 self-contained implementation is
-\code{research\_notes/scripts/simple\_vertex\_blocks.py}. It requires nauty's
+\code{program/scripts/simple\_vertex\_blocks.py}. It requires nauty's
 \code{geng} on the path. From the repository root, the quoted range is reproduced
 by \code{BMAX=9 .venv/bin/python3
-research\_notes/scripts/simple\_vertex\_blocks.py}. The recorded environment
+program/scripts/simple\_vertex\_blocks.py}. The recorded environment
 used nauty 2.9.3.
 
 The required dependency ranges are listed in
@@ -2436,14 +2441,14 @@ The base cases of the directed $m = 2$ induction run to $n = 7$, and are settled
   flow test with the separation, and at these sizes the two happen to cut the
   tree in the same places. The wall times do not coincide, with the vertex run at $n = 7$ taking
   $3125$\,s against the arc run's $718$\,s. Full logs:
-  \code{figures/basecase\_search\_log.txt} and
-  \code{figures/basecase\_search\_vertex\_log.txt}.}
+  \code{program/logs/basecase\_search\_log.txt} and
+  \code{program/logs/basecase\_search\_vertex\_log.txt}.}
   \label{tab:basecase-search}
 \end{table}
 
 The historical cut-counting optimisation closes the directed multigraph checks
 through $n=6$ but emits no independently replayable matching bound, so no
-theorem rests on it. Its raw log is \path{figures/certificate_log.txt}. Exact
+theorem rests on it. Its raw log is \path{program/logs/certificate_log.txt}. Exact
 flow measures a supplied object, completed enumeration proves a finite optimum,
 and heuristic search supplies only a checked witness and lower bound. The file
 \code{program/README.md} records the dependencies, commands, entry points, and

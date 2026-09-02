@@ -25,8 +25,8 @@ extremal multigraph.  The claim is that the only one is (m-1)*B(n/2,n/2).
 
 Self-contained: standard library only, own capped arc-disjoint-route counter.
 
-Run:  python3 research_notes/scripts/quadratic_branch_uniqueness.py
-      N=10 M=3 python3 research_notes/scripts/quadratic_branch_uniqueness.py
+Run:  python3 program/scripts/quadratic_branch_uniqueness.py
+      N=10 M=3 python3 program/scripts/quadratic_branch_uniqueness.py
 """
 from __future__ import annotations
 

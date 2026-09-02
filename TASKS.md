@@ -7,7 +7,10 @@ batch (Whitney inversion, five overclaims, error term to O_m(n), multigraph vert
 alt-convention, Case 2 tightness, S-T threshold, Leonard citation fix) are all logged
 in claude.md and deleted here.
 
-## OPEN — multigraph vertex, alternate convention (new section A.8)
+## OPEN — multigraph vertex, K_m(n) (appendix section A.9)
+NOTE 2026-09-02: this is no longer an "alternate convention". The thesis now poses
+vertex separation once, in the incidence graph, so this IS the multigraph vertex
+problem and the section is live in the appendix. Older wording below predates that.
 - [x] **conj:multi-vertex REFUTED for all m>=5 (2026-07-31).** thm:clique-chain-vertex:
       chaining thickened K_r blocks (r~m/2 optimal) through single bridge
       vertices beats the thickened tree by an amount growing LINEARLY in n
@@ -19,7 +22,7 @@ in claude.md and deleted here.
       is now secondary (still useful data, but no longer tests a live
       conjecture) -- check its PID before relaunching.
 - [ ] **Extend the m=5 and m=6 rows of tab:multi-vertex.** Command:
-      max_multigraph_vertex_standard(n, m). RUNNING as of 2026-07-30 22:50,
+      max_multigraph_vertex(n, m) (renamed 2026-09-02). RUNNING as of 2026-07-30 22:50,
       PID 79194 (background, outside this session): (3,7),(4,6),(6,5),
       (5,6),(5,7),(4,7) each capped at 5400s.
 - [x] **The value is a BLOCK problem (2026-08-14), thm:multi-vertex-blocks.**
@@ -186,7 +189,7 @@ computation are now moot:
       did not return within the session (the looser codegree cap at higher m
       widens the space sharply). Natural next computation; needs either a
       longer run on a quiet machine or a better-pruned search.
-      Command: research_notes/scripts/hyper_vertex_m4_search.py (edit the
+      Command: program/scripts/hyper_vertex_m4_search.py (edit the
       case list) or the same DFS with symmetry reduction added.
 - [x] ~~m=4 base facts~~ — moot. thm:dir-multi-full gives L_4^dir(7) =
       (4-1)*M(7) = 3*12 = 36 directly (matching the target this item was
@@ -302,5 +305,6 @@ comments themselves are gone from ch3.
       which looks better? Perhaps move some of it into that one, or into
       tab:open-problems." Editorial call for the author. Note that tab:summary
       is currently the authority for every range and convention: the
-      hypergraph attainment ranges, the two multigraph vertex conventions, and
-      the m=5 n>=6 exception all live in its note and nowhere else.
+      hypergraph attainment ranges, the incidence convention for the two
+      multigraph vertex rows, and the m=5 n>=6 exception all live in its note
+      and nowhere else.

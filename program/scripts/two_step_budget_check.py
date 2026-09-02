@@ -10,7 +10,7 @@ hypergraph and vertex-split models. It shares no code with
 program/erdos915_unified.py, which is the point, since its job is to
 corroborate results that the program also computes.
 
-Run:  python3 research_notes/scripts/two_step_budget_check.py
+Run:  python3 program/scripts/two_step_budget_check.py
 """
 from __future__ import annotations
 

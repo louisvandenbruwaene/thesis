@@ -31,7 +31,7 @@ passage cut during the 2026-08 shortening passes with restore anchors.
 - Standard of done before calling anything finished: rebuild the PDF clean,
   run the test suite, run the program's own `_run_checks` self-test, and
   re-verify any numeric claim against at least one independent implementation
-  (own from-scratch Edmonds–Karp scripts in `research_notes/scripts/` are the
+  (own from-scratch Edmonds–Karp scripts in `program/scripts/` are the
   usual second opinion).
 
 ## What's proved (current, load-bearing — supersedes any older note)
@@ -51,10 +51,12 @@ passage cut during the 2026-08 shortening passes with restore anchors.
 - **Hypergraph vertex problem: m=2 and m=3 proved for all n, r**
   (`thm:hyper-vertex-m2`, `thm:hyper-vertex-m3`, via `lem:incidence-rank`).
   m>=4 open (needs a 4-connectivity SPQR analogue) — see below.
-- **Multigraph vertex problem, alternate ("collapsing") convention**: solved
-  as a block/knapsack problem (`thm:multi-vertex-blocks`), asymptotically
-  Theta(m²n) with matching upper bound (`prop:multi-vertex-upper`, via Mader).
-  Exact constant between the K_{s,t} construction and 2 is still open.
+- **Multigraph vertex problem** (`K_m(n)`, incidence convention): exact at
+  m <= 3 (`thm:multi-vertex-m2`, `cor:multi-vertex-m3`), solved as a
+  block/knapsack problem (`thm:multi-vertex-blocks`), asymptotically Theta(m²n)
+  with matching upper bound (`prop:multi-vertex-upper`, via Mader). Exact
+  constant between the K_{s,t} construction and 2 is still open. Directed:
+  `cor:dir-multi-incidence` gives M(n) at m=2 and (m-1)n²/4 + O_m(n) for fixed m.
 - **Undirected simple vertex problem (Mader/Leonard/Sørensen–Thomassen)**:
   standard results hold for n>=m; k_5 divergence point (edge vs. vertex) is
   n=14, resolved 2026-08-13/24 from the primary Sørensen–Thomassen paper
@@ -74,9 +76,9 @@ passage cut during the 2026-08 shortening passes with restore anchors.
    new idea.
 2. Hypergraph vertex problem at m=4 and beyond. No counterexample at m=4
    across eleven (n,r) cells; the r=2 case of this same problem *is* the
-   multigraph vertex problem and is known to fail at m=5, so m=4 sits right
+   multigraph vertex problem `K_m(n)` and is known to fail at m=5, so m=4 sits right
    at the edge. Where r>=3 first breaks is an open computation.
-3. Multigraph vertex problem (alternate convention): tighten the constant
+3. Multigraph vertex problem (`K_m(n)`, m>=4): tighten the constant
    between (3-2√2)m² and 2m² (`thm:multi-vertex-bipartite` vs.
    `prop:multi-vertex-upper`).
 4. Undirected simple vertex problem, m>=6 (the 1974 Bollobás–Erdős question):
@@ -143,19 +145,23 @@ and only touch this summary if the *status* (proved/open) changes.
   worst mistake (2026-08-11 audit) was three places asserting a MILP run
   "returns INFEASIBLE" when it had actually been abandoned unfinished.
   State plainly what ran to completion and what did not.
-- **The multigraph VERTEX variants are posed on the underlying simple graph,
-  and that is why two rows of `tab:summary` read "= simple".** Parallel copies
-  never raise kappa, since a second copy of an edge is a route with an empty
-  interior between vertices that are already adjacent. So counted with
-  multiplicity the extremal question has no finite answer at all: thicken any
-  feasible graph and kappa never moves. The thesis therefore counts adjacencies
-  for those two cells (`sec:parallel-convention` in ch2), which collapses them
-  onto the simple problem. This is NOT what happens one arity up: q parallel
-  copies of a HYPEREDGE give q Berge routes with empty interiors between any two
-  of its members, so multiplicity does raise kappa there, the cap is m-1 in both
-  separations, and all four multihypergraph cells are genuine
-  (`_hyper_multiplicity_cap`). Restored 2026-08-27 from the review record; it had
-  survived only in the git log after the condensation.
+- **ONE convention for vertex separation, in every model: the incidence graph**
+  (`sec:incidence-convention` in ch1). A route is a path of I(H), whose interior
+  nodes are vertices AND edge copies, so separated routes share neither an
+  intermediate vertex nor a copy. Hence q parallel edges are q separated routes,
+  exactly as q copies of a hyperedge are, multiplicity is capped at m-1 in BOTH
+  separations, and the two multigraph vertex cells are genuine problems of their
+  own, `K_m(n)` and `K_m^dir(n)`. They are NOT the underlying simple graph:
+  K_5(4) = 14 against L_5(4) = 12, and K_6(n) = 5, 12, 19, 26 for n = 2..5
+  against L_6(n) = 5, 10, 15, 20. In the program this is one capacity: the
+  adjacency arc carries mu(u,v) while the vertex gate carries one
+  (`_split_capacity_matrix`, `_hyper_multiplicity_cap`).
+  ADOPTED 2026-09-02, replacing the collapsing convention that had stood until
+  then. Everything the old one is quoted saying below (a second copy never moves
+  kappa, the question would be infinite, two rows of `tab:summary` read
+  "= simple") is superseded, log entries included. The machine cache stamps
+  `convention=incidence-1` on exactly the affected keys, so a future change
+  retires them.
 
 - **The hypergraph witness is gated at the source by proved attainment, never
   clamped downstream.** `prop:hyper-edge` is an upper bound that a simple
@@ -630,7 +636,7 @@ Python call against a subprocess spawn); from $n=5$ generation pulls ahead by
 5.5x, 20x, 68x. New `\Cref{tab:generating-benchmark}` with two sentences of
 prose, sourced from `figures/generating_benchmark_table.tex`, matching
 `tab:rediscovery`'s `\input`-a-tabular house style. The benchmark script is
-saved at `research_notes/scripts/generating_search_benchmark.py` for
+saved at `program/scripts/generating_search_benchmark.py` for
 reproduction, following the same sys.path pattern as the other standalone
 scripts in that directory.
 
@@ -1596,3 +1602,71 @@ All nine new badged proof headings confirmed in the extracted text as Theorems
 files in the diff. No em-dashes, en-dashes or prose semicolons in the diff (the
 one `--` is `Gomory--Hu`), no banned verdict phrases, `git diff --check` clean.
 All four rewritten passages read back out of the built PDF, not just the source.
+
+## 2026-09-02 (Opus) — one convention for vertex separation, and the hand-in reduced to main.pdf + program/
+
+The author asked for the incidence convention throughout, framed as a consistency
+repair rather than a modelling preference, and it is exactly that: the hypergraph
+theorems already read Berge routes as paths of I(H), and a multigraph is what that
+model becomes at r = 2. The thesis had been carrying a second, contradictory rule
+for graphs (`sec:parallel-convention`), under which parallel copies never raise
+kappa and the two multigraph vertex rows collapsed onto their simple counterparts.
+Both readings cannot be right at once, and the one with theorems behind it wins.
+
+WHAT THE CONVENTION IS NOW. A route is a path of the incidence graph, whose
+interior nodes are vertices AND edge copies, so separated routes share neither an
+intermediate vertex nor a copy. q parallel edges are q separated routes, exactly
+as q copies of a hyperedge are. Multiplicity is capped at m-1 in both separations,
+which is what keeps the question finite, and `K_m(n)` and `K_m^dir(n)` are
+problems of their own.
+
+THE NUMBERS THAT CAME BACK. K_2(n) = n-1 and K_3(n) = 2(n-1), both proved, the
+second straight from `thm:hyper-vertex-m3` at r = 2. K_5(4) = 14 against
+L_5(4) = 12 and K_5(5) = 19 against 16, so the separations genuinely differ on
+multigraphs. K_6(n) = 5, 12, 19, 26 for n = 2..5. Directed: K_2^dir(n) = M(n) and
+K_6^dir(3) = 24, which is ABOVE (m-1)M(3) = 20, so the arc extremiser read through
+kappa <= lambda is a lower bound here and not the value.
+
+WHERE IT LANDED. Program first (own entry in `program/CLAUDE.md`), then
+`app_proofs` gained section A.9 from the archived research note, renamed to K_m
+and extended with `rem:multi-vertex-m2-simple`, `cor:multi-vertex-m3`,
+`lem:multi-vertex-split-dir` and `cor:dir-multi-incidence`. Then ch1's convention
+paragraph, its two summary paragraphs after the hypergraph and directed-hypergraph
+theorems, `tab:notation`'s caption; ch2's split-network paragraph and
+`fig:vertex-split` caption (only the vertex gate is a unit, an adjacency keeps
+mu); ch3's `tab:summary` rows and caption, two new `tab:open-problems` rows and a
+fourth named frontier; main.tex's contribution table (one new row, badged status
+stated), Short Summary and symbol list. `[AI]` marks 43 -> 52, the nine new badged
+statements.
+
+WHAT I DID NOT DO, and the author should say if he wants it. The plan had the
+sixteen-variant tree and `tab:summary` renaming their "vertex" leaves and column
+to "incidence". I left them. The separation IS vertex separation and kappa is
+called the vertex connectivity in every chapter, so renaming the leaves alone
+would have introduced a second vocabulary rather than removed one. The word
+"incidence" now names the convention, not the separation.
+
+HAND-IN SHAPE. The author's rule: a reader gets `main.pdf` and a `program/`
+directory holding all code, conjecture checks included. So `research_notes/scripts/`
+(27 scripts) moved to `program/scripts/`, `figures/machine_values.json` to
+`program/data/`, and the four cited transcripts to `program/logs/`. The scripts'
+own `../../program` and `parents[2]` path inserts still resolve from one level
+across, which was luck rather than design, and one stale absolute path
+(`/Users/chief/Projects/thesis/program`, dead since the repo moved) was fixed on
+the way. `research_notes/` keeps the prose notes only. Every path the thesis
+prints now begins with `program/`, and the audit section says so in a sentence.
+
+STIJN'S TWO DRAFTS. The Huang-Lyu observation is in, as one sentence in ch1 plus
+a citation: a feasible digraph has at most m-1 two-step routes between an ordered
+pair, so it contains no m of them with common endpoints, and their Turan number
+turns 4(m-1) into m-1 for n above a threshold cubic in m (121 at m=3). Metadata
+checked against Crossref, formula against the arXiv abstract. The thesis bound
+stays the uniform one and is the one that reaches the hypergraph rows, which
+theirs does not. The claimed m = 3 proof of `conj:dir-arc` stays out: its base
+cases n <= 10 are a Z3 run whose script was never handed over, so the finite half
+cannot be replayed at all. Both drafts are in `research_notes/external/` with an
+entry recording what was checked and what was not.
+
+VERIFY: 109 pp, 0 overfull, 3 underfull, 0 undefined references. 132 tests, one
+skip. Self-check green. All four grids and `variant_table_all.tex` regenerated
+from the new cache location.

@@ -16,7 +16,8 @@ worth keeping for whoever (AI or human) continues the work.
   `tabu_vs_sa.py`) are the exception by design: they import the thesis program
   and/or call nauty, because their whole job is to check the program and the
   tools against each other. Run any of them with
-  `python3 research_notes/scripts/<name>.py`.
+  `python3 program/scripts/<name>.py` (the scripts moved there on
+  2026-09-02, so that the thesis hands the reader main.pdf and program/ alone).
 - Keep the formal statement and its status at the top of each entry; put the
   reasoning and the open residue below.
 
@@ -292,6 +293,14 @@ records a degeneracy question that would halve the only known upper bound.
 Scripts: `simple_vertex_blocks.py` (block table via geng), `st_construction.py`
 (rebuilds the Sorensen-Thomassen witness and checks counts, 2-connectivity and
 feasibility), `vertex_min_degree.py` (the degeneracy search).
+
+### The multigraph vertex archive is live in the thesis again (2026-09-02)
+`alternate_multigraph_vertex_convention.tex` is deleted from this folder. Under
+the incidence convention adopted on 2026-09-02 there is no alternate convention
+left to archive: that text IS the multigraph vertex problem, and it is now
+appendix section A.9 of the thesis, renamed from `K_m^multi(n)` to `K_m(n)` and
+extended with the m = 3 corollary and the directed splitting lemma. Git history
+holds the archived form if it is ever needed.
 
 ### Two external drafts on the directed problem (UNVERIFIED, arrived 2026-09-02)
 

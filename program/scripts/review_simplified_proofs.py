@@ -10,7 +10,7 @@ connectivity value is needed:
    maximum degree exactly ceil(re/n);
 3. the cyclic-word construction, by direct enumeration.
 
-Run with the repo virtualenv:  .venv/bin/python3 research_notes/scripts/review_simplified_proofs.py
+Run with the repo virtualenv:  .venv/bin/python3 program/scripts/review_simplified_proofs.py
 """
 
 import itertools

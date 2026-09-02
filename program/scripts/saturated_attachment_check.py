@@ -18,7 +18,7 @@ thesis program for its capped feasibility predicate (exceeds_bound), because
 3^12 patterns per tree need the fast path; the predicate itself is
 differential-tested inside the program's own suite.
 
-Run:  python3 research_notes/scripts/saturated_attachment_check.py
+Run:  python3 program/scripts/saturated_attachment_check.py
 Expected output: nine lines, every one reporting max d(v) = 4 and
 all-single-partner-full = True, as re-verified on 2026-07-02.
 """

@@ -237,7 +237,7 @@ simple graph
   & the edge value for $m\le4$, and $\floor{8n/3}-4$ at $m=5$ \ \chip{stPartial}{RANGE} open $m\ge6$ \\
 multigraph
   & $(m-1)(n-1)$ \ \chip{stProved}{PROVED}
-  & the simple value \ \chip{stPartial}{RANGE} parallel copies do not raise $\kap$ \\
+  & $n-1$ at $m=2$, $2(n-1)$ at $m=3$ \ \chip{stPartial}{RANGE} open $m\ge4$ \\
 $r$-hypergraph
   & $\le\floorfrac{(m-1)(n-1)}{r-1}$, equality in the stated range \ \chip{stProved}{PROVED}
   & $\floorfrac{n-1}{r-1}$ at $m=2$, $\le\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \chip{stPartial}{RANGE} open $m\ge4$ \\
@@ -252,7 +252,7 @@ simple digraph
   & $M(n)$ at $m=2$; $n^2/4+\Theta_m(n)$ for $m\ge3$ \ \chip{stProved}{PROVED} $m=2$ \ \chip{stConj}{CONJ} $m\ge3$ \\
 multigraph
   & $(m-1)M(n)$ \ \chip{stProved}{PROVED} every $n$ and $m$
-  & the simple digraph value \ \chip{stConj}{CONJ} $m\ge3$ \\
+  & $M(n)$ at $m=2$, else $(m-1)n^2/4+O_m(n)$ \ \chip{stConj}{CONJ} $m\ge3$ \\
 $r$-hypergraph
   & $(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \chip{stOpen}{LEADING TERM}
   & the same leading term \ \chip{stOpen}{LEADING TERM} \\

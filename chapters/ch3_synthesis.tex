@@ -229,7 +229,9 @@ simple graph
   & the edge value for $m \le 4$, and at $m=5$ the edge value up to $n=13$ then $\floor{8n/3}-4$ from $n=14$, while it is open for $m \ge 6$ \\
 multigraph
   & $(m-1)(n-1)$, proved
-  & the simple value \\
+  & $n-1$ at $m=2$ and $2(n-1)$ at $m=3$ (proved), while it is open for
+    $m \ge 4$, where it is a knapsack over $2$-connected blocks with rate
+    between $(3-2\sqrt{2})m^2$ and $2m^2$ per added vertex \\
 $r$-hypergraph
   & $\le \floor{(m-1)(n-1)/(r-1)}$, with equality in the range below
   & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$, while it is open for $m \ge 4$ \\
@@ -246,7 +248,8 @@ simple digraph
   & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$ with equality to the arc value open \\
 multigraph
   & $(m-1)M(n)$, proved
-  & the simple digraph value, whose exact formula is open for $m\ge3$ \\
+  & $M(n)$ at $m=2$ (proved), and $(m-1)n^2/4 + O_m(n)$ for $m \ge 3$ with the
+    exact value open \\
 $r$-hypergraph
   & $(1+o(1))(m-1)n^2/[4(r-1)]$ for fixed $r, m$, leading term proved
   & the same leading term for fixed $r, m$ \\
@@ -255,7 +258,7 @@ $r$-multi-hyper
   & the same leading term for fixed $r, m$ \\
 \bottomrule
 \end{tabularx}
-\caption{The sixteen variants and the strongest result known for each. The two multigraph vertex rows read ``the simple value'' because parallel copies do not raise $\kap$, under the counting convention of \Cref{sec:incidence-convention}. Ranges of validity, including the one at $m=5$, are stated below the table.}
+\caption{The sixteen variants and the strongest result known for each. The two multigraph vertex rows count multiplicity, since $q$ parallel copies are $q$ separated routes under the incidence convention of \Cref{sec:incidence-convention}. Ranges of validity, including the one at $m=5$, are stated below the table.}
 \label{tab:summary}
 \end{table}
 
@@ -312,7 +315,7 @@ A value is settled only when its lower and upper bounds agree.
 Directed vertex values require separate checks because Whitney's inequality transfers witnesses but not upper bounds.
 Every computational claim in this thesis can be rerun from the repository.
 The principal checks run from \code{program/erdos915\_unified.py}.
-Two block sweeps use separate scripts in \code{research\_notes/scripts/}.
+Two block sweeps use separate scripts in \code{program/scripts/}.
 They are named where their results appear and provide independent implementations.
 \Cref{app:verification-ladder,app:software-tests} gives the environment, commands, and audit evidence.
 No theorem here depends only on an unchecked solver result.
@@ -349,7 +352,9 @@ Problem & Known here & Remaining target \\
 Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-arc-linear-error}) & Prove the decomposition of \Cref{open:decomposition}, or otherwise determine the linear coefficient. \\
 Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value, given that an arc upper bound does not transfer. \\
 Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
+Directed multigraph incidence, $m\ge3$ & $K_m^{\mathrm{dir}}(n)=(m-1)n^2/4+O_m(n)$ (\Cref{cor:dir-multi-incidence}) & Determine the linear coefficient, and decide whether the arc extremiser is optimal here too. \\
 Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m = \lim_n k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) & Determine $c_m$, whose likely next structure is triconnected rather than merely blockwise. \\
+Undirected multigraph incidence, $m\ge4$ & Exact at $m\le3$, and a knapsack over $2$-connected blocks whose per-vertex rate lies between $(3-2\sqrt{2})m^2$ and $2m^2$ (\Cref{thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper}) & Determine the rate, which asks for the best $2$-connected block of each size. \\
 Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Locate the first failure for $r\ge3$ and replace the rank-two decomposition used at $m=3$. \\
 Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
 \bottomrule
@@ -358,7 +363,7 @@ Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all
 \label{tab:open-problems}
 \end{table}
 
-Three directions carry most of the remaining mathematical weight.
+Four directions carry most of the remaining mathematical weight.
 The first is the simple directed arc problem.
 \Cref{conj:dir-arc} predicts the exact linear correction to the proved quadratic leading term.
 The decomposition of \Cref{open:decomposition} isolates a structural route to that formula.
@@ -367,6 +372,11 @@ The second direction is the classical undirected vertex problem for $m\ge6$.
 It remains open despite the results of S{\o}rensen and Thomassen.
 The third is the hypergraph vertex problem beyond $m=3$.
 There the incidence-rank argument has no known higher-connectivity replacement.
+The fourth is the multigraph incidence problem beyond $m=3$, which the convention
+of \Cref{sec:incidence-convention} poses as a question of its own.
+Its value is a knapsack over $2$-connected blocks, and what is missing is the
+best block of each size, which fixes a per-vertex rate currently known only to
+lie between $(3-2\sqrt{2})m^2$ and $2m^2$.
 
 The other rows of \Cref{tab:open-problems} remain natural questions.
 They ask for finer classifications or finite exact values.
