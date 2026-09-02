@@ -1038,8 +1038,7 @@ def _pairs(obj):
 # the rare step where the search genuinely needs it (an infeasible proposal).
 # DEPENDENCIES: _pairs (above), _tiny_maxflow (Section ENUMERATE), _UNBOUNDED.
 
-def _split_capacity_matrix(graph: Graph,
-                           parallel_routes: bool = False) -> tuple[np.ndarray, int]:
+def _split_capacity_matrix(graph: Graph) -> tuple[np.ndarray, int]:
     """The ``2n x 2n`` capacity matrix of the vertex-split network.
 
     The vertex-mode network as a plain matrix, consumed by both the exact measure
@@ -1047,18 +1046,17 @@ def _split_capacity_matrix(graph: Graph,
     (:func:`exceeds_bound` via :func:`_tiny_maxflow`).  Vertex ``v`` becomes an
     in-copy ``2v`` and an out-copy ``2v+1`` joined by an internal arc of capacity
     one (so any route uses ``v`` at most once), and each adjacency ``u -> v``
-    becomes an arc ``(2u+1) -> (2v)``.  The caller uncaps the two endpoints' own
-    in->out gates so Menger counts internally disjoint routes (see
-    :func:`exceeds_bound`).
+    becomes an arc ``(2u+1) -> (2v)`` of capacity ``mu(u,v)``.  The caller uncaps
+    the two endpoints' own in->out gates so Menger counts internally disjoint
+    routes (see :func:`exceeds_bound`).
 
-    ``parallel_routes`` selects the counting convention for parallel copies, the
-    choice discussed at length in the thesis (sec:parallel-convention).  The
-    default False caps every adjacency at one, so a bundle of parallel edges is a
-    single direct route and a multigraph measures as its underlying simple graph:
-    that is the convention the sixteen variants use.  Setting it True gives the
-    adjacency capacity ``mu(u,v)``, so ``q`` parallel copies count as ``q``
-    internally disjoint routes, which is the alternative convention explored in
-    sec:multi-vertex-standard.
+    The adjacency capacity is the multiplicity, so ``q`` parallel edges are ``q``
+    internally disjoint routes between their endpoints.  This is the incidence
+    convention of the thesis (sec:incidence-convention): a route is a path in the
+    incidence graph, two routes may not share an edge or an intermediate vertex,
+    and a simple graph has every capacity equal to one, so nothing changes there.
+    It is also exactly what the hypergraph network does at ``r = 2`` (one gate of
+    capacity ``mu`` per distinct hyperedge), which the tests check.
     """
     n = graph.num_vertices
     size = 2 * n
@@ -1068,22 +1066,22 @@ def _split_capacity_matrix(graph: Graph,
     for u in range(n):
         for v in range(n):
             if u != v and graph.mu[u, v] > 0:
-                cap[2 * u + 1, 2 * v] = (int(graph.mu[u, v]) if parallel_routes
-                                         else 1)
+                cap[2 * u + 1, 2 * v] = int(graph.mu[u, v])
     return cap, size
 
 
-def max_multigraph_vertex_standard(n: int, m: int,
-                                   deadline: float | None = None) -> tuple[int, Graph | None, bool]:
-    """Exhaustive maximum for the multigraph vertex problem, OTHER convention.
+def max_multigraph_vertex(n: int, m: int,
+                          deadline: float | None = None) -> tuple[int, Graph | None, bool]:
+    """Exhaustive maximum ``K_m(n)`` for the undirected multigraph vertex problem.
 
-    Maximises the total multiplicity of an undirected multigraph on ``n``
-    vertices subject to ``kappa^max <= m - 1`` when parallel copies are counted
-    as distinct internally vertex-disjoint routes.  Every multiplicity is capped
-    at ``m - 1`` because ``m`` parallel copies already exceed the ceiling on
-    their own.  Branch and bound over the pairs in a fixed order, trying the
-    largest multiplicity first, pruning on feasibility (which is monotone) and
-    on the incumbent.  Returns ``(best_total, witness, completed)``.
+    Maximises the size (total multiplicity) of an undirected multigraph on ``n``
+    vertices subject to ``kappa^max <= m - 1``, with parallel edges counted as
+    distinct internally disjoint routes as in :func:`_split_capacity_matrix`.
+    Every multiplicity is capped at ``m - 1`` because ``m`` parallel copies
+    already exceed the cap on their own.  Branch and bound over the pairs in a
+    fixed order, trying the largest multiplicity first, pruning on feasibility
+    (which is monotone) and on the incumbent.  Returns
+    ``(best_total, witness, completed)``.
     """
     pairs = list(combinations(range(n), 2))
     cap = m - 1
@@ -1092,8 +1090,7 @@ def max_multigraph_vertex_standard(n: int, m: int,
     timed_out = [False]
 
     def feasible() -> bool:
-        return not exceeds_bound(graph, m - 1, separation="vertex",
-                                 parallel_routes=True)
+        return not exceeds_bound(graph, m - 1, separation="vertex")
 
     def recurse(i: int, total: int) -> None:
         if deadline is not None and time.time() > deadline:
@@ -1119,8 +1116,7 @@ def max_multigraph_vertex_standard(n: int, m: int,
     return best[0], best[1], not timed_out[0]
 
 
-def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge",
-                  parallel_routes: bool = False) -> bool:
+def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     """``True`` iff ``lambda^max(G) > k`` (edge) or ``kappa^max(G) > k`` (vertex).
 
     Equivalent to ``max_connectivity(graph, vertex_split=(separation=='vertex')) > k``
@@ -1128,10 +1124,6 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge",
     paths, and the pair loop stops at the first violating pair.  On an infeasible
     graph this typically returns after a single pair.  The pair set is exactly the
     one :func:`max_connectivity` iterates, so the predicate matches it pair for pair.
-
-    ``parallel_routes`` is passed through to :func:`_split_capacity_matrix` and
-    only affects vertex mode: it selects the convention in which parallel copies
-    are distinct routes, used by :func:`max_multigraph_vertex_standard`.
     """
     n = graph.num_vertices
     if separation == "edge":
@@ -1145,7 +1137,7 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge",
                 return True
         return False
     if separation == "vertex":
-        cap, size = _split_capacity_matrix(graph, parallel_routes)
+        cap, size = _split_capacity_matrix(graph)
         for s, t in _pairs(graph):
             # Uncap the endpoints' own in->out gates so Menger counts INTERNAL
             # routes (mirrors local_connectivity's vertex mode); flow leaves s's
@@ -2008,11 +2000,6 @@ class SolveResult:
         return line if not self.note else f"{line}\n    note: {self.note}"
 
 
-def _joined_note(*parts: str) -> str:
-    """Join the non-empty note fragments a SolveResult may carry."""
-    return "; ".join(part for part in parts if part)
-
-
 def _variant_for(directed: bool, simple: bool) -> Variant:
     """Pick the matching named Variant constant from the two booleans."""
     if directed:
@@ -2188,11 +2175,10 @@ def _hyper_multiplicity_cap(m: int, simple: bool) -> int:
     members, one per copy, and those routes have empty interiors, so they are
     pairwise hyperedge-disjoint AND internally vertex-disjoint.  Feasibility
     therefore caps every multiplicity at ``m - 1`` by itself, under BOTH
-    separations.  This is what keeps the multihypergraph question finite, and it
-    is why the multi rows do not collapse onto the simple ones the way the
-    multigraph VERTEX rows do (``sec:parallel-convention``): there a parallel copy
-    is a route with an empty interior between ADJACENT vertices only, and the
-    objective was redefined to count adjacencies.
+    separations.  This is what keeps the multihypergraph question finite.  At
+    ``r = 2`` it is the multigraph cap of :func:`_brute_force_matrix`, since
+    under the incidence convention ``q`` parallel edges are ``q`` internally
+    disjoint routes exactly as ``q`` copies of a hyperedge are.
     """
     return 1 if simple else m - 1
 
@@ -2460,12 +2446,11 @@ def solve(
         hypergraph, r: switch to the ``r``-uniform hypergraph model instead.
         exhaustive: ``True`` to PROVE the optimum, ``False`` to DISCOVER one.
         separation: ``"edge"`` or ``"vertex"`` disjointness (matrix models).
-            ``simple=False`` with ``separation="vertex"`` is REDUCED to the
-            simple problem on the underlying graph, because those two variants
-            are posed with the objective counting adjacencies rather than edges
-            with multiplicity (``sec:parallel-convention``).  The returned value
-            is therefore an adjacency count and the witness is a simple graph;
-            ``SolveResult.note`` and ``.variant`` both say so.
+            Under ``"vertex"`` the routes are internally disjoint paths of the
+            incidence graph (``sec:incidence-convention``), so ``q`` parallel
+            edges are ``q`` routes and a multigraph is a genuine problem of its
+            own, ``K_m(n)`` or ``K_m^dir(n)``, with every multiplicity capped at
+            ``m - 1`` exactly as in the edge separation.
         max_seconds: wall-clock budget.  The engines poll it at their natural
             loop boundaries (the annealer and blind enumerators do so in small
             batches), so the final batch may overrun it.
@@ -2513,26 +2498,12 @@ def solve(
                            time.time() - start, done, witness, note)
 
     # ----- the matrix models -----------------------------------------------
-    # The two MULTIGRAPH VERTEX variants are posed with the objective counting
-    # ADJACENCIES, not edges with multiplicity (sec:parallel-convention).  The
-    # reason is that a parallel copy never raises kappa, so it never breaks
-    # feasibility either: counted with multiplicity the maximum would simply be
-    # infinite and the question empty.  Under the adjacency reading the problem
-    # IS the simple problem on the underlying graph, so we solve that instead.
-    # Without this reduction the driver would optimise Graph.edge_count(), which
-    # counts multiplicity, and report (m-1) times the real answer with a witness
-    # whose parallel copies contribute nothing.
-    reduced_to_simple = (not simple) and separation == "vertex"
-    if reduced_to_simple:
-        simple = True
+    # The multigraph variants are the same problem in both separations: the
+    # objective is the size (multiplicity counted) and every multiplicity is
+    # capped at m - 1, because m parallel copies are already m disjoint routes,
+    # edge-disjoint and internally disjoint alike (_split_capacity_matrix).
     variant = _variant_for(directed, simple)
     label = variant.describe()
-    reduction_note = (
-        "multigraph vertex variant: the objective counts adjacencies "
-        "(sec:parallel-convention), so this is the simple problem on the "
-        "underlying graph" if reduced_to_simple else "")
-    if reduced_to_simple:
-        label = f"{label} (multigraph vertex, reduced)"
 
     # DISCOVER: search within the budget; the witness found is a lower bound.
     if not exhaustive:
@@ -2546,8 +2517,7 @@ def solve(
         return SolveResult(
             n, m, label, separation, result.best_edge_count, "lower",
             method_label, time.time() - start, False,
-            result.best_graph, _joined_note(
-                "discovery only ever yields a lower bound", reduction_note))
+            result.best_graph, "discovery only ever yields a lower bound")
 
     # EXHAUSTIVE, simple directed: a pruned exhaustive digraph search is exact.
     # This is the prover for the m=2 base cases of the directed theorem, and it
@@ -2556,9 +2526,7 @@ def solve(
         value, witness, done = _exhaustive_directed(n, m, separation, deadline)
         bound = "exact" if done else "lower"
         method = "exhaustive digraph search (branch and bound)"
-        note = _joined_note(
-            "" if done else "budget ran out; value is only a lower bound",
-            reduction_note)
+        note = "" if done else "budget ran out; value is only a lower bound"
         return SolveResult(n, m, label, separation, value, bound, method,
                            time.time() - start, done, witness, note)
 
@@ -2587,10 +2555,8 @@ def solve(
         variant, n, m, separation, deadline)
     bound = "exact" if done else "lower"
     method = "brute-force enumeration"
-    note = _joined_note(
-        "" if done else "budget ran out; value is only a lower bound "
-                        "(no cut-counting exists for this case)",
-        reduction_note)
+    note = ("" if done else "budget ran out; value is only a lower bound "
+                            "(no cut-counting exists for this case)")
     return SolveResult(n, m, label, separation, value, bound, method,
                        time.time() - start, done, witness, note)
 
@@ -4528,17 +4494,6 @@ def plot_edge_dist_grid(
 
 # --- 3-D BOUND SURFACE: cache solve() over (variant, n, m) grid; plot_variant_3d_surfaces draws it ---
 
-# The two multigraph vertex problems reduce exactly to the simple ones: vertex
-# mode is blind to parallel copies (see _split_capacity_matrix), so a multigraph
-# and its underlying simple graph have the same vertex connectivity.  We mirror
-# the simple-vertex surface into these keys rather than searching multigraphs,
-# whose degenerate free-parallel fills would report a lower bound far above the
-# true (simple) value and spike the plot.
-_SURFACE_ALIASED_VERTEX = {
-    "multi_undirected_vertex": "simple_undirected_vertex",
-    "multi_directed_vertex":   "simple_directed_vertex",
-}
-
 # 12 variant configs for the surface computation.
 _SURFACE_VARIANT_CONFIGS: list[dict] = [
     dict(key="simple_undirected_edge",   title="simple undirected edge",
@@ -4592,11 +4547,11 @@ def _surface_known_value(vkey: str, n: int, m: int) -> int | None:
         return min(directed_arc_lower_bound(n, 2), tri_dir) if m == 2 else None
     if vkey == "multi_undirected_edge":             # multi-tree bound, all m
         return min(multigraph_undirected_edge(n, m), (m - 1) * tri_simple)
-    if vkey == "multi_undirected_vertex":           # = simple vertex, m<=4
-        return min(simple_undirected_edge(n, m), tri_simple) if m <= 4 else None
+    if vkey == "multi_undirected_vertex":           # thm:hyper-vertex-m2/m3 at r=2: K_m(n)=(m-1)(n-1), m<=3
+        return min((m - 1) * (n - 1), (m - 1) * tri_simple) if m <= 3 else None
     if vkey == "multi_directed_edge":               # thm:dir-multi-full, all n and m
         return min(directed_multigraph_arc(n, m), (m - 1) * tri_dir)
-    if vkey == "multi_directed_vertex":             # = simple digraph, exact m=2
+    if vkey == "multi_directed_vertex":             # cor:dir-multi-incidence, exact m=2 (= M(n))
         return min(directed_arc_lower_bound(n, 2), tri_dir) if m == 2 else None
     if vkey == "hyper_undirected_edge":             # Gomory-Hu, simple-attaining iff m-1<=C(n-2,r-2)
         known = _hyper_edge_simple_proved(n, m, 3)
@@ -4641,8 +4596,6 @@ def compute_surface_cache(
 
     for cfg in _SURFACE_VARIANT_CONFIGS:
         vkey = cfg["key"]
-        if vkey in _SURFACE_ALIASED_VERTEX:
-            continue  # filled by mirroring its simple counterpart, below
         if vkey not in cache:
             cache[vkey] = {}
         for n in ns:
@@ -4677,14 +4630,6 @@ def compute_surface_cache(
                 )
                 cache[vkey][sn][sm] = {"value": res.value, "bound": res.bound}
                 changed = True
-
-    # Mirror the simple-vertex surfaces into their multigraph aliases, so the two
-    # provably-equal problems show identical bars instead of two independent
-    # (and possibly degenerate) searches.
-    for multi_key, simple_key in _SURFACE_ALIASED_VERTEX.items():
-        if simple_key in cache and cache.get(multi_key) != cache[simple_key]:
-            cache[multi_key] = copy.deepcopy(cache[simple_key])
-            changed = True
 
     if changed:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -5758,25 +5703,20 @@ def gallery_extremal_graphs(
     ``hyper_undirected_r{r}_{edge,vertex}``,
     ``hyper_directed_r{r}_{edge,vertex}``.
 
-    The two ``multi_*_vertex`` keys report the reduced SIMPLE problem, because
-    the thesis's vertex measure is blind to parallel copies and the variant
-    collapses onto the simple one (see the config comment below).
+    The two ``multi_*_vertex`` keys are the multigraph problems ``K_m(n)`` and
+    ``K_m^dir(n)`` under the incidence convention, where ``q`` parallel edges
+    are ``q`` internally disjoint routes and every multiplicity is capped at
+    ``m - 1`` by feasibility, exactly as in the edge separation.
     """
-    # The two multi-vertex rows run on the SIMPLE variant: the checker's vertex
-    # mode gives every adjacency capacity one, so parallel copies never change
-    # kappa and a raw multigraph search would just fill every cell to m-1 for
-    # free (it once reported a "36-arc extremal K_4 at multiplicity 3").  The
-    # thesis reduces these variants to the simple ones (tab:summary), and the
-    # gallery must report the reduced problem, exactly as the variant grids do.
     matrix_configs: list[tuple[str, Variant, str]] = [
         ("simple_undirected_edge",   SIMPLE_UNDIRECTED, "edge"),
         ("simple_undirected_vertex", SIMPLE_UNDIRECTED, "vertex"),
         ("simple_directed_edge",     SIMPLE_DIRECTED,   "edge"),
         ("simple_directed_vertex",   SIMPLE_DIRECTED,   "vertex"),
         ("multi_undirected_edge",    MULTI_UNDIRECTED,  "edge"),
-        ("multi_undirected_vertex",  SIMPLE_UNDIRECTED, "vertex"),
+        ("multi_undirected_vertex",  MULTI_UNDIRECTED,  "vertex"),
         ("multi_directed_edge",      MULTI_DIRECTED,    "edge"),
-        ("multi_directed_vertex",    SIMPLE_DIRECTED,   "vertex"),
+        ("multi_directed_vertex",    MULTI_DIRECTED,    "vertex"),
     ]
     hyper_configs: list[tuple[str, bool, bool]] = [
         (f"hyper_undirected_r{r}_edge",   False, False),
@@ -6252,14 +6192,15 @@ def _run_checks() -> int:
     check("prop:dir-arc-stability and thm:dir-arc-linear-error hold on 120 "
           f"sampled feasible digraphs (tightest slack {_worst_slack:.1f})",
           _count_ok and _worst_slack >= 0)
-    # sec:multi-vertex-standard: the OTHER counting convention is a different
-    # problem, and the theta construction beats the thickened tree at m=5, n=4.
-    _mv4, _, _mv4_done = max_multigraph_vertex_standard(4, 3)
-    _mv5, _, _mv5_done = max_multigraph_vertex_standard(4, 5)
-    check(f"multigraph vertex, other convention: K_3(4) = {_mv4} = (m-1)(n-1)",
+    # Multigraph vertex problem K_m(n) under the incidence convention: K_3(4) is
+    # the thickened tree (thm:hyper-vertex-m3 at r=2), and at m=5, n=4 the value
+    # 14 exceeds L_5(4) = 12, so the vertex and edge problems are different.
+    _mv4, _, _mv4_done = max_multigraph_vertex(4, 3)
+    _mv5, _, _mv5_done = max_multigraph_vertex(4, 5)
+    check(f"multigraph vertex: K_3(4) = {_mv4} = (m-1)(n-1)",
           _mv4_done and _mv4 == 6)
-    check(f"multigraph vertex, other convention: K_5(4) = {_mv5} > 12, the "
-          "multigraph edge value, so the two problems differ",
+    check(f"multigraph vertex: K_5(4) = {_mv5} > 12 = L_5(4), so the two "
+          "separations give different problems on multigraphs",
           _mv5_done and _mv5 == 14)
     # Exhaustive undirected by brute force: ell_2(5) = n-1 = 4 (a spanning tree).
     tree = solve(5, 2, directed=False, simple=True, exhaustive=True,

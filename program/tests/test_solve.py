@@ -9,10 +9,20 @@ import itertools
 
 import numpy as np
 
+import random
+
 from erdos915_unified import (
     solve,
     Graph,
+    Hypergraph,
+    MULTI_DIRECTED,
+    MULTI_UNDIRECTED,
     Variant,
+    hyper_connectivity,
+    local_vertex_connectivity,
+    max_hyper_connectivity,
+    max_multigraph_vertex,
+    max_vertex_connectivity,
     directed_multigraph_arc,
     exceeds_bound,
     max_edge_connectivity,
@@ -190,79 +200,154 @@ class SupportWorker(unittest.TestCase):
         self.assertEqual(worker, dfs)
 
 
-class MultigraphVertexObjective(unittest.TestCase):
-    """The two multigraph VERTEX variants count adjacencies, not multiplicity.
+class MultigraphVertexIncidenceConvention(unittest.TestCase):
+    """The two multigraph VERTEX variants under the incidence convention.
 
-    sec:parallel-convention poses them that way because a parallel copy never
-    raises kappa, so counted with multiplicity the maximum would be infinite and
-    the question empty.  solve() must therefore report the simple value on the
-    underlying graph.  It once reported Graph.edge_count() on a multigraph, which
-    is (m-1) times too large and returns a witness whose parallel copies do no
-    work; these tests pin the objective down in both modes and both directions.
+    A route is a path of the incidence graph and two routes may share neither an
+    edge nor an intermediate vertex, so q parallel edges between u and v are q
+    internally disjoint routes (sec:incidence-convention).  The multigraph
+    vertex problem K_m(n) is then a problem of its own with every multiplicity
+    capped at m - 1, exactly as in the edge separation, and solve() must treat
+    it that way rather than fall back to the simple graph.  These tests pin the
+    local measure, the unit step, the small exact values proved in the appendix,
+    and the agreement of the graph checker with the hypergraph checker at r = 2,
+    which is where the convention comes from.
     """
 
-    def _check(self, *, directed, exhaustive, n, m, expected):
-        r = solve(n, m, directed=directed, simple=False, separation="vertex",
-                  exhaustive=exhaustive, max_seconds=30.0)
-        self.assertEqual(r.value, expected)
-        # The witness must be simple: every adjacency at multiplicity one, so
-        # the reported count really is an adjacency count.
-        mu = r.witness.mu
-        self.assertTrue(((mu == 0) | (mu == 1)).all(), f"witness not simple:\n{mu}")
-        # And the count must agree with the witness read as adjacencies.
-        adjacencies = int((mu > 0).sum())
-        if not directed:
-            adjacencies //= 2
-        self.assertEqual(r.value, adjacencies)
-        self.assertIn("adjacencies", r.note)
+    @staticmethod
+    def _as_hypergraph(graph):
+        """The same multigraph as a 2-uniform multihypergraph, one hyperedge per copy."""
+        n = graph.num_vertices
+        directed = graph.variant.directed
+        h = Hypergraph(n, directed=directed, r=2)
+        for u in range(n):
+            for v in range(u + 1 if not directed else 0, n):
+                if u == v:
+                    continue
+                for _ in range(int(graph.mu[u, v])):
+                    h.add_hyperedge((u, [v]) if directed else [u, v])
+        return h
 
-    def test_exhaustive_undirected_counts_adjacencies(self):
-        # K_3 has kappa^max = 2 = m - 1, so all three adjacencies are feasible.
-        # Counting multiplicity instead would give 6 (every pair doubled).
-        self._check(directed=False, exhaustive=True, n=3, m=3, expected=3)
+    def test_two_parallel_edges_are_two_routes(self):
+        g = Graph(2, MULTI_UNDIRECTED)
+        g.set_multiplicity(0, 1, 2)
+        self.assertEqual(local_vertex_connectivity(g, 0, 1), 2)
+        g.set_multiplicity(0, 1, 5)
+        self.assertEqual(local_vertex_connectivity(g, 0, 1), 5)
 
-    def test_exhaustive_directed_counts_adjacencies(self):
-        # The same on ordered pairs: 6 adjacencies, not 12 arcs.
-        self._check(directed=True, exhaustive=True, n=3, m=3, expected=6)
+    def test_one_parallel_edge_raises_the_local_value_by_exactly_one(self):
+        rng = random.Random(3)
+        for variant in (MULTI_UNDIRECTED, MULTI_DIRECTED):
+            for _ in range(15):
+                g = Graph(5, variant)
+                for u in range(5):
+                    for v in range(5):
+                        if u != v and (variant.directed or u < v) and rng.random() < 0.5:
+                            g.set_multiplicity(u, v, rng.randint(1, 3))
+                u, v = rng.sample(range(5), 2)
+                if g.mu[u, v] == 0:
+                    continue
+                before = local_vertex_connectivity(g, u, v)
+                g.set_multiplicity(u, v, int(g.mu[u, v]) + 1)
+                self.assertEqual(local_vertex_connectivity(g, u, v), before + 1)
 
-    def test_discovery_undirected_counts_adjacencies(self):
-        self._check(directed=False, exhaustive=False, n=3, m=3, expected=3)
+    def test_one_parallel_edge_raises_kappa_max_by_at_most_one(self):
+        # prop:monotone in the vertex separation for multigraphs: the new copy
+        # is one more route between its own endpoints and can join at most one
+        # route family between any other pair.
+        rng = random.Random(4)
+        for variant in (MULTI_UNDIRECTED, MULTI_DIRECTED):
+            for _ in range(15):
+                g = Graph(5, variant)
+                for u in range(5):
+                    for v in range(5):
+                        if u != v and (variant.directed or u < v) and rng.random() < 0.5:
+                            g.set_multiplicity(u, v, rng.randint(1, 2))
+                before = max_vertex_connectivity(g)
+                u, v = rng.sample(range(5), 2)
+                g.set_multiplicity(u, v, int(g.mu[u, v]) + 1)
+                after = max_vertex_connectivity(g)
+                self.assertGreaterEqual(after, before)
+                self.assertLessEqual(after, before + 1)
 
-    def test_discovery_directed_counts_adjacencies(self):
-        self._check(directed=True, exhaustive=False, n=3, m=3, expected=6)
+    def test_K_2_is_n_minus_one(self):
+        # thm:hyper-vertex-m2 at r = 2: at m = 2 every multiplicity is at most
+        # one, so K_2(n) = k_2(n) = n - 1, the spanning tree.
+        for n in (2, 3, 4, 5):
+            r = solve(n, 2, directed=False, simple=False, separation="vertex",
+                      exhaustive=True, max_seconds=60.0)
+            self.assertEqual(r.bound, "exact")
+            self.assertEqual(r.value, n - 1)
 
-    def test_value_matches_the_simple_variant_it_reduces_to(self):
-        # The reduction is the whole claim of sec:parallel-convention: the
-        # multigraph vertex question IS the simple vertex question.  Check the
-        # two drivers agree rather than just checking a hardcoded number.
+    def test_K_3_is_twice_n_minus_one(self):
+        # thm:hyper-vertex-m3 at r = 2: K_3(n) = 2(n - 1), the thickened tree,
+        # and the exhaustive maximum must exhibit a multigraph witness with a
+        # doubled edge, which the old reduction never could.
+        for n in (2, 3, 4, 5):
+            r = solve(n, 3, directed=False, simple=False, separation="vertex",
+                      exhaustive=True, max_seconds=60.0)
+            self.assertEqual(r.bound, "exact")
+            self.assertEqual(r.value, 2 * (n - 1))
+            self.assertEqual(int(r.witness.mu.max()), 2)
+            self.assertLessEqual(max_vertex_connectivity(r.witness), 2)
+
+    def test_K_5_of_4_exceeds_the_edge_value(self):
+        # K_5(4) = 14 > 12 = L_5(4): the vertex and edge problems differ on
+        # multigraphs, so neither is a relabelling of the other.
+        r = solve(4, 5, directed=False, simple=False, separation="vertex",
+                  exhaustive=True, max_seconds=120.0)
+        self.assertEqual((r.bound, r.value), ("exact", 14))
+        self.assertEqual(max_multigraph_vertex(4, 5)[:1], (14,))
+        self.assertEqual(solve(4, 5, directed=False, simple=False,
+                               separation="edge", exhaustive=True,
+                               max_seconds=60.0).value, 12)
+
+    def test_discovery_finds_multigraph_witnesses(self):
+        # The tabu search runs on the multigraph move set with cap m - 1, so
+        # it must at least reach the thickened tree.
         for directed in (False, True):
-            for n, m in ((4, 2), (4, 3), (5, 2)):
-                multi = solve(n, m, directed=directed, simple=False,
-                              separation="vertex", exhaustive=True, max_seconds=60.0)
-                plain = solve(n, m, directed=directed, simple=True,
-                              separation="vertex", exhaustive=True, max_seconds=60.0)
-                self.assertEqual(multi.value, plain.value,
-                                 f"directed={directed} n={n} m={m}")
+            r = solve(4, 3, directed=directed, simple=False, separation="vertex",
+                      exhaustive=False, max_seconds=5.0, seed=0)
+            self.assertGreaterEqual(r.value, (2 if directed else 1) * 2 * 3)
+            self.assertLessEqual(max_vertex_connectivity(r.witness), 2)
+            self.assertEqual(r.bound, "lower")
 
-    def test_the_value_never_exceeds_the_adjacencies_available(self):
-        # The tell-tale of the old bug.  An adjacency count cannot exceed the
-        # number of pairs there are, but a multiplicity count can and did: at
-        # n=3, m=3 the driver reported 6 undirected "edges" on 3 vertices, which
-        # offer only 3 pairs.  The bound below is trivially true of the right
-        # objective and was violated by the wrong one at every m >= 3.
-        # Kept to n <= 4: the old objective violated this at EVERY m >= 3 and
-        # every n, so a small grid pins it, and the directed exhaustion at n = 5
-        # cost more than the rest of this file put together.
-        for directed in (False, True):
-            for n in (3, 4):
-                pairs = n * (n - 1) if directed else n * (n - 1) // 2
-                for m in (3, 4, 5):
-                    r = solve(n, m, directed=directed, simple=False,
-                              separation="vertex", exhaustive=True, max_seconds=60.0)
-                    self.assertLessEqual(
-                        r.value, pairs,
-                        f"directed={directed} n={n} m={m}: reported {r.value} "
-                        f"against only {pairs} pairs")
+    def test_graph_and_hypergraph_checkers_agree_at_r_2(self):
+        # The convention is the hypergraph one specialised to r = 2: one gate of
+        # capacity mu per distinct hyperedge.  Both implementations must give the
+        # same local and maximum values on random multigraphs, undirected and
+        # directed alike.
+        rng = random.Random(5)
+        for variant in (MULTI_UNDIRECTED, MULTI_DIRECTED):
+            for _ in range(20):
+                n = rng.randint(3, 6)
+                g = Graph(n, variant)
+                for u in range(n):
+                    for v in range(n):
+                        if u != v and (variant.directed or u < v) and rng.random() < 0.6:
+                            g.set_multiplicity(u, v, rng.randint(1, 3))
+                h = self._as_hypergraph(g)
+                for s_, t_ in itertools.permutations(range(n), 2):
+                    self.assertEqual(
+                        local_vertex_connectivity(g, s_, t_),
+                        hyper_connectivity(h, s_, t_, vertex_split=True),
+                        f"{variant.describe()} n={n} pair {(s_, t_)}\n{g.mu}")
+                self.assertEqual(max_vertex_connectivity(g),
+                                 max_hyper_connectivity(h, vertex_split=True))
+
+    def test_directed_exact_values_at_m_2_and_3(self):
+        # m = 2: K_2^dir(n) = M(n) (every multiplicity at most one).  m = 3: the
+        # search-and-exhaust values K_3^dir(n) for n <= 4 equal (m-1) M(n),
+        # the lower bound from the arc extremiser via kappa <= lambda.
+        for n in (2, 3, 4):
+            r = solve(n, 2, directed=True, simple=False, separation="vertex",
+                      exhaustive=True, max_seconds=60.0)
+            self.assertEqual((r.bound, r.value),
+                             ("exact", max(2 * (n - 1), n * n // 4)))
+            r = solve(n, 3, directed=True, simple=False, separation="vertex",
+                      exhaustive=True, max_seconds=120.0)
+            self.assertEqual((r.bound, r.value),
+                             ("exact", 2 * max(2 * (n - 1), n * n // 4)))
 
 
 class PrunedEnumerationMatchesBlind(unittest.TestCase):

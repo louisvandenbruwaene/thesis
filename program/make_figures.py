@@ -74,6 +74,14 @@ FIGURES = Path(__file__).resolve().parent.parent / "figures"
 MACHINE_CACHE_PATH = FIGURES / "machine_values.json"
 
 
+# How the vertex separation counts parallel edges in the two multigraph cells.
+# "incidence-1": routes are internally disjoint paths of the incidence graph, so
+# q parallel edges are q routes (sec:incidence-convention).  Bump this if the
+# convention ever changes again; MachineValues.key stamps it on exactly the
+# cache entries whose value depends on it.
+VERTEX_CONVENTION = "incidence-1"
+
+
 class MachineValues:
     """Remembered results of the ``solve`` calls behind the variant grids.
 
@@ -165,9 +173,22 @@ class MachineValues:
 
     @staticmethod
     def key(kind: str, n: int, m: int, budget: float, kwargs: dict) -> str:
-        """A canonical, human-readable key, so the JSON can be read and audited."""
+        """A canonical, human-readable key, so the JSON can be read and audited.
+
+        A multigraph value in the vertex separation carries the convention it was
+        measured under (``VERTEX_CONVENTION``).  Those are the only entries whose
+        meaning depends on how parallel edges are counted: the edge separation
+        never depended on it, the hypergraph checker has always given a repeated
+        hyperedge one gate of capacity ``mu``, and a simple graph has every
+        multiplicity at most one.  Changing the convention therefore orphans
+        exactly the entries it changes and no others, so ``--refresh`` cannot
+        reconcile a stale value against a record measured under the old one.
+        """
         parts = [kind, f"n={n}", f"m={m}", f"budget={budget:g}"]
         parts += [f"{name}={kwargs[name]}" for name in sorted(kwargs)]
+        if (kwargs.get("separation") == "vertex" and not kwargs.get("simple", True)
+                and not kwargs.get("hypergraph", False)):
+            parts.append(f"convention={VERTEX_CONVENTION}")
         return "|".join(parts)
 
     def get_or_run(self, kind, n, m, budget, kwargs, run):
@@ -345,7 +366,9 @@ def _reconcile_panel(panel: dict) -> dict:
     2. **Search lower bounds rise with ``n``.**  A feasible graph on ``n``
        vertices stays feasible on ``n+1`` (add an isolated vertex), so the best
        feasible edge count can never *drop* as ``n`` grows.  We take a running
-       maximum, which is exactly that extend-by-an-isolated-vertex bound.
+       maximum, which is exactly that extend-by-an-isolated-vertex bound, over a
+       series into which the exact values have first been folded, since a proved
+       maximum is attained and is therefore itself a witness.
     3. **Open cases show points, not interpolated functions.**  The loose
        [construction, trivial-max] band dwarfed the data and is dropped.  A
        line through lower-bound points repeated the same information and made
@@ -378,7 +401,14 @@ def _reconcile_panel(panel: dict) -> dict:
     # invariants 1 then 2 applied to the search circles
     if panel.get("search") is not None:
         sx, sy = panel["search"]
-        sy = [min(y, exact[x]) if x in exact else y for x, y in zip(sx, sy)]
+        # Where the value is known exactly the circle IS the square: a maximum is
+        # attained by some feasible object, so it caps the circle from above and
+        # supplies it from below, and the running max below then carries it to
+        # every larger n.  Clamping alone left a search that had underperformed
+        # dragging the reported bound down past a value already proved: at
+        # m = 6 the undirected multigraph incidence row printed an exact 26 at
+        # n = 5 and only >= 25 at n = 6.
+        sy = [exact[x] if x in exact else y for x, y in zip(sx, sy)]
         running, mono = -1, []
         for y in sy:
             running = max(running, y)
@@ -469,6 +499,20 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     def lb_multi_dir(n):
         return min(directed_multigraph_arc(n, m), (m - 1) * n * (n - 1))
 
+    def lb_multi_vert(n):
+        # The thickened tree: m-1 parallel copies of each tree edge give
+        # kappa = m-1 on every tree edge and 1 elsewhere, so it is feasible
+        # under the incidence convention and has (m-1)(n-1) edges.  It is the
+        # exact value K_m(n) for m <= 3 (thm:hyper-vertex-m2/m3 at r = 2) and
+        # a lower bound above, where bipartite blocks eventually beat it.
+        return min((m - 1) * (n - 1), (m - 1) * (n * (n - 1) // 2))
+
+    def lb_multi_dir_vert(n):
+        # kappa <= lambda, so the arc extremiser of thm:dir-multi-full is
+        # feasible in the vertex separation too: K_m^dir(n) >= (m-1) M(n).
+        # At m = 2 this is the exact value M(n) (cor:dir-multi-incidence).
+        return lb_multi_dir(n)
+
     def lb_hyper_edge(n):
         # prop:hyper-edge, a proved UPPER bound for every r-uniform hypergraph.
         # Right for the proved curve, WRONG as a lower bound: see below.
@@ -553,6 +597,9 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     vert_proved = (m <= 4)
     # Hypergraph vertex is proved for m<=3 (incidence-rank lemma, thm:hyper-vertex-m3).
     hyper_vert_proved = (m <= 3)
+    # The multigraph vertex problem K_m(n) is the r = 2 case of the same two
+    # theorems, so it is proved on the same range.
+    multi_vert_proved = (m <= 3)
 
     def searched(ns, lb_fn, **solve_kw):
         """Search over the uniform range, then raise to the known construction."""
@@ -643,17 +690,30 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         proved=(matrix_ns, [lb_multi_edge(n) for n in matrix_ns]),
         exact=ex5, search=se5))
 
-    # (6) multigraph undirected vertex -- equals simple (parallel edges irrelevant for vertex cuts).
-    multi_vert_label = ("= simple, proved" if vert_proved else "= simple, open")
-    if vert_proved:
+    # (6) multigraph undirected vertex, K_m(n) -- proved for m <= 3 (the r = 2
+    # case of thm:hyper-vertex-m2 and thm:hyper-vertex-m3, attained by the
+    # thickened tree), open for m >= 4.  Its own runs: q parallel edges are q
+    # internally disjoint routes under the incidence convention, so this is
+    # not the simple problem and cannot borrow panel (2)'s points.  The
+    # exhaustion is slower than the simple one (every pair ranges over m
+    # values): at m = 3 n = 6 finishes in about 19s and at m = 6 n = 5 in
+    # about 84s on the author's machine, so the shared 60s budget would stop
+    # the m = 6 row one size early; 120s reaches both, and n = 6 at m = 6 is
+    # the one size that pays the full timeout once and is then cached.
+    multi_vert_exact_budget = 120.0
+    ex6 = _exact_points(range(2, 7), m, multi_vert_exact_budget,
+                        directed=False, simple=False, separation="vertex")
+    se6 = searched(matrix_ns, lb_multi_vert,
+                   directed=False, simple=False, separation="vertex")
+    if multi_vert_proved:
         panels.append(dict(
-            status=multi_vert_label, ylabel="edges",
-            proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
-            exact=ex2, search=se2))
+            status="proved", ylabel="edges",
+            proved=(matrix_ns, [lb_multi_vert(n) for n in matrix_ns]),
+            exact=ex6, search=se6))
     else:
         panels.append(dict(
-            status=multi_vert_label, ylabel="edges",
-            exact=ex2, search=se2))
+            status="open", ylabel="edges",
+            exact=ex6, search=se6))
 
     # (7) multigraph directed arc -- proved for all n and m (thm:dir-multi-full).
     ex7 = _exact_points(range(2, 6), m, 10.0,
@@ -665,11 +725,27 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
         exact=ex7, search=se7))
 
-    # (8) multigraph directed vertex -- reduces exactly to the open simple
-    # digraph value under the thesis's vertex-counting convention.
-    panels.append(dict(
-        status="= simple, open", ylabel="arcs",
-        exact=ex4, search=se4))
+    # (8) multigraph directed vertex, K_m^dir(n) -- proved at m = 2, where every
+    # multiplicity is at most one and the value is M(n) (thm:dir-vertex-m2-exact);
+    # for m >= 3 the leading term (m-1) n^2/4 is proved (cor:dir-multi-incidence,
+    # from thm:dir-hyper-constant at r = 2) and the exact value is open, so the
+    # panel shows points only, exactly as panel (4) does.  The lower bound is the
+    # arc extremiser of thm:dir-multi-full, vertex-feasible because kappa <= lambda.
+    # Exhaustion: n = 4 finishes in under a second at m = 3, n = 5 does not finish
+    # in 120s, and at m = 6 n = 4 already does not; each failure is cached once.
+    ex8 = _exact_points(range(2, 6), m, multi_vert_exact_budget,
+                        directed=True, simple=False, separation="vertex")
+    se8 = searched(matrix_ns, lb_multi_dir_vert,
+                   directed=True, simple=False, separation="vertex")
+    if m == 2:
+        panels.append(dict(
+            status="proved", ylabel="arcs",
+            proved=(matrix_ns, [lb_multi_dir_vert(n) for n in matrix_ns]),
+            exact=ex8, search=se8))
+    else:
+        panels.append(dict(
+            status="open", ylabel="arcs",
+            exact=ex8, search=se8))
 
     # ----- row 3: hypergraph (r=3) -------------------------------------
     # (9) hypergraph undirected edge -- proved for all m.
@@ -737,9 +813,9 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     # This row is NOT a relabelling of row 3.  Parallel copies of a hyperedge are
     # Berge routes with empty interiors, so q copies give q routes that are both
     # hyperedge-disjoint and internally vertex-disjoint: multiplicity raises kappa
-    # as well as lambda, and neither separation collapses (contrast the multigraph
-    # VERTEX rows, which do, under sec:parallel-convention).  Multiplicity is
-    # therefore capped at m-1 and the four cells are genuine extremal questions.
+    # as well as lambda, exactly as parallel edges do in row 2 under the incidence
+    # convention.  Multiplicity is therefore capped at m-1 and the four cells are
+    # genuine extremal questions.
     # Every simple hypergraph IS a multihypergraph, so the row-3 value is always a
     # valid lower bound here and is planted as one; the machine sweep is one vertex
     # shorter because it walks m^C assignments rather than 2^C.
@@ -844,8 +920,8 @@ def variant_grid_figures() -> None:
 
 # Row metadata for variant_value_tables(), in the same panel order
 # gather_variant_grid() appends them: model label, column label, and (for the
-# eight graph-model rows only) the symbol tab:rediscovery already uses for
-# that quantity.  The four hypergraph rows have no such standing symbol
+# eight graph-model rows only) the symbol tab:notation uses for that
+# quantity.  The four hypergraph rows have no such standing symbol
 # elsewhere in the thesis, so they are left with the same words the figure's
 # own column headers use and nothing more is invented.
 _VARIANT_ROW_META = [
@@ -854,9 +930,9 @@ _VARIANT_ROW_META = [
     ("simple graph", "directed, arc", r"$\ell_m^{\mathrm{dir}}(n)$"),
     ("simple graph", "directed, vertex", r"$k_m^{\mathrm{dir}}(n)$"),
     ("multigraph", "undirected, edge", r"$L_m(n)$"),
-    ("multigraph", "undirected, vertex", r"$k_m(n)$"),
+    ("multigraph", "undirected, vertex", r"$K_m(n)$"),
     ("multigraph", "directed, arc", r"$L_m^{\mathrm{dir}}(n)$"),
-    ("multigraph", "directed, vertex", r"$k_m^{\mathrm{dir}}(n)$"),
+    ("multigraph", "directed, vertex", r"$K_m^{\mathrm{dir}}(n)$"),
     (r"hypergraph $r=3$", "undirected, edge", None),
     (r"hypergraph $r=3$", "undirected, vertex", None),
     (r"hypergraph $r=3$", "directed, arc", None),

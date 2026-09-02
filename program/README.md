@@ -90,6 +90,13 @@ elsewhere can legitimately return a different (still honest) lower bound and
 move a plotted circle. Recording the value pins the published figure to the run
 that produced it.
 
+A cached value is only reusable while its key still means the same question, so
+the key of a multigraph *incidence* entry carries a convention stamp
+(`VERTEX_CONVENTION` in `make_figures.py`). The fingerprint below reports a
+changed program and reuses the values anyway, which is right for a faster search
+or a new figure and wrong for a redefinition of the objective. Bumping the stamp
+retires exactly the entries whose meaning moved and leaves the rest alone.
+
 Delete the file, or pass `--refresh`, to recompute every entry from scratch;
 that is the check that the file is still telling the truth. The fingerprint
 stored beside the values covers the program above its chapter 4 banner, which is
@@ -108,7 +115,16 @@ from erdos915_unified import solve
 solve(6, 3, directed=True, simple=False, exhaustive=True)  # directed multigraph value
 solve(16, 3, directed=True, exhaustive=False) # discover a dense example (lower bound)
 solve(7, 2, hypergraph=True, r=3)             # the hypergraph model
+solve(5, 3, simple=False, separation="vertex") # K_3(5), the multigraph incidence value
 ```
+
+The two separations are `separation="edge"` and `separation="vertex"`, and on a
+multigraph they are different questions, not two names for one. Under the
+incidence convention of `sec:incidence-convention` a route is a path of the
+incidence graph, so `q` parallel edges are `q` internally disjoint routes just as
+they are `q` edge-disjoint ones, and the multigraph incidence maxima `K_m(n)` and
+`K_m^dir(n)` are problems in their own right rather than the value of the
+underlying simple graph. They can separate: `K_5(4) = 14` against `L_5(4) = 12`.
 
 ## The honesty contract
 
