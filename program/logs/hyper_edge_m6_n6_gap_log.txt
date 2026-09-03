@@ -1,0 +1,22 @@
+n=6, m=6, r=3
+prop:hyper-edge upper bound      : 12
+available distinct hyperedges    : 20
+
+(a) walked 125970 families of 12 hyperedges in 349.3s
+    feasible among them          : 0
+
+(b) a feasible 11-hyperedge family:
+       [0, 1, 2]
+       [0, 1, 3]
+       [0, 1, 4]
+       [0, 1, 5]
+       [0, 2, 3]
+       [0, 2, 4]
+       [0, 2, 5]
+       [0, 3, 4]
+       [0, 3, 5]
+       [0, 4, 5]
+       [1, 2, 3]
+    lambda^max                   : 5 <= 5
+
+exact value: 11, one below the bound of 12

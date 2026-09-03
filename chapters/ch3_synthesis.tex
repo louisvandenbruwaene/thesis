@@ -48,7 +48,8 @@ Proving the three conditions for every extremal digraph is the missing step.
 The conjecture has the correct leading term and the correct order of error.
 \Cref{thm:dir-arc-linear-error} proves this without assuming the shape of an extremal graph.
 Only the coefficient of the linear term remains unknown.
-It lies between the conjectured $(m-2)/2$ and the proved $4(m-1)$.
+It lies between the conjectured $(m-2)/2$ and the proved $4(m-1)$, which holds at every $n$.
+Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
 The next section considers the separate question of extremal shape.
 
 The directed vertex problem has the same leading term and error order by \Cref{thm:dir-vertex-linear-error}.
@@ -315,7 +316,7 @@ A value is settled only when its lower and upper bounds agree.
 Directed vertex values require separate checks because Whitney's inequality transfers witnesses but not upper bounds.
 Every computational claim in this thesis can be rerun from the repository.
 The principal checks run from \code{program/erdos915\_unified.py}.
-Two block sweeps use separate scripts in \code{program/scripts/}.
+Two block sweeps and one hypergraph enumeration use separate scripts in \code{program/scripts/}.
 They are named where their results appear and provide independent implementations.
 \Cref{app:verification-ladder,app:software-tests} gives the environment, commands, and audit evidence.
 No theorem here depends only on an unchecked solver result.

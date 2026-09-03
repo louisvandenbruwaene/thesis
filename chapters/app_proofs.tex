@@ -300,7 +300,7 @@ Those two quantities are adjacent integers by construction: if $k$ is the larges
 
 What follows is the bookkeeping that convention forces on every constant quoted from the literature.
 
-The shift is visible in every entry the database and this thesis both state. It gives $k_2(n) = n$ where a tree has $n-1$ edges, $k_3(2n) = 3n-1$ against $\floor{3(2n-1)/2} = 3n-2$ here, $k_4(n) = 2n-1$ against $2n-2$, $\ell_5(2n) = 5n-2$ against $5n-3$, $\ell_6(n) = 3n-2$ \cite{Leonard73} against $3n-3$, and it writes the Bollob\'{a}s--Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ \emph{on $1 + (m-1)n$ vertices} against $\binom{m}{2}n$ here. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
+The shift is visible in every entry the database and this thesis both state. Write $f_m(n) = k_m(n) + 1$ for the forcing count, which is the form the database and \cite{SorensenThomassen74} both use, so that the symbols $k_m$ and $\ell_m$ keep their meaning here throughout. The database gives $f_2(n) = n$ where a tree has $n-1$ edges, $f_3(2n) = 3n-1$ where this thesis has $k_3(2n) = \floor{3(2n-1)/2} = 3n-2$, and $f_4(n) = 2n-1$ where this thesis has $2n-2$. The edge entries shift the same way: the database quotes $5n-2$ where $\ell_5(2n) = 5n-3$ here, and $3n-2$ \cite{Leonard73} where $\ell_6(n) = 3n-3$ here. It also writes the Bollob\'{a}s--Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ \emph{on $1 + (m-1)n$ vertices} against $\binom{m}{2}n$ here. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
 
 The conjecture is the one entry that must keep its vertex count attached, and an earlier draft of this thesis lost it. On $N = 1 + (m-1)n$ vertices the conjectured value is $\binom{m}{2}\frac{N-1}{m-1} = \frac{m(N-1)}{2}$, which is the rate $c_m = m/2$ of \Cref{thm:simple-vertex-blocks}. Read instead as a count on $n$ vertices, $\binom{m}{2}n$ overstates it by a factor of $m-1$, giving $3n$ at $m = 3$ where the true value is about $3n/2$.
 
@@ -736,7 +736,7 @@ By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
 \end{proof}
 
-What is left open is therefore a constant factor in one coefficient, not a shape. \Cref{conj:dir-arc} says the second-order coefficient is exactly $(m-2)/2$, and \Cref{thm:dir-arc-linear-error} pins it between that and $4(m-1)$, a factor of $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. Closing that gap is where the structure of \Cref{open:decomposition} lives, and \Cref{rem:case2-tight} rules out the most obvious way to try.
+What is left open is therefore a constant factor in one coefficient, not a shape. \Cref{conj:dir-arc} says the second-order coefficient is exactly $(m-2)/2$, and \Cref{thm:dir-arc-linear-error} pins it between that and $4(m-1)$, a factor of $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. That is the factor at every $n$. Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} cited in \Cref{ch:basecases} lowers the upper end to $m-1$, and the factor with it to $2(m-1)/(m-2)$: four at $m = 3$, and tending to two. Closing that gap is where the structure of \Cref{open:decomposition} lives, and \Cref{rem:case2-tight} rules out the most obvious way to try.
 
 \begin{remark}[The dense case's coefficient needs a new inequality]\label{rem:case2-tight}
 One might hope to cut the coefficient of the dense case, the one where every $d(x) \ge n/2$, using the observation that in the conjectured extremiser one whole side has $\min(d^+, d^-) = 0$, so summing \Cref{lem:small-side}'s worst case at every vertex looks wasteful. That observation alone does not cut the coefficient. The value four is the best universal coefficient obtainable from the two facts that case uses, the budget $\sum_x d^+(x)\,d^-(x) \le C n(n-1)$ of \Cref{lem:budget-degree-sum} and the floor $d(x) \ge n/2$. Read $C = m-1$ throughout what follows.
@@ -2392,14 +2392,16 @@ This keeps parity effects in the discrete data from looking like a proposed form
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m6_hypergraphs.png}
-    \caption{The eight hypergraph-model variants at $m=6$. In the simple undirected edge panel the proved upper bound is $10$ at $n=5$ and $12$ at $n=6$, while the true maxima are $8$ and $11$. Only the $8$ is drawn as a square: the exhaustive solve finished at $n=5$ and not at $n=6$, where the twelve-hyperedge enumeration below supplies the value.}
+    \caption{The eight hypergraph-model variants at $m=6$. In the simple undirected edge panel the proved upper bound is $10$ at $n=5$ and $12$ at $n=6$, while the true maxima are $8$ and $11$. Both are drawn as squares. The $8$ comes from the exhaustive solve, which finished at $n=5$ and not at $n=6$, and the $11$ from the twelve-hyperedge enumeration below.}
     \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}
 
 \Cref{prop:hyper-edge} bounds every simple hypergraph from above.
 It does not assert attainment outside its stated range.
-At $m=6$, $n=6$, and $r=3$, all $125\,970$ simple twelve-hyperedge candidates are infeasible.
+At $m=6$, $n=6$, and $r=3$, all $125\,970$ simple twelve-hyperedge candidates are infeasible, and an eleven-hyperedge family is not.
 The true maximum is therefore $11$, one below the bound of $12$.
+That enumeration runs from its own standalone script, \code{program/scripts/hyper\_edge\_m6\_n6\_gap.py}, because the main program's branch and bound does not finish this cell inside the figure budget.
+It supplies the exhaustive computation the branch and bound could not, so the value is recorded as exact.
 The smallest analogous gap occurs at $n=r=m=3$.
 A simple hypergraph then has one hyperedge, while a multihypergraph attains the bound with two copies.
 
@@ -2409,8 +2411,8 @@ A bold green entry is machine-checked exact.
 The prefix $\le$ marks a proved upper bound that no recorded exact value matches at that point.
 The prefix $\ge$ marks a verified construction without a matching upper bound.
 A blank cell means that the model does not exist at that order.
-The simple hypergraph cell at $m=6$, $n=6$ is such a $\le$ point.
-It reads $\le 12$ because the exhaustive solve did not finish there, while the twelve-hyperedge enumeration above fixes the true maximum at $11$.
+The simple hypergraph cell at $m=6$, $n=6$ reads a bold $11$ against the bound of $12$ drawn as the curve above it, which is the gap the enumeration just described settles.
+The multihypergraph cell beside it is the one $\le$ point of the table, since repeats are proved to attain the bound only when $(r-1) \mid (n-1)$, which $n = 6$ fails.
 
 \begin{table}[p]
     \centering

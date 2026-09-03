@@ -355,6 +355,64 @@ def _exact_points(ns, m, budget, **kw):
     return xs, ys
 
 
+# Cells settled by a standalone enumeration rather than by ``solve``'s branch
+# and bound, which does not finish them inside the figure budget.  Keyed by
+# ``(m, n, r)`` for the simple undirected EDGE hypergraph panel.
+#
+# The one entry is the ``m = 6, n = 6, r = 3`` gap.  ``prop:hyper-edge`` reads
+# 12 there and ``thm:simple-hyper-edge`` does not attain it, since ``m-1 <=
+# C(n-2, r-2)`` asks 5 <= 4.  ``scripts/hyper_edge_m6_n6_gap.py`` walks all
+# C(20, 12) = 125970 twelve-hyperedge families, finds none feasible, and
+# exhibits an eleven-hyperedge one, so the true maximum is 11.  That is a
+# completed exhaustive computation like any other exact value, so the panel
+# carries it as one and the table prints it in bold rather than printing the
+# unattained bound with a ``<=``.
+_SETTLED_HYPER_EDGE_SIMPLE = {(6, 6, 3): 11}
+
+
+def theta_bouquet_lower_bound(n: int, m: int) -> int:
+    """A lower bound on ``K_m(n)``: a bouquet of thickened THETA blocks.
+
+    One block on ``b`` vertices takes two poles, joins each of the other
+    ``b - 2`` vertices to both poles at multiplicity ``m - 2``, and joins the
+    poles to each other at multiplicity ``max(0, m + 1 - b)``.  It carries
+    ``2(b-2)(m-2) + max(0, m+1-b)`` edges and is feasible exactly for
+    ``b <= m + 1``, both stated in ``sec:multi-vertex``.
+    ``thm:multi-vertex-blocks`` then hangs any multiset of blocks with
+    ``sum(b_i - 1) <= n - 1`` off one shared vertex, which is the knapsack here.
+
+    ``b = 2`` is the degenerate block, one edge at multiplicity ``m - 1``, so
+    the thickened tree is the ``b = 2`` case and this is never worse than it.
+    It returns the tree's ``(m-1)(n-1)`` at ``m <= 4``, where that is optimal,
+    and beats it from ``m = 5`` on, where ``thm:clique-chain-vertex`` proves the
+    tree is not extremal.  Every value is attained by an exhibited multigraph,
+    so it can never exceed the true ``K_m(n)``.
+
+    It agrees with the independent block sweep of
+    ``scripts/multi_vertex_blocks.py`` at every ``n`` that sweep reaches, which
+    ``tests/test_variant_table.py`` pins.
+    """
+    block = {b - 1: 2 * (b - 2) * (m - 2) + max(0, m + 1 - b)
+             for b in range(2, min(n, m + 1) + 1)}
+    best = [0] * n
+    for budget in range(1, n):
+        for cost, value in block.items():
+            if cost <= budget:
+                best[budget] = max(best[budget], best[budget - cost] + value)
+    return min(best[n - 1], (m - 1) * (n * (n - 1) // 2))
+
+
+def _with_settled_cells(points, m, r, settled):
+    """Fold externally settled exact values into an ``_exact_points`` series."""
+    xs, ys = list(points[0]), list(points[1])
+    known = dict(zip(xs, ys))
+    for (m_key, n_key, r_key), value in settled.items():
+        if m_key == m and r_key == r and n_key not in known:
+            known[n_key] = value
+    xs = sorted(known)
+    return xs, [known[n] for n in xs]
+
+
 def _search_points(ns, m, budget, **kw):
     """Discovery lower bounds: a concrete feasible graph at each n (the LB construction)."""
     xs, ys = [], []
@@ -584,12 +642,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         return min(directed_multigraph_arc(n, m), (m - 1) * n * (n - 1))
 
     def lb_multi_vert(n):
-        # The thickened tree: m-1 parallel copies of each tree edge give
-        # kappa = m-1 on every tree edge and 1 elsewhere, so it is feasible
-        # under the incidence convention and has (m-1)(n-1) edges.  It is the
-        # exact value K_m(n) for m <= 3 (thm:hyper-vertex-m2/m3 at r = 2) and
-        # a lower bound above, where bipartite blocks eventually beat it.
-        return min((m - 1) * (n - 1), (m - 1) * (n * (n - 1) // 2))
+        return theta_bouquet_lower_bound(n, m)
 
     def lb_multi_dir_vert(n):
         # kappa <= lambda, so the arc extremiser of thm:dir-multi-full is
@@ -835,6 +888,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     # (9) hypergraph undirected edge -- proved for all m.
     ex9 = _exact_points(range(3, 8), m, exact_budget,
                         hypergraph=True, r=3, directed=False, separation="edge")
+    ex9 = _with_settled_cells(ex9, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
     se9 = searched(hyper_ns, attained_hyper_edge,
                    hypergraph=True, r=3, directed=False, separation="edge")
     panels.append(dict(
