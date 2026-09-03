@@ -47,7 +47,8 @@ research_notes/       conjectures and supposed proofs mostly NOT in the thesis:
                       too specific or unfinished for the text, kept for future
                       work (AI or human). Prose only; their scripts live in
                       program/scripts/.
-claude.md, TASKS.md   operating notes and the prioritized open-problem queue
+check_consistency.sh  pre-hand-in gate: AI badge sync, dangling refs, cleveref
+                      naming
 main.pdf              the compiled thesis
 ```
 
@@ -102,7 +103,7 @@ rests on a hand proof or a cited theorem. Computations are supporting evidence.
 ## Where to continue
 
 The open problems are stated precisely in **ch3 (`chapters/ch3_synthesis.tex`,
-"Open problems")** and tracked in **`TASKS.md`**. The headline targets:
+"Open problems")**. The headline targets:
 
 - **The extremal decomposition.** Proving an extremal non-hub digraph splits as `A ∪ B`
   with `A → B` complete, no arc inside `A`, and no arc from `B` back to `A` would turn

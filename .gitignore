@@ -52,3 +52,20 @@ directed_multigraph_extremal_revised.pdf
 
 # The offcuts record builds from offcuts.tex; the PDF is a build product
 offcuts.pdf
+
+# Working notes on the writing process, kept on disk and out of the published
+# repository. The thesis cites this repository as the archive of the
+# computational work, so what it serves is what an examiner reads; these files
+# are the session-by-session process behind that work, not the work itself.
+# Nothing in the thesis references any of them (offcuts.tex, which IS cited,
+# stays tracked). Removing them here affects HEAD only: they remain in the Git
+# history, and rewriting that is ruled out because main.pdf prints commit
+# hashes in its computational audit.
+claude.md
+TASKS.md
+REVIEW_STATUS.md
+SIMPLIFIED_AI_PROOFS.md
+SIMPLIFIED_AI_PROOFS_REVIEW.md
+PLAN_connectivity_speedup.md
+mistakes found 24082026.md
+program/CLAUDE.md

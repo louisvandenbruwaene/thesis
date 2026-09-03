@@ -291,25 +291,31 @@
 \newenvironment{claimproof}[1][\proofname]{\begin{proof}[#1]\renewcommand{\qedsymbol}{$\diamondsuit$}}{\end{proof}}
 
 % Cleveref settings (must be after theorem environment definitions)
-\crefname{theorem}{theorem}{theorems}
+% Every reference in this document goes through \Cref, never \cref, and a mixed-type
+% group such as \Cref{prop:a,thm:b} capitalises only its FIRST group and takes the
+% lowercase name for the rest, printing "Proposition A.37 and theorem 1.11". The
+% lowercase slot is therefore filled with the capitalised name here, exactly as it
+% already is for figure, table, section, chapter and part below. Do not "restore"
+% lowercase forms without first adding a \cref use that needs them.
+\crefname{theorem}{Theorem}{Theorems}
 \Crefname{theorem}{Theorem}{Theorems}
-\crefname{proposition}{proposition}{propositions}
+\crefname{proposition}{Proposition}{Propositions}
 \Crefname{proposition}{Proposition}{Propositions}
-\crefname{lemma}{lemma}{lemmas}
+\crefname{lemma}{Lemma}{Lemmas}
 \Crefname{lemma}{Lemma}{Lemmas}
-\crefname{corollary}{corollary}{corollaries}
+\crefname{corollary}{Corollary}{Corollaries}
 \Crefname{corollary}{Corollary}{Corollaries}
-\crefname{conjecture}{conjecture}{conjectures}
+\crefname{conjecture}{Conjecture}{Conjectures}
 \Crefname{conjecture}{Conjecture}{Conjectures}
-\crefname{definition}{definition}{definitions}
+\crefname{definition}{Definition}{Definitions}
 \Crefname{definition}{Definition}{Definitions}
-\crefname{example}{example}{examples}
+\crefname{example}{Example}{Examples}
 \Crefname{example}{Example}{Examples}
-\crefname{remark}{remark}{remarks}
+\crefname{remark}{Remark}{Remarks}
 \Crefname{remark}{Remark}{Remarks}
-\crefname{construction}{construction}{constructions}
+\crefname{construction}{Construction}{Constructions}
 \Crefname{construction}{Construction}{Constructions}
-\crefname{ques}{question}{questions}
+\crefname{ques}{Question}{Questions}
 \Crefname{ques}{Question}{Questions}
 \crefname{chapter}{Chapter}{Chapters}
 \crefname{appendix}{Appendix}{Appendices}

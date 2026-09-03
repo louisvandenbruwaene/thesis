@@ -269,8 +269,8 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
       % red {A,B,C}, tail B, repeated: B->A and B->C, each a straddling pair
       \draw[hstar, metroA] (Bm) to[bend left=16] (Am);
       \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Am);
-      \draw[hstar, metroA] (Bm) to[bend left=16] (Cm);
-      \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Cm);
+      \draw[hstar, metroA!55!black] (Bm) to[bend left=16] (Cm);
+      \draw[hstar, metroA] (Bm) to[bend right=16] (Cm);
       % blue {B,C,D}, tail D: D->B (diagonal) + D->C (top)
       \draw[hstar, metroB] (Dm) to (Bm);
       \draw[hstar, metroB] (Dm) to (Cm);
@@ -511,7 +511,7 @@ S{\o}rensen and Thomassen state the second formula for every $n \ge 6$ apart fro
     \label{fig:divergence}
 \end{figure}
 
-\begin{theorem}[Directed arc value at $m = 2$,\aimedal]\label{thm:dir-arc-m2-exact}
+\begin{theorem}[Directed arc value at $m = 2$]\label{thm:dir-arc-m2-exact}
 For simple digraphs,
 \[
     \ell_2^{\mathrm{dir}}(n) = \max\!\left(2(n-1),\ \floorfrac{n^2}{4}\right).
@@ -520,7 +520,7 @@ For simple digraphs,
 
 Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is proved in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, the larger feasible family, and the arc value follows from it.
 
-\begin{theorem}[Directed vertex value at $m = 2$,\aimedal]\label{thm:dir-vertex-m2-exact}
+\begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 \end{theorem}
 
@@ -572,7 +572,7 @@ The hub leads for $n < 7$ and the bipartite wall leads for $n > 7$.
 Notice how the directed value is quadratic in $n$ for large $n$, while the undirected value is linear.
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
-\begin{proposition}[Hypergraph edge bound,\aimedal]\label{prop:hyper-edge}
+\begin{proposition}[Hypergraph edge bound]\label{prop:hyper-edge}
 An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
 \end{proposition}
 
@@ -609,7 +609,7 @@ For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from
 \label{fig:hyper-star}
 \end{figure}
 
-\begin{theorem}[Hypergraph vertex value at $m = 2$,\aimedal]\label{thm:hyper-vertex-m2}
+\begin{theorem}[Hypergraph vertex value at $m = 2$]\label{thm:hyper-vertex-m2}
 For $r \ge 2$ and $n \ge 1$, the maximum number of hyperedges of an
 $r$-uniform multihypergraph on $n$ vertices with $\kap^{\max} \le 1$ is
 \[
@@ -621,7 +621,7 @@ problems agree at $m = 2$ for every uniformity, and repeated hyperedges never
 help.
 \end{theorem}
 
-\begin{theorem}[Hypergraph vertex value at $m = 3$,\aimedal]\label{thm:hyper-vertex-m3}
+\begin{theorem}[Hypergraph vertex value at $m = 3$]\label{thm:hyper-vertex-m3}
 For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
 $\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
 $2 < r < n$, which is exactly the range where $2 \le \binom{n-2}{r-2}$, the bound

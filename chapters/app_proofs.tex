@@ -601,7 +601,7 @@ Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vert
 and an upper bound for the arc problem says nothing at all about the vertex problem. The gap is not vacuous: two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$, so there really are digraphs in the difference of the two families. Whitney therefore gives one thing, that an arc construction is a vertex \emph{lower} bound, and the vertex upper bound has to be proved separately. The proof below does that, and \Cref{ch:synthesis} treats the two separations the same way for $m \ge 3$, where the vertex problem stays open even though the arc conjecture is stated.
 \end{remark}
 
-\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}\aimedal]
+\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}]
 Write $M(n) = \max(2(n-1), \floor{n^2/4})$.
 
 \emph{Lower bound.} The directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}) both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem as well. Between them they witness $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ and $k_2^{\mathrm{dir}}(n) \ge M(n)$ at once.
@@ -617,7 +617,7 @@ In words: at $m = 2$ a feasible digraph can afford no arc that some other route 
 
 The arc value costs one further line.
 
-\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}\aimedal]
+\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
 The two constructions above give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
 \[
     M(n) \;\le\; \ell_2^{\mathrm{dir}}(n) \;\le\; k_2^{\mathrm{dir}}(n) \;\le\; M(n),
@@ -655,7 +655,7 @@ For the connectivity, fix $a \in A$ and $b \in B$. Two kinds of route run from $
 
 These are the proved ingredients of the reduction discussed in \Cref{ch:synthesis}. What the reduction still assumes is stated as \Cref{open:decomposition}, and \Cref{sec:two-step-budget} then closes the section with the bounds that assume nothing at all: one counting lemma, \Cref{lem:two-step-budget}, and the four results it drives, of which \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error} and \Cref{prop:dir-arc-stability} are proved here and \Cref{thm:dir-hyper-constant} in \Cref{sec:dir-hyper}.
 
-\begin{proposition}[Two-hop budget on bipartite partitions,\aimedal]\label{prop:two-hop-bipartite}
+\begin{proposition}[Two-hop budget on bipartite partitions]\label{prop:two-hop-bipartite}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ is present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
 \end{proposition}
 
@@ -694,7 +694,7 @@ Let $D$ be a simple digraph and let $C \ge 1$. Write $p_2(u,v)$ for the number o
 \]
 \end{definition}
 
-\begin{lemma}[Feasible digraphs are budgeted,\aimedal]\label{lem:feasible-budgeted}
+\begin{lemma}[Feasible digraphs are budgeted]\label{lem:feasible-budgeted}
 Let $D$ be a simple digraph and $m \ge 2$. If $\lec^{\max}_D \le m-1$, or if $\kap^{\max}_D \le m-1$, then $D$ is $(m-1)$-budgeted.
 \end{lemma}
 
@@ -942,7 +942,7 @@ Taking $k = m-1$ gives $L_m^{\mathrm{dir}}(n) \le (m-1)M(n)$, matching the lower
 
 Nothing above depended on $m$ or on the parity of $n$: the same three-step construction of $R$ and the same one-line deletion bound run identically at every level. In particular, the induction closes exactly the finite computation the rest of this appendix once needed help to settle.
 
-\begin{corollary}[\aimedal]\label{cor:dir-multi-n7}
+\begin{corollary}[The directed multigraph value at $n = 7$, $m = 3$,\aimedal]\label{cor:dir-multi-n7}
 $L_3^{\mathrm{dir}}(7) = 24$.
 \end{corollary}
 
@@ -1123,7 +1123,7 @@ For a hypergraph, its \emph{incidence graph} is the bipartite graph joining
 each vertex to the hyperedges that contain it. A \emph{hypertree} is a
 hypergraph whose incidence graph is a tree.
 
-\begin{proof}[Proof of \Cref{prop:hyper-edge}\aimedal]
+\begin{proof}[Proof of \Cref{prop:hyper-edge}]
 \emph{Upper bound.} Every hyperedge copy has $|e| = r$, so
 \Cref{lem:hyper-cut-induction} at $k = m-1$ reads
 $(r-1)|E(\HH)| \le (m-1)(n-1)$. Dividing and rounding down, because
@@ -1306,7 +1306,7 @@ drawn in both. \textbf{(bottom)} The star hypertree of
 \Cref{thm:hyper-vertex-m2}, stated in \Cref{ch:basecases}, follows at once from
 the incidence translation.
 
-\begin{proof}[Proof of \Cref{thm:hyper-vertex-m2}\aimedal]
+\begin{proof}[Proof of \Cref{thm:hyper-vertex-m2}]
 We claim $\kap^{\max}_\HH \le 1$ holds if and only if $I(\HH)$ is a forest.
 If $I(\HH)$ contains a cycle $v_1, e_1, v_2, e_2, \dots, v_\ell, e_\ell, v_1$
 (it alternates classes, so $\ell \ge 2$, all $v_i$ and $e_i$ distinct), then
@@ -1575,7 +1575,7 @@ in the second, since $s \le 2$. This exhausts the cases.
 The rank bound now yields \Cref{thm:hyper-vertex-m3}, stated in
 \Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $2 < r < n$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
 
-\begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}\aimedal]
+\begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}]
 Apply \Cref{lem:incidence-rank} to each connected component of the incidence
 graph $I(\HH)$, with $X$ the vertex class and $Z$ the hyperedge class:
 $Z$ is independent, incidences are simple even when hyperedges repeat,
