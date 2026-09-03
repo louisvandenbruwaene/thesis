@@ -31,6 +31,22 @@ git worktree add -q -B public "$wt" origin/main
 find "$wt" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 git archive HEAD main.pdf program README.md | tar -x -C "$wt"
 
+# Whole directories are copied above, so anything private living INSIDE one has
+# to be named here. program/CLAUDE.md is the program's development history and
+# is not part of the submission.
+rm -f "$wt/program/CLAUDE.md"
+
+# Last line of defence: refuse to publish a snapshot carrying a working-notes
+# file, whatever the path, rather than push and discover it afterwards.
+if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+        -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' \
+        | grep -q .; then
+    echo "publish.sh: refusing to publish, a working-notes file reached the snapshot:" >&2
+    find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+        -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' >&2
+    exit 1
+fi
+
 cd "$wt"
 git add -A
 if git diff --cached --quiet; then
