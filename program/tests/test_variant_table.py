@@ -8,12 +8,12 @@ from make_figures import (
     _panel_cell,
     dir_block_bouquet_lower_bound,
     gather_variant_grid,
-    theta_bouquet_lower_bound,
+    block_bouquet_lower_bound,
 )
 
 
-class ThetaBouquetLowerBound(unittest.TestCase):
-    """The K_m(n) construction curve is the theta bouquet, not the thickened tree.
+class BlockBouquetLowerBound(unittest.TestCase):
+    """The K_m(n) construction curve is the block bouquet, not the thickened tree.
 
     thm:clique-chain-vertex proves the thickened tree is not extremal from
     m = 5 on, so plotting it as the lower bound understated the panel the
@@ -22,40 +22,47 @@ class ThetaBouquetLowerBound(unittest.TestCase):
     2-connected graphs with geng and solves the knapsack of
     thm:multi-vertex-blocks. They are reproduced here as literals so the test
     needs neither geng nor networkx.
+
+    An earlier version of this class pinned 45 at n = 8 against a curve built
+    from theta blocks alone. The theta family stops at b = m+1 = 7, so it never
+    saw g_6(8) = 47, and the pinned literal recorded the truncation rather than
+    the sweep it names. The value below is the sweep's own.
     """
 
-    # scripts/multi_vertex_blocks.py, blocks up to 7 vertices, m = 6.
-    BLOCK_SWEEP_M6 = {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 45}
+    # scripts/multi_vertex_blocks.py, blocks up to 8 vertices, m = 6: the row
+    # g_6 = (5, 12, 19, 26, 33, 40, 47) of tab:multi-vertex-blocks, whose
+    # per-vertex rate rises with b, so each n below is one single block.
+    BLOCK_SWEEP_M6 = {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 47}
 
     def test_it_matches_the_independent_block_sweep_at_m6(self):
         for n, expected in self.BLOCK_SWEEP_M6.items():
-            self.assertEqual(theta_bouquet_lower_bound(n, 6), expected, f"n={n}")
+            self.assertEqual(block_bouquet_lower_bound(n, 6), expected, f"n={n}")
 
     def test_it_is_the_thickened_tree_where_the_tree_is_optimal(self):
         # K_m(n) = (m-1)(n-1) for m <= 3 (thm:hyper-vertex-m2/m3 at r = 2), and
         # the block sweep shows the two tie at m = 4.
         for m in (2, 3, 4):
             for n in range(2, 17):
-                self.assertEqual(theta_bouquet_lower_bound(n, m),
+                self.assertEqual(block_bouquet_lower_bound(n, m),
                                  (m - 1) * (n - 1), f"m={m}, n={n}")
 
     def test_it_never_falls_below_the_thickened_tree(self):
         for m in range(2, 9):
             for n in range(2, 17):
-                self.assertGreaterEqual(theta_bouquet_lower_bound(n, m),
+                self.assertGreaterEqual(block_bouquet_lower_bound(n, m),
                                         (m - 1) * (n - 1), f"m={m}, n={n}")
 
     def test_it_never_exceeds_the_trivial_maximum(self):
         # Every pair at multiplicity m-1 is the ceiling for any multigraph.
         for m in range(2, 9):
             for n in range(2, 17):
-                self.assertLessEqual(theta_bouquet_lower_bound(n, m),
+                self.assertLessEqual(block_bouquet_lower_bound(n, m),
                                      (m - 1) * (n * (n - 1) // 2), f"m={m}, n={n}")
 
     def test_it_rises_with_n(self):
         # An isolated vertex keeps a feasible multigraph feasible.
         for m in range(2, 9):
-            values = [theta_bouquet_lower_bound(n, m) for n in range(2, 17)]
+            values = [block_bouquet_lower_bound(n, m) for n in range(2, 17)]
             self.assertEqual(values, sorted(values), f"m={m}")
 
 

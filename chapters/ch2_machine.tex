@@ -367,9 +367,9 @@ The enumeration is exact wherever it finishes and it does so only for the smalle
 
 \subsection{Pruned search}
 The enumeration step will skip whole families of hopeless graphs, via a pruned search. 
-The induction proving the directed $m=2$ vertex theorem depends on finite checks through $n=7$ (\Cref{thm:dir-vertex-m2-exact}).
-The arc theorem then follows from the vertex theorem.
-These base cases lie just beyond the range where blind digraph enumeration is practical.
+The directed $m=2$ values are checked independently at every order through $n=7$, under both separations (\Cref{tab:basecase-search}).
+\Cref{thm:dir-vertex-m2-exact,thm:dir-arc-m2-exact} are proved at every $n$ at once and use none of those checks, so the sweep corroborates them rather than supporting them.
+Those orders lie just beyond the range where blind digraph enumeration is practical.
 They can be reached by enumerating more cleverly.
 Every variant offers a fixed list of edges its graphs are allowed to use, 
 whether those are pairs, ordered pairs, or oriented sets of $r$ vertices, 

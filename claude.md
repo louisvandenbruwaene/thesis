@@ -31,9 +31,11 @@ path the thesis prints begins with `program/`.
   while the log held 4 and 1; that was a grep that silently matched nothing,
   not a cleaner build. See the locale gotcha below, and recount with
   `LC_ALL=C grep -a` before ever restating these numbers.
-- Recorded revision: tag `submitted-3` at `b4547a7be57d`, printed in the
-  computational audit. Pushed, and `record_revision.sh` will not move it, so the
-  next recorded build is `submitted-4`.
+- Recorded revision: the tags run to `submitted-6`, printed in the
+  computational audit. `record_revision.sh` will not move an existing tag, so
+  each recorded build takes the next free name. An earlier version of this line
+  still named `submitted-3` after three further builds had been recorded, so
+  read the tag off `git tag` rather than off this file.
 - **`./check_consistency.sh` is the pre-hand-in gate.** Run it before any
   recorded build. It catches the three defects `latexmk` exits 0 on: an
   `\aimedal` edited on a Chapter 1 statement but not its appendix proof (or the
@@ -232,6 +234,28 @@ path the thesis prints begins with `program/`.
 ## Recent sessions
 
 One line each. `git log` has the full message for every one of them.
+
+- **2026-09-04.** A full read-through of all four chapter sources with every
+  numeric claim re-derived. Four defects, one of them a bound the thesis
+  understated against its own table. `cor:dir-multi-incidence` said
+  `M(n) = floor(n^2/4)` for `n >= 4`, false at 4, 5 and 6, since the branches
+  only tie at 7. Three places still described the m=2 directed proof as the
+  vertex-deletion induction it no longer is: `ch2_machine.tex` said
+  `thm:dir-vertex-m2-exact` "depends on finite checks through n=7", against the
+  appendix's own "no result in this thesis rests on a machine run"; the Short
+  Summary said "a long induction"; and `directed_arc_m2`'s docstring said
+  "induction on n". Fourth, `theta_bouquet_lower_bound` built the `K_m(n)`
+  curve from theta blocks alone, which the theta family caps at `b <= m+1`, so
+  the grid and `tab:variant-values` printed `K_6(8) >= 45` where the swept
+  `g_6(8) = 47` is attained by a block on eight vertices that is not a theta
+  (graph6 `G?AFvw`). It is now `block_bouquet_lower_bound`, reading the
+  swept `g_m(b)` for `b <= 8` and falling back to the theta and thickened
+  `K_{s,t}` families beyond, and the pinning test's literal was recording that
+  truncation rather than the sweep it named. Independent re-verification, no
+  import of the program: the whole of `tab:multi-vertex-blocks` (43 cells, own
+  max-flow plus a geng sweep), the 125970-candidate `m=6, n=6, r=3` hypergraph
+  enumeration, `K_5(4)=14` and `K_5(5)=19` by direct multigraph exhaustion, and
+  `ell_3^dir` and `k_3^dir` at n=3,4.
 
 - **2026-09-03 (second pass).** A pre-hand-in review, six defects, none
   mathematical. The AI badge had come off five Chapter 1 statements but not
