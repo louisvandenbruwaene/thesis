@@ -2842,4 +2842,53 @@ Colouring a graph's arcs by $\sigma$ reads a finished witness at a glance regard
 \end{figure}
 \end{offcut}
 
+\begin{offcut}{K1. The minimum-degree induction for the directed $m=2$ values}{K1}{chapters/app\_proofs.tex, former Section A.4 proofs}{replacing the proofs of \Cref{thm:dir-vertex-m2-exact} and \Cref{thm:dir-arc-m2-exact}}{Superseded by a five-line argument from \Cref{lem:reach-skeleton}: a feasible digraph at $m=2$ has no reachability-redundant arc, so it IS its own skeleton and the skeleton's own count bounds it. The replacement removes the two-parity arithmetic, the averaging step, and the dependence on the exhaustive base cases $2 \le n \le 7$, after which no theorem in the thesis rests on a machine run. Verified before replacing: no feasible digraph on $n \le 5$ has a redundant arc (all $18\,516$ of them), and $|A(D)| \le f(q)$ throughout. Review finding, 3 September 2026.}
+
+\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}\aimedal]
+Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \ge \floor{n^2/4}$ exactly for $n \le 7$, with equality at $n = 7$, so $M(n) = 2(n-1)$ for $n \le 7$ and $M(n) = \floor{n^2/4}$ for $n \ge 7$.
+
+\emph{Lower bound.} The directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}) both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem as well. Between them they witness $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ and $k_2^{\mathrm{dir}}(n) \ge M(n)$ at once.
+
+\emph{Upper bound.} We show by strong induction on $n$ that $\kap^{\max}_D \le 1$ forces $|A(D)| \le M(n)$.
+
+\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, run with the vertex feasibility test. It walks every simple digraph with $\kap^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. \Cref{tab:basecase-search} records the run.
+
+\emph{Inductive step $n \ge 8$.} Let $D$ be a simple digraph on $n$ vertices with $\kap^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ minimising the total degree $d(v) = d^+(v) + d^-(v)$. Since $\sum_v d(v) = 2a$, averaging gives $d(v_0) \le 2a/n$. By \Cref{lem:subdigraph-monotone} the digraph $D - v_0$ on $n-1 \ge 7$ vertices satisfies the induction hypothesis, so $a - d(v_0) \le M(n-1) = \floorfrac{(n-1)^2}{4}$. Combining,
+\[
+a \;\le\; \frac{2a}{n} + \floorfrac{(n-1)^2}{4}
+\qquad\Longrightarrow\qquad
+a \;\le\; \frac{n}{n-2} \, \floorfrac{(n-1)^2}{4}.
+\]
+It remains to check that this right-hand side never exceeds $\floor{n^2/4}$, and the two parities behave differently enough to treat them in turn.
+
+For even $n = 2k$ with $k \ge 4$, first simplify $\floor{(n-1)^2/4}$. Expanding $(2k-1)^2 = 4k^2 - 4k + 1$ and dividing by $4$ gives $k^2 - k + \tfrac14$, whose floor is $k(k-1)$. The bound then reads
+\[
+a \;\le\; \frac{2k}{2k-2}\,k(k-1) \;=\; \frac{k}{k-1}\,k(k-1) \;=\; k^2,
+\]
+and since $\floor{n^2/4} = \floor{(2k)^2/4} = k^2$ as well, the bound lands exactly on the target with no slack left over.
+
+For odd $n = 2k+1$ with $k \ge 4$, the same simplification gives $\floor{(n-1)^2/4} = \floor{(2k)^2/4} = k^2$, so the bound is $a \le \frac{2k+1}{2k-1}\,k^2$. To compare this fraction with the target, split off its integer part by dividing $(2k+1)k^2$ by $2k-1$. The remainder is exactly $k$, because $(2k-1)(k^2+k) = 2k^3 + k^2 - k$ and $(2k+1)k^2 = 2k^3 + k^2$ differ by $k$, so
+\[
+\frac{n}{n-2}\,\floorfrac{(n-1)^2}{4} \;=\; \frac{(2k+1)k^2}{2k-1} \;=\; k(k+1) + \frac{k}{2k-1}.
+\]
+The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 2$ (the induction here is already past the base cases, so $k \ge 4$), so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction, and with the lower bound $k_2^{\mathrm{dir}}(n) = M(n)$.
+\end{proof}
+
+The arc value now costs two lines, because the vertex family is the larger of the two.
+
+\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}\aimedal]
+The two constructions of the previous proof give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
+\[
+    M(n) \;\le\; \ell_2^{\mathrm{dir}}(n) \;\le\; k_2^{\mathrm{dir}}(n) \;\le\; M(n),
+\]
+so all three are equal.
+\end{proof}
+
+Hence $\ell_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n)$, and the two separations agreeing at $m = 2$ is a consequence of that chain rather than a coincidence of two searches. What is a computed coincidence is narrower and is recorded in \Cref{tab:basecase-search}: the two sweeps also visit the same number of search nodes at every size.
+
+Two independent confirmations of the arc value sit beside this proof and neither is needed by it. The exhaustive search of \Cref{ch:certify} was also run under the arc feasibility test, reporting the same maxima $2, 4, 6, 8, 10, 12$ at $n \le 7$, and the two smallest of those are immediate by hand: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Separately, \Cref{thm:dir-multi-full} proves $L_2^{\mathrm{dir}}(n) = M(n)$ for directed multigraphs by peeling one reachability skeleton, with no base cases and no parity split at all, and \Cref{thm:dir-multi-m2} records that at $m = 2$ the multigraph and the simple digraph problems are the same problem.
+
+Three remarks on the shape of the induction. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. Third, the induction's length comes from carrying the two regimes of $M(n)$ through the arithmetic separately, the same bookkeeping \Cref{ch:certify} hands to the machine at the base cases.
+\end{offcut}
+
 \end{document}

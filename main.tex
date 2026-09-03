@@ -176,7 +176,11 @@ $c_m$ & per-vertex growth constant of the simple undirected vertex problem, $c_m
 % BACK MATTER
 % ============================================================================
 
-% Bibliography
+% Bibliography.  One entry (BercziEtAl24) leaves an underfull hbox of badness
+% 1168: four accented author names TeX will not hyphenate, so the first line
+% stretches rather than breaking.  \sloppy does not help, since it raises
+% tolerance and emergency stretch, neither of which addresses a loose line, and
+% ragged-right would restyle the whole bibliography for one entry.  Left as is.
 \bibliographystyle{unsrt}
 \bibliography{ref}
 

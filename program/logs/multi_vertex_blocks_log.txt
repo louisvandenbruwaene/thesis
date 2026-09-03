@@ -1,8 +1,8 @@
-Command: PYTHONPATH=/private/tmp/thesis-networkx BMAX=8 python3 research_notes/scripts/multi_vertex_blocks.py
+Command: BMAX=8 .venv/bin/python3 program/scripts/multi_vertex_blocks.py
 Python: 3.14.6
 NetworkX: 3.6.1
 nauty: 2.9.3, geng at /opt/homebrew/bin/geng
-Source SHA-256: 4bd26f12d9511a1e05d8d1fd3a4832f16de9061f95551a9d80deb4b3aa4ee9b1
+Source SHA-256: b2449c30fb7aa625f2acb1548692c8ef0ebd86642a7dac2f97bac0a0eb7be8cf
 
 [1] g_m(b), best score of one block, for b <= 8
     m=2  b=2:   1  b=3:   -  b=4:   -  b=5:   -  b=6:   -  b=7:   -  b=8:   -
@@ -12,6 +12,50 @@ Source SHA-256: 4bd26f12d9511a1e05d8d1fd3a4832f16de9061f95551a9d80deb4b3aa4ee9b1
     m=6  b=2:   5  b=3:  12  b=4:  19  b=5:  26  b=6:  33  b=7:  40  b=8:  47
     m=7  b=2:   6  b=3:  15  b=4:  24  b=5:  33  b=6:  42  b=7:  52  b=8:  62
     m=8  b=2:   7  b=3:  18  b=4:  30  b=5:  42  b=6:  54  b=7:  66  b=8:  79
+
+[1b] the winning block itself, per (m, b).  This is the structural
+     evidence behind 'the winning blocks are unbalanced and
+     bipartite-like rather than complete'.  A witness is reported as
+     K_{s,t}+e when its complement of a maximum independent set I
+     sees every one of the |I|*(b-|I|) cross edges present, so the
+     block is complete bipartite between I and the rest plus e extra
+     edges inside the smaller side.  'complete' means K_b.
+    m=3 b=3: W=  3  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=3 b=4: W=  4  graph6 C]  degrees [2, 2, 2, 2]  K_{2,2}  [unique maximiser]
+    m=3 b=5: W=  5  graph6 DUW  degrees [2, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 2, 4 of 6 cross edges)  [unique maximiser]
+    m=3 b=6: W=  6  graph6 EEh_  degrees [2, 2, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 3, 6 of 9 cross edges)  [unique maximiser]
+    m=3 b=7: W=  7  graph6 FCp`_  degrees [2, 2, 2, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 3, 6 of 12 cross edges)  [unique maximiser]
+    m=3 b=8: W=  8  graph6 G?qa`_  degrees [2, 2, 2, 2, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 4, 8 of 16 cross edges)  [unique maximiser]
+    m=4 b=3: W=  6  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=4 b=4: W=  9  graph6 C^  degrees [3, 3, 2, 2]  K_{2,2}+1e inside the side of size 2  [unique maximiser]
+    m=4 b=5: W= 12  graph6 DFw  degrees [3, 3, 2, 2, 2]  K_{2,3}  [2 maximisers, 1 of them K_{s,t}-with-extras]
+    m=4 b=6: W= 15  graph6 ECzo  degrees [4, 3, 3, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 3, 7 of 9 cross edges)  [4 maximisers, 0 of them K_{s,t}-with-extras]
+    m=4 b=7: W= 18  graph6 F?qvo  degrees [5, 3, 3, 3, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 4, 9 of 12 cross edges)  [10 maximisers, 0 of them K_{s,t}-with-extras]
+    m=4 b=8: W= 21  graph6 G?Bcvo  degrees [5, 3, 3, 3, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 5, 11 of 15 cross edges)  [31 maximisers, 0 of them K_{s,t}-with-extras]
+    m=5 b=3: W=  9  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=5 b=4: W= 14  graph6 C^  degrees [3, 3, 2, 2]  K_{2,2}+1e inside the side of size 2  [unique maximiser]
+    m=5 b=5: W= 19  graph6 DF{  degrees [4, 4, 2, 2, 2]  K_{2,3}+1e inside the side of size 2  [2 maximisers, 1 of them K_{s,t}-with-extras]
+    m=5 b=6: W= 24  graph6 E?~o  degrees [4, 4, 2, 2, 2, 2]  K_{2,4}  [5 maximisers, 1 of them K_{s,t}-with-extras]
+    m=5 b=7: W= 29  graph6 F?bvo  degrees [5, 4, 3, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 4, 9 of 12 cross edges)  [11 maximisers, 0 of them K_{s,t}-with-extras]
+    m=5 b=8: W= 34  graph6 G?BDvw  degrees [6, 4, 3, 3, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 5, 11 of 15 cross edges)  [37 maximisers, 0 of them K_{s,t}-with-extras]
+    m=6 b=3: W= 12  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=6 b=4: W= 19  graph6 C^  degrees [3, 3, 2, 2]  K_{2,2}+1e inside the side of size 2  [unique maximiser]
+    m=6 b=5: W= 26  graph6 DF{  degrees [4, 4, 2, 2, 2]  K_{2,3}+1e inside the side of size 2  [2 maximisers, 1 of them K_{s,t}-with-extras]
+    m=6 b=6: W= 33  graph6 E?~w  degrees [5, 5, 2, 2, 2, 2]  K_{2,4}+1e inside the side of size 2  [5 maximisers, 1 of them K_{s,t}-with-extras]
+    m=6 b=7: W= 40  graph6 F?B~o  degrees [5, 5, 2, 2, 2, 2, 2]  K_{2,5}  [12 maximisers, 1 of them K_{s,t}-with-extras]
+    m=6 b=8: W= 47  graph6 G?AFvw  degrees [6, 5, 3, 2, 2, 2, 2, 2]  not complete-bipartite-plus-extras (independent set 5, 11 of 15 cross edges)  [38 maximisers, 0 of them K_{s,t}-with-extras]
+    m=7 b=3: W= 15  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=7 b=4: W= 24  graph6 C^  degrees [3, 3, 2, 2]  K_{2,2}+1e inside the side of size 2  [2 maximisers, 1 of them K_{s,t}-with-extras]
+    m=7 b=5: W= 33  graph6 DF{  degrees [4, 4, 2, 2, 2]  K_{2,3}+1e inside the side of size 2  [4 maximisers, 2 of them K_{s,t}-with-extras]
+    m=7 b=6: W= 42  graph6 E?~w  degrees [5, 5, 2, 2, 2, 2]  K_{2,4}+1e inside the side of size 2  [15 maximisers, 3 of them K_{s,t}-with-extras]
+    m=7 b=7: W= 52  graph6 F?~vw  degrees [6, 5, 5, 3, 3, 3, 3]  K_{3,4}+2e inside the side of size 3  [unique maximiser]
+    m=7 b=8: W= 62  graph6 G?B~v{  degrees [7, 6, 6, 3, 3, 3, 3, 3]  K_{3,5}+2e inside the side of size 3  [unique maximiser]
+    m=8 b=3: W= 18  graph6 Bw  degrees [2, 2, 2]  complete K_3  [unique maximiser]
+    m=8 b=4: W= 30  graph6 C~  degrees [3, 3, 3, 3]  complete K_4  [unique maximiser]
+    m=8 b=5: W= 42  graph6 D^{  degrees [4, 4, 4, 3, 3]  K_{3,2}+3e inside the side of size 3  [unique maximiser]
+    m=8 b=6: W= 54  graph6 EF~w  degrees [5, 5, 5, 3, 3, 3]  K_{3,3}+3e inside the side of size 3  [2 maximisers, 1 of them K_{s,t}-with-extras]
+    m=8 b=7: W= 66  graph6 F?~vw  degrees [6, 5, 5, 3, 3, 3, 3]  K_{3,4}+2e inside the side of size 3  [6 maximisers, 2 of them K_{s,t}-with-extras]
+    m=8 b=8: W= 79  graph6 G?B~v{  degrees [7, 6, 6, 3, 3, 3, 3, 3]  K_{3,5}+2e inside the side of size 3  [unique maximiser]
 
 [2] K_m(n) by knapsack.  B = one block attains it, T = the thickened tree attains it
     m=2     1BT      2T      3T      4T      5T      6T      7T

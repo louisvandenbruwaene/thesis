@@ -504,7 +504,7 @@ The two separations therefore part company at $n = 14$, and $k_5(n) > \ell_5(n)$
 
 S{\o}rensen and Thomassen state the second formula for every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supply those two values separately. On the small range the two formulas agree except at exactly those points, where the second reads one too few at $n = 7$ and one too many at $n = 12$, so splitting the statement by range removes both exceptions. \Cref{rem:threshold-convention} records the counting convention that turns their numbers into these.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/edge_vertex_divergence.png}
     \caption{The edge and vertex extremal functions for $m = 2, 3, 4$ (blue shades, single curve per $m$ since they agree) and $m = 5$ (dashed blue for edge, solid orange for vertex). The vertex function diverges from the edge function at $n = 14$ and grows faster thereafter.}
@@ -518,13 +518,13 @@ For simple digraphs,
 \]
 \end{theorem}
 
-Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is an induction on $n$, proved in \Cref{sec:dir-arc-m2}: delete a vertex of minimum total degree, which carries at most the average number of arcs, and apply the bound to what remains. The base cases $n \le 7$ are left to exhaustive search rather than hand argument, and \Cref{ch:machine} is what runs them. The induction never mentions the separation, so it is run there for $\kap$, which is the larger feasible family, and the arc value follows from it.
+Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper bound is proved in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, the larger feasible family, and the arc value follows from it.
 
 \begin{theorem}[Directed vertex value at $m = 2$,\aimedal]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 \end{theorem}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[>=Stealth, scale=1.0,
     smallleftvertex/.style={gvertex}, smallrightvertex/.style={gvsink},
@@ -583,7 +583,7 @@ For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeat
 That is a real difference between the two edge sizes. 
 For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the two are equal, but only while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[scale=1.0,
    stn/.style={metrostop, minimum size=6mm},
@@ -695,7 +695,7 @@ For all $n \ge 2$ and $m \ge 2$,
 \]
 \end{theorem}
 
-The extremisers include the doubled trees on the linear branch and the balanced one-way bipartite multigraph on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
+The extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. Equality also classifies the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), and only the smaller range remains open.
 
 \begin{theorem}[The directed hypergraph constant,\aimedal]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph

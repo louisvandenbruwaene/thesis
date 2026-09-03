@@ -12,7 +12,7 @@ The appendix has four parts, and they do not carry equal weight.
 A reader who trusts the cited results may skip it.
 \textsc{Parts II} and \textsc{III} contain the original arguments.
 Readers who want a selective route through them can focus on three proof ideas.
-The first is the reachability-skeleton argument proving \Cref{thm:dir-multi-full} for every $n$ and $m$.
+The first is the reachability skeleton of \Cref{lem:reach-skeleton}, which settles \Cref{thm:dir-vertex-m2-exact,thm:dir-arc-m2-exact} in a few lines and \Cref{thm:dir-multi-full} for every $n$ and $m$.
 The second is the incidence-rank argument of \Cref{lem:incidence-rank,thm:hyper-vertex-m3}.
 It settles the hypergraph vertex problem at $m=3$ by induction over blocks and separating pairs.
 The third is the two-step budget of \Cref{lem:two-step-budget}.
@@ -96,7 +96,7 @@ The theorem applies to undirected simple graphs and multigraphs, but not to asym
 We also use the immediate endpoint bound.
 
 \begin{lemma}[Degree bound]\label{lem:degree-bound}
-For every pair of vertices of a graph $G$, $\lec_G(u, v) \le \min(\deg u, \deg v)$. In a digraph $D$, $\lec_D(u, v) \le \min(d^+(u), d^-(v))$.
+Every pair $u, v$ of distinct vertices of a graph $G$ satisfies $\lec_G(u, v) \le \min(\deg u, \deg v)$, and every ordered pair of a digraph $D$ satisfies $\lec_D(u, v) \le \min(d^+(u), d^-(v))$.
 \end{lemma}
 
 \begin{proof}
@@ -421,7 +421,7 @@ question rather than a conjecture, since the sizes reached are well below those
 at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
 
-\apppart{Part II. The directed results}{The three constructions the body names but does not define, the exact value at $m=2$, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
+\apppart{Part II. The directed results}{The three constructions the body names but does not define, the reachability skeleton that both exact directed results run on, the value at $m=2$ under both separations, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
 
 \section{The directed constructions}\label{sec:dir-constructions}
 
@@ -447,9 +447,115 @@ The only in-arcs of a $b \in B$ that an $a \in A$ can reach are the direct arc $
 
 At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\max(m(n-1), \floor{n^2/4})$. Here $|B| = \ceil{11/2} = 6$ and $|A| = 4$, so its $24$ arcs from $A$ to $B$ carry a six-cycle inside $B$, one arc per $b_j$ since $m-2 = 1$, giving every $b_j$ one extra in-arc, so each pair $a_i, b_j$ has the direct arc and one detour and $\lec^{\max} = 2$. That is $24 + 6 = 30$ arcs against the guess of $27$, and the correction is the shift of the partition away from a balanced split of $n$, which the guess assumes, towards a balanced split of $n + m - 2$. At this size that quantity is $11$ and odd, so $|B| = 6$ and $|B| = 5$ tie, the latter giving $25 + 5 = 30$ as well.
 
+\section{The reachability skeleton}\label{sec:reach-skeleton}
+
+One tool serves both directed results that follow, so it is proved here before
+either of them. The object is a thin subdigraph that carries the whole
+reachability relation of $D$ and nothing else. \Cref{sec:dir-arc-m2} uses it
+once, to settle $m = 2$ in a few lines under both separations, and
+\Cref{sec:dir-multi} uses it $m-1$ times over, peeling one copy of each of its
+arcs per unit of the cap.
+
+\begin{definition}[Reachability skeleton]\label{def:reach-skeleton}
+Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using at most one copy of each arc it uses (no parallel copies, even if $D$ has them), is a \emph{reachability skeleton} of $D$ if, for every pair of vertices $u \ne v$, $u$ reaches $v$ by some directed path in $R$ exactly when $u$ reaches $v$ by some directed path in $D$.
+\end{definition}
+
+A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular every parallel copy of every arc. It is a caricature of $D$: thin, but faithful on the one question connectivity actually depends on. The lemma below says such a skeleton always exists and is never too big. That one fact is what both later arguments run on. At $m = 2$ the skeleton turns out to be the whole digraph, which is the content of \Cref{thm:dir-vertex-m2-exact}, and at a general $m$ deleting it repeatedly is what \Cref{lem:reach-delete} makes pay.
+
+\begin{lemma}[A sparse reachability skeleton always exists,\aimedal]\label{lem:reach-skeleton}
+Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
+\end{lemma}
+
+\begin{proof}
+Building $R$ takes three steps: handle the traffic \emph{inside} each strongly connected piece of $D$, handle the traffic \emph{between} pieces, then count. A \emph{strongly connected component} (an SCC) is a maximal set of vertices any two of which reach each other, and every directed multigraph partitions uniquely into its SCCs, since mutual reachability is an equivalence relation. \Cref{fig:skeleton-example} carries one small running example through all three steps, and every object named below appears in it concretely.
+
+\emph{Step 1: inside each component.} Fix one SCC of order $n_i \ge 1$ and pick any vertex $r$ inside it as a root. Since $r$ reaches every vertex of the component, a standard fact about digraphs gives a spanning \emph{out-arborescence}: a tree of $n_i - 1$ arcs of $D$, every one pointing away from $r$, along which $r$ alone reaches every other vertex of the component (grow it one hop at a time, always available since the component is strongly connected). Symmetrically, because every vertex of the component reaches $r$, there is a spanning \emph{in-arborescence} of $n_i - 1$ arcs, every one pointing toward $r$, along which every vertex reaches $r$. Taking both trees together, any two vertices $u, v$ of the component are joined by the route $u \to r \to v$, first the in-arborescence, then the out-arborescence, so the $2(n_i - 1)$ arcs of the two trees alone reconstruct \emph{every} reachability relation inside this one component.
+
+\emph{Step 2: between components.} Contract each SCC to a single point and, between two contracted points, keep one arc whenever $D$ has at least one arc from the first component to the second (dropping any further parallel arcs between the same two components at this stage). Call the result $Q_0$, a digraph on $q$ points, one per component. Two different SCCs can never reach each other in both directions, since that would make them one strongly connected component after all, so $Q_0$ has no directed cycle: it is a DAG (a directed acyclic graph). Reachability between two different components of $D$ is, by this very construction, exactly reachability between the two corresponding points of $Q_0$. Thin $Q_0$ down to an \emph{inclusion-minimal} spanning subdigraph $Q \subseteq Q_0$ that still has the same reachability relation, deleting one arc at a time for as long as some arc is redundant, which must stop since $Q_0$ has only finitely many arcs.
+
+The contracted DAG $Q_0$ is called the \emph{condensation} of $D$. The reason to thin $Q_0$ down to $Q$ is that $Q$'s \emph{underlying undirected graph}, meaning $Q$ with the arrows erased, has no triangle. Suppose three points $x, y, z$ of $Q$ were pairwise joined by some arc of $Q$. Since $Q \subseteq Q_0$ and $Q_0$ has no cycle, $Q$ has none either, so between any two of $x,y,z$ the arc runs in only one direction, never both. Three points pairwise joined with a consistent direction on each pair admit only one pattern, up to relabelling: a linear order, say $x \to y$, $y \to z$, and $x \to z$. But then $x \to z$ is redundant, since $x$ already reaches $z$ via $y$, so deleting it would leave the reachability relation of $Q$ unchanged, contradicting that $Q$ is inclusion-minimal. So no three points of $Q$ can be pairwise joined at all: that is triangle-freeness of the underlying graph.
+
+A triangle-free graph on $q$ vertices has at most $\floor{q^2/4}$ edges, by Mantel's theorem \cite{Mantel07}, the $r = 2$ case of the more general theorem of Tur\'an \cite{Turan41}. Applied to $Q$,
+\[
+    |A(Q)| \;\le\; \floorfrac{q^2}{4}.
+\]
+
+\emph{Step 3: assembling $R$ and counting.} Build $R$ from the two arborescences of Step 1 inside every SCC, together with one witness arc of $D$ for every arc of $Q$ (some arc of $D$ realises it, by the very definition of $Q_0$). By Step 1, every pair inside one component reaches each other in $R$ exactly as in $D$. By Step 2, and because within-component reachability is already secured, every pair in two different components reaches each other in $R$ exactly as in $D$ too: to travel from $u$ to $v$ across the components $Q$'s path visits, reach each witness arc's tail inside its own component (Step 1), cross the witness arc, and repeat. Since $R \subseteq D$ throughout, $R$ can never certify a reachability $D$ does not already have, so $R$ is a genuine reachability skeleton. Writing $n_1, \dots, n_q$ for the SCC orders, so $\sum_i n_i = n$, its arc count is at most the $2(n_i-1)$ arborescence arcs of each component plus one witness per arc of $Q$. The first count is an upper bound rather than an equality, since the in- and out-arborescence of one component may share an arc, which only helps. So
+\[
+    |A(R)| \;\le\; \sum_{i=1}^{q} 2(n_i - 1) \;+\; |A(Q)| \;\le\; 2(n-q) \;+\; \floorfrac{q^2}{4} \;=:\; f(q).
+\]
+
+It remains to bound $f(q)$ over the range $1 \le q \le n$ that the number of components can actually take. Its increments are
+\[
+    f(q+1) - f(q) \;=\; -2 \;+\; \floorfrac{q+1}{2},
+\]
+using the identity $\floor{(q+1)^2/4} - \floor{q^2/4} = \floor{(q+1)/2}$, checked on the two parities of $q$ (at $q = 2j$ both sides are $j$, at $q = 2j+1$ both are $j+1$). Since $\floor{(q+1)/2}$ never decreases as $q$ grows, neither do the increments of $f$, which is to say $f$ is convex. A convex function on an interval attains its largest value at one of the two ends, because a value at an interior point is a weighted average of the two ends or less. Hence
+\[
+    f(q) \;\le\; \max\bigl(f(1),\,f(n)\bigr) \qquad \text{for } 1 \le q \le n.
+\]
+At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ every component is a single vertex, so $f(n) = 0 + \floor{n^2/4}$. Hence $f(q) \le \max\bigl(2(n-1), \floor{n^2/4}\bigr) = M(n)$ for every $q$ in range, which is the lemma.
+\end{proof}
+
+The inclusion-minimal reachability subdigraph $Q$ is also called the
+\emph{transitive reduction} of the DAG $Q_0$. A \emph{transitively closed
+triangle} is the three-vertex pattern $x\to y$, $y\to z$, $x\to z$.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+% ---- left panel: D, three bidirected SCCs A={a1,a2}, B={b1,b2}, C={c1,c2},
+% joined a2->b1, b2->c1, and the redundant direct arc a1->c2 bent well below
+% everything so it never crosses the other arcs.
+\begin{scope}
+  \node[apxlab] (a1) at (0,1) {$a_1$};
+  \node[apxlab] (a2) at (0,-1) {$a_2$};
+  \node[apxlab] (b1) at (2.6,1) {$b_1$};
+  \node[apxlab] (b2) at (2.6,-1) {$b_2$};
+  \node[apxlab] (c1) at (5.2,1) {$c_1$};
+  \node[apxlab] (c2) at (5.2,-1) {$c_2$};
+  \draw[aparc] (a1) to[bend left=14]  (a2);
+  \draw[aparc] (a2) to[bend left=14]  (a1);
+  \draw[aparc] (b1) to[bend left=14]  (b2);
+  \draw[aparc] (b2) to[bend left=14]  (b1);
+  \draw[aparc] (c1) to[bend left=14]  (c2);
+  \draw[aparc] (c2) to[bend left=14]  (c1);
+  \draw[aparc] (a2) to[bend left=8] (b1);
+  \draw[aparc] (b2) to[bend left=8] (c1);
+  \draw[apfaint] (a1) to[bend right=55] (c2);
+  \node[apname, text=black!55] at (2.6,-2.35) {redundant: $a_1$ already reaches $c_2$ via $a_2,b_1,b_2,c_1$};
+  \node[font=\small] at (2.6,2.0) {$D$};
+\end{scope}
+% ---- arrow between panels ----
+\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b] (6.6,0) -- (7.9,0);
+\node[font=\scriptsize, align=center, text=KULblauw3b] at (7.25,0.5) {drop the\\redundant arc};
+% ---- right panel: R, same six vertices, same six internal arcs, only the
+% two witness arcs a2->b1 and b2->c1 survive between components.
+\begin{scope}[xshift=9.6cm]
+  \node[apxlab] (ra1) at (0,1) {$a_1$};
+  \node[apxlab] (ra2) at (0,-1) {$a_2$};
+  \node[apxlab] (rb1) at (2.6,1) {$b_1$};
+  \node[apxlab] (rb2) at (2.6,-1) {$b_2$};
+  \node[apxlab] (rc1) at (5.2,1) {$c_1$};
+  \node[apxlab] (rc2) at (5.2,-1) {$c_2$};
+  \draw[aparc] (ra1) to[bend left=14]  (ra2);
+  \draw[aparc] (ra2) to[bend left=14]  (ra1);
+  \draw[aparc] (rb1) to[bend left=14]  (rb2);
+  \draw[aparc] (rb2) to[bend left=14]  (rb1);
+  \draw[aparc] (rc1) to[bend left=14]  (rc2);
+  \draw[aparc] (rc2) to[bend left=14]  (rc1);
+  \draw[aparc] (ra2) to[bend left=8] (rb1);
+  \draw[aparc] (rb2) to[bend left=8] (rc1);
+  \node[font=\small] at (2.6,2.0) {$R$};
+\end{scope}
+\end{tikzpicture}}
+\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the three component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
+\label{fig:skeleton-example}
+\end{figure}
+
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}\label{sec:dir-arc-m2}
 
-This section proves the two $m = 2$ values, and it proves them in the order the logic runs rather than the order they are stated. The \emph{vertex} case carries the induction. The \emph{arc} case then follows from it in two lines through \Cref{rem:whitney-direction}, because an upper bound on the larger feasible family is an upper bound on the smaller one. Only \Cref{lem:subdigraph-monotone} is load-bearing for that induction. The two lemmas before it are ancillary, the first showing that a hub forces a linear bound for every $m$, which is the proof behind the hub branch of \Cref{conj:dir-arc}, and the second settling $n = 3$ by hand as a check on the machine. All four carry no badge, while the induction of \Cref{thm:dir-vertex-m2-exact} that they support keeps one at its statement, and its finite base cases $2 \le n \le 7$ were verified by the author's program, through the exhaustive search of \Cref{ch:certify} whose completed range is recorded in \Cref{tab:basecase-search}.
+This section proves the two $m = 2$ values, and it proves them in the order the logic runs rather than the order they are stated. The \emph{vertex} case comes first, in a few lines from \Cref{lem:reach-skeleton}. The \emph{arc} case then follows from it through \Cref{rem:whitney-direction}, because an upper bound on the larger feasible family is an upper bound on the smaller one, and the same argument also proves it directly. Neither proof uses induction on $n$, so neither needs a base case, and no result in this thesis rests on a machine run. The lemmas below are used elsewhere rather than here: the first two show that a hub forces a linear bound for every $m$, which is the proof behind the hub branch of \Cref{conj:dir-arc}, the third settles $n = 3$ by hand, and the fourth is the deletion monotonicity that \Cref{sec:two-step-budget} runs on. All four carry no badge, while the two theorems keep one apiece at their statements. \Cref{tab:basecase-search} records an exhaustive sweep over $2 \le n \le 7$ under both separations; it agrees with both theorems at every size and is corroboration rather than an ingredient.
 
 \begin{lemma}[Two-hop lemma]\label{lem:two-hop-arc}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$ containing a vertex $r$ with $d^+(r) = n-1$. Then every $v \ne r$ has at most $m-2$ in-arcs from $V \setminus \{r, v\}$.
@@ -481,7 +587,7 @@ Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ t
 since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates any, and it cannot make two surviving routes share anything they did not share before.
 \end{lemma}
 
-In words: deleting a vertex can never manufacture independent routes. Every route surviving in $D - v_0$ was already a route in $D$, so no pair comes out of the deletion better connected than it went in. This single guarantee is what every vertex-deletion induction in this section rests on, and it holds for both separations alike.
+In words: deleting a vertex can never manufacture independent routes. Every route surviving in $D - v_0$ was already a route in $D$, so no pair comes out of the deletion better connected than it went in. It is stated here because it is elementary and directed, and it is used in \Cref{sec:two-step-budget}, where the sparse case of \Cref{lem:two-step-budget} deletes a vertex of low degree and needs to know the budget survives. It holds for both separations alike.
 
 \begin{remark}[Which way Whitney runs]\label{rem:whitney-direction}
 Whitney's inequality is easy to misread: the tempting direction is the wrong one. From $\kap_D(u,v) \le \lec_D(u,v)$ for every pair it follows that $\kap^{\max}_D \le \lec^{\max}_D$, hence that
@@ -496,50 +602,32 @@ and an upper bound for the arc problem says nothing at all about the vertex prob
 \end{remark}
 
 \begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}\aimedal]
-Write $M(n) = \max(2(n-1), \floor{n^2/4})$. A direct computation shows $2(n-1) \ge \floor{n^2/4}$ exactly for $n \le 7$, with equality at $n = 7$, so $M(n) = 2(n-1)$ for $n \le 7$ and $M(n) = \floor{n^2/4}$ for $n \ge 7$.
+Write $M(n) = \max(2(n-1), \floor{n^2/4})$.
 
 \emph{Lower bound.} The directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}) both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem as well. Between them they witness $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ and $k_2^{\mathrm{dir}}(n) \ge M(n)$ at once.
 
-\emph{Upper bound.} We show by strong induction on $n$ that $\kap^{\max}_D \le 1$ forces $|A(D)| \le M(n)$.
+\emph{Upper bound.} Let $D$ be a simple digraph on $n \ge 2$ vertices with $\kap^{\max}_D \le 1$, and let $R \subseteq D$ be a reachability skeleton with $|A(R)| \le M(n)$, which \Cref{lem:reach-skeleton} supplies for every loopless directed multigraph and so in particular for this one.
 
-\emph{Base cases $2 \le n \le 7$.} All six are settled uniformly by the pruned exhaustive search of \Cref{ch:certify}, run with the vertex feasibility test. It walks every simple digraph with $\kap^{\max} \le 1$ on up to seven vertices and reports the maxima $2, 4, 6, 8, 10, 12$, matching $M(n)$ at each size. \Cref{tab:basecase-search} records the run.
+We claim $A(D) = A(R)$. One inclusion is the definition of $R$. For the other, take an arc $(u,v) \in A(D)$ and suppose $(u,v) \notin A(R)$. The arc itself shows that $u$ reaches $v$ in $D$, so $u$ reaches $v$ in $R$ as well, along some directed path $P$ using only arcs of $R$. Since $(u,v) \notin A(R)$, the path $P$ is not that single arc, so it has length at least two. Now $P$ and the one-arc route $u \to v$ are two distinct $u$-$v$ routes, and they are internally vertex-disjoint, because the one-arc route has no interior at all and the empty set meets nothing. Hence $\kap_D(u,v) \ge 2$, against feasibility. So $(u,v) \in A(R)$.
 
-\emph{Inductive step $n \ge 8$.} Let $D$ be a simple digraph on $n$ vertices with $\kap^{\max}_D \le 1$ and put $a := |A(D)|$. Choose $v_0$ minimising the total degree $d(v) = d^+(v) + d^-(v)$. Since $\sum_v d(v) = 2a$, averaging gives $d(v_0) \le 2a/n$. By \Cref{lem:subdigraph-monotone} the digraph $D - v_0$ on $n-1 \ge 7$ vertices satisfies the induction hypothesis, so $a - d(v_0) \le M(n-1) = \floorfrac{(n-1)^2}{4}$. Combining,
-\[
-a \;\le\; \frac{2a}{n} + \floorfrac{(n-1)^2}{4}
-\qquad\Longrightarrow\qquad
-a \;\le\; \frac{n}{n-2} \, \floorfrac{(n-1)^2}{4}.
-\]
-It remains to check that this right-hand side never exceeds $\floor{n^2/4}$, and the two parities behave differently enough to treat them in turn.
-
-For even $n = 2k$ with $k \ge 4$, first simplify $\floor{(n-1)^2/4}$. Expanding $(2k-1)^2 = 4k^2 - 4k + 1$ and dividing by $4$ gives $k^2 - k + \tfrac14$, whose floor is $k(k-1)$. The bound then reads
-\[
-a \;\le\; \frac{2k}{2k-2}\,k(k-1) \;=\; \frac{k}{k-1}\,k(k-1) \;=\; k^2,
-\]
-and since $\floor{n^2/4} = \floor{(2k)^2/4} = k^2$ as well, the bound lands exactly on the target with no slack left over.
-
-For odd $n = 2k+1$ with $k \ge 4$, the same simplification gives $\floor{(n-1)^2/4} = \floor{(2k)^2/4} = k^2$, so the bound is $a \le \frac{2k+1}{2k-1}\,k^2$. To compare this fraction with the target, split off its integer part by dividing $(2k+1)k^2$ by $2k-1$. The remainder is exactly $k$, because $(2k-1)(k^2+k) = 2k^3 + k^2 - k$ and $(2k+1)k^2 = 2k^3 + k^2$ differ by $k$, so
-\[
-\frac{n}{n-2}\,\floorfrac{(n-1)^2}{4} \;=\; \frac{(2k+1)k^2}{2k-1} \;=\; k(k+1) + \frac{k}{2k-1}.
-\]
-The leftover fraction $\frac{k}{2k-1}$ lies strictly between $0$ and $1$ for every $k \ge 2$ (the induction here is already past the base cases, so $k \ge 4$), so the bound puts $a$ at most an integer $k(k+1)$ plus a positive amount below one. Since $a$ is itself an integer it cannot reach the next integer up, so $a \le k(k+1)$. The target $\floor{n^2/4} = \floor{(2k+1)^2/4} = k^2 + k = k(k+1)$ agrees, so for odd $n$ it is integrality, not the raw arithmetic, that closes the last fraction of a unit. In both parities $a \le \floor{n^2/4} \le M(n)$, completing the induction, and with the lower bound $k_2^{\mathrm{dir}}(n) = M(n)$.
+Therefore $|A(D)| = |A(R)| \le M(n)$, which with the lower bound gives $k_2^{\mathrm{dir}}(n) = M(n)$.
 \end{proof}
 
-The arc value now costs two lines, because the vertex family is the larger of the two.
+In words: at $m = 2$ a feasible digraph can afford no arc that some other route already makes redundant, so it is its own reachability skeleton, and the count \Cref{lem:reach-skeleton} proves for skeletons in general is already a count for $D$ itself. Nothing here inspects $n$, and no base case is needed.
+
+The arc value costs one further line.
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}\aimedal]
-The two constructions of the previous proof give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
+The two constructions above give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
 \[
     M(n) \;\le\; \ell_2^{\mathrm{dir}}(n) \;\le\; k_2^{\mathrm{dir}}(n) \;\le\; M(n),
 \]
-so all three are equal.
+so all three are equal. The same argument also proves it directly: in the claim above, $P$ shares no \emph{arc} with $(u,v)$ either, since $P$ runs inside $R$ and $(u,v)$ does not, so $\lec_D(u,v) \ge 2$ follows by the identical sentence.
 \end{proof}
 
 Hence $\ell_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n)$, and the two separations agreeing at $m = 2$ is a consequence of that chain rather than a coincidence of two searches. What is a computed coincidence is narrower and is recorded in \Cref{tab:basecase-search}: the two sweeps also visit the same number of search nodes at every size.
 
-Two independent confirmations of the arc value sit beside this proof and neither is needed by it. The exhaustive search of \Cref{ch:certify} was also run under the arc feasibility test, reporting the same maxima $2, 4, 6, 8, 10, 12$ at $n \le 7$, and the two smallest of those are immediate by hand: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Separately, \Cref{thm:dir-multi-full} proves $L_2^{\mathrm{dir}}(n) = M(n)$ for directed multigraphs by peeling one reachability skeleton, with no base cases and no parity split at all, and \Cref{thm:dir-multi-m2} records that at $m = 2$ the multigraph and the simple digraph problems are the same problem.
-
-Three remarks on the shape of the induction. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. Third, the induction's length comes from carrying the two regimes of $M(n)$ through the arithmetic separately, the same bookkeeping \Cref{ch:certify} hands to the machine at the base cases.
+Three independent confirmations sit beside these proofs and none is needed by them. The exhaustive search of \Cref{ch:certify} was run under both feasibility tests, reporting the same maxima $2, 4, 6, 8, 10, 12$ at $n \le 7$, and the two smallest of those are immediate by hand: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Separately, \Cref{thm:dir-multi-full} proves $L_2^{\mathrm{dir}}(n) = M(n)$ for directed multigraphs, and \Cref{thm:dir-multi-m2} records that at $m = 2$ the multigraph and the simple digraph problems are the same problem. Those runs and that theorem corroborate the values; the proofs above are what establish them.
 
 \begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
 The proof above transfers the $m = 2$ induction but nothing more, and for $m \ge 3$ the vertex problem is separate: the arc conjecture, and the decomposition of \Cref{open:decomposition} that would prove it, both concern the smaller family and leave $k_m^{\mathrm{dir}}(n)$ untouched. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
@@ -788,11 +876,11 @@ The Cauchy--Schwarz step is what costs the $\sqrt n$, and it is tight only if $d
 
 The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as the arc problem rather than in the wide one. Its leading constant is $\tfrac14$ unconditionally, the term after it is linear in $n$, and since $\ell_m^{\mathrm{dir}}(n) \le k_m^{\mathrm{dir}}(n)$ with both now inside $n^2/4 + \Theta_m(n)$, the two values agree to first order. What is left is the coefficient of the linear term, the same quantity \Cref{open:decomposition} is needed for on the arc side, together with the conjecture that the two values coincide exactly.
 
-\section{The directed multigraph problem, solved in full}
+\section{The directed multigraph problem, solved in full}\label{sec:dir-multi}
 
-The section above, on the simple digraph at $m = 2$, closes \emph{every} $n$ by repeatedly deleting one vertex of least degree and averaging. The same argument almost settles the multigraph case at every $m$. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting then drives the same averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
+At $m = 2$ the value can also be reached by induction on $n$, deleting one vertex of least total degree and bounding what it carried by the average. That route is written out in \code{offcuts.tex} and it very nearly settles the multigraph case at every $m$ as well. Dividing every multiplicity by $m-1$, as in the scaling step of \Cref{ch:certify}, turns a feasible multigraph into a weighting with values in $[0,1]$ whose pairwise maximum flows are all at most one. Deleting a vertex of least weighted degree from that weighting drives the averaging argument through cleanly on the linear branch, and on the quadratic branch as well whenever $n$ is even. What breaks it is a single fractional remainder at odd $n$: a leftover of size $\frac{k}{2k-1}$ that an integer count could round away but a genuinely fractional weight cannot. Finding a specific vertex that is provably light enough to absorb that remainder turns out to resist every direct attempt.
 
-This section abandons that attempt and proves the full value a different way. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every positive pairwise connectivity by at least one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
+This section abandons that attempt and proves the full value the other way, along the road \Cref{sec:reach-skeleton} has already laid. Instead of deleting one vertex at a time, it deletes one whole \emph{sparse subgraph} at a time, chosen so that the deletion is guaranteed to lower every positive pairwise connectivity by at least one in a single stroke. That change removes the fractional step altogether, along with the restriction to a particular $m$ or a particular parity of $n$.
 
 \subsection{The lower bound: thickening}
 
@@ -814,104 +902,8 @@ Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n)
 
 \subsection{The upper bound: a reachability skeleton}
 
-Consider first what a single vertex deletion gives at $m=2$: removing a vertex can only remove routes passing through it, so no pair's connectivity ever rises, and the $m=2$ induction rests on that guarantee together with an averaging bound on how much one well-chosen vertex carries. The multigraph problem at a general $m$ needs those same two ingredients: a deletion that is guaranteed to lower every positive connectivity, paired with a bound on how much it removes. There, though, the natural analogue of ``one vertex'' breaks down. Once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead: one general enough to always exist, sparse enough to bound, and specific enough that removing it is guaranteed to lower every positive pairwise connectivity by at least one.
+An upper bound needs a deletion that is guaranteed to lower every positive connectivity, paired with a bound on how much it removes. The vertex deletion that suggests itself supplies the first of those and not the second. Once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead, and the reachability skeleton of \Cref{sec:reach-skeleton} is one: general enough to always exist, sparse enough to bound by \Cref{lem:reach-skeleton}, and, as the next lemma shows, specific enough that removing it lowers every positive pairwise connectivity by at least one.
 
-\begin{definition}[Reachability skeleton]\label{def:reach-skeleton}
-Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using at most one copy of each arc it uses (no parallel copies, even if $D$ has them), is a \emph{reachability skeleton} of $D$ if, for every pair of vertices $u \ne v$, $u$ reaches $v$ by some directed path in $R$ exactly when $u$ reaches $v$ by some directed path in $D$.
-\end{definition}
-
-A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular every parallel copy of every arc. It is a caricature of $D$: thin, but faithful on the one question connectivity actually depends on. The next two lemmas turn that faithfulness into the whole induction. The first says a reachability skeleton always exists and is never too big. The second says deleting it lowers every positive local connectivity by at least one.
-
-\begin{lemma}[A sparse reachability skeleton always exists,\aimedal]\label{lem:reach-skeleton}
-Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
-\end{lemma}
-
-\begin{proof}
-Building $R$ takes three steps: handle the traffic \emph{inside} each strongly connected piece of $D$, handle the traffic \emph{between} pieces, then count. A \emph{strongly connected component} (an SCC) is a maximal set of vertices any two of which reach each other, and every directed multigraph partitions uniquely into its SCCs, since mutual reachability is an equivalence relation. \Cref{fig:skeleton-example} carries one small running example through all three steps, and every object named below appears in it concretely.
-
-\emph{Step 1: inside each component.} Fix one SCC of order $n_i \ge 1$ and pick any vertex $r$ inside it as a root. Since $r$ reaches every vertex of the component, a standard fact about digraphs gives a spanning \emph{out-arborescence}: a tree of $n_i - 1$ arcs of $D$, every one pointing away from $r$, along which $r$ alone reaches every other vertex of the component (grow it one hop at a time, always available since the component is strongly connected). Symmetrically, because every vertex of the component reaches $r$, there is a spanning \emph{in-arborescence} of $n_i - 1$ arcs, every one pointing toward $r$, along which every vertex reaches $r$. Taking both trees together, any two vertices $u, v$ of the component are joined by the route $u \to r \to v$, first the in-arborescence, then the out-arborescence, so the $2(n_i - 1)$ arcs of the two trees alone reconstruct \emph{every} reachability relation inside this one component.
-
-\emph{Step 2: between components.} Contract each SCC to a single point and, between two contracted points, keep one arc whenever $D$ has at least one arc from the first component to the second (dropping any further parallel arcs between the same two components at this stage). Call the result $Q_0$, a digraph on $q$ points, one per component. Two different SCCs can never reach each other in both directions, since that would make them one strongly connected component after all, so $Q_0$ has no directed cycle: it is a DAG (a directed acyclic graph). Reachability between two different components of $D$ is, by this very construction, exactly reachability between the two corresponding points of $Q_0$. Thin $Q_0$ down to an \emph{inclusion-minimal} spanning subdigraph $Q \subseteq Q_0$ that still has the same reachability relation, deleting one arc at a time for as long as some arc is redundant, which must stop since $Q_0$ has only finitely many arcs.
-
-The contracted DAG $Q_0$ is called the \emph{condensation} of $D$. The reason to thin $Q_0$ down to $Q$ is that $Q$'s \emph{underlying undirected graph}, meaning $Q$ with the arrows erased, has no triangle. Suppose three points $x, y, z$ of $Q$ were pairwise joined by some arc of $Q$. Since $Q \subseteq Q_0$ and $Q_0$ has no cycle, $Q$ has none either, so between any two of $x,y,z$ the arc runs in only one direction, never both. Three points pairwise joined with a consistent direction on each pair admit only one pattern, up to relabelling: a linear order, say $x \to y$, $y \to z$, and $x \to z$. But then $x \to z$ is redundant, since $x$ already reaches $z$ via $y$, so deleting it would leave the reachability relation of $Q$ unchanged, contradicting that $Q$ is inclusion-minimal. So no three points of $Q$ can be pairwise joined at all: that is triangle-freeness of the underlying graph.
-
-A triangle-free graph on $q$ vertices has at most $\floor{q^2/4}$ edges, by Mantel's theorem \cite{Mantel07}, the $r = 2$ case of the more general theorem of Tur\'an \cite{Turan41}. Applied to $Q$,
-\[
-    |A(Q)| \;\le\; \floorfrac{q^2}{4}.
-\]
-
-\emph{Step 3: assembling $R$ and counting.} Build $R$ from the two arborescences of Step 1 inside every SCC, together with one witness arc of $D$ for every arc of $Q$ (some arc of $D$ realises it, by the very definition of $Q_0$). By Step 1, every pair inside one component reaches each other in $R$ exactly as in $D$. By Step 2, and because within-component reachability is already secured, every pair in two different components reaches each other in $R$ exactly as in $D$ too: to travel from $u$ to $v$ across the components $Q$'s path visits, reach each witness arc's tail inside its own component (Step 1), cross the witness arc, and repeat. Since $R \subseteq D$ throughout, $R$ can never certify a reachability $D$ does not already have, so $R$ is a genuine reachability skeleton. Writing $n_1, \dots, n_q$ for the SCC orders, so $\sum_i n_i = n$, its arc count is at most the $2(n_i-1)$ arborescence arcs of each component plus one witness per arc of $Q$. The first count is an upper bound rather than an equality, since the in- and out-arborescence of one component may share an arc, which only helps. So
-\[
-    |A(R)| \;\le\; \sum_{i=1}^{q} 2(n_i - 1) \;+\; |A(Q)| \;\le\; 2(n-q) \;+\; \floorfrac{q^2}{4} \;=:\; f(q).
-\]
-
-It remains to bound $f(q)$ over the range $1 \le q \le n$ that the number of components can actually take. Its increments are
-\[
-    f(q+1) - f(q) \;=\; -2 \;+\; \floorfrac{q+1}{2},
-\]
-using the identity $\floor{(q+1)^2/4} - \floor{q^2/4} = \floor{(q+1)/2}$, checked on the two parities of $q$ (at $q = 2j$ both sides are $j$, at $q = 2j+1$ both are $j+1$). Since $\floor{(q+1)/2}$ never decreases as $q$ grows, neither do the increments of $f$, which is to say $f$ is convex. A convex function on an interval attains its largest value at one of the two ends, because a value at an interior point is a weighted average of the two ends or less. Hence
-\[
-    f(q) \;\le\; \max\bigl(f(1),\,f(n)\bigr) \qquad \text{for } 1 \le q \le n.
-\]
-At $q=1$ the whole digraph is one component, so $f(1) = 2(n-1) + 0$. At $q=n$ every component is a single vertex, so $f(n) = 0 + \floor{n^2/4}$. Hence $f(q) \le \max\bigl(2(n-1), \floor{n^2/4}\bigr) = M(n)$ for every $q$ in range, which is the lemma.
-\end{proof}
-
-The inclusion-minimal reachability subdigraph $Q$ is also called the
-\emph{transitive reduction} of the DAG $Q_0$. A \emph{transitively closed
-triangle} is the three-vertex pattern $x\to y$, $y\to z$, $x\to z$.
-
-\begin{figure}[htbp]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}
-% ---- left panel: D, three bidirected SCCs A={a1,a2}, B={b1,b2}, C={c1,c2},
-% joined a2->b1, b2->c1, and the redundant direct arc a1->c2 bent well below
-% everything so it never crosses the other arcs.
-\begin{scope}
-  \node[apxlab] (a1) at (0,1) {$a_1$};
-  \node[apxlab] (a2) at (0,-1) {$a_2$};
-  \node[apxlab] (b1) at (2.6,1) {$b_1$};
-  \node[apxlab] (b2) at (2.6,-1) {$b_2$};
-  \node[apxlab] (c1) at (5.2,1) {$c_1$};
-  \node[apxlab] (c2) at (5.2,-1) {$c_2$};
-  \draw[aparc] (a1) to[bend left=14]  (a2);
-  \draw[aparc] (a2) to[bend left=14]  (a1);
-  \draw[aparc] (b1) to[bend left=14]  (b2);
-  \draw[aparc] (b2) to[bend left=14]  (b1);
-  \draw[aparc] (c1) to[bend left=14]  (c2);
-  \draw[aparc] (c2) to[bend left=14]  (c1);
-  \draw[aparc] (a2) to[bend left=8] (b1);
-  \draw[aparc] (b2) to[bend left=8] (c1);
-  \draw[apfaint] (a1) to[bend right=55] (c2);
-  \node[apname, text=black!55] at (2.6,-2.35) {redundant: $a_1$ already reaches $c_2$ via $a_2,b_1,b_2,c_1$};
-  \node[font=\small] at (2.6,2.0) {$D$};
-\end{scope}
-% ---- arrow between panels ----
-\draw[-{Stealth[length=6pt]}, line width=1.3pt, KULblauw3b] (6.6,0) -- (7.9,0);
-\node[font=\scriptsize, align=center, text=KULblauw3b] at (7.25,0.5) {drop the\\redundant arc};
-% ---- right panel: R, same six vertices, same six internal arcs, only the
-% two witness arcs a2->b1 and b2->c1 survive between components.
-\begin{scope}[xshift=9.6cm]
-  \node[apxlab] (ra1) at (0,1) {$a_1$};
-  \node[apxlab] (ra2) at (0,-1) {$a_2$};
-  \node[apxlab] (rb1) at (2.6,1) {$b_1$};
-  \node[apxlab] (rb2) at (2.6,-1) {$b_2$};
-  \node[apxlab] (rc1) at (5.2,1) {$c_1$};
-  \node[apxlab] (rc2) at (5.2,-1) {$c_2$};
-  \draw[aparc] (ra1) to[bend left=14]  (ra2);
-  \draw[aparc] (ra2) to[bend left=14]  (ra1);
-  \draw[aparc] (rb1) to[bend left=14]  (rb2);
-  \draw[aparc] (rb2) to[bend left=14]  (rb1);
-  \draw[aparc] (rc1) to[bend left=14]  (rc2);
-  \draw[aparc] (rc2) to[bend left=14]  (rc1);
-  \draw[aparc] (ra2) to[bend left=8] (rb1);
-  \draw[aparc] (rb2) to[bend left=8] (rc1);
-  \node[font=\small] at (2.6,2.0) {$R$};
-\end{scope}
-\end{tikzpicture}}
-\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the three component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
-\label{fig:skeleton-example}
-\end{figure}
 
 \begin{lemma}[Deleting a skeleton lowers every positive connectivity,\aimedal]\label{lem:reach-delete}
 Let $D$ be a directed multigraph with $\lec^{\max}(D) \le k$ for some $k \ge 1$, and let $R$ be a reachability skeleton of $D$. Write $D - R$ for the multigraph obtained by deleting, from each multiplicity $\mu(u,v)$, the one copy (if any) that $R$ uses on that pair. Then, for every ordered pair $u \ne v$,
@@ -1708,10 +1700,10 @@ At $r = 3$, $\mathrm{gain}(3,m) = m-4$: zero at $m = 4$, matching the exhaustive
 
 Sharing a vertex is what buys that count. Disjoint blocks joined by bridges would fit only $\lfloor n/r \rfloor$ of them, since each bridge spends a vertex on nothing but the join, and the difference is real rather than cosmetic: at $m = 10$, $r = 6$ and $n = 11$ the shared-vertex form carries $150$ against the bridged form's $120$.
 
-Optimising $r$ widens the gap further. Treated as continuous, the gain per vertex $\mathrm{gain}(r,m)/(r-1)$ peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$. Packing blocks of that size therefore gives $K_m(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1-O(m))$. In particular the per-vertex rate is quadratic in $m$ once $n/m\to\infty$, a different order from the tree's linear rate.
+Optimising $r$ widens the gap further. Treated as continuous, the gain per added vertex, which is $\mathrm{gain}(r,m)/(r-1)$, peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$. Packing blocks of that size therefore gives $K_m(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1-O(m))$. In particular the per-vertex rate is quadratic in $m$ once $n/m\to\infty$, a different order from the tree's linear rate.
 
 Even this is not the truth. At $m = 5$, $n = 7$ the construction above gives
-$27$ and the exact block computation below gives $29$.
+$27$ and the block computation of \Cref{tab:multi-vertex-blocks} gives $29$.
 What is not open is the order, and to say that the bouquet is
 a lower bound of the right order there has to be a matching upper bound. There
 is one, and it comes from the underlying simple graph rather than cycle rank.
@@ -1793,12 +1785,56 @@ Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ b
 
 The reduction changes what has to be searched: enumerate $2$-connected simple
 graphs, evaluate $W_m$, and solve the resulting knapsack. A sweep through eight
-vertices agrees with the independent exhaustive routine wherever both finish.
-It shows that the winning blocks are unbalanced and bipartite-like rather than
-complete, which motivates the family below. It too runs from a standalone script,
+vertices gives \Cref{tab:multi-vertex-blocks} and agrees with the independent
+exhaustive routine wherever both finish. It runs from a standalone script,
 \code{program/scripts/multi\_vertex\_blocks.py}, and its retained
 transcript is \path{program/logs/multi_vertex_blocks_log.txt} in the repository named
 in \Cref{sec:transcripts}.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{@{}r rrrrrrr@{}}
+    \toprule
+    & \multicolumn{7}{c}{$b$} \\
+    \cmidrule(l){2-8}
+    $m$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ \\
+    \midrule
+    $2$ & $1$ & --- & --- & --- & --- & --- & --- \\
+    $3$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ \\
+    $4$ & $3$ & $6$ & $9$ & $12$ & $15$ & $18$ & $21$ \\
+    $5$ & $4$ & $9$ & $14$ & $19$ & $24$ & $29$ & $34$ \\
+    $6$ & $5$ & $12$ & $19$ & $26$ & $33$ & $40$ & $47$ \\
+    $7$ & $6$ & $15$ & $24$ & $33$ & $42$ & $52$ & $62$ \\
+    $8$ & $7$ & $18$ & $30$ & $42$ & $54$ & $66$ & $79$ \\
+    \bottomrule
+  \end{tabular}
+  \caption[Best score of one block]{$g_m(b)$, the largest $W_m$ a single
+  $2$-connected block on $b$ vertices can score, by exhaustion over every
+  $2$-connected graph of that order. A dash marks a size at which no feasible
+  block exists, which at $m=2$ is every $b \ge 3$. Feeding this row into the
+  knapsack of \Cref{thm:multi-vertex-blocks} gives $K_m(n)$ for $n \le 8$; at
+  $m=5$, $n=7$ it returns the $29$ quoted above, against the $27$ that
+  \Cref{thm:clique-chain-vertex} reaches. The per-vertex rate $g_m(b)/(b-1)$ is
+  still rising at $b=8$ in every row, so this table does not extrapolate: a
+  larger $n$ needs larger blocks enumerated.}
+  \label{tab:multi-vertex-blocks}
+\end{table}
+
+The winning blocks are never complete once $b \ge 5$, and their degree
+sequences are lopsided at every cell, a few vertices of high degree beside a
+majority at degree two or three. What the sweep does \emph{not} show is that
+they are complete bipartite graphs with a few edges added. That description is
+exact at $m = 7$ and $m = 8$, where the maximiser at $b = 7$ and $b = 8$ is
+unique and is $K_{3,4}$ or $K_{3,5}$ with two further edges inside the side of
+size three. It fails at $m = 4$, $5$ and $6$, where from $b = 7$ onwards the
+maximum is attained by many non-isomorphic blocks at once, up to $38$ of them,
+and none of those is a complete bipartite graph plus edges inside one side. So
+the family of \Cref{thm:multi-vertex-bipartite} below is a construction
+suggested by the largest $m$ in reach, and it is a lower bound rather than a
+description of the extremisers. The script prints each maximiser's
+\code{graph6} string, its degree sequence and the count of blocks tied with it,
+so the reader can check which of these cells is which.
 
 \begin{theorem}[Thickened complete bipartite blocks,\aimedal]\label{thm:multi-vertex-bipartite}
 Let $1 \le s \le t \le m-1$. Thicken every edge of $K_{s,t}$ to multiplicity $m-s$. The result is feasible, $\kap^{\max} \le m-1$, on $s+t$ vertices with total multiplicity $st(m-s)$. Hanging $k$ such blocks off one shared vertex gives, for $n = k(s+t-1)+1$,
@@ -1826,10 +1862,12 @@ and $h(\alpha) = \alpha(1-\alpha)/(1+\alpha)$ has $h'(\alpha) = (1 - 2\alpha - \
 \end{proof}
 
 The optimum is lopsided: one side has size about $0.41m$ and the other reaches
-the cap $m-1$. Finite block sweeps also show that adding a few edges inside
-the small side can improve this clean family. Thus the answer is a block
-problem with dense bipartite-like blocks, and its asymptotic constant lies
-between $3-2\sqrt2$ and $2$.
+the cap $m-1$. The finite sweep of \Cref{tab:multi-vertex-blocks} shows that
+adding a few edges inside the small side improves this clean family at $m = 7$
+and $m = 8$, and that at $m = 4$, $5$ and $6$ the extremal blocks take some
+other shape entirely. So the answer is a block problem, its asymptotic constant
+lies between $3-2\sqrt2$ and $2$, and which blocks attain it is open along with
+the constant.
 
 \subsection{The directed problem}\label{sec:multi-vertex-dir}
 
@@ -2401,8 +2439,8 @@ Starting from Python 3.14.6, create one at the repository root with
 \code{python3 -m venv .venv}, then run
 \code{.venv/bin/python3 -m pip install -r program/requirements-lock.txt}.
 The required dependency ranges are listed in
-\code{program/requirements.txt}. The exact verified versions are pinned in
-\code{program/requirements-lock.txt}. They are Python 3.14.6, NumPy 2.4.6,
+\code{program/requirements.txt}, and \code{program/requirements-lock.txt} pins
+the exact verified versions. They are Python 3.14.6, NumPy 2.4.6,
 SciPy 1.18.0, and PuLP 3.3.2. The two optional roles use Matplotlib 3.11.0 and
 NetworkX 3.6.1. Installing from the lock file reproduces that environment.
 
@@ -2477,7 +2515,7 @@ which a partial candidate is extended along several branches and a proved bound
 discards, or \emph{prunes}, a branch that cannot reach the target. A search
 \emph{node} is one such partial candidate.
 
-The base cases of the directed $m = 2$ induction run to $n = 7$, and are settled by a pruned exhaustive search that is exact and complete at these sizes, so each completed row is an upper-bound proof at that $n$. The run the induction depends on is the \emph{vertex} one, over all simple digraphs with $\kappa^{\max} \le 1$, since \Cref{rem:whitney-direction} shows base cases cannot be inherited in that direction. The same driver was also run under the arc feasibility test, with only the inner test swapped, and \Cref{tab:basecase-search} records both. That second run corroborates the arc value rather than establishing it, because \Cref{thm:dir-arc-m2-exact} follows from the vertex theorem through Whitney. What the two runs do share by coincidence is their search-tree size, the node counts coinciding at every $n$ as a computed fact.
+The directed $m = 2$ values at $n \le 7$ were settled independently by a pruned exhaustive search that is exact and complete at these sizes, so each completed row is an upper-bound proof at that $n$. The driver was run twice, once over all simple digraphs with $\kappa^{\max} \le 1$ and once with $\lambda^{\max} \le 1$, only the inner feasibility test swapped, and \Cref{tab:basecase-search} records both. These rows were the base cases of the vertex-deletion induction that \Cref{sec:dir-arc-m2} used to carry. That induction has been replaced by the reachability-skeleton argument, which closes every $n$ in one step, so the table no longer supports either theorem and both columns now stand as an independent check on them. No result in this thesis depends on a completed computation. What the two runs share by coincidence is their search-tree size, the node counts coinciding at every $n$ as a computed fact.
 
 \begin{table}[ht]
   \centering
@@ -2494,14 +2532,15 @@ The base cases of the directed $m = 2$ induction run to $n = 7$, and are settled
     7 & 12 & 12 & 12 & 45\,122\,129 & complete \\
     \bottomrule
   \end{tabular}
-  \caption{The directed $m = 2$ base cases under both separations: exhaustive
-  branch and bound over all simple digraphs on $n$ vertices with
+  \caption{The directed $m = 2$ values at small $n$ under both separations:
+  exhaustive branch and bound over all simple digraphs on $n$ vertices with
   $\lambda^{\max} \le 1$, and the same run with $\kappa^{\max} \le 1$. Same
   driver, same prunes, only the inner feasibility test changes. Both columns
   agree with $M(n) = \max(2(n-1), \floor{n^2/4})$ at every size, and every run
-  completed. Only the vertex column is load-bearing, the arc theorem following
-  from the vertex one through \Cref{rem:whitney-direction}, so the arc column
-  corroborates rather than proves. The node counts coincide as a computed fact, not by
+  completed. Neither column is load-bearing. These were the base cases of an
+  earlier induction, which \Cref{sec:dir-arc-m2} has replaced by an argument
+  from \Cref{lem:reach-skeleton} that runs at every $n$ at once, so both columns
+  now corroborate rather than prove. The node counts coincide as a computed fact, not by
   construction: the feasibility prune switches between the arc and the vertex
   flow test with the separation, and at these sizes the two happen to cut the
   tree in the same places. The wall times do not coincide, with the vertex run at $n = 7$ taking

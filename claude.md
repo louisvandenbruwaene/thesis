@@ -19,17 +19,25 @@ anchor.
 The hand-in is `main.pdf` plus the `program/` directory, and nothing else. Every
 path the thesis prints begins with `program/`.
 
-## Current build state (2026-09-02)
+## Current build state (2026-09-03)
 
 - `main.pdf`: 111 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
-  underfull, 0 undefined refs, 0 LaTeX warnings, 0 occurrences of `??`.
+  undefined refs, 0 LaTeX warnings and 0 occurrences of `??`. One underfull
+  hbox remains, badness 1168, in the `BercziEtAl24` bibliography entry: four
+  accented author names TeX will not hyphenate. `\sloppy` does not fix a loose
+  line and ragged-right would restyle the whole bibliography, so it is left,
+  with the reasoning recorded beside `\bibliography` in `main.tex`.
+  An earlier version of this block claimed 0 underfull and 0 LaTeX warnings
+  while the log held 4 and 1; that was a grep that silently matched nothing,
+  not a cleaner build. See the locale gotcha below, and recount with
+  `LC_ALL=C grep -a` before ever restating these numbers.
 - Recorded revision: tag `submitted-2` at `47ba4a0bd9ba`, printed in the
   computational audit. The tag is pushed and `record_revision.sh` will not move
   it, so the next recorded build is `submitted-3`.
 - `program/`: one file, `erdos915_unified.py`. Core needs numpy and scipy only;
   pulp, networkx and matplotlib are optional and guarded. `geng` optional.
 - Tests: `cd program && ../.venv/bin/python3 -m unittest discover -s tests`,
-  currently 157 tests with 1 expected skip.
+  currently 168 tests with 1 expected skip.
 - Standard of done: rebuild the PDF clean, run the suite, run the program's
   `_run_checks` self-test, and re-verify any numeric claim against a second
   implementation (`program/scripts/` holds the independent ones).
@@ -138,11 +146,24 @@ path the thesis prints begins with `program/`.
   no matplotlib, and the import guard sets every plotting name to None together,
   so a figure call runs most of its length and fails late inside legend
   construction with a hundred-line traceback that looks like a code defect.
-- **`grep -c` returns blank in this shell even on matching input.** Use
-  `grep ... | wc -l`.
+- **`main.log` is not valid UTF-8, so grep over it can silently match nothing.**
+  It carries an invalid continuation byte `0xf3` around offset 57167. On a
+  matching pattern a bare `grep` returned zero hits for `Warning`, `Underfull`
+  and every other pattern in one shell, while `LC_ALL=C grep -a` returned the
+  true counts 1 and 4 in the same shell on the same file. There is no error and
+  no `Binary file ... matches` line, only an empty result that reads exactly
+  like a clean build. Whether a bare grep fails depends on the active locale, so
+  do not depend on one: **always `LC_ALL=C grep -a` on any `.log` in this repo**,
+  and treat an empty result as unproven until rerun that way. A previous version
+  of this entry blamed `grep -c` and prescribed `grep ... | wc -l`; that is the
+  wrong cause and the workaround does not help, because the pipe cannot recover
+  matches grep never made. This trap has now produced a false "0 warnings"
+  claim in a review.
 - **`??` is the real build gate, not the log.** Cleveref's fallback prints `??`
   with no warning and `latexmk` exits 0. Check
-  `pdftotext main.pdf - | grep '??' | wc -l`.
+  `pdftotext main.pdf - | LC_ALL=C grep -a '??' | wc -l`. `pdftotext` output has
+  been clean UTF-8 so far, so this one has not misfired, but use the same
+  invocation everywhere rather than keeping two habits.
 - **`latexmk -C` then a clean rebuild** fixes the recurring exit 12 with null
   bytes in `main.aux` and mass undefined refs. It is stale aux state, never the
   source.
