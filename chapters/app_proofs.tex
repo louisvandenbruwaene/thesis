@@ -1896,7 +1896,52 @@ $M(n) = \floor{n^2/4}$ for $n \ge 4$, and the difference is linear in $n$ for fi
 The exhaustive values agree and stay strictly inside these bounds where both are known:
 $K_6^{\mathrm{dir}}(3) = 24$ against the lower bound $(m-1)M(3) = 20$, so the arc
 extremiser read through $\kap \le \lec$ is a lower bound for the incidence problem and
-not its value.
+not its value. What beats it at that size is a block, and the block argument of
+\Cref{thm:multi-vertex-blocks} carries over to directed routes without change.
+
+\begin{construction}[Thickened complete digraph, and its bouquet]\label{const:dir-multi-vertex-blocks}
+For $2 \le b \le m+1$, take the complete digraph on $b$ vertices and give every arc
+multiplicity $m+1-b$. At $b=2$ this is one bidirected edge at multiplicity $m-1$.
+Hanging $k$ such blocks off one shared vertex, pairwise disjoint otherwise, uses
+$k(b-1)+1$ vertices, and blocks of different sizes may be mixed.
+\end{construction}
+
+\begin{proposition}[The directed incidence value is a block problem too,\aimedal]\label{prop:dir-multi-vertex-blocks}
+Let $D$ be a multidigraph with underlying simple digraph $D_0$, and take the blocks of
+the underlying undirected graph of $D_0$. Then $\kap_D$ agrees with the value measured
+inside a block on every pair joined by an arc, and is at most $1$ on every pair split
+between two blocks, so the count of \Cref{lem:multi-vertex-split-dir} is additive over
+blocks exactly as in \Cref{thm:multi-vertex-blocks}. Each block of
+\Cref{const:dir-multi-vertex-blocks} is feasible and carries $b(b-1)(m+1-b)$ arcs, so
+\[
+    K_m^{\mathrm{dir}}(n) \;\ge\; \max\Bigl\{\, \sum_i b_i(b_i-1)(m+1-b_i)
+      \;:\; 2 \le b_i \le m+1,\ \sum_i (b_i - 1) \le n-1 \,\Bigr\} .
+\]
+\end{proposition}
+
+\begin{proof}
+For the block structure, let $u,v$ be joined by an arc of $D_0$ and let $B$ be the block
+of the underlying undirected graph that contains it. A directed $u$-$v$ path of $D_0$
+leaves $B$ only by crossing a cut vertex, and returning crosses that same vertex a
+second time, which no path does. So every route counted by $\pi(u,v)$ stays inside $B$,
+and a pair split between two blocks is separated by the vertex they share, giving
+$\kap_D \le 1$ there.
+
+For one block, the internally disjoint directed $u$-$v$ routes of length at least two
+in the complete digraph on $b$ vertices have pairwise disjoint interiors drawn from the
+other $b-2$ vertices, so there are at most $b-2$ of them, and the two-step routes attain
+that. Hence $\pi(u,v) = b-2$, and \Cref{lem:multi-vertex-split-dir} gives
+$\kap_D(u,v) = (m+1-b) + (b-2) = m-1$ on each of the $b(b-1)$ ordered pairs, which sits
+at the cap. The count is $b(b-1)(m+1-b)$. Attaching the blocks at one shared vertex uses
+$1 + \sum_i (b_i-1)$ vertices, and any spare vertices are left isolated.
+\end{proof}
+
+The blocks and the arc extremiser lead on different ranges, and the grids of
+\Cref{sec:variant-grids} plot whichever is larger. At $m=3$ the best block is the
+bidirected edge, the bouquet is the thickened bidirected tree, and the arc extremiser
+takes over from $n=8$. At $m=6$ the best block has three or four vertices, the bouquet
+leads through $n=8$ at $84$ arcs against the extremiser's $80$, and the extremiser leads
+from $n=9$.
 
 \section{The directed hypergraph}\label{sec:dir-hyper}
 

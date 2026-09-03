@@ -6,6 +6,7 @@ import unittest
 from make_figures import (
     _lift_multi_above_simple,
     _panel_cell,
+    dir_block_bouquet_lower_bound,
     gather_variant_grid,
     theta_bouquet_lower_bound,
 )
@@ -56,6 +57,53 @@ class ThetaBouquetLowerBound(unittest.TestCase):
         for m in range(2, 9):
             values = [theta_bouquet_lower_bound(n, m) for n in range(2, 17)]
             self.assertEqual(values, sorted(values), f"m={m}")
+
+
+class DirectedBlockBouquetLowerBound(unittest.TestCase):
+    """K_m^dir's curve is the better of the arc extremiser and the block bouquet.
+
+    prop:dir-multi-vertex-blocks makes the directed incidence value additive over
+    blocks, and the thickened complete digraph on b <= m+1 vertices carries
+    b(b-1)(m+1-b) arcs. Plotting the arc extremiser (m-1)M(n) alone understated
+    the panel while n is small against m: at m=6, n=4 it read 34 against a
+    checked 36. Every value below was realised as an explicit multidigraph and
+    confirmed feasible by the program's own checker.
+    """
+
+    # max(arc extremiser, block bouquet), verified against the checker.
+    EXPECTED_M6 = {2: 10, 3: 24, 4: 36, 5: 48, 6: 60, 7: 72, 8: 84, 9: 100}
+
+    def _arc_extremiser(self, n, m):
+        return (m - 1) * max(2 * (n - 1), n * n // 4)
+
+    def test_the_panel_matches_the_verified_values_at_m6(self):
+        panel = gather_variant_grid(m=6)[7]
+        published = dict(zip(*panel["search"]))
+        for n, expected in self.EXPECTED_M6.items():
+            self.assertEqual(published[n], expected, f"n={n}")
+
+    def test_it_never_falls_below_the_arc_extremiser(self):
+        # kappa <= lambda, so thm:dir-multi-full's extremiser is always available.
+        for m in range(2, 9):
+            for n in range(2, 17):
+                self.assertGreaterEqual(
+                    max(self._arc_extremiser(n, m),
+                        dir_block_bouquet_lower_bound(n, m)),
+                    self._arc_extremiser(n, m), f"m={m}, n={n}")
+
+    def test_the_bouquet_is_the_thickened_tree_at_m3(self):
+        # At m=3 the best block is the bidirected edge, so the bouquet is the
+        # thickened bidirected tree with 2(m-1)(n-1) arcs.
+        for n in range(2, 17):
+            self.assertEqual(dir_block_bouquet_lower_bound(n, 3), 4 * (n - 1), f"n={n}")
+
+    def test_no_lower_bound_sits_above_a_proved_optimum(self):
+        for m in (3, 6):
+            panel = gather_variant_grid(m=m)[7]
+            exact = dict(zip(*panel["exact"]))
+            for n, value in zip(*panel["search"]):
+                if n in exact:
+                    self.assertLessEqual(value, exact[n], f"m={m}, n={n}")
 
 
 class DirectedHypergraphLowerBound(unittest.TestCase):

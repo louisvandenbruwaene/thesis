@@ -370,6 +370,32 @@ def _exact_points(ns, m, budget, **kw):
 _SETTLED_HYPER_EDGE_SIMPLE = {(6, 6, 3): 11}
 
 
+def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
+    """A lower bound on ``K_m^dir(n)``: a bouquet of thickened complete digraphs.
+
+    ``const:dir-multi-vertex-blocks`` takes the complete digraph on ``b <= m+1``
+    vertices at multiplicity ``m+1-b``, which ``prop:dir-multi-vertex-blocks``
+    checks is feasible and carries ``b(b-1)(m+1-b)`` arcs, and hangs any multiset
+    of such blocks off one shared vertex.  ``b = 2`` is the bidirected edge at
+    multiplicity ``m-1``, so the thickened bidirected tree is the ``b = 2`` case.
+
+    This is the vertex-separation counterpart of
+    :func:`theta_bouquet_lower_bound`, and it beats the arc extremiser
+    ``(m-1) M(n)`` while ``n`` is small against ``m``: at ``m = 6`` it leads
+    through ``n = 8`` with 84 arcs against 80, and the extremiser leads from
+    ``n = 9``.  Plotting the extremiser alone understated the panel, at ``m = 6``,
+    ``n = 4`` reading 34 against a checked 36.
+    """
+    block = {b - 1: b * (b - 1) * (m + 1 - b)
+             for b in range(2, min(n, m + 1) + 1)}
+    best = [0] * n
+    for budget in range(1, n):
+        for cost, value in block.items():
+            if cost <= budget:
+                best[budget] = max(best[budget], best[budget - cost] + value)
+    return min(best[n - 1], (m - 1) * n * (n - 1))
+
+
 def theta_bouquet_lower_bound(n: int, m: int) -> int:
     """A lower bound on ``K_m(n)``: a bouquet of thickened THETA blocks.
 
@@ -645,10 +671,17 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         return theta_bouquet_lower_bound(n, m)
 
     def lb_multi_dir_vert(n):
+        # Two constructions compete, and the panel plots the larger.
+        #
         # kappa <= lambda, so the arc extremiser of thm:dir-multi-full is
         # feasible in the vertex separation too: K_m^dir(n) >= (m-1) M(n).
         # At m = 2 this is the exact value M(n) (cor:dir-multi-incidence).
-        return lb_multi_dir(n)
+        #
+        # It is not the best construction while n is small against m.  The
+        # bouquet of thickened complete digraphs of prop:dir-multi-vertex-blocks
+        # is, and the exhaustive value already said so: K_6^dir(3) = 24 against
+        # the extremiser's 20.
+        return max(lb_multi_dir(n), dir_block_bouquet_lower_bound(n, m))
 
     def lb_hyper_edge(n):
         # prop:hyper-edge, a proved UPPER bound for every r-uniform hypergraph.
