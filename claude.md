@@ -161,15 +161,22 @@ path the thesis prints begins with `program/`.
   and theorem 1.11" at five sites, one of them in the Contribution Statement.
   Do not restore lowercase forms without first adding a `\cref` use that needs
   them, and there is none.
-- **The working notes are deliberately untracked.** `claude.md` (this file),
-  `TASKS.md`, `REVIEW_STATUS.md`, `SIMPLIFIED_AI_PROOFS*.md`,
-  `PLAN_connectivity_speedup.md`, `mistakes found 24082026.md` and
-  `program/CLAUDE.md` are gitignored as of 2026-09-03. The thesis cites this
-  repository as the archive of the computational work, so what it serves is what
-  an examiner reads, and the session-by-session process is not that work. They
-  stay on disk. They are still in the Git history, and rewriting it is ruled out
-  because `main.pdf` prints commit hashes. `offcuts.tex` IS cited, at
-  `app_proofs.tex:881`, and stays tracked. Do not re-add any of them to git.
+- **Two remotes, and main is the private one.** `main` tracks EVERYTHING: the
+  LaTeX sources, the figures, the research notes and the working notes including
+  this file. It pushes to `backup`, the private repository
+  `louisvandenbruwaene/thesis-private`. `git config remote.pushDefault` is set
+  to `backup`, so a bare `git push` can never reach the public repository.
+  The public repository `louisvandenbruwaene/thesis` is a GENERATED SNAPSHOT
+  carrying `main.pdf`, `program/` and `README.md` only, refreshed by
+  `./publish.sh` and by nothing else. Privacy lives in that script, not in
+  `.gitignore`: a file is public because publish.sh copies it. Whole directories
+  are copied, so anything private inside one (`program/CLAUDE.md` was the first
+  case, and it did leak once) must be named for removal in the script, which
+  also refuses to push if a working-notes file reaches the snapshot. After a
+  recorded build, run `./publish.sh` to put the new PDF on the public link.
+  Everything remains in the public repository's OLD history from before the
+  reduction, and rewriting that is ruled out because `main.pdf` prints commit
+  hashes.
 - **Commit and push at the end of each session.**
 - **Re-verify any numeric or bibliographic claim inherited from an older note.**
   Several "settled" facts turned out to rest on a convention mismatch that
