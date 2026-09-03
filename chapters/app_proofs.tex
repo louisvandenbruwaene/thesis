@@ -1832,13 +1832,15 @@ sequences are lopsided at every cell, a few vertices of high degree beside a
 majority at degree two or three. What the sweep does \emph{not} show is that
 they are complete bipartite graphs with a few edges added. That description is
 exact at $m = 7$ and $m = 8$, where the maximiser at $b = 7$ and $b = 8$ is
-unique and is $K_{3,4}$ or $K_{3,5}$ with two further edges inside the side of
-size three. It fails at $m = 4$, $5$ and $6$, where from $b = 7$ onwards the
-maximum is attained by many non-isomorphic blocks at once, up to $38$ of them,
-and none of those is a complete bipartite graph plus edges inside one side. So
-the family of \Cref{thm:multi-vertex-bipartite} below is a construction
-suggested by the largest $m$ in reach, and it is a lower bound rather than a
-description of the extremisers. The script prints each maximiser's
+$K_{3,4}$ or $K_{3,5}$ with two further edges inside the side of size three. It
+is the unique maximiser in three of those four cells, $m = 8$ at $b = 7$ having
+six. The description fails at $m = 4$, $5$ and $6$, where from $b = 7$ onwards
+the maximum is attained by many non-isomorphic blocks at once, up to $38$ of
+them, and across those six cells exactly one tied block is complete bipartite,
+the $K_{2,5}$ at $m = 6$, $b = 7$, which scores the $st(m-s) = 40$ of the family
+below at $s = 2$, $t = 5$. So the family of \Cref{thm:multi-vertex-bipartite}
+below is a construction suggested by the largest $m$ in reach, and it is a lower
+bound rather than a description of the extremisers. The script prints each maximiser's
 \code{graph6} string, its degree sequence and the count of blocks tied with it,
 so the reader can check which of these cells is which.
 

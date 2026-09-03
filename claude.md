@@ -255,7 +255,15 @@ One line each. `git log` has the full message for every one of them.
   import of the program: the whole of `tab:multi-vertex-blocks` (43 cells, own
   max-flow plus a geng sweep), the 125970-candidate `m=6, n=6, r=3` hypergraph
   enumeration, `K_5(4)=14` and `K_5(5)=19` by direct multigraph exhaustion, and
-  `ell_3^dir` and `k_3^dir` at n=3,4.
+  `ell_3^dir` and `k_3^dir` at n=3,4. Checking the appendix prose against
+  `logs/multi_vertex_blocks_log.txt` then found two more: the maximiser is
+  NOT unique at m=8, b=7 (six of them, as the log says), and the m=6, b=7
+  cell HAS a complete bipartite tie (`K_{2,5}`, again as the log says),
+  against prose claiming uniqueness across four cells and none across six.
+  Both were contradicted by the very log the passage tells the reader to
+  consult. Also re-verified: geng -C 9 gives 194066, `h_4(b) = 2(b-1)` with
+  the hub-and-spokes the unique optimum at every b from 4 to 8, and the rate
+  m/2 attained and never exceeded for m <= 8.
 
 - **2026-09-03 (second pass).** A pre-hand-in review, six defects, none
   mathematical. The AI badge had come off five Chapter 1 statements but not
