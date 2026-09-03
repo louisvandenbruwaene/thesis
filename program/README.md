@@ -20,7 +20,7 @@ program for a different case.
 program/
   erdos915_unified.py   the whole program: the model, the connectivity checker,
                         Gomory-Hu, the cut-counting solver check, sensitivity, the
-                        temperature search, solve(), the random-model sampling,
+                        tabu and annealing searches, solve(), the random-model sampling,
                         the figure routines, and a self-check in __main__
   _erdos_fast.c         optional C hot-path helpers for small max-flow and
                         canonical-form calls
@@ -84,6 +84,7 @@ From this `program/` directory:
 ../.venv/bin/python3 -m unittest discover -s tests  # run the full suite
 ../.venv/bin/python3 make_figures.py                 # regenerate every figure
 ../.venv/bin/python3 make_figures.py --grids-only    # regenerate the four bound grids
+../.venv/bin/python3 make_figures.py --tables-only   # regenerate the sixteen-variant value table
 ../.venv/bin/python3 make_figures.py --rebuild       # recompute every machine value from scratch
 ../.venv/bin/python3 make_figures.py --compare       # show how the rebuild departs from the record
 ../.venv/bin/python3 make_figures.py --promote       # publish the reviewed rebuild
@@ -156,35 +157,39 @@ underlying simple graph. They can separate: `K_5(4) = 14` against `L_5(4) = 12`.
 |-----------------------|-------------------|
 | connectivity checker  | **exact** local connectivity (Menger / max-flow) |
 | cut-counting solver check | a finite solver result and primal witness, with no independently replayable certificate emitted |
-| temperature search | a **discovered** construction, hence only a **lower** bound, never a proof of optimality |
+| tabu search (and the annealing cross-check) | a **discovered** construction, hence only a **lower** bound, never a proof of optimality |
 | random-model sampling | an **estimate** over random samples, never a proof |
 
 The search proposes. The certifier and the hand proofs dispose.
 
 ## Which output feeds which figure
 
-The thesis is three chapters: (1) The Problem and Its Base Cases, (2) Certifying
+The thesis is three chapters: (1) The Problem and Its Variants, (2) Certifying
 and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems.
-`make_figures.py` writes every figure below except
-`figures/rediscovery_table.tex`, which is a small hand-kept LaTeX table of
-`solve(...)` discovery runs at fixed seeds. Its header records how each row
-was produced; rerun those calls to check it.
+`make_figures.py` writes every figure below except two tables.
+`figures/rediscovery_table.tex` is a small hand-kept LaTeX table of
+`solve(...)` discovery runs at fixed seeds, and
+`figures/generating_benchmark_table.tex` is written by
+`scripts/generating_search_benchmark.py`. Each header records how its rows
+were produced; rerun those calls to check them.
 
 | Figure | Thesis chapter |
 |--------|----------------|
 | `figures/edge_vertex_divergence.png` | the m=5 divergence (Ch.1) |
 | `figures/edge_vertex_sampling.png` | edge vs vertex disjointness in G(n,p) (offcut only) |
 | `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.2) |
-| `figures/temperature_trace.png` | a cooling run (Ch.2) |
+| `figures/temperature_trace.png` | a cooling run (offcut only) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (offcut only) |
 | `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
+| `figures/generating_benchmark_table.tex` | blind / pruned / generated timings (Ch.2), from `scripts/generating_search_benchmark.py` |
+| `figures/variant_table_all.tex` | the sixteen-variant value table (Appendix audit) |
 | `figures/variant_bounds_m3_graphs.png` | proved / conjectured / open, the eight graph-model variants at m = 3 (Appendix audit) |
 | `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Appendix audit) |
 | `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Appendix audit) |
 | `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Appendix audit) |
 | `program/data/machine_values.json` | the cached `solve` results those four grids plot (not a figure) |
-| `figures/directed_crossover.png` | hub/bipartite crossover (Ch.2) |
-| `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (Ch.2) |
+| `figures/directed_crossover.png` | hub/bipartite crossover (Ch.3) |
+| `figures/scatter_lambda_edges.png` | the extremal envelope over all graphs (offcut only) |
 | `figures/variant_surface_3d.png` | the bound surface over the (n, m) grid (offcut only) |
 | `figures/extremal_graphs_gallery.png` | the named extremal families (offcut only) |
 | `figures/pair_conn_dist.png` | pooled per-pair connectivity distributions (offcut only) |
@@ -199,8 +204,8 @@ still generated, still checked, and still rendered, but by `offcuts.tex` (the
 record of what the shortening pass removed) rather than by the thesis. None of
 these files may be deleted while that document exists.
 
-The solver records (`figures/certificate_log.txt`, `figures/basecase_search_log.txt`,
-`figures/basecase_search_vertex_log.txt`) were produced by the named finite
+The solver records (`logs/certificate_log.txt`, `logs/basecase_search_log.txt`,
+`logs/basecase_search_vertex_log.txt`) were produced by the named finite
 routines on the directed cases; the appendix now tabulates them rather than
 printing them verbatim. Randomised searches use fixed seeds. The SA-versus-tabu
 timings are the documented exception, because their stopping rule is wall-clock.

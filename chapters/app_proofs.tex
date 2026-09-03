@@ -391,7 +391,7 @@ when it remains connected after any two vertices are deleted.
 
 Their witness is built by a recursion, described here in the language of this section, since it says why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The arrangement is cyclic, and three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the classical triconnected one along separating pairs \cite{Tutte66,HopcroftTarjan73}. That is the concrete next step this reformulation points at, and it is pointing somewhere the answer is already known: S\o{}rensen and Thomassen prove in the same paper that the Bollob\'{a}s--Erd\H{o}s bound \emph{does} hold for $3$-connected graphs \cite{SorensenThomassen74}. So the rate $m/2$ survives exactly one refinement past the block decomposition, and what a triconnected version of \Cref{thm:simple-vertex-blocks} would have to supply is not a new bound on the rigid pieces but the bookkeeping that assembles them, which is where the recursion above hides.
 
-It also explains the sizes. The recursion beats the rate $m/2$ only once $j > 2/(m-4)$, so the smallest member of the family that outruns a bouquet of $K_m$'s has $26$ vertices at $m = 5$, $24$ at $m = 6$ and $18$ at $m = 7$, against the nine that exhaustive enumeration reaches. The construction was rebuilt and checked here at $m = 5, 6, 7$ and $j \le 3$: the vertex and edge counts match the formulas exactly, every member is $2$-connected, and every member has $\kap^{\max} = m-1$, so each is feasible and none contains the forbidden $m$ internally disjoint paths.
+It also explains the sizes. The recursion beats the rate $m/2$ only once $j > 2/(m-4)$, so the smallest member of the family that outruns a bouquet of $K_m$'s has $26$ vertices at $m = 5$, $24$ at $m = 6$ and $18$ at $m = 7$, against the nine that exhaustive enumeration reaches. The construction was rebuilt and checked here at $m = 5, 6, 7$ and $j \le 3$, by the standalone script \code{program/scripts/st\_construction.py}: the vertex and edge counts match the formulas exactly, every member is $2$-connected, and every member has $\kap^{\max} = m-1$, so each is feasible and none contains the forbidden $m$ internally disjoint paths.
 
 \begin{remark}[A degeneracy question, and what it would give]\label{rem:vertex-degeneracy}
 A general density bound is $k_m(n) < 2(m-1)n$: Mader's density theorem \cite{Mader72} would otherwise produce an $m$-connected subgraph. Feasibility says much more than that. It gives, for instance, that any two adjacent vertices have at most $m-2$ common neighbours, since each common neighbour is a route of length two beside the edge.
@@ -415,7 +415,8 @@ contains a \emph{subdivision} of $K_4$, obtained by replacing its edges with
 internally disjoint paths. The four vertices corresponding to those of $K_4$
 are its \emph{branch vertices}, and two of them are joined by three internally
 disjoint paths. Exhaustive search over all graphs with minimum degree at least
-$m$ finds no feasible one for $m \le 6$ and $n \le 10$. It is stated here as a
+$m$ finds no feasible one for $m \le 6$ and $n \le 10$, run from the standalone script
+\code{program/scripts/vertex\_min\_degree.py}. It is stated here as a
 question rather than a conjecture, since the sizes reached are well below those
 at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
@@ -2257,7 +2258,8 @@ Two remarks on that proof. The constant $2r+1$ is not
 optimised and is not claimed to be sharp: it is what the crude estimate
 $|U| \le 2M$ gives, and a search over deliberately adversarial instances, in which
 every target shares both its entrance and its exit with another, never drives
-$|\mathcal{T}|/\kap(u,v)$ above $r-1$, the forward model's own constant. Nothing
+$|\mathcal{T}|/\kap(u,v)$ above $r-1$, the forward model's own constant. That search runs from the standalone script
+\code{program/scripts/general\_orientation\_check.py}. Nothing
 rests on the difference, since \Cref{lem:two-step-budget} places this constant
 in the linear term, where it never touches the $n^2/4$ that carries the leading
 constant. The second point is what the theorem does to the
@@ -2338,7 +2340,8 @@ every entry on which the candidate departs from the record, and
 separation keeps the figures reproducible, since these are timed measurements and
 the same search on a slower machine can return a different lower bound. A full
 rebuild takes about an hour, of which two directed simple exhaustions at $n=6$,
-$m=3$ account for a little over twenty minutes.
+$m=3$ account for a little over half of it, the edge one running about nine
+minutes and the vertex one about twenty-four.
 
 The block sweep is independent of that file and of the main program. Its
 self-contained implementation is
