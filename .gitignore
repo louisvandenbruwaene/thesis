@@ -72,3 +72,26 @@ program/CLAUDE.md
 
 # Hand-in bundle built by git archive; regenerate, never edit.
 handin/
+
+# The published repository serves what the thesis hands a reader and nothing
+# else: main.pdf and program/. Everything below stays on disk and is version
+# controlled in the private backup remote, not here. Removing them affects HEAD
+# only; they remain in this repository's Git history, and rewriting that is
+# ruled out because main.pdf prints commit hashes in its computational audit.
+chapters/
+figures/
+shared/
+research_notes/
+slides/
+popularising_summary/
+main.tex
+preamble.tex
+ref.bib
+kulakreport.cls
+offcuts.tex
+LogoKULeuven.png
+kuleuvenLogo.pdf
+kuleuvenSedes.pdf
+sedes.png
+check_consistency.sh
+record_revision.sh
