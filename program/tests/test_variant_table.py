@@ -1,5 +1,6 @@
 """Regression tests for the claim markers and the cross-model floor."""
 
+import math
 import unittest
 
 from make_figures import (
@@ -55,6 +56,40 @@ class ThetaBouquetLowerBound(unittest.TestCase):
         for m in range(2, 9):
             values = [theta_bouquet_lower_bound(n, m) for n in range(2, 17)]
             self.assertEqual(values, sorted(values), f"m={m}")
+
+
+class DirectedHypergraphLowerBound(unittest.TestCase):
+    """The multihypergraph directed rows may not use the simple model's range.
+
+    prop:dir-hyper-first splits V into alpha tails and n-alpha heads and hangs
+    a head family of maximum degree m-1 off every tail. For the SIMPLE model the
+    head edges must be distinct, which at r=3 caps alpha at n-m. The MULTI model
+    reads the cyclic word in blocks of r-1 and repeats freely, so it needs only
+    r-1 <= n-alpha, capping alpha at n-r+1. Using the simple cap on the multi
+    rows understated them: at m=6, n=9 it gave 45 where the proposition proves
+    50.
+    """
+
+    def _prop_bound(self, n, m, r=3):
+        """prop:dir-hyper-first for the multi model, computed independently."""
+        best = max((a * ((m - 1) * (n - a) // (r - 1))
+                    for a in range(1, n - r + 2)), default=0)
+        return min(best, n * math.comb(n - 1, 2))
+
+    def test_no_multi_directed_hypergraph_cell_sits_below_the_proposition(self):
+        for m in (3, 6):
+            panels = gather_variant_grid(m=m)
+            for idx in (14, 15):        # multihypergraph directed arc, vertex
+                for n, value in zip(*panels[idx]["search"]):
+                    self.assertGreaterEqual(
+                        value, self._prop_bound(n, m),
+                        f"m={m}, panel {idx}, n={n}")
+
+    def test_the_cell_that_was_wrong(self):
+        panels = gather_variant_grid(m=6)
+        for idx in (14, 15):
+            published = dict(zip(*panels[idx]["search"]))
+            self.assertGreaterEqual(published[9], 50, f"panel {idx}")
 
 
 class VariantTableClaims(unittest.TestCase):

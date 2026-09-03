@@ -718,17 +718,33 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         """
         return attained_hyper_vertex(n)
 
-    def lb_dir_hyper(n):
-        # The PROVED bipartite family of prop:dir-hyper-first at r = 3:
-        # alpha tails, and on the other n - alpha vertices a shared near-regular
-        # head graph of max degree m - 1 (realisable iff m - 1 <= n - alpha - 1),
-        # giving alpha * floor((m-1)(n-alpha)/2) single-step hyperarcs with
-        # lambda^max = kappa^max = m - 1.  Sound for BOTH separations, since
-        # every route in it is a single tail -> head step.
-        best = 0
-        for alpha in range(1, n - m + 1):
-            best = max(best, alpha * ((m - 1) * (n - alpha) // 2))
+    def _dir_hyper_family(n, alpha_max):
+        # The PROVED bipartite family of prop:dir-hyper-first at r = 3: alpha
+        # tails, and on the other n - alpha vertices a shared head hypergraph of
+        # maximum degree m - 1, giving alpha * floor((m-1)(n-alpha)/2)
+        # single-step hyperarcs with lambda^max = kappa^max = m - 1.  Sound for
+        # BOTH separations, since every route in it is a single tail -> head
+        # step.  The two models differ only in how far alpha may run, which is
+        # what the two callers below supply.
+        best = max((alpha * ((m - 1) * (n - alpha) // 2)
+                    for alpha in range(1, alpha_max + 1)), default=0)
         return min(best, n * math.comb(n - 1, 2))
+
+    def lb_dir_hyper(n):
+        # SIMPLE model.  The head hypergraph's edges must be distinct, so
+        # lem:sparse-hypergraph asks m - 1 <= C(n - alpha - 1, r - 2), which at
+        # r = 3 reads m - 1 <= n - alpha - 1, that is alpha <= n - m.
+        return _dir_hyper_family(n, n - m)
+
+    def lb_dir_multihyper(n):
+        # MULTI model.  prop:dir-hyper-first's head family is the cyclic word
+        # read in blocks of r - 1, which repeats hyperedges freely and needs only
+        # r - 1 <= n - alpha, that is alpha <= n - r + 1.  Using the simple
+        # model's alpha <= n - m here understated the two multihypergraph
+        # directed rows: at m = 6, n = 9 it gave 45 where the proposition proves
+        # 50.  A multi lower bound may never sit below what a proposition
+        # supplies for the multi model.
+        return _dir_hyper_family(n, n - 3 + 1)
 
     # Undirected vertex is proved for m<=4 (Leonard/Whitney), open for m>=5.
     vert_proved = (m <= 4)
@@ -1008,7 +1024,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se15 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, simple=False,
                           separation="edge")
-    se15 = _extend_lower_bounds(se15, lb_dir_hyper, hyper_ns)
+    se15 = _extend_lower_bounds(se15, lb_dir_multihyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
         exact=ex15, search=se15))
@@ -1020,7 +1036,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
     se16 = _search_points(hyper_ns, m, open_search_budget,
                           hypergraph=True, r=3, directed=True, simple=False,
                           separation="vertex")
-    se16 = _extend_lower_bounds(se16, lb_dir_hyper, hyper_ns)
+    se16 = _extend_lower_bounds(se16, lb_dir_multihyper, hyper_ns)
     panels.append(dict(
         status="open", ylabel="hyperarcs",
         exact=ex16, search=se16))
