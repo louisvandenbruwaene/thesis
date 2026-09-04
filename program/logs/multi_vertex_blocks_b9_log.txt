@@ -1,0 +1,3 @@
+new best W_6 = 54  graph6 H??EDz}
+examined 191826 two-connected graphs on 9 vertices with at least 14 edges
+g_6(9) = 54, attained by H??EDz}

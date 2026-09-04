@@ -81,9 +81,13 @@ DATA = Path(__file__).resolve().parent / "data"
 #  Those numbers are an EXPERIMENT, and this file is its result.  The two acts
 #  are kept apart:
 #
-#    * rendering (no flag) reads the frozen record and never calls ``solve``.
-#      It is a reproducible drawing operation: the same file draws the same
-#      figures on any machine, in seconds.
+#    * rendering (no flag) draws the four variant grids from the frozen record
+#      and never calls ``solve`` for them: the same file draws the same grids on
+#      any machine, in seconds.  This is a statement about the RECORD, not about
+#      the whole command.  The same run also refreshes offcut-only outputs, and
+#      two of those, the gallery classification and the annealing-against-tabu
+#      comparison, run under wall-clock budgets on every invocation, while the
+#      surface cache is rebuilt whenever its fingerprint no longer matches.
 #    * rebuilding (``--rebuild``) recomputes every value from scratch, consults
 #      nothing, and writes a CANDIDATE beside the record.  ``--compare`` then
 #      shows what moved, and only a deliberate ``--promote`` replaces the
@@ -380,7 +384,7 @@ def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     multiplicity ``m-1``, so the thickened bidirected tree is the ``b = 2`` case.
 
     This is the vertex-separation counterpart of
-    :func:`theta_bouquet_lower_bound`, and it beats the arc extremiser
+    :func:`block_bouquet_lower_bound`, and it beats the arc extremiser
     ``(m-1) M(n)`` while ``n`` is small against ``m``: at ``m = 6`` it leads
     through ``n = 8`` with 84 arcs against 80, and the extremiser leads from
     ``n = 9``.  Plotting the extremiser alone understated the panel, at ``m = 6``,
@@ -396,30 +400,83 @@ def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     return min(best[n - 1], (m - 1) * n * (n - 1))
 
 
-def theta_bouquet_lower_bound(n: int, m: int) -> int:
-    """A lower bound on ``K_m(n)``: a bouquet of thickened THETA blocks.
+# The exhaustive block sweep of ``scripts/multi_vertex_blocks.py``: for each m,
+# ``g_m(b)`` is the largest ``W_m`` a single 2-connected block (or single edge)
+# on ``b`` vertices can score, taken over every such graph that ``geng`` emits.
+# A missing (m, b) entry means the sweep does not reach that cell, not that no
+# block exists; ``m = 2`` is the exception, where no feasible block of order
+# ``b >= 3`` exists at all.  The rows are deliberately allowed to be ragged.
+# ``tab:multi-vertex-blocks`` prints the b <= 8 square, whose transcript is
+# ``logs/multi_vertex_blocks_log.txt``.  The one cell beyond it, ``g_6(9) = 54``,
+# comes from ``scripts/multi_vertex_blocks_b9.py`` with its own transcript in
+# ``logs/multi_vertex_blocks_b9_log.txt``, and is here because m = 6 is a row the
+# grids plot: without it the curve read 52 at n = 9 against a known 54.
+_BLOCK_SWEEP = {
+    2: {2: 1},
+    3: {2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8},
+    4: {2: 3, 3: 6, 4: 9, 5: 12, 6: 15, 7: 18, 8: 21},
+    5: {2: 4, 3: 9, 4: 14, 5: 19, 6: 24, 7: 29, 8: 34},
+    6: {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 47, 9: 54},
+    7: {2: 6, 3: 15, 4: 24, 5: 33, 6: 42, 7: 52, 8: 62},
+    8: {2: 7, 3: 18, 4: 30, 5: 42, 6: 54, 7: 66, 8: 79},
+}
 
-    One block on ``b`` vertices takes two poles, joins each of the other
-    ``b - 2`` vertices to both poles at multiplicity ``m - 2``, and joins the
-    poles to each other at multiplicity ``max(0, m + 1 - b)``.  It carries
-    ``2(b-2)(m-2) + max(0, m+1-b)`` edges and is feasible exactly for
-    ``b <= m + 1``, both stated in ``sec:multi-vertex``.
-    ``thm:multi-vertex-blocks`` then hangs any multiset of blocks with
-    ``sum(b_i - 1) <= n - 1`` off one shared vertex, which is the knapsack here.
 
-    ``b = 2`` is the degenerate block, one edge at multiplicity ``m - 1``, so
-    the thickened tree is the ``b = 2`` case and this is never worse than it.
-    It returns the tree's ``(m-1)(n-1)`` at ``m <= 4``, where that is optimal,
-    and beats it from ``m = 5`` on, where ``thm:clique-chain-vertex`` proves the
-    tree is not extremal.  Every value is attained by an exhibited multigraph,
-    so it can never exceed the true ``K_m(n)``.
+def _best_known_block(b: int, m: int) -> int:
+    """The best ``W_m`` a single feasible block on ``b`` vertices is known to score.
 
-    It agrees with the independent block sweep of
-    ``scripts/multi_vertex_blocks.py`` at every ``n`` that sweep reaches, which
-    ``tests/test_variant_table.py`` pins.
+    ``thm:multi-vertex-blocks`` allows ANY 2-connected block, so restricting the
+    knapsack to one construction family understates it.  Where the exhaustive
+    sweep of ``scripts/multi_vertex_blocks.py`` reaches, ``_BLOCK_SWEEP`` holds
+    its answer, which is ``g_m(b)`` exactly and is what ``tab:multi-vertex-blocks``
+    prints.  Beyond that range the value is the larger of the two exhibited
+    families:
+
+    * the thickened theta of ``sec:multi-vertex``, two poles joined to each of
+      the other ``b-2`` vertices at multiplicity ``m-2`` and to each other at
+      ``max(0, m+1-b)``, feasible exactly for ``b <= m+1``; and
+    * the thickened complete bipartite block ``K_{s,t}`` at multiplicity ``m-s``
+      of ``thm:multi-vertex-bipartite``, feasible for every split ``s + t = b``
+      with ``s <= t <= m-1``, carrying ``st(m-s)`` edges.
+
+    Every value returned is realised by an exhibited feasible block, so the
+    knapsack built on it can never exceed the true ``K_m(n)``.  A return of ``0``
+    means no block of that order is known, which for ``b >= 3`` costs budget and
+    scores nothing, so the knapsack never prefers one.
     """
-    block = {b - 1: 2 * (b - 2) * (m - 2) + max(0, m + 1 - b)
-             for b in range(2, min(n, m + 1) + 1)}
+    swept = _BLOCK_SWEEP.get(m, {}).get(b)
+    if swept is not None:
+        return swept
+    best = 0
+    if b <= m + 1:
+        best = max(best, 2 * (b - 2) * (m - 2) + max(0, m + 1 - b))
+    for s in range(1, b // 2 + 1):
+        if b - s <= m - 1:
+            best = max(best, s * (b - s) * (m - s))
+    return best
+
+
+def block_bouquet_lower_bound(n: int, m: int) -> int:
+    """A lower bound on ``K_m(n)``: a bouquet of the best blocks known.
+
+    ``thm:multi-vertex-blocks`` reduces the value to a knapsack: each block costs
+    ``b - 1`` vertices beyond the shared one and scores ``g_m(b)``, and the total
+    cost may not exceed ``n - 1``.  :func:`_best_known_block` supplies the score,
+    exhaustively where the sweep reaches and by construction beyond it.
+
+    ``b = 2`` is the single edge at multiplicity ``m-1``, so the thickened tree is
+    the ``b = 2`` case and this is never worse than it.  It returns the tree's
+    ``(m-1)(n-1)`` at ``m <= 4``, where that is optimal, and beats it from
+    ``m = 5`` on, where ``thm:clique-chain-vertex`` proves the tree is not
+    extremal.
+
+    An earlier version offered theta blocks alone, which the theta family caps at
+    ``b <= m+1``.  That missed the larger blocks the sweep finds: at ``m = 6`` it
+    read 45 at ``n = 8`` where ``g_6(8) = 47`` is attained by a block on eight
+    vertices that is not a theta (graph6 ``G?AFvw``), and it understated ``n = 14``
+    and ``n = 15`` the same way.
+    """
+    block = {b - 1: _best_known_block(b, m) for b in range(2, n + 1)}
     best = [0] * n
     for budget in range(1, n):
         for cost, value in block.items():
@@ -668,7 +725,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         return min(directed_multigraph_arc(n, m), (m - 1) * n * (n - 1))
 
     def lb_multi_vert(n):
-        return theta_bouquet_lower_bound(n, m)
+        return block_bouquet_lower_bound(n, m)
 
     def lb_multi_dir_vert(n):
         # Two constructions compete, and the panel plots the larger.

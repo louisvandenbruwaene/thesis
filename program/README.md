@@ -102,7 +102,7 @@ recomputing are separate acts**:
 
 | command | what it does |
 | --- | --- |
-| no flag | reads the record and draws. Never calls `solve`. A missing entry is an error, not a fresh run. |
+| no flag | draws the four variant grids from the record. Never calls `solve` for them, and a missing entry is an error rather than a fresh run. It also regenerates offcut-only outputs, so the command as a whole is not pure rendering: the gallery and the annealing-against-tabu comparison run under wall-clock budgets every time, and the surface cache is rebuilt when its fingerprint no longer matches. |
 | `--rebuild` | recomputes every value from scratch, consulting nothing, into `data/machine_values.candidate.json`. Draws nothing. Resumable: an interrupted run picks up where it stopped. |
 | `--compare` | lists every way the candidate departs from the record, and calls out two completed exhaustions that disagree. |
 | `--promote` | replaces the record with the reviewed candidate. |
