@@ -21,7 +21,7 @@ path the thesis prints begins with `program/`.
 
 ## Current build state (2026-09-03, after the hand-in review)
 
-- `main.pdf`: 111 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
+- `main.pdf`: 112 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
   undefined refs, 0 LaTeX warnings and 0 occurrences of `??`. One underfull
   hbox remains, badness 1168, in the `BercziEtAl24` bibliography entry: four
   accented author names TeX will not hyphenate. `\sloppy` does not fix a loose
@@ -264,6 +264,30 @@ One line each. `git log` has the full message for every one of them.
   consult. Also re-verified: geng -C 9 gives 194066, `h_4(b) = 2(b-1)` with
   the hub-and-spokes the unique optimum at every b from 4 to 8, and the rate
   m/2 attained and never exceeded for m <= 8.
+  A third pass, prompted by the author, found three more and one
+  non-finding. `fig:gomory-hu-dist` carried two wrong tree-distance
+  comments (a-c is a TREE edge, distance 1 not 2; e-c is 2 not 3), source
+  only, the drawn tree itself verified a genuine Gomory-Hu tree. The audit
+  said the render command "never starts a search", true of
+  `machine_values.json` but false of the command: the same run rebuilds the
+  surface, enumeration and gallery caches with timed searches. Those three
+  caches have carried a fingerprint that does not match the program since at
+  least `submitted-2`, so they never hit and are recomputed every run, which
+  is how a plain run silently rewrote committed values DOWNWARD (surface
+  `multi_directed_vertex/9/5`: 64 -> 50) while other jobs held the CPU. They
+  feed only offcut figures, so nothing printed moved. The symbols table
+  listed `h_m(b)` but not `g_m(b)` or `W_m(G_0)`; adding them took the thesis
+  from 111 to 112 pages, the symbols list now owning a page of its own.
+  NOT a defect, recorded so it is not rediscovered: the corrected `K_m(n)`
+  curve is still short from n=9, since the sweep stops at b=8. An exhaustive
+  9-vertex search found a block scoring `W_6 = 54` (graph6 `H??EDz}`, 14
+  edges, kappa^max 5) against the curve's 52. `tab:multi-vertex-blocks`
+  already warns the table does not extrapolate, and the curve is labelled a
+  lower bound, so both stay honest. Extending the sweep to b=9 would tighten
+  it. OPEN FOR THE AUTHOR: `program/CLAUDE.md`, 392 lines of working notes,
+  rides into the hand-in via `git archive HEAD program`, is absent from the
+  README manifest and from the audit's list of what `program/` holds.
+  `publish.sh` strips it from the PUBLIC snapshot; the hand-in path does not.
 
 - **2026-09-03 (second pass).** A pre-hand-in review, six defects, none
   mathematical. The AI badge had come off five Chapter 1 statements but not
