@@ -280,8 +280,11 @@ One line each. `git log` has the full message for every one of them.
   from 111 to 112 pages, the symbols list now owning a page of its own.
   NOT a defect, recorded so it is not rediscovered: the corrected `K_m(n)`
   curve is still short from n=9, since the sweep stops at b=8. An exhaustive
-  9-vertex search found a block scoring `W_6 = 54` (graph6 `H??EDz}`, 14
-  edges, kappa^max 5) against the curve's 52. `tab:multi-vertex-blocks`
+  9-vertex search settles `g_6(9) = 54` EXACTLY, attained by graph6 `H??EDz}`
+  (14 edges, kappa^max 5), so `K_6(9) = 54` against the curve's 52. Exhaustive
+  over all 191826 two-connected graphs on 9 vertices with at least 14 edges,
+  which is no restriction: kappa >= 2 on every edge of a 2-connected graph caps
+  `W_6` at `4|E|`, so 13 edges cannot reach 53. `tab:multi-vertex-blocks`
   already warns the table does not extrapolate, and the curve is labelled a
   lower bound, so both stay honest. Extending the sweep to b=9 would tighten
   it. OPEN FOR THE AUTHOR: `program/CLAUDE.md`, 392 lines of working notes,
