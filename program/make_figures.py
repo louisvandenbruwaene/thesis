@@ -81,9 +81,13 @@ DATA = Path(__file__).resolve().parent / "data"
 #  Those numbers are an EXPERIMENT, and this file is its result.  The two acts
 #  are kept apart:
 #
-#    * rendering (no flag) reads the frozen record and never calls ``solve``.
-#      It is a reproducible drawing operation: the same file draws the same
-#      figures on any machine, in seconds.
+#    * rendering (no flag) draws the four variant grids from the frozen record
+#      and never calls ``solve`` for them: the same file draws the same grids on
+#      any machine, in seconds.  This is a statement about the RECORD, not about
+#      the whole command.  The same run also refreshes offcut-only outputs, and
+#      two of those, the gallery classification and the annealing-against-tabu
+#      comparison, run under wall-clock budgets on every invocation, while the
+#      surface cache is rebuilt whenever its fingerprint no longer matches.
 #    * rebuilding (``--rebuild``) recomputes every value from scratch, consults
 #      nothing, and writes a CANDIDATE beside the record.  ``--compare`` then
 #      shows what moved, and only a deliberate ``--promote`` replaces the
@@ -401,14 +405,18 @@ def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
 # on ``b`` vertices can score, taken over every such graph that ``geng`` emits.
 # A missing (m, b) entry means the sweep does not reach that cell, not that no
 # block exists; ``m = 2`` is the exception, where no feasible block of order
-# ``b >= 3`` exists at all.  These are the numbers ``tab:multi-vertex-blocks``
-# prints, and the retained transcript is ``logs/multi_vertex_blocks_log.txt``.
+# ``b >= 3`` exists at all.  The rows are deliberately allowed to be ragged.
+# ``tab:multi-vertex-blocks`` prints the b <= 8 square, whose transcript is
+# ``logs/multi_vertex_blocks_log.txt``.  The one cell beyond it, ``g_6(9) = 54``,
+# comes from ``scripts/multi_vertex_blocks_b9.py`` with its own transcript in
+# ``logs/multi_vertex_blocks_b9_log.txt``, and is here because m = 6 is a row the
+# grids plot: without it the curve read 52 at n = 9 against a known 54.
 _BLOCK_SWEEP = {
     2: {2: 1},
     3: {2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8},
     4: {2: 3, 3: 6, 4: 9, 5: 12, 6: 15, 7: 18, 8: 21},
     5: {2: 4, 3: 9, 4: 14, 5: 19, 6: 24, 7: 29, 8: 34},
-    6: {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 47},
+    6: {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 47, 9: 54},
     7: {2: 6, 3: 15, 4: 24, 5: 33, 6: 42, 7: 52, 8: 62},
     8: {2: 7, 3: 18, 4: 30, 5: 42, 6: 54, 7: 66, 8: 79},
 }

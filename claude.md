@@ -269,17 +269,29 @@ One line each. `git log` has the full message for every one of them.
   comments (a-c is a TREE edge, distance 1 not 2; e-c is 2 not 3), source
   only, the drawn tree itself verified a genuine Gomory-Hu tree. The audit
   said the render command "never starts a search", true of
-  `machine_values.json` but false of the command: the same run rebuilds the
-  surface, enumeration and gallery caches with timed searches. Those three
-  caches have carried a fingerprint that does not match the program since at
-  least `submitted-2`, so they never hit and are recomputed every run, which
-  is how a plain run silently rewrote committed values DOWNWARD (surface
-  `multi_directed_vertex/9/5`: 64 -> 50) while other jobs held the CPU. They
-  feed only offcut figures, so nothing printed moved. The symbols table
+  `machine_values.json` but false of the command. A FIRST ATTEMPT AT THIS FIX
+  WAS ALSO WRONG and an external review caught it, so get the mechanism right:
+  the two enumeration caches are EXHAUSTIVE and currently HIT, so they are
+  neither timed nor recomputed. Only `surface_cache.json` both misses (it
+  carries `d58345...` against the program's `cbcb38...`) and is filled by timed
+  `solve(exhaustive=False, max_seconds=20)` calls. The gallery and the
+  annealing-against-tabu comparison are not fingerprint-governed at all and rerun
+  under wall-clock budgets EVERY invocation. All of it feeds offcut-only outputs,
+  so nothing printed moved. A plain run did rewrite committed surface values
+  downward (`multi_directed_vertex/9/5`: 64 -> 50), observed in session but not
+  preserved in any git object; the earlier note blamed CPU contention, which was
+  never tested and is only one candidate, the stale cache predating a program
+  change being another.
+  **After changing a curve, regenerate with `--grids-only` and `--tables-only`,
+  never a bare `make_figures.py`**, which is what drags the offcut searches in. The symbols table
   listed `h_m(b)` but not `g_m(b)` or `W_m(G_0)`; adding them took the thesis
   from 111 to 112 pages, the symbols list now owning a page of its own.
-  NOT a defect, recorded so it is not rediscovered: the corrected `K_m(n)`
-  curve is still short from n=9, since the sweep stops at b=8. An exhaustive
+  `g_6(9) = 54` is now IN `_BLOCK_SWEEP`, so the m=6 curve reads 54 at n=9 and
+  101 at n=16. The rows of that table are deliberately ragged: the appendix
+  prints the b<=8 square, and this one extra cell has its own script
+  (`scripts/multi_vertex_blocks_b9.py`) and transcript, cited where it is
+  stated. The curve is still short from n=10 on, since g_6(10) is unknown. An
+  exhaustive
   9-vertex search settles `g_6(9) = 54` EXACTLY, attained by graph6 `H??EDz}`
   (14 edges, kappa^max 5), so `K_6(9) = 54` against the curve's 52. Exhaustive
   over all 191826 two-connected graphs on 9 vertices with at least 14 edges,

@@ -1822,19 +1822,29 @@ in \Cref{sec:transcripts}.
   knapsack of \Cref{thm:multi-vertex-blocks} gives $K_m(n)$ for $n \le 8$; at
   $m=5$, $n=7$ it returns the $29$ quoted above, against the $27$ that
   \Cref{thm:clique-chain-vertex} reaches. The per-vertex rate $g_m(b)/(b-1)$ is
-  still rising at $b=8$ in every row, so this table does not extrapolate: a
-  larger $n$ needs larger blocks enumerated.}
+  still rising at $b=8$ in every row from $m=5$ on, while at $m=3$ it falls and
+  at $m=4$ it is flat, so this table does not extrapolate: a larger $n$ needs
+  larger blocks enumerated.}
   \label{tab:multi-vertex-blocks}
 \end{table}
 
-The winning blocks are never complete once $b \ge 5$, and their degree
-sequences are lopsided at every cell, a few vertices of high degree beside a
-majority at degree two or three. What the sweep does \emph{not} show is that
-they are complete bipartite graphs with a few edges added. That description is
-exact at $m = 7$ and $m = 8$, where the maximiser at $b = 7$ and $b = 8$ is
-$K_{3,4}$ or $K_{3,5}$ with two further edges inside the side of size three. It
-is the unique maximiser in three of those four cells, $m = 8$ at $b = 7$ having
-six. The description fails at $m = 4$, $5$ and $6$, where from $b = 7$ onwards
+One cell beyond the table is known. An exhaustive sweep of the $2$-connected
+graphs on nine vertices gives $g_6(9) = 54$, attained by a block with fourteen
+edges, run from the standalone script
+\code{program/scripts/multi\_vertex\_blocks\_b9.py}. A single block of that order
+beats every split of the same budget, the best of which reach $52$, so
+$K_6(9) = 54$. Its rate $54/8$ exceeds the $47/7$ of $b=8$, which is the $m=6$
+row still rising at $b=9$ exactly as the caption warns.
+
+The winning blocks are never complete once $b \ge 5$, and from $m = 4$ on their
+degree sequences are lopsided, a few vertices of high degree beside a majority
+at degree two or three. At $m = 3$ they are the cycles, every degree two. What
+the sweep does \emph{not} show is that they are complete bipartite graphs with a
+few edges added. That description fits at $m = 7$ and $m = 8$, where $K_{3,4}$
+or $K_{3,5}$ with two further edges inside the side of size three attains the
+maximum at $b = 7$ and $b = 8$. It is the unique maximiser at three of those
+four cells and one of six at $m = 8$, $b = 7$, where two of the six carry the
+shape. The description fails at $m = 4$, $5$ and $6$, where from $b = 7$ onwards
 the maximum is attained by many non-isomorphic blocks at once, up to $38$ of
 them, and across those six cells exactly one tied block is complete bipartite,
 the $K_{2,5}$ at $m = 6$, $b = 7$, which scores the $st(m-s) = 40$ of the family
@@ -1872,8 +1882,9 @@ and $h(\alpha) = \alpha(1-\alpha)/(1+\alpha)$ has $h'(\alpha) = (1 - 2\alpha - \
 The optimum is lopsided: one side has size about $0.41m$ and the other reaches
 the cap $m-1$. The finite sweep of \Cref{tab:multi-vertex-blocks} shows that
 adding a few edges inside the small side improves this clean family at $m = 7$
-and $m = 8$, and that at $m = 4$, $5$ and $6$ the extremal blocks take some
-other shape entirely. So the answer is a block problem, its asymptotic constant
+and $m = 8$, and that at $m = 4$, $5$ and $6$ the extremal blocks are mostly
+of other shapes, the $K_{2,5}$ tying at $m = 6$, $b = 7$ being the one that is
+not. So the answer is a block problem, its asymptotic constant
 lies between $3-2\sqrt2$ and $2$, and which blocks attain it is open along with
 the constant.
 
@@ -2426,9 +2437,12 @@ timed search.
 
 Rendering and recomputing are separate operations. The third command above draws
 the four variant grids from the recorded values without calling the solver, so an
-entry the file does not hold is reported as an error rather than computed. That
-run does rebuild three further caches, behind figures this thesis does not print,
-and those carry timed searches, so it takes minutes rather than seconds. Passing
+entry the file does not hold is reported as an error rather than computed. Outside
+the four grids, the same command regenerates several offcut-only outputs. It
+caches two exhaustive enumerations and the timed surface searches, while the
+gallery search and the annealing-against-tabu comparison run under wall-clock
+budgets every time. So the full no-flag command is not a pure rendering
+operation, and it takes minutes rather than seconds. Passing
 \code{-{}-rebuild} recomputes every entry from scratch, without consulting the
 record, and writes a candidate file beside it. Passing \code{-{}-compare} lists
 every entry on which the candidate departs from the record, and

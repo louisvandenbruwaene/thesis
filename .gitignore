@@ -2,8 +2,10 @@
 __pycache__/
 *.pyc
 
-# Program run logs.  The four transcripts the thesis cites are tracked already,
-# so this rule only keeps the scratch logs of later runs out of the repository.
+# Program run logs.  The transcripts the thesis and the program cite are tracked
+# already, by force-add, so this rule only keeps the scratch logs of later runs
+# out of the repository.  It said "the four transcripts" while six were tracked,
+# so it carries no count now.
 program/logs/
 
 # A rebuild in progress. Scratch state, promoted into machine_values.json by
