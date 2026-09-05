@@ -20,7 +20,7 @@ Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices 
 \Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
 Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
 All possible graphs of a given size will later be checked to see if they are extremal for the given size and connectivity restraint.
-Matrices are iterated as a depth-first search with entries taking values between $0$ and $m-1$, and the diagonal is always zero.
+Matrices are iterated as a depth-first search with entries in $\{0,1\}$ for simple graphs and in $\{0,\ldots,m-1\}$ for multigraphs, and the diagonal is always zero.
 Hypergraphs are implemented similarly from the ground up as there are no matrix tools for them.
 Notice how depth-first search is memory-efficient.
 
@@ -31,7 +31,7 @@ local connectivity $\lambda^{\max}$ or $\kap^{\max}$ of each with a max-flow com
 keep the densest graph that stays at or below the cap $m - 1$. 
 If the enumeration cannot finish within the time limit, the best graph so far is returned.
 It is therefore important to distinguish between the densest graph possible and the densest graph found.
-Here they are called exact (upper) bounds and lower bounds respectively.
+A completed enumeration gives an exact extremal value. An unfinished enumeration gives only a lower bound.
 In the vertex-disjoint and hypergraph cases the graph will be transformed before the flow can be measured.
 This ensures that every variant shares the same integer max-flow engine no matter the implementation.
 Thus the whole question reduces to a flow computation:
@@ -61,8 +61,7 @@ Another representation for multihypergraphs is a separate gate with capacity one
 
 The hypergraph Menger theorem (\Cref{thm:menger-hyper}) proves that the resulting maximum flow is exactly the Berge connectivity. 
 \Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph. 
-For the vertex-disjoint hypergraph checker, 
-the ordinary vertices are split as before and the helper point is added to the split network with infinite internal capacity.
+For the vertex-disjoint hypergraph checker, only the ordinary vertices are split into unit-capacity gates. Each hyperedge retains its multiplicity-capacity gate.
 
 Lastly, all vertex-disjoint versions can then be transformed into an identical edge-disjoint question by splitting
 each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}). 
@@ -440,8 +439,7 @@ Decorations that reach the target arc count are retained and converted to canoni
 which ensures that each isomorphism class is reported only once. 
 Because different support graphs produce disjoint search spaces, they can be processed independently on separate processor cores. 
 The related orientation tools \texttt{directg} and \texttt{watercluster2} are not used.
-They assign only one orientation to each edge, so they cannot represent the bidirected edges
-or the repeated arc multiplicities that occur in the extremal graphs.
+Both allow edges in both directions, but they do not assign the repeated arc multiplicities used here \cite{NautyGuide29}. The custom decoration step also applies the connectivity pruning after each assignment.
 
 \Cref{tab:generating-benchmark} compares three single-core methods for proving $\ell_2^{\mathrm{dir}}(n)$.
 The first is a blind sweep over every matrix assignment.
@@ -579,8 +577,8 @@ That probability decreases as the run cools.
 At an equal wall-clock budget, annealing is the weaker engine here.
 For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph extremiser, while annealing reaches $20$ arcs.
 For the simple digraph, tabu reaches $18$ arcs and annealing reaches $16$.
-Every discovery value this thesis reports therefore comes from tabu search. 
-Annealing is kept only as an independent cross-check in the program's self-test, 
+The reported discovery bounds use tabu search, supplemented by explicit constructions.
+Annealing is retained for the comparison above and as an independent cross-check in the program's self-test,
 where agreement between two unrelated walks is worth more than the speed of either.
 
 It is fair to ask why the walk is allowed above the cap at all. 
@@ -626,7 +624,7 @@ and the regression test that holds the fast walk to the naive one step for step.
 
 Before addressing open cases, the search is tested on settled ones.
 Each run starts from the empty graph.
-The search is told only to add edges without breaching the connectivity cap.
+The search is given the edge-count objective and the connectivity cap, and retains only feasible witnesses. Its intermediate states may be infeasible.
 It receives no description of the known extremal construction.
 In every tested case, it nevertheless reaches the established value and recovers a named construction.
 \Cref{tab:rediscovery} compares the densest witness with the theoretical value.

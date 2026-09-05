@@ -504,13 +504,15 @@ def directed_arc_m2(n: int) -> int:
 
 
 def directed_arc_lower_bound(n: int, m: int) -> int:
-    """Lower bound and conjectured value for ``ell_m^dir(n)``, ``m >= 2``.
+    """Hub/augmented-bipartite lower bound for ``ell_m^dir(n)``, ``m >= 2``.
 
     ``max(m(n-1), floor((n+m-2)^2/4))``.  The two branches are the hub
     construction (``const:directed-hub``) and the shifted-partition augmented
     bipartite construction (``const:augmented-bipartite``).  Proved as a lower
-    bound for all ``m`` after capping at the complete digraph. It is conjectured to be tight for ``m >= 3``
-    (``conj:dir-arc``), proved tight for ``m = 2``.
+    bound for all ``m`` after capping at the complete digraph, and exact at
+    ``m = 2``. The all-order equality is false: the clique-core construction
+    has 57 arcs at ``m = 5, n = 12``, where this bound is 56. The thesis retains
+    only eventual equality with the quadratic branch as ``conj:dir-arc``.
     """
     hub_branch = m * (n - 1)
     bipartite_branch = (n + m - 2) ** 2 // 4
@@ -901,7 +903,7 @@ def directed_hub(n: int, m: int) -> Graph:
 
 
 def augmented_bipartite(n: int, m: int) -> Graph:
-    """The conjectured directed extremiser for ``m >= 2``.
+    """A directed construction conjectured optimal for each fixed m and large n.
 
     Set ``|B| = ceil((n+m-2)/2)`` and ``|A| = n - |B|``.  Fill every arc
     ``A -> B`` (the one-directional wall), then give each ``B``-vertex
@@ -3025,7 +3027,7 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
     augmented-bipartite branch.  Before floors, the upper crossover is
     ``n = m + 2 + 2*sqrt(m)``, hence ``n ~ m`` for growing ``m``.
     """
-    ns = list(range(2, max_n + 1))
+    ns = list(range(max(2, m), max_n + 1))
     hub = [m * (n - 1) for n in ns]                         # linear hub branch
     # Quadratic branch: the shifted-partition augmented bipartite count
     # floor((n+m-2)^2/4) of const:augmented-bipartite (at m <= 3 it equals the
@@ -6314,7 +6316,7 @@ def _run_checks() -> int:
         check(f"K_4-tree on {ktree.num_vertices} vertices: kappa={min_vertex_connectivity(ktree)}",
               min_vertex_connectivity(ktree) == 3)
 
-    section("Constructions: the augmented bipartite conjecture values")
+    section("Constructions: the augmented bipartite lower bounds")
     counterexample = augmented_bipartite(10, 3)
     check(f"m=3,n=10: {counterexample.edge_count()} arcs, lambda^max={max_edge_connectivity(counterexample)}",
           counterexample.edge_count() == 30 and max_edge_connectivity(counterexample) == 2)

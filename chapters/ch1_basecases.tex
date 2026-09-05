@@ -428,7 +428,7 @@ one route at a time is the whole difficulty of the model.
 For a simple graph the definition changes nothing, because an edge lies on a
 route exactly when both of its endpoints do. For a multigraph it says that $q$
 parallel copies of $uv$ are $q$ separated routes, exactly as $q$ copies of a
-hyperedge are, since a single edge is a path with nothing in its interior. So the
+hyperedge are, since each copy supplies its own interior edge-node and no interior original vertex. So the
 two multigraph vertex variants are questions of their own, written $K_m(n)$ and
 $K_m^{\mathrm{dir}}(n)$, rather than the simple problems under another name. They
 are finite for the same reason the edge variants are: $m$ parallel copies are
@@ -578,10 +578,10 @@ An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at m
 
 The proof is an elementary induction on a hyperedge cut, and \Cref{app:proofs} gives it.
 It has to be re-run rather than deduced from \Cref{thm:multigraph-edge}, because the obvious reduction points the wrong way. Replacing every hyperedge by a spanning star on its $r$ vertices gives a multigraph of size $(r-1)|E(\HH)|$, but two routes may then take two different star edges of one hyperedge, which a family of Berge routes forbids. The star multigraph can therefore carry more connectivity than the hypergraph it came from, and a feasible hypergraph need not produce a feasible multigraph to count.
-The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one everywhere, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound. 
+The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one between vertices in its nontrivial component, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound.
 For $r \ge 3$ the bound is attained by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}). 
 That is a real difference between the two edge sizes. 
-For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the two are equal, but only while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
+For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the two are equal, but only while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two may part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
 
 \begin{figure}[ht]
 \centering
@@ -705,9 +705,9 @@ $\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
 \]
 The same bound therefore holds under $\lec^{\max}_{\HH} \le m-1$, which is the
 stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
-edge- and the vertex-disjoint maxima are
+edge- and the vertex-disjoint multihypergraph maxima are
 $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
-of \Cref{prop:dir-hyper-first} is asymptotically optimal for both.
+of \Cref{prop:dir-hyper-first} is asymptotically optimal for both. For simple directed hypergraphs the same conclusion holds when $r\ge3$. The case $r=2$ is the simple digraph problem, with leading term $n^2/4$.
 \end{theorem}
 
 The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
@@ -726,4 +726,4 @@ well, since $\kap \le \lec$, and the theorem above at $r = 2$ is the matching
 upper bound, so $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$
 (\Cref{cor:dir-multi-incidence}).
 
-For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so what the conjecture still claims beyond what is known is the coefficient of the linear term rather than the shape of the answer. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.
+For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so the conjecture additionally specifies the linear coefficient and the exact bounded correction for sufficiently large orders. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.

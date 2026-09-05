@@ -377,7 +377,7 @@ _SETTLED_HYPER_EDGE_SIMPLE = {(6, 6, 3): 11}
 def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     """A lower bound on ``K_m^dir(n)``: a bouquet of thickened complete digraphs.
 
-    ``const:dir-multi-vertex-blocks`` takes the complete digraph on ``b <= m+1``
+    ``const:dir-multi-vertex-blocks`` takes the complete digraph on ``b <= m``
     vertices at multiplicity ``m+1-b``, which ``prop:dir-multi-vertex-blocks``
     checks is feasible and carries ``b(b-1)(m+1-b)`` arcs, and hangs any multiset
     of such blocks off one shared vertex.  ``b = 2`` is the bidirected edge at
@@ -391,7 +391,7 @@ def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     ``n = 4`` reading 34 against a checked 36.
     """
     block = {b - 1: b * (b - 1) * (m + 1 - b)
-             for b in range(2, min(n, m + 1) + 1)}
+             for b in range(2, min(n, m) + 1)}
     best = [0] * n
     for budget in range(1, n):
         for cost, value in block.items():
@@ -885,7 +885,7 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
             status="open", ylabel="edges",
             exact=ex2, search=se2))
 
-    # (3) simple directed arc -- conjectured.
+    # (3) simple directed arc -- finite exact value open for m >= 3.
     # The shared exact_budget (60s) is calibrated for the hypergraph panels
     # (see its own docstring) and is far too short here: at m=3, n=6 this
     # panel's own exhaustion measures 544.2s (edge) and 1422.7s (vertex) on
@@ -902,13 +902,11 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
                         directed=True, simple=True, separation="edge")
     se3 = searched(matrix_ns, lb_dir,
                    directed=True, simple=True, separation="edge")
-    # No named sub-branches. conj:dir-arc is the maximum of a hub count and a
-    # bipartite count, and drawing the losing one as a dotted line made this the
-    # only panel of sixteen with a mark the others do not have. The curve plotted
-    # is the conjectured value itself, exactly as in every other panel.
+    # Eventual exactness has no verified threshold. Do not draw the refuted
+    # all-order formula as a conjectured optimum at the plotted finite orders.
     panels.append(dict(
-        status="conjectured", ylabel="arcs",
-        conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
+        status="proved" if m == 2 else "open", ylabel="arcs",
+        **({"proved": (matrix_ns, [lb_dir(n) for n in matrix_ns])} if m == 2 else {}),
         exact=ex3, search=se3))
 
     # (4) simple directed vertex -- exact value open.  The arc construction is

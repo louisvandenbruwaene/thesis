@@ -2891,4 +2891,40 @@ Two independent confirmations of the arc value sit beside this proof and neither
 Three remarks on the shape of the induction. First, the minimum-degree deletion closes the step on its own, and no separate hub case is needed, because the averaging bound holds whether or not $D$ contains a hub, although \Cref{thm:directed-upper} shows directly that a hub digraph never exceeds the linear branch. Second, for even $n$ the bound is exactly tight against the one-directional bipartite construction, which is $\frac{n}{2}$-regular in total degree, so every step of the chain is achieved by the conjectured extremiser, and for odd $n$ the slack $\frac{k}{2k-1} < 1$ is absorbed by integrality. Third, the induction's length comes from carrying the two regimes of $M(n)$ through the arithmetic separately, the same bookkeeping \Cref{ch:certify} hands to the machine at the base cases.
 \end{offcut}
 
+\begin{offcut}{K2. The decomposition conjecture and its two-hop count}{K2}{chapters/app\_proofs.tex, former lead-in to \Cref{sec:two-step-budget}}{nothing: this material is REFUTED and must not be restored}{The clique-core construction of Stijn Cambie has $57$ arcs at $m=5$, $n=12$ with $\lec^{\max}=4$, while the count below bounds any digraph admitting the proposed partition by $\floor{(n+m-2)^2/4}=56$. So no such partition exists for that extremiser and the conjecture is false, along with the all-order formula it was meant to close. \Cref{prop:two-hop-bipartite} itself remains valid; it is only the assumption that every extremiser has the stated shape that fails. Review finding, 5 September 2026.}
+
+These are the proved ingredients of the reduction discussed in \Cref{ch:synthesis}. What the reduction still assumes is stated as \Cref{open:decomposition}, and \Cref{sec:two-step-budget} then closes the section with the bounds that assume nothing at all: one counting lemma, \Cref{lem:two-step-budget}, and the four results it drives, of which \Cref{thm:dir-arc-linear-error,thm:dir-vertex-linear-error} and \Cref{prop:dir-arc-stability} are proved here and \Cref{thm:dir-hyper-constant} in \Cref{sec:dir-hyper}.
+
+\begin{proposition}[Two-hop budget on bipartite partitions]\label{prop:two-hop-bipartite}
+Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$. If $V$ admits a partition $A \cup B$ with $A \ne \emptyset$ and every arc from $A$ to $B$ is present, then every $b \in B$ has in-degree at most $m - 2$ from inside $B$, and consequently the number of arcs inside $B$ is at most $(m-2)|B|$.
+\end{proposition}
+
+In words: once every arc from $A$ to $B$ is present, a vertex of $B$ can afford very few in-arcs from inside $B$. Each such arc creates a fresh two-step detour on top of the direct arc that every vertex of $A$ already has, and the cap allows only $m-2$ of them.
+
+\begin{proof}
+Fix $a \in A$ and $b \in B$, and let $b'_1, \dots, b'_d$ be the in-neighbours of $b$ inside $B$, where $d = \deg^-_B(b)$. The direct arc $a \to b$ together with the two-step detours $a \to b'_i \to b$ are $1 + d$ arc-disjoint $a$-to-$b$ routes, all present because $A \to B$ is complete. Feasibility forces $1 + d \le m - 1$, so $d \le m - 2$, and summing over $B$ bounds the internal arcs by $(m-2)|B|$.
+\end{proof}
+
+We now combine \Cref{prop:two-hop-bipartite} with the best choice of partition. Suppose every arc of $D$ either runs from $A$ to $B$ or stays inside $B$: the partition $A \to B$ is complete, no arc lies inside $A$, and crucially \emph{no arc runs from $B$ back to $A$}. Write $b = |B|$, so that $|A| = n - b$. The arcs then come in exactly two kinds. The arcs crossing the partition number $|A|\,|B| = (n-b)\,b$, one for each ordered $A$--$B$ pair. The arcs inside $B$ number at most $(m-2)\,b$, which is \Cref{prop:two-hop-bipartite} applied to the partition $A \cup B$ exactly as it stands. What the absence of backward arcs supplies is not that step but the next one: it is why the two kinds are the only kinds. There are no other arcs, so, adding the two,
+\[
+   |A(D)| \;\le\; (n-b)\,b \;+\; (m-2)\,b \;=\; b\,\bigl(n + m - 2 - b\bigr).
+\]
+The right-hand side is a downward parabola in $b$. Writing $s = n + m - 2$, it is $b(s-b) = -b^2 + sb$, maximised at $b = s/2$, so over integers the best partition takes $b = \ceil{s/2}$ (equivalently $\floor{s/2}$). That value lies in the admissible range $1 \le b \le n-1$, which $A \ne \emptyset$ forces, exactly when $m \le n$, and $n \ge m$ is the range \Cref{conj:dir-arc} is stated on. The maximum value is
+\[
+   \max_{b} \; b\,(s-b) \;=\; \floorfrac{s^2}{4} \;=\; \floorfrac{(n+m-2)^2}{4}.
+\]
+This is the quadratic branch of \Cref{conj:dir-arc}, reached uniformly in $m$. The count is often summarised as resting on the absence of backward arcs alone, and that summary is too narrow. Four things were granted at once: that a partition $V = A \cup B$ exists at all, that every arc from $A$ to $B$ is present, that no arc lies inside $A$, and that no arc runs from $B$ back to $A$. Only the last of the four is the backward-arc condition. The first three describe the shape of the extremiser, and nothing proved so far forces an arbitrary extremal digraph to have that shape. The gap is therefore a structural one:
+
+\begin{conjecture}[The missing decomposition]\label{open:decomposition}
+Let $n$ be large enough that the quadratic branch of \Cref{conj:dir-arc} strictly exceeds the linear one, that is, $\floor{(n+m-2)^2/4} > m(n-1)$. Then every extremal digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ admits a partition $V(D) = A \cup B$ into two non-empty parts such that every arc from $A$ to $B$ is present, no arc lies inside $A$, and no arc runs from $B$ to $A$.
+\end{conjecture}
+
+The hypothesis on $n$ has to be there, because the obvious phrasing is too narrow. On the linear branch the extremisers are \emph{not} just the hub. At $m = 2$, every bidirected spanning tree is feasible and has exactly $2(n-1)$ arcs, since between two vertices the only route follows the unique tree path. An exhaustive classification confirms that at $n = 5$ and $n = 6$ these are all the extremal digraphs: there are exactly $3$ and $6$ up to isomorphism, which are precisely the numbers of trees on $5$ and $6$ vertices, and none admits the decomposition. At the tie $n=7$, the one-directional bipartite digraph is extremal as well. Excluding ``the hub'' would therefore leave other extremisers behind, so the hypothesis is on the size rather than on the shape.
+
+Given \Cref{open:decomposition} the count above closes \Cref{conj:dir-arc} for $m \ge 3$. The backward-arc clause is the part where the natural delete-and-compensate exchange fails to be monotone, which is why it is the clause usually named, but the partition itself is not free either, and \Cref{ch:synthesis} states the position that way. Testing the conjecture by exhaustion is harder than it looks: the crossover sits at $n = 8$ for $m = 2$ and at $n = 9$ for $m = 3$, so every size an exhaustive sweep can reach at $m = 3$ still lies on the linear branch, where the statement says nothing. That is the practical reason this conjecture has resisted a computational probe rather than a proof.
+
+What can be proved without any of the four is the leading constant, and the machinery for it is a single counting lemma. Feasibility enters that lemma once, to cap one explicit family of routes, and everything after it is arithmetic on in-degrees and out-degrees. Promoting that one cap from a deduction to a hypothesis costs nothing and lets the same count serve four theorems, one of them for a problem \Cref{ch:synthesis} lists as untouched by the arc case. The lemma and its ingredients therefore come first, and each theorem then costs a few lines.
+
+\end{offcut}
+
 \end{document}
