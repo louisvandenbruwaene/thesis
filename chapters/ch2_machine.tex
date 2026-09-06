@@ -282,7 +282,7 @@ the gates aren't split by this step.
 
 \section{Checking every graph of a fixed size}\label{sec:certification-standard}
 The connectivity checker works on all variants but measures only one graph at a time. 
-All graphs of a fixed number of vertices must be enumerated to discover the bound for a single connectivity constraint.
+To establish an exact value by enumeration, every feasible graph must either be checked or excluded by a sound pruning argument. This is one route to an upper bound. A mathematical theorem can establish it without enumeration.
 A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal entry, a multigraph a choice in $\{0,\dots,m-1\}$,
 and a digraph varies every ordered pair rather than only the upper triangle.
 A hypergraph is not a matrix at all, so it is enumerated over its own list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
@@ -291,7 +291,7 @@ In the directed model, the tail is specified with a pointer and the multihypergr
 Using these representations for all graph variants means iteration traverses all possible representation states easily. 
 Walking those possibilities, measuring each candidate with the checker and keeping the densest feasible graph settles a bound exactly.
 If the enumeration hits its deadline before finishing, the returned graph is labelled as a lower bound.
-On the small cases this exhaustive mode independently reproduces every value proved by hand in \Cref{ch:basecases}.
+Completed enumerations corroborate the small cases reported in the audit. There is one important exception to the driver's terminology: for directed multigraphs under arc separation, \code{solve(exhaustive=True)} returns the proved closed form and a named witness. That branch is a theorem evaluation, not an independent exhaustive check. It therefore supplies no enumeration markers in the figures. The standalone formula audit calls the enumerator directly when checking that theorem.
 
 \begin{figure}[ht]
     \centering
@@ -313,9 +313,9 @@ It decides both directions of a pair independently, turning two undirected state
 Which change costs more depends on $m$ and on the model.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
-These are precisely the variants whose answers \Cref{ch:basecases} could not prove.
+These variants are particularly costly to enumerate, even where a theorem already determines their leading term.
 The separation, by contrast, does not change the enumeration: edge and vertex disjointness
-search the same graphs and differ only in output.
+start from the same candidate space, but use different feasibility tests. Their pruning and running times can therefore differ.
 
 \begin{figure}[ht]
 \centering
@@ -441,10 +441,10 @@ Because different support graphs produce disjoint search spaces, they can be pro
 The related orientation tools \texttt{directg} and \texttt{watercluster2} are not used.
 Both allow edges in both directions, but they do not assign the repeated arc multiplicities used here \cite{NautyGuide29}. The custom decoration step also applies the connectivity pruning after each assignment.
 
-\Cref{tab:generating-benchmark} compares three single-core methods for proving $\ell_2^{\mathrm{dir}}(n)$.
-The first is a blind sweep over every matrix assignment.
-The second is the pruned depth-first search of \Cref{fig:prune}.
-The third is the pipeline seeded by \texttt{geng}.
+\Cref{tab:generating-benchmark} records historical timings for three different single-core tasks. The distinction matters: they are not three equivalent ways of discovering an unknown optimum.
+The blind sweep maximises the arc count over all matrix assignments.
+The pruned depth-first search also maximises it, but starts with a supplied feasible construction as an incumbent.
+The \texttt{geng} pipeline is given the already known extremal arc count and lists the feasible isomorphism classes at that target. Finding representatives there does not rule out a larger feasible count, so this last run does not prove the optimum independently.
 
 The blind sweep is omitted after $n=4$, where $2^{n(n-1)}$ assignments already take $6.3$\,s.
 Each additional vertex multiplies the assignment count by $2^{2n}$.
@@ -454,16 +454,13 @@ This is the growth shown in \Cref{fig:complexity}.
 Below $n=5$, fixed overhead dominates the two remaining methods.
 The main costs there are Python function calls and subprocess start-up.
 Those timings do not give a meaningful comparison of search performance.
-From $n=5$ onwards, the gap widens with every vertex.
-Generation is $5.6$ times faster at $n=5$, $20$ times faster at $n=6$, and $68$ times faster at $n=7$.
-At $n=7$, the pruned search takes $1156.6$\,s and the generated pipeline takes $17.0$\,s.
-All three methods return the same proved value at every $n$ where they finish.
+At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-target classification takes $17.0$\,s. Their different outputs and prior information prevent interpreting this ratio as a speed-up for proving an unknown optimum. The script gives the pruned search a $1800$-second stopping target. The blind and generated routines have no common time limit. These observations illustrate the cost of the respective tasks, not an equal-budget performance comparison.
 
 \begin{table}[ht]
     \centering
     \small
     \input{figures/generating_benchmark_table.tex}
-    \caption{Wall-clock time to prove $\ell_2^{\mathrm{dir}}(n)$ by three methods, single core. The blind sweep has no pruning. The pruned search is \Cref{fig:prune}'s depth-first branch and bound. The generated pipeline is the geng-seeded search above. A dash marks a run not attempted at that size. These times come from a separate execution of the same pruned-search method, so the pruned column at $n=7$ does not match the $718$\,s that \Cref{tab:basecase-search} records for the same search.}
+    \caption{Historical timings for different tasks: blind maximisation, construction-seeded pruned maximisation and \texttt{geng}-based classification at a supplied target. Only the first two independently bound the optimum from above. A dash means not attempted. These are separate runs from \Cref{tab:basecase-search}, whose recorded times differ. The table is not evidence of a like-for-like speed-up.}
     \label{tab:generating-benchmark}
 \end{table}
 \section{Proving every \texorpdfstring{$m$}{m} at once}
@@ -626,14 +623,14 @@ Before addressing open cases, the search is tested on settled ones.
 Each run starts from the empty graph.
 The search is given the edge-count objective and the connectivity cap, and retains only feasible witnesses. Its intermediate states may be infeasible.
 It receives no description of the known extremal construction.
-In every tested case, it nevertheless reaches the established value and recovers a named construction.
+In all seven validation cases in \Cref{tab:rediscovery}, it reaches the established value. This is a statement about those runs, not a claim that it succeeds at every size or throughout the sixteen-variant grids.
 \Cref{tab:rediscovery} compares the densest witness with the theoretical value.
 
 \begin{table}[ht]
     \centering
     \small
     \input{figures/rediscovery_table.tex}
-    \caption{Validation by rediscovery. For each variant the tabu search, run from scratch with a handful of restarts, recovers exactly the extremal value proved or certified earlier. The ``Search'' column is the lower bound it found, and the ``Theory'' column is the proved or certified value.}
+    \caption{Seven short validation runs. Each uses unaided tabu search, initial seed zero and a two-second stopping target per case. Elapsed times include the search and may slightly exceed the target because deadline checks are cooperative. The search count and known optimum are separate columns. These are not one-hour benchmarks.}
     \label{tab:rediscovery}
 \end{table}
 
@@ -678,11 +675,11 @@ In every tested case, it nevertheless reaches the established value and recovers
   \end{scope}
 \end{tikzpicture}%
 }
-\caption{Three of the shapes \Cref{tab:rediscovery} names, each drawn at the size the table reports. \Cref{fig:simple-digraph-m2} draws the fourth, the bidirected star tying the one-directional wall at $n=7$.}
+\caption{Examples from the extremal families discussed alongside \Cref{tab:rediscovery}, drawn at the reported sizes. The path illustrates the tree family but is not the saved search witness. \Cref{fig:simple-digraph-m2} shows a bidirected star, which ties the one-directional wall at $n=7$.}
 \label{fig:rediscovery-gallery}
 \end{figure}
 
-The search recovers the named constructions, not merely their edge counts.
+The recorded witnesses can be inspected, rather than inferring their shapes from their edge counts. They are saved with methods and elapsed times in \code{program/data/rediscovery.json}. \code{program/scripts/rediscovery.py} runs the experiment and \code{make\_figures.py} renders the table without rerunning it. Each later restart uses the next integer seed. The supplied optimum is not passed to the search. All seven saved witnesses have star-shaped support, with the direction and multiplicity specified below.
 \Cref{fig:rediscovery-gallery} draws three examples.
 The undirected simple run at $m = 2$ settles on a tree. The example drawn is the path $P_6$.
 Every tree on $n$ vertices has $n-1$ edges and local edge-connectivity at most one.
@@ -699,11 +696,11 @@ This is the crossover predicted by \Cref{thm:dir-arc-m2-exact}.
 The search carries none of these names.
 It finds the constructions solely by optimising under the connectivity cap.
 
-Past $n=7$, the heuristic search reaches its limit before the checker does.
-At $n=8$ and $m=2$, repeated tabu runs stall at the hub's arc count.
+The seven successful cases do not establish reliable performance past $n=7$.
+At $n=8$ and $m=2$, a bidirected star has fourteen arcs, whereas a one-directional balanced wall has sixteen.
 Moving from a completed hub to the one-directional wall requires many coordinated arc changes (\Cref{fig:simple-digraph-m2}).
-Single-arc moves do not cross that barrier within the available budget.
-The value at this order therefore comes from the explicit construction and the exact checker, not from the search.
+Single-arc moves can therefore make the star a difficult state to escape. This explains a possible search obstruction, not a proof that every run must stall there.
+The explicit construction and its connectivity check supply the sixteen-arc lower bound independently of whether an unaided run finds it.
 
 The double star of \Cref{fig:rediscovery-gallery} provides another witness beyond the search range.
 At $n=7$ and $m=4$, it has $36$ arcs and $\lambda^{\max}=3$.

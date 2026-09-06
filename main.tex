@@ -25,11 +25,11 @@ This thesis studies how many edges or arcs a network can contain when no pair of
 The starting point is Erd\H{o}s Problem~915, an extremal question about edge-disjoint paths in simple graphs. 
 The work begins with the necessary background to formulate the problem and all its variants. 
 It then discusses their answers or highlights the difficulty behind unsolved cases. 
-Afterwards, computational research on small graphs confirms these values or provides evidence for conjectures. 
+Afterwards, computational research on small graphs checks finite instances of these values and supplies dense examples in open cases.
 This is accomplished by measuring connectivity with a maximum-flow routine and by searching for extremal graphs with metaheuristics.
-Completed computations either prove the extremal value in a finite search space or produce a lower bound, while unfinished searches provide only evidence for conjectures.
+Completed exhaustive computations establish an extremal value in a finite search space. Heuristic searches and unfinished enumerations provide only lower bounds, witnessed by the feasible graphs they find.
 At the end, the thesis synthesises the results and presents the open problems that remain.
-This work is theoretical in nature, but the computational methods and the resulting conjectures are of interest to anyone who uses networks and wants to understand the relationship between connectivity and size.
+This work is theoretical in nature, but its computational methods, constructions and open questions address the relationship between connectivity and size in networks.
 
 I am grateful to my promotor, Dr.\ Stijn Cambie, for his day-to-day guidance, corrections, and mathematical feedback throughout the project.
 I could not ask for a more patient and enthusiastic supervisor.
@@ -54,9 +54,9 @@ The proofs that carry no badge are the ones I have worked through myself.
 Two of them I wrote out in full: the Gomory--Hu double count for the simple undirected edge-disjoint case (\Cref{thm:mader}) and for the undirected multigraph edge-disjoint case (\Cref{thm:multigraph-edge}), together with the three counting lemmas they run on (\Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}).
 The other unbadged results of \Cref{app:proofs} are ones whose proofs I have since read and checked.
 Results taken from the literature carry no badge either, since their proofs are published and are cited where the result is stated.
-Definitions, constructions, conjectures and open questions carry no badge. The badge marks a result presented with a proof that the author has not verified.
+Definitions, conjectures and open questions carry no badge. A construction carries a badge when its stated properties come with a proof that I have not checked line by line. The badge concerns verification of the proof, not whether the object is explicitly defined.
 
-The clique-core counterexample and the research-note argument for eventual exactness were supplied by Stijn Cambie with AI assistance. The counterexample is included in \Cref{const:clique-core}. The eventual statement is retained as \Cref{conj:dir-arc}, without incorporating the proof from the research note.
+The clique-core counterexample and the research-note argument for eventual exactness were supplied by Stijn Cambie with AI assistance. The counterexample is included in \Cref{const:clique-core}. Only the verified construction counts are retained in \Cref{const:directed-comparison}. Eventual optimality is not asserted.
 
 The summary of my original results is:
 
@@ -69,8 +69,8 @@ Variant & Contribution \\
 Hypergraph, vertex separation & Exact value at $m=2$. The $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
 Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
 Multigraph, incidence separation & The two multigraph vertex variants posed as problems of their own: exact values at $m\le3$, the reduction to a knapsack over $2$-connected blocks, thickened bipartite blocks against an upper bound of the same order, and the directed value to its leading term with the same block structure (\Cref{thm:multi-vertex-m2,cor:multi-vertex-m3,thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper,cor:dir-multi-incidence,prop:dir-multi-vertex-blocks}). Every result in this row carries the badge except the $m=2$ value. \\
-Directed simple graph, arc separation & Unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
-Transferred quadratic bounds & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ and, for fixed $r\ge3,m$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
+Directed simple graph, arc separation & For fixed $m\ge3$, unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
+Transferred quadratic bounds & For fixed $m\ge3$, $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$. For fixed $r\ge3$ and $m\ge2$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -92,7 +92,7 @@ The two separation notions are edge-disjointness and internal vertex-disjointnes
 Parallel copies are therefore separate routes, which makes the two multigraph vertex variants problems of their own rather than restatements of the simple ones.
 The simple edge-disjoint case is proved independently here using Gomory--Hu trees \cite{GomoryHu61}, and a general extremal construction resolves it for all $n$ and $m$.
 Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, due to B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66} and Leonard \cite{Leonard72b}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
-The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved in a few lines, a feasible digraph at $m=2$ being its own reachability skeleton and so inheriting the skeleton's arc count. For $m\ge3$, the eventual quadratic value remains conjectural in this thesis. A twelve-vertex clique-core construction supplied by Stijn Cambie refutes the earlier formula for all orders (\Cref{const:clique-core}).
+The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved in a few lines, a feasible digraph at $m=2$ being its own reachability skeleton and so inheriting the skeleton's arc count. For $m\ge3$, the thesis gives dense constructions, without asserting an exact eventual value. A twelve-vertex clique-core construction supplied by Stijn Cambie refutes the earlier formula for all orders (\Cref{const:clique-core}).
 
 
 The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity matrix and converts the vertex-disjoint problem to an edge-disjoint one by building the capacity network of the vertex-splitting construction, in which a vertex is a unit gate while an adjacency keeps its multiplicity.

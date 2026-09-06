@@ -1,0 +1,544 @@
+{
+ "meta": {
+  "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+  "source_commit": "05f7780e78d9",
+  "python": "3.14.6",
+  "platform": "macOS-26.6.2",
+  "computed": "2026-09-05",
+  "entries": 7,
+  "dependencies": {
+   "numpy": "2.4.6",
+   "scipy": "1.18.0",
+   "pulp": "3.3.2",
+   "networkx": "3.6.1",
+   "matplotlib": "3.11.0"
+  },
+  "c_extension_loaded": true,
+  "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+ },
+ "values": {
+  "search|n=4|m=2|budget=2|directed=True|separation=edge|simple=True": 6,
+  "search|n=4|m=3|budget=2|directed=True|separation=edge|simple=False": 12,
+  "search|n=5|m=3|budget=2|directed=True|separation=edge|simple=False": 16,
+  "search|n=6|m=2|budget=2|directed=False|separation=edge|simple=True": 5,
+  "search|n=6|m=2|budget=2|directed=True|separation=edge|simple=True": 10,
+  "search|n=6|m=3|budget=2|directed=False|separation=edge|simple=False": 10,
+  "search|n=7|m=2|budget=2|directed=True|separation=edge|simple=True": 12
+ },
+ "runs": {
+  "search|n=6|m=2|budget=2|directed=False|separation=edge|simple=True": {
+   "value": 5,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.005662202835083,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 0,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=6|m=3|budget=2|directed=False|separation=edge|simple=False": {
+   "value": 10,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.0038070678710938,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      2,
+      2,
+      2,
+      2,
+      2
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 1,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=4|m=2|budget=2|directed=True|separation=edge|simple=True": {
+   "value": 6,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.0000829696655273,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      1,
+      1,
+      1
+     ],
+     [
+      1,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 2,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=6|m=2|budget=2|directed=True|separation=edge|simple=True": {
+   "value": 10,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.020035982131958,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 3,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=7|m=2|budget=2|directed=True|separation=edge|simple=True": {
+   "value": 12,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.0220320224761963,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 4,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=4|m=3|budget=2|directed=True|separation=edge|simple=False": {
+   "value": 12,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.000014066696167,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      2,
+      2,
+      2
+     ],
+     [
+      2,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 5,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  },
+  "search|n=5|m=3|budget=2|directed=True|separation=edge|simple=False": {
+   "value": 16,
+   "bound": "lower",
+   "complete": false,
+   "method": "tabu search",
+   "elapsed_seconds": 2.0109548568725586,
+   "requested_seconds": 2.0,
+   "seed": 0,
+   "construction_seeded": false,
+   "witness": {
+    "multiplicity_matrix": [
+     [
+      0,
+      2,
+      2,
+      2,
+      2
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   "note": "discovery only ever yields a lower bound",
+   "environment": {
+    "program_sha256": "40d966385d7a7278a21d1978423b8504b87eb3c8c0a8ca00b4f8c1da063b1855",
+    "source_commit": "05f7780e78d9",
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2",
+    "computed": "2026-09-05",
+    "entries": 6,
+    "dependencies": {
+     "numpy": "2.4.6",
+     "scipy": "1.18.0",
+     "pulp": "3.3.2",
+     "networkx": "3.6.1",
+     "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "c_binary_sha256": "1f37aade751595200e8180c2390322a9dcc99800db380a9f71826bbdf63a827c"
+   }
+  }
+ }
+}

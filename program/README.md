@@ -27,10 +27,8 @@ program/
   build_fast.sh         builds the optional _erdos_fast.so accelerator
   make_figures.py       regenerates every thesis figure into ../figures/
   tests/                an extensive unittest suite covering the whole program
-  scripts/              standalone checks written apart from this program so
-                        they corroborate it rather than share its code: the two
-                        block sweeps the thesis cites and the conjecture checks
-                        behind research_notes/
+  scripts/              independent mathematical checks, block sweeps and
+                        experiment drivers that call the main solver
   data/                 machine_values.json, the recorded result of every solve
                         call behind the four variant grids
   logs/                 run transcripts the computational audit cites
@@ -44,8 +42,9 @@ everything the text points at is inside it.
 
 Install with `pip install -r requirements.txt`. The core needs only `numpy` and
 `scipy`: the model, the connectivity checker, the search, the enumeration, the
-random-model sampling, and the self-check all run on those two alone, because every
-connectivity measure is one scipy integer max-flow on a capacity matrix (Menger).
+random-model sampling, and the self-check all run on those two alone, because connectivity is measured by integer max-flow on a capacity matrix (Menger).
+Small capped checks can use the optional C helper; capacities too large for
+safe int32 arithmetic use the Python-integer fallback.
 One more library backs the solver check and two are optional:
 
 - `pulp` backs the MILP solver checks (`prove_directed_multigraph` and
@@ -87,6 +86,69 @@ From this `program/` directory:
 ../.venv/bin/python3 make_figures.py --promote       # publish the reviewed rebuild
 ```
 
+### Search results are not construction values
+
+The grids retain raw unaided search outcomes as circles and show supplied
+constructions separately as plus signs. Neither exact values nor a stronger
+result at another order or in another model overwrite the search.
+A contradiction with a proved upper bound raises an error rather than
+silently clamping a number.
+
+The companion tables give separate search/construction rows.
+`data/search_evidence.json` gives both values for all plotted orders, the
+historical per-case limit, and the source cache key. Most historical searches
+used 0.4 seconds; the more expensive selected open cases used 4 seconds.
+These are not equal-time or one-hour benchmark results. Deadline checks are
+cooperative: an in-progress feasibility check can overrun the target.
+A fixed seed does not make timed outcomes hardware-independent.
+
+### Equal-budget benchmark
+
+`scripts/equal_budget_benchmark.py` runs the 16 variants serially. The default
+allocation is 3600 seconds of search per variant, split equally over orders
+6, 8, 10 and 12, thresholds 3 and 6 and three initial seeds. Thus each of the
+384 trials has a 150-second cooperative stopping target. Hypergraphs are
+3-uniform and directed hypergraphs use the forward orientation. Matrix models
+use tabu search and hypergraph models use randomised greedy search. No
+construction or optimum is passed to either method.
+
+```bash
+../.venv/bin/python3 scripts/equal_budget_benchmark.py --output data/equal_budget_2026-09-06
+../.venv/bin/python3 scripts/benchmark_report.py data/equal_budget_2026-09-06
+```
+
+The output directory must be new. It contains a frozen copy of the solver,
+the runner and the optional C accelerator, together with source hashes and
+the full schedule. Each completed trial saves its witness, checked
+connectivity, actual search time, CPU time and validation time. The process
+limits numerical-library threads to one but does not control other programs
+on the computer. Wall time depends on system load and sleep.
+
+Use the printed frozen `--resume` command after an interruption. Completed
+trials are reused. An unfinished trial is restarted and recorded as an
+interruption with unknown previous elapsed time. Such restarts mean the total
+time spent can exceed the nominal allocation. A lock prevents simultaneous
+runners from writing to the same experiment.
+
+The separate report shows all seed outcomes and supplied construction counts.
+It labels unfinished experiments as partial and does not count missing trials
+as zero. Neither script replaces historical data or updates the thesis figures.
+The full default experiment needs about 16 hours plus setup and validation.
+
+The first long experiment uses its frozen, older solver with calendar-clock
+deadlines. One saved trial showed a large discrepancy between calendar time
+and the outer monotonic duration clock. The reporter flags such trials and
+excludes them from timing-qualified statistics without deleting their values.
+A flagged run must be reviewed or rerun before claiming the full equal-budget
+comparison. A one-second tolerance is used for clock disagreement and short
+durations. Cooperative overruns remain visible in the elapsed-time fields.
+
+The working solver now uses monotonic duration budgets in `solve()`. Direct
+calls to older helpers still accept absolute calendar deadlines for backwards
+compatibility. The running experiment's frozen source has not been modified.
+New experiments additionally record calendar elapsed time alongside monotonic
+duration and CPU time.
+
 ### The machine-value record
 
 The four sixteen-variant bound grids are built from several hundred `solve`
@@ -102,7 +164,7 @@ recomputing are separate acts**:
 
 | command | what it does |
 | --- | --- |
-| no flag | draws the four variant grids from the record. Never calls `solve` for them, and a missing entry is an error rather than a fresh run. It also regenerates offcut-only outputs, so the command as a whole is not pure rendering: the gallery and the annealing-against-tabu comparison run under wall-clock budgets every time, and the surface cache is rebuilt when its fingerprint no longer matches. |
+| no flag | renders only the figures and tables used by the current thesis, from formulas and the frozen record. It never starts a search. A missing recorded value is an error. |
 | `--rebuild` | recomputes every value from scratch, consulting nothing, into `data/machine_values.candidate.json`. Draws nothing. Resumable: an interrupted run picks up where it stopped. |
 | `--compare` | lists every way the candidate departs from the record, and calls out two completed exhaustions that disagree. |
 | `--promote` | replaces the record with the reviewed candidate. |
@@ -118,8 +180,11 @@ the interpreter version, the platform and the date. It is recorded, not
 enforced. A fingerprint answers "did any byte change", never "did any answer
 change", so nothing refuses to draw because it moved; `--rebuild` followed by
 `--compare` settles that question with the numbers themselves. The fingerprint
-covers the program above its chapter 4 banner, which is everything `solve`
-runs, so editing the plotting code below does not move it.
+now covers the complete main program, C source and figure/experiment driver.
+The earlier chapter-four cutoff missed flow helpers defined later in the file.
+New runs also record dependency versions, the loaded C binary hash, method,
+requested and elapsed seconds, completion status and the witness. Historical
+records without those fields remain explicitly incomplete; they are not backfilled.
 
 A recorded value is only meaningful while its key still means the same
 question, so the key of a multigraph *incidence* entry carries a convention
@@ -163,9 +228,17 @@ The search proposes. The certifier and the hand proofs dispose.
 
 The thesis is three chapters: (1) The Problem and Its Variants, (2) Certifying
 and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems.
-`make_figures.py` writes every figure below except two tables.
-`figures/rediscovery_table.tex` is a small hand-kept LaTeX table of
-`solve(...)` discovery runs at fixed seeds, and
+`make_figures.py` renders the current thesis assets, including the rediscovery
+table from `data/rediscovery.json`. The latter contains seven fresh unaided
+runs, each with a two-second target, initial seed zero, measured elapsed time
+and a saved witness. To perform a new experiment without replacing that record:
+
+```bash
+../.venv/bin/python3 scripts/rediscovery.py --seconds 2 --output data/rediscovery.new.json
+```
+
+These are small validation cases, not an equal-time sixteen-variant benchmark.
+The remaining separately generated table,
 `figures/generating_benchmark_table.tex` is written by
 `scripts/generating_search_benchmark.py`. Each header records how its rows
 were produced; rerun those calls to check them.
@@ -177,10 +250,10 @@ were produced; rerun those calls to check them.
 | `figures/complexity_growth.png` | the enumeration explosion in n, m, direction (Ch.2) |
 | `figures/temperature_trace.png` | a cooling run (offcut only) |
 | `figures/sensitivity_mixed.png` | load-bearing edges by sensitivity (offcut only) |
-| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), hand-kept, not generated |
+| `figures/rediscovery_table.tex` | validation-by-rediscovery table (Ch.2), rendered from `data/rediscovery.json` |
 | `figures/generating_benchmark_table.tex` | blind / pruned / generated timings (Ch.2), from `scripts/generating_search_benchmark.py` |
 | `figures/variant_table_all.tex` | the sixteen-variant value table (Appendix audit) |
-| `figures/variant_bounds_m3_graphs.png` | proved / conjectured / open, the eight graph-model variants at m = 3 (Appendix audit) |
+| `figures/variant_bounds_m3_graphs.png` | theorem / enumeration / raw search / construction, the eight graph-model variants at m = 3 (Appendix audit) |
 | `figures/variant_bounds_m3_hypergraphs.png` | the eight hypergraph-model variants at m = 3 (Appendix audit) |
 | `figures/variant_bounds_m6_graphs.png` | the same graph-model half at m = 6 (Appendix audit) |
 | `figures/variant_bounds_m6_hypergraphs.png` | the same hypergraph-model half at m = 6 (Appendix audit) |
@@ -197,9 +270,8 @@ were produced; rerun those calls to check them.
 | `figures/sa_vs_tabu_convergence.pdf` | SA against tabu, wall-clock timed (offcut only) |
 
 **Offcut only** means the figure is no longer referenced from `main.tex`. It is
-still generated, still checked, and still rendered, but by `offcuts.tex` (the
-record of what the shortening pass removed) rather than by the thesis. None of
-these files may be deleted while that document exists.
+preserved for `offcuts.tex`, the record of removed material. Normal figure
+rendering no longer reruns these archived experiments or refreshes their assets.
 
 The solver records (`logs/certificate_log.txt`, `logs/basecase_search_log.txt`,
 `logs/basecase_search_vertex_log.txt`) were produced by the named finite

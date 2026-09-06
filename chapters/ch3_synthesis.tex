@@ -4,33 +4,47 @@ This chapter brings those strands together.
 It identifies the main conclusions and separates the central open problems from questions of classification and completeness.
 
 \section{The directed frontier}
-Two constructions give lower bounds for the directed arc value.
-The hub has $m(n-1)$ arcs.
-The augmented bipartite construction has $\floor{(n+m-2)^2/4}$ arcs
-(\Cref{const:directed-hub,const:augmented-bipartite}).
-At $m=3$, the second bound overtakes the first near $n=9$.
+The simple directed arc problem has several verified dense constructions, but
+their feasibility must not be confused with optimality. A construction proves
+a lower bound: it shows that at least that many arcs are possible. Proving the
+extremal value would additionally require an upper bound for every feasible
+digraph.
 
-\begin{conjecture}[Eventual exactness]\label{conj:dir-arc}
-For every fixed $m\ge2$, there is an integer $N(m)\ge m$ such that, for all $n\ge N(m)$,
+\begin{construction}[Competing dense directed families]\label{const:directed-comparison}
+For $n\ge m\ge2$, choose the densest of the directed hub, the augmented
+bipartite digraph and the clique-core digraph
+(\Cref{const:directed-hub,const:augmented-bipartite,const:clique-core}).
+Their respective arc counts are
 \[
-    \ell_m^{\mathrm{dir}}(n) = \floorfrac{(n+m-2)^2}{4}.
+ H_m(n)=m(n-1),\qquad
+ Q_m(n)=\floorfrac{(n+m-2)^2}{4},\qquad
+ B_m(n)=\floorfrac{(n+m-3)^2}{4}+2(m-1).
 \]
-\end{conjecture}
+Each has maximum local arc-connectivity $m-1$. Consequently,
+\[
+ \ell_m^{\mathrm{dir}}(n)\ge \max\{H_m(n),Q_m(n),B_m(n)\}.
+\]
+This is a lower bound, not a proposed formula for the optimum.
+\end{construction}
 
-The earlier conjecture asserted the maximum of the two lower bounds for every
-$n\ge m$. It is false. A construction supplied by Stijn Cambie places a
-bidirected clique between sources and sinks and gives $57$ arcs at $m=5$,
-$n=12$, with $\lec^{\max}=4$, whereas the proposed value was $56$
-(\Cref{const:clique-core}). More generally, it refutes that formula whenever
-$m\ge5$ and $m+7\le n\le3m-3$. Thus any threshold in
-\Cref{conj:dir-arc} must satisfy $N(m)\ge3m-2$ for $m\ge5$.
-No formula for the smaller orders or least threshold is asserted here.
-Cambie also supplied an AI-assisted argument for eventual exactness.
-It is retained as a research note, and the statement remains a conjecture in
-this thesis pending the author's verification of that proof.
+The earlier conjecture asserted $\ell_m^{\mathrm{dir}}(n)=
+\max\{H_m(n),Q_m(n)\}$ for every $n\ge m$. It is false.
+The clique-core construction, supplied by Stijn Cambie, has $57$ arcs at
+$m=5$, $n=12$, with maximum local arc-connectivity $4$. The proposed formula
+gives only $56$. More generally, this construction beats both earlier families
+whenever $m\ge5$ and $m+7\le n\le3m-3$
+(\Cref{const:clique-core}). It does not prove that $57$ is optimal at $(12,5)$,
+nor that the maximum of all three displayed counts is always optimal.
 
-At $m=2$, eventual exactness follows from \Cref{thm:dir-arc-m2-exact}, with $N(2)=7$.
-\Cref{fig:crossover} plots both branches at $m=3$ and marks their crossover.
+For fixed $m$, the augmented bipartite family eventually has more arcs than
+the other two displayed families. That comparison only ranks these
+constructions. Another feasible family could still be denser.
+Cambie also supplied an AI-assisted argument for eventual optimality.
+It is retained separately as a research note, not used as a theorem or
+adopted as a conjecture in this thesis.
+At $m=2$, the exact value is already established by
+\Cref{thm:dir-arc-m2-exact}: the bipartite count is optimal for $n\ge7$.
+\Cref{fig:crossover} compares the hub and augmented bipartite counts at $m=3$.
 
 \begin{figure}[t]
     \centering
@@ -48,11 +62,11 @@ It would force the quadratic upper bound as soon as that branch exceeds the
 hub bound, which already happens at $m=5$, $n=12$.
 The counterexample therefore refutes that structural assertion too.
 
-The conjecture has the correct leading term and the correct order of error.
+The augmented bipartite count has the same leading term and the same order of error as the optimum.
 \Cref{thm:dir-arc-linear-error} proves this without assuming the shape of an extremal graph.
 The linear coefficient remains unknown among the results proved in this thesis.
 Even identifying it would leave the exact bounded correction to establish.
-It lies between the conjectured $(m-2)/2$ and the proved $4(m-1)$, which holds at every $n$.
+More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ above $n^2/4$, while the proved upper bound allows $4(m-1)n$. These inequalities do not show that a unique limiting linear coefficient exists.
 Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
 The next section considers the separate question of extremal shape.
 
@@ -139,13 +153,15 @@ The quadratic phenomenon is therefore the reason the directed and undirected pro
 \section{Summary of the sixteen variants}
 
 \Cref{fig:variant-tree-status} sorts all sixteen structural variants by how much
-is known, and \Cref{tab:summary} states the strongest result for each. Each entry
-is either proved here, supported by a result from the literature, conjectured
-with a proved lower bound, or proved asymptotically.
+is known, and \Cref{tab:summary} states the strongest result for each. The entries
+distinguish exact values, asymptotic bounds and constructions for cases whose
+exact value remains open.
 Each exact value is supported by a proof or by a completed exhaustive search.
-Conjectured and open entries carry only proved or machine-verified lower bounds.
+Construction entries provide lower bounds, not claims of optimality.
 Heuristic witnesses are never presented as upper bounds.
 The markings follow the standard set in \Cref{ch:machine}.
+For results with an AI badge, the author's verification caveat in the
+Contribution Statement still applies. The summary does not upgrade their proof status.
 
 \begin{figure}[t]
 \centering
@@ -210,7 +226,7 @@ The markings follow the standard set in \Cref{ch:machine}.
   \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
 \end{tikzpicture}%
 }
-\caption{Status of the sixteen variants. Blue marks a closed form proved for every $n$ and $m$. Purple marks an exact value proved on stated parameter ranges and open outside them. Amber marks a proved leading term with the general exact value unknown. For simple directed arcs, \Cref{conj:dir-arc} concerns only sufficiently large orders. The model and direction rows carry no status. \Cref{tab:summary} is authoritative for exceptions and conventions.}
+\caption{Status of the sixteen variants. Blue marks a closed form proved for every $n$ and $m$. Purple marks an exact value proved on stated parameter ranges and open outside them. Amber marks a proved leading term with the general exact value unknown. For simple directed arcs, \Cref{const:directed-comparison} records lower bounds without asserting optimality. The model and direction rows carry no status. \Cref{tab:summary} is authoritative for exceptions and conventions.}
 \label{fig:variant-tree-status}
 \end{figure}
 
@@ -232,8 +248,8 @@ simple graph
 multigraph
   & $(m-1)(n-1)$, proved
   & $n-1$ at $m=2$ and $2(n-1)$ at $m=3$ (proved), while it is open for
-    $m \ge 4$, where it is a knapsack over $2$-connected blocks with rate
-    between $(3-2\sqrt{2})m^2$ and $2m^2$ per added vertex \\
+    $m \ge 4$, where it is a knapsack over $2$-connected blocks and has order
+    $\Theta(m^2n)$ in the joint regime stated below \\
 $r$-hypergraph
   & $\le \floor{(m-1)(n-1)/(r-1)}$, with equality in the range below
   & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$, while it is open for $m \ge 4$ \\
@@ -246,7 +262,7 @@ $r$-multi-hyper
 \multicolumn{3}{@{}l}{\itshape Directed} \\
 \addlinespace[2pt]
 simple digraph
-  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$, with eventual exactness conjectured
+  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$, with dense constructions but no general exact formula
   & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$ with equality to the arc value open \\
 multigraph
   & $(m-1)M(n)$, proved
@@ -264,7 +280,7 @@ $r$-multi-hyper
 \label{tab:summary}
 \end{table}
 
-Here $M(n)=\max(2(n-1),\floor{n^2/4})$. The hypergraph rows use $r\ge3$. At $r=2$, use the corresponding graph rows, in particular the different leading constant for simple digraphs when $m\ge3$. The multigraph rate constants are asymptotic as $m\to\infty$, after $n$ is large enough to pack the blocks. Simple-graph formulas assume
+Here $M(n)=\max(2(n-1),\floor{n^2/4})$. The hypergraph rows use $r\ge3$. At $r=2$, use the corresponding graph rows, in particular the different leading constant for simple digraphs when $m\ge3$. The multigraph incidence estimate uses $m\to\infty$ with $n/m\to\infty$. Simple-graph formulas assume
 $n\ge m$. Below that range the complete object gives the trivial maximum.
 The $m=5$ vertex row is quoted from $n\ge6$ because that is the range
 \cite{SorensenThomassen74} states, not because it fails below it: extending the
@@ -301,11 +317,11 @@ Whether they agree exactly once $n>r$ remains open.
 
 The program replaces separate implementations with one shared interface.
 It represents graph models by a multiplicity matrix.
-It represents hypergraph models by collections of vertex sets.
+It represents undirected hypergraph models by collections of vertex sets and directed ones by tail and head sets.
 An exact checker measures connectivity.
 A certifier proves upper bounds for small cases.
-A tabu search finds examples and hence lower bounds.
-On solved cases, the same framework recovers the known answers (\Cref{sec:rediscovery}).
+Tabu search for graphs and random greedy search for hypergraphs find examples and hence lower bounds.
+The seven validation runs in \Cref{sec:rediscovery} recover their known answers.
 
 The three tools provide different levels of evidence.
 The checker measures one supplied graph exactly.
@@ -315,11 +331,12 @@ Without a replayable bound, it is not a reusable proof.
 Heuristic search supplies lower bounds only.
 A value is settled only when its lower and upper bounds agree.
 Directed vertex values require separate checks because Whitney's inequality transfers witnesses but not upper bounds.
-Every computational claim in this thesis can be rerun from the repository.
+The repository contains the code and commands for rerunning the computational workflows.
+This does not guarantee identical outcomes for time-limited searches. Some historical results also lack saved witnesses or measured runtimes, as recorded in the accompanying data.
 The principal checks run from \code{program/erdos915\_unified.py}.
 Several individual claims are backed by standalone scripts in \code{program/scripts/} instead.
-Each is named where its result appears and provides an independent implementation.
-\Cref{app:verification-ladder,app:software-tests} gives the environment, commands, and audit evidence.
+Each is named where its result appears. Some implement separate checks, while experiment drivers reuse the shared solver.
+\Cref{app:verification-ladder,app:software-tests} gives the environment, commands and audit evidence.
 No theorem here depends only on an unchecked solver result.
 
 The program also has clear limits.
@@ -332,7 +349,7 @@ The certifier did not finish at $n=7$.
 
 Computation also leaves the structural gaps untouched.
 Small-order agreement did not prevent the old directed arc formula from failing.
-The remaining conjecture concerns sufficiently large orders only.
+Even when one displayed construction eventually beats the others, its optimality among all feasible digraphs remains open here.
 The directed vertex problem for $m\ge3$ does not follow from the arc case.
 The undirected vertex problem for $m\ge6$ has been open for half a century.
 The program can explore these problems, but it cannot settle them alone.
@@ -351,14 +368,14 @@ It then states the next mathematical target.
 \toprule
 Problem & Known here & Remaining target \\
 \midrule
-Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-arc-linear-error}) & Verify eventual exactness (\Cref{conj:dir-arc}), then determine the least threshold and the values below it. \\
+Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-arc-linear-error}) & Determine when, if ever, the constructions of \Cref{const:directed-comparison} attain the optimum. \\
 Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value, given that an arc upper bound does not transfer. \\
 Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
-Directed multigraph incidence, $m\ge3$ & $K_m^{\mathrm{dir}}(n)=(m-1)n^2/4+O_m(n)$ (\Cref{cor:dir-multi-incidence}) & Determine the linear coefficient, and decide whether the arc extremiser is optimal here too. \\
-Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m = \lim_n k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) & Determine $c_m$, whose likely next structure is triconnected rather than merely blockwise. \\
-Undirected multigraph incidence, $m\ge4$ & Exact at $m\le3$, and a knapsack over $2$-connected blocks whose per-vertex rate lies between $(3-2\sqrt{2})m^2$ and $2m^2$ (\Cref{thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper}) & Determine the rate, which asks for the best $2$-connected block of each size. \\
-Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Locate the first failure for $r\ge3$ and replace the rank-two decomposition used at $m=3$. \\
-Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
+Directed multigraph incidence, $m\ge3$ & $K_m^{\mathrm{dir}}(n)=(m-1)n^2/4+O_m(n)$ (\Cref{cor:dir-multi-incidence}) & Sharpen the next-order term and decide whether the arc extremiser is optimal here too. \\
+Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m = \lim_n k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) & Determine $c_m$ by finding sharper bounds on feasible blocks. \\
+Undirected multigraph incidence, $m\ge4$ & Reduction to a knapsack over $2$-connected blocks. The value is $\Theta(m^2n)$ as $m\to\infty$ with $n/m\to\infty$ (\Cref{thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper}) & Determine the best $2$-connected block of each size and sharpen the asymptotic bounds. \\
+Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Determine which edge-separation bounds remain valid for vertex separation when $r\ge3$. \\
+Directed hypergraphs & For fixed $r\ge3$ and $m\ge2$, leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
 \bottomrule
 \end{tabularx}
 \caption{The remaining problems, separated from the results already proved in this thesis.}
@@ -367,7 +384,7 @@ Directed hypergraphs & For fixed $r,m$, leading term $(m-1)n^2/(4(r-1))$ for all
 
 Four directions carry most of the remaining mathematical weight.
 The first is the simple directed arc problem.
-\Cref{conj:dir-arc} predicts the exact value for sufficiently large orders.
+\Cref{const:directed-comparison} supplies three dense families, but no matching general upper bound.
 The clique-core counterexample leaves the smaller orders as a separate question.
 
 The second direction is the classical undirected vertex problem for $m\ge6$.
@@ -377,8 +394,9 @@ There the incidence-rank argument has no known higher-connectivity replacement.
 The fourth is the multigraph incidence problem beyond $m=3$, which the convention
 of \Cref{sec:incidence-convention} poses as a question of its own.
 Its value is a knapsack over $2$-connected blocks, and what is missing is the
-best block of each size, which fixes a per-vertex rate currently known only to
-lie between $(3-2\sqrt{2})m^2$ and $2m^2$.
+best block of each size. As $m\to\infty$ with $n/m\to\infty$, the ratio
+$K_m(n)/(m^2n)$ is at least $3-2\sqrt{2}-o(1)$ and less than $2$.
+These bounds do not establish that the ratio converges.
 
 The other rows of \Cref{tab:open-problems} remain natural questions.
 They ask for finer classifications or finite exact values.

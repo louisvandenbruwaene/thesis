@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Wall-clock benchmark backing tab:generating-benchmark in ch2_machine.tex.
 
-Times three ways of proving ell_2^dir(n), the directed simple m=2 extremal
-value, for n = 3..7 on a single core:
+Times two maximisation procedures and one supplied-target classification task,
+for directed simple digraphs with m=2, n=3..7, on a single core.
+These are not equivalent tasks and their times are not solver speed-up ratios:
 
   blind   -- every matrix assignment, no pruning (test_solve.py's reference
              sweep, reimplemented here so this script is self-contained).
-  pruned  -- the in-house depth-first branch and bound, _exhaustive_directed.
+  pruned  -- maximisation by _exhaustive_directed, with a construction incumbent.
   geng    -- the geng-seeded generation pipeline of this section,
              enumerate_extremal_directed_multigraphs_via_generation, run with
-             parallel=False for a fair single-core comparison against the
-             other two sequential methods.
+             parallel=False. It is GIVEN the known optimal arc count and only
+             lists feasible classes at that count; it does not prove the optimum.
 
 The blind sweep is only run for n <= 4: at n = 5 the 2^20 assignments already
 cost tens of minutes with this reference implementation, the same growth

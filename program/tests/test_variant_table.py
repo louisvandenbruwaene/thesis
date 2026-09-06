@@ -2,9 +2,12 @@
 
 import math
 import unittest
+from unittest.mock import patch
+
+import make_figures
 
 from make_figures import (
-    _lift_multi_above_simple,
+    _reconcile_panel,
     _panel_cell,
     dir_block_bouquet_lower_bound,
     gather_variant_grid,
@@ -70,7 +73,7 @@ class DirectedBlockBouquetLowerBound(unittest.TestCase):
     """K_m^dir's curve is the better of the arc extremiser and the block bouquet.
 
     prop:dir-multi-vertex-blocks makes the directed incidence value additive over
-    blocks, and the thickened complete digraph on b <= m+1 vertices carries
+    blocks, and the thickened complete digraph on b <= m vertices carries
     b(b-1)(m+1-b) arcs. Plotting the arc extremiser (m-1)M(n) alone understated
     the panel while n is small against m: at m=6, n=4 it read 34 against a
     checked 36. Every value below was realised as an explicit multidigraph and
@@ -85,7 +88,7 @@ class DirectedBlockBouquetLowerBound(unittest.TestCase):
 
     def test_the_panel_matches_the_verified_values_at_m6(self):
         panel = gather_variant_grid(m=6)[7]
-        published = dict(zip(*panel["search"]))
+        published = dict(zip(*panel["construction"]))
         for n, expected in self.EXPECTED_M6.items():
             self.assertEqual(published[n], expected, f"n={n}")
 
@@ -108,7 +111,7 @@ class DirectedBlockBouquetLowerBound(unittest.TestCase):
         for m in (3, 6):
             panel = gather_variant_grid(m=m)[7]
             exact = dict(zip(*panel["exact"]))
-            for n, value in zip(*panel["search"]):
+            for n, value in zip(*panel["construction"]):
                 if n in exact:
                     self.assertLessEqual(value, exact[n], f"m={m}, n={n}")
 
@@ -135,7 +138,7 @@ class DirectedHypergraphLowerBound(unittest.TestCase):
         for m in (3, 6):
             panels = gather_variant_grid(m=m)
             for idx in (14, 15):        # multihypergraph directed arc, vertex
-                for n, value in zip(*panels[idx]["search"]):
+                for n, value in zip(*panels[idx]["construction"]):
                     self.assertGreaterEqual(
                         value, self._prop_bound(n, m),
                         f"m={m}, panel {idx}, n={n}")
@@ -143,7 +146,7 @@ class DirectedHypergraphLowerBound(unittest.TestCase):
     def test_the_cell_that_was_wrong(self):
         panels = gather_variant_grid(m=6)
         for idx in (14, 15):
-            published = dict(zip(*panels[idx]["search"]))
+            published = dict(zip(*panels[idx]["construction"]))
             self.assertGreaterEqual(published[9], 50, f"panel {idx}")
 
 
@@ -169,51 +172,40 @@ class VariantTableClaims(unittest.TestCase):
         )
 
 
-class MultiDominatesSimple(unittest.TestCase):
-    """A simple object is the multi object with every multiplicity one.
-
-    So a simple witness is a multi witness, and no multi lower bound can sit
-    below its simple counterpart. The raw searches did exactly that at m = 6 on
-    the hypergraph vertex panel, at six of ten sizes, because the multi space is
-    (m - 1) times larger per edge and the same budget explores less of it.
-    """
-
-    def _panels(self, simple_ys, multi_ys):
-        """Sixteen panels, all trivial but for one simple/multi column pair."""
-        blank = lambda: {"search": ([3, 4, 5], [0, 0, 0]), "exact": ([], [])}
-        panels = [blank() for _ in range(16)]
-        panels[9]["search"] = ([3, 4, 5], list(simple_ys))
-        panels[13]["search"] = ([3, 4, 5], list(multi_ys))
-        return panels
-
-    def test_a_weaker_multi_bound_is_raised_to_the_simple_one(self):
-        panels = _lift_multi_above_simple(self._panels([1, 15, 17], [5, 13, 16]))
-        self.assertEqual(panels[13]["search"][1], [5, 15, 17])
-
-    def test_a_stronger_multi_bound_is_left_alone(self):
-        panels = _lift_multi_above_simple(self._panels([1, 4, 8], [5, 7, 10]))
-        self.assertEqual(panels[13]["search"][1], [5, 7, 10],
-                         "the multi model genuinely does better here")
-
-    def test_the_simple_panel_is_never_touched(self):
-        panels = _lift_multi_above_simple(self._panels([1, 15, 17], [5, 13, 16]))
-        self.assertEqual(panels[9]["search"][1], [1, 15, 17])
-
-    def test_the_published_grids_satisfy_the_inclusion(self):
-        """The invariant on the real record, for every model pair and both m."""
+class EvidenceSeparation(unittest.TestCase):
+    def test_every_panel_preserves_its_raw_search(self):
+        original = make_figures._search_points
         for m in (3, 6):
-            panels = gather_variant_grid(m=m)
-            for start in (0, 8):
-                for column in range(4):
-                    simple = panels[start + column]
-                    multi = panels[start + 4 + column]
-                    for series in ("search", "exact"):
-                        floor = dict(zip(*simple[series]))
-                        for n, value in zip(*multi[series]):
-                            if n in floor:
-                                with self.subTest(m=m, panel=start + column,
-                                                  series=series, n=n):
-                                    self.assertGreaterEqual(value, floor[n])
+            observed = []
+            def capture(*args, **kwargs):
+                result = original(*args, **kwargs)
+                observed.append((list(result[0]), list(result[1])))
+                return result
+            with patch("make_figures._search_points", side_effect=capture):
+                panels = gather_variant_grid(m)
+            self.assertEqual(len(observed), 16)
+            for panel, raw in zip(panels, observed):
+                self.assertEqual(panel["search"], raw)
+
+    def test_underperformance_is_not_replaced_or_smoothed(self):
+        panel = dict(exact=([3], [5]), search=([3, 4, 5], [2, 1, 3]),
+                     construction=([3, 4, 5], [5, 6, 7]))
+        self.assertEqual(_reconcile_panel(panel)["search"][1], [2, 1, 3])
+
+    def test_contradictions_raise_instead_of_clamping(self):
+        for source in ("search", "construction"):
+            with self.assertRaises(ValueError):
+                _reconcile_panel(dict(exact=([4], [5]), **{source: ([4], [6])}))
+
+    def test_closed_form_dispatch_is_not_an_enumeration_point(self):
+        for m in (3, 6):
+            self.assertEqual(gather_variant_grid(m)[6]["exact"], ([], []))
+
+    def test_known_construction_can_close_gap_without_replacing_search(self):
+        panel = dict(exact=([], []), proved=([6], [12]), proved_is_bound=True,
+                     search=([6], [9]), construction=([6], [12]))
+        self.assertEqual(_panel_cell(panel, 6), ("12", "vtProved", False))
+        self.assertEqual(panel["search"][1], [9])
 
 
 if __name__ == "__main__":

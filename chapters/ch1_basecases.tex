@@ -50,6 +50,8 @@ The pair with the most such paths determines the value for the whole graph:
 \[
     \lec_G^{\max} = \max_{u \ne v} \lec_G(u, v).
 \]
+For a graph with fewer than two vertices, we set this maximum to zero.
+The same convention applies to the other maximum local connectivities below.
 A theorem of Menger \cite{Menger27}, recalled in \Cref{app:proofs}, gives this quantity a second face: $\lec_G(u, v)$ also equals the least number of edges one must remove to cut every route from $u$ to $v$ (\Cref{fig:menger}). 
 The maximum number of edge-disjoint paths between a pair is exactly the number of edges in the minimum cut between them when every edge has unit capacity.
 
@@ -573,7 +575,7 @@ Notice how the directed value is quadratic in $n$ for large $n$, while the undir
 This is because digraphs can be lopsided in one direction without creating routes back. 
 
 \begin{proposition}[Hypergraph edge bound]\label{prop:hyper-edge}
-An $r$-uniform multihypergraph on $n$ vertices with Berge edge-connectivity at most $m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
+For $n\ge r\ge2$ and $m\ge2$, an $r$-uniform multihypergraph on $n$ vertices with $\lec^{\max}\le m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
 \end{proposition}
 
 The proof is an elementary induction on a hyperedge cut, and \Cref{app:proofs} gives it.
@@ -670,7 +672,7 @@ so for each fixed $m$,
 \[
     \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
 \]
-and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of \Cref{conj:dir-arc} hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
+and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of the augmented bipartite count hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
 \end{theorem}
 
 The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to the wall plus a linear correction.
@@ -726,4 +728,4 @@ well, since $\kap \le \lec$, and the theorem above at $r = 2$ is the matching
 upper bound, so $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$
 (\Cref{cor:dir-multi-incidence}).
 
-For the directed simple digraph problem of \Cref{conj:dir-arc}, the matching upper bound for fixed $m \ge 3$ is open, though not entirely: \Cref{thm:dir-arc-linear-error} proves unconditionally that the value is $n^2/4 + \Theta_m(n)$, so the conjecture additionally specifies the linear coefficient and the exact bounded correction for sufficiently large orders. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.
+For the simple directed arc problem, a matching upper bound for the constructions of \Cref{const:directed-comparison} remains open here when $m\ge3$. Nevertheless, \Cref{thm:dir-arc-linear-error} proves that the value is $n^2/4+\Theta_m(n)$. Determining the linear contribution, and then the bounded correction if such an expansion holds, would require sharper bounds. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.

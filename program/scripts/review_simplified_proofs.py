@@ -325,12 +325,15 @@ def torsos(G, a, b, U, W, s):
             return MG(keep, mu, X), "temp-edge"
         mu = dict(mu); mu[frozenset({a, fresh})] = 1; mu[frozenset({fresh, b})] = 1
         return MG(keep | {fresh}, mu, X | {fresh}), "fresh-vertex"
-    GU, mode = side(U, ("c", 0)); GW, _ = side(W, ("c", 1))
+    # Each torso is a separate graph, so the same unused integer is safe in both.
+    fresh = max(G.V) + 1
+    GU, mode = side(U, fresh); GW, _ = side(W, fresh)
     return GU, GW, mode
 
 
 
 def check_incidence_rank(nmax: int = 5, maxmult: int = 3) -> None:
+    STATS.clear()
     checked = 0
     for n in range(2, nmax + 1):
         pairs = list(itertools.combinations(range(n), 2))
@@ -347,15 +350,14 @@ def check_incidence_rank(nmax: int = 5, maxmult: int = 3) -> None:
                     bound(G)
                     checked += 1
     print(f"incidence rank: {checked} instances (n<={nmax}, multiplicity<={maxmult}), "
-          f"every branch verified")
+          f"all encountered recursive cases passed")
     print(f"  branch counts: {dict(sorted(STATS.items()))}")
-    assert STATS["min-degree-3 core REACHED"] == 0, (
-        "the separating-pair case fired; it was expected to be unreachable")
+    if not STATS["min-degree-3 core REACHED"]:
+        print("  separating-pair branch not exercised by this finite check")
 
 
 def check_core_vacuity(nmax: int = 7) -> None:
-    """The 2-connected, minimum-degree-3 core is empty, so the dossier's
-    separating-pair recursion can never be exercised by a computation."""
+    """Look for eligible cores through nmax, without asserting general absence."""
     import subprocess
 
     def decode(g6, n):
@@ -371,7 +373,7 @@ def check_core_vacuity(nmax: int = 7) -> None:
     found = 0
     for n in range(4, nmax + 1):
         out = subprocess.run(["geng", "-q", "-c", "-C", "-d3", str(n)],
-                             capture_output=True, text=True).stdout
+                             capture_output=True, text=True, check=True).stdout
         total = 0
         for line in out.splitlines():
             E = decode(line.strip(), n)
