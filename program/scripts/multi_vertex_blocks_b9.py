@@ -33,10 +33,10 @@ def kappa(G, u, v):
 
 
 def main():
-    best, witness, seen = M - 2, None, 0     # 4 * (FLOOR - 1) = 52
+    # This is an exclusion threshold, not a claimed feasible block score.
+    best, witness, seen = (M - 2) * (FLOOR - 1), None, 0
     proc = subprocess.Popen(["geng", "-Cq", str(B), f"{FLOOR}:36"],
                             stdout=subprocess.PIPE, text=True)
-    best = 52
     for line in proc.stdout:
         g6 = line.strip()
         if not g6:
@@ -60,9 +60,14 @@ def main():
         if W > best:
             best, witness = W, g6
             print(f"new best W_{M} = {W}  graph6 {g6}", flush=True)
+    if proc.wait() != 0:
+        raise RuntimeError("geng failed. The sweep does not prove an upper bound.")
     print(f"examined {seen} two-connected graphs on {B} vertices "
           f"with at least {FLOOR} edges")
-    print(f"g_{M}({B}) = {best}" + (f", attained by {witness}" if witness else ""))
+    if witness is None:
+        print(f"g_{M}({B}) <= {best}. No attaining witness was found above the exclusion threshold.")
+    else:
+        print(f"g_{M}({B}) = {best}, attained by {witness}")
 
 
 if __name__ == "__main__":

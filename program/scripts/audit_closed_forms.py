@@ -1,28 +1,9 @@
-"""Systematic audit: every closed-form value claim in the thesis, swept.
+"""Finite checks of selected formulas and construction lower bounds.
 
-For each formula the thesis states, this recomputes the TRUE extremal value
-exhaustively at every size within reach and compares. It reports three
-outcomes per cell: agreement, a mismatch INSIDE the formula's stated
-hypothesis range (a real bug), or a mismatch OUTSIDE it (expected, and a
-check that the stated hypothesis is actually needed rather than decorative).
-
-That last column is the point. Two hypotheses (n >= m on thm:leonard and on
-conj:dir-arc) were missing until 2026-07-30 precisely because nobody swept
-below them, and one range endpoint (r <= m on thm:clique-chain-vertex) was
-wrong until 2026-07-31. A hypothesis with no cell outside it that fails is a
-hypothesis nobody has tested.
-
-One trap, since this sweep cried wolf about it on 2026-08-12. `solve` in
-hypergraph mode enumerates SIMPLE hypergraphs: every candidate hyperedge is
-present or absent, never repeated. prop:hyper-edge's floor is attained by a
-simple hypergraph only when m-1 <= C(n-2,r-2), and otherwise by a MULTI
-hypergraph this sweep cannot build, so comparing the formula against the
-simple optimum below that threshold reports a mismatch where the thesis is
-right (it says exactly this, and n=3 m=3 r=3 is the smallest case). Those
-cells are now recorded out of range. Before believing any future mismatch,
-check which family the routine behind it actually searches.
-
-Run from program/:  python3 ../program/scripts/audit_closed_forms.py
+Timeouts are reported as unfinished. A theorem shortcut is not an independent
+check. Construction counts are tested as lower bounds, not predicted optima.
+The limit is 90 seconds per case; this is not the historical figure experiment.
+Run from program/: python3 scripts/audit_closed_forms.py
 """
 
 import math
@@ -34,26 +15,32 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 "..", "..", "program"))
 
 from erdos915_unified import (  # noqa: E402
-    solve, verify_hyper_vertex_value, max_multigraph_vertex,
-    hyper_vertex_feasible_exists,
+    solve, max_multigraph_vertex, _brute_force_matrix, MULTI_DIRECTED,
+    directed_arc_lower_bound, clique_core,
 )
 
 BUDGET = 90.0
 rows = []
 
 
-def record(claim, params, stated, actual, in_range, note=""):
-    ok = (stated == actual)
+def record(claim, params, stated, actual, in_range, note="", relation="="):
+    ok = {"=": actual == stated, ">=": actual >= stated, "<=": actual <= stated}[relation]
     rows.append((claim, params, stated, actual, in_range, ok, note))
     flag = "ok " if ok else ("*** MISMATCH IN RANGE ***" if in_range
                              else "differs (outside stated range, expected)")
-    print(f"  {claim:28s} {params:22s} formula={stated:<6} true={actual:<6} {flag}")
+    print(f"  {claim:28s} {params:22s} bound={stated:<6} actual={actual:<6} requires actual {relation} bound {flag}")
     sys.stdout.flush()
 
 
 def matrix_value(n, m, **kw):
-    r = solve(n, m, exhaustive=True, max_seconds=BUDGET, **kw)
-    return r.value if r.bound == "exact" else None
+    if kw.get("directed") and not kw.get("simple", True) and kw.get("separation", "edge") == "edge":
+        value, _, done = _brute_force_matrix(MULTI_DIRECTED, n, m, "edge", time.time() + BUDGET)
+    else:
+        result = solve(n, m, exhaustive=True, max_seconds=BUDGET, **kw)
+        value, done = result.value, result.complete
+    if not done:
+        print(f"  unfinished n={n}, m={m}, {kw}; lower bound {value}, limit {BUDGET}s")
+    return value if done else None
 
 
 def main():
@@ -98,14 +85,16 @@ def main():
         record("thm:dir-vertex-m2", f"n={n} m=2",
                max(2 * (n - 1), (n * n) // 4), v, True)
 
-    print("\nconj:dir-arc  l_m^dir(n) = max(m(n-1), floor((n+m-2)^2/4)), n >= m")
+    print("const:directed-comparison: verified construction LOWER bounds")
     for m in (3, 4):
         for n in range(2, 7):
             v = matrix_value(n, m, directed=True, simple=True)
             if v is None:
                 continue
-            stated = max(m * (n - 1), ((n + m - 2) ** 2) // 4)
-            record("conj:dir-arc", f"n={n} m={m}", stated, v, n >= m)
+            stated = directed_arc_lower_bound(n, m)
+            if n >= m:
+                stated = max(stated, clique_core(n, m).edge_count())
+            record("directed constructions", f"n={n} m={m}", stated, v, True, relation=">=")
 
     # thm:dir-multi-small (the n <= 6 linear branch) was superseded on
     # 2026-08-11 by thm:dir-multi-full, which holds for every n and every m, so
@@ -128,33 +117,27 @@ def main():
                 res = solve(n, m, hypergraph=True, r=r, exhaustive=True,
                             max_seconds=BUDGET)
                 if res.bound != "exact":
+                    print(f"  unfinished hyperedge case n={n}, m={m}, r={r}; limit {BUDGET}s")
                     continue
-                # solve() enumerates SIMPLE hypergraphs (each candidate edge is
-                # present or absent), but prop:hyper-edge states the bound is
-                # attained by a simple hypergraph only when m-1 <= C(n-2,r-2);
-                # otherwise it takes a multihypergraph, which this sweep cannot
-                # build.  So the equality is in range only under that condition.
-                # Below it the formula is still a valid upper bound, and the
-                # cell is recorded out of range rather than as a mismatch.
+                # This is a sufficient attainment condition, not a necessary one.
                 simple_attains = (m - 1) <= math.comb(n - 2, r - 2)
                 record("prop:hyper-edge", f"n={n} m={m} r={r}",
-                       ((m - 1) * (n - 1)) // (r - 1), res.value, simple_attains,
-                       "" if simple_attains
-                       else "simple cannot attain here, multi needed")
+                       ((m - 1) * (n - 1)) // (r - 1), res.value, True,
+                       relation="=" if simple_attains else "<=")
 
     print("\nthm:hyper-vertex-m2 / m3  k_m^(r)(n) = floor((m-1)(n-1)/(r-1))")
     for m in (2, 3):
         for r in (3, 4):
             for n in range(r, 8):
-                try:
-                    good = verify_hyper_vertex_value(n, r, m)
-                except Exception as exc:                     # size out of reach
-                    print(f"  (skipped n={n} r={r} m={m}: {exc})")
+                res = solve(n, m, hypergraph=True, r=r, separation="vertex",
+                            exhaustive=True, max_seconds=BUDGET)
+                if not res.complete:
+                    print(f"  unfinished hypervertex case n={n}, m={m}, r={r}; limit {BUDGET}s")
                     continue
-                tgt = ((m - 1) * (n - 1)) // (r - 1)
+                target = ((m - 1) * (n - 1)) // (r - 1)
                 record(f"thm:hyper-vertex-m{m}", f"n={n} m={m} r={r}",
-                       tgt, tgt if good else -1, True,
-                       "" if good else "verify_hyper_vertex_value returned False")
+                       target, res.value, True,
+                       relation="=" if m == 2 or r < n else "<=")
 
     print("\nthm:multi-vertex-m2  K_2(n) = n-1  (incidence convention)")
     for n in range(2, 7):

@@ -96,7 +96,7 @@ from collections import Counter, deque
 # are not needed for any of the three.
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from itertools import combinations, combinations_with_replacement, permutations, product
+from itertools import combinations, combinations_with_replacement, islice, permutations, product
 from pathlib import Path
 
 import concurrent.futures
@@ -104,6 +104,27 @@ import concurrent.futures
 import numpy as np
 from scipy.sparse import csr_matrix as _csr
 from scipy.sparse.csgraph import maximum_flow as _csgraph_maxflow
+
+
+@dataclass(frozen=True)
+class _DurationDeadline:
+    """A monotonic deadline used internally by solve's duration-based budget."""
+
+    expires_at: float
+
+
+def _deadline_passed(deadline: float | _DurationDeadline | None) -> bool:
+    """Keep legacy absolute calendar deadlines compatible with direct callers.
+
+    solve() uses a monotonic duration instead. Calendar adjustments therefore
+    cannot prematurely exhaust or extend its requested search allocation.
+    Whether suspended time is included depends on the platform's monotonic clock.
+    """
+    if deadline is None:
+        return False
+    if isinstance(deadline, _DurationDeadline):
+        return time.monotonic() >= deadline.expires_at
+    return time.time() >= deadline
 
 # networkx is OPTIONAL.  Every connectivity measure the thesis reports is computed
 # through scipy's integer max-flow on a capacity matrix, so the core checker,
@@ -292,6 +313,13 @@ SIMPLE_DIRECTED = Variant(directed=True, simple=True, name="simple directed")
 MULTI_DIRECTED = Variant(directed=True, simple=False, name="multi directed")
 
 
+def _integer_sum(values) -> int:
+    """A fast NumPy sum where safe, Python-integer accumulation otherwise."""
+    if int(values.max(initial=0)) * values.size <= np.iinfo(np.int64).max:
+        return int(values.sum())
+    return sum(map(int, values.flat))
+
+
 class Graph:
     """A graph or digraph stored as an integer multiplicity matrix.
 
@@ -345,19 +373,19 @@ class Graph:
         counts once.
         """
         if self.variant.directed:
-            return int(self.mu.sum())
+            return _integer_sum(self.mu)
         # Strict upper triangle (k=1) avoids double-counting the symmetric pair.
-        return int(np.triu(self.mu, k=1).sum())
+        return _integer_sum(np.triu(self.mu, k=1))
 
     def out_degree(self, v: int) -> int:
         """Number of edges or arcs leaving ``v`` (with multiplicity)."""
         self._require_vertex(v)
-        return int(self.mu[v, :].sum())
+        return _integer_sum(self.mu[v, :])
 
     def in_degree(self, v: int) -> int:
         """Number of edges or arcs entering ``v`` (with multiplicity)."""
         self._require_vertex(v)
-        return int(self.mu[:, v].sum())
+        return _integer_sum(self.mu[:, v])
 
     def degree(self, v: int) -> int:
         """Total degree of ``v``.
@@ -396,7 +424,7 @@ class Graph:
         # is min(mu + count, 1), which turns a fractional count into a clean
         # integer 1 and would hide the bad input from the guard in _assign.
         count = _require_integer("edge count", count, minimum=0)
-        new_value = self.mu[u, v] + count
+        new_value = int(self.mu[u, v]) + count
         if self.variant.simple:
             new_value = min(new_value, 1)  # enforce the 0/1 simple-graph cap
         self._assign(u, v, new_value)
@@ -407,7 +435,7 @@ class Graph:
         # Before the arithmetic for the same reason as add_edge: max(0, ...)
         # would launder a fractional count away from the guard in _assign.
         count = _require_integer("edge count", count, minimum=0)
-        new_value = max(0, self.mu[u, v] - count)
+        new_value = max(0, int(self.mu[u, v]) - count)
         self._assign(u, v, new_value)
 
     def set_multiplicity(self, u: int, v: int, value: int) -> None:
@@ -427,7 +455,8 @@ class Graph:
         """Write ``value`` into the matrix, mirroring it when undirected."""
         # The single place a number reaches the matrix, so the type and sign
         # checks live here and cover every mutator that routes through it.
-        value = _require_integer("multiplicity", value, minimum=0)
+        value = _require_integer("multiplicity", value, minimum=0,
+                                 maximum=np.iinfo(self.mu.dtype).max)
         if self.variant.simple and value > 1:
             raise ValueError("a simple graph cannot have multiplicity above one")
         self.mu[u, v] = value
@@ -504,13 +533,14 @@ def directed_arc_m2(n: int) -> int:
 
 
 def directed_arc_lower_bound(n: int, m: int) -> int:
-    """Lower bound and conjectured value for ``ell_m^dir(n)``, ``m >= 2``.
+    """Hub/augmented-bipartite lower bound for ``ell_m^dir(n)``, ``m >= 2``.
 
     ``max(m(n-1), floor((n+m-2)^2/4))``.  The two branches are the hub
     construction (``const:directed-hub``) and the shifted-partition augmented
     bipartite construction (``const:augmented-bipartite``).  Proved as a lower
-    bound for all ``m`` after capping at the complete digraph. It is conjectured to be tight for ``m >= 3``
-    (``conj:dir-arc``), proved tight for ``m = 2``.
+    bound for all ``m`` after capping at the complete digraph, and exact at
+    ``m = 2``. The all-order equality is false: the clique-core construction
+    has 57 arcs at ``m = 5, n = 12``, where this bound is 56. The thesis makes no general optimality claim for this two-family bound.
     """
     hub_branch = m * (n - 1)
     bipartite_branch = (n + m - 2) ** 2 // 4
@@ -521,14 +551,14 @@ def hypergraph_edge(n: int, m: int, r: int) -> int:
     """``floor((m-1)(n-1)/(r-1))`` hyperedges for the ``r``-uniform edge problem.
 
     Proved as an upper bound for every ``r``-uniform hypergraph, simple or
-    not (``prop:hyper-edge``, hypergraph Gomory-Hu). Attained by a
+    not (``prop:hyper-edge``, cut induction). Attained by a
     MULTIhypergraph (a repeated-hyperedge star) whenever ``(r-1) | (n-1)``.
-    Attained by a SIMPLE hypergraph, the model this program's sixteen-panel
-    enumeration actually searches, only under the extra hypothesis
-    ``m - 1 <= C(n-2, r-2)`` (``thm:simple-hyper-edge``). Outside both
-    conditions this value is still a valid upper bound but is not known to
-    be attained by any hypergraph the program can build; use
-    ``_hyper_edge_simple_proved`` for the gated version figures should read.
+    Attained by a SIMPLE hypergraph whenever
+    ``m - 1 <= C(n-2, r-2)`` (``thm:simple-hyper-edge``). This is a sufficient
+    condition, not a necessary one. Outside both conditions the formula
+    remains an upper bound and individual cells may still attain it. Use
+    ``_hyper_edge_simple_proved`` to test the theorem's sufficient condition.
+    The sixteen-panel grids include both simple and multi models.
     """
     return ((m - 1) * (n - 1)) // (r - 1)
 
@@ -537,11 +567,10 @@ def _hyper_edge_simple_proved(n: int, m: int, r: int) -> int | None:
     """``hypergraph_edge(n, m, r)``, gated to where a SIMPLE hypergraph is
     proved to attain it (``thm:simple-hyper-edge``: ``m - 1 <= C(n-2, r-2)``).
 
-    Returns ``None`` outside that range. The sixteen-variant program's hyper
-    rows enumerate simple hypergraphs (no repeated hyperedges), and outside
-    this condition the closed form is only an unattained upper bound for
-    that model, e.g. at ``n = r = m = 3`` it gives 2 while only one 3-set
-    exists on 3 vertices, so the simple maximum is 1.
+    Returns ``None`` outside that range, meaning this theorem does not settle
+    the cell. That does not establish nonattainment. Some cells do fail to
+    attain the bound, for example ``n = r = m = 3`` gives 2 while only one
+    3-set exists, so the simple maximum there is 1.
     """
     if r < 2 or n < r:
         return None
@@ -815,7 +844,7 @@ def hyper_connectivity(hypergraph: Hypergraph, source: int, target: int,
         # Endpoints must not be the bottleneck: only interior vertices are capped.
         cap[2 * source, 2 * source + 1] = _UNBOUNDED
         cap[2 * target, 2 * target + 1] = _UNBOUNDED
-    return int(_csgraph_maxflow(_csr(cap, dtype=int), leave(source), enter(target)).flow_value)
+    return _flow_value(_csr(cap, dtype=int), leave(source), enter(target))
 
 
 def max_hyper_connectivity(hypergraph: Hypergraph, *, vertex_split: bool = False) -> int:
@@ -901,7 +930,7 @@ def directed_hub(n: int, m: int) -> Graph:
 
 
 def augmented_bipartite(n: int, m: int) -> Graph:
-    """The conjectured directed extremiser for ``m >= 2``.
+    """A dense directed construction; no general optimality claim is made.
 
     Set ``|B| = ceil((n+m-2)/2)`` and ``|A| = n - |B|``.  Fill every arc
     ``A -> B`` (the one-directional wall), then give each ``B``-vertex
@@ -942,6 +971,27 @@ def augmented_bipartite(n: int, m: int) -> Graph:
             source = part_b[i]
             target = part_b[(i + offset) % size_b]
             graph.add_edge(source, target)
+    return graph
+
+
+def clique_core(n: int, m: int) -> Graph:
+    """Cambie's dense clique-core construction (const:clique-core).
+
+    Sources feed m-1 core vertices; m-2 core vertices feed the sinks.
+    All source-to-sink arcs and both directions inside the m-clique are present.
+    The displayed cuts in the thesis certify maximum local connectivity m-1.
+    """
+    m = _require_integer("m", m, minimum=2)
+    n = _require_integer("n", n, minimum=m)
+    a = (n - m + 1) // 2
+    sources, core, sinks = range(a), range(a, a + m), range(a + m, n)
+    graph = Graph(n, SIMPLE_DIRECTED)
+    for u, v in product(core, repeat=2):
+        if u != v:
+            graph.add_edge(u, v)
+    for left, right in ((sources, core[:-1]), (core[:-2], sinks), (sources, sinks)):
+        for u, v in product(left, right):
+            graph.add_edge(u, v)
     return graph
 
 
@@ -1015,6 +1065,33 @@ def star_hypertree(n: int, r: int) -> Hypergraph:
     return hypergraph
 
 
+def bounded_outdegree_hypergraph(n: int, m: int, r: int = 3, *, simple: bool = True) -> Hypergraph:
+    """A forward hypergraph with at most m-1 outgoing copies at every vertex.
+
+    Every route starts through one of its source's outgoing copies. This
+    therefore bounds both arc and incidence vertex connectivity by m-1.
+    """
+    n = _require_integer("n", n, minimum=2)
+    m = _require_integer("m", m, minimum=2)
+    r = _require_integer("r", r, minimum=2, maximum=n)
+    edges = []
+    for tail in range(n):
+        candidates = combinations([v for v in range(n) if v != tail], r - 1)
+        heads = list(islice(candidates, m - 1)) if simple else [next(candidates)] * (m - 1)
+        edges.extend((tail, frozenset(head)) for head in heads)
+    return Hypergraph(n, edges, directed=True, r=r)
+
+
+def six_vertex_multihypergraph() -> Hypergraph:
+    """Twelve triples at n=6, m=6. Every vertex except hub 0 has degree five.
+
+    Take all ten triples through the hub, repeat {0,4,5} and add {1,2,3}.
+    Degree cuts establish feasibility and the edge upper bound is twelve.
+    """
+    edges = [{0, x, y} for x, y in combinations(range(1, 6), 2)]
+    return Hypergraph(6, edges + [{0, 4, 5}, {1, 2, 3}], r=3)
+
+
 ######################################################################
 ##
 ##  CHAPTER 2 — PROVING BOUNDS BY MACHINE
@@ -1035,6 +1112,45 @@ def star_hypertree(n: int, r: int) -> Hypergraph:
 # where each vertex becomes a capacity-one in/out gate, so a route uses a vertex at
 # most once.  Edge vs vertex is one boolean, not a second code path.
 
+def _python_maxflow(mu, n, source, target, cutoff=None) -> int:
+    """Exact integer flow, optionally stopping once it exceeds a cutoff.
+
+    Python integers prevent residual-capacity and accumulated-flow overflow.
+    """
+    residual = np.asarray(mu, dtype=object).copy()
+    flow = 0
+    while cutoff is None or flow <= cutoff:
+        parent = [-1] * n
+        parent[source] = source
+        stack = [source]
+        while stack and parent[target] == -1:
+            u = stack.pop()
+            for v in range(n):
+                if parent[v] == -1 and residual[u, v] > 0:
+                    parent[v] = u
+                    stack.append(v)
+        if parent[target] == -1:
+            break
+        path, v = [], target
+        while v != source:
+            path.append((parent[v], v))
+            v = parent[v]
+        amount = min(residual[u, v] for u, v in path)
+        for u, v in path:
+            residual[u, v] -= amount
+            residual[v, u] += amount
+        flow += amount
+    return int(flow)
+
+
+def _flow_value(capacity, source, target) -> int:
+    """Use SciPy only when its int32 flow and residual arithmetic is safe."""
+    largest = int(capacity.data.max(initial=0))
+    if largest * capacity.nnz <= np.iinfo(np.int32).max // 2:
+        return int(_csgraph_maxflow(capacity, source, target).flow_value)
+    return _python_maxflow(capacity.toarray(), capacity.shape[0], source, target)
+
+
 def local_connectivity(graph: Graph, source: int, target: int,
                        *, vertex_split: bool = False) -> int:
     """Disjoint ``source``-``target`` routes by a single max-flow (Menger).
@@ -1046,7 +1162,7 @@ def local_connectivity(graph: Graph, source: int, target: int,
     if not vertex_split:
         # scipy.sparse.csgraph.maximum_flow is a C implementation; faster than
         # NetworkX for the small integer capacity matrices we use.
-        return int(_csgraph_maxflow(_csr(graph.mu, dtype=int), source, target).flow_value)
+        return _flow_value(_csr(graph.mu, dtype=int), source, target)
     # Vertex mode: the same scipy max-flow on the split matrix.  Only the INTERIOR
     # vertices stay capped at one, which is what makes Menger count internally
     # vertex-disjoint routes.
@@ -1060,7 +1176,7 @@ def local_connectivity(graph: Graph, source: int, target: int,
     cap, _ = _split_capacity_matrix(graph)
     cap[2 * source, 2 * source + 1] = _UNBOUNDED
     cap[2 * target, 2 * target + 1] = _UNBOUNDED
-    return int(_csgraph_maxflow(_csr(cap, dtype=int), 2 * source + 1, 2 * target).flow_value)
+    return _flow_value(_csr(cap, dtype=int), 2 * source + 1, 2 * target)
 
 
 def max_connectivity(graph: Graph, *, vertex_split: bool = False) -> int:
@@ -1071,7 +1187,7 @@ def max_connectivity(graph: Graph, *, vertex_split: bool = False) -> int:
     if not vertex_split:
         # Build the CSR matrix once and reuse it for every pair.
         csr = _csr(graph.mu, dtype=int)
-        return max((int(_csgraph_maxflow(csr, s, t).flow_value)
+        return max((_flow_value(csr, s, t)
                     for s, t in _pairs(graph)), default=0)
     return max((local_connectivity(graph, s, t, vertex_split=True)
                 for s, t in _pairs(graph)), default=0)
@@ -1215,7 +1331,7 @@ def max_multigraph_vertex(n: int, m: int,
         return not exceeds_bound(graph, m - 1, separation="vertex")
 
     def recurse(i: int, total: int) -> None:
-        if deadline is not None and time.time() > deadline:
+        if _deadline_passed(deadline):
             timed_out[0] = True
             return
         if total + cap * (len(pairs) - i) <= best[0]:
@@ -1250,7 +1366,7 @@ def exceeds_bound(graph: Graph, k: int, *, separation: str = "edge") -> bool:
     n = graph.num_vertices
     if separation == "edge":
         mu = graph.mu
-        if _C is not None and n <= 16:
+        if _C is not None and n <= 16 and _c_flow_safe(mu, k):
             flat, ptr = _c_flat(mu)
             directed = int(graph.variant.directed)
             return bool(_C.max_connectivity_exceeds(ptr, n, k, directed))
@@ -1838,6 +1954,8 @@ def search_for_dense_graph(
     clock_start = time.perf_counter()  # for the timed convergence trace only
 
     for step in range(steps):
+        if _deadline_passed(deadline):
+            break
         # Periodically recompute the sensitivity map that guides removals.  It
         # is expensive, so we cache it and refresh only every bias_refresh steps.
         if sensitivity_guided and step % bias_refresh == 0 and current.edge_count() > 0:
@@ -1919,10 +2037,6 @@ def search_for_dense_graph(
         ))
         temperature *= cooling  # cool down: T <- cooling * T each step
 
-        # Respect the deadline when supplied; check every 100 steps to amortise
-        # the time.time() call.
-        if deadline is not None and step % 100 == 99 and time.time() > deadline:
-            break
 
     return SearchResult(best_graph, best_edges, history)
 
@@ -1974,7 +2088,9 @@ def tabu_search_for_dense_graph(
     perturbs from the incumbent once it has stalled for ``stall_limit`` steps.
     Aspiration overrides the tabu flag for any move that beats the global best.
     There is no temperature and no accept-worse coin: the only randomness is the
-    seed driving the perturbation kicks, so two runs from one seed are identical.
+    seed driving the perturbation kicks. With a fixed step count and no deadline,
+    the same seed gives the same search trajectory. A timed cutoff can stop
+    that trajectory at different points on different runs.
 
     Returns the same :class:`SearchResult` as the annealer (the best feasible graph
     and the full timed history), so the two engines are interchangeable through the
@@ -2008,7 +2124,7 @@ def tabu_search_for_dense_graph(
         return -edges + penalty * (measure(graph) - (m - 1)), False
 
     for step in range(steps):
-        if deadline is not None and time.time() > deadline:
+        if _deadline_passed(deadline):
             break
         best_move: tuple[int, int, int] | None = None
         best_move_energy: float | None = None
@@ -2247,7 +2363,7 @@ def _brute_force_matrix(
     total = len(cells)
     # headroom[pos] = the most the still-undecided cells pos .. total-1 can add.
     headroom = [(total - i) * (span - 1) for i in range(total + 1)]
-    best_count, best_graph = 0, None
+    best_count, best_graph = 0, Graph(n, variant)
     completed = [True]
     graph = Graph(n, variant)
 
@@ -2257,7 +2373,7 @@ def _brute_force_matrix(
             return
         if count + headroom[pos] <= best_count:
             return                          # even the ceiling cannot beat the best
-        if time.time() > deadline:
+        if _deadline_passed(deadline):
             completed[0] = False            # ran out before exhausting the space
             return
         if pos == total:
@@ -2268,6 +2384,8 @@ def _brute_force_matrix(
         # Descending values first, so a dense feasible graph is found early and
         # the counting prune bites on the sparser siblings.
         for value in range(span - 1, 0, -1):
+            if not completed[0]:
+                break
             graph.set_multiplicity(u, v, value)
             if not exceeds_bound(graph, m - 1, separation=separation):
                 descend(pos + 1, count + value)
@@ -2293,7 +2411,7 @@ def _search_within_budget(
         if best is None or outcome.best_edge_count > best.best_edge_count:
             best = outcome
         restart += 1
-        if time.time() > deadline or restart >= 200:
+        if _deadline_passed(deadline):
             break
     assert best is not None
     return best
@@ -2369,9 +2487,9 @@ def _brute_force_hypergraph(
     """
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     cap = _hyper_multiplicity_cap(m, simple)
-    best_count, best_h, completed = 0, None, True
-    for tick, mult in enumerate(product(range(cap + 1), repeat=len(candidates))):
-        if tick % 256 == 0 and time.time() > deadline:
+    best_count, best_h, completed = 0, Hypergraph(n, directed=directed), True
+    for mult in product(range(cap + 1), repeat=len(candidates)):
+        if _deadline_passed(deadline):
             completed = False
             break
         # Size first, and from the multiplicities alone.  A candidate that cannot
@@ -2407,11 +2525,13 @@ def _random_hypergraph_search(
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     cap = _hyper_multiplicity_cap(m, simple)
     best_count, best_h = 0, None
-    while time.time() < deadline:
+    while not _deadline_passed(deadline):
         order = [e for e in candidates for _ in range(cap)]
         rng.shuffle(order)
         hypergraph = Hypergraph(n, directed=directed)
         for edge in order:
+            if _deadline_passed(deadline):
+                break
             hypergraph.add_hyperedge(edge)
             if max_hyper_connectivity(hypergraph, vertex_split=vertex_split) > m - 1:
                 hypergraph.hyperedges.pop()   # this one broke feasibility; undo
@@ -2561,7 +2681,7 @@ def _exhaustive_directed(
     def recurse(idx: int, count: int) -> None:
         if stats is not None:
             stats["nodes"] = stats.get("nodes", 0) + 1
-        if time.time() > deadline:
+        if _deadline_passed(deadline):
             timed_out[0] = True
             return
         if count + (total - idx) <= best_count[0]:
@@ -2633,9 +2753,10 @@ def solve(
             edges are ``q`` routes and a multigraph is a genuine problem of its
             own, ``K_m(n)`` or ``K_m^dir(n)``, with every multiplicity capped at
             ``m - 1`` exactly as in the edge separation.
-        max_seconds: wall-clock budget.  The engines poll it at their natural
-            loop boundaries (the annealer and blind enumerators do so in small
-            batches), so the final batch may overrun it.
+        max_seconds: monotonic duration budget, unaffected by calendar-clock
+            adjustments. Engines poll it at loop boundaries, so work already
+            in progress may overrun the target. The platform's monotonic clock
+            determines whether suspended time counts toward the duration.
         seed: random seed for the discovery searches.
         method: discovery engine.  ``None`` selects tabu search for matrix models
             and randomised greedy search for hypergraphs; the explicit alternatives
@@ -2655,11 +2776,13 @@ def solve(
     # enumeration, which reads exactly like a computed result.
     n = _require_integer("n", n, minimum=1)
     m = _require_integer("m", m, minimum=2)
+    if isinstance(max_seconds, bool) or not isinstance(max_seconds, (int, float)) or not math.isfinite(max_seconds) or max_seconds < 0:
+        raise ValueError("max_seconds must be finite and non-negative")
     if hypergraph:
         r = _require_integer("uniformity r", r, minimum=2, maximum=n)
 
-    start = time.time()
-    deadline = start + max_seconds
+    start = time.monotonic()
+    deadline = _DurationDeadline(start + max_seconds)
 
     # ----- the hypergraph model --------------------------------------------
     # Same driver, a different internal measure: the edge/vertex separation and
@@ -2692,7 +2815,7 @@ def solve(
             bound, done, method = "lower", False, "randomised greedy search"
             note = "discovery only ever yields a lower bound"
         return SolveResult(n, m, label, separation, value, bound, method,
-                           time.time() - start, done, witness, note)
+                           time.monotonic() - start, done, witness, note)
 
     # ----- the matrix models -----------------------------------------------
     # Both multigraph separations use the same multiplicity-counted objective
@@ -2713,7 +2836,7 @@ def solve(
                         else "simulated annealing")
         return SolveResult(
             n, m, label, separation, result.best_edge_count, "lower",
-            method_label, time.time() - start, False,
+            method_label, time.monotonic() - start, False,
             result.best_graph, "discovery only ever yields a lower bound")
 
     # EXHAUSTIVE, simple directed: a pruned exhaustive digraph search is exact.
@@ -2725,7 +2848,7 @@ def solve(
         method = "exhaustive digraph search (branch and bound)"
         note = "" if done else "budget ran out; value is only a lower bound"
         return SolveResult(n, m, label, separation, value, bound, method,
-                           time.time() - start, done, witness, note)
+                           time.monotonic() - start, done, witness, note)
 
     # Directed MULTIGRAPH arc problem: the general hand theorem gives the exact
     # value directly.  The historical cut-counting routine remains available as
@@ -2745,7 +2868,7 @@ def solve(
         return SolveResult(
             n, m, label, separation, value, "exact",
             "closed form (directed multigraph theorem)",
-            time.time() - start, True, witness, "")
+            time.monotonic() - start, True, witness, "")
 
     # EXHAUSTIVE otherwise (undirected, or vertex separation): brute force.
     value, witness, done = _brute_force_matrix(
@@ -2755,7 +2878,7 @@ def solve(
     note = ("" if done else "budget ran out; value is only a lower bound "
                             "(no cut-counting exists for this case)")
     return SolveResult(n, m, label, separation, value, bound, method,
-                       time.time() - start, done, witness, note)
+                       time.monotonic() - start, done, witness, note)
 
 
 ######################################################################
@@ -3025,7 +3148,7 @@ def plot_directed_crossover(m: int, max_n: int, path: str | Path) -> None:
     augmented-bipartite branch.  Before floors, the upper crossover is
     ``n = m + 2 + 2*sqrt(m)``, hence ``n ~ m`` for growing ``m``.
     """
-    ns = list(range(2, max_n + 1))
+    ns = list(range(max(2, m), max_n + 1))
     hub = [m * (n - 1) for n in ns]                         # linear hub branch
     # Quadratic branch: the shifted-partition augmented bipartite count
     # floor((n+m-2)^2/4) of const:augmented-bipartite (at m <= 3 it equals the
@@ -3931,7 +4054,8 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                    for panel in panels)
 
     drawn = {"proved": _uses("proved"), "conj": _uses("conj"),
-             "exact": _uses_points("exact"), "search": _uses_points("search")}
+             "exact": _uses_points("exact"), "search": _uses_points("search"),
+             "construction": _uses_points("construction")}
 
     def draw_panel(ax, panel):
         for key, colour in (("proved", _KUL_BLUE), ("conj", _RED)):
@@ -3939,6 +4063,9 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                 xs, ys = panel[key]
                 ax.plot(xs, ys, "-", color=colour, linewidth=2.0,
                         solid_capstyle="round", zorder=2.5)
+        if panel.get("construction") is not None:
+            xs, ys = panel["construction"]
+            ax.plot(xs, ys, "+", color=_RED, markersize=5.5, mew=1.1, zorder=3.5)
         if panel.get("search") is not None:
             xs, ys = panel["search"]
             if len(xs):
@@ -4004,7 +4131,9 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
         ("exact", dict(color=_GREEN, marker="s", ls="none", markersize=4.4,
                        label="machine-checked (exact)")),
         ("search", dict(color=_VIOLET, marker="o", ls="none", markersize=5.2,
-                        mfc="none", mew=1.1, label="search (lower bound)")),
+                        mfc="none", mew=1.1, label="unaided search")),
+        ("construction", dict(color=_RED, marker="+", ls="none", markersize=5.5,
+                              label="known construction")),
     ]
 
     suptitle = "Erdős 915 across the sixteen variants"
@@ -4040,7 +4169,7 @@ def plot_variant_grid(panels: list[dict], path: str | Path,
                         adjust=adjust, finish=finish,
                         legend_handles=key_handles,
                         legend_ncol=len(key_handles),
-                        legend_fontsize=8.4,
+                        legend_fontsize=7.2,
                         legend_y=0.075 if two_row else 0.045,
                         bbox_tight=False)
 
@@ -4211,7 +4340,7 @@ def _pair_connectivities(obj, *, separation: str, hypergraph: bool) -> list[int]
                 for s, t in _pairs(obj)]
     if not vsplit:
         csr = _csr(obj.mu, dtype=int)
-        return [int(_csgraph_maxflow(csr, s, t).flow_value) for s, t in _pairs(obj)]
+        return [_flow_value(csr, s, t) for s, t in _pairs(obj)]
     return [local_connectivity(obj, s, t, vertex_split=True) for s, t in _pairs(obj)]
 
 
@@ -5252,7 +5381,7 @@ def max_feasible_hyperedges(
             return
         if count + cap * (total - pos) <= best[0]:
             return                                   # cannot beat the incumbent
-        if time.time() > deadline:
+        if _deadline_passed(deadline):
             timed_out[0] = True
             return
         if pos == total:
@@ -5284,6 +5413,11 @@ def max_feasible_hyperedges(
     return (best[0] if exact else max(best[0], seed_lb)), exact
 
 
+def _c_flow_safe(mu, cutoff) -> bool:
+    limit = np.iinfo(np.int32).max // 2
+    return 0 <= cutoff <= limit and int(mu.max(initial=0)) <= limit
+
+
 def _c_flat(mu: np.ndarray) -> tuple[np.ndarray, "_ct.POINTER[_ct.c_int]"]:
     """Return a contiguous int32 copy of ``mu`` and a ctypes c_int pointer into it."""
     flat = np.ascontiguousarray(mu, dtype=np.int32)
@@ -5302,35 +5436,10 @@ def _tiny_maxflow(mu: np.ndarray, n: int, s: int, t: int, cap: int) -> bool:
     cap+1 augmenting paths).  Correct for integer capacities: each augmentation
     increases flow by at least 1, so the loop terminates in at most
     max-flow-value iterations."""
-    if _C is not None and n <= 7:
+    if _C is not None and n <= 7 and _c_flow_safe(mu, cap):
         flat, ptr = _c_flat(mu)
         return bool(_C.tiny_maxflow(ptr, n, s, t, cap))
-    residual = mu.astype(int)          # astype already returns a fresh, mutable copy
-    flow = 0
-    while flow <= cap:
-        parent = [-1] * n
-        parent[s] = s
-        queue = [s]
-        while queue and parent[t] == -1:
-            u = queue.pop()
-            for v in range(n):
-                if parent[v] == -1 and residual[u, v] > 0:
-                    parent[v] = u
-                    queue.append(v)
-        if parent[t] == -1:
-            return False  # flow is maximal and <= cap
-        bottleneck = 10 ** 9
-        v = t
-        while v != s:
-            bottleneck = min(bottleneck, residual[parent[v], v])
-            v = parent[v]
-        v = t
-        while v != s:
-            residual[parent[v], v] -= bottleneck
-            residual[v, parent[v]] += bottleneck
-            v = parent[v]
-        flow += bottleneck
-    return True
+    return _python_maxflow(mu, n, s, t, cutoff=cap) > cap
 
 
 def _canonical_form(mu: np.ndarray) -> bytes:
@@ -5339,21 +5448,18 @@ def _canonical_form(mu: np.ndarray) -> bytes:
     The key is the lexicographically smallest flattened multiplicity matrix over
     all vertex relabellings: two multiplicity matrices have the same key iff one
     is a vertex permutation of the other.  "Lexicographically smallest" is over
-    the int32 byte encoding, which orders the same way as the integer sequence
-    exactly while every multiplicity stays below 256.  That holds throughout
-    here, since feasibility caps multiplicity at ``m - 1``.  Either way the key
-    is a canonical form and the C and Python paths agree on it (differentially
-    checked over 300 random graphs at n=5, 0 mismatches).  This is the SOURCE OF
-    TRUTH for isomorphism here, with no dependency on any external library, so
-    the enumeration's correctness never rests on an outside binary.  For ``n=7`` it is
-    5040 permutations per graph, which is cheap on CPU; storing one key per class
-    is what bounds the enumeration's memory to the number of classes rather than
-    the number of labelled copies.
+    byte encoding, not necessarily the numerical sequence. Matrices whose
+    largest entry fits in int32 use that width. Larger entries use int64 and
+    the Python path, avoiding truncation. The width is invariant under vertex
+    relabelling. The C and Python paths use the same ordering at int32 width.
+    For ``n=7`` there are 5040 permutations per graph. Storing one key per
+    class bounds memory by the number of classes instead of labelled copies.
     """
     # Canonical keys must not depend on the caller's native integer width.
-    mu = np.ascontiguousarray(mu, dtype=np.int32)
+    dtype = np.int32 if int(mu.max(initial=0)) <= np.iinfo(np.int32).max else np.int64
+    mu = np.ascontiguousarray(mu, dtype=dtype)
     n = mu.shape[0]
-    if _C is not None and n <= 7:
+    if _C is not None and n <= 7 and dtype == np.int32:
         flat, ptr = _c_flat(mu)
         out = np.empty(n * n, dtype=np.int32)
         out_ptr = out.ctypes.data_as(_ct.POINTER(_ct.c_int))
@@ -5862,7 +5968,7 @@ def _enum_matrix_extremals(
     def dfs(pos: int, edges: int) -> None:
         if timed_out[0]:
             return
-        if time.time() > deadline:
+        if _deadline_passed(deadline):
             timed_out[0] = True
             return
         if edges + max_mult * (total - pos) < target or edges > target:
@@ -5928,7 +6034,7 @@ def _enum_hyper_extremals(
     def dfs(pos: int, count: int) -> None:
         if timed_out[0]:
             return
-        if time.time() > deadline:
+        if _deadline_passed(deadline):
             timed_out[0] = True
             return
         if count + (total - pos) < target or count > target:
@@ -6314,7 +6420,7 @@ def _run_checks() -> int:
         check(f"K_4-tree on {ktree.num_vertices} vertices: kappa={min_vertex_connectivity(ktree)}",
               min_vertex_connectivity(ktree) == 3)
 
-    section("Constructions: the augmented bipartite conjecture values")
+    section("Constructions: the augmented bipartite lower bounds")
     counterexample = augmented_bipartite(10, 3)
     check(f"m=3,n=10: {counterexample.edge_count()} arcs, lambda^max={max_edge_connectivity(counterexample)}",
           counterexample.edge_count() == 30 and max_edge_connectivity(counterexample) == 2)

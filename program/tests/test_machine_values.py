@@ -154,7 +154,7 @@ class Promoting(unittest.TestCase):
     """--promote: the one act that changes the published record."""
 
     def test_promotion_replaces_the_record_and_clears_the_candidate(self):
-        path = _record({KEY: 8})
+        path = _record({KEY: None})
         mv = MachineValues(path, rebuild=True)
         mv.get_or_run("exact", 4, 3, 4, {"directed": True}, lambda: 9)
         mv.promote()
@@ -166,6 +166,16 @@ class Promoting(unittest.TestCase):
     def test_promoting_nothing_is_refused(self):
         with self.assertRaises(SystemExit):
             MachineValues(_record({KEY: 8})).promote()
+
+    def test_contradictory_exact_values_cannot_be_promoted(self):
+        path = _record({KEY: 8})
+        before = path.read_text()
+        mv = MachineValues(path, rebuild=True)
+        mv.get_or_run("exact", 4, 3, 4, {"directed": True}, lambda: 9)
+        with self.assertRaises(SystemExit):
+            mv.promote()
+        self.assertEqual(path.read_text(), before)
+        self.assertTrue(mv.candidate.exists())
 
 
 if __name__ == "__main__":

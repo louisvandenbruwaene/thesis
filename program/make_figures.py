@@ -9,7 +9,7 @@ directory:
     python make_figures.py
 
 Each figure is written into ``../figures/``.  Every randomised search uses a
-fixed seed, so the output is reproducible.
+fixed initial seed. Timed reruns can differ; rendering uses the frozen record.
 """
 
 from __future__ import annotations
@@ -18,49 +18,33 @@ import hashlib
 import json
 import datetime
 import math
+import os
 import platform
 import subprocess
 import sys
+import tempfile
+from importlib.metadata import version, PackageNotFoundError
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from erdos915_unified import (  # noqa: E402
-    MULTI_DIRECTED,
-    MULTI_UNDIRECTED,
-    SIMPLE_DIRECTED,
-    SIMPLE_UNDIRECTED,
-    Graph,
-    search_for_dense_graph,
-    compute_enumeration_cache,
-    compute_pair_enumeration_cache,
-    compute_surface_cache,
-    gallery_extremal_graphs,
+from erdos915_unified import (
     directed_arc_lower_bound,
     directed_multigraph_arc,
-    draw_graph_with_sensitivity,
-    edge_vertex_distribution,
     hypergraph_edge,
     _hyper_edge_simple_proved,
     _hyper_vertex_simple_proved,
     multigraph_undirected_edge,
     plot_complexity_growth,
-    plot_extremal_gallery,
-    plot_conn_dist_grid,
-    plot_conn_threshold_3d,
-    plot_pair_conn_dist_grid,
     plot_directed_crossover,
     plot_edge_vertex_divergence,
-    plot_edge_vertex_histograms,
-    plot_edge_dist_grid,
-    plot_scatter_lambda_edges,
-    plot_search_trace,
-    plot_sa_vs_tabu_convergence,
-    plot_variant_3d_surfaces,
     plot_variant_grid,
-    save_gallery_json,
     simple_undirected_edge,
     solve,
+    SolveResult,
+    Graph,
+    _dir_tails_heads,
+    C_EXTENSION_LOADED,
 )
 
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
@@ -72,32 +56,27 @@ FIGURES = Path(__file__).resolve().parent.parent / "figures"
 DATA = Path(__file__).resolve().parent / "data"
 
 
-# ----------------------------------------------------------------------
-#  The machine-value record.
-#  Every number the variant grids plot comes from a ``solve`` call, and there
-#  are several hundred of them: exhaustive enumerations that run to a timeout,
-#  and timed searches.  That is nearly all the wall clock in this script.
-#
-#  Those numbers are an EXPERIMENT, and this file is its result.  The two acts
-#  are kept apart:
-#
-#    * rendering (no flag) draws the four variant grids from the frozen record
-#      and never calls ``solve`` for them: the same file draws the same grids on
-#      any machine, in seconds.  This is a statement about the RECORD, not about
-#      the whole command.  The same run also refreshes offcut-only outputs, and
-#      two of those, the gallery classification and the annealing-against-tabu
-#      comparison, run under wall-clock budgets on every invocation, while the
-#      surface cache is rebuilt whenever its fingerprint no longer matches.
-#    * rebuilding (``--rebuild``) recomputes every value from scratch, consults
-#      nothing, and writes a CANDIDATE beside the record.  ``--compare`` then
-#      shows what moved, and only a deliberate ``--promote`` replaces the
-#      published file.
-#
-#  Keeping them apart is what makes the figures reproducible.  A timed search
-#  finds what that machine reached in that budget, so a render that quietly
-#  recomputed would redraw the thesis differently on a busier laptop.
-# ----------------------------------------------------------------------
+def _write_json(path, value):
+    """Atomically replace one JSON file, so interruption cannot truncate it."""
+    path = Path(path)
+    with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as stream:
+        temporary = Path(stream.name)
+        try:
+            json.dump(value, stream, indent=1)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
+    try:
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
+
+# Rendering reads frozen observations. Rebuilding writes a separate candidate;
+# only an explicit promotion replaces the published experiment.
 MACHINE_CACHE_PATH = DATA / "machine_values.json"
 # A rebuild in progress writes here, never over the published record.  It also
 # survives an interruption: a twelve-hour recomputation that dies at hour eleven
@@ -146,6 +125,7 @@ class MachineValues:
         self.values: dict[str, int | None] = {}
         self.published: dict[str, int | None] = {}
         self.meta: dict = {}
+        self.runs: dict = {}
         self.hits = 0
         self.misses = 0
         self.resumed = 0
@@ -155,40 +135,25 @@ class MachineValues:
             self.meta = blob.get("meta", {})
             if not rebuild:
                 self.values = dict(self.published)
+                self.runs = dict(blob.get("runs", {}))
         self.program_hash = self._program_hash()
         if rebuild:
             self._resume()
 
     # -- provenance ----------------------------------------------------------
 
-    # Where the value-determining half of the program ends.  Everything above
-    # this banner is the model, the checker, the provers, the search and
-    # ``solve`` itself; everything below it is figures and the self-check.
-    _VALUE_CODE_ENDS_AT = "##  CHAPTER 4"
-
     @classmethod
     def _program_hash(cls) -> str:
-        """Fingerprint of the code that can change a value.
+        """Hash the complete solver, optional C source and experiment harness.
 
-        Deliberately NOT the whole file. Hashing all six thousand lines would
-        make every edit to the plotting code below invalidate a fingerprint on
-        results the plotting code cannot possibly affect.  The cut is at the
-        chapter 4 banner: above it is everything ``solve`` runs, below it is the
-        figures.
-
-        This is provenance and nothing more.  It records which program produced
-        a number, which a reader can check; it cannot tell a change that alters
-        an answer from one that cannot, so it is never used to decide whether a
-        value may be drawn.
+        Flow helpers below the old chapter-four boundary also affect results.
+        A fingerprint is provenance, not evidence that a result is correct.
         """
-        source = (Path(__file__).resolve().parent
-                  / "erdos915_unified.py").read_text()
-        head, sep, _ = source.partition(cls._VALUE_CODE_ENDS_AT)
-        if not sep:                      # banner renamed: fall back to the lot
-            print("NOTE: could not find the chapter 4 banner in "
-                  "erdos915_unified.py; fingerprinting the whole file.")
-            head = source
-        return hashlib.sha256(head.encode()).hexdigest()
+        root = Path(__file__).resolve().parent
+        digest = hashlib.sha256()
+        for name in ("erdos915_unified.py", "_erdos_fast.c", "make_figures.py"):
+            digest.update(name.encode() + b"\0" + (root / name).read_bytes() + b"\0")
+        return digest.hexdigest()
 
     def _provenance(self) -> dict:
         """What produced these numbers, recorded so a reader can check it."""
@@ -200,6 +165,13 @@ class MachineValues:
             source_commit = commit.stdout.strip() if commit.returncode == 0 else None
         except (OSError, subprocess.SubprocessError):
             source_commit = None
+        dependencies = {}
+        for name in ("numpy", "scipy", "pulp", "networkx", "matplotlib"):
+            try:
+                dependencies[name] = version(name)
+            except PackageNotFoundError:
+                dependencies[name] = None
+        binary = Path(__file__).with_name("_erdos_fast.so")
         return {
             "program_sha256": self.program_hash,
             "source_commit": source_commit,
@@ -207,6 +179,10 @@ class MachineValues:
             "platform": platform.platform(terse=True),
             "computed": datetime.date.today().isoformat(),
             "entries": len(self.values),
+            "dependencies": dependencies,
+            "c_extension_loaded": C_EXTENSION_LOADED,
+            "c_binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest()
+                               if C_EXTENSION_LOADED else None,
         }
 
     # -- keys ----------------------------------------------------------------
@@ -249,7 +225,29 @@ class MachineValues:
             self.hits += 1                 # recovered from an interrupted rebuild
             return self.values[cache_key]
         self.misses += 1
-        self.values[cache_key] = run()
+        result = run()
+        if isinstance(result, SolveResult):
+            witness = result.witness
+            if isinstance(witness, Graph):
+                encoded = {"multiplicity_matrix": witness.mu.tolist()}
+            elif witness is not None:
+                edges = ([[sorted(t), sorted(h)] for t, h in
+                          map(_dir_tails_heads, witness.hyperedges)]
+                         if witness.directed else [sorted(e) for e in witness.hyperedges])
+                encoded = {"hyperedges": edges}
+            else:
+                encoded = None
+            self.runs[cache_key] = dict(
+                value=result.value, bound=result.bound, complete=result.complete,
+                method=result.method, elapsed_seconds=result.seconds,
+                requested_seconds=budget, seed=0 if kind == "search" else None,
+                construction_seeded=(kind == "exact" and kwargs.get("directed", False)
+                                     and kwargs.get("simple", True)
+                                     and not kwargs.get("hypergraph", False)),
+                witness=encoded, note=result.note)
+            self.runs[cache_key]["environment"] = self._provenance()
+            result = result.value if kind != "exact" or result.bound == "exact" else None
+        self.values[cache_key] = result
         # Written after every value, not once at the end: a rebuild takes hours
         # and an interrupted one should keep what it has already paid for.
         self.save()
@@ -265,6 +263,7 @@ class MachineValues:
                   f"different version of the program. Starting from nothing.")
             return
         self.values = dict(blob.get("values", {}))
+        self.runs = dict(blob.get("runs", {}))
         self.resumed = len(self.values)
         if self.resumed:
             print(f"NOTE: resuming an interrupted rebuild; {self.resumed} values "
@@ -274,8 +273,9 @@ class MachineValues:
         """Write the candidate. Only :meth:`promote` ever writes the record."""
         self.candidate.parent.mkdir(parents=True, exist_ok=True)
         blob = {"meta": self._provenance(),
-                "values": dict(sorted(self.values.items()))}
-        self.candidate.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
+                "values": dict(sorted(self.values.items())),
+                "runs": self.runs}
+        _write_json(self.candidate, blob)
 
     # -- reviewing a rebuild -------------------------------------------------
 
@@ -311,8 +311,10 @@ class MachineValues:
         """Replace the published record with the reviewed candidate."""
         if not self.candidate.exists():
             raise SystemExit(f"ERROR: there is no {self.candidate.name} to promote.")
+        if any("DISAGREE" in change for change in self.compare()):
+            raise SystemExit("ERROR: completed exact values disagree; resolve the discrepancy before promotion.")
         blob = json.loads(self.candidate.read_text())
-        self.path.write_text(json.dumps(blob, indent=1, sort_keys=False) + "\n")
+        _write_json(self.path, blob)
         self.candidate.unlink()
         print(f"promoted {len(blob.get('values', {}))} machine values into "
               f"{self.path.name}")
@@ -350,10 +352,10 @@ def _exact_points(ns, m, budget, **kw):
     for n in ns:
         def run(n=n):
             res = solve(n, m, exhaustive=True, max_seconds=budget, **kw)
-            return res.value if res.bound == "exact" else None
+            return res
         value = MACHINE_VALUES.get_or_run("exact", n, m, budget, kw, run)
         if value is None:
-            break          # once it cannot finish, larger n cannot either
+            break          # sampling policy, not a proof that larger cases are harder
         xs.append(n)
         ys.append(value)
     return xs, ys
@@ -377,7 +379,7 @@ _SETTLED_HYPER_EDGE_SIMPLE = {(6, 6, 3): 11}
 def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     """A lower bound on ``K_m^dir(n)``: a bouquet of thickened complete digraphs.
 
-    ``const:dir-multi-vertex-blocks`` takes the complete digraph on ``b <= m+1``
+    ``const:dir-multi-vertex-blocks`` takes the complete digraph on ``b <= m``
     vertices at multiplicity ``m+1-b``, which ``prop:dir-multi-vertex-blocks``
     checks is feasible and carries ``b(b-1)(m+1-b)`` arcs, and hangs any multiset
     of such blocks off one shared vertex.  ``b = 2`` is the bidirected edge at
@@ -391,7 +393,7 @@ def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     ``n = 4`` reading 34 against a checked 36.
     """
     block = {b - 1: b * (b - 1) * (m + 1 - b)
-             for b in range(2, min(n, m + 1) + 1)}
+             for b in range(2, min(n, m) + 1)}
     best = [0] * n
     for budget in range(1, n):
         for cost, value in block.items():
@@ -497,149 +499,38 @@ def _with_settled_cells(points, m, r, settled):
 
 
 def _search_points(ns, m, budget, **kw):
-    """Discovery lower bounds: a concrete feasible graph at each n (the LB construction)."""
+    """Raw discovery outcomes, without construction or theorem assistance."""
     xs, ys = [], []
     for n in ns:
         def run(n=n):
             return solve(n, m, exhaustive=False, max_seconds=budget,
-                         seed=0, **kw).value
+                         seed=0, **kw)
         xs.append(n)
         ys.append(MACHINE_VALUES.get_or_run("search", n, m, budget, kw, run))
     return xs, ys
 
 
-def _extend_lower_bounds(search, lb_fn, ns):
-    """Raise the search lower bounds to a known verified construction where it wins.
-
-    Past the size the quick search reaches, an explicit construction the checker
-    confirms is a better (still honest) lower bound, so we report the best of the
-    two at each n, exactly as the rediscovery section does by hand.
-    """
-    found = dict(zip(search[0], search[1]))
-    for n in ns:
-        found[n] = max(found.get(n, 0), lb_fn(n))
-    xs = sorted(found)
-    return xs, [found[n] for n in xs]
-
-
-# Panels are appended row-major, four columns per model row, in the order
-# simple graph, multigraph, hypergraph, multihypergraph.  So a simple panel's
-# multi counterpart sits exactly one model row later, and the two model-row
-# pairs are (0..3, 4..7) and (8..11, 12..15).
-_PANELS_PER_MODEL_ROW = 4
-_SIMPLE_MODEL_ROW_STARTS = (0, 8)
-
-
-def _lift_multi_above_simple(panels):
-    """Raise every multi panel's search points to its simple counterpart's.
-
-    A simple object IS the multi object with every multiplicity one, so a simple
-    witness is a multi witness and the multi lower bound can never legitimately
-    sit below the simple one.  Where the raw walk puts it there, the cause is the
-    search rather than the mathematics: the multi space is ``m - 1`` times larger
-    per edge, so at ``m = 6`` the same budget explores far less of it, and the
-    multihypergraph vertex panel came back weaker than the simple hypergraph one
-    at six of its ten sizes (n = 7..12, 13 against 15 up to 22 against 27).
-    Plotted unlifted, that reads as the richer model doing worse, which no
-    hypergraph can do.
-
-    This is the cross-model twin of :func:`_extend_lower_bounds`.  That function
-    raises a search to a named construction inside one panel; this one raises it
-    to an object another panel actually exhibited, which is the same argument
-    with a different witness.  It runs BEFORE :func:`_reconcile_panel`, so the
-    monotone running-max there applies to the lifted series rather than to a
-    series the lift would then contradict.
-    """
-    for start in _SIMPLE_MODEL_ROW_STARTS:
-        for column in range(_PANELS_PER_MODEL_ROW):
-            simple = panels[start + column]
-            multi = panels[start + _PANELS_PER_MODEL_ROW + column]
-            floor = dict(zip(*simple["search"]))
-            xs, ys = multi["search"]
-            multi["search"] = (xs, [max(y, floor[n]) if n in floor else y
-                                    for n, y in zip(xs, ys)])
-    return panels
-
-
 def _reconcile_panel(panel: dict) -> dict:
-    """Make a panel internally consistent before plotting.
+    """Check evidence without repairing, smoothing or replacing observations.
 
-    Three honest invariants, enforced here once for every panel rather than
-    scattered through the construction code:
-
-    1. **Nothing exceeds a proved optimum.**  A machine-checked exact value is
-       the true maximum at that ``n``; no proved/conjectured curve, no
-       named-construction lower bound, and no search circle may sit above it.
-       (This is what produced the green square *below* its own curve: a closed
-       form -- e.g. Mader's floor -- can overshoot what is actually achievable at
-       small ``n``, where the complete object is the answer.)
-
-       **The formula half of this is skipped when a panel passes**
-       ``clamp_formula=False``.  It applies to a curve that is a *value*, and the
-       four hypergraph panels draw a curve that is a proved upper *bound*
-       (``prop:hyper-edge``), attained only when ``m-1 <= C(n-2, r-2)`` for the
-       simple model or ``(r-1) | (n-1)`` for the multi one.  Clamping a bound
-       makes the line mean the true maximum wherever exhaustion happened to
-       finish and the looser bound wherever it did not, so one line carries two
-       theorems and the switch point is set by the exhaustion budget rather than
-       by any mathematics.  At ``m = 6, r = 3`` that read the true 8 at ``n = 5``
-       and the un-attained 12 at ``n = 6``, where the true maximum is 11.
-       Un-clamping only ever *raises* a curve, and an exact value can never
-       exceed a proved bound for the model being enumerated, so no square can
-       rise above its curve as a result.  The search circles are still clamped
-       below: a witness really cannot beat a proved optimum.
-    2. **Search lower bounds rise with ``n``.**  A feasible graph on ``n``
-       vertices stays feasible on ``n+1`` (add an isolated vertex), so the best
-       feasible edge count can never *drop* as ``n`` grows.  We take a running
-       maximum, which is exactly that extend-by-an-isolated-vertex bound, over a
-       series into which the exact values have first been folded, since a proved
-       maximum is attained and is therefore itself a witness.
-    3. **Open cases show points, not interpolated functions.**  The loose
-       [construction, trivial-max] band dwarfed the data and is dropped.  A
-       line through lower-bound points repeated the same information and made
-       parity effects look like a proposed formula.  Open panels therefore
-       show exact values and verified witnesses as discrete points only.
+    A failed inequality is an error to investigate, never permission to change
+    a measured result. Search outcomes need not increase with order or improve
+    when the feasible family becomes larger.
     """
-    panel.pop("band", None)  # invariant 3a: no shaded certain interval
-
-    exact = dict(zip(*panel["exact"])) if panel.get("exact") else {}
-
-    def cap_to_exact(curve):
-        if curve is None:
-            return None
-        xs, ys = curve
-        return xs, [min(y, exact[x]) if x in exact else y for x, y in zip(xs, ys)]
-
-    # invariant 1 applied to every formula line, unless the panel says its
-    # formula is a BOUND rather than a value (see the docstring's invariant 1).
-    if panel.pop("clamp_formula", True):
-        for key in ("proved", "conj"):
-            if panel.get(key) is not None:
-                panel[key] = cap_to_exact(panel[key])
-    else:
-        # Tell the plotter, so its key can say "proved upper bound" rather than
-        # "proved".  Every blue curve in a hypergraph grid is a bound and every
-        # blue curve in a graph grid is a value, so this is a property of the
-        # figure and needs no per-panel mark inside the grid.
+    panel.pop("band", None)
+    if not panel.pop("clamp_formula", True):
         panel["proved_is_bound"] = True
-
-    # invariants 1 then 2 applied to the search circles
-    if panel.get("search") is not None:
-        sx, sy = panel["search"]
-        # Where the value is known exactly the circle IS the square: a maximum is
-        # attained by some feasible object, so it caps the circle from above and
-        # supplies it from below, and the running max below then carries it to
-        # every larger n.  Clamping alone left a search that had underperformed
-        # dragging the reported bound down past a value already proved: at
-        # m = 6 the undirected multigraph incidence row printed an exact 26 at
-        # n = 5 and only >= 25 at n = 6.
-        sy = [exact[x] if x in exact else y for x, y in zip(sx, sy)]
-        running, mono = -1, []
-        for y in sy:
-            running = max(running, y)
-            mono.append(running)
-        panel["search"] = (sx, mono)
-
+    exact = dict(zip(*panel.get("exact", ([], []))))
+    proved = dict(zip(*panel.get("proved", ([], []))))
+    for n, value in exact.items():
+        if n in proved and (value > proved[n] or
+                            (not panel.get("proved_is_bound") and value != proved[n])):
+            raise ValueError(f"exact/formula disagreement at n={n}: {value}, {proved[n]}")
+    for source in ("search", "construction"):
+        for n, value in zip(*panel.get(source, ([], []))):
+            upper = min(exact.get(n, math.inf), proved.get(n, math.inf))
+            if value > upper:
+                raise ValueError(f"{source} exceeds upper bound at n={n}: {value} > {upper}")
     return panel
 
 
@@ -658,480 +549,112 @@ _EXACT_BUDGET = 60.0
 
 def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
                         open_search_budget=4.0):
-    """Build the sixteen panels of the all-variant grid (row-major, model x col).
+    """Build sixteen panels from a common specification, keeping evidence separate.
 
-    ``m`` is the forbidden connectivity value shown in every panel.
-
-    Four model rows (simple graph, multigraph, hypergraph, multihypergraph)
-    by four columns (undirected/directed x edge/vertex).  Two uniformity rules
-    make the sixteen panels directly comparable:
-
-    1. Every matrix panel plots its search lower bounds over the *same* vertex
-       range ``matrix_ns`` and every hypergraph panel over ``hyper_ns``, so each
-       panel carries the same number of data points -- no panel trails off early.
-    2. For every panel where a construction is known (proved or conjectured) the
-       search lower bound is raised to that named construction with
-       :func:`_extend_lower_bounds`, exactly as the caption of the figure and
-       the rediscovery section state: the reported circle at each ``n`` is the
-       better of the cooled search and the verified construction.  This is the
-       honest "lands on the curve" rule, applied to *all* panels rather than
-       only the two directed ones it used to cover, so the proved curves pass
-       through their circles instead of floating above a jagged search tail.
-
-    Open panels also get a verified construction planted, not only the proved
-    ones: the open undirected vertex panels get the proved EDGE value (Whitney,
-    kappa <= lambda, so the edge extremiser is vertex-feasible) and the two
-    directed-hypergraph panels get the proved bipartite family of
-    prop:dir-hyper-first.  This matters because at ``search_budget=0.4`` the
-    vertex-mode search on a large matrix graph barely completes one move, so
-    the RAW result actively *degrades* with growing ``n`` (measured:
-    n=6/10/14/16 gave 15/12/5/4 at m=6), and the monotone running-max in
-    :func:`_reconcile_panel` then freezes the plotted curve at its early peak,
-    a flat line that looks like a finding but is really budget starvation.
-    ``open_search_budget`` (default 4s, ~10x ``search_budget``) still gives
-    those panels a stronger walk, since the search can genuinely beat the
-    planted construction where the open problem is richer (it does at m=6,
-    n=9 on the undirected vertex panel).
+    Parameter-dependent attainment conditions belong in construction functions,
+    never in post-processing of measured results. Historical budgets are retained.
     """
+    simple_edge = lambda n: simple_undirected_edge(n, m)
+    multi_edge = lambda n: multigraph_undirected_edge(n, m)
+    multi_arc = lambda n: directed_multigraph_arc(n, m)
+    multi_vertex = lambda n: block_bouquet_lower_bound(n, m)
+    multi_dir_vertex = lambda n: max(multi_arc(n), dir_block_bouquet_lower_bound(n, m))
+
+    def simple_arc(n):
+        if n < m:
+            return n * (n - 1)  # complete digraph
+        return max(directed_arc_lower_bound(n, m),
+                   (n + m - 3) ** 2 // 4 + 2 * (m - 1))  # clique core
+
+    # Hypergraph curves are UPPER bounds; the following functions separately
+    # express where a supplied construction actually attains them.
+    hyper_upper = lambda n: min(hypergraph_edge(n, m, 3), math.comb(n, 3))
+    multihyper_upper = lambda n: min(hypergraph_edge(n, m, 3), (m - 1) * math.comb(n, 3))
+    hyper_edge = lambda n: max(_hyper_edge_simple_proved(n, m, 3) or 0,
+                               (n - 1) // 2,  # simple star with unused isolated vertices
+                               _SETTLED_HYPER_EDGE_SIMPLE.get((m, n, 3), 0))
+    hyper_vertex = lambda n: max(_hyper_vertex_simple_proved(n, m, 3) or 0, hyper_edge(n))
+
+    def multihyper_edge(n):
+        # Use a partial star and leave any leftover vertex isolated.
+        star = (m - 1) * ((n - 1) // 2)
+        # const:multihyper-six is a separate explicit construction, not a
+        # replacement of the historical search observation at this cell.
+        twelve = 12 if (n, m) == (6, 6) else 0
+        return max(star, hyper_edge(n), twelve)
+
+    def multihyper_vertex(n):
+        # Whitney transfers either attained edge construction to vertex mode.
+        return max(multihyper_edge(n), hyper_vertex(n))
+
+    def directed_hyper(n, simple):
+        # prop:dir-hyper-first: alpha tails and a degree-(m-1) head family.
+        # Distinct head edges require alpha <= n-m; repeats need only two heads.
+        last = n - m if simple else n - 2
+        layered = max((a * ((m - 1) * (n - a) // 2)
+                       for a in range(1, last + 1)), default=0)
+        # const:bounded-outdegree-hyper: every source has at most m-1 copies.
+        bounded = n * (min(m - 1, math.comb(n - 1, 2)) if simple else m - 1)
+        return max(layered, bounded)
+
+    hyper_arc = lambda n: directed_hyper(n, True)
+    multihyper_arc = lambda n: directed_hyper(n, False)
+
+    def matrix(directed, simple, separation):
+        return dict(directed=directed, simple=simple, separation=separation)
+
+    def hyper(directed, simple, separation):
+        kw = dict(hypergraph=True, r=3, directed=directed, separation=separation)
+        if not simple:
+            kw["simple"] = False  # preserve the legacy record's exact keys
+        return kw
+
+    # Each row: model, exhaustion stop (exclusive), exhaustion seconds,
+    # discovery seconds, construction, theorem curve (or None).
+    specs = [
+        (matrix(False, True, "edge"), 9, exact_budget, search_budget, simple_edge, simple_edge),
+        (matrix(False, True, "vertex"), 8, exact_budget,
+         search_budget if m <= 4 else open_search_budget, simple_edge, simple_edge if m <= 4 else None),
+        (matrix(True, True, "edge"), 7, 1800., search_budget, simple_arc, simple_arc if m == 2 else None),
+        (matrix(True, True, "vertex"), 7, 1800., search_budget, simple_arc, simple_arc if m == 2 else None),
+        (matrix(False, False, "edge"), 7, exact_budget, search_budget, multi_edge, multi_edge),
+        (matrix(False, False, "vertex"), 7, 120., search_budget, multi_vertex, multi_vertex if m <= 3 else None),
+        # The legacy dispatcher uses a theorem here, not independent enumeration.
+        (matrix(True, False, "edge"), 2, 10., search_budget, multi_arc, multi_arc),
+        (matrix(True, False, "vertex"), 6, 120., search_budget, multi_dir_vertex, multi_dir_vertex if m == 2 else None),
+        (hyper(False, True, "edge"), 8, exact_budget, search_budget, hyper_edge, hyper_upper),
+        (hyper(False, True, "vertex"), 7, exact_budget,
+         search_budget if m <= 3 else open_search_budget, hyper_vertex, hyper_upper if m <= 3 else None),
+        (hyper(True, True, "edge"), 6, exact_budget, open_search_budget, hyper_arc, None),
+        (hyper(True, True, "vertex"), 6, exact_budget, open_search_budget, hyper_arc, None),
+        (hyper(False, False, "edge"), 7, exact_budget, search_budget, multihyper_edge, multihyper_upper),
+        (hyper(False, False, "vertex"), 6, exact_budget,
+         search_budget if m <= 3 else open_search_budget, multihyper_vertex, multihyper_upper if m <= 3 else None),
+        (hyper(True, False, "edge"), 5, exact_budget, open_search_budget, multihyper_arc, None),
+        (hyper(True, False, "vertex"), 5, exact_budget, open_search_budget, multihyper_arc, None),
+    ]
     panels = []
-    # Uniform x-ranges for the search / construction curves.  The machine-PROVED
-    # (exact) points are genuinely limited by enumeration cost and stop early; the
-    # search lower bounds and the formula curves are cheap, so they run well past
-    # that, to show each variant's trend and let the search discover dense
-    # ("maybe extremal") graphs at sizes exhaustion cannot reach.
-    matrix_ns = list(range(2, 17))   # all matrix panels, n = 2..16
-    # n = 2 forces zero hyperedges for every r=3 panel below (no 3-set exists on
-    # 2 vertices), a structural degeneracy rather than a data point, so the
-    # hypergraph panels start where the first hyperedge can.
-    hyper_ns = list(range(3, 13))    # all hypergraph panels, n = 3..12
-
-    # Construction lower bounds (verified, proved-or-conjectured values), each
-    # capped at the trivial maximum for its model.  The cap matters at small n:
-    # a closed form like Mader's floor(m(n-1)/2) is the value only for n >= m;
-    # for n < m the complete graph K_n already has lambda^max = n-1 <= m-1, so it
-    # is feasible and denser, and the true value is comb(n,2).  Without the cap
-    # the plotted curve and its lower-bound circles float ABOVE the exact squares,
-    # which is impossible (a lower bound can never exceed the proved optimum).
-    def lb_simple_edge(n):
-        return min(simple_undirected_edge(n, m), n * (n - 1) // 2)
-
-    def lb_multi_edge(n):
-        return min(multigraph_undirected_edge(n, m), (m - 1) * (n * (n - 1) // 2))
-
-    def lb_dir(n):
-        return min(directed_arc_lower_bound(n, m), n * (n - 1))
-
-    def lb_multi_dir(n):
-        return min(directed_multigraph_arc(n, m), (m - 1) * n * (n - 1))
-
-    def lb_multi_vert(n):
-        return block_bouquet_lower_bound(n, m)
-
-    def lb_multi_dir_vert(n):
-        # Two constructions compete, and the panel plots the larger.
-        #
-        # kappa <= lambda, so the arc extremiser of thm:dir-multi-full is
-        # feasible in the vertex separation too: K_m^dir(n) >= (m-1) M(n).
-        # At m = 2 this is the exact value M(n) (cor:dir-multi-incidence).
-        #
-        # It is not the best construction while n is small against m.  The
-        # bouquet of thickened complete digraphs of prop:dir-multi-vertex-blocks
-        # is, and the exhaustive value already said so: K_6^dir(3) = 24 against
-        # the extremiser's 20.
-        return max(lb_multi_dir(n), dir_block_bouquet_lower_bound(n, m))
-
-    def lb_hyper_edge(n):
-        # prop:hyper-edge, a proved UPPER bound for every r-uniform hypergraph.
-        # Right for the proved curve, WRONG as a lower bound: see below.
-        return min(hypergraph_edge(n, m, 3), math.comb(n, 3))
-
-    def attained_hyper_edge(n):
-        """The same value, but only where a SIMPLE hypergraph is proved to reach it.
-
-        The panels enumerate and search SIMPLE hypergraphs, and thm:simple-hyper-edge
-        attains the bound only when ``m - 1 <= C(n-2, 1)``.  Outside that range the
-        closed form is an upper bound nobody has exhibited, so promoting it to an
-        open-circle witness asserts a graph that need not exist.  It sometimes does
-        not: at ``n = 6, m = 6`` the formula gives 12, yet all 125970 twelve-edge
-        simple 3-uniform hypergraphs on six vertices are infeasible and the true
-        maximum is 11.  Returning 0 here leaves the honest search value alone.
-        """
-        proved = _hyper_edge_simple_proved(n, m, 3)
-        return 0 if proved is None else min(proved, math.comb(n, 3))
-
-    def attained_hyper_vertex(n):
-        """The vertex analogue, gated by thm:hyper-vertex-m2 / thm:hyper-vertex-m3."""
-        proved = _hyper_vertex_simple_proved(n, m, 3)
-        return 0 if proved is None else min(proved, math.comb(n, 3))
-
-    def lb_multihyper_edge(n):
-        """prop:hyper-edge again, but capped at the MULTIhypergraph trivial max.
-
-        The cap matters and is not the simple one.  A simple hypergraph cannot
-        hold more than ``C(n,r)`` hyperedges, but a multihypergraph may take each
-        of them up to ``m-1`` times, so its ceiling is ``(m-1) C(n,r)``.  Capping
-        this row at ``C(n,r)`` would push the curve BELOW the true value at small
-        n: at ``n = r = m = 3`` it would read 1 where the multihypergraph star
-        actually carries 2, putting an exact square above its own curve.
-        """
-        return min(hypergraph_edge(n, m, 3), (m - 1) * math.comb(n, 3))
-
-    def attained_multihyper_edge(n):
-        """The multihypergraph half of prop:hyper-edge.
-
-        The displayed bound holds for EVERY r-uniform hypergraph.  A
-        multihypergraph is proved to attain it when ``(r - 1) | (n - 1)``, where
-        the star hypertree's blocks divide the non-hub vertices exactly and each
-        hyperedge is taken at full multiplicity.  Outside that range the formula
-        is an upper bound nobody has exhibited in this model, so return 0 and let
-        the honest search value stand, exactly as ``attained_hyper_edge`` does for
-        the simple model.  Note the two gates are genuinely different conditions,
-        which is the whole reason the two rows are separate variants: at
-        ``n = r = m = 3`` the simple gate fails and the multi gate holds, and the
-        machine confirms the split, one hyperedge against two.
-        """
-        if (n - 1) % 2 != 0:            # r - 1 = 2 throughout these panels
-            return 0
-        return lb_multihyper_edge(n)
-
-    def attained_multihyper_vertex(n):
-        """The multihypergraph vertex analogue.
-
-        thm:hyper-vertex-m2 and thm:hyper-vertex-m3 are both stated FOR
-        multihypergraphs, so whatever the simple model is proved to attain, the
-        multi model attains too, and this plants at least that much.  It is
-        deliberately CONSERVATIVE: repeats do help at m = 3 in cases the simple
-        gate rejects (machine-checked at n = r = m = 3, where the simple maximum
-        is 1 and the multi maximum is 2), and there this returns 0 and lets the
-        honest search value stand rather than plant a number no theorem covers.
-        At m = 2 repeats provably never help (thm:hyper-vertex-m2).
-        """
-        return attained_hyper_vertex(n)
-
-    def _dir_hyper_family(n, alpha_max):
-        # The PROVED bipartite family of prop:dir-hyper-first at r = 3: alpha
-        # tails, and on the other n - alpha vertices a shared head hypergraph of
-        # maximum degree m - 1, giving alpha * floor((m-1)(n-alpha)/2)
-        # single-step hyperarcs with lambda^max = kappa^max = m - 1.  Sound for
-        # BOTH separations, since every route in it is a single tail -> head
-        # step.  The two models differ only in how far alpha may run, which is
-        # what the two callers below supply.
-        best = max((alpha * ((m - 1) * (n - alpha) // 2)
-                    for alpha in range(1, alpha_max + 1)), default=0)
-        return min(best, n * math.comb(n - 1, 2))
-
-    def lb_dir_hyper(n):
-        # SIMPLE model.  The head hypergraph's edges must be distinct, so
-        # lem:sparse-hypergraph asks m - 1 <= C(n - alpha - 1, r - 2), which at
-        # r = 3 reads m - 1 <= n - alpha - 1, that is alpha <= n - m.
-        return _dir_hyper_family(n, n - m)
-
-    def lb_dir_multihyper(n):
-        # MULTI model.  prop:dir-hyper-first's head family is the cyclic word
-        # read in blocks of r - 1, which repeats hyperedges freely and needs only
-        # r - 1 <= n - alpha, that is alpha <= n - r + 1.  Using the simple
-        # model's alpha <= n - m here understated the two multihypergraph
-        # directed rows: at m = 6, n = 9 it gave 45 where the proposition proves
-        # 50.  A multi lower bound may never sit below what a proposition
-        # supplies for the multi model.
-        return _dir_hyper_family(n, n - 3 + 1)
-
-    # Undirected vertex is proved for m<=4 (Leonard/Whitney), open for m>=5.
-    vert_proved = (m <= 4)
-    # Hypergraph vertex is proved for m<=3 (incidence-rank lemma, thm:hyper-vertex-m3).
-    hyper_vert_proved = (m <= 3)
-    # The multigraph vertex problem K_m(n) is the r = 2 case of the same two
-    # theorems, so it is proved on the same range.
-    multi_vert_proved = (m <= 3)
-
-    def searched(ns, lb_fn, **solve_kw):
-        """Search over the uniform range, then raise to the known construction."""
-        se = _search_points(ns, m, search_budget, **solve_kw)
-        if lb_fn is not None:
-            se = _extend_lower_bounds(se, lb_fn, ns)
-        return se
-
-    # ----- row 1: simple ------------------------------------------------
-    # (1) simple undirected edge -- proved (Mader) for all m.
-    ex = _exact_points(range(2, 9), m, exact_budget,
-                       directed=False, simple=True, separation="edge")
-    se = searched(matrix_ns, lb_simple_edge,
-                  directed=False, simple=True, separation="edge")
-    panels.append(dict(
-        status="proved", ylabel="edges",
-        proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
-        exact=ex, search=se))
-
-    # (2) simple undirected vertex -- proved for m<=4, open for m>=5.
-    ex2 = _exact_points(range(2, 8), m, exact_budget,
-                        directed=False, simple=True, separation="vertex")
-    if vert_proved:
-        se2 = searched(matrix_ns, lb_simple_edge,
-                       directed=False, simple=True, separation="vertex")
-        panels.append(dict(
-            status="proved", ylabel="edges",
-            proved=(matrix_ns, [lb_simple_edge(n) for n in matrix_ns]),
-            exact=ex2, search=se2))
-    else:
-        se2 = _search_points(matrix_ns, m, open_search_budget,
-                             directed=False, simple=True, separation="vertex")
-        # Whitney: kappa <= lambda, so Mader's edge extremiser is vertex-feasible
-        # and the proved edge value is an honest lower bound on the open vertex
-        # panel too.  Without it the starved vertex-mode search freezes into a
-        # flat plateau at large n (the "cut off" look); the search may still beat
-        # the edge value where the vertex problem is genuinely richer.
-        se2 = _extend_lower_bounds(se2, lb_simple_edge, matrix_ns)
-        panels.append(dict(
-            status="open", ylabel="edges",
-            exact=ex2, search=se2))
-
-    # (3) simple directed arc -- conjectured.
-    # The shared exact_budget (60s) is calibrated for the hypergraph panels
-    # (see its own docstring) and is far too short here: at m=3, n=6 this
-    # panel's own exhaustion measures 544.2s (edge) and 1422.7s (vertex) on
-    # the author's machine, matching rem:dir-vertex-m3's claim that the
-    # exhaustion behind the appendix's n=6 row (both separations = 15)
-    # completes, while n=7 does not finish even in about an hour and a half.
-    # A dedicated budget with the range capped at n=6 reproduces exactly that
-    # boundary: generous enough to reach the size the appendix proves, and
-    # never large enough to spend an hour discovering n=7 still will not
-    # finish, which range(2, 8) under a many-minute budget would otherwise do
-    # twice (edge and vertex) at every m this grid is drawn for.
-    dir_simple_exact_budget = 1800.0
-    ex3 = _exact_points(range(2, 7), m, dir_simple_exact_budget,
-                        directed=True, simple=True, separation="edge")
-    se3 = searched(matrix_ns, lb_dir,
-                   directed=True, simple=True, separation="edge")
-    # No named sub-branches. conj:dir-arc is the maximum of a hub count and a
-    # bipartite count, and drawing the losing one as a dotted line made this the
-    # only panel of sixteen with a mark the others do not have. The curve plotted
-    # is the conjectured value itself, exactly as in every other panel.
-    panels.append(dict(
-        status="conjectured", ylabel="arcs",
-        conj=(matrix_ns, [lb_dir(n) for n in matrix_ns]),
-        exact=ex3, search=se3))
-
-    # (4) simple directed vertex -- exact value open.  The arc construction is
-    # an honest lower bound, but equality with the arc value is not a stated
-    # conjecture and an arc upper bound does not transfer through Whitney.
-    ex4 = _exact_points(range(2, 7), m, dir_simple_exact_budget,
-                        directed=True, simple=True, separation="vertex")
-    se4 = searched(matrix_ns, lb_dir,
-                   directed=True, simple=True, separation="vertex")
-    panels.append(dict(
-        status="open", ylabel="arcs",
-        exact=ex4, search=se4))
-
-    # ----- row 2: multigraph -------------------------------------------
-    # (5) multigraph undirected edge -- proved for all m.
-    ex5 = _exact_points(range(2, 7), m, exact_budget,
-                        directed=False, simple=False, separation="edge")
-    se5 = searched(matrix_ns, lb_multi_edge,
-                   directed=False, simple=False, separation="edge")
-    panels.append(dict(
-        status="proved", ylabel="edges",
-        proved=(matrix_ns, [lb_multi_edge(n) for n in matrix_ns]),
-        exact=ex5, search=se5))
-
-    # (6) multigraph undirected vertex, K_m(n) -- proved for m <= 3 (the r = 2
-    # case of thm:hyper-vertex-m2 and thm:hyper-vertex-m3, attained by the
-    # thickened tree), open for m >= 4.  Its own runs: q parallel edges are q
-    # internally disjoint routes under the incidence convention, so this is
-    # not the simple problem and cannot borrow panel (2)'s points.  The
-    # exhaustion is slower than the simple one (every pair ranges over m
-    # values): at m = 3 n = 6 finishes in about 19s and at m = 6 n = 5 in
-    # about 84s on the author's machine, so the shared 60s budget would stop
-    # the m = 6 row one size early; 120s reaches both, and n = 6 at m = 6 is
-    # the one size that pays the full timeout once and is then cached.
-    multi_vert_exact_budget = 120.0
-    ex6 = _exact_points(range(2, 7), m, multi_vert_exact_budget,
-                        directed=False, simple=False, separation="vertex")
-    se6 = searched(matrix_ns, lb_multi_vert,
-                   directed=False, simple=False, separation="vertex")
-    if multi_vert_proved:
-        panels.append(dict(
-            status="proved", ylabel="edges",
-            proved=(matrix_ns, [lb_multi_vert(n) for n in matrix_ns]),
-            exact=ex6, search=se6))
-    else:
-        panels.append(dict(
-            status="open", ylabel="edges",
-            exact=ex6, search=se6))
-
-    # (7) multigraph directed arc -- proved for all n and m (thm:dir-multi-full).
-    ex7 = _exact_points(range(2, 6), m, 10.0,
-                        directed=True, simple=False, separation="edge")
-    se7 = searched(matrix_ns, lb_multi_dir,
-                   directed=True, simple=False, separation="edge")
-    panels.append(dict(
-        status="proved", ylabel="arcs",
-        proved=(matrix_ns, [lb_multi_dir(n) for n in matrix_ns]),
-        exact=ex7, search=se7))
-
-    # (8) multigraph directed vertex, K_m^dir(n) -- proved at m = 2, where every
-    # multiplicity is at most one and the value is M(n) (thm:dir-vertex-m2-exact);
-    # for m >= 3 the leading term (m-1) n^2/4 is proved (cor:dir-multi-incidence,
-    # from thm:dir-hyper-constant at r = 2) and the exact value is open, so the
-    # panel shows points only, exactly as panel (4) does.  The lower bound is the
-    # arc extremiser of thm:dir-multi-full, vertex-feasible because kappa <= lambda.
-    # Exhaustion: n = 4 finishes in under a second at m = 3, n = 5 does not finish
-    # in 120s, and at m = 6 n = 4 already does not; each failure is cached once.
-    ex8 = _exact_points(range(2, 6), m, multi_vert_exact_budget,
-                        directed=True, simple=False, separation="vertex")
-    se8 = searched(matrix_ns, lb_multi_dir_vert,
-                   directed=True, simple=False, separation="vertex")
-    if m == 2:
-        panels.append(dict(
-            status="proved", ylabel="arcs",
-            proved=(matrix_ns, [lb_multi_dir_vert(n) for n in matrix_ns]),
-            exact=ex8, search=se8))
-    else:
-        panels.append(dict(
-            status="open", ylabel="arcs",
-            exact=ex8, search=se8))
-
-    # ----- row 3: hypergraph (r=3) -------------------------------------
-    # (9) hypergraph undirected edge -- proved for all m.
-    ex9 = _exact_points(range(3, 8), m, exact_budget,
-                        hypergraph=True, r=3, directed=False, separation="edge")
-    ex9 = _with_settled_cells(ex9, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
-    se9 = searched(hyper_ns, attained_hyper_edge,
-                   hypergraph=True, r=3, directed=False, separation="edge")
-    panels.append(dict(
-        status="proved", ylabel="hyperedges",
-        proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
-        clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
-        exact=ex9, search=se9))
-
-    # (10) hypergraph undirected vertex -- PROVED for m<=3 (incidence-rank lemma),
-    #      open for m>=4.
-    ex10 = _exact_points(range(3, 7), m, exact_budget,
-                         hypergraph=True, r=3, directed=False, separation="vertex")
-    if hyper_vert_proved:
-        se10 = searched(hyper_ns, attained_hyper_vertex,
-                        hypergraph=True, r=3, directed=False, separation="vertex")
-        panels.append(dict(
-            status="proved", ylabel="hyperedges",
-            proved=(hyper_ns, [lb_hyper_edge(n) for n in hyper_ns]),
-            clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
-            exact=ex10, search=se10))
-    else:
-        se10 = _search_points(hyper_ns, m, open_search_budget,
-                              hypergraph=True, r=3, directed=False, separation="vertex")
-        # Whitney again: an ATTAINED hyperedge value is a lower bound for the
-        # vertex separation too, since that extremiser is vertex-feasible.  It
-        # must be the attained one: _reconcile_panel's exact-value clamp was
-        # relied on here to fix the small-n corner, but it can only fire where
-        # exhaustion actually finished inside its budget, which at m = 6, n = 6
-        # it does not.  Gating at the source needs no safety net.
-        se10 = _extend_lower_bounds(se10, attained_hyper_edge, hyper_ns)
-        panels.append(dict(
-            status="open", ylabel="hyperedges",
-            exact=ex10, search=se10))
-
-    # (11) hypergraph directed arc -- OPEN (new directed Berge model).
-    ex11 = _exact_points(range(3, 6), m, exact_budget,
-                         hypergraph=True, r=3, directed=True, separation="edge")
-    se11 = _search_points(hyper_ns, m, open_search_budget,
-                          hypergraph=True, r=3, directed=True, separation="edge")
-    # The proved bipartite construction of prop:dir-hyper-first is the named
-    # lower bound here (the search alone slips below the quadratic at larger n).
-    se11 = _extend_lower_bounds(se11, lb_dir_hyper, hyper_ns)
-    panels.append(dict(
-        status="open", ylabel="hyperarcs",
-        exact=ex11, search=se11))
-
-    # (12) hypergraph directed vertex -- OPEN (new directed Berge model).
-    ex12 = _exact_points(range(3, 6), m, exact_budget,
-                         hypergraph=True, r=3, directed=True, separation="vertex")
-    se12 = _search_points(hyper_ns, m, open_search_budget,
-                          hypergraph=True, r=3, directed=True, separation="vertex")
-    # Same construction: all its routes are single tail -> head steps, so it is
-    # feasible for the vertex separation at the same value.
-    se12 = _extend_lower_bounds(se12, lb_dir_hyper, hyper_ns)
-    panels.append(dict(
-        status="open", ylabel="hyperarcs",
-        exact=ex12, search=se12))
-
-    # ----- row 4: multihypergraph (r=3), hyperedges may repeat ----------
-    # This row is NOT a relabelling of row 3.  Parallel copies of a hyperedge are
-    # Berge routes with empty interiors, so q copies give q routes that are both
-    # hyperedge-disjoint and internally vertex-disjoint: multiplicity raises kappa
-    # as well as lambda, exactly as parallel edges do in row 2 under the incidence
-    # convention.  Multiplicity is therefore capped at m-1 and the four cells are
-    # genuine extremal questions.
-    # Every simple hypergraph IS a multihypergraph, so the row-3 value is always a
-    # valid lower bound here and is planted as one; the machine sweep is one vertex
-    # shorter because it walks m^C assignments rather than 2^C.
-
-    def multi_lb(simple_fn, attained_fn):
-        """Lower bound for a multi panel: the better of the simple row and the
-        multi-specific construction.  Both are exhibited feasible objects, so the
-        maximum of the two is honest."""
-        return lambda n: max(simple_fn(n), attained_fn(n))
-
-    # (13) multihypergraph undirected edge -- prop:hyper-edge, proved for all m.
-    ex13 = _exact_points(range(3, 7), m, exact_budget,
-                         hypergraph=True, r=3, directed=False, simple=False,
-                         separation="edge")
-    se13 = searched(hyper_ns, multi_lb(attained_hyper_edge, attained_multihyper_edge),
-                    hypergraph=True, r=3, directed=False, simple=False,
-                    separation="edge")
-    panels.append(dict(
-        status="proved", ylabel="hyperedges",
-        proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
-        clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
-        exact=ex13, search=se13))
-
-    # (14) multihypergraph undirected vertex -- PROVED for m<=3, open for m>=4.
-    ex14 = _exact_points(range(3, 6), m, exact_budget,
-                         hypergraph=True, r=3, directed=False, simple=False,
-                         separation="vertex")
-    if hyper_vert_proved:
-        se14 = searched(hyper_ns, attained_multihyper_vertex,
-                        hypergraph=True, r=3, directed=False, simple=False,
-                        separation="vertex")
-        panels.append(dict(
-            status="proved", ylabel="hyperedges",
-            proved=(hyper_ns, [lb_multihyper_edge(n) for n in hyper_ns]),
-            clamp_formula=False,  # a proved BOUND, not a value: see _reconcile_panel
-            exact=ex14, search=se14))
-    else:
-        se14 = _search_points(hyper_ns, m, open_search_budget,
-                              hypergraph=True, r=3, directed=False, simple=False,
-                              separation="vertex")
-        se14 = _extend_lower_bounds(se14, attained_multihyper_vertex, hyper_ns)
-        panels.append(dict(
-            status="open", ylabel="hyperedges",
-            exact=ex14, search=se14))
-
-    # (15) multihypergraph directed arc -- OPEN.  thm:dir-hyper-constant is stated
-    # for forward directed r-uniform MULTIhypergraphs, so the proved leading term
-    # is this row's as much as row 3's; the exact value is open in both.
-    ex15 = _exact_points(range(3, 5), m, exact_budget,
-                         hypergraph=True, r=3, directed=True, simple=False,
-                         separation="edge")
-    se15 = _search_points(hyper_ns, m, open_search_budget,
-                          hypergraph=True, r=3, directed=True, simple=False,
-                          separation="edge")
-    se15 = _extend_lower_bounds(se15, lb_dir_multihyper, hyper_ns)
-    panels.append(dict(
-        status="open", ylabel="hyperarcs",
-        exact=ex15, search=se15))
-
-    # (16) multihypergraph directed vertex -- OPEN, same construction and bound.
-    ex16 = _exact_points(range(3, 5), m, exact_budget,
-                         hypergraph=True, r=3, directed=True, simple=False,
-                         separation="vertex")
-    se16 = _search_points(hyper_ns, m, open_search_budget,
-                          hypergraph=True, r=3, directed=True, simple=False,
-                          separation="vertex")
-    se16 = _extend_lower_bounds(se16, lb_dir_multihyper, hyper_ns)
-    panels.append(dict(
-        status="open", ylabel="hyperarcs",
-        exact=ex16, search=se16))
-
-    return [_reconcile_panel(p) for p in _lift_multi_above_simple(panels)]
+    for i, (kw, stop, exact_seconds, search_seconds, construction, theorem) in enumerate(specs):
+        is_hyper = kw.get("hypergraph", False)
+        first = 3 if is_hyper else 2
+        ns = list(range(first, 13 if is_hyper else 17))
+        exact = _exact_points(range(first, stop), m, exact_seconds, **kw)
+        if i == 8:
+            exact = _with_settled_cells(exact, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
+        panel = dict(
+            status="proved" if theorem else "open",
+            ylabel=("hyperarcs" if kw["directed"] else "hyperedges") if is_hyper
+                   else ("arcs" if kw["directed"] else "edges"),
+            exact=exact, search=_search_points(ns, m, search_seconds, **kw),
+            construction=(ns, [construction(n) for n in ns]),
+            search_budget_seconds=search_seconds,
+            search_keys=[MachineValues.key("search", n, m, search_seconds, kw) for n in ns])
+        if theorem:
+            panel["proved"] = (ns, [theorem(n) for n in ns])
+            if is_hyper:
+                panel["proved_is_bound"] = True
+        panels.append(_reconcile_panel(panel))
+    return panels
 
 
 def variant_grid_figures() -> None:
@@ -1223,10 +746,9 @@ def _panel_cell(panel, n):
     hypergraph row whose blue curve is a proved upper bound rather than a
     proved value (``proved_is_bound``, set by ``_reconcile_panel``), a matching
     construction closes the gap and the cell is exact; otherwise the upper
-    bound is prefixed by $\\le$.  That construction is whichever the ``search``
-    series holds at this n: the attainment theorem's own object where
-    ``attained_hyper_*`` plants it, and the checker-verified witness the timed
-    search exhibited where it does not.  Conjectured and open rows are prefixed by
+    bound is prefixed by $\\le$. Attainment may come from the separate
+    ``construction`` series or a raw ``search`` witness. Neither series is
+    overwritten by that comparison. Conjectured and open rows are prefixed by
     $\\ge$, since their numbers are verified constructions without proved
     optimality.  A proved graph row needs no prefix because its closed form is
     the exact value for every n.
@@ -1240,12 +762,15 @@ def _panel_cell(panel, n):
     if n not in curve_ns:
         return None
     value = curve_vals[curve_ns.index(n)]
+    if key == "search":
+        value = max(value, dict(zip(*panel.get("construction", ([], [])))).get(n, 0))
     color = _CURVE_COLOR[key]
     if key == "proved":
         prefix = ""
         if panel.get("proved_is_bound"):
             search_ns, search_vals = panel.get("search", ([], []))
-            attained = dict(zip(search_ns, search_vals)).get(n)
+            attained = max(dict(zip(search_ns, search_vals)).get(n, 0),
+                           dict(zip(*panel.get("construction", ([], [])))).get(n, 0))
             if attained != value:
                 prefix = r"$\le$"
     else:
@@ -1259,6 +784,56 @@ def _fmt_cell(cell):
     text, color, bold = cell
     body = rf"\textbf{{{text}}}" if bold else text
     return rf"\textcolor{{{color}}}{{{body}}}"
+
+
+
+def search_evidence_tables() -> None:
+    """Export historical raw search and construction values without blending them.
+
+    Missing elapsed times and witnesses in the legacy record remain unknown.
+    The derived file does not claim to be a new experiment.
+    """
+    records = []
+    for m in (3, 6):
+        panels = gather_variant_grid(m)
+        for group, indices in (("graphs", range(8)), ("hypergraphs", range(8, 16))):
+            ns = list(range(2 if group == "graphs" else 3, 9))
+            lines = [r"\begin{tabular}{llr" + "r" * len(ns) + "}",
+                     r"\toprule",
+                     "Variant & Source & Limit (s) & " +
+                     " & ".join(f"$n={n}$" for n in ns) + r" \\",
+                     r"\midrule"]
+            for i in indices:
+                panel = panels[i]
+                model, variant, _ = _VARIANT_ROW_META[i]
+                label = model.replace(" $r=3$", "") + ", " + variant
+                for source in ("search", "construction"):
+                    values = dict(zip(*panel[source]))
+                    limit = f'{panel["search_budget_seconds"]:g}' if source == "search" else "--"
+                    lines.append(" & ".join(
+                        [label if source == "search" else "", source, limit] +
+                        [str(values[n]) if n in values else "--" for n in ns]) + r" \\")
+                lines.append(r"\addlinespace[2pt]")
+                search, construction, exact = (dict(zip(*panel[key]))
+                                                for key in ("search", "construction", "exact"))
+                for n in sorted(set(search) | set(construction)):
+                    key = panel["search_keys"][panel["search"][0].index(n)]
+                    run = MACHINE_VALUES.runs.get(key, {})
+                    records.append(dict(
+                        m=m, n=n, panel=i, model=model, variant=variant,
+                        search_value=search.get(n), construction_value=construction.get(n),
+                        enumeration_value=exact.get(n),
+                        search_limit_seconds=panel["search_budget_seconds"],
+                        search_method="randomised greedy" if i >= 8 else "tabu",
+                        search_seed=0, search_elapsed_seconds=run.get("elapsed_seconds"),
+                        search_witness=run.get("witness"), source_key=key,
+                        provenance="machine_values.json run record" if run else
+                                   "legacy machine_values.json; elapsed time and witness not saved"))
+            lines += [r"\bottomrule", r"\end{tabular}"]
+            (FIGURES / f"search_evidence_m{m}_{group}.tex").write_text("\n".join(lines) + "\n")
+    _write_json(DATA / "search_evidence.json", dict(
+        description="Derived comparison, not a rerun. Raw search is never lifted to a construction.",
+        source_meta=MACHINE_VALUES.meta, records=records))
 
 
 def variant_value_tables() -> None:
@@ -1277,14 +852,14 @@ def variant_value_tables() -> None:
     Split out of :func:`main` so it can be rerun on its own
     (``python make_figures.py --tables-only``).
     """
+    search_evidence_tables()
     ns = _TABLE_NS
     groups = [(0, 8), (8, 16)]
     lines = [
         "% Generated by make_figures.py:variant_value_tables().",
         "% Colours: vtProved/vtConjectured/vtOpen match the curve in the",
         "% matching figure; vtExact (bold) is a machine-checked value.",
-        "% A blank cell means the model does not exist at that n (e.g. no",
-        "% r=3 hyperedge exists on 2 vertices).",
+        "% Blank cells omit the degenerate zero-edge hypergraph case n=2.",
         "\\begin{tabular}{ll" + "r" * len(ns) + "}",
         "\\toprule",
     ]
@@ -1328,176 +903,49 @@ def variant_value_tables() -> None:
     print(f"wrote {out.name}")
 
 
+REDISCOVERY_CASES = [
+    (r"simple undirected", 6, 2, False, True),
+    (r"multi undirected", 6, 3, False, False),
+    (r"simple directed", 4, 2, True, True),
+    (r"simple directed", 6, 2, True, True),
+    (r"simple directed", 7, 2, True, True),
+    (r"multi directed", 4, 3, True, False),
+    (r"multi directed", 5, 3, True, False),
+]
+
+
+def rediscovery_table():
+    """Render the recorded unaided runs, with optima supplied only for comparison."""
+    record = json.loads((DATA / "rediscovery.json").read_text())
+    lines = [r"\begin{tabular}{lrrrrrr}", r"\toprule",
+             r"Variant & $n$ & $m$ & Limit (s) & Elapsed (s) & Search & Optimum \\",
+             r"\midrule"]
+    for label, n, m, directed, simple in REDISCOVERY_CASES:
+        suffix = f"|directed={directed}|separation=edge|simple={simple}"
+        matches = [run for key, run in record["runs"].items()
+                   if key.startswith(f"search|n={n}|m={m}|") and key.endswith(suffix)]
+        if len(matches) != 1:
+            raise ValueError(f"expected one rediscovery run for {label}, n={n}, m={m}")
+        run, = matches
+        optimum = (directed_arc_lower_bound(n, m) if simple else directed_multigraph_arc(n, m)) if directed else (
+                   simple_undirected_edge(n, m) if simple else multigraph_undirected_edge(n, m))
+        if run["value"] > optimum:
+            raise ValueError("rediscovery exceeds a proved optimum")
+        lines.append(" & ".join([label, str(n), str(m), f'{run["requested_seconds"]:g}',
+                                f'{run["elapsed_seconds"]:.3f}', str(run["value"]), str(optimum)]) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    (FIGURES / "rediscovery_table.tex").write_text("\n".join(lines) + "\n")
+
+
 def main() -> None:
+    """Render only assets used by the current thesis; never start a search."""
     FIGURES.mkdir(parents=True, exist_ok=True)
-
     plot_directed_crossover(m=3, max_n=15, path=FIGURES / "directed_crossover.png")
-    print("wrote directed_crossover.png")
-
     plot_edge_vertex_divergence(max_n=35, path=FIGURES / "edge_vertex_divergence.png")
-    print("wrote edge_vertex_divergence.png")
-
-    # Figure 3.2: cooling trace for the directed multigraph n=4, m=3 case.
-    # record_exact_connectivity logs the true lambda^max per step (more expensive
-    # but needed for an exact scatter; the search itself uses the cheaper upper bound).
-    run = search_for_dense_graph(MULTI_DIRECTED, n=4, m=3, steps=3000, seed=1,
-                                 record_exact_connectivity=True)
-    plot_search_trace(run, path=FIGURES / "temperature_trace.png",
-                      optimum=12, ceiling=2, show_histogram=False)
-    print(f"wrote temperature_trace.png (search reached {run.best_edge_count} arcs of 12)")
-
-    # Additional scatter-only traces for other variants (no cooling panel needed
-    # since the cooling schedule is the same across all cases).
-    trace_cases = [
-        # (variant, n, m, filename_stem, ceiling, connectivity_label, edge_label, title)
-        (SIMPLE_UNDIRECTED, 7, 3, "trace_simple_undirected_n7_m3", 2,
-         r"$\lambda^{\max}$", "edges",
-         r"Search trace: simple undirected, $n=7$, $m=3$"),
-        (SIMPLE_DIRECTED, 5, 3, "trace_simple_directed_n5_m3", 2,
-         r"$\lambda^{\max}$", "arcs",
-         r"Search trace: simple directed, $n=5$, $m=3$"),
-        (MULTI_UNDIRECTED, 5, 3, "trace_multi_undirected_n5_m3", 2,
-         r"$\lambda^{\max}$", "edges",
-         r"Search trace: multi undirected, $n=5$, $m=3$"),
-        (MULTI_DIRECTED, 5, 3, "trace_multi_directed_n5_m3", 2,
-         r"$\lambda^{\max}$", "arcs",
-         r"Search trace: multi directed, $n=5$, $m=3$"),
-        (MULTI_DIRECTED, 4, 3, "trace_multi_directed_n4_m3_vertex", 2,
-         r"$\kappa^{\max}$", "arcs",
-         r"Search trace: multi directed vertex-sep, $n=4$, $m=3$"),
-    ]
-    for variant, n, m, stem, ceil_val, clabel, elabel, ttitle in trace_cases:
-        sep = "vertex" if "vertex" in stem else "edge"
-        tr = search_for_dense_graph(variant, n=n, m=m, separation=sep,
-                                    steps=3000, seed=1,
-                                    record_exact_connectivity=True)
-        plot_search_trace(tr, path=FIGURES / f"{stem}.png",
-                          ceiling=ceil_val, show_cooling=False,
-                          show_histogram=False,
-                          connectivity_label=clabel, edge_label=elabel,
-                          title=ttitle)
-        print(f"wrote {stem}.png  (best={tr.best_edge_count})")
-
-    # A larger directed multigraph: four s->t routes of differing capacity plus a
-    # dead end.  Parallel arcs are drawn explicitly, so multiplicity is read by
-    # counting.  The s->a route is over-provisioned (mu=3 into a but a single arc
-    # a->t out), so it appears as three arcs in a COOL colour (sigma=1): the
-    # visual point that multiplicity and load-bearing role are not the same.
-    sens = Graph(8, MULTI_DIRECTED)   # 0=s 1=t 2=a 3=b 4=c 5=d 6=e 7=f
-    sens.set_multiplicity(0, 2, 3); sens.set_multiplicity(2, 1, 1)  # s->a->t, over-provisioned in
-    sens.set_multiplicity(0, 3, 3); sens.set_multiplicity(3, 1, 3)  # s->b->t, cap 3 (load-bearing)
-    sens.set_multiplicity(0, 4, 2); sens.set_multiplicity(4, 1, 2)  # s->c->t, cap 2
-    sens.set_multiplicity(0, 6, 1); sens.set_multiplicity(6, 1, 1)  # s->e->t, cap 1
-    sens.set_multiplicity(0, 7, 2); sens.set_multiplicity(7, 1, 2)  # s->f->t, cap 2
-    sens.set_multiplicity(0, 5, 2)                                  # s->d, dead end
-    sens_layout = {0: (-3.2, 0.0), 1: (3.2, 0.0),
-                   2: (0.0, 2.6), 3: (0.0, 1.3), 4: (0.0, 0.0),
-                   6: (0.0, -1.3), 7: (0.0, -2.6), 5: (-3.2, -2.4)}
-    sens_labels = {0: "s", 1: "t", 2: "a", 3: "b", 4: "c", 5: "d", 6: "e", 7: "f"}
-    draw_graph_with_sensitivity(
-        sens, path=FIGURES / "sensitivity_mixed.png",
-        layout=sens_layout, node_labels=sens_labels)
-    print("wrote sensitivity_mixed.png")
-
-    # Annealing vs tabu convergence (Ch.3): wall-clock timed, so a representative
-    # run rather than a seed-exact one (see the figure caption).
-    plot_sa_vs_tabu_convergence(FIGURES / "sa_vs_tabu_convergence.pdf",
-                                cases=((5, 3), (7, 3)), budget=8.0, seed=0)
-    print("wrote sa_vs_tabu_convergence.pdf")
-
     plot_complexity_growth(path=FIGURES / "complexity_growth.png")
-    print("wrote complexity_growth.png")
-
-    # Gallery of named families, built directly (independent of extremal_gallery.json).
-    plot_extremal_gallery(FIGURES / "extremal_graphs_gallery.png")
-    print("wrote extremal_graphs_gallery.png")
-
     variant_grid_figures()
     variant_value_tables()
-
-    # --------------------------------------------------------------
-    # Full-enumeration scatter and distribution figures.
-    # The enumeration cache is written once to figures/enumeration_cache.json.
-    # --------------------------------------------------------------
-    print("building enumeration cache (slow on first run, cached thereafter)...")
-    enum_cache_path = FIGURES / "enumeration_cache.json"
-    enum_data = compute_enumeration_cache(cache_path=enum_cache_path)
-    print("enumeration cache ready")
-
-    plot_scatter_lambda_edges(enum_data, path=FIGURES / "scatter_lambda_edges.png")
-    print("wrote scatter_lambda_edges.png")
-
-    # Pooled per-pair connectivity: every vertex pair of every enumerated graph,
-    # tagged with its graph's lambda^max.  Slow first run, cached thereafter.
-    print("building pair-connectivity cache (slow on first run, cached thereafter)...")
-    pair_cache_path = FIGURES / "pair_enumeration_cache.json"
-    pair_data = compute_pair_enumeration_cache(cache_path=pair_cache_path)
-    print("pair-connectivity cache ready")
-
-    # Pooled per-pair connectivity histograms (Ch.4): each panel stacks blue/red
-    # at its own mid-range connectivity boundary, so the split is meaningful in
-    # every variant rather than collapsing to one colour at a fixed m.
-    plot_pair_conn_dist_grid(pair_data, path=FIGURES / "pair_conn_dist.png")
-    print("wrote pair_conn_dist.png")
-
-    # Edge-count histograms (Ch.4): same mid-range stacked colouring.
-    plot_edge_dist_grid(enum_data, path=FIGURES / "edges_dist.png")
-    print("wrote edges_dist.png")
-
-    # Per-graph connectivity distribution at the fixed forbidden threshold m=6
-    # (App. B), showing the m=6 feasibility split; m=3 body version removed 2026-06-20.
-    plot_conn_dist_grid(enum_data, 6, path=FIGURES / "conn_dist_m6.png")
-    print("wrote conn_dist_m6.png")
-
-    # --------------------------------------------------------------
-    # 3-D bound surface over the (n, m) grid.
-    # Uses a JSON cache (slow first run, instant thereafter).
-    # --------------------------------------------------------------
-    surface_cache_path = FIGURES / "surface_cache.json"
-    print("building surface cache (slow on first run, cached thereafter)...")
-    compute_surface_cache(
-        n_range=(3, 9), m_range=(2, 6),
-        max_seconds=20, cache_path=surface_cache_path)
-    plot_variant_3d_surfaces(surface_cache_path, path=FIGURES / "variant_surface_3d.png")
-    print("wrote variant_surface_3d.png")
-
-    # --------------------------------------------------------------
-    # 3-D threshold histogram (appendix): how the lambda_max distribution shifts
-    # with density p, for three representative variants.  Kept as a standalone
-    # appendix figure (fig:threshold-3d) after the Figure 4.2 threshold story was
-    # removed from the body on 2026-06-20.
-    # --------------------------------------------------------------
-    # No p_values: each panel sweeps in units of its own threshold, since the
-    # graph and hypergraph models do not share a density scale.
-    plot_conn_threshold_3d(
-        path=FIGURES / "threshold_3d.png",
-        n=12, m=3, samples=150, seed=7)
-    print("wrote threshold_3d.png")
-
-    # NOTE: the 2-D random-sampling threshold figures (degree_threshold,
-    # sampled_variant_grid) were removed from the thesis on 2026-06-20.  Their
-    # generators are kept in erdos915_unified.py and the restore recipe is in
-    # research_notes/removed_threshold_phenomenon.md.
-
-    # Edge vs vertex disjointness in G(16, p) at three densities (Chapter 1).
-    p_values = [0.25, 0.5, 0.75]
-    data = {pp: edge_vertex_distribution(16, pp, trials=400, seed=7)
-            for pp in p_values}
-    plot_edge_vertex_histograms(data, 16, p_values,
-                                FIGURES / "edge_vertex_sampling.png")
-    print("wrote edge_vertex_sampling.png")
-
-    # Gallery of extremal graphs: all 12 variants × small (n, m), ~3s per case.
-    print("building extremal graph gallery (this takes a few minutes)...")
-    gallery_path = FIGURES / "extremal_gallery.json"
-    gal = gallery_extremal_graphs(max_n=7, max_m=4, r=3, time_per_case=3.0)
-    save_gallery_json(gal, gallery_path)
-    total_classes = sum(
-        len(cases.get("classes", []))
-        for variant_data in gal.values()
-        for cases in variant_data.values()
-    )
-    print(f"wrote {gallery_path.name}  ({total_classes} iso-classes across all variants)")
+    rediscovery_table()
 
 
 def rebuild_machine_values() -> None:
