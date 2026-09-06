@@ -617,6 +617,60 @@ At a fixed step interval it measures the exact value again.
 \Cref{sec:cheap-checker} gives the bookkeeping, 
 and the regression test that holds the fast walk to the naive one step for step.
 
+\section{An equal search allocation across all variants}\label{sec:equal-budget}
+
+A separate experiment gives each of the sixteen variants one hour of search
+in total. This is one hour per variant, not per parameter case. Each variant
+is tested at $n=6,8,10,12$ and $m=3,6$. Each of these eight cases receives
+three runs with initial seeds $0$, $1000000$ and $2000000$, each with a
+$150$-second stopping target. Thus every variant receives
+$8\cdot3\cdot150=3600$ seconds of allocated search.
+
+All runs start empty. No construction, known optimum or earlier incumbent is
+supplied to the search. Graph variants use tabu search and hypergraph variants
+use random greedy growth. Hypergraphs have rank $3$ and directed hypergraphs
+use the forward convention. Runs are serial, with the variant order rotated
+between cases. Validation and reporting take place outside the search budget.
+
+The original solver used a calendar clock for its stopping rule. Nineteen runs
+had a discrepancy between that clock and the independently measured monotonic
+duration. They are retained in the data but excluded from equal-budget
+statistics. Each flagged trial is repeated with the same frozen search code
+and seed, changing only its deadline clock to a monotonic one. The replacement
+takes its original slot regardless of which run found more edges. Selecting
+the better of the two would give those slots an unfair additional chance.
+The discarded attempts are counted separately as extra computation.
+
+The timing rule is cooperative, so a connectivity calculation already in
+progress can overrun its target. Monotonic time also has platform-specific
+behaviour during system suspension. The records therefore include calendar
+duration, monotonic duration and CPU time. The computer was not isolated from
+other work, so this is a comparison under equal allocated search durations,
+not a controlled comparison of processor efficiency.
+
+\IfFileExists{figures/equal_budget_summary.tex}{%
+\Cref{tab:equal-budget-summary} compares the unaided outcomes with a separately
+supplied construction count $C$. Reaching $C$ need not mean reaching the
+optimum. Failing to reach it measures a limitation of these particular runs,
+not a failure of the construction. The detailed tables in
+\Cref{sec:equal-budget-details} retain the minimum, median and maximum across
+the three seeds instead of replacing a search value by $C$.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\input{figures/equal_budget_summary.tex}
+\caption{Eight parameter cases per variant under a one-hour total search
+allocation. The first count records cases where the best of three seeds
+reaches or exceeds the supplied construction count $C$. The second requires
+all three seeds to do so. Neither column counts proved optima.}
+\label{tab:equal-budget-summary}
+\end{table}
+}{%
+The replacement runs and final timing audit are still in progress in this
+working version. Their tables are not presented as complete results.
+}
+
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
 Before addressing open cases, the search is tested on settled ones.

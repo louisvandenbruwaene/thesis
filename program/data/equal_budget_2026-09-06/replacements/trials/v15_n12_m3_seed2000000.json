@@ -1,0 +1,270 @@
+{
+  "trial": {
+    "id": "v15_n12_m3_seed2000000",
+    "variant": 15,
+    "n": 12,
+    "m": 3,
+    "seed": 2000000,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": false,
+    "directed": true,
+    "separation": "vertex"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T21:29:53.739006+00:00",
+  "ended_utc": "2026-09-06T21:32:23.781210+00:00",
+  "original_sha256": "3a1878ea450a1a9634941853c3c4e13a75f5637760c6507e312354c325d47ad5",
+  "replacement_manifest_sha256": "ed493942d47e6112aae113187985ca27042c015c07d3c3048b295fa86ffc6d19",
+  "search_elapsed_seconds": 150.01291258299898,
+  "search_cpu_seconds": 150.01250100000016,
+  "calendar_elapsed_seconds": 150.01278424263,
+  "solver_reported_seconds": 150.01289291700232,
+  "validation_seconds": 0.02919054200174287,
+  "value": 24,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 2,
+  "witness": {
+    "hyperedges": [
+      [
+        [
+          10
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          6,
+          9
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      [
+        [
+          6
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          7
+        ],
+        [
+          3,
+          9
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      [
+        [
+          6
+        ],
+        [
+          3,
+          11
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          9,
+          11
+        ]
+      ],
+      [
+        [
+          7
+        ],
+        [
+          0,
+          8
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          7,
+          11
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          8
+        ],
+        [
+          9,
+          11
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          5,
+          7
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          1,
+          8
+        ]
+      ],
+      [
+        [
+          8
+        ],
+        [
+          0,
+          10
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          7,
+          11
+        ]
+      ],
+      [
+        [
+          9
+        ],
+        [
+          2,
+          10
+        ]
+      ],
+      [
+        [
+          9
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        [
+          11
+        ],
+        [
+          5,
+          8
+        ]
+      ],
+      [
+        [
+          10
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      [
+        [
+          11
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

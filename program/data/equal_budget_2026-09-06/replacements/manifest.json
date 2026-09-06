@@ -1,0 +1,299 @@
+{
+  "schema": 1,
+  "created_utc": "2026-09-06T20:52:22.667765+00:00",
+  "original_manifest_sha256": "de0d6b84c41e49aa082a245440521bbcce2c09773a78d283c0238b133615ba61",
+  "runner_sha256": "82023416241be6ea28474995f18b84fe5bad99ab721902ffaa8f2357f5637e43",
+  "selected": [
+    {
+      "trial": {
+        "id": "v05_n6_m3_seed0",
+        "variant": 5,
+        "n": 6,
+        "m": 3,
+        "seed": 0,
+        "requested_seconds": 150.0,
+        "hypergraph": false,
+        "simple": false,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "75c5701e744646dd0e50159ba41cfbbb98231f6d39c67f676096d779df75af58"
+    },
+    {
+      "trial": {
+        "id": "v12_n12_m3_seed1000000",
+        "variant": 12,
+        "n": 12,
+        "m": 3,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": false,
+        "separation": "edge"
+      },
+      "original_sha256": "37de94e59800a9768f051a2eee970559029c77048e3865f66dcefc23bbd86ca6"
+    },
+    {
+      "trial": {
+        "id": "v13_n12_m3_seed1000000",
+        "variant": 13,
+        "n": 12,
+        "m": 3,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "4c8bc1dc45c88d8b40bf5f464a590607485545130aa2c0b2ea6db6baf6ad8f93"
+    },
+    {
+      "trial": {
+        "id": "v15_n12_m6_seed1000000",
+        "variant": 15,
+        "n": 12,
+        "m": 6,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": true,
+        "separation": "vertex"
+      },
+      "original_sha256": "2fa8ceff72e6bd45a1f6572e3f574b19e8b7468be5690593765acb6975b5c2b2"
+    },
+    {
+      "trial": {
+        "id": "v08_n12_m6_seed1000000",
+        "variant": 8,
+        "n": 12,
+        "m": 6,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": false,
+        "separation": "edge"
+      },
+      "original_sha256": "55d2306ae560e26947e84232e62f12ef496c92a93472f55d22e8afad1d5f22c9"
+    },
+    {
+      "trial": {
+        "id": "v09_n12_m6_seed1000000",
+        "variant": 9,
+        "n": 12,
+        "m": 6,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "88fd144381b85e3108200aafe8351088cf512c60959666afc3b8140a198a945b"
+    },
+    {
+      "trial": {
+        "id": "v10_n12_m6_seed1000000",
+        "variant": 10,
+        "n": 12,
+        "m": 6,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": true,
+        "separation": "edge"
+      },
+      "original_sha256": "0e0b49e5b4947a3527c3472e24d311352c91d46bac18cac37fd68f7365d1b58b"
+    },
+    {
+      "trial": {
+        "id": "v11_n12_m6_seed1000000",
+        "variant": 11,
+        "n": 12,
+        "m": 6,
+        "seed": 1000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": true,
+        "separation": "vertex"
+      },
+      "original_sha256": "b1ae7aad2674d0ee5af51a6d9b4214da0198e785434b9c05623840d9194a944f"
+    },
+    {
+      "trial": {
+        "id": "v08_n12_m3_seed2000000",
+        "variant": 8,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": false,
+        "separation": "edge"
+      },
+      "original_sha256": "d4efb7ae09ea3fe4086472bed9bbc5477360d3971dc28084deabc0a0e5cb91e9"
+    },
+    {
+      "trial": {
+        "id": "v09_n12_m3_seed2000000",
+        "variant": 9,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "391b4374936a1f57b12e64e6c334f7bb710e6b168a8fb11d11e018396874c452"
+    },
+    {
+      "trial": {
+        "id": "v10_n12_m3_seed2000000",
+        "variant": 10,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": true,
+        "separation": "edge"
+      },
+      "original_sha256": "15c754e1846d47a9e5eefddb16bf2a710e0c8c7e064689443b1b42a19dd84e2a"
+    },
+    {
+      "trial": {
+        "id": "v11_n12_m3_seed2000000",
+        "variant": 11,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": true,
+        "directed": true,
+        "separation": "vertex"
+      },
+      "original_sha256": "068d085a35882c35c3a149fb7d98bdf08274f51e2db7b0f1c558d9c840ae220b"
+    },
+    {
+      "trial": {
+        "id": "v12_n12_m3_seed2000000",
+        "variant": 12,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": false,
+        "separation": "edge"
+      },
+      "original_sha256": "133d702320576671441b276664c865efa319b9dcb2f52da96b98d67a7389f876"
+    },
+    {
+      "trial": {
+        "id": "v13_n12_m3_seed2000000",
+        "variant": 13,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "8716f56e7f5cd89bb026e6466200a05a6a3dffe522b7d04cfc51445780ec1ff0"
+    },
+    {
+      "trial": {
+        "id": "v14_n12_m3_seed2000000",
+        "variant": 14,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": true,
+        "separation": "edge"
+      },
+      "original_sha256": "2fbb1e9a34f4a471b19c3bed8abe685351a45b1a2e04031a73272941d3ffb2a7"
+    },
+    {
+      "trial": {
+        "id": "v15_n12_m3_seed2000000",
+        "variant": 15,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": true,
+        "simple": false,
+        "directed": true,
+        "separation": "vertex"
+      },
+      "original_sha256": "3a1878ea450a1a9634941853c3c4e13a75f5637760c6507e312354c325d47ad5"
+    },
+    {
+      "trial": {
+        "id": "v00_n12_m3_seed2000000",
+        "variant": 0,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": false,
+        "simple": true,
+        "directed": false,
+        "separation": "edge"
+      },
+      "original_sha256": "f12a4412a5418b904df4f2fb8663d5a8fddc5d77322099b65bf5d6bca8bdf2e6"
+    },
+    {
+      "trial": {
+        "id": "v01_n12_m3_seed2000000",
+        "variant": 1,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": false,
+        "simple": true,
+        "directed": false,
+        "separation": "vertex"
+      },
+      "original_sha256": "d9d4a9722085cab98099886b4fb4c702834115828855e05e301541d422097038"
+    },
+    {
+      "trial": {
+        "id": "v02_n12_m3_seed2000000",
+        "variant": 2,
+        "n": 12,
+        "m": 3,
+        "seed": 2000000,
+        "requested_seconds": 150.0,
+        "hypergraph": false,
+        "simple": true,
+        "directed": true,
+        "separation": "edge"
+      },
+      "original_sha256": "ecfcd7256a0c55bea001cdd995463a9fe36cb0a3dee6bf9832f5d100ef88bbde"
+    }
+  ],
+  "selection": "All original timing-flagged trials in original schedule order, independent of objective value",
+  "selection_tolerance_seconds": 1,
+  "source": "Original frozen solver and C binary, verified against the original manifest",
+  "change": "Only engine.time.time is rebound to time.monotonic through a module-local proxy",
+  "clock": "Monotonic duration, with platform-specific treatment of suspended time",
+  "reporting": "Use replacement instead of flagged original, never the better of their objectives"
+}

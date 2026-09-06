@@ -45,6 +45,14 @@ class EqualBudgetProtocol(unittest.TestCase):
         run.update(search_elapsed_seconds=150.02, solver_reported_seconds=150.03)
         self.assertEqual(timing_issues(run), [])
 
+    def test_invalid_clocks_never_qualify(self):
+        for value in (math.nan, math.inf, -math.inf, -1, None, True):
+            for field in ("search_elapsed_seconds", "solver_reported_seconds"):
+                run = dict(trial=dict(requested_seconds=150), search_elapsed_seconds=150,
+                           solver_reported_seconds=150)
+                run[field] = value
+                self.assertTrue(timing_issues(run))
+
 
 if __name__ == "__main__":
     unittest.main()

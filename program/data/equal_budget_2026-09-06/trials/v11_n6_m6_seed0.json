@@ -1,0 +1,321 @@
+{
+  "trial": {
+    "id": "v11_n6_m6_seed0",
+    "variant": 11,
+    "n": 6,
+    "m": 6,
+    "seed": 0,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": true,
+    "directed": true,
+    "separation": "vertex"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T00:35:15.779520+00:00",
+  "ended_utc": "2026-09-06T00:37:45.790904+00:00",
+  "search_elapsed_seconds": 150.00845950000075,
+  "search_cpu_seconds": 150.00012899999956,
+  "solver_reported_seconds": 150.00393509864807,
+  "validation_seconds": 0.00697799999761628,
+  "value": 30,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 5,
+  "witness": {
+    "hyperedges": [
+      [
+        [
+          1
+        ],
+        [
+          0,
+          4
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          3,
+          5
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

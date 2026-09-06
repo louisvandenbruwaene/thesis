@@ -1,0 +1,131 @@
+{
+  "trial": {
+    "id": "v07_n8_m3_seed0",
+    "variant": 7,
+    "n": 8,
+    "m": 3,
+    "seed": 0,
+    "requested_seconds": 150.0,
+    "hypergraph": false,
+    "simple": false,
+    "directed": true,
+    "separation": "vertex"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T01:02:46.892933+00:00",
+  "ended_utc": "2026-09-06T01:05:17.194033+00:00",
+  "search_elapsed_seconds": 150.29128024999955,
+  "search_cpu_seconds": 150.291252,
+  "solver_reported_seconds": 150.29086685180664,
+  "validation_seconds": 0.009744333998241927,
+  "value": 28,
+  "bound": "lower",
+  "method": "tabu search",
+  "complete": false,
+  "max_connectivity": 2,
+  "witness": {
+    "multiplicity_matrix": [
+      [
+        0,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

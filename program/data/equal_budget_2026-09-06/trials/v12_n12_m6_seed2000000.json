@@ -1,0 +1,161 @@
+{
+  "trial": {
+    "id": "v12_n12_m6_seed2000000",
+    "variant": 12,
+    "n": 12,
+    "m": 6,
+    "seed": 2000000,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": false,
+    "directed": false,
+    "separation": "edge"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T19:48:08.422508+00:00",
+  "ended_utc": "2026-09-06T19:50:38.444015+00:00",
+  "search_elapsed_seconds": 150.00172895799915,
+  "search_cpu_seconds": 149.9186370000025,
+  "solver_reported_seconds": 150.00696897506714,
+  "validation_seconds": 0.014019666996318847,
+  "value": 22,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 5,
+  "witness": {
+    "hyperedges": [
+      [
+        2,
+        5,
+        10
+      ],
+      [
+        1,
+        6,
+        9
+      ],
+      [
+        1,
+        2,
+        10
+      ],
+      [
+        2,
+        4,
+        6
+      ],
+      [
+        2,
+        7,
+        8
+      ],
+      [
+        4,
+        8,
+        11
+      ],
+      [
+        0,
+        1,
+        7
+      ],
+      [
+        4,
+        7,
+        10
+      ],
+      [
+        3,
+        8,
+        11
+      ],
+      [
+        0,
+        3,
+        10
+      ],
+      [
+        4,
+        7,
+        8
+      ],
+      [
+        3,
+        5,
+        10
+      ],
+      [
+        2,
+        5,
+        8
+      ],
+      [
+        4,
+        5,
+        8
+      ],
+      [
+        3,
+        6,
+        11
+      ],
+      [
+        3,
+        7,
+        11
+      ],
+      [
+        1,
+        8,
+        11
+      ],
+      [
+        0,
+        5,
+        6
+      ],
+      [
+        1,
+        8,
+        9
+      ],
+      [
+        0,
+        8,
+        9
+      ],
+      [
+        0,
+        8,
+        9
+      ],
+      [
+        6,
+        8,
+        9
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "trial": {
+    "id": "v12_n12_m3_seed1000000",
+    "variant": 12,
+    "n": 12,
+    "m": 3,
+    "seed": 1000000,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": false,
+    "directed": false,
+    "separation": "edge"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T20:54:53.270185+00:00",
+  "ended_utc": "2026-09-06T20:57:23.288555+00:00",
+  "original_sha256": "37de94e59800a9768f051a2eee970559029c77048e3865f66dcefc23bbd86ca6",
+  "replacement_manifest_sha256": "ed493942d47e6112aae113187985ca27042c015c07d3c3048b295fa86ffc6d19",
+  "search_elapsed_seconds": 150.00605716599966,
+  "search_cpu_seconds": 149.993032,
+  "calendar_elapsed_seconds": 150.00585675239563,
+  "solver_reported_seconds": 150.0060210829979,
+  "validation_seconds": 0.012321457994403318,
+  "value": 10,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 2,
+  "witness": {
+    "hyperedges": [
+      [
+        0,
+        2,
+        3
+      ],
+      [
+        3,
+        5,
+        6
+      ],
+      [
+        1,
+        6,
+        9
+      ],
+      [
+        4,
+        6,
+        11
+      ],
+      [
+        3,
+        4,
+        5
+      ],
+      [
+        0,
+        3,
+        7
+      ],
+      [
+        3,
+        7,
+        8
+      ],
+      [
+        9,
+        10,
+        11
+      ],
+      [
+        1,
+        6,
+        10
+      ],
+      [
+        2,
+        3,
+        8
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

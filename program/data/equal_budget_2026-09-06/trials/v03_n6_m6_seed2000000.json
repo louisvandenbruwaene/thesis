@@ -1,0 +1,99 @@
+{
+  "trial": {
+    "id": "v03_n6_m6_seed2000000",
+    "variant": 3,
+    "n": 6,
+    "m": 6,
+    "seed": 2000000,
+    "requested_seconds": 150.0,
+    "hypergraph": false,
+    "simple": true,
+    "directed": true,
+    "separation": "vertex"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T12:12:25.116036+00:00",
+  "ended_utc": "2026-09-06T12:14:55.120189+00:00",
+  "search_elapsed_seconds": 150.0021365829889,
+  "search_cpu_seconds": 149.83049200000096,
+  "solver_reported_seconds": 150.00096774101257,
+  "validation_seconds": 0.0027338750078342855,
+  "value": 30,
+  "bound": "lower",
+  "method": "tabu search",
+  "complete": false,
+  "max_connectivity": 5,
+  "witness": {
+    "multiplicity_matrix": [
+      [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

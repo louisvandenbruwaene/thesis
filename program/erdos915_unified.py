@@ -2488,8 +2488,9 @@ def _brute_force_hypergraph(
     candidates = _hyperedge_candidates(n, r, directed, kind=kind)
     cap = _hyper_multiplicity_cap(m, simple)
     best_count, best_h, completed = 0, Hypergraph(n, directed=directed), True
-    for mult in product(range(cap + 1), repeat=len(candidates)):
-        if _deadline_passed(deadline):
+    for index, mult in enumerate(product(range(cap + 1), repeat=len(candidates))):
+        # Batch clock reads for cheap incumbent skips, but check again before flow.
+        if index % 256 == 0 and _deadline_passed(deadline):
             completed = False
             break
         # Size first, and from the multiplicities alone.  A candidate that cannot
@@ -2499,6 +2500,9 @@ def _brute_force_hypergraph(
         total = sum(mult)
         if total <= best_count:
             continue
+        if _deadline_passed(deadline):
+            completed = False
+            break
         chosen = [candidates[i] for i, q in enumerate(mult) for _ in range(q)]
         hypergraph = Hypergraph(n, chosen, directed=directed)
         if max_hyper_connectivity(hypergraph, vertex_split=vertex_split) <= m - 1:

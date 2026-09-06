@@ -66,3 +66,7 @@ handin/
 
 # The public snapshot worktree, created and removed by publish.sh.
 .public-snapshot/
+
+# Benchmark runner mutexes. Transient, and program/ rides into the hand-in
+# through git archive, so they must not be tracked.
+program/data/**/*.lock
