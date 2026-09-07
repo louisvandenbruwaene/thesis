@@ -10,11 +10,18 @@ incidence-rank separating-pair step was checked logically. Its eligible
 minimum-degree-three core remains outside the finite branch coverage.
 
 This is an AI reasoning audit, not a formal certificate or independent human
-referee report. Published theorems remain dependencies. The full 1974 paper
-of Sorensen and Thomassen was not retrieved during the source audit, so its
-detailed theorem transcription and recursive construction cannot be described
-as newly checked against that original article. The existing author badges
-must not be changed by treating this review as Louis's personal verification.
+referee report. Published theorems remain dependencies. The existing author
+badges must not be changed by treating this review as Louis's personal
+verification.
+
+CLOSED 2026-09-07. The 1974 paper of Sørensen and Thomassen is in the
+repository as `sorensen.pdf`, a scan with no text layer, and was read in a
+later pass. Every claim the thesis attributes to it, the Theorem 4 statement
+and its two exceptional values, the small-range formula, the Corollary 2(a)
+rate, the recursive construction with its vertex and edge counts, the
+3-connected treatment at m=5 and the attributions of the disproof, matches the
+original. See sorensen_thomassen_source_check_2026-09-07.md. Leonard's
+57-vertex counterexample is still carried from a secondary source.
 
 The follow-up makes the fixed m at least three regime explicit in two
 asymptotic conclusions. It also corrects the incidence-rank proof's sentence

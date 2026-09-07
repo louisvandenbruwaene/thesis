@@ -428,7 +428,7 @@ question rather than a conjecture, since the sizes reached are well below those
 at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
 
-\apppart{Part II. The directed results}{The three constructions the body names but does not define, the reachability skeleton that both exact directed results run on, the value at $m=2$ under both separations, the structural propositions that bound the frontier at $m \ge 3$, and the directed multigraph problem closed for every $n$ and every $m$.}
+\apppart{Part II. The directed results}{The three constructions the body names but does not define, the reachability skeleton that both exact directed results run on, the value at $m=2$ under both separations, the structural propositions that bound the frontier at $m \ge 3$, and the proposed proof that covers the directed multigraph problem at every $n$ and every $m$.}
 
 \section{The directed constructions}\label{sec:dir-constructions}
 
@@ -651,7 +651,7 @@ The exhaustive searches independently give the maxima $2,4,6,8,10,12$ at $2\le n
 The multigraph formula is a related conjecture built on the same skeleton argument, so it is not independent corroboration of that argument.
 
 \begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
-The skeleton argument settles $m=2$. For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
+The skeleton argument proposes the value at $m=2$ (\Cref{thm:dir-vertex-m2-exact}, conditional on \Cref{lem:reach-skeleton}). For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
 \[
 \begin{array}{r|ccccc}
     n & 2 & 3 & 4 & 5 & 6 \\ \hline
@@ -2572,7 +2572,7 @@ The table renderer refuses incomplete timing coverage, unvalidated selected
 witnesses or a search count above a recorded upper bound. Its provenance file
 records the hashes of the report, comparison snapshot and witness audit.
 
-Each row below contains exactly three timing-qualified runs. Search counts
+Each row of \Cref{tab:equal-budget-m3-graphs,tab:equal-budget-m6-graphs,tab:equal-budget-m3-hypergraphs,tab:equal-budget-m6-hypergraphs} contains exactly three timing-qualified runs. Search counts
 are printed without adjustment, even when a supplied construction is better.
 \begin{table}[p]
 \centering\scriptsize
@@ -2608,7 +2608,7 @@ protocol as \Cref{tab:equal-budget-m3-hypergraphs}.}
 
 \subsection{Detailed values across the sixteen variants}\label{sec:variant-grids}
 
-The four grids below record the finite data behind \Cref{fig:variant-tree-status,tab:summary}.
+\Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} record the finite data behind \Cref{fig:variant-tree-status,tab:summary}.
 Every hypergraph panel and comparison table in this section uses $r=3$.
 Directed hypergraphs use the forward orientation, with one tail and two heads.
 A blue curve represents an established result. A red curve represents a conjectured formula or upper bound.
@@ -2651,7 +2651,7 @@ observations} reproducible. Rerunning the searches is a new experiment.
 \code{program/data/search\_evidence.json} exports the raw search and supplied
 construction values in distinct fields for every plotted order. Missing
 historical elapsed times and witnesses are explicitly marked as unknown.
-The companion tables distinguish the same sources numerically.
+\Cref{tab:search-evidence-m3-graphs,tab:search-evidence-m3-hypergraphs,tab:search-evidence-m6-graphs,tab:search-evidence-m6-hypergraphs} distinguish the same sources numerically.
 A construction entry of zero means that the selected formula supplies no
 positive lower bound in that parameter range, not that the optimum is zero.
 

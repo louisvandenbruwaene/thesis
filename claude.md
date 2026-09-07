@@ -76,9 +76,13 @@ equal-budget records are the only case).
 
 ## What is proved (load-bearing, supersedes any older note)
 
-- **Directed multigraph arc, closed.** `L_m^dir(n) = (m-1) max(2(n-1),
-  floor(n^2/4))` for every n>=2, m>=2 (`thm:dir-multi-full`), one proof, no
-  parity split.
+- **Directed multigraph arc.** `L_m^dir(n) = (m-1) max(2(n-1),
+  floor(n^2/4))` for every n>=2, m>=2 (`thm:dir-multi-full`), one proposed
+  proof, no parity split. NOT closed: it is a `conjecture ... with proof,
+  [AI]` under the 7 September revision policy at the top of this file, and it
+  leans on `lem:reach-skeleton`, which is also unchecked. Prose anywhere in the
+  thesis must not call it settled. Two sentences did on 2026-09-07 and were
+  corrected.
 - **Directed simple arc/vertex:** leading term plus Theta_m(n) second order,
   unconditionally, via `lem:two-step-budget`. The exact value for m>=3
   (`conj:dir-arc`) is open.
