@@ -62,7 +62,7 @@ It would force the quadratic upper bound as soon as that branch exceeds the
 hub bound, which already happens at $m=5$, $n=12$.
 The counterexample therefore refutes that structural assertion too.
 
-The augmented bipartite count has the same leading term and the same order of error as the optimum.
+For fixed $m\ge3$, the augmented bipartite count has the same leading term and the same order of error as the optimum.
 \Cref{thm:dir-arc-linear-error} proves this without assuming the shape of an extremal graph.
 The linear coefficient remains unknown among the results proved in this thesis.
 Even identifying it would leave the exact bounded correction to establish.
@@ -70,7 +70,7 @@ More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ a
 Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
 The next section considers the separate question of extremal shape.
 
-The directed vertex problem has the same leading term and error order by \Cref{thm:dir-vertex-linear-error}.
+For fixed $m\ge3$, the directed vertex problem has the same leading term and error order by \Cref{thm:dir-vertex-linear-error}.
 \Cref{app:proofs} treats it separately from the arc problem.
 It remains open whether the two values are exactly equal for $m \ge 3$.
 
@@ -343,7 +343,7 @@ The program also has clear limits.
 The heuristic search cannot prove upper bounds.
 The certifier proves an upper bound only at one fixed order.
 Without a replayable certificate, that solver check does not become a reusable argument (\Cref{sec:certification-standard}).
-For directed multigraphs, the finite encoding reaches only $n=6$.
+For directed multigraphs, the recorded successful solver checks reach only $n=6$.
 At larger orders, the hand proof in \Cref{app:proofs} establishes the value.
 The certifier did not finish at $n=7$.
 

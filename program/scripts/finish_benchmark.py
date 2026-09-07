@@ -35,7 +35,8 @@ def finish(directory, wait_seconds=0):
                 ("independent witness audit", [sys.executable, "scripts/validate_benchmark.py", str(directory)], program, 300),
                 ("audited tables", [sys.executable, "scripts/benchmark_tables.py", str(directory)], program, 300),
                 ("benchmark regression tests", [sys.executable, "-m", "unittest", "tests.test_benchmark_validation",
-                 "tests.test_benchmark_tables", "tests.test_benchmark_replacements", "tests.test_equal_budget_benchmark"], program, 300),
+                 "tests.test_benchmark_tables", "tests.test_benchmark_replacements", "tests.test_equal_budget_benchmark",
+                 "tests.test_benchmark_finalization"], program, 300),
                 # -g forces a run. A build made while a table file was absent records a
                 # lookup that FAILED, not a dependency, so latexmk sees nothing to redo
                 # once the render creates it.

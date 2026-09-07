@@ -1507,7 +1507,7 @@ which would repeat that vertex on the cycle. So the cycle rank adds
 up over blocks, $\mathrm{rank}(G) = \sum_i \mathrm{rank}(B_i)$, and it is
 enough to bound each $\mathrm{rank}(B_i)$ by $|X \cap B_i| - 1$ and sum.
 
-Each block inherits the hypotheses. A bridge block is one edge, so its rank
+Non-bridge blocks inherit the hypotheses. A bridge block is one edge, so its rank
 is $0$, and by (i) at least one endpoint lies in $X$, giving
 $0 \le |X \cap B| - 1$. Every other block has minimum degree at least $2$,
 including the possible two-vertex parallel bundle, so (i) to (iv) hold inside
@@ -2584,7 +2584,6 @@ The table renderer refuses incomplete timing coverage, unvalidated selected
 witnesses or a search count above a recorded upper bound. Its provenance file
 records the hashes of the report, comparison snapshot and witness audit.
 
-\IfFileExists{figures/equal_budget_summary.tex}{%
 Each row below contains exactly three timing-qualified runs. Search counts
 are printed without adjustment, even when a supplied construction is better.
 \begin{table}[p]
@@ -2618,7 +2617,6 @@ protocol as \Cref{tab:equal-budget-m3-hypergraphs}.}
 \label{tab:equal-budget-m6-hypergraphs}
 \end{table}
 \clearpage
-}{}
 
 \subsection{Detailed values across the sixteen variants}\label{sec:variant-grids}
 

@@ -1,10 +1,10 @@
 {
-  "created_utc": "2026-09-06T23:53:31.841379+00:00",
+  "created_utc": "2026-09-07T08:30:52.347807+00:00",
   "verifier_sha256": "e268c10635e1b42e0d5e15e6c0cab92007faf520cf9512648cf96d420dd7c39b",
   "networkx": "3.6.1",
   "method": "Independent per-copy gate construction and NetworkX Edmonds-Karp",
   "original_manifest_sha256": "de0d6b84c41e49aa082a245440521bbcce2c09773a78d283c0238b133615ba61",
-  "elapsed_seconds": 0.4270032080094097,
+  "elapsed_seconds": 0.3406324579846114,
   "records": [
     {
       "path": "trials/v00_n6_m3_seed0.json",
