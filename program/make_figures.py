@@ -641,8 +641,12 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         exact = _exact_points(range(first, stop), m, exact_seconds, **kw)
         if i == 8:
             exact = _with_settled_cells(exact, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
+        conjectural = (kw["directed"] or
+                       (not kw.get("simple", True) and kw["separation"] == "vertex" and m > 2) or
+                       (is_hyper and m > 2))
+        curve_key = "conj" if conjectural else "proved"
         panel = dict(
-            status="proved" if theorem else "open",
+            status=("conjectured" if conjectural else "proved") if theorem else "open",
             ylabel=("hyperarcs" if kw["directed"] else "hyperedges") if is_hyper
                    else ("arcs" if kw["directed"] else "edges"),
             exact=exact, search=_search_points(ns, m, search_seconds, **kw),
@@ -650,9 +654,9 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
             search_budget_seconds=search_seconds,
             search_keys=[MachineValues.key("search", n, m, search_seconds, kw) for n in ns])
         if theorem:
-            panel["proved"] = (ns, [theorem(n) for n in ns])
+            panel[curve_key] = (ns, [theorem(n) for n in ns])
             if is_hyper:
-                panel["proved_is_bound"] = True
+                panel[curve_key + "_is_bound"] = True
         panels.append(_reconcile_panel(panel))
     return panels
 
@@ -748,9 +752,8 @@ def _panel_cell(panel, n):
     construction closes the gap and the cell is exact; otherwise the upper
     bound is prefixed by $\\le$. Attainment may come from the separate
     ``construction`` series or a raw ``search`` witness. Neither series is
-    overwritten by that comparison. Conjectured and open rows are prefixed by
-    $\\ge$, since their numbers are verified constructions without proved
-    optimality.  A proved graph row needs no prefix because its closed form is
+    overwritten by that comparison. Conjectural rows carry a question-marked equality or upper-bound sign.
+    Open rows carry $\\ge$ for verified constructions.  A proved graph row needs no prefix because its closed form is
     the exact value for every n.
     """
     exact_ns, exact_vals = panel["exact"]
@@ -773,6 +776,8 @@ def _panel_cell(panel, n):
                            dict(zip(*panel.get("construction", ([], [])))).get(n, 0))
             if attained != value:
                 prefix = r"$\le$"
+    elif key == "conj":
+        prefix = r"$\stackrel{?}{\le}$" if panel.get("conj_is_bound") else r"$\stackrel{?}{=}$"
     else:
         prefix = r"$\ge$"
     return f"{prefix}{value}", color, False

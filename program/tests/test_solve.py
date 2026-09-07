@@ -97,13 +97,13 @@ class Solve(unittest.TestCase):
         self.assertTrue(r.proven)
         self.assertEqual(r.value, 4)  # a spanning tree on 5 vertices
 
-    def test_directed_multigraph_is_proved(self):
-        # No pulp needed: solve() returns the closed form of thm:dir-multi-full
-        # for this variant and checks it against a named witness.  It used to
-        # route through the MILP certifier, and the skip that guarded that is
-        # gone, so this branch is now covered on a minimal numpy+scipy install.
+    def test_directed_multigraph_formula_does_not_certify_optimality(self):
+        # A matching construction cannot certify an unchecked upper bound.
         r = solve(4, 3, directed=True, simple=False, exhaustive=True, max_seconds=120.0)
-        self.assertTrue(r.proven)
+        self.assertFalse(r.proven)
+        self.assertFalse(r.complete)
+        self.assertEqual(r.bound, "lower")
+        self.assertIn("unchecked", r.note)
         self.assertEqual(r.value, 12)  # L_3^dir(4) = 2(n-1)(m-1) = 12
         self.assertIn("closed form", r.method)
 
@@ -135,7 +135,7 @@ class Solve(unittest.TestCase):
         with self.assertRaises(ValueError):
             solve(4, 2, separation="edges")
 
-    def test_named_multidigraph_witness_attains_the_proved_value(self):
+    def test_named_multidigraph_witness_attains_the_conjectured_value(self):
         for n, m in ((6, 3), (8, 3), (9, 3), (8, 4), (10, 3)):
             with self.subTest(n=n, m=m):
                 witness = _directed_witness(n, m, simple=False)

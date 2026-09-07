@@ -9,10 +9,26 @@ merely *discovered*. An optional C helper accelerates small hot paths, but the
 Python implementation is the correctness path.
 
 There is one solver. Whatever the question, you call `solve(...)`: it picks the
-right method for the case (a proved closed form, brute-force enumeration, a
+right method for the case (a named construction, brute-force enumeration, a
 matrix search, or randomised greedy hypergraph search) and labels its answer
 honestly as exact, an upper bound, or a lower bound. You never run a different
 program for a different case.
+
+## Proposed proofs and result status
+
+The thesis labels unchecked AI arguments as conjectures with proofs. In
+particular, the directed multigraph arc formula is not a verified upper
+bound. `solve(exhaustive=True)` returns its named construction as `lower`,
+with `complete=False`, rather than certifying optimality. Hypergraph formula
+helpers with legacy `_proved` names evaluate the proposed attainment formulas;
+they are not certificates. Figure legends distinguish conjectural curves from
+completed enumerations.
+
+The specialised directed multigraph structural enumerators retain conjectural
+prefix pruning. Their completeness depends on that bound, so they cannot
+independently establish it. The cut-counting MILP uses unconditional box bounds
+for its optional deletion constraints. Frozen experiments retain the historical
+code and observations that produced them.
 
 ## Layout
 
