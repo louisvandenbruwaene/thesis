@@ -1,8 +1,8 @@
 {
   "state": "complete",
   "stage": "recorded build checked after visual review",
-  "updated_utc": "2026-09-07T08:37:16Z",
-  "source_revision": "bb51988d47ab",
-  "source_tag": "submitted-10",
-  "pdf_sha256": "a57c4f3b66807481ceeaa03615828c43906315419a56470a4c8ea2ea5122c42d"
+  "updated_utc": "2026-09-07T13:22:43Z",
+  "source_revision": "aebed4ee1c4c",
+  "source_tag": "submitted-12",
+  "pdf_sha256": "73fe0665ad21e20de35fff88581ef05842f9646b31cf4276a4fa371ad760e9fe"
 }
