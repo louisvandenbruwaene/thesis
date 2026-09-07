@@ -490,11 +490,12 @@ Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 
 On the linear branch, \Cref{const:dir-multi-lower} supplies the double star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
-For $n\le6$, this is the larger term of $M(n)$ and realises $M^{*}(n)$.
+For $n\le6$, this is the larger term of the candidate $M(n)$.
+The historical solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
 At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
 It then overtakes it.
 The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
-Thus no single shape witnesses $M^{*}(n)$ at every order.
+Thus the construction attaining the candidate $M(n)$ changes at the crossover.
 
 What would generalise is integrality.
 \Cref{cor:mstar-integral} proposes that some $\{0,1\}$ matrix always attains $M^{*}(n)$, and that this optimum equals $M(n)$.

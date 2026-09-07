@@ -24,34 +24,14 @@ ch1 = open('chapters/ch1_basecases.tex', encoding='utf-8').read()
 app = open('chapters/app_proofs.tex', encoding='utf-8').read()
 bad = 0
 
-# Every unchecked or dependent statement must be visibly conjectural.
-source = ch1 + '\n' + app
-for m in re.finditer(
-        r'\\begin\{(theorem|proposition|lemma|corollary|claim|construction|conjecture)\}'
-        r'(\[(?:[^][]|\[[^]]*\])*\])?\\label\{([^}]+)\}', source):
-    kind, title, label = m.groups()
-    title = title or ''
-    if '\\aimedal' in title or '\\conditional' in title:
-        if kind != 'conjecture' or 'with proof' not in title:
-            print('UNQUALIFIED PROOF STATUS:', label); bad = 1
-    if kind == 'conjecture':
-        expected = 'Conditional proof' if '\\conditional' in title else 'Proposed proof'
-        matches = re.findall(r'\\begin\{proof\}\[([^\n]*?\\Cref\{' + re.escape(label) + r'\}[^\n]*?)\]', app)
-        for heading in matches:
-            if not heading.startswith(expected):
-                print('PROOF STATUS DESYNC:', label, heading); bad = 1
-        # A heading that says "with proof" must have one. An argument living
-        # inside the statement body does not count: the reader is told to expect
-        # a separate block whose own heading carries the status.
-        if 'with proof' in title and not matches:
-            rest = source[m.end():]
-            nxt = re.search(r'\\begin\{(theorem|proposition|lemma|corollary'
-                            r'|claim|construction|conjecture)\}', rest)
-            inline = re.search(r'\\begin\{proof\}(\[([^\n]*?)\])?', rest)
-            if not inline or (nxt and nxt.start() < inline.start()):
-                print('CONJECTURE WITHOUT PROOF:', label); bad = 1
-            elif not (inline.group(2) or '').startswith(expected):
-                print('PROOF STATUS DESYNC:', label, inline.group(2)); bad = 1
+from check_proof_status import check_proof_status
+errors = check_proof_status({
+    'chapters/ch1_basecases.tex': ch1,
+    'chapters/app_proofs.tex': app,
+})
+for error in errors:
+    print(error)
+bad = bool(errors)
 
 pre = open('preamble.tex', encoding='utf-8').read()
 for m in re.finditer(r'\\crefname\{([a-z]+)\}\{([^}]*)\}\{([^}]*)\}', pre):
