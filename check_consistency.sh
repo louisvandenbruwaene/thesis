@@ -35,11 +35,23 @@ for m in re.finditer(
         if kind != 'conjecture' or 'with proof' not in title:
             print('UNQUALIFIED PROOF STATUS:', label); bad = 1
     if kind == 'conjecture':
+        expected = 'Conditional proof' if '\\conditional' in title else 'Proposed proof'
         matches = re.findall(r'\\begin\{proof\}\[([^\n]*?\\Cref\{' + re.escape(label) + r'\}[^\n]*?)\]', app)
         for heading in matches:
-            expected = 'Conditional proof' if '\\conditional' in title else 'Proposed proof'
             if not heading.startswith(expected):
                 print('PROOF STATUS DESYNC:', label, heading); bad = 1
+        # A heading that says "with proof" must have one. An argument living
+        # inside the statement body does not count: the reader is told to expect
+        # a separate block whose own heading carries the status.
+        if 'with proof' in title and not matches:
+            rest = source[m.end():]
+            nxt = re.search(r'\\begin\{(theorem|proposition|lemma|corollary'
+                            r'|claim|construction|conjecture)\}', rest)
+            inline = re.search(r'\\begin\{proof\}(\[([^\n]*?)\])?', rest)
+            if not inline or (nxt and nxt.start() < inline.start()):
+                print('CONJECTURE WITHOUT PROOF:', label); bad = 1
+            elif not (inline.group(2) or '').startswith(expected):
+                print('PROOF STATUS DESYNC:', label, inline.group(2)); bad = 1
 
 pre = open('preamble.tex', encoding='utf-8').read()
 for m in re.finditer(r'\\crefname\{([a-z]+)\}\{([^}]*)\}\{([^}]*)\}', pre):

@@ -1021,8 +1021,12 @@ The identity follows because \Cref{thm:dir-multi-full} gives $L_m^{\mathrm{dir}}
 \end{proof}
 
 \begin{conjecture}[The $m=2$ case collapses to the simple digraph, with proof,\conditional]\label{thm:dir-multi-m2}
-At $m=2$ (so $k=1$), \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, matching \Cref{thm:dir-arc-m2-exact} exactly, and this is not a coincidence. A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints, so at $m=2$ the multigraph problem and the simple digraph problem are literally the same problem. \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case, rather than needing it as a separate input.
+At $m=2$, that is at $k=1$, \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, which is exactly the value \Cref{thm:dir-arc-m2-exact} states for the simple digraph. The agreement is forced rather than coincidental, so \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case rather than needing it as a separate input.
 \end{conjecture}
+
+\begin{proof}[Conditional proof]
+A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints. At $m=2$ the multigraph problem and the simple digraph problem are therefore the same problem, and the two statements are two readings of one value. Both readings rest on \Cref{thm:dir-multi-full}, whose proposed proof is unchecked, so the agreement is conditional on it and is not independent confirmation of either statement.
+\end{proof}
 
 \subsection{Extremal classification on the quadratic branch}\label{sec:quadratic-uniqueness}
 
