@@ -1,0 +1,204 @@
+{
+  "trial": {
+    "id": "v10_n8_m3_seed0",
+    "variant": 10,
+    "n": 8,
+    "m": 3,
+    "seed": 0,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": true,
+    "directed": true,
+    "separation": "edge"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T01:10:17.216184+00:00",
+  "ended_utc": "2026-09-06T01:12:47.228342+00:00",
+  "search_elapsed_seconds": 150.00105199999962,
+  "search_cpu_seconds": 150.0010310000007,
+  "solver_reported_seconds": 150.00066566467285,
+  "validation_seconds": 0.011063624995585997,
+  "value": 17,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 2,
+  "witness": {
+    "hyperedges": [
+      [
+        [
+          3
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      [
+        [
+          6
+        ],
+        [
+          5,
+          7
+        ]
+      ],
+      [
+        [
+          6
+        ],
+        [
+          2,
+          7
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      [
+        [
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        [
+          0
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      [
+        [
+          1
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      [
+        [
+          7
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      [
+        [
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      [
+        [
+          4
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      [
+        [
+          7
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      [
+        [
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}

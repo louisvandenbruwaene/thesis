@@ -16,6 +16,13 @@ except ImportError:
 
 @unittest.skipUnless(nx is not None, "networkx is optional")
 class BlockAudit(unittest.TestCase):
+    def test_recursive_construction_audit_rejects_a_bad_witness(self):
+        from scripts import st_construction
+        with patch.object(st_construction, "glue", return_value=(nx.path_graph(5), 0, 1, 2)), \
+             redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, "Construction check failed"):
+                st_construction.main()
+
     def test_generator_failure_cannot_report_exact(self):
         with patch.object(sweep.subprocess, "Popen") as popen:
             popen.return_value.stdout = iter(())

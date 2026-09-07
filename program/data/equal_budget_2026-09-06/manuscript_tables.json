@@ -1,0 +1,16 @@
+{
+  "created_utc": "2026-09-07T08:30:52.569286+00:00",
+  "renderer_sha256": "5c59c9852c92f6659d90bf47d7a6e552046f6d3499d07465683251ca5c8622b3",
+  "report_sha256": "fe718c76c0fa650e1607bac7c250ac4a1d00dc1176025a0605fdb2bdcf86db49",
+  "comparison_sha256": "ae2c64f95ac07c4ada4eab6473ee0cf04ca0cc3a800132a78d5c3fc789c8f7e4",
+  "witness_audit_sha256": "4b83bffb4d25ceb5e1aca2d0f754044855e38433b661bce349320926f54abe98",
+  "nominal_search_seconds": 57600.0,
+  "all_saved_duration_seconds": 58690.82011692298,
+  "all_saved_cpu_seconds": 58663.68864799996,
+  "qualified_duration_seconds": 57657.72560971796,
+  "qualified_cpu_seconds": 57634.933824999964,
+  "original_timing_flagged": 19,
+  "original_interruptions": 0,
+  "replacement_interruptions": 0,
+  "replacements_saved": 19
+}

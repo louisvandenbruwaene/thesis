@@ -78,9 +78,12 @@ def main() -> None:
             exp_n = k + (2 * k - 3) * m
             exp_e = (k * (k - 1) - 2) * (2 * m + 1) // 2
             km = kappa_max(G)
+            connected = nx.is_biconnected(G)
+            if (n, e, km, connected) != (exp_n, exp_e, k - 1, True):
+                raise RuntimeError(f"Construction check failed at k={k}, depth={m}")
             print(f"{k:>3}{m:>3}{n:>6}{exp_n:>12}{e:>6}{exp_e:>12}{km:>11}"
                   f"{str(km <= k - 1):>8}"
-                  f"{str(nx.is_biconnected(G)):>8}{e/(n-1):>14.4f}")
+                  f"{str(connected):>8}{e/(n-1):>14.4f}")
         limit = (k * (k - 1) - 2) / (2 * k - 3)
         print(f"     limit rate {limit:.4f} against the Bollobas-Erdos rate "
               f"{k/2:.2f}; first m beating it: m > {2/(k-4):.2f}\n")

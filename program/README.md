@@ -53,8 +53,9 @@ One more library backs the solver check and two are optional:
   These routines raise a clear message if called without `pulp`.
 - `matplotlib` is needed only to render the figures (`make_figures.py` and the
   `plot_*` routines). Without it everything else still runs.
-- `networkx` is needed only for the Gomory-Hu tree, a single figure/analysis
-  helper. `gomory_hu_tree` raises a clear message if it is called without it.
+- `networkx` is needed for the Gomory-Hu tree helper and the independent
+  benchmark witness audit. The core solver does not require it. Final benchmark
+  tables require this audit, so install it before preparing those tables.
 
 The program runs without a build step. `bash build_fast.sh` optionally compiles
 `_erdos_fast.so` to accelerate small hot-path searches.
@@ -68,7 +69,7 @@ the open `n = 7` classification practical on a multi-core machine. Pass
 self-test, the figures, and the test suite, runs without `geng`. Every test that
 needs an optional dependency skips itself cleanly when that dependency is absent,
 `geng` for the generation pipeline, `pulp` for the MILP certifier and `networkx`
-for the Gomory-Hu view, so a minimal `numpy` plus `scipy` install runs the suite
+for the Gomory-Hu view and independent witness checks, so a minimal `numpy` plus `scipy` install runs the suite
 green rather than reporting failures for tools it was never asked to have.
 
 ## How to run
@@ -136,8 +137,8 @@ as zero. Neither script replaces historical data or updates the thesis figures.
 The full default experiment needs about 16 hours plus setup and validation.
 
 The first long experiment uses its frozen, older solver with calendar-clock
-deadlines. One saved trial showed a large discrepancy between calendar time
-and the outer monotonic duration clock. The reporter flags such trials and
+deadlines. Nineteen of its 384 saved trials failed the timing checks. The
+reporter flags such trials and
 excludes them from timing-qualified statistics without deleting their values.
 A flagged run must be reviewed or rerun before claiming the full equal-budget
 comparison. A one-second tolerance is used for clock disagreement and short
@@ -145,7 +146,7 @@ durations. Cooperative overruns remain visible in the elapsed-time fields.
 
 The working solver now uses monotonic duration budgets in `solve()`. Direct
 calls to older helpers still accept absolute calendar deadlines for backwards
-compatibility. The running experiment's frozen source has not been modified.
+compatibility. The original experiment's frozen source has not been modified.
 New experiments additionally record calendar elapsed time alongside monotonic
 duration and CPU time.
 
@@ -225,6 +226,44 @@ underlying simple graph. They can separate: `K_5(4) = 14` against `L_5(4) = 12`.
 The search proposes. The certifier and the hand proofs dispose.
 
 ## Which output feeds which figure
+
+### Equal-budget experiment
+
+`data/equal_budget_2026-09-06/` retains the 384 original trials. Each variant
+has a 3600-second allocation divided over eight cases and three seeds per case.
+The 19 timing-flagged trials are repeated separately, with unchanged search
+logic and seeds but monotonic deadlines. Originals are never overwritten and
+selection never takes the better of an original and its replacement.
+
+The frozen replacement runner resumes with:
+
+```bash
+../.venv/bin/python3 data/equal_budget_2026-09-06/replacements/source/benchmark_replacements.py --resume data/equal_budget_2026-09-06/replacements
+```
+
+After completion, validate and render from `program/`:
+
+```bash
+../.venv/bin/python3 scripts/benchmark_report.py data/equal_budget_2026-09-06
+../.venv/bin/python3 scripts/validate_benchmark.py data/equal_budget_2026-09-06
+../.venv/bin/python3 scripts/benchmark_tables.py data/equal_budget_2026-09-06
+```
+
+Alternatively, `scripts/finish_benchmark.py data/equal_budget_2026-09-06`
+runs the witness audit, renders the tables, runs the benchmark regression tests
+and rebuilds the working PDF. Add `--wait-seconds 3600` to wait up to one hour
+for active replacements. Progress and failures are recorded in
+`finalization_status.json` and `finalization.log`. This command never commits
+or publishes. A successful build still needs visual review.
+
+The independent witness validator uses NetworkX and does not call the main
+checker. The table renderer requires complete timing coverage and matching
+witness-audit hashes. It keeps unaided minimum, median and maximum counts
+separate from supplied constructions. The original construction snapshot is
+preserved. A separate manuscript snapshot includes the later constructions.
+These tables do not overwrite `machine_values.json` or its historical grids.
+
+### Other figures
 
 The thesis is three chapters: (1) The Problem and Its Variants, (2) Certifying
 and Discovering Bounds by Machine, and (3) Synthesis, Results, and Open Problems.

@@ -43,6 +43,23 @@ class IntegerArithmetic(unittest.TestCase):
 
 
 class Budgets(unittest.TestCase):
+    def test_hypergraph_enumeration_checks_before_expensive_work(self):
+        with patch.object(e, "_deadline_passed", side_effect=[False, True]), \
+             patch.object(e, "max_hyper_connectivity") as measure:
+            value, witness, complete = e._brute_force_hypergraph(3, 3, 3, None)
+        self.assertFalse(complete)
+        self.assertEqual(value, 0)
+        self.assertEqual(witness.edge_count(), 0)
+        measure.assert_not_called()
+
+    def test_hypergraph_enumeration_batches_cheap_skips(self):
+        with patch.object(e, "_deadline_passed", return_value=False) as clock, \
+             patch.object(e, "product", return_value=iter([(0,)] * 600)):
+            value, _, complete = e._brute_force_hypergraph(3, 3, 3, None)
+        self.assertTrue(complete)
+        self.assertEqual(value, 0)
+        self.assertEqual(clock.call_count, 3)
+
     def test_solve_does_not_use_calendar_clock_for_duration(self):
         with patch.object(e.time, "time", side_effect=AssertionError("calendar clock used")):
             for hyper in (False, True):

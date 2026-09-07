@@ -1,0 +1,86 @@
+{
+  "trial": {
+    "id": "v08_n8_m3_seed1000000",
+    "variant": 8,
+    "n": 8,
+    "m": 3,
+    "seed": 1000000,
+    "requested_seconds": 150.0,
+    "hypergraph": true,
+    "simple": true,
+    "directed": false,
+    "separation": "edge"
+  },
+  "status": "validated",
+  "started_utc": "2026-09-06T06:45:41.275639+00:00",
+  "ended_utc": "2026-09-06T06:48:11.282664+00:00",
+  "search_elapsed_seconds": 149.99999254199793,
+  "search_cpu_seconds": 149.99999200000093,
+  "solver_reported_seconds": 150.00157022476196,
+  "validation_seconds": 0.0050069580029230565,
+  "value": 7,
+  "bound": "lower",
+  "method": "randomised greedy search",
+  "complete": false,
+  "max_connectivity": 2,
+  "witness": {
+    "hyperedges": [
+      [
+        2,
+        4,
+        7
+      ],
+      [
+        1,
+        4,
+        5
+      ],
+      [
+        0,
+        4,
+        6
+      ],
+      [
+        2,
+        4,
+        6
+      ],
+      [
+        4,
+        5,
+        7
+      ],
+      [
+        0,
+        3,
+        4
+      ],
+      [
+        1,
+        3,
+        4
+      ]
+    ]
+  },
+  "environment": {
+    "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+    "executable": "/Users/chief/Documents/Projects/thesis/.venv/bin/python3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "dependencies": {
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "pulp": "3.3.2",
+      "networkx": "3.6.1",
+      "matplotlib": "3.11.0"
+    },
+    "c_extension_loaded": true,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  }
+}
