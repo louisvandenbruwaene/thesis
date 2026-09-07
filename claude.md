@@ -253,6 +253,33 @@ equal-budget records are the only case).
 
 One line each. `git log` has the full message for every one of them.
 
+- **2026-09-07 (second pass).** A consistency sweep of the conjecture-status
+  overhaul, hunting prose that the demotion missed. Nine sites where running
+  text still asserted a conjectural result: `ch2` had `cor:mstar-integral`
+  "proves" the integrality that carries `L_m^dir(n) = (m-1)M^*(n)`, with the
+  paragraph deriving the identity unconditionally, and the appendix had "the
+  upper-bound side closes completely" at hypergraph `m=3`,
+  `thm:dir-arc-linear-error` "now proves" the bipartite pattern,
+  `prop:hyper-edge` "bounds every simple hypergraph", "the true maximum is one
+  below the bound of 12", "the count `lem:reach-skeleton` proves", "the rank
+  bound now yields `thm:hyper-vertex-m3`", and a "proves" inside the
+  `prop:dir-hyper-first` statement. `make_figures.py`'s bouquet docstring
+  carried the SAME defect the 09-07 review fixed in the prose: it said the
+  thickened tree "is optimal" at `m <= 4`, where only `m <= 2` is settled, plus
+  two proof-verbs on `thm:multi-vertex-blocks` and `thm:clique-chain-vertex`.
+  The **popularising summary** was the worst of it: untouched since 09-06, so it
+  still sold five conjectures as achievements, including "settles the exact
+  answer completely" and "proves the count outright" for the directed multigraph.
+  Rewritten to name the status convention in lay terms and to credit Huang and
+  Lyu for the asymptotic that does not depend on an unchecked proof. Faculty cap
+  is 3,500 characters, now at 3,449, still one page. Also removed ten prose
+  semicolons the overhaul introduced, nine of them in `ch3`'s new status table.
+  **Two invariants verified by script and clean:** no unmarked result's proof,
+  named-target or inline, cites a conjecture, so the dependency closure the
+  Contribution Statement promises actually holds; and `make_figures.py`'s
+  `conjectural` predicate agrees with `ch3`'s new subsections variant by
+  variant. Build 124 -> 126 pages, 0 warnings, 0 `??`, tests green.
+
 - **2026-09-07.** A full independent review of the built PDF, then a corrective
   pass on what it found. No new proof gap: the mathematics was re-derived end to
   end and every load-bearing computation reproduced from scratch, with a
@@ -328,8 +355,11 @@ One line each. `git log` has the full message for every one of them.
   preserved in any git object; the earlier note blamed CPU contention, which was
   never tested and is only one candidate, the stale cache predating a program
   change being another.
-  **After changing a curve, regenerate with `--grids-only` and `--tables-only`,
-  never a bare `make_figures.py`**, which is what drags the offcut searches in. The symbols table
+  **CORRECTED 2026-09-07: a bare `make_figures.py` is safe.** The render/rebuild
+  split made `main()` draw from the frozen record and never start a search, which
+  is what both the thesis audit instructions and the public README tell a reader
+  to run. `--grids-only` and `--tables-only` are narrower reruns, and only
+  `--rebuild` computes. The old warning here predated that split. The symbols table
   listed `h_m(b)` but not `g_m(b)` or `W_m(G_0)`; adding them took the thesis
   from 111 to 112 pages, the symbols list now owning a page of its own.
   `g_6(9) = 54` is now IN `_BLOCK_SWEEP`, so the m=6 curve reads 54 at n=9 and

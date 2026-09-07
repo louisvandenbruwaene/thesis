@@ -16,7 +16,7 @@ The proposed reachability-skeleton argument supports the directed formulas.
 The proposed incidence-rank argument supports the hypergraph vertex value at $m=3$.
 The two-step budget supplies proposed elementary bounds for directed models.
 These arguments remain subject to verification. Their statements are labelled
-\emph{Conjecture, with proof}; the presence of an argument does not establish them.
+\emph{Conjecture, with proof}, and the presence of an argument does not establish them.
 
 \textsc{Part IV} contains the search's connectivity bookkeeping and the computational audit.
 Every construction named in the body is defined in this appendix.
@@ -622,7 +622,7 @@ We claim $A(D) = A(R)$. One inclusion is the definition of $R$. For the other, t
 Therefore $|A(D)| = |A(R)| \le M(n)$, which with the lower bound gives $k_2^{\mathrm{dir}}(n) = M(n)$.
 \end{proof}
 
-In words: at $m = 2$ a feasible digraph can afford no arc that some other route already makes redundant, so it is its own reachability skeleton, and the count \Cref{lem:reach-skeleton} proves for skeletons in general is already a count for $D$ itself. Nothing here inspects $n$, and no base case is needed.
+In words: at $m = 2$ a feasible digraph can afford no arc that some other route already makes redundant, so it is its own reachability skeleton, and the count \Cref{lem:reach-skeleton} gives for skeletons in general is already a count for $D$ itself. Nothing here inspects $n$, and no base case is needed.
 
 The arc value costs one further line.
 
@@ -1432,7 +1432,7 @@ divisibility hypothesis, and \Cref{thm:hyper-vertex-m3} bounds every
 multihypergraph by that same quantity.
 \end{proof}
 
-At $m=3$ the upper-bound side closes completely, and equality follows in the construction range stated below. The engine is a rank bound for
+At $m=3$ the proposed upper bound covers every multihypergraph, and equality follows in the construction range stated below. Both rest on the unchecked rank inequality proved next, whose engine is a bound for
 graphs in which one side of a partition must stay below local
 $3$-connectivity. The hypergraph conjecture then falls out of the incidence
 translation. Throughout, $\mathrm{rank}(G) = |E(G)| - |V(G)| + 1$ denotes
@@ -1621,7 +1621,7 @@ in the first and third cases, and $\mathrm{rank}(G) \le |X| + s - 3 \le |X| - 1$
 in the second, since $s \le 2$. This exhausts the cases.
 \end{proof}
 
-The rank bound now yields \Cref{thm:hyper-vertex-m3}, stated in
+Conditionally on that rank bound, \Cref{thm:hyper-vertex-m3} follows, stated in
 \Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $2 < r < n$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
 
 \begin{proof}[Conditional proof of \Cref{thm:hyper-vertex-m3}]
@@ -2077,7 +2077,7 @@ multihypergraph with
 hyperedges. This construction is simple whenever
 $m-1\le\binom{n-\alpha-1}{r-2}$. Consequently, for fixed $r$ and $m$, the
 balanced choice $\alpha=\floor{n/2}$ is available for all sufficiently large
-$n$ and proves that the extremal value is $\Theta_{r,m}(n^2)$.
+$n$, so the extremal value is $\Theta_{r,m}(n^2)$.
 \end{conjecture}
 
 \begin{proof}[Proposed proof]
@@ -2209,7 +2209,7 @@ class, and those running backwards, entirely idle. The factor of four is exactly
 that difference, $n^2$ against $n^2/4$, and it is the same difference that
 appears in the simple directed problem, where \Cref{const:augmented-bipartite}
 has a complete one-directional bipartite part and only $O_m(n)$ additional internal arcs. There, \Cref{thm:dir-arc-linear-error}
-now proves that the bipartite pattern is right to first order, that no
+proposes that the bipartite pattern is right to first order, that no
 arrangement recovers the idle pairs. If that phenomenon is a feature of
 directedness rather than of graphs specifically, then it is the upper bound here
 that should come down by a factor of four, not the construction that should
@@ -2677,10 +2677,10 @@ positive lower bound in that parameter range, not that the optimum is zero.
     \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}
 
-\Cref{prop:hyper-edge} bounds every simple hypergraph from above.
-It does not assert attainment outside its stated range.
+\Cref{prop:hyper-edge} proposes an upper bound on every simple hypergraph.
+It does not assert attainment outside its stated range, and its proof is unchecked.
 At $m=6$, $n=6$, and $r=3$, all $125\,970$ simple twelve-hyperedge candidates are infeasible, and an eleven-hyperedge family is not.
-The true maximum is therefore $11$, one below the bound of $12$.
+The true maximum is therefore $11$, one below the proposed bound of $12$.
 That enumeration runs from its own standalone script, \code{program/scripts/hyper\_edge\_m6\_n6\_gap.py}, because the main program's branch and bound does not finish this cell inside the figure budget.
 It supplies the exhaustive computation the branch and bound could not, so the value is recorded as exact.
 The smallest analogous gap occurs at $n=r=m=3$.
