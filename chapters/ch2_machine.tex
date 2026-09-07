@@ -578,8 +578,7 @@ The reported discovery bounds use tabu search, supplemented by explicit construc
 Annealing is retained for the comparison above and as an independent cross-check in the program's self-test,
 where agreement between two unrelated walks is worth more than the speed of either.
 
-It is fair to ask why the walk is allowed above the cap at all. 
-Reaching every feasible graph does not require it. 
+Allowing the walk above the cap is a search strategy, not a requirement for reaching every feasible graph.
 Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, 
 so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. 
 From any feasible target we can therefore delete edges one at a time down to the empty graph 

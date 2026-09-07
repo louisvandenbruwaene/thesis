@@ -58,6 +58,8 @@ offcuts.pdf
 
 # Hand-in bundle built by git archive; regenerate, never edit.
 handin/
+.handin-build.*/
+handin.previous.*/
 
 # Everything else in this working tree IS tracked, on the private main branch.
 # The public repository at origin is a generated snapshot built by publish.sh
