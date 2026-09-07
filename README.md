@@ -8,8 +8,9 @@ This repository holds the two things the thesis hands a reader:
 - `program/` — the companion program, its tests, the standalone scripts, the
   recorded machine values and the run transcripts the computational audit cites.
 
-Every file path printed in the thesis is relative to this repository and begins
-with `program/`. `program/README.md` documents the program itself.
+Every file path printed in the thesis is relative to this repository, or to a
+base directory named where the path is given, as the equal-budget records do.
+`program/README.md` documents the program itself.
 
 ## Running the program
 
