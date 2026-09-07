@@ -1,6 +1,6 @@
 
 The previous chapter gave insight into the problem and some variants, but left most of the harder questions open.
-This chapter will serve as a sanity check for the given theorems by testing them on small graphs through brute-force enumeration.
+This chapter will serve as a finite check of the results and conjectures by testing them on small graphs through brute-force enumeration.
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
 Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those statements are naive because they are based on small graphs only.
 Larger graph spaces will be scoured by a heuristic, namely tabu search.
@@ -15,8 +15,8 @@ Below is a diagram of the program's architecture, showing how the modelled graph
 \end{figure}
 
 \section{Modelling}
-All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is symmetric when undirected and binary when simple. 
-Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices with a tail distinguished in the directed model. 
+All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is symmetric when undirected and binary when simple.
+Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices with a tail distinguished in the directed model.
 \Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
 Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
 All possible graphs of a given size will later be checked to see if they are extremal for the given size and connectivity restraint.
@@ -28,7 +28,7 @@ Notice how depth-first search is memory-efficient.
 \section{Measuring}
 Given $n$ and $m$, walk through every graph on $n$ vertices, measure the largest
 local connectivity $\lambda^{\max}$ or $\kap^{\max}$ of each with a max-flow computation and
-keep the densest graph that stays at or below the cap $m - 1$. 
+keep the densest graph that stays at or below the cap $m - 1$.
 If the enumeration cannot finish within the time limit, the best graph so far is returned.
 It is therefore important to distinguish between the densest graph possible and the densest graph found.
 A completed enumeration gives an exact extremal value. An unfinished enumeration gives only a lower bound.
@@ -37,14 +37,14 @@ This ensures that every variant shares the same integer max-flow engine no matte
 Thus the whole question reduces to a flow computation:
 A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
 Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges/arcs in a minimum cut.
-For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities. 
-For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$. 
+For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities.
+For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$.
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
 The max-flow/min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that this smallest cut has exactly the value of a maximum flow.
 So the route count we are after is just a maximum-flow value: measure the flow and you have measured the connectivity.
 
-The routine that runs this flow and reports the route count is the connectivity \emph{checker}. 
-The program ships an optional compiled C helper that runs this same flow more efficiently. 
+The routine that runs this flow and reports the route count is the connectivity \emph{checker}.
+The program ships an optional compiled C helper that runs this same flow more efficiently.
 
 \subsection{Transformations}
 This max-flow computation is built for directed multigraphs (including simple digraphs) with edge-disjoint paths.
@@ -52,22 +52,22 @@ That is why the other variants will have to be transformed into such a flow netw
 Undirected multigraphs have a natural identification with a directed multigraph, obtained by replacing every edge with a pair of arcs going in opposite directions.
 To transform a multihypergraph, replace each distinct hyperedge with a helper gate,
 an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
-Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity, 
+Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity,
 so the one arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
-A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit, 
+A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit,
 which is what forces a route to cross it from tail to head.
 The directed hypergraph's flow network is just a restricted version of the undirected one.
 Another representation for multihypergraphs is a separate gate with capacity one for each hyperedge.
 
-The hypergraph Menger theorem (\Cref{thm:menger-hyper}) proves that the resulting maximum flow is exactly the Berge connectivity. 
-\Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph. 
+The proposed hypergraph Menger argument (\Cref{thm:menger-hyper}) explains that the resulting maximum flow is exactly the Berge connectivity.
+\Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph.
 For the vertex-disjoint hypergraph checker, only the ordinary vertices are split into unit-capacity gates. Each hyperedge retains its multiplicity-capacity gate.
 
 Lastly, all vertex-disjoint versions can then be transformed into an identical edge-disjoint question by splitting
-each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}). 
+each vertex $v$ into an in-copy $v^{\mathrm{in}}$ and an out-copy $v^{\mathrm{out}}$ joined by a single unit-capacity arc (\Cref{fig:vertex-split}).
 Every arc $u \to v$ of the digraph becomes $u^{\mathrm{out}} \to v^{\mathrm{in}}$ in the split network.
-Routing through $v$ now consumes the one unit of capacity on its internal arc, 
-so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow. 
+Routing through $v$ now consumes the one unit of capacity on its internal arc,
+so two paths sharing $v$ as an intermediate vertex compete for that unit and cannot coexist in any maximum flow.
 A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network therefore equals the number of internally vertex-disjoint $u$-$v$ paths in the original graph.
 For a multigraph the arc carrying an adjacency keeps its full capacity
 $\mu(u,v)$, and only the internal arc of a vertex is a unit. That is the
@@ -75,7 +75,7 @@ incidence convention of \Cref{sec:incidence-convention} written as a network:
 parallel copies stay separate routes while the vertex they run through does not,
 so the split network measures $K_m(n)$ and $K_m^{\mathrm{dir}}(n)$ rather than
 the value of the underlying simple graph.
-Notice how the undirected or hypergraph transformation is done beforehand and 
+Notice how the undirected or hypergraph transformation is done beforehand and
 the gates aren't split by this step.
 
 \begin{figure}[htbp]
@@ -281,17 +281,17 @@ the gates aren't split by this step.
 \end{figure}
 
 \section{Checking every graph of a fixed size}\label{sec:certification-standard}
-The connectivity checker works on all variants but measures only one graph at a time. 
+The connectivity checker works on all variants but measures only one graph at a time.
 To establish an exact value by enumeration, every feasible graph must either be checked or excluded by a sound pruning argument. This is one route to an upper bound. A mathematical theorem can establish it without enumeration.
 A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal entry, a multigraph a choice in $\{0,\dots,m-1\}$,
 and a digraph varies every ordered pair rather than only the upper triangle.
 A hypergraph is not a matrix at all, so it is enumerated over its own list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
 In the directed model, the tail is specified with a pointer and the multihypergraphs have multiplicities for each hyperedge.
 \Cref{fig:matrix-rep} shows how a directed multigraph and hypergraph are represented.
-Using these representations for all graph variants means iteration traverses all possible representation states easily. 
+Using these representations for all graph variants means iteration traverses all possible representation states easily.
 Walking those possibilities, measuring each candidate with the checker and keeping the densest feasible graph settles a bound exactly.
 If the enumeration hits its deadline before finishing, the returned graph is labelled as a lower bound.
-Completed enumerations corroborate the small cases reported in the audit. There is one important exception to the driver's terminology: for directed multigraphs under arc separation, \code{solve(exhaustive=True)} returns the proved closed form and a named witness. That branch is a theorem evaluation, not an independent exhaustive check. It therefore supplies no enumeration markers in the figures. The standalone formula audit calls the enumerator directly when checking that theorem.
+Completed enumerations establish the small cases reported in the audit. For directed multigraphs under arc separation, \code{solve(exhaustive=True)} instead evaluates the conjectured formula and returns a named witness, explicitly labelled as a lower bound. This branch supplies no enumeration markers in the figures. The specialised structural enumerators use that same conjectured formula for prefix pruning, so their completeness is conditional and they cannot independently prove it.
 
 \begin{figure}[ht]
     \centering
@@ -313,7 +313,7 @@ It decides both directions of a pair independently, turning two undirected state
 Which change costs more depends on $m$ and on the model.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
-These variants are particularly costly to enumerate, even where a theorem already determines their leading term.
+These variants are particularly costly to enumerate, even where a conjecture predicts their leading term.
 The separation, by contrast, does not change the enumeration: edge and vertex disjointness
 start from the same candidate space, but use different feasibility tests. Their pruning and running times can therefore differ.
 
@@ -359,24 +359,24 @@ start from the same candidate space, but use different feasibility tests. Their 
 \end{figure}
 
 The number of graphs the checker must visit grows as $2^{\binom{n}{2}}$ for simple undirected graphs and $2^{n(n-1)}$ for digraphs,
-and capping multiplicities at $m-1$, so that each run ranges over the $m$ values $\{0,\dots,m-1\}$, raises the base from two to $m$, 
-giving $m^{\binom{n}{2}}$ undirected multigraphs and $m^{n(n-1)}$ directed ones. 
-The enumeration is exact wherever it finishes and it does so only for the smallest sizes. 
-\Cref{fig:complexity} measures exactly how fast the search space grows. 
+and capping multiplicities at $m-1$, so that each run ranges over the $m$ values $\{0,\dots,m-1\}$, raises the base from two to $m$,
+giving $m^{\binom{n}{2}}$ undirected multigraphs and $m^{n(n-1)}$ directed ones.
+The enumeration is exact wherever it finishes and it does so only for the smallest sizes.
+\Cref{fig:complexity} measures exactly how fast the search space grows.
 
 \subsection{Pruned search}
-The enumeration step will skip whole families of hopeless graphs, via a pruned search. 
+The enumeration step will skip whole families of hopeless graphs, via a pruned search.
 The directed $m=2$ values are checked independently at every order through $n=7$, under both separations (\Cref{tab:basecase-search}).
-\Cref{thm:dir-vertex-m2-exact,thm:dir-arc-m2-exact} are proved at every $n$ at once and use none of those checks, so the sweep corroborates them rather than supporting them.
+\Cref{thm:dir-vertex-m2-exact,thm:dir-arc-m2-exact} propose all-order formulas whose upper-bound proofs depend on the unchecked reachability-skeleton argument. The sweep establishes only the listed finite cases.
 Those orders lie just beyond the range where blind digraph enumeration is practical.
 They can be reached by enumerating more cleverly.
-Every variant offers a fixed list of edges its graphs are allowed to use, 
-whether those are pairs, ordered pairs, or oriented sets of $r$ vertices, 
-and a graph is a choice of how many copies each of them gets. 
-Rather than writing out whole choices one after another, 
-fix an order on that list and decide the edges one at a time, 
-leaving the undecided ones absent. 
-Each partly built graph then stands for the whole family of graphs agreeing with it so far, 
+Every variant offers a fixed list of edges its graphs are allowed to use,
+whether those are pairs, ordered pairs, or oriented sets of $r$ vertices,
+and a graph is a choice of how many copies each of them gets.
+Rather than writing out whole choices one after another,
+fix an order on that list and decide the edges one at a time,
+leaving the undecided ones absent.
+Each partly built graph then stands for the whole family of graphs agreeing with it so far,
 and a pruning rule discards that entire family if it is deemed to bear no fruit.
 
 Adding an edge never lowers connectivity because every existing family of disjoint routes survives (\Cref{prop:monotone}).
@@ -389,7 +389,7 @@ A second pruning method starts with the edges already placed.
 It then adds the largest possible contribution from the undecided edges: their number times the largest allowed multiplicity.
 The resulting sum is an upper bound on every completion.
 If this upper bound cannot beat the best feasible graph found so far, the branch is discarded without further exploration (\Cref{fig:prune}).
-Only infeasible graphs and graphs that cannot beat the incumbent are ever discarded, so a run that finishes returns exactly the maximum the basic walk would have returned. 
+Only infeasible graphs and graphs that cannot beat the incumbent are ever discarded, so a run that finishes returns exactly the maximum the basic walk would have returned.
 
 \begin{figure}[ht]
 \centering
@@ -424,20 +424,20 @@ Only infeasible graphs and graphs that cannot beat the incumbent are ever discar
 \subsection{Generating search}
 Iterating over all possible graphs and measuring each one's connectivity repeats many isomorphic cases.
 Another method, suggested by Prof.\ Jan Goedgebeur, instead generates all non-isomorphic graphs.
-It uses the \texttt{geng} program from the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14} 
-to perform the difficult task of generating one representative of each isomorphism class. 
-The program is called as a subprocess, and its \texttt{graph6} output is decoded. 
-For a given $n$, \texttt{geng} produces all non-isomorphic \emph{undirected} graphs. 
-The program then treats each such graph as a support graph and assigns directed arc multiplicities to its edges. 
-Consequently, the search automatically inherits the support graph's isomorphism reduction. 
-For each support edge $\{u,v\}$, considered in a fixed order, it assigns the ordered pair 
+It uses the \texttt{geng} program from the \texttt{nauty} toolkit of McKay and Piperno \cite{McKayPiperno14}
+to perform the difficult task of generating one representative of each isomorphism class.
+The program is called as a subprocess, and its \texttt{graph6} output is decoded.
+For a given $n$, \texttt{geng} produces all non-isomorphic \emph{undirected} graphs.
+The program then treats each such graph as a support graph and assigns directed arc multiplicities to its edges.
+Consequently, the search automatically inherits the support graph's isomorphism reduction.
+For each support edge $\{u,v\}$, considered in a fixed order, it assigns the ordered pair
 of multiplicities $\mu(u,v)$ and $\mu(v,u)$. Each lies between $0$ and $m-1$, and the two cannot both be zero because every support edge must represent at least one arc.
-After each assignment, the checker evaluates the partially decorated multigraph. 
-If any pair already exceeds the allowed connectivity, that branch is stopped immediately: 
-adding more arcs cannot decrease connectivity. This is the same monotonicity-based pruning used in \Cref{fig:prune}. 
-Decorations that reach the target arc count are retained and converted to canonical form, 
-which ensures that each isomorphism class is reported only once. 
-Because different support graphs produce disjoint search spaces, they can be processed independently on separate processor cores. 
+After each assignment, the checker evaluates the partially decorated multigraph.
+If any pair already exceeds the allowed connectivity, that branch is stopped immediately:
+adding more arcs cannot decrease connectivity. This is the same monotonicity-based pruning used in \Cref{fig:prune}.
+Decorations that reach the target arc count are retained and converted to canonical form,
+which ensures that each isomorphism class is reported only once.
+Because different support graphs produce disjoint search spaces, they can be processed independently on separate processor cores.
 The related orientation tools \texttt{directg} and \texttt{watercluster2} are not used.
 Both allow edges in both directions, but they do not assign the repeated arc multiplicities used here \cite{NautyGuide29}. The custom decoration step also applies the connectivity pruning after each assignment.
 
@@ -468,7 +468,7 @@ At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-ta
 The search so far treats one pair $(n,m)$ at a time.
 For a directed multigraph, scaling can instead check every threshold at a fixed $n$ in one pass.
 It divides all multiplicities by $m-1$.
-The general theorem of \Cref{thm:dir-multi-full} has now replaced this route in \code{solve}, but the older formulation is still a useful independent finite check.
+The formula in \Cref{thm:dir-multi-full} now supplies a lower-bound witness in \code{solve}. The cut formulation can provide a separate finite check, provided its optional cuts are valid independently of that conjecture.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
 The resulting weights satisfy $w(u,v)\in[0,1]$.
@@ -552,38 +552,38 @@ likely to be (almost) extremal.
 The guide that pulls the walk towards a (local) maximum is called a heuristic.
 To avoid getting stuck in a local maximum, a metaheuristic allows worsening moves to discover new optima.
 
-To implement the metaheuristic, give each graph one number: its energy
+For graph and digraph models represented by a multiplicity matrix, give each candidate one number: its energy
 \[
     \Phi(G) = -|E(G)| + \Lambda \cdot \max\bigl(0,\ c^{\max}(G) - (m - 1)\bigr),
 \]
-which rewards edges (arcs, hyperedges) and penalises any excess connectivity, where $c^{\max}(G)$ denotes $\lambda^{\max}(G)$ or $\kappa^{\max}(G)$, matching whichever separation the run measures.
-The search starts from the empty graph and moves by toggling one adjacency: an edge, an arc, or a hyperedge, depending on the model.
-The method used is \emph{tabu search} \cite{Glover89}, 
-which escapes a local optimum by forbidding the pairs it has just touched. 
+which rewards edges or arcs and penalises any excess connectivity, where $c^{\max}(G)$ denotes $\lambda^{\max}(G)$ or $\kappa^{\max}(G)$, matching whichever separation the run measures.
+The matrix search starts from the empty graph and changes one edge or arc multiplicity by one at each move.
+The method used is \emph{tabu search} \cite{Glover89},
+which escapes a local optimum by forbidding the pairs it has just touched.
 Among the moves not forbidden, the walk always takes the one that lowers $\Phi$ most, even when every candidate raises it.
-This is unlike a greedy walk that only ever accepts an improving move. 
-After each move the pair it changed is put on a tabu list for a fixed number of steps, 
-so the walk cannot immediately undo what it just did and cycle back into the optimum it came from. 
-A move that would beat the best graph seen so far overrides the tabu flag regardless of its status, 
-an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress, 
+This is unlike a greedy walk that only ever accepts an improving move.
+After each move the pair it changed is put on a tabu list for a fixed number of steps,
+so the walk cannot immediately undo what it just did and cycle back into the optimum it came from.
+A move that would beat the best graph seen so far overrides the tabu flag regardless of its status,
+an \emph{aspiration criterion} that keeps the tabu list from ever blocking genuine progress,
 and the walk perturbs itself when it stalls.
 
 Simulated annealing is an alternative on the same energy and neighbourhood \cite{KirkpatrickGelattVecchi83}.
 It accepts worsening moves with the probability given by the Metropolis rule \cite{Metropolis53}.
 That probability decreases as the run cools.
 At an equal wall-clock budget, annealing is the weaker engine here.
-For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph extremiser, while annealing reaches $20$ arcs.
+For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph construction, while annealing reaches $20$ arcs.
 For the simple digraph, tabu reaches $18$ arcs and annealing reaches $16$.
-The reported discovery bounds use tabu search, supplemented by explicit constructions.
+Matrix-model discovery uses tabu search. Supplied constructions are reported separately from the search outcomes.
 Annealing is retained for the comparison above and as an independent cross-check in the program's self-test,
 where agreement between two unrelated walks is worth more than the speed of either.
 
 Allowing the walk above the cap is a search strategy, not a requirement for reaching every feasible graph.
-Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them, 
-so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially. 
-From any feasible target we can therefore delete edges one at a time down to the empty graph 
-without ever crossing the cap, and reading that path backward builds the target up the same way. 
-The feasible region is connected through the empty graph by single-edge moves that stay inside it, 
+Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them,
+so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially.
+From any feasible target we can therefore delete edges one at a time down to the empty graph
+without ever crossing the cap, and reading that path backward builds the target up the same way.
+The feasible region is connected through the empty graph by single-edge moves that stay inside it,
 so a walk that never went infeasible could in principle visit every feasible graph there is.
 We let the walk become infeasible because reachability and efficiency are different questions.
 A feasible graph can be locally maximal even when it is far from globally optimal.
@@ -597,10 +597,38 @@ The program therefore runs several independent restarts until the wall-clock bud
 It keeps the densest witness found by any restart.
 The restarts share no state and can run on separate processor cores.
 
-\subsection{Measuring only on the possible bounds}
+\subsection{Random greedy growth for hypergraphs}
+
+Hypergraph discovery uses a separate random greedy procedure. Each restart
+begins with the empty hypergraph and a shuffled list of all permitted hyperedge
+types. The list contains one occurrence of each type in the simple model and
+$m-1$ occurrences in the multihypergraph model. Directed candidates retain
+their tail and head sets. The procedure tries each occurrence in turn, keeps
+the added copy if the exact Berge-connectivity checker returns at most $m-1$,
+and otherwise removes that copy. It repeats with a new shuffled order until
+the time budget expires, retaining the densest feasible result.
+
+A completed pass is maximal under adding one copy: every rejected copy was
+already infeasible when tried, and later additions cannot reduce connectivity
+(\Cref{prop:monotone}). Maximality does not imply maximum size. An early choice
+can prevent several later choices, and this procedure makes no exchanges or
+temporarily infeasible moves within a pass. The shuffled restarts explore
+different choices. An interrupted pass still supplies a feasible lower bound.
+
+The current tabu engine changes entries of a multiplicity matrix and is not
+implemented for the hyperedge-list representation. Extending it would require
+hyperedge moves and corresponding tabu bookkeeping. A full neighbourhood scan
+would consider $\binom{n}{r}$ types in an undirected simple hypergraph and
+$r\binom{n}{r}$ in the forward directed model, with feasibility measured in
+the expanded gate network. This motivates the simpler implementation, but
+does not establish a performance advantage: no hypergraph tabu comparison was
+run. The equal-allocation experiment below compares the implemented searches,
+including their different methods.
+
+\subsection{Measuring only near the connectivity cap}
 Removing an edge, arc, or hyperedge can never raise $\lambda^{\max}$, while adding one raises it by at most one.
 The same holds for $\kappa^{\max}$.
-This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}. 
+This relies on the monotonicity and unit-step bounds of \Cref{prop:monotone}.
 Therefore the max-flow algorithm only needs to be run every once in a while,
 depending on how close to the constraint the graph sits.
 Most steps need no measurement at all.
@@ -613,7 +641,7 @@ the cap, and a removal from a graph already above it.
 The search keeps that running bound and raises it by one for each addition
 it accepts.
 At a fixed step interval it measures the exact value again.
-\Cref{sec:cheap-checker} gives the bookkeeping, 
+\Cref{sec:cheap-checker} gives the bookkeeping,
 and the regression test that holds the fast walk to the naive one step for step.
 
 \section{An equal search allocation across all variants}\label{sec:equal-budget}

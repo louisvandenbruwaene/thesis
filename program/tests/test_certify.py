@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -18,6 +19,12 @@ from erdos915_unified import (
 
 @unittest.skipUnless(PULP_AVAILABLE, "the MILP solver check needs the optional pulp")
 class SolverCheck(unittest.TestCase):
+    def test_independent_solver_does_not_use_conjectured_formula(self):
+        with patch("erdos915_unified._mstar", side_effect=AssertionError("conjectural bound used")):
+            result = prove_directed_multigraph(3, time_limit=30.0)
+        self.assertTrue(result.solver_claims_optimal())
+        self.assertEqual(round(result.scaled_optimum), 4)
+
     def test_small_optima_are_reported(self):
         # The solver reports M*(n) = 2(n-1) and OPTIMAL at these sizes.
         for n in (3, 4, 5):

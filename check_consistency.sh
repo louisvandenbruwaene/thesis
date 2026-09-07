@@ -4,10 +4,8 @@
 #
 #     ./check_consistency.sh
 #
-# 1. AI badge sync.  The badge rule is stated in three places and all three say
-#    it appears on BOTH the Chapter 1 statement and the Appendix A proof, so a
-#    badge edited at one end and not the other makes the thesis contradict its
-#    own Contribution Statement.
+# 1. Proof status. Unchecked AI statements and dependent deductions must be
+#    conjectures with proofs, and their appendix headings must retain that status.
 # 2. Dangling references.  Cleveref prints ?? with no warning and latexmk still
 #    exits 0, so the log is not the gate, the PDF text is.
 # 3. Cleveref naming.  Every reference here goes through \Cref, and a mixed-type
@@ -26,16 +24,22 @@ ch1 = open('chapters/ch1_basecases.tex', encoding='utf-8').read()
 app = open('chapters/app_proofs.tex', encoding='utf-8').read()
 bad = 0
 
-stated = {m.group(3): '\\aimedal' in (m.group(2) or '') for m in re.finditer(
-    r'\\begin\{(theorem|proposition|lemma|corollary|claim)\}'
-    r'(\[(?:[^][]|\[[^]]*\])*\])?\\label\{([^}]+)\}', ch1)}
-proved = {m.group(1): m.group(2) is not None for m in re.finditer(
-    r'\\begin\{proof\}\[Proof of \\Cref\{([^}]+)\}(\\aimedal)?\]', app)}
-for lab in sorted(set(stated) & set(proved)):
-    if stated[lab] != proved[lab]:
-        print("BADGE DESYNC: %s  statement=%s appendix=%s"
-              % (lab, 'AI' if stated[lab] else 'clean',
-                 'AI' if proved[lab] else 'clean')); bad = 1
+# Every unchecked or dependent statement must be visibly conjectural.
+source = ch1 + '\n' + app
+for m in re.finditer(
+        r'\\begin\{(theorem|proposition|lemma|corollary|claim|construction|conjecture)\}'
+        r'(\[(?:[^][]|\[[^]]*\])*\])?\\label\{([^}]+)\}', source):
+    kind, title, label = m.groups()
+    title = title or ''
+    if '\\aimedal' in title or '\\conditional' in title:
+        if kind != 'conjecture' or 'with proof' not in title:
+            print('UNQUALIFIED PROOF STATUS:', label); bad = 1
+    if kind == 'conjecture':
+        matches = re.findall(r'\\begin\{proof\}\[([^\n]*?\\Cref\{' + re.escape(label) + r'\}[^\n]*?)\]', app)
+        for heading in matches:
+            expected = 'Conditional proof' if '\\conditional' in title else 'Proposed proof'
+            if not heading.startswith(expected):
+                print('PROOF STATUS DESYNC:', label, heading); bad = 1
 
 pre = open('preamble.tex', encoding='utf-8').read()
 for m in re.finditer(r'\\crefname\{([a-z]+)\}\{([^}]*)\}\{([^}]*)\}', pre):

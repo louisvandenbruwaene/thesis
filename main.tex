@@ -40,112 +40,137 @@ Above all I thank my girlfriend Sara, whose patience and encouragement carried m
 
 \chapter*{Contribution Statement}
 \addcontentsline{toc}{chapter}{Contribution Statement}
-All the work in this thesis is my own, except where I explicitly say otherwise. 
-I used artificial intelligence to implement the code, suggest and verify proofs, format \LaTeX{} and check spelling.
-Where a result comes from the literature I say so and cite it. 
-The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Ford and Fulkerson, Whitney, Gomory and Hu, Mantel and Tur\'an, Fekete, and Huang and Lyu. Tutte's triconnected decomposition and its algorithmic form due to Hopcroft and Tarjan are cited once as a signpost for further work and are used in no proof.
-Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}. 
-Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
+I carried out this project with guidance from Stijn Cambie. I used artificial
+intelligence to implement code, suggest proofs, assist with verification,
+format \LaTeX{} and check spelling. Results from the literature are attributed
+and cited where used. The companion code and computational records are
+available in the repository \cite{vandenbruwaene_thesis}.
 
-A result whose proof I have not checked line by line carries the badge \aimedal{} in its heading, both in \Cref{ch:basecases} where it is stated and in \Cref{app:proofs} where it is proved.
-Those proofs were written by an AI model, and for several of them I am not the right person to check them.
-A badged result should be read as a conjecture that comes with a proof attached which is likely correct, rather than as a theorem I can vouch for myself.
-The proofs that carry no badge are the ones I have worked through myself.
-Two of them I wrote out in full: the Gomory--Hu double count for the simple undirected edge-disjoint case (\Cref{thm:mader}) and for the undirected multigraph edge-disjoint case (\Cref{thm:multigraph-edge}), together with the three counting lemmas they run on (\Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}).
-The other unbadged results of \Cref{app:proofs} are ones whose proofs I have since read and checked.
-Results taken from the literature carry no badge either, since their proofs are published and are cited where the result is stated.
-Definitions, conjectures and open questions carry no badge. A construction carries a badge when its stated properties come with a proof that I have not checked line by line. The badge concerns verification of the proof, not whether the object is explicitly defined.
+Every result with an AI-written proof that I have not checked line by line is
+labelled \emph{Conjecture}, with ``with proof'' and \aimedal{} in its heading.
+Its argument is retained as a \emph{Proposed proof}. The presence of that
+argument does not establish the conjecture. A deduction whose own proof I have
+checked but which depends on an unresolved conjecture is also labelled
+\emph{Conjecture}, with ``with proof'' and \conditional{} in its heading.
+Its \emph{Conditional proof} identifies the dependency. These statuses apply
+in the statements, appendix, summaries and figure legends.
 
-The clique-core counterexample and the research-note argument for eventual exactness were supplied by Stijn Cambie with AI assistance. The counterexample is included in \Cref{const:clique-core}. Only the verified construction counts are retained in \Cref{const:directed-comparison}. Eventual optimality is not asserted.
+Unmarked theorems and lemmas are cited results or arguments I have checked.
+In particular, I wrote out the Gomory--Hu double counts for the simple and
+multigraph edge bounds and their three counting lemmas
+(\Cref{thm:mader,thm:multigraph-edge,lem:dist-1-count,lem:sum-dist,lem:double-count}).
+An AI-assisted proof that I have already checked is not classified as
+unchecked merely because of its origin. Explicit constructions and completed
+enumerations provide evidence separately from the conjectures.
 
-The summary of my original results is:
+Stijn Cambie supplied the clique-core counterexample with AI assistance
+(\Cref{const:clique-core}). His separate AI-assisted argument for eventual
+optimality is retained as a research note and is not asserted here.
 
+The contributions comprise the unified computational framework, checked
+arguments, and the conjectures with proposed proofs listed below.
 \begin{center}
 \small
-\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}X@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.25\textwidth}X@{}}
 \toprule
-Variant & Contribution \\
+Area & Contribution and status \\
 \midrule
-Hypergraph, vertex separation & Exact value at $m=2$. The $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
-Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
-Multigraph, incidence separation & The two multigraph vertex variants posed as problems of their own: exact values at $m\le3$, the reduction to a knapsack over $2$-connected blocks, thickened bipartite blocks against an upper bound of the same order, and the directed value to its leading term with the same block structure (\Cref{thm:multi-vertex-m2,cor:multi-vertex-m3,thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper,cor:dir-multi-incidence,prop:dir-multi-vertex-blocks}). Every result in this row carries the badge except the $m=2$ value. \\
-Directed simple graph, arc separation & For fixed $m\ge3$, unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
-Transferred quadratic bounds & For fixed $m\ge3$, $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$. For fixed $r\ge3$ and $m\ge2$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
+Undirected graphs & Independent Gomory--Hu proof of the edge bounds and an extremal simple construction for every $n\ge m$. \\
+Hypergraph vertex & Checked $m=2$ value. Conjectural $m=3$ bound and attainment, depending on the proposed incidence-rank proof. \\
+Directed multigraph & Conjectured exact arc value and quadratic-branch classification, with proposed skeleton proofs. \\
+Multigraph incidence & Checked $m=2$ value, finite computations, and proposed proofs for block optimisation and asymptotic bounds. \\
+Directed quadratic bounds & Proposed elementary proofs valid at every $n$, and proposed hypergraph extensions. The simple-digraph asymptotic also follows from Huang and Lyu \cite{HuangLyu26} with the displayed lower construction. \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-
 \chapter*{Short Summary}
 \addcontentsline{toc}{chapter}{Short Summary}
-\emph{Erd\H{o}s Problem~915}, posed by Bollob\'{a}s and Erd\H{o}s \cite{BollobasErdos62}, asks for the maximum number of edges in a graph on $n$ vertices such that no two vertices are connected by $m$ edge-disjoint paths. In modern notation this asks for
+Erd\H{o}s Problem~915 asks how many edges a simple graph on $n$ vertices can
+have if no pair is joined by $m$ edge-disjoint paths
+\cite{BollobasErdos62,ErdosProblems}. Writing the maximum as $\ell_m(n)$,
+Mader's bound is
 \[
-\ell_m(n)=\max\{|E(G)|:|V(G)|=n,\ \lambda_G^{\max}\le m-1\}.
+ \ell_m(n)\le\floorfrac{m(n-1)}2.
 \]
-Mader proved that, for simple graphs and all $n\ge2$ and $m\ge2$,
+This thesis gives an independent proof through Gomory--Hu trees and a
+construction attaining equality for every $n\ge m\ge2$. It then studies
+sixteen variants obtained by changing direction, multiplicity, hyperedge
+size and route separation. Vertex separation is measured in the incidence
+graph, directed when the model is directed, so separated routes share
+neither an intermediate vertex nor an edge copy.
+
+The checked results include the undirected multigraph edge value
+$(m-1)(n-1)$ and the hypergraph vertex value
+$\floor{(n-1)/(r-1)}$ at $m=2$. The classical simple vertex results agree
+with the edge values through $m=4$ and first diverge at $m=5,n=14$
+\cite{Bartfai60,Bollobas66,Leonard72b,SorensenThomassen74}.
+
+Further results are presented as \emph{conjectures with proofs}, with the
+verification status explained in the Contribution Statement. They include
+the directed multigraph arc formula
 \[
-\ell_m(n)\le\left\lfloor \frac{m(n-1)}2\right\rfloor 
+ L_m^{\mathrm{dir}}(n)=(m-1)\max\!\left(2(n-1),\floorfrac{n^2}4\right),
 \]
-and provided a construction achieving this bound when $(m-1)|(n-1)$.
-This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multihypergraphs), the path-separation notion and the presence or absence of directions.
-The two separation notions are edge-disjointness and internal vertex-disjointness, the second read in the incidence graph, so that separated routes share neither an intermediate vertex nor an edge copy.
-Parallel copies are therefore separate routes, which makes the two multigraph vertex variants problems of their own rather than restatements of the simple ones.
-The simple edge-disjoint case is proved independently here using Gomory--Hu trees \cite{GomoryHu61}, and a general extremal construction resolves it for all $n$ and $m$.
-Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, due to B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66} and Leonard \cite{Leonard72b}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
-The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved in a few lines, a feasible digraph at $m=2$ being its own reachability skeleton and so inheriting the skeleton's arc count. For $m\ge3$, the thesis gives dense constructions, without asserting an exact eventual value. A twelve-vertex clique-core construction supplied by Stijn Cambie refutes the earlier formula for all orders (\Cref{const:clique-core}).
+the hypergraph vertex bound $\floor{2(n-1)/(r-1)}$ at $m=3$, and the directed
+hypergraph leading term $(m-1)n^2/(4(r-1))$ for fixed $r\ge3,m\ge2$.
+Their proposed arguments use reachability skeletons, incidence rank and
+two-step route counts. For simple digraphs, the asymptotic
+$n^2/4+\Theta_m(n)$ at fixed $m\ge3$ also follows from the cited theorem of
+Huang and Lyu and the feasible augmented bipartite construction. The proposed
+elementary argument gives an explicit bound at every order. The exact
+simple directed value remains open for $m\ge3$.
 
-
-The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity matrix and converts the vertex-disjoint problem to an edge-disjoint one by building the capacity network of the vertex-splitting construction, in which a vertex is a unit gate while an adjacency keeps its multiplicity.
-The hypergraphs are handled as a list of hyperedges, which may use head and tail sets to represent directed hyperedges.
-Then a maximum-flow algorithm measures connectivity between all pairs of vertices and reports the maximum local connectivity.
-At each point of the program, optimisations are applied to reduce the search space and traverse it more efficiently.
-When these optimisations are exhausted and the computation becomes intractable, the program uses metaheuristics to search for extremal graphs, which are then checked for correctness.
-
-
-
-The hypergraph vertex problem is settled completely at $m=2$. 
-At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by induction over blocks and separating pairs.
-On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time. 
-For every fixed $m\ge3$, the extremal value for simple digraphs, arc and vertex alike, is $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser, and at $m=2$ it differs from $n^2/4$ by only an $O(1)$ correction.
-For fixed $r\ge3$ and $m$, the directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
+The companion program measures connectivity with maximum flow, enumerates
+small instances and searches larger ones. Graphs use multiplicity matrices
+and tabu search. Hypergraphs use hyperedge lists and random greedy growth.
+Completed enumeration establishes a finite optimum, while heuristic searches
+give feasible witnesses and lower bounds. An experiment allocates one hour
+to each variant and compares the unaided search with separately supplied
+constructions. Chapter~3 explains the status and remaining questions for
+each variant. The appendix retains the full arguments and computational audit.
 
 \chapter*{Abbreviations and Symbols}
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}
-\begin{tabular}{l>{\raggedright\arraybackslash}p{0.78\linewidth}}
+\begingroup
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{\fill}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{\dimexpr0.78\textwidth-2\tabcolsep\relax}@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+\endfirsthead
+\multicolumn{2}{@{}l}{\textit{Abbreviations and Symbols (continued)}}\\
+\toprule
+Symbol & Meaning \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
 MILP & mixed-integer linear program \\
-\aimedal & in a theorem heading: the proof of that result was written by an AI model and is not verified line by line by the author (Contribution Statement) \\
-\end{tabular}
-
-\bigskip
-
-\begin{tabular}{l>{\raggedright\arraybackslash}p{0.74\linewidth}}
-$G=(V,E)$ & graph with vertex set $V$ and edge set $E$ \\
-$D=(V,A)$ & directed graph with vertex set $V$ and arc set $A$ \\
-$n$ & number of vertices \\
-$m$ & forbidden-connectivity parameter, with all local connectivities at most $m-1$ \\
-$r$ & hyperedge size (every hyperedge spans $r$ vertices) \\
-$\lambda_G(u,v)$ & maximum number of edge-disjoint $u$-$v$ paths \\
-$\lambda_G^{\max}$ & maximum local edge-connectivity over all vertex pairs \\
-$\kappa_G(u,v)$ & maximum number of internally vertex-disjoint $u$-$v$ paths \\
-$\kappa_G^{\max}$ & maximum local vertex-connectivity over all vertex pairs \\
-$\ell_m(n)$ & simple undirected edge-disjoint extremal function \\
-$L_m(n)$ & undirected multigraph edge-disjoint extremal function \\
-$k_m(n)$ & simple undirected vertex-disjoint extremal function \\
-$\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
-$L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
-$k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
-$K_m(n)$, $K_m^{\mathrm{dir}}(n)$ & undirected and directed multigraph vertex-disjoint extremal functions, multiplicity counted (\Cref{sec:incidence-convention}) \\
-$\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform simple hypergraph edge-disjoint and incidence-graph vertex-disjoint extremal functions \\
-$L_m^{(r)}(n)$, $K_m^{(r)}(n)$ & the same two for $r$-uniform multihypergraphs, multiplicity counted (\Cref{tab:notation}) \\
-$M(n)$ & $\max\bigl(2(n-1), \floor{n^2/4}\bigr)$, the directed multigraph value per unit of $m-1$ \\
-$M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$, equal to $M(n)$ by \Cref{cor:mstar-integral} \\
-$B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
-$\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
-$h_m(b)$ & most edges a feasible $2$-connected block on $b$ vertices can carry (\Cref{thm:simple-vertex-blocks}) \\
-$W_m(G_0)$ & largest total multiplicity over a fixed underlying simple graph $G_0$ (\Cref{lem:multi-vertex-objective}) \\
-$g_m(b)$ & most $W_m$ a feasible $2$-connected block on $b$ vertices can score (\Cref{thm:multi-vertex-blocks}) \\
-$c_m$ & per-vertex growth constant of the simple undirected vertex problem, $c_m = \lim_{n\to\infty} k_m(n)/(n-1) = \sup_{b\ge2} h_m(b)/(b-1)$ (\Cref{thm:simple-vertex-blocks}) \\
-\end{tabular}
+\aimedal & conjecture with an unchecked AI-written proposed proof \\
+\conditional & conjecture with a checked deduction from an unresolved conjecture \\
+$G=(V,E)$, $D=(V,A)$ & graph or digraph, with vertex set $V$ and edge or arc set \\
+$n$, $m$, $r$ & vertex count, forbidden-connectivity threshold, hyperedge size \\
+$\lambda_G(u,v)$ & maximum number of edge-disjoint $u$--$v$ paths \\
+$\kappa_G(u,v)$ & maximum number of incidence-separated $u$--$v$ paths \\
+$\lambda_G^{\max}$, $\kappa_G^{\max}$ & maximum local connectivity over distinct vertex pairs, ordered in directed models \\
+$\ell_m(n)$, $L_m(n)$ & simple and multigraph undirected edge maxima \\
+$k_m(n)$, $K_m(n)$ & simple and multigraph undirected vertex maxima \\
+$\ell_m^{\mathrm{dir}}(n)$, $L_m^{\mathrm{dir}}(n)$ & simple and multigraph directed arc maxima \\
+$k_m^{\mathrm{dir}}(n)$, $K_m^{\mathrm{dir}}(n)$ & simple and multigraph directed vertex maxima \\
+$\ell_m^{(r)}(n)$, $L_m^{(r)}(n)$ & simple and multi $r$-uniform hypergraph edge maxima \\
+$k_m^{(r)}(n)$, $K_m^{(r)}(n)$ & simple and multi $r$-uniform hypergraph vertex maxima \\
+$M(n)$ & $\max(2(n-1),\floor{n^2/4})$, the directed arc candidate per unit multiplicity \\
+$M^*(n)$ & optimum of the fractional directed arc formulation (\Cref{ch:certify}) \\
+$B_{p,q}$ & complete one-way bipartite digraph, from the $p$-part to the $q$-part \\
+$\mu(u,v)$ & edge or arc multiplicity \\
+$h_m(b)$ & maximum edge count of a feasible simple block on $b$ vertices \\
+$W_m(G_0)$ & maximum feasible total multiplicity over the simple support $G_0$ \\
+$g_m(b)$ & maximum $W_m$ of a feasible block on $b$ vertices \\
+$c_m$ & proposed limiting rate $\lim_{n\to\infty}k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) \\
+\end{longtable}
+\endgroup
 
 \tableofcontents
 
@@ -173,7 +198,7 @@ $c_m$ & per-vertex growth constant of the simple undirected vertex problem, $c_m
 \appendix
 \crefalias{chapter}{appendix}
 
-\chapter{Full Proofs and Computational Audit}\label{app:proofs}
+\chapter{Proofs, Proposed Proofs and Computational Audit}\label{app:proofs}
 \input{chapters/app_proofs}
 
 % ============================================================================

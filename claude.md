@@ -1,3 +1,9 @@
+## Revision policy agreed on 7 September 2026 (supersedes older status notes)
+
+Unchecked AI arguments are labelled `Conjecture` with `with proof` and `[AI]` in the heading. Their arguments are `Proposed proof`. Checked deductions relying on unresolved conjectures are labelled likewise with `[conditional]` and `Conditional proof`. Preserve the author's existing verification distinctions. General directed multigraph and hypergraph bounds are not established just because their proposed proofs are included. Match this status in summaries, tables, plots and program results.
+
+Hypergraph discovery is random greedy growth with shuffled restarts. The user requested accurate documentation of this implementation, not a tabu implementation. Chapter 3 explains every model family's edge and vertex status in detail. The full Mader proof stays in the appendix.
+
 # Claude working notes — Erdős Problem 915 thesis
 
 Current state and standing rules only. The session-by-session log that used to

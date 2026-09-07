@@ -2927,4 +2927,466 @@ What can be proved without any of the four is the leading constant, and the mach
 
 \end{offcut}
 
+\begin{offcut}{Submission revision 1}{2026-09-07}{\texttt{chapters/app\_proofs.tex}}{the corresponding section}{Remove repetition while retaining the original text.}
+\begin{remark}[The counting convention, and the audit it forces]\offcutlabel{rem:threshold-convention}\offcutlabel{rem:threshold-audit}
+This thesis defines $\ell_m(n)$ and $k_m(n)$ as the \emph{largest} number of edges a graph can carry while \emph{no} pair is joined by $m$ independent routes.
+S{\o}rensen and Thomassen, and the Erd\H{o}s Problems database \cite{ErdosProblems} after them, state the same results the other way round, as the \emph{smallest} number of edges that \emph{forces} such a pair.
+Those two quantities are adjacent integers by construction: if $k$ is the largest feasible edge count then no graph on $n$ vertices with $k+1$ edges is feasible, so $k+1$ is exactly the forcing threshold.
+
+What follows is the bookkeeping that convention forces on every constant quoted from the literature.
+
+The shift is visible in every entry the database and this thesis both state. Write $f_m(n) = k_m(n) + 1$ for the forcing count, which is the form the database and \cite{SorensenThomassen74} both use, so that the symbols $k_m$ and $\ell_m$ keep their meaning here throughout. The database gives $f_2(n) = n$ where a tree has $n-1$ edges, $f_3(2n) = 3n-1$ where this thesis has $k_3(2n) = \floor{3(2n-1)/2} = 3n-2$, and $f_4(n) = 2n-1$ where this thesis has $2n-2$. The edge entries shift the same way: the database quotes $5n-2$ where $\ell_5(2n) = 5n-3$ here, and $3n-2$ \cite{Leonard73} where $\ell_6(n) = 3n-3$ here. It also writes the Bollob\'{a}s--Erd\H{o}s conjecture as $1 + \binom{m}{2}n$ \emph{on $1 + (m-1)n$ vertices} against $\binom{m}{2}n$ here. Every one is exactly one apart, and the values in this thesis are the ones an exhaustive search returns: $k_3(4) = 4$, $k_3(5) = 6$ and $k_4(5) = 8$ were each confirmed by walking every graph of that size.
+
+The conjecture is the one entry that must keep its vertex count attached, and an earlier draft of this thesis lost it. On $N = 1 + (m-1)n$ vertices the conjectured value is $\binom{m}{2}\frac{N-1}{m-1} = \frac{m(N-1)}{2}$, which is the rate $c_m = m/2$ of \Cref{thm:simple-vertex-blocks}. Read instead as a count on $n$ vertices, $\binom{m}{2}n$ overstates it by a factor of $m-1$, giving $3n$ at $m = 3$ where the true value is about $3n/2$.
+
+An inconsistent conversion between forcing and avoiding counts can also produce a false comparison. The comparison $k_5 > \ell_5$ is invariant under the shift, since \emph{both} functions move by one, so no internal check can detect a half-converted statement. What does detect it is evaluating the two sides in different conventions, which manufactures a spurious divergence one size early. Reading $\floor{8 \cdot 13/3} - 3 = 31$ against this thesis's $\ell_5(13) = 30$ appears to separate the two problems at $n = 13$, but the $31$ is a forcing count and the $30$ is an avoiding count. Done consistently, $k_5(13) = 30 = \ell_5(13)$ and the separation begins at $n = 14$, which is also what \cite{SorensenThomassen74} proves directly by showing $f_5(n) = \floor{5(n-1)/2} + 1$ throughout $6 \le n \le 13$.
+
+The range likewise comes from the paper rather than from the database, which records only the clean tail $n \ge 13$. Theorem 4 there states $f_5(n) = \floor{8n/3} - 3$ for every $n \ge 6$ apart from $n = 7$ and $n = 12$, and supplies $f_5(7) = 16$ and $f_5(12) = 28$ separately. Its closing line then covers the whole small range at once, $f_5(n) = \floor{5(n-1)/2} + 1$ for $6 \le n \le 13$. That is why \Cref{thm:sorensen-thomassen} is stated in two ranges and needs no exceptions: the two sizes the paper sets aside are the only points of $6 \le n \le 13$ at which the large-$n$ formula misses the small-$n$ one, low by one at $n = 7$ and high by one at $n = 12$.
+\end{remark}
+
+
+\end{offcut}
+
+\begin{offcut}{Submission revision 2}{2026-09-07}{\texttt{chapters/app\_proofs.tex}}{the corresponding section}{Remove repetition while retaining the original text.}
+\begin{lemma}[Small side of a high-degree vertex]\offcutlabel{lem:small-side}
+For any vertex $x$ of a digraph with total degree $d(x) = d^+(x) + d^-(x) > 0$,
+\[
+    \min\bigl(d^+(x), d^-(x)\bigr) \;\le\; \frac{2\,d^+(x)\,d^-(x)}{d(x)} .
+\]
+\end{lemma}
+
+\begin{proof}
+Write $\mu = \min(d^+(x), d^-(x))$ and $M = \max(d^+(x), d^-(x))$, so $\mu + M = d(x)$ and $\mu M = d^+(x)d^-(x)$. Since $\mu \le M$ we have $M \ge d(x)/2$, hence $d^+(x)d^-(x) = \mu M \ge \mu\, d(x)/2$, which rearranges to the claim.
+\end{proof}
+
+\begin{lemma}[Arithmetic identity]\offcutlabel{lem:floor-identity}
+For all $n \ge 2$, $\floorfrac{(n-1)^2}{4} + \floor{n/2} = \floorfrac{n^2}{4}$.
+\end{lemma}
+
+\begin{proof}
+For $n = 2k$ the left side is $k(k-1) + k = k^2$, and for $n = 2k+1$ it is $k^2 + k = k(k+1)$. Both match the right side.
+\end{proof}
+
+
+\end{offcut}
+
+\begin{offcut}{Submission revision 3}{2026-09-07}{\texttt{chapters/app\_proofs.tex}}{the corresponding section}{Remove repetition while retaining the original text.}
+In words: the backward model is the forward model seen in a mirror. Turning every hyperarc around swaps the tails with the heads and reverses every route, which leaves the number of independent routes between a pair untouched. The two models have identical extremal numbers, so nothing below needs to treat backward as a separate case.
+
+\begin{proof}
+Reversal sends a backward hyperarc ($|T| = r-1$, $|H| = 1$) to a forward one
+($|T| = 1$) and is its own inverse, so it is an edge-count-preserving bijection
+between the two families. Let $u = x_0, e_1, x_1, \dots, e_k, x_k = v$ be a directed Berge
+route in $\HH$, where $x_{i-1}$ is a tail and $x_i$ a head of $e_i$. The reversed
+edge $e_i^{R} = (H_i, T_i)$ has $x_i$ as a tail and $x_{i-1}$ as a head, so
+$v = x_k, e_k^{R}, x_{k-1}, \dots, e_1^{R}, x_0 = u$ is a directed Berge route
+from $v$ to $u$ in $\HH^{R}$ on the same edges and the same internal vertices. This
+is a bijection between $u$--$v$ routes in $\HH$ and $v$--$u$ routes in $\HH^{R}$
+that preserves which edges and which internal vertices any two routes share, so it
+carries an edge-disjoint (respectively internally vertex-disjoint) family to one of
+equal size. Therefore $\lec_{\HH}(u, v) = \lec_{\HH^{R}}(v, u)$ and
+$\kap_{\HH}(u, v) = \kap_{\HH^{R}}(v, u)$, and maximising over ordered pairs gives
+$\lec^{\max}(\HH) = \lec^{\max}(\HH^{R})$ and the same for $\kap$. Since reversal is
+a bijection preserving feasibility and edge count, the two models share every
+extremal number.
+\end{proof}
+
+
+\end{offcut}
+
+\begin{offcut}{Submission revision 4}{2026-09-07}{\texttt{chapters/app\_proofs.tex}}{the corresponding section}{Remove repetition while retaining the original text.}
+Nothing above depended on $m$ or on the parity of $n$: the same three-step construction of $R$ and the same one-line deletion bound run identically at every level. In particular, the induction closes exactly the finite computation the rest of this appendix once needed help to settle.
+
+\begin{corollary}[The directed multigraph value at $n = 7$, $m = 3$,\aimedal]\offcutlabel{cor:dir-multi-n7}
+$L_3^{\mathrm{dir}}(7) = 24$.
+\end{corollary}
+
+\begin{proof}
+Since $M(7) = \max(12,12) = 12$, \Cref{thm:dir-multi-full} at $m = 3$ gives
+$L_3^{\mathrm{dir}}(7) = 2M(7) = 24$.
+\end{proof}
+
+This hand proof replaces an unfinished computation once discussed in
+\Cref{ch:certify,ch:synthesis}. The mixed-integer call
+\code{prove\_integral\_arc\_bound(7, 3, 25)} reached its time limit on the
+bundled CBC solver, and a fourteen-hour uncapped enumeration was stopped
+without a verdict. It was never run on a stronger solver. The computation and
+the proof do not independently confirm one another: only the proof settles the
+claim.
+
+
+\end{offcut}
+
+\begin{offcut}{Submission revision 5}{2026-09-07}{\texttt{chapters/app\_proofs.tex}}{the corresponding section}{Remove repetition while retaining the original text.}
+This settles the integrality question \Cref{ch:certify} raises when it introduces $M^{*}(n)$, namely whether an optimal weight matrix can always be chosen with entries in $\{0,1\}$. It can, and the argument runs backwards from the usual direction. Nothing here inspects the fractional problem at all. An integral theorem, proved for every $m$ at once, is strong enough to be applied to the scaled-up matrix $q\,w$, and the fractional statement falls out of the integral one rather than the other way round. That is only possible because \Cref{thm:dir-multi-full} holds at every $m$, however large, so no denominator is out of reach.
+
+
+\end{offcut}
+
+\begin{offcut}{Front matter before submission revision}{2026-09-07}{main.tex}{Contribution Statement}{Compact the front matter and make verification status explicit.}
+\chapter*{Contribution Statement}
+\addcontentsline{toc}{chapter}{Contribution Statement}
+All the work in this thesis is my own, except where I explicitly say otherwise.
+I used artificial intelligence to implement the code, suggest and verify proofs, format \LaTeX{} and check spelling.
+Where a result comes from the literature I say so and cite it.
+The theorems I use but do not claim as mine are those of Mader, B\'{a}rtfai, Bollob\'{a}s, Leonard, S{\o}rensen and Thomassen, Menger, Ford and Fulkerson, Whitney, Gomory and Hu, Mantel and Tur\'an, Fekete, and Huang and Lyu. Tutte's triconnected decomposition and its algorithmic form due to Hopcroft and Tarjan are cited once as a signpost for further work and are used in no proof.
+Related hypergraph-connectivity work includes B\'{e}rczi, Chandrasekaran, Kir\'{a}ly and Kulkarni \cite{BercziEtAl24}.
+Proofs are located in \Cref{app:proofs} and all computational work is available in my personal repository \cite{vandenbruwaene_thesis}.
+
+A result whose proof I have not checked line by line carries the badge \aimedal{} in its heading, both in \Cref{ch:basecases} where it is stated and in \Cref{app:proofs} where it is proved.
+Those proofs were written by an AI model, and for several of them I am not the right person to check them.
+A badged result should be read as a conjecture that comes with a proof attached which is likely correct, rather than as a theorem I can vouch for myself.
+The proofs that carry no badge are the ones I have worked through myself.
+Two of them I wrote out in full: the Gomory--Hu double count for the simple undirected edge-disjoint case (\Cref{thm:mader}) and for the undirected multigraph edge-disjoint case (\Cref{thm:multigraph-edge}), together with the three counting lemmas they run on (\Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}).
+The other unbadged results of \Cref{app:proofs} are ones whose proofs I have since read and checked.
+Results taken from the literature carry no badge either, since their proofs are published and are cited where the result is stated.
+Definitions, conjectures and open questions carry no badge. A construction carries a badge when its stated properties come with a proof that I have not checked line by line. The badge concerns verification of the proof, not whether the object is explicitly defined.
+
+The clique-core counterexample and the research-note argument for eventual exactness were supplied by Stijn Cambie with AI assistance. The counterexample is included in \Cref{const:clique-core}. Only the verified construction counts are retained in \Cref{const:directed-comparison}. Eventual optimality is not asserted.
+
+The summary of my original results is:
+
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}X@{}}
+\toprule
+Variant & Contribution \\
+\midrule
+Hypergraph, vertex separation & Exact value at $m=2$. The $m=3$ universal bound and its stated attainment range, via a new incidence-rank lemma (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}). \\
+Directed multigraph & Exact value for all $n,m$, plus quadratic-branch classification for $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-full,thm:dir-multi-uniqueness}). \\
+Multigraph, incidence separation & The two multigraph vertex variants posed as problems of their own: exact values at $m\le3$, the reduction to a knapsack over $2$-connected blocks, thickened bipartite blocks against an upper bound of the same order, and the directed value to its leading term with the same block structure (\Cref{thm:multi-vertex-m2,cor:multi-vertex-m3,thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper,cor:dir-multi-incidence,prop:dir-multi-vertex-blocks}). Every result in this row carries the badge except the $m=2$ value. \\
+Directed simple graph, arc separation & For fixed $m\ge3$, unconditional $n^2/4+\Theta_m(n)$ bound and an $O(\sqrt m\,n^{3/2})$ structural distance from a one-way bipartite graph (\Cref{prop:dir-arc-stability,thm:dir-arc-linear-error}). \\
+Transferred quadratic bounds & For fixed $m\ge3$, $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$. For fixed $r\ge3$ and $m\ge2$, leading term $(m-1)n^2/(4(r-1))$ for directed hypergraphs under both separations and all orientations (\Cref{thm:dir-vertex-linear-error,thm:dir-hyper-constant,thm:dir-hyper-general-constant}). \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+
+\chapter*{Short Summary}
+\addcontentsline{toc}{chapter}{Short Summary}
+\emph{Erd\H{o}s Problem~915}, posed by Bollob\'{a}s and Erd\H{o}s \cite{BollobasErdos62}, asks for the maximum number of edges in a graph on $n$ vertices such that no two vertices are connected by $m$ edge-disjoint paths. In modern notation this asks for
+\[
+\ell_m(n)=\max\{|E(G)|:|V(G)|=n,\ \lambda_G^{\max}\le m-1\}.
+\]
+Mader proved that, for simple graphs and all $n\ge2$ and $m\ge2$,
+\[
+\ell_m(n)\le\left\lfloor \frac{m(n-1)}2\right\rfloor
+\]
+and provided a construction achieving this bound when $(m-1)|(n-1)$.
+This thesis revisits this theorem and studies the corresponding extremal problem under three independent changes: the graph model (simple graphs, multigraphs, hypergraphs and multihypergraphs), the path-separation notion and the presence or absence of directions.
+The two separation notions are edge-disjointness and internal vertex-disjointness, the second read in the incidence graph, so that separated routes share neither an intermediate vertex nor an edge copy.
+Parallel copies are therefore separate routes, which makes the two multigraph vertex variants problems of their own rather than restatements of the simple ones.
+The simple edge-disjoint case is proved independently here using Gomory--Hu trees \cite{GomoryHu61}, and a general extremal construction resolves it for all $n$ and $m$.
+Other rigorously settled variants include the multigraph value $L_m(n)=(m-1)(n-1)$, the equality of the simple edge and vertex problems for $m\le4$, due to B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66} and Leonard \cite{Leonard72b}, and their divergence at $m=5$, shown by S{\o}rensen and Thomassen \cite{SorensenThomassen74}.
+The directed case is resolved for $m=2$: the value $\ell_2^{\mathrm{dir}}(n)=\max(2(n-1),\lfloor n^2/4\rfloor)$ is proved in a few lines, a feasible digraph at $m=2$ being its own reachability skeleton and so inheriting the skeleton's arc count. For $m\ge3$, the thesis gives dense constructions, without asserting an exact eventual value. A twelve-vertex clique-core construction supplied by Stijn Cambie refutes the earlier formula for all orders (\Cref{const:clique-core}).
+
+
+The centrepiece is then a unified program, which represents non-hypergraphs with a multiplicity matrix and converts the vertex-disjoint problem to an edge-disjoint one by building the capacity network of the vertex-splitting construction, in which a vertex is a unit gate while an adjacency keeps its multiplicity.
+The hypergraphs are handled as a list of hyperedges, which may use head and tail sets to represent directed hyperedges.
+Then a maximum-flow algorithm measures connectivity between all pairs of vertices and reports the maximum local connectivity.
+At each point of the program, optimisations are applied to reduce the search space and traverse it more efficiently.
+When these optimisations are exhausted and the computation becomes intractable, the program uses metaheuristics to search for extremal graphs, which are then checked for correctness.
+
+
+
+The hypergraph vertex problem is settled completely at $m=2$.
+At $m=3$ the formula $\bigl\lfloor2(n-1)/(r-1)\bigr\rfloor$ is a universal upper bound for multihypergraphs and is exact whenever $r\ge3$ and $2\le\binom{n-2}{r-2}$, the upper bound following from a new rank bound on incidence graphs proved by induction over blocks and separating pairs.
+On the directed side the multigraph problem closes completely, $L_m^{\mathrm{dir}}(n)=(m-1)\max(2(n-1),\lfloor n^2/4\rfloor)$ for every $n$ and every $m$, by deleting a sparse reachability-preserving subgraph at a time rather than a vertex at a time.
+For every fixed $m\ge3$, the extremal value for simple digraphs, arc and vertex alike, is $n^2/4+\Theta_m(n)$ with no assumption on the shape of the extremiser, and at $m=2$ it differs from $n^2/4$ by only an $O(1)$ correction.
+For fixed $r\ge3$ and $m$, the directed hypergraph, which had only bounds a factor of four apart, has its leading term settled at $(m-1)n^2/\bigl(4(r-1)\bigr)$, so its bipartite construction is asymptotically optimal.
+
+\chapter*{Abbreviations and Symbols}
+\addcontentsline{toc}{chapter}{Abbreviations and Symbols}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{0.78\linewidth}}
+MILP & mixed-integer linear program \\
+\aimedal & in a theorem heading: the proof of that result was written by an AI model and is not verified line by line by the author (Contribution Statement) \\
+\end{tabular}
+
+\bigskip
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{0.74\linewidth}}
+$G=(V,E)$ & graph with vertex set $V$ and edge set $E$ \\
+$D=(V,A)$ & directed graph with vertex set $V$ and arc set $A$ \\
+$n$ & number of vertices \\
+$m$ & forbidden-connectivity parameter, with all local connectivities at most $m-1$ \\
+$r$ & hyperedge size (every hyperedge spans $r$ vertices) \\
+$\lambda_G(u,v)$ & maximum number of edge-disjoint $u$-$v$ paths \\
+$\lambda_G^{\max}$ & maximum local edge-connectivity over all vertex pairs \\
+$\kappa_G(u,v)$ & maximum number of internally vertex-disjoint $u$-$v$ paths \\
+$\kappa_G^{\max}$ & maximum local vertex-connectivity over all vertex pairs \\
+$\ell_m(n)$ & simple undirected edge-disjoint extremal function \\
+$L_m(n)$ & undirected multigraph edge-disjoint extremal function \\
+$k_m(n)$ & simple undirected vertex-disjoint extremal function \\
+$\ell_m^{\mathrm{dir}}(n)$ & simple directed arc-disjoint extremal function \\
+$L_m^{\mathrm{dir}}(n)$ & directed multigraph arc-disjoint extremal function \\
+$k_m^{\mathrm{dir}}(n)$ & simple directed vertex-disjoint extremal function \\
+$K_m(n)$, $K_m^{\mathrm{dir}}(n)$ & undirected and directed multigraph vertex-disjoint extremal functions, multiplicity counted (\Cref{sec:incidence-convention}) \\
+$\ell_m^{(r)}(n)$, $k_m^{(r)}(n)$ & $r$-uniform simple hypergraph edge-disjoint and incidence-graph vertex-disjoint extremal functions \\
+$L_m^{(r)}(n)$, $K_m^{(r)}(n)$ & the same two for $r$-uniform multihypergraphs, multiplicity counted (\Cref{tab:notation}) \\
+$M(n)$ & $\max\bigl(2(n-1), \floor{n^2/4}\bigr)$, the directed multigraph value per unit of $m-1$ \\
+$M^{*}(n)$ & the $m$-free directed multigraph optimum, $L_m^{\mathrm{dir}}(n) = (m-1)\,M^{*}(n)$, equal to $M(n)$ by \Cref{cor:mstar-integral} \\
+$B_{p,q}$ & one-directional complete bipartite digraph, all arcs from a $p$-part to a $q$-part \\
+$\mu(u,v)$ & multiplicity of an edge or arc between $u$ and $v$ \\
+$h_m(b)$ & most edges a feasible $2$-connected block on $b$ vertices can carry (\Cref{thm:simple-vertex-blocks}) \\
+$W_m(G_0)$ & largest total multiplicity over a fixed underlying simple graph $G_0$ (\Cref{lem:multi-vertex-objective}) \\
+$g_m(b)$ & most $W_m$ a feasible $2$-connected block on $b$ vertices can score (\Cref{thm:multi-vertex-blocks}) \\
+$c_m$ & per-vertex growth constant of the simple undirected vertex problem, $c_m = \lim_{n\to\infty} k_m(n)/(n-1) = \sup_{b\ge2} h_m(b)/(b-1)$ (\Cref{thm:simple-vertex-blocks}) \\
+\end{tabular}
+
+
+\end{offcut}
+
+\section{Previous Chapter 3 status discussion}
+\section{Summary of the sixteen variants}
+
+\Cref{fig:variant-tree-status} sorts all sixteen structural variants by how much
+is known, and \Cref{tab:summary} states the strongest result for each. The entries
+distinguish exact values, asymptotic bounds and constructions for cases whose
+exact value remains open.
+Each exact value is supported by a proof or by a completed exhaustive search.
+Construction entries provide lower bounds, not claims of optimality.
+Heuristic witnesses are never presented as upper bounds.
+The markings follow the standard set in \Cref{ch:machine}.
+For results with an AI badge, the author's verification caveat in the
+Contribution Statement still applies. The summary does not upgrade their proof status.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+  \node[vtroot, fill=KULblauw3a!18]  (root) at (9.0,3.9) {Problem 915};
+  \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6)  {simple};
+  \node[vtmodel, fill=KULblauw3a!12] (multi)  at (6.6,2.6)  {multi};
+  \node[vtmodel, fill=KULblauw3a!12] (hyper)  at (11.4,2.6) {hyper};
+  \node[vtmodel, fill=KULblauw3a!12] (mhyper) at (16.2,2.6) {multi-hyper};
+  \draw[vtedge] (root) -- (simple);
+  \draw[vtedge] (root) -- (multi);
+  \draw[vtedge] (root) -- (hyper);
+  \draw[vtedge] (root) -- (mhyper);
+  \node[vtdir, fill=KULblauw3a!8]  (d0) at (0.6,1.3)  {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d1) at (3.0,1.3)  {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d2) at (5.4,1.3)  {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d3) at (7.8,1.3)  {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d4) at (10.2,1.3) {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d5) at (12.6,1.3) {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d6) at (15.0,1.3) {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d7) at (17.4,1.3) {directed};
+  \draw[vtedge] (simple) -- (d0);
+  \draw[vtedge] (simple) -- (d1);
+  \draw[vtedge] (multi)  -- (d2);
+  \draw[vtedge] (multi)  -- (d3);
+  \draw[vtedge] (hyper)  -- (d4);
+  \draw[vtedge] (hyper)  -- (d5);
+  \draw[vtedge] (mhyper) -- (d6);
+  \draw[vtedge] (mhyper) -- (d7);
+  \node[vtleaf, fill=regimeProved!16]      (l0)  at (0,0)    {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l1)  at (1.2,0)  {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l2)  at (2.4,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l3)  at (3.6,0)  {vertex};
+  \node[vtleaf, fill=regimeProved!16]      (l4)  at (4.8,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
+  \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l7)  at (8.4,0)  {vertex};
+  \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l11) at (13.2,0) {vertex};
+  \node[vtleaf, fill=regimePartial!20]     (l12) at (14.4,0) {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l13) at (15.6,0) {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l14) at (16.8,0) {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l15) at (18.0,0) {vertex};
+  \draw[vtedge] (d0) -- (l0);  \draw[vtedge] (d0) -- (l1);
+  \draw[vtedge] (d1) -- (l2);  \draw[vtedge] (d1) -- (l3);
+  \draw[vtedge] (d2) -- (l4);  \draw[vtedge] (d2) -- (l5);
+  \draw[vtedge] (d3) -- (l6);  \draw[vtedge] (d3) -- (l7);
+  \draw[vtedge] (d4) -- (l8);  \draw[vtedge] (d4) -- (l9);
+  \draw[vtedge] (d5) -- (l10); \draw[vtedge] (d5) -- (l11);
+  \draw[vtedge] (d6) -- (l12); \draw[vtedge] (d6) -- (l13);
+  \draw[vtedge] (d7) -- (l14); \draw[vtedge] (d7) -- (l15);
+  % Legend, two columns of two. Column 1 is what is settled, column 2 is what is
+  % not, so the partial entry sits beside the open one.
+  \node[vtleaf, fill=regimeProved!16, minimum width=8mm]      (leg1) at (0,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (0.9,-1.5) {closed form proved for every $n$ and $m$};
+  \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (9.4,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {leading constant proved, exact value open};
+  \node[vtleaf, fill=regimePartial!20, minimum width=8mm]     (leg4) at (9.4,-2.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
+\end{tikzpicture}%
+}
+\caption{Status of the sixteen variants. Blue marks a closed form proved for every $n$ and $m$. Purple marks an exact value proved on stated parameter ranges and open outside them. Amber marks a proved leading term with the general exact value unknown. For simple directed arcs, \Cref{const:directed-comparison} records lower bounds without asserting optimality. The model and direction rows carry no status. \Cref{tab:summary} is authoritative for exceptions and conventions.}
+
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.155\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Model & Edge or arc-disjoint & Vertex-disjoint \\
+\midrule
+\addlinespace[1pt]
+\multicolumn{3}{@{}l}{\itshape Undirected} \\
+\addlinespace[2pt]
+simple graph
+  & $\floor{m(n-1)/2}$, proved
+  & the edge value for $m \le 4$, and at $m=5$ the edge value for $6 \le n \le 13$ then $\floor{8n/3}-4$ from $n=14$, while it is open for $m \ge 6$ \\
+multigraph
+  & $(m-1)(n-1)$, proved
+  & $n-1$ at $m=2$ and $2(n-1)$ at $m=3$ (proved), while it is open for
+    $m \ge 4$, where it is a knapsack over $2$-connected blocks and has order
+    $\Theta(m^2n)$ in the joint regime stated below \\
+$r$-hypergraph
+  & $\le \floor{(m-1)(n-1)/(r-1)}$, with equality in the range below
+  & $\floor{(n-1)/(r-1)}$ at $m=2$ and $\le \floor{2(n-1)/(r-1)}$ at $m=3$, while it is open for $m \ge 4$ \\
+$r$-multi-hyper
+  & the same bound, with equality when \mbox{$(r-1) \mid (n-1)$}
+  & the same bounds, with repeated hyperedges settling cases missed by the simple model at $m=3$ \\
+\addlinespace[4pt]
+\midrule
+\addlinespace[1pt]
+\multicolumn{3}{@{}l}{\itshape Directed} \\
+\addlinespace[2pt]
+simple digraph
+  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$, with dense constructions but no general exact formula
+  & $M(n)$ at $m=2$ (proved), and $n^2/4 + \Theta_m(n)$ for $m \ge 3$ with equality to the arc value open \\
+multigraph
+  & $(m-1)M(n)$, proved
+  & $M(n)$ at $m=2$ (proved), and $(m-1)n^2/4 + O_m(n)$ for $m \ge 3$ with the
+    exact value open \\
+$r$-hypergraph
+  & $(1+o(1))(m-1)n^2/[4(r-1)]$ for fixed $r, m$, leading term proved
+  & the same leading term for fixed $r, m$ \\
+$r$-multi-hyper
+  & the same leading term, the bound proved with repeats allowed
+  & the same leading term for fixed $r, m$ \\
+\bottomrule
+\end{tabularx}
+\caption{The sixteen variants and the strongest result known for each. The two multigraph vertex rows count multiplicity, since $q$ parallel copies are $q$ separated routes under the incidence convention of \Cref{sec:incidence-convention}. Ranges of validity, including the one at $m=5$, are stated below the table.}
+
+\end{table}
+
+Here $M(n)=\max(2(n-1),\floor{n^2/4})$. The hypergraph rows use $r\ge3$. At $r=2$, use the corresponding graph rows, in particular the different leading constant for simple digraphs when $m\ge3$. The multigraph incidence estimate uses $m\to\infty$ with $n/m\to\infty$. Simple-graph formulas assume
+$n\ge m$. Below that range the complete object gives the trivial maximum.
+The $m=5$ vertex row is quoted from $n\ge6$ because that is the range
+\cite{SorensenThomassen74} states, not because it fails below it: extending the
+small-range branch to $n=5$ reads $\floor{5\cdot4/2}=10$, which is what $K_5$
+gives at $\kap^{\max}=4$.
+The edge-hypergraph bound is attained when $(r-1)\mid(n-1)$ for
+multihypergraphs, and for simple hypergraphs when $r\ge3$ and
+$m-1\le\binom{n-2}{r-2}$. The $m=3$ vertex-hypergraph bound is attained by a simple hypergraph when
+$2<r<n$, and by a multihypergraph whenever
+$(r-1)\mid(n-1)$ (\Cref{prop:hyper-vertex-lower-multi}). Full statements and
+exceptions are in
+\Cref{thm:mader,thm:leonard,thm:sorensen-thomassen,prop:hyper-edge,thm:simple-hyper-edge,thm:hyper-vertex-m2,thm:hyper-vertex-m3,thm:dir-multi-full,thm:dir-arc-linear-error,thm:dir-vertex-linear-error,thm:dir-hyper-constant}.
+
+\subsection{Detailed finite values}
+
+\Cref{tab:summary} and \Cref{fig:variant-tree-status} give the conclusion for every variant.
+The computational audit records the underlying finite values at $m=3$ and $m=6$.
+It also contains the four detailed grids (\Cref{sec:variant-grids}).
+Keeping those repeated data in the appendix lets this chapter focus on the mathematical distinctions between the variants.
+
+\subsection{Orientations of a directed hyperedge}
+
+
+\Cref{thm:dir-hyper-constant} pins the leading term in the directed hypergraph rows of \Cref{tab:summary}.
+The table uses the \emph{forward} convention: one tail and $r-1$ heads.
+Reversing every hyperedge gives the equivalent one-head \emph{backward} convention (\Cref{lem:dir-hyper-duality}).
+\Cref{thm:dir-hyper-general-constant} gives the same leading term for the general model, which allows all nonempty tail--head splits.
+It covers both separation conditions.
+Orientation therefore creates no new asymptotic row in \Cref{tab:summary}.
+The conventions may still differ at small orders.
+Whether they agree exactly once $n>r$ remains open.
+
+\section{Contributions and limitations of the program}
+
+The program replaces separate implementations with one shared interface.
+It represents graph models by a multiplicity matrix.
+It represents undirected hypergraph models by collections of vertex sets and directed ones by tail and head sets.
+An exact checker measures connectivity.
+A certifier proves upper bounds for small cases.
+Tabu search for graphs and random greedy search for hypergraphs find examples and hence lower bounds.
+The seven validation runs in \Cref{sec:rediscovery} recover their known answers.
+
+The three tools provide different levels of evidence.
+The checker measures one supplied graph exactly.
+A completed exhaustive search proves the best value at one finite order.
+The certifier is also a finite check.
+Without a replayable bound, it is not a reusable proof.
+Heuristic search supplies lower bounds only.
+A value is settled only when its lower and upper bounds agree.
+Directed vertex values require separate checks because Whitney's inequality transfers witnesses but not upper bounds.
+The repository contains the code and commands for rerunning the computational workflows.
+This does not guarantee identical outcomes for time-limited searches. Some historical results also lack saved witnesses or measured runtimes, as recorded in the accompanying data.
+The principal checks run from \code{program/erdos915\_unified.py}.
+Several individual claims are backed by standalone scripts in \code{program/scripts/} instead.
+Each is named where its result appears. Some implement separate checks, while experiment drivers reuse the shared solver.
+\Cref{app:verification-ladder,app:software-tests} gives the environment, commands and audit evidence.
+No theorem here depends only on an unchecked solver result.
+
+The program also has clear limits.
+The heuristic search cannot prove upper bounds.
+The certifier proves an upper bound only at one fixed order.
+Without a replayable certificate, that solver check does not become a reusable argument (\Cref{sec:certification-standard}).
+For directed multigraphs, the recorded successful solver checks reach only $n=6$.
+At larger orders, the hand proof in \Cref{app:proofs} establishes the value.
+The certifier did not finish at $n=7$.
+
+Computation also leaves the structural gaps untouched.
+Small-order agreement did not prevent the old directed arc formula from failing.
+Even when one displayed construction eventually beats the others, its optimality among all feasible digraphs remains open here.
+The directed vertex problem for $m\ge3$ does not follow from the arc case.
+The undirected vertex problem for $m\ge6$ has been open for half a century.
+The program can explore these problems, but it cannot settle them alone.
+
+\section{Open problems}
+
+\Cref{tab:open-problems} separates the proved results from the remaining frontiers.
+Each row gives the strongest result established here.
+It then states the next mathematical target.
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.31\textwidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Problem & Known here & Remaining target \\
+\midrule
+Directed simple arc, $m\ge3$ & $\ell_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-arc-linear-error}) & Determine when, if ever, the constructions of \Cref{const:directed-comparison} attain the optimum. \\
+Directed simple vertex, $m\ge3$ & $k_m^{\mathrm{dir}}(n)=n^2/4+\Theta_m(n)$ (\Cref{thm:dir-vertex-linear-error}) & Decide whether its exact value equals the arc value, given that an arc upper bound does not transfer. \\
+Directed multigraph classification & Exact value for all $n,m$ and quadratic-branch uniqueness for $n\ge\max(8,2m)$ & Classify the range $n<2m$ and the remaining linear-branch extremisers. \\
+Directed multigraph incidence, $m\ge3$ & $K_m^{\mathrm{dir}}(n)=(m-1)n^2/4+O_m(n)$ (\Cref{cor:dir-multi-incidence}) & Sharpen the next-order term and decide whether the arc extremiser is optimal here too. \\
+Undirected simple vertex, $m\ge6$ & Block formulation and $m/2<c_m\le2(m-1)$, where $c_m = \lim_n k_m(n)/(n-1)$ (\Cref{thm:simple-vertex-blocks}) & Determine $c_m$ by finding sharper bounds on feasible blocks. \\
+Undirected multigraph incidence, $m\ge4$ & Reduction to a knapsack over $2$-connected blocks. The value is $\Theta(m^2n)$ as $m\to\infty$ with $n/m\to\infty$ (\Cref{thm:multi-vertex-blocks,thm:multi-vertex-bipartite,prop:multi-vertex-upper}) & Determine the best $2$-connected block of each size and sharpen the asymptotic bounds. \\
+Hypergraph vertex, $m\ge4$ & Exact at $m=2$ and, in the stated range, $m=3$ (\Cref{thm:hyper-vertex-m2,thm:hyper-vertex-m3}) & Determine which edge-separation bounds remain valid for vertex separation when $r\ge3$. \\
+Directed hypergraphs & For fixed $r\ge3$ and $m\ge2$, leading term $(m-1)n^2/(4(r-1))$ for all orientations and both separations & Determine finite exact values and whether forward and general agree once $n>r$. \\
+\bottomrule
+\end{tabularx}
+\caption{The remaining problems, separated from the results already proved in this thesis.}
+
+\end{table}
+
+Four directions carry most of the remaining mathematical weight.
+The first is the simple directed arc problem.
+\Cref{const:directed-comparison} supplies three dense families, but no matching general upper bound.
+The clique-core counterexample leaves the smaller orders as a separate question.
+
+The second direction is the classical undirected vertex problem for $m\ge6$.
+It remains open despite the results of S{\o}rensen and Thomassen.
+The third is the hypergraph vertex problem beyond $m=3$.
+There the incidence-rank argument has no known higher-connectivity replacement.
+The fourth is the multigraph incidence problem beyond $m=3$, which the convention
+of \Cref{sec:incidence-convention} poses as a question of its own.
+Its value is a knapsack over $2$-connected blocks, and what is missing is the
+best block of each size. As $m\to\infty$ with $n/m\to\infty$, the ratio
+$K_m(n)/(m^2n)$ is at least $3-2\sqrt{2}-o(1)$ and less than $2$.
+These bounds do not establish that the ratio converges.
+
+The other rows of \Cref{tab:open-problems} remain natural questions.
+They ask for finer classifications or finite exact values.
+They complete the map, but they are secondary to the four frontiers above.
+
 \end{document}

@@ -781,6 +781,7 @@ for scientific awards or contests.
 % inputs and output, a one-line "how", and an epistemic-role badge. No function
 % bodies live in the running text; the full source accompanies the document.
 \usepackage{tabularx}
+\usepackage{longtable}
 
 % --- epistemic-role palette: the MODEL -> MEASURE -> PROVE/DISCOVER spine
 %     spine, given one colour each so the role is legible at a glance. ----------
@@ -914,24 +915,9 @@ for scientific awards or contests.
 }
 
 % ============================================================================
-% THE AI MEDAL
-% ----------------------------------------------------------------------------
-% A result carries this badge when the proof written for it in this thesis was
-% produced by a large language model and has not been checked line by line by
-% the author. The badge is a provenance mark, not a verdict: the statement is
-% believed true and the argument is believed correct, but the reader should
-% treat it the way a conjecture with a plausible proof attached is treated,
-% not the way a refereed theorem is.
-%
-% It is NOT carried by results quoted from the literature, which rest on their
-% published proofs and are cited where they are stated, and it is NOT carried
-% by the Gomory--Hu double count that proves Mader's theorem and the
-% undirected multigraph edge value, which the author worked through in full.
-% Definitions, constructions, notation and conjectures assert nothing that
-% could be verified, so they carry no badge either.
-%
-% Usage: put it inside the theorem's optional argument, after a comma when
-% the result already has a name, alone when it does not.
-%   \begin{lemma}[Degree bound,\aimedal]\label{lem:degree-bound}
-%   \begin{theorem}[\aimedal]\label{thm:whatever}
+% PROOF STATUS
+% Unchecked AI arguments are conjectures with proofs, marked [AI].
+% Deductions depending on them are conjectures with conditional proofs.
+% Existing author-verified arguments retain their unmarked status.
 \newcommand{\aimedal}{\,[AI]}
+\newcommand{\conditional}{\,[conditional]}
