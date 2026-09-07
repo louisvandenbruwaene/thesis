@@ -64,11 +64,81 @@ it. Cross-references were added at the four places the prose already introduced
 them. `check_consistency.sh` now gates all four float conditions, verified by
 removing one reference and watching the gate fail.
 
+## The four carried-forward checks, closed
+
+The pass above verified the two $m = 6$ grids and `fig:skeleton-example` and
+carried four floats forward on earlier verification: the $m = 3$ hypergraph
+grid, `fig:spine`, `fig:vertex-split` and `fig:scaling-reduction`. Each is now
+checked against what it claims rather than against its label and caption.
+
+**The variant-bound grids, all four of them.**
+`program/scripts/verify_variant_grids.py` reads the panel data from the frozen
+machine record and asks three separate questions of each grid. Whether the
+eight panels agree with `tab:variant-values` cell by cell, matching a bold
+`vtExact` cell to a completed enumeration at that order and the same value, a
+`vtProved` or `vtConjectured` cell to the drawn curve, and a `vtOpen` cell to a
+witness at least as large as the printed lower bound. Whether the panels obey
+what the captions say a panel means, so a conjectured panel carries a curve, an
+open panel carries none, no square, circle or plus sits above a curve the
+caption calls an upper bound, and no search circle sits above a completed
+enumeration. And whether the committed PNG is the file that panel data draws,
+by redrawing each grid and comparing SHA-256. No mismatches on any of the four,
+and all four PNGs are byte-identical to their redraws. The table and the
+figures both read `gather_variant_grid` and neither reads the other, so the
+agreement is between two renderings of one record.
+
+Read against the figure, the $m = 3$ hypergraph grid shows the construction
+marks sitting on the conjectured curve in all four undirected panels and no
+exact square anywhere below it, which is the state its caption describes: the
+bound is not shown unattainable at $m = 3$. The two directed hypergraph panels
+carry no curve, exact squares at $n = 3$ and $n = 4$ only, and the downward
+circle steps at $n = 10$ that `sec:variant-grids` states are weaker timed runs
+rather than a decreasing extremal function.
+
+**`fig:spine`. One defect, fixed.** The diagram itself matches: MODEL feeds
+MEASURE, MEASURE feeds both PROVE and DISCOVER, and those four are the shape of
+Chapter 2, which runs Modelling, Measuring, the two certification sections and
+then the heuristic search. The caption's last sentence was not. It read "The
+badge colours on the code cards match the boxes here", and the code cards were
+cut from the thesis in a shortening pass. `\codecard` is defined in
+`preamble.tex` and used in `offcuts.tex` alone, `\rolebadge` appears in no
+chapter source, and `pdftotext main.pdf` finds MEASURE and DISCOVER only inside
+the spine diagram itself. The colours still match, because both the boxes and
+the badges read the same four `roleModel`/`roleMeasure`/`roleProve`/
+`roleDiscover` definitions, but the caption pointed the reader at objects the
+thesis no longer prints. The sentence is removed. A caption and label sweep
+cannot find this, since the caption is present, well formed and attached to the
+right figure. Nothing is lost by the removal: `offcuts.tex` archives the
+caption's earlier form carrying that same sentence, at the head of the block of
+code cards it was describing, so the archive already holds both halves of what
+the live caption was pointing at.
+
+**`fig:vertex-split`.** The drawn transformation is the standard one and the
+picture carries it out: both incoming arcs enter $v^{\mathrm{in}}$, both
+outgoing arcs leave $v^{\mathrm{out}}$, and the only arc drawn as a unit is the
+internal one, which is what makes vertex-disjointness into edge-disjointness.
+The caption's qualification that an adjacency keeps capacity $\mu(u,v)$ and a
+hyperedge keeps its gate matches `sec:transformations` and the gate network of
+`fig:hyper-gadget-example`.
+
+**`fig:scaling-reduction`.** Checked with an exact-rational max flow written for
+the check, not with the program's. The drawn multigraph has $A \to B$ of
+multiplicity two, $A \to C$ of multiplicity one and $B \to C$ absent, so
+$\lambda^{\max} = 2$, which is $m - 1$ at the $m = 3$ the caption names, so the
+object is feasible at that threshold rather than merely drawn. Dividing by
+$m - 1 = 2$ gives the weights $1$ and $\tfrac{1}{2}$ printed on the right, and
+the scaled $\lambda^{\max}$ is exactly $1$, matching the caption's "pairwise
+maximum flow at most one". Its total weight is $\tfrac{3}{2}$, which is the
+three arcs of $D$ divided by $m - 1$, the identity the sentence introducing the
+figure states.
+
 ## Not re-checked in this pass
 
 Carried from earlier passes rather than redone here: `fig:divergence`,
-`fig:complexity`, `fig:crossover`, the two $m = 3$ grids, and the TikZ diagrams
-other than `fig:skeleton-example`. `fig:gomory-hu-dist` had two wrong
+`fig:complexity`, `fig:crossover`, and the TikZ diagrams other than
+`fig:skeleton-example`, `fig:spine`, `fig:vertex-split` and
+`fig:scaling-reduction`. The two $m = 3$ grids are no longer on this list, the
+section above closes them. `fig:gomory-hu-dist` had two wrong
 tree-distance comments in its source corrected on 2026-09-04, with the drawn
 tree itself verified a genuine Gomory-Hu tree.
 
