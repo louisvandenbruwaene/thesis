@@ -253,6 +253,36 @@ equal-budget records are the only case).
 
 One line each. `git log` has the full message for every one of them.
 
+- **2026-09-07 (third pass).** Structural checks rather than greps, and the two
+  that paid. `thm:dir-multi-m2` was headed "with proof" but had NO proof block:
+  its argument sat inside the statement body, so the promised block never
+  existed. `check_consistency.sh` only compared headings that were present, so
+  it passed. It now also requires that a "with proof" conjecture HAVE a proof,
+  named-target or inline, with the right status word, verified by deleting the
+  block again and watching the gate fail. **`offcuts.tex` had stopped building
+  entirely** (exit 12), unnoticed because its last log predated the overhaul:
+  three transcript `\lstinputlisting` paths still said `figures/` after the logs
+  moved to `program/logs/`, and two `\includegraphics` pointed at the combined
+  twelve-variant PNGs that the `_graphs`/`_hypergraphs` split superseded when
+  the fourth model took the count to sixteen. Those two image slots now carry a
+  note instead of being repointed at a sixteen-variant replacement, since the
+  archived captions say twelve. It builds again, 136 pages. Its 66 `??` over 17
+  labels are EXPECTED and now documented in its header: `xr` reads `main.aux`,
+  so a surviving label resolves and a label whose material was itself cut cannot.
+  **Do not chase `??` in offcuts.pdf the way you must in main.pdf.**
+  Verified clean by script: 41 conjectures, 33 `[AI]` and 8 `[conditional]`,
+  none both, every conditional leaning on an unchecked result directly or
+  transitively; no unmarked result's proof cites a conjecture; bibliography
+  prints in appearance order under `unsrt` with no missing or dangling keys;
+  every referenced file path exists; no duplicate labels and no dangling refs in
+  the thesis; British spelling consistent once TikZ `color=`/`anchor=center`
+  keys are excluded. The equal-budget numbers reproduce from `report.json` to
+  the digit (74/128, 54 short, 68 all-seeds, 57657.7 s selected vs 58690.8 s
+  including discards, 110 in all three seeds at n=12 m=6 against 180).
+  Also `program/README.md`'s layout block was missing `requirements*.txt` and
+  understated `data/`, and "programme of conjectures" collided with the thesis's
+  own word for the code.
+
 - **2026-09-07 (second pass).** A consistency sweep of the conjecture-status
   overhaul, hunting prose that the demotion missed. Nine sites where running
   text still asserted a conjectural result: `ch2` had `cor:mstar-integral`

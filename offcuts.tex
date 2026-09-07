@@ -10,6 +10,20 @@
 % Baseline: everything here was cut from commit d4d5a0d.
 % Build:    latexmk -pdf offcuts.tex   (after main.tex has been built once, so
 %           main.aux exists for xr to read).
+%
+% KNOWN, EXPECTED `??`: xr resolves a reference by reading main.aux, so a label
+% the live thesis still owns prints its real number. Seventeen labels named
+% material that was ITSELF cut, so neither main.aux nor this archive defines
+% them and they print `??` (66 occurrences as of 2026-09-07):
+%   conj:dir-arc, fig:backward-arc, fig:bidirected-star, fig:three-models,
+%   fig:three-models-directed, fig:variant-bounds-comparison,
+%   fig:variant-bounds-m3, fig:variant-bounds-m6, lem:saturated-attachment,
+%   rem:counterexample-m3, rem:n7-classification, sec:multi-vertex-standard,
+%   sec:parallel-convention, sec:trichotomy, tab:open-problems,
+%   thm:dir-multi-small, thm:hyper-gomory-hu.
+% They are dangling because the thing they point at is gone, which is the
+% archive working as intended, not a build fault. Unlike main.pdf, where `??`
+% is the real build gate, here it is expected and must not be chased.
 % ============================================================================
 
 \input{preamble}
@@ -319,7 +333,7 @@ LaTeX rather than generated, and its fixed-seed calls are recorded in its header
 \begin{offcut}{A6 (restored compactly). Former standalone twelve-variant grid at $m = 6$}{A6}{chapters/ch3\_discover.tex, former full-width \code{variant\_bounds\_m6.png} figure}{\textbackslash{}label\{fig:variant-bounds-comparison\}, replacing the right-hand subfigure}{The image has been restored beside the $m=3$ grid. This entry keeps the former standalone full-width layout and caption as the history of the earlier cut.}
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{figures/variant_bounds_m6.png}
+    \fbox{\parbox{0.92\textwidth}{\small Image unavailable. \path{figures/variant_bounds_m6.png} held all twelve variants and was superseded by the \path{_graphs} and \path{_hypergraphs} split when the fourth model took the count to sixteen. The archived caption below describes the twelve-variant original, so it is not repointed at the sixteen-variant replacements.}}
     \caption{The same twelve variants at $m = 6$. The undirected edge and multigraph edge cases remain proved (Mader's theorem holds for all $m$), as does the directed multigraph arc case (\Cref{thm:dir-multi-full} holds for all $m$ too), while the undirected vertex separation is the famous open problem at $m \geq 6$ and the directed \emph{simple} cases carry the same conjectured formula scaled to $m = 6$. On the open vertex panels the circles never sit below the proved edge value at the same size. Every graph feasible for the edge problem is feasible for the vertex problem (Whitney), so the edge extremiser is an honest lower bound there, and the search is free to climb past that floor wherever the vertex problem is genuinely richer. Comparing this figure with the $m = 3$ version above shows that the proved cases grow linearly with $m$ as the formulas predict, while on the open cases the circles and their yellow interpolation climb steadily without a proved curve to meet.}
     \offcutlabel{fig:variant-bounds-m6}
 \end{figure}
@@ -338,15 +352,15 @@ LaTeX rather than generated, and its fixed-seed calls are recorded in its header
 \begin{offcutrewrite}{B1. Appendix A.11, the computational transcripts}{B1}{chapters/app\_proofs.tex, three \textbackslash{}lstinputlisting dumps and their lead-ins}{the section heading \textbackslash{}section\{Computational transcripts\}}{The certificate dump goes: it records solver status with no replayable dual certificate or gap, for a value now proved by hand. The two base-case logs are NOT decoration, they are the settled base cases of the directed $m=2$ vertex theorem, so they stay as a compact table.}
 The cut-counting optimisation formulation used as a finite solver check for \Cref{thm:dir-multi-small} is given in \Cref{ch:certify}. Here are the historical solver records, together with the exhaustive-search output that settles the directed base cases. The first records solver status but not an independently replayable dual certificate or gap. The theorem itself is proved by hand in this appendix. The complete commented source is maintained with the document as \texttt{erdos915\_unified.py} in the \texttt{program/} directory and should be included in the archived submission described in \Cref{app:code}. Its core runs on \texttt{numpy} and \texttt{scipy} alone, the certifier adds \texttt{pulp}, and \texttt{matplotlib} and \texttt{networkx} are optional analysis and visualisation dependencies. An optional compiled helper accelerates selected small hot paths but is not needed for correctness.
 
-\lstinputlisting[style=pythonkul, language={}, caption={Historical solver output reporting $M^{*}(n)=2(n-1)$ and status \texttt{OPTIMAL} for $n=3,4,5,6$. The archived run did not record an independently checked optimality gap.}]{figures/certificate_log.txt}
+\lstinputlisting[style=pythonkul, language={}, caption={Historical solver output reporting $M^{*}(n)=2(n-1)$ and status \texttt{OPTIMAL} for $n=3,4,5,6$. The archived run did not record an independently checked optimality gap.}]{program/logs/certificate_log.txt}
 
 The cut-counting optimisation closes the gap up to $n = 5$ inside a short budget and reaches $n = 6$ in about twenty minutes. Past that it stalls, because a solver handles the yes-or-no cut labels by case-splitting, trying a label both ways and solving each half, and the number of cases it must open grows too fast at $n = 7$. The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and those are settled instead by the pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, and it agrees with $\ell_2^{\mathrm{dir}}(n) = M(n)$ throughout.
 
-\lstinputlisting[style=pythonkul, language={}, caption={Exhaustive-search output for the base cases $2 \le n \le 7$: the maximum arc count equals $M(n) = 2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_log.txt}
+\lstinputlisting[style=pythonkul, language={}, caption={Exhaustive-search output for the base cases $2 \le n \le 7$: the maximum arc count equals $M(n) = 2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{program/logs/basecase_search_log.txt}
 
 The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}.
 
-\lstinputlisting[style=pythonkul, language={}, caption={The same search run with the internally vertex-disjoint feasibility test, settling the base cases of \Cref{thm:dir-vertex-m2-exact}: the maximum arc count is again $2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{figures/basecase_search_vertex_log.txt}
+\lstinputlisting[style=pythonkul, language={}, caption={The same search run with the internally vertex-disjoint feasibility test, settling the base cases of \Cref{thm:dir-vertex-m2-exact}: the maximum arc count is again $2, 4, 6, 8, 10, 12$, proved complete at each $n$.}]{program/logs/basecase_search_vertex_log.txt}
 \nowreads
 The base cases of the directed induction (\Cref{thm:dir-arc-m2-exact}) run to $n = 7$, and are settled by a pruned exhaustive search over all simple digraphs with $\lambda^{\max} \le 1$. That search is exact and complete at these sizes, so each completed row is an upper-bound proof at that $n$. The vertex problem needs its own base cases, since \Cref{rem:whitney-direction} shows they cannot be inherited from the arc ones, and the same driver supplies them with only the inner feasibility test swapped. \Cref{tab:basecase-search} records both runs. The two separations agree at every size, which is what closes \Cref{thm:dir-vertex-m2-exact}, and that agreement is a computed coincidence of the two searches rather than a formal consequence of Whitney's inequality.
 
@@ -862,7 +876,7 @@ One feature stands out in the bottom row: the directed hypergraph panels, both a
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{figures/variant_bounds_m3.png}
+    \fbox{\parbox{0.92\textwidth}{\small Image unavailable. \path{figures/variant_bounds_m3.png} held all twelve variants and was superseded by the \path{_graphs} and \path{_hypergraphs} split when the fourth model took the count to sixteen. The archived caption below describes the twelve-variant original, so it is not repointed at the sixteen-variant replacements.}}
     \caption{All twelve variants at $m = 3$, edges against $n$, laid out by model (rows: simple, multigraph, $3$-uniform hypergraph) and by separation and direction (columns: undirected edge, undirected vertex, directed arc, directed vertex). A \emph{blue} curve is a value proved for all $n$, a \emph{red} curve a conjectured formula, and a \emph{yellow} curve a bare interpolation of the machine points where no formula is known, the three told apart by colour rather than by dash pattern. Filled squares are the sizes \code{solve} proved or certified exactly within the few seconds per size that regenerating the whole grid in one pass allows. That budget, not the method, is what ends each run of squares: the directed-arc panel closes $n = 6$ too when given nine minutes, as \Cref{sec:trichotomy} records, and every square drawn is exact wherever it appears. Open circles are lower bounds at larger $n$, the better at each size of the search's densest find and a named construction measured by the checker, reported as a running maximum so a feasible graph at one size is never lost at the next. On the open variants the yellow curve is the piecewise-linear interpolation \emph{through} those circles, never above them, and the axes are scaled to the data rather than to a loose certain interval. The directed hypergraph panels in the bottom row rise steeply because their value is quadratic in $n$, not linear.}
     \offcutlabel{fig:variant-bounds-m3}
 \end{figure}
@@ -1477,7 +1491,7 @@ The computational material is deliberately divided by responsibility:
   BMAX=8 .venv/bin/python3 program/scripts/multi_vertex_blocks.py
   \end{verbatim}
   The second script's terminal output is retained as
-  \path{figures/multi_vertex_blocks_log.txt}.
+  \path{program/logs/multi_vertex_blocks_log.txt}.
 
   \item[\code{program/tests/}]
   The independent regression suite. Its tests cover the graph and hypergraph representations, edge and vertex connectivity, known closed forms, named constructions, exhaustive enumeration, certification, search invariants, and random-model utilities.
@@ -1492,7 +1506,7 @@ The computational material is deliberately divided by responsibility:
   The declared Python dependencies and supported version ranges.
 
   \item[Execution transcripts]
-  The files \path{figures/certificate_log.txt}, \path{figures/basecase_search_log.txt}, \path{figures/basecase_search_vertex_log.txt}, and \path{figures/multi_vertex_blocks_log.txt} are plain-text records of finite runs used in the thesis. They record particular executions and are not substitutes for the source or for the mathematical interpretation of their status.
+  The files \path{program/logs/certificate_log.txt}, \path{program/logs/basecase_search_log.txt}, \path{program/logs/basecase_search_vertex_log.txt}, and \path{program/logs/multi_vertex_blocks_log.txt} are plain-text records of finite runs used in the thesis. They record particular executions and are not substitutes for the source or for the mathematical interpretation of their status.
 
   \item[\code{figures/*.json}, \code{figures/*.pkl}, and generated images]
   Cached data and presentation outputs. The JSON files are human-readable, while the pickle files are Python caches and must never be accepted from an untrusted source. None is a hand proof.
@@ -2598,8 +2612,8 @@ exhaustive searches under the arc and vertex tests both complete and return
 $M(n)=\max(2(n-1),\floor{n^2/4})$ throughout. The second run is necessary
 because Whitney's inequality does not transfer an arc upper bound to the
 vertex problem (\Cref{rem:whitney-direction}). Full logs are retained as
-\path{figures/basecase_search_log.txt} and
-\path{figures/basecase_search_vertex_log.txt}.
+\path{program/logs/basecase_search_log.txt} and
+\path{program/logs/basecase_search_vertex_log.txt}.
 
 The cut-counting optimisation of \Cref{ch:certify} is a separate and weaker kind of record. It closes the directed multigraph problem only up to $n = 6$, taking about twenty minutes there, and stalls at $n = 7$ because the solver handles the yes-or-no cut labels by case-splitting and the number of cases grows too fast. Its archived runs reported $M^{*}(n) = 2(n-1)$ with status \texttt{OPTIMAL} for $3 \le n \le 6$, but recorded no independently checkable best bound or gap, so no claim here rests on them: \Cref{thm:dir-multi-full} proves the value for every $n$ and every $m$ by hand. The raw log is kept with the other two in the repository (\Cref{app:software-reproduction}).
 
@@ -2626,7 +2640,7 @@ Path & Role \\
 \code{program/tests/} & Independent regression tests for representations, connectivity, constructions, certification, and search invariants. \\
 \code{program/make\_figures.py} & Regenerates the computational figures it owns and their underlying data with fixed seeds; \path{figures/rediscovery_table.tex} is hand-kept. \\
 \path{program/scripts/simple_vertex_blocks.py} & Runs the finite $2$-connected block sweep behind the statement about $c_m$ in \Cref{thm:simple-vertex-blocks}. \\
-\path{program/scripts/multi_vertex_blocks.py} & Runs the finite block-knapsack checks used in \Cref{sec:multi-vertex-blocks}; its retained output is \path{figures/multi_vertex_blocks_log.txt}. \\
+\path{program/scripts/multi_vertex_blocks.py} & Runs the finite block-knapsack checks used in \Cref{sec:multi-vertex-blocks}; its retained output is \path{program/logs/multi_vertex_blocks_log.txt}. \\
 \code{figures/*.txt}, \code{*.json}, \code{*.pkl} & Run transcripts, human-readable data, and Python caches. Pickles must not be loaded from an untrusted source. \\
 \bottomrule
 \end{tabularx}
