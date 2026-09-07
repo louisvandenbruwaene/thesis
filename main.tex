@@ -205,11 +205,12 @@ $c_m$ & proposed limiting rate $\lim_{n\to\infty}k_m(n)/(n-1)$ (\Cref{thm:simple
 % BACK MATTER
 % ============================================================================
 
-% Bibliography.  One entry (BercziEtAl24) leaves an underfull hbox of badness
-% 1168: four accented author names TeX will not hyphenate, so the first line
-% stretches rather than breaking.  \sloppy does not help, since it raises
-% tolerance and emergency stretch, neither of which addresses a loose line, and
-% ragged-right would restyle the whole bibliography for one entry.  Left as is.
+% Bibliography.  \bibliographystyle{unsrt} numbers entries in order of first
+% citation, so only cited keys reach main.bbl; ref.bib also carries entries that
+% only offcuts.tex cites (BercziEtAl24 among them), and those do not print here.
+% An earlier note in this slot explained an underfull hbox of badness 1168 in the
+% BercziEtAl24 entry.  That entry left the thesis with the passage that cited it,
+% and the build now reports no overfull and no underfull boxes at all.
 \bibliographystyle{unsrt}
 \bibliography{ref}
 

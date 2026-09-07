@@ -29,16 +29,16 @@ equal-budget records are the only case).
 
 ## Current build state (2026-09-07, after the corrective pass)
 
-- `main.pdf`: 124 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
-  undefined refs, 0 LaTeX warnings and 0 occurrences of `??`. One underfull
-  hbox remains, badness 1168, in the `BercziEtAl24` bibliography entry: four
-  accented author names TeX will not hyphenate. `\sloppy` does not fix a loose
-  line and ragged-right would restyle the whole bibliography, so it is left,
-  with the reasoning recorded beside `\bibliography` in `main.tex`.
-  An earlier version of this block claimed 0 underfull and 0 LaTeX warnings
-  while the log held 4 and 1; that was a grep that silently matched nothing,
-  not a cleaner build. See the locale gotcha below, and recount with
-  `LC_ALL=C grep -a` before ever restating these numbers.
+- `main.pdf`: 126 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
+  underfull, 0 undefined refs, 0 LaTeX warnings and 0 occurrences of `??`.
+  The underfull hbox of badness 1168 that this block used to record went away
+  with the `BercziEtAl24` bibliography entry, which only `offcuts.tex` cites
+  now, so `unsrt` no longer prints it in `main.bbl`. Do NOT read that as proof
+  that a clean count is safe to assume: an earlier version of this block claimed
+  0 underfull and 0 LaTeX warnings while the log held 4 and 1, because a bare
+  grep silently matched nothing. See the locale gotcha below, recount with
+  `LC_ALL=C grep -a` before ever restating these numbers, and prove the grep
+  read the file with a pattern you know is present (`Output written` works).
 - Recorded revision: the tags run to `submitted-11`, printed in the
   computational audit. `record_revision.sh` will not move an existing tag, so
   each recorded build takes the next free name. An earlier version of this line
