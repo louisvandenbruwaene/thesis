@@ -20,6 +20,12 @@ Their respective arc counts are
  Q_m(n)=\floorfrac{(n+m-2)^2}{4},\qquad
  B_m(n)=\floorfrac{(n+m-3)^2}{4}+2(m-1).
 \]
+These three letters name arc \emph{counts} of the three directed constructions
+rather than the digraphs themselves. Two similar symbols elsewhere name graphs:
+$H_{m,n}$ is the undirected hub-and-spokes graph of \Cref{const:hub-spokes},
+which carries $\floor{m(n-1)/2}$ edges and is unrelated to the directed hub
+count $H_m(n)$ above, and $B_{p,q}$ is the one-directional complete bipartite
+digraph of \Cref{const:bipartite}.
 Each has maximum local arc-connectivity $m-1$. Consequently,
 \[
  \ell_m^{\mathrm{dir}}(n)\ge \max\{H_m(n),Q_m(n),B_m(n)\}.

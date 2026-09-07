@@ -556,7 +556,7 @@ triangle} is the three-vertex pattern $x\to y$, $y\to z$, $x\to z$.
 
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}\label{sec:dir-arc-m2}
 
-This section proves the two $m = 2$ values, and it proves them in the order the logic runs rather than the order they are stated. The \emph{vertex} case comes first, in a few lines from \Cref{lem:reach-skeleton}. The \emph{arc} case then follows from it through \Cref{rem:whitney-direction}, because an upper bound on the larger feasible family is an upper bound on the smaller one, and the same argument also proves it directly. Neither proof uses induction on $n$, so neither needs a base case, and neither theorem rests on a machine run. The lemmas below are used elsewhere rather than here: the first two show that a hub forces a linear bound for every $m$, which explains the hub lower bound discussed in \Cref{ch:synthesis}, the third rules out transitive triangles, and the fourth is the deletion monotonicity that \Cref{sec:two-step-budget} runs on. These auxiliary statements and the two $m=2$ theorems carry no badge. \Cref{tab:basecase-search} records an exhaustive sweep over $2 \le n \le 7$ under both separations; it agrees with both theorems at every size and is corroboration rather than an ingredient.
+This section proves the two $m = 2$ values, and it proves them in the order the logic runs rather than the order they are stated. The \emph{vertex} case comes first, in a few lines from \Cref{lem:reach-skeleton}. The \emph{arc} case then follows from it through \Cref{rem:whitney-direction}, because an upper bound on the larger feasible family is an upper bound on the smaller one, and the same argument also proves it directly. Neither proof uses induction on $n$, so neither needs a base case, and neither theorem rests on a machine run. The lemmas below are used elsewhere rather than here: the first two show that a hub forces a linear bound for every $m$, which explains the hub lower bound discussed in \Cref{ch:synthesis}, the third rules out transitive triangles, and the fourth is the deletion monotonicity that \Cref{sec:two-step-budget} runs on. These auxiliary statements and the two $m=2$ theorems carry no badge. \Cref{tab:basecase-search} records an exhaustive sweep over $2 \le n \le 7$ under both separations. It agrees with both theorems at every size and is corroboration rather than an ingredient.
 
 \begin{lemma}[Two-hop lemma]\label{lem:two-hop-arc}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$ containing a vertex $r$ with $d^+(r) = n-1$. Then every $v \ne r$ has at most $m-2$ in-arcs from $V \setminus \{r, v\}$.
@@ -628,7 +628,7 @@ so all three are equal. The same argument also proves it directly: in the claim 
 
 Hence $\ell_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n)$, and the two separations agreeing at $m = 2$ is a consequence of that chain rather than a coincidence of two searches. What is a computed coincidence is narrower and is recorded in \Cref{tab:basecase-search}: the two sweeps also visit the same number of search nodes at every size.
 
-Three independent confirmations sit beside these proofs and none is needed by them. The exhaustive search of \Cref{ch:certify} was run under both feasibility tests, reporting the same maxima $2, 4, 6, 8, 10, 12$ at $n \le 7$, and the two smallest of those are immediate by hand: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Separately, \Cref{thm:dir-multi-full} proves $L_2^{\mathrm{dir}}(n) = M(n)$ for directed multigraphs, and \Cref{thm:dir-multi-m2} records that at $m = 2$ the multigraph and the simple digraph problems are the same problem. Those runs and that theorem corroborate the values; the proofs above are what establish them.
+Three independent confirmations sit beside these proofs and none is needed by them. The exhaustive search of \Cref{ch:certify} was run under both feasibility tests, reporting the same maxima $2, 4, 6, 8, 10, 12$ at $n \le 7$, and the two smallest of those are immediate by hand: at $n = 2$ there are at most $2$ arcs, and at $n = 3$ a fifth arc would leave at most one arc of the complete bidirected triangle missing, so three of the remaining arcs form a transitive triangle, which \Cref{lem:no-transitive-triangle} forbids. Separately, \Cref{thm:dir-multi-full} proves $L_2^{\mathrm{dir}}(n) = M(n)$ for directed multigraphs, and \Cref{thm:dir-multi-m2} records that at $m = 2$ the multigraph and the simple digraph problems are the same problem. Those runs and that theorem corroborate the values, and the proofs above are what establish them.
 
 \begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
 The skeleton argument settles $m=2$. For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
@@ -660,7 +660,7 @@ by Stijn Cambie, refutes the earlier formula and the decomposition proposed
 alongside it.
 
 \begin{construction}[Clique-core counterexample]\label{const:clique-core}
-Let $n\ge m\ge2$, put $r=n-m$, $a=\ceil{r/2}$ and $b=\floor{r/2}$.
+Let $n\ge m\ge2$, put $p=n-m$, $a=\ceil{p/2}$ and $b=\floor{p/2}$.
 Take disjoint sets $S,C,T$ of sizes $a,m,b$, with
 $C=\{c_1,\ldots,c_m\}$. Include exactly the arcs
 \[
@@ -689,12 +689,12 @@ $\lec_D^{\max}=m-1$. The arc count is
  |A(D)|=m(m-1)+(m-1)a+(m-2)b+ab
        =\floorfrac{(n+m-3)^2}{4}+2(m-1)=:B_m(n).
 \]
-Indeed, $a(b+1)=\floor{(r+1)^2/4}$. Subtracting the old branches gives
+Indeed, $a(b+1)=\floor{(p+1)^2/4}$. Subtracting the old branches gives
 \[
- B_m(n)-m(n-1)=\floorfrac{(r+1)^2}{4}-2r,\qquad
- B_m(n)-\floorfrac{(n+m-2)^2}{4}=m-1-\floor{r/2}.
+ B_m(n)-m(n-1)=\floorfrac{(p+1)^2}{4}-2p,\qquad
+ B_m(n)-\floorfrac{(n+m-2)^2}{4}=m-1-\floor{p/2}.
 \]
-Both differences are positive when $m\ge5$ and $7\le r\le2m-3$.
+Both differences are positive when $m\ge5$ and $7\le p\le2m-3$.
 At $m=5$, $n=12$, the four arc classes contribute $20+16+9+12=57$,
 whereas the earlier formula gives $\max(55,56)=56$.
 This establishes a lower bound, not the exact value of $\ell_5^{\mathrm{dir}}(12)$.
@@ -1707,7 +1707,7 @@ $K_3(n) = 2(n-1)$ for every $n \ge 2$.
 The upper bound is \Cref{thm:hyper-vertex-m3} at $r = 2$, where the displayed bound $q(r-1) \le 2(n-1)$ reads $q \le 2(n-1)$ and $q$ is the total multiplicity. Its proof asks only that hyperedge-nodes have degree $r \ge 2$, which holds at $r = 2$. For the lower bound take a spanning tree and give every edge multiplicity two. A tree edge $uv$ has $\pi(u,v) = 0$, so $\kap(u,v) = 2$ by \Cref{lem:multi-vertex-split}, and a non-adjacent pair is joined by the unique tree path, so $\kap = 1$. Nothing exceeds $2 = m-1$, and the count is $2(n-1)$.
 \end{proof}
 
-At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The two separations part company at $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ they agree for every $n \le 8$, since $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}, and whether they agree at every $n$ is open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
 
 \begin{itemize}
     \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
@@ -1731,7 +1731,7 @@ By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connec
 The obvious guess is that cycles must always pay for themselves against this bound: each independent cycle costs $m-1$ units of route capacity. The next theorem shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
 
 \begin{theorem}[A bouquet of thickened cliques, and how it beats the thickened tree,\aimedal]\label{thm:clique-chain-vertex}
-Fix $3 \le r \le m$ and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex cap on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
+Fix $3 \le r \le m$, the order of the clique block rather than the hyperedge uniformity of \Cref{tab:notation}, and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex cap on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
 \[
     (m-1)(n-1) \;+\; k \cdot \mathrm{gain}(r,m),
     \qquad
@@ -1872,7 +1872,7 @@ in \Cref{sec:transcripts}.
   $2$-connected block on $b$ vertices can score, by exhaustion over every
   $2$-connected graph of that order. A dash marks a size at which no feasible
   block exists, which at $m=2$ is every $b \ge 3$. Feeding this row into the
-  knapsack of \Cref{thm:multi-vertex-blocks} gives $K_m(n)$ for $n \le 8$; at
+  knapsack of \Cref{thm:multi-vertex-blocks} gives $K_m(n)$ for $n \le 8$. At
   $m=5$, $n=7$ it returns the $29$ quoted above, against the $27$ that
   \Cref{thm:clique-chain-vertex} reaches. The per-vertex rate $g_m(b)/(b-1)$ is
   still rising at $b=8$ in every row from $m=5$ on, while at $m=3$ it falls and

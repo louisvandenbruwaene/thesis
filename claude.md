@@ -17,11 +17,13 @@ the single-file companion program, `research_notes/` holds working notes, and
 anchor.
 
 The hand-in is `main.pdf` plus the `program/` directory, and nothing else. Every
-path the thesis prints begins with `program/`.
+path the thesis prints is relative to the repository root, so it begins with
+`program/`, unless a base directory is named where the path is given (the
+equal-budget records are the only case).
 
-## Current build state (2026-09-03, after the hand-in review)
+## Current build state (2026-09-07, after the corrective pass)
 
-- `main.pdf`: 112 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
+- `main.pdf`: 124 pages. `latexmk -pdf -g main.tex` exits 0 with 0 overfull, 0
   undefined refs, 0 LaTeX warnings and 0 occurrences of `??`. One underfull
   hbox remains, badness 1168, in the `BercziEtAl24` bibliography entry: four
   accented author names TeX will not hyphenate. `\sloppy` does not fix a loose
@@ -31,7 +33,7 @@ path the thesis prints begins with `program/`.
   while the log held 4 and 1; that was a grep that silently matched nothing,
   not a cleaner build. See the locale gotcha below, and recount with
   `LC_ALL=C grep -a` before ever restating these numbers.
-- Recorded revision: the tags run to `submitted-6`, printed in the
+- Recorded revision: the tags run to `submitted-11`, printed in the
   computational audit. `record_revision.sh` will not move an existing tag, so
   each recorded build takes the next free name. An earlier version of this line
   still named `submitted-3` after three further builds had been recorded, so
@@ -44,13 +46,23 @@ path the thesis prints begins with `program/`.
 - `program/`: one file, `erdos915_unified.py`. Core needs numpy and scipy only;
   pulp, networkx and matplotlib are optional and guarded. `geng` optional.
 - Tests: `cd program && ../.venv/bin/python3 -m unittest discover -s tests`,
-  currently 168 tests with 1 expected skip.
-- **The hand-in is built, never copied: `handin/` comes from `git archive`** so
-  the local `.DS_Store`, `__pycache__`, `_erdos_fast.so` and the fourteen
-  uncited scratch logs in `program/logs/` cannot ride along. Its shape matches
-  the audit's instructions, the venv going at the bundle root so
-  `../.venv/bin/python3` resolves from `program/`. Rebuild it with:
-  `rm -rf handin && mkdir handin && git archive --format=tar HEAD program | tar -x -C handin && git show HEAD:main.pdf > handin/main.pdf`
+  currently 207 tests with 1 expected skip.
+- **The hand-in is built, never copied: `./build_handin.sh`** wraps the
+  `git archive` bundle so the local `.DS_Store`, `__pycache__`,
+  `_erdos_fast.so` and the fourteen uncited scratch logs in `program/logs/`
+  cannot ride along. Its shape matches the audit's instructions, the venv going
+  at the bundle root so `../.venv/bin/python3` resolves from `program/`. It runs
+  publish.sh's working-notes guard over the finished bundle and refuses on a
+  dirty tree, and `handin/` is gitignored, so it is a build product with no
+  independent existence. **Rebuild it after every recorded build**, or its
+  `main.pdf` silently lags `HEAD`.
+- **`.gitattributes` is what keeps `program/CLAUDE.md` out of both
+  distributions.** `git archive` honours `export-ignore`, and both the hand-in
+  and `publish.sh` go through `git archive`, so one line covers both. Before
+  2026-09-07 only publish.sh stripped it, by an explicit `rm -f`, and the
+  hand-in path did not: 392 lines of program working notes shipped to the
+  examiners in a bundle whose own manifest did not list them. That `rm -f` and
+  the guard stay as a second line of defence.
 - Standard of done: run `./check_consistency.sh`, rebuild the PDF clean, run the
   suite, run the program's `_run_checks` self-test, and re-verify any numeric
   claim against a second implementation (`program/scripts/` holds the
@@ -235,6 +247,34 @@ path the thesis prints begins with `program/`.
 
 One line each. `git log` has the full message for every one of them.
 
+- **2026-09-07.** A full independent review of the built PDF, then a corrective
+  pass on what it found. No new proof gap: the mathematics was re-derived end to
+  end and every load-bearing computation reproduced from scratch, with a
+  separate max-flow and `geng` and no import of `program/`. Reproduced exactly:
+  all 43 cells of `tab:multi-vertex-blocks`, `g_6(9) = 54` attained by graph6
+  `H??EDz}` at 14 edges over 191826 candidates, no 2-connected block on nine or
+  fewer vertices beating the rate `m/2` for any `m <= 8`, the 2-connected counts
+  468 / 7123 / 194066, and the four equal-budget totals (128 cases, 74 / 68 / 8,
+  57657.7 s and 58690.8 s) to the digit. Four defects fixed. The PACKAGING one
+  is the one that mattered: see the `.gitattributes` entry above. The
+  MATHEMATICAL one was a wording defect at two sites, ch1 and `app_proofs`
+  around `cor:multi-vertex-m3`, both saying the multigraph vertex problem
+  "parts company with its edge counterpart at `m = 5`", which asserts
+  `K_4(n) = L_4(n)` at every `n` while `tab:summary` and `tab:open-problems`
+  both list that variant open from `m >= 4`. The evidence is only
+  `g_4(b) = 3(b-1)` for `b <= 8`, and the easy bound is far too weak to close
+  it: every edge of a 2-connected block has `kappa >= 2`, so `W_4(B) <= 2|E|`,
+  a factor 4/3 above `3(b-1)`. Both now read "the first threshold at which the
+  two values are known to differ is `m = 5`" and say `m = 4` is open. Also:
+  three prose semicolons removed; ch2's blanket "every file path is relative to
+  the repository" qualified, since the equal-budget records name their own base
+  directory; `const:clique-core`'s `r = n-m` renamed to `p`, `r` being reserved
+  thesis-wide for hyperedge size; `H_{m,n}` (undirected hub-and-spokes GRAPH,
+  `floor(m(n-1)/2)` edges) disambiguated from `H_m(n)` (directed hub ARC COUNT,
+  `m(n-1)`) where both are in play, and `thm:clique-chain-vertex` now says its
+  `r` is a clique order. Left alone as deliberate: `lem:near-regular`'s generic
+  `r`, and a handful of banned-list phrases the author may still want out.
+
 - **2026-09-04.** A full read-through of all four chapter sources with every
   numeric claim re-derived. Four defects, one of them a bound the thesis
   understated against its own table. `cor:dir-multi-incidence` said
@@ -299,10 +339,8 @@ One line each. `git log` has the full message for every one of them.
   `W_6` at `4|E|`, so 13 edges cannot reach 53. `tab:multi-vertex-blocks`
   already warns the table does not extrapolate, and the curve is labelled a
   lower bound, so both stay honest. Extending the sweep to b=9 would tighten
-  it. OPEN FOR THE AUTHOR: `program/CLAUDE.md`, 392 lines of working notes,
-  rides into the hand-in via `git archive HEAD program`, is absent from the
-  README manifest and from the audit's list of what `program/` holds.
-  `publish.sh` strips it from the PUBLIC snapshot; the hand-in path does not.
+  it. `program/CLAUDE.md` riding into the hand-in was flagged here and is fixed
+  as of 2026-09-07 by `.gitattributes`.
 
 - **2026-09-03 (second pass).** A pre-hand-in review, six defects, none
   mathematical. The AI badge had come off five Chapter 1 statements but not
