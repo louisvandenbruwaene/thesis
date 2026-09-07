@@ -461,16 +461,19 @@ def _best_known_block(b: int, m: int) -> int:
 def block_bouquet_lower_bound(n: int, m: int) -> int:
     """A lower bound on ``K_m(n)``: a bouquet of the best blocks known.
 
-    ``thm:multi-vertex-blocks`` reduces the value to a knapsack: each block costs
+    ``thm:multi-vertex-blocks`` proposes a reduction to a knapsack: each block costs
     ``b - 1`` vertices beyond the shared one and scores ``g_m(b)``, and the total
     cost may not exceed ``n - 1``.  :func:`_best_known_block` supplies the score,
     exhaustively where the sweep reaches and by construction beyond it.
 
     ``b = 2`` is the single edge at multiplicity ``m-1``, so the thickened tree is
     the ``b = 2`` case and this is never worse than it.  It returns the tree's
-    ``(m-1)(n-1)`` at ``m <= 4``, where that is optimal, and beats it from
-    ``m = 5`` on, where ``thm:clique-chain-vertex`` proves the tree is not
-    extremal.
+    ``(m-1)(n-1)`` at ``m <= 4``, where no better block is known and the value is
+    settled only at ``m <= 2``, and beats it from ``m = 5`` on, where
+    ``thm:clique-chain-vertex`` proposes that the tree is not extremal.
+
+    Everything this returns is a LOWER bound: the knapsack reduction it follows
+    is itself conjectural, so a matching value certifies nothing above it.
 
     An earlier version offered theta blocks alone, which the theta family caps at
     ``b <= m+1``.  That missed the larger blocks the sweep finds: at ``m = 6`` it
