@@ -39,8 +39,9 @@ equal-budget records are the only case).
   grep silently matched nothing. See the locale gotcha below, recount with
   `LC_ALL=C grep -a` before ever restating these numbers, and prove the grep
   read the file with a pattern you know is present (`Output written` works).
-- Recorded revision: the tags run to `submitted-11`, printed in the
-  computational audit. `record_revision.sh` will not move an existing tag, so
+- Recorded revision: the tags run to `revised-21`, printed in the
+  computational audit. The naming moved from `submitted-N` to `revised-N`
+  partway through, and both series exist, so sort with `git tag | sort -V`. `record_revision.sh` will not move an existing tag, so
   each recorded build takes the next free name. An earlier version of this line
   still named `submitted-3` after three further builds had been recorded, so
   read the tag off `git tag` rather than off this file.
@@ -256,6 +257,27 @@ equal-budget records are the only case).
 ## Recent sessions
 
 One line each. `git log` has the full message for every one of them.
+
+- **2026-09-07 (fourth pass).** The four floats the morning's inventory carried
+  forward, closed by checking what they claim rather than their labels. One
+  defect: `fig:spine`'s caption ended "The badge colours on the code cards match
+  the boxes here", and the code cards were cut to `offcuts.tex` in a shortening
+  pass, so it pointed at objects the thesis no longer prints. `\codecard` is used
+  in `offcuts.tex` alone and `\rolebadge` in no chapter source. Sentence removed,
+  and `offcuts.tex` already archives the caption's earlier form carrying it.
+  `program/scripts/verify_variant_grids.py` closes all four variant-bound grids,
+  not just the m=3 hypergraph one: it matches every printed cell of
+  `tab:variant-values` to its panel, checks that a conjectured panel carries a
+  curve and an open panel none and that no drawn point sits above an upper-bound
+  curve or above a completed enumeration, and redraws each PNG and compares
+  SHA-256. No mismatches, all four byte-identical. `fig:vertex-split` and
+  `fig:scaling-reduction` verified, the latter with an exact-rational max flow:
+  the drawn multigraph has lambda^max = 2 = m-1 so it is feasible at m=3, and
+  total weight 3/2 is its three arcs over m-1. Recorded as `revised-21`, hand-in
+  rebuilt so it carries the two `incidence_rank_step4_*` scripts the previous
+  bundle predated, pushed and published. Still Louis's own: the proof
+  walkthrough and badge decisions, and the academic year and conjectural scope
+  with his supervisor.
 
 - **2026-09-07 (third pass).** Structural checks rather than greps, and the two
   that paid. `thm:dir-multi-m2` was headed "with proof" but had NO proof block:
