@@ -46,8 +46,13 @@ program/
   scripts/              independent mathematical checks, block sweeps and
                         experiment drivers that call the main solver
   data/                 machine_values.json, the recorded result of every solve
-                        call behind the four variant grids
+                        call behind the four variant grids, alongside
+                        rediscovery.json, search_evidence.json and the
+                        equal_budget_2026-09-06/ benchmark records the appendix
+                        cites by name
   logs/                 run transcripts the computational audit cites
+  requirements.txt      the libraries, unpinned
+  requirements-lock.txt the exact versions the recorded runs used
   README.md             this file
 ```
 
