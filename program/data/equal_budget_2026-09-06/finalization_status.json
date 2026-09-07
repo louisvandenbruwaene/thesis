@@ -1,6 +1,8 @@
 {
   "state": "complete",
-  "stage": "ready for visual review",
-  "updated_utc": "2026-09-07T08:31:02.703947+00:00",
-  "pdf_sha256": "6aa3ca95fe92ca0fd6feeeed5f7c73efe7625dfdbbf3070b65fa5b9b4503f9df"
+  "stage": "recorded build checked after visual review",
+  "updated_utc": "2026-09-07T08:37:16Z",
+  "source_revision": "bb51988d47ab",
+  "source_tag": "submitted-10",
+  "pdf_sha256": "a57c4f3b66807481ceeaa03615828c43906315419a56470a4c8ea2ea5122c42d"
 }
