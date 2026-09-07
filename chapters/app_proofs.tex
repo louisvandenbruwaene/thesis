@@ -350,7 +350,7 @@ exists, the limit being approached from below. The supremum is finite: \Cref{rem
 \end{conjecture}
 
 \begin{proof}[Proposed proof]
-Let $G$ be feasible. Adjacent vertices $u,v$ lie in a common block $B$, and no $u$-$v$ path leaves $B$: leaving means crossing a cut vertex, and returning means crossing that same cut vertex a second time, which no path does. So $\kap_G(u,v) = \kap_B(u,v)$, every block inherits feasibility, and since every edge lies in exactly one block, $|E(G)| = \sum_B |E(B)| \le \sum_B h_m(|V(B)|)$. Within one component the block sizes satisfy $\sum_B (|V(B)|-1) = (\text{order of the component}) - 1$, and summing over components loses one further vertex apiece, so $\sum_B (|V(B)|-1) \le n-1$. That is $\le$.
+Let $G$ be feasible. Adjacent vertices $u,v$ lie in a common block $B$, and no $u$--$v$ path leaves $B$: leaving means crossing a cut vertex, and returning means crossing that same cut vertex a second time, which no path does. So $\kap_G(u,v) = \kap_B(u,v)$, every block inherits feasibility, and since every edge lies in exactly one block, $|E(G)| = \sum_B |E(B)| \le \sum_B h_m(|V(B)|)$. Within one component the block sizes satisfy $\sum_B (|V(B)|-1) = (\text{order of the component}) - 1$, and summing over components loses one further vertex apiece, so $\sum_B (|V(B)|-1) \le n-1$. That is $\le$.
 
 For $\ge$, take blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, pick one vertex, and attach all the $B_i$ to it, pairwise disjoint otherwise. The result has $1 + \sum(b_i-1) \le n$ vertices. Add isolated vertices if necessary to bring its order to exactly $n$. Its nontrivial blocks are exactly the $B_i$, so pairs inside a block keep their $\kap$ and pairs split between two blocks are separated by the shared vertex and have $\kap \le 1 \le m-1$. It is feasible with $\sum_i |E(B_i)|$ edges.
 
@@ -618,7 +618,7 @@ Write $M(n) = \max(2(n-1), \floor{n^2/4})$.
 
 \emph{Upper bound.} Let $D$ be a simple digraph on $n \ge 2$ vertices with $\kap^{\max}_D \le 1$, and let $R \subseteq D$ be a reachability skeleton with $|A(R)| \le M(n)$, which \Cref{lem:reach-skeleton} supplies for every loopless directed multigraph and so in particular for this one.
 
-We claim $A(D) = A(R)$. One inclusion is the definition of $R$. For the other, take an arc $(u,v) \in A(D)$ and suppose $(u,v) \notin A(R)$. The arc itself shows that $u$ reaches $v$ in $D$, so $u$ reaches $v$ in $R$ as well, along some directed path $P$ using only arcs of $R$. Since $(u,v) \notin A(R)$, the path $P$ is not that single arc, so it has length at least two. Now $P$ and the one-arc route $u \to v$ are two distinct $u$-$v$ routes, and they are internally vertex-disjoint, because the one-arc route has no interior at all and the empty set meets nothing. Hence $\kap_D(u,v) \ge 2$, against feasibility. So $(u,v) \in A(R)$.
+We claim $A(D) = A(R)$. One inclusion is the definition of $R$. For the other, take an arc $(u,v) \in A(D)$ and suppose $(u,v) \notin A(R)$. The arc itself shows that $u$ reaches $v$ in $D$, so $u$ reaches $v$ in $R$ as well, along some directed path $P$ using only arcs of $R$. Since $(u,v) \notin A(R)$, the path $P$ is not that single arc, so it has length at least two. Now $P$ and the one-arc route $u \to v$ are two distinct $u$--$v$ routes, and they are internally vertex-disjoint, because the one-arc route has no interior at all and the empty set meets nothing. Hence $\kap_D(u,v) \ge 2$, against feasibility. So $(u,v) \in A(R)$.
 
 Therefore $|A(D)| = |A(R)| \le M(n)$, which with the lower bound gives $k_2^{\mathrm{dir}}(n) = M(n)$.
 \end{proof}
@@ -1663,12 +1663,12 @@ separating pairs, and none is supplied here.
 
 \section{The multigraph incidence problems}\label{sec:multi-vertex}
 
-The conjecture above is about hyperedge networks, and at $r = 2$ a hyperedge network is a multigraph, so the two multigraph vertex questions are the $r = 2$ case of the two hypergraph vertex questions and not restatements of their simple counterparts. This section works them out. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally disjoint $u$-$v$ routes, since a single edge is a path with no interior, which is the incidence convention of \Cref{sec:incidence-convention}. Write $K_m(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$, as in \Cref{tab:notation}.
+The conjecture above is about hyperedge networks, and at $r = 2$ a hyperedge network is a multigraph, so the two multigraph vertex questions are the $r = 2$ case of the two hypergraph vertex questions and not restatements of their simple counterparts. This section works them out. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally disjoint $u$--$v$ routes, since a single edge is a path with no interior, which is the incidence convention of \Cref{sec:incidence-convention}. Write $K_m(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$, as in \Cref{tab:notation}.
 
 The two kinds of route never interfere, which splits the measure in two.
 
 \begin{lemma}[Splitting the vertex measure]\label{lem:multi-vertex-split}
-Let $G$ be a multigraph with multiplicity function $\mu$ and underlying simple graph $G_0$. For any two vertices $u \ne v$, write $\pi(u,v)$ for the largest number of pairwise internally disjoint $u$-$v$ paths of length at least two in $G_0$. Then
+Let $G$ be a multigraph with multiplicity function $\mu$ and underlying simple graph $G_0$. For any two vertices $u \ne v$, write $\pi(u,v)$ for the largest number of pairwise internally disjoint $u$--$v$ paths of length at least two in $G_0$. Then
 \[
     \kap_G(u,v) \;=\; \mu(u,v) \;+\; \pi(u,v).
 \]
@@ -1677,9 +1677,9 @@ Let $G$ be a multigraph with multiplicity function $\mu$ and underlying simple g
 \begin{proof}
 A route of length one is a single copy of the edge $uv$, and its interior is empty, so it is internally disjoint from every other route whatever the length. We prove the two inequalities separately.
 
-\emph{Lower bound.} Take all $\mu(u,v)$ copies of $uv$, and take a maximum family $P$ of pairwise internally disjoint $u$-$v$ paths of length at least two in $G_0$, so $|P| = \pi(u,v)$. Lift each path of $P$ into $G$ by choosing one copy of each of its edges, which is possible because every edge of $G_0$ carries multiplicity at least one. Lifting leaves interior vertices unchanged, so the lifted routes are pairwise internally disjoint, and they are internally disjoint from the copies of $uv$ because those have empty interior. That is a family of $\mu(u,v) + \pi(u,v)$ pairwise internally disjoint routes, so $\kap_G(u,v) \ge \mu(u,v) + \pi(u,v)$.
+\emph{Lower bound.} Take all $\mu(u,v)$ copies of $uv$, and take a maximum family $P$ of pairwise internally disjoint $u$--$v$ paths of length at least two in $G_0$, so $|P| = \pi(u,v)$. Lift each path of $P$ into $G$ by choosing one copy of each of its edges, which is possible because every edge of $G_0$ carries multiplicity at least one. Lifting leaves interior vertices unchanged, so the lifted routes are pairwise internally disjoint, and they are internally disjoint from the copies of $uv$ because those have empty interior. That is a family of $\mu(u,v) + \pi(u,v)$ pairwise internally disjoint routes, so $\kap_G(u,v) \ge \mu(u,v) + \pi(u,v)$.
 
-\emph{Upper bound.} Let $F$ be any family of pairwise internally disjoint $u$-$v$ routes in $G$, and split it into the routes $F_1$ of length one and the routes $F_2$ of length at least two. The members of $F_1$ are distinct copies of the edge $uv$ and there are only $\mu(u,v)$ such copies, so $|F_1| \le \mu(u,v)$. Send each route of $F_2$ to its vertex sequence, a $u$-$v$ path of $G_0$ of length at least two. That map is injective on $F_2$: two routes with the same vertex sequence have the same interior, which is non-empty because the length is at least two, and $F$ is internally disjoint, so no two such routes can both belong to it. Distinct members of $F_2$ have disjoint interiors, so their images are pairwise internally disjoint paths of $G_0$ of length at least two, giving $|F_2| \le \pi(u,v)$. Hence $|F| \le \mu(u,v) + \pi(u,v)$, and taking $F$ maximum gives $\kap_G(u,v) \le \mu(u,v) + \pi(u,v)$.
+\emph{Upper bound.} Let $F$ be any family of pairwise internally disjoint $u$--$v$ routes in $G$, and split it into the routes $F_1$ of length one and the routes $F_2$ of length at least two. The members of $F_1$ are distinct copies of the edge $uv$ and there are only $\mu(u,v)$ such copies, so $|F_1| \le \mu(u,v)$. Send each route of $F_2$ to its vertex sequence, a $u$--$v$ path of $G_0$ of length at least two. That map is injective on $F_2$: two routes with the same vertex sequence have the same interior, which is non-empty because the length is at least two, and $F$ is internally disjoint, so no two such routes can both belong to it. Distinct members of $F_2$ have disjoint interiors, so their images are pairwise internally disjoint paths of $G_0$ of length at least two, giving $|F_2| \le \pi(u,v)$. Hence $|F| \le \mu(u,v) + \pi(u,v)$, and taking $F$ maximum gives $\kap_G(u,v) \le \mu(u,v) + \pi(u,v)$.
 
 The two bounds give the equality.
 \end{proof}
@@ -1832,7 +1832,7 @@ the maximum over all finite multisets of block sizes. In particular the value is
 \end{conjecture}
 
 \begin{proof}[Proposed proof]
-\emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$-$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
+\emph{The objective is additive over blocks.} Let $G_0$ be feasible and let $u,v$ be adjacent, lying in the block $B$. Every $u$--$v$ path of $G_0$ stays inside $B$: a path leaving $B$ must leave through a cut vertex, and to return it would have to pass through that same cut vertex a second time, which no path does. So $\kap_{G_0}(u,v) = \kap_B(u,v)$, and since every edge lies in exactly one block,
 \[
     W_m(G_0) \;=\; \sum_{\text{blocks } B} W_m(B) .
 \]
@@ -1955,7 +1955,7 @@ to $K_m^{\mathrm{dir}}(n)$ without any asymptotic argument.
 \begin{conjecture}[Splitting the directed vertex measure, with proof,\aimedal]\label{lem:multi-vertex-split-dir}
 Let $D$ be a multidigraph with multiplicity function $\mu$ and underlying simple
 digraph $D_0$. For an ordered pair $u \ne v$, write $\pi(u,v)$ for the largest number
-of pairwise internally disjoint directed $u$-$v$ paths of length at least two in
+of pairwise internally disjoint directed $u$--$v$ paths of length at least two in
 $D_0$. Then $\kap_D(u,v) = \mu(u,v) + \pi(u,v)$, and consequently
 \[
     K_m^{\mathrm{dir}}(n) \;\le\; (m-1)\,k_m^{\mathrm{dir}}(n) .
@@ -1963,15 +1963,15 @@ $D_0$. Then $\kap_D(u,v) = \mu(u,v) + \pi(u,v)$, and consequently
 \end{conjecture}
 
 \begin{proof}[Proposed proof]
-A directed $u$-$v$ route of length one is a parallel copy of the arc $uv$ and has empty
+A directed $u$--$v$ route of length one is a parallel copy of the arc $uv$ and has empty
 interior, and no step of \Cref{lem:multi-vertex-split} uses the absence of orientation,
 so its proof applies with directed routes throughout. The lower bound lifts a maximum
-family of internally disjoint directed $u$-$v$ paths of length at least two out of
+family of internally disjoint directed $u$--$v$ paths of length at least two out of
 $D_0$ and adjoins the $\mu(u,v)$ copies. The upper bound splits a family into copies of
 the arc $uv$ and routes of length at least two, the latter mapping injectively to
 directed paths of $D_0$ because two routes with the same vertex sequence share an
 interior that is non-empty. Note that a
-directed $u$-$v$ path uses no copy of the arc $vu$, so the reverse multiplicity plays
+directed $u$--$v$ path uses no copy of the arc $vu$, so the reverse multiplicity plays
 no part.
 
 For the bound, let $D$ be feasible. The identity gives $\mu(u,v) \le \kap_D(u,v) \le m-1$
@@ -2038,7 +2038,7 @@ blocks exactly as in \Cref{thm:multi-vertex-blocks}. Each block of
 
 \begin{proof}[Proposed proof]
 For the block structure, let $u,v$ be joined by an arc of $D_0$ and let $B$ be the block
-of the underlying undirected graph that contains it. A directed $u$-$v$ path of $D_0$
+of the underlying undirected graph that contains it. A directed $u$--$v$ path of $D_0$
 leaves $B$ only by crossing a cut vertex, and returning crosses that same vertex a
 second time, which no path does. So every route counted by $\pi(u,v)$ stays inside $B$.
 For two vertices that lie in no common block, either no path joins them or a
@@ -2046,7 +2046,7 @@ cut vertex on the intervening block chain separates them. Every directed
 route must pass through that vertex, giving $\kap_D \le 1$ there. The two
 blocks need not themselves share a vertex.
 
-For one block, the internally disjoint directed $u$-$v$ routes of length at least two
+For one block, the internally disjoint directed $u$--$v$ routes of length at least two
 in the complete digraph on $b$ vertices have pairwise disjoint interiors drawn from the
 other $b-2$ vertices, so there are at most $b-2$ of them, and the two-step routes attain
 that. Hence $\pi(u,v) = b-2$, and \Cref{lem:multi-vertex-split-dir} gives
