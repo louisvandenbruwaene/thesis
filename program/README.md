@@ -86,8 +86,11 @@ sound, generation-based directed-multigraph enumerator that follows J. Goedgebeu
 `geng` suggestion) shells out to nauty's `geng`. It decorates the supports in
 parallel across processor cores (each support is independent), which is what makes
 the open `n = 7` classification practical on a multi-core machine. Pass
-`parallel=False` for a single-process run. Everything else, including the
-self-test, the figures, and the test suite, runs without `geng`. Every test that
+`parallel=False` for a single-process run. The three block sweeps in `scripts/`
+(`multi_vertex_blocks.py`, `multi_vertex_blocks_b9.py` and
+`simple_vertex_blocks.py`) need `geng` as well, and `networkx` with it; the
+appendix cites the second of those for `g_6(9) = 54`. Everything else, including
+the self-test, the figures, and the test suite, runs without `geng`. Every test that
 needs an optional dependency skips itself cleanly when that dependency is absent,
 `geng` for the generation pipeline, `pulp` for the MILP certifier and `networkx`
 for the Gomory-Hu view and independent witness checks, so a minimal `numpy` plus `scipy` install runs the suite
