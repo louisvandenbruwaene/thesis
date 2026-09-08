@@ -47,7 +47,7 @@ class Constructions(unittest.TestCase):
         from make_figures import gather_variant_grid, _panel_cell
         panel = gather_variant_grid(6)[12]
         self.assertEqual(dict(zip(*panel["construction"]))[6], 12)
-        self.assertEqual(_panel_cell(panel, 6), (r"$\stackrel{?}{\le}$12", "vtConjectured", False))
+        self.assertEqual(_panel_cell(panel, 6), ("12", "vtProved", False))
 
     def test_clique_core_count_and_feasibility(self):
         for m in range(2, 7):
