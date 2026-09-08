@@ -2088,13 +2088,22 @@ $n$, so the extremal value is $\Theta_{r,m}(n^2)$.
 
 \begin{proof}[Proposed proof]
 Upper bound: a hyperedge with tail $u$ serves the $r-1$ ordered pairs
-$(u, h)$, $h$ a head. If some ordered pair $(u, v)$ were served by $m$
-distinct hyperedges, those would be $m$ hyperedge-disjoint one-step routes, so
-each ordered pair is served at most $m-1$ times. Summing that cap over all
-$n(n-1)$ ordered pairs counts every hyperedge once for each of its $r-1$
-tail-head pairs, so the sum is $(r-1)|E|$ on one side and at most
-$(m-1)n(n-1)$ on the other, giving
-$(r-1)|E| \le (m-1) n(n-1)$.
+$(u, h)$, $h$ a head, so each hyperedge contributes $r-1$ tail-head pairs and
+the actual number of such pairs is
+\[
+    (r-1)|E|.
+\]
+If some ordered pair $(u, v)$ were served by $m$ distinct hyperedges, those
+would be $m$ hyperedge-disjoint one-step routes, so for any ordered pair
+$(u,v)$ at most $m-1$ hyperedges can connect $u$ directly to $v$. Since there
+are $n(n-1)$ ordered pairs, the maximum possible number of tail-head pairs is
+\[
+    (m-1)\,n(n-1).
+\]
+Therefore
+\[
+    (r-1)|E| \le (m-1)\,n(n-1).
+\]
 
 For the lower bound, split $V$ into tails $A$, $|A|=\alpha$, and heads $B$,
 where $b:=|B|=n-\alpha\ge r-1$. Put $k:=r-1$, $d:=m-1$ and
