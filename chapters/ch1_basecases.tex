@@ -523,18 +523,18 @@ S{\o}rensen and Thomassen state the second formula for every $n \ge 6$ apart fro
 
 \subsection{Directed graphs at the first threshold}
 
-\begin{conjecture}[Directed arc value at $m = 2$, with proof,\conditional]\label{thm:dir-arc-m2-exact}
+\begin{theorem}[Directed arc value at $m = 2$]\label{thm:dir-arc-m2-exact}
 For simple digraphs,
 \[
     \ell_2^{\mathrm{dir}}(n) = \max\!\left(2(n-1),\ \floorfrac{n^2}{4}\right).
 \]
-\end{conjecture}
+\end{theorem}
 
 Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The proposed upper-bound proof is in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, the larger feasible family, and the arc value follows from it.
 
-\begin{conjecture}[Directed vertex value at $m = 2$, with proof,\conditional]\label{thm:dir-vertex-m2-exact}
+\begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
-\end{conjecture}
+\end{theorem}
 
 \begin{figure}[ht]
 \centering
@@ -679,7 +679,7 @@ while the underlying simple graph gives the upper bound $K_m(n) < 2(m-1)^2n$
 
 \subsection{Directed bounds beyond the first threshold}
 
-\begin{conjecture}[The quadratic bound with a linear error, with proof,\aimedal\readfirst{2}]\label{thm:dir-arc-linear-error}
+\begin{theorem}[The quadratic bound with a linear error]\label{thm:dir-arc-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -689,13 +689,13 @@ so for each fixed $m$,
     \ell_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3),
 \]
 and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of the augmented bipartite count hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
-\end{conjecture}
+\end{theorem}
 
 The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to the wall plus a linear correction.
 
 The routes this count produces are internally vertex-disjoint, not merely arc-disjoint. That is what lets the whole argument be re-run under the stricter separation, and Whitney's inequality alone would not justify the transfer, since it points the other way.
 
-\begin{conjecture}[Directed vertex problem, leading constant and order, with proof,\aimedal]\label{thm:dir-vertex-linear-error}
+\begin{conjecture}[Directed vertex problem, leading constant and order, with proof,\aimedal\readfirst{3}]\label{thm:dir-vertex-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -706,7 +706,7 @@ and consequently, for each fixed $m$,
 \]
 \end{conjecture}
 
-\begin{conjecture}[Directed multigraph value, every $n$ and $m$, with proof,\aimedal\readfirst{4}]\label{thm:dir-multi-full}
+\begin{conjecture}[Directed multigraph value, every $n$ and $m$, with proof,\aimedal\readfirst{1}]\label{thm:dir-multi-full}
 For all $n \ge 2$ and $m \ge 2$,
 \[
     L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
@@ -715,7 +715,7 @@ For all $n \ge 2$ and $m \ge 2$,
 
 Under the conjecture, extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proposed proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
 
-\begin{conjecture}[The directed hypergraph constant, with proof,\aimedal]\label{thm:dir-hyper-constant}
+\begin{conjecture}[The directed hypergraph constant, with proof,\aimedal\readfirst{9}]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
 $\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
 \[

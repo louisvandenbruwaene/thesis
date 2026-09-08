@@ -522,10 +522,10 @@ def simple_undirected_vertex_m5(n: int) -> int:
 
 
 def directed_arc_m2(n: int) -> int:
-    """``ell_2^dir(n) = max(2(n-1), floor(n^2/4))``.  Conjectured (thm:dir-arc-m2-exact).
+    """``ell_2^dir(n) = max(2(n-1), floor(n^2/4))`` (thm:dir-arc-m2-exact).
 
-    The unchecked proposed proof uses the reachability skeleton of
-    lem:reach-skeleton, so it inducts on nothing and needs no base case.
+    The proof uses the reachability skeleton of lem:reach-skeleton, so it
+    inducts on nothing and needs no base case.
     """
     # The max picks whichever of the two competing constructions wins at this n:
     # the linear hub (double star) versus the quadratic one-directional wall.

@@ -468,11 +468,11 @@ Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using a
 
 A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular every parallel copy of every arc. It is a caricature of $D$: thin, and faithful on reachability, but not on the number of disjoint paths. The lemma below says such a skeleton always exists and is never too big. That one fact is what both later arguments run on. At $m = 2$ the skeleton turns out to be the whole digraph, which is the content of \Cref{thm:dir-vertex-m2-exact}, and at a general $m$ deleting it repeatedly is what \Cref{lem:reach-delete} makes pay.
 
-\begin{conjecture}[A sparse reachability skeleton always exists, with proof,\aimedal\readfirst{3}]\label{lem:reach-skeleton}
+\begin{lemma}[A sparse reachability skeleton always exists]\label{lem:reach-skeleton}
 Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
-\end{conjecture}
+\end{lemma}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Building $R$ takes three steps: handle the traffic \emph{inside} each strongly connected piece of $D$, handle the traffic \emph{between} pieces, then count. A \emph{strongly connected component} (an SCC) is a maximal set of vertices any two of which reach each other, and every directed multigraph partitions uniquely into its SCCs, since mutual reachability is an equivalence relation. \Cref{fig:skeleton-example} carries one small running example through all three steps, and every object named below appears in it concretely.
 
 \emph{Step 1: inside each component.} Fix one SCC of order $n_i \ge 1$ and pick any vertex $r$ inside it as a root. Since $r$ reaches every vertex of the component, a standard fact about digraphs gives a spanning \emph{out-arborescence}: a tree of $n_i - 1$ arcs of $D$, every one pointing away from $r$, along which $r$ reaches every other vertex of the component (grow it one hop at a time, always available since the component is strongly connected). Symmetrically, because every vertex of the component reaches $r$, there is a spanning \emph{in-arborescence} of $n_i - 1$ arcs, every one pointing toward $r$, along which every vertex reaches $r$. Taking both trees together, any two vertices $u, v$ of the component are joined by the route $u \to r \to v$, first the in-arborescence, then the out-arborescence. This concatenation can revisit vertices, but deleting closed portions leaves a directed $u$--$v$ path. Thus the at most $2(n_i - 1)$ arcs of the two trees reconstruct \emph{every} reachability relation inside this one component.
@@ -561,8 +561,8 @@ triangle} is the three-vertex pattern $x\to y$, $y\to z$, $x\to z$.
 
 \section{The directed arc value at \texorpdfstring{$m = 2$}{m=2}}\label{sec:dir-arc-m2}
 
-This section gives conditional proofs of the two proposed $m=2$ values.
-The vertex upper bound uses \Cref{lem:reach-skeleton}, whose proposed proof remains unchecked.
+This section proves the two $m=2$ values.
+The vertex upper bound uses \Cref{lem:reach-skeleton}.
 The arc upper bound then follows because every arc-feasible digraph is vertex-feasible.
 The completed enumerations in \Cref{tab:basecase-search} establish the values independently for $2\le n\le7$.
 They do not establish the all-order conjectures.
@@ -611,7 +611,7 @@ Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vert
 and an upper bound for the arc problem says nothing at all about the vertex problem. The gap is not vacuous: two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$, so there really are digraphs in the difference of the two families. Whitney therefore gives one thing, that an arc construction is a vertex \emph{lower} bound, and the vertex upper bound has to be proved separately. The proof below does that, and \Cref{ch:synthesis} treats the two separations the same way for $m \ge 3$, where the vertex problem stays open without assuming that the two optima coincide.
 \end{remark}
 
-\begin{proof}[Conditional proof of \Cref{thm:dir-vertex-m2-exact}]
+\begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}]
 Write $M(n) = \max(2(n-1), \floor{n^2/4})$.
 
 \emph{Lower bound.} The directed hub construction (\Cref{const:directed-hub} at $m = 2$, the bidirected star) and the one-directional bipartite construction (\Cref{const:bipartite}) both have $\lec^{\max} = 1$, so by \Cref{rem:whitney-direction} both have $\kap^{\max} \le 1$ and are feasible for the vertex problem as well. Between them they witness $\ell_2^{\mathrm{dir}}(n) \ge M(n)$ and $k_2^{\mathrm{dir}}(n) \ge M(n)$ at once.
@@ -627,7 +627,7 @@ In words: at $m = 2$ a feasible digraph can afford no arc that some other route 
 
 The arc value costs one further line.
 
-\begin{proof}[Conditional proof of \Cref{thm:dir-arc-m2-exact}]
+\begin{proof}[Proof of \Cref{thm:dir-arc-m2-exact}]
 The two constructions above give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the upper bound, \Cref{rem:whitney-direction} places every arc-feasible digraph inside the vertex-feasible family, so \Cref{thm:dir-vertex-m2-exact} bounds it. Chaining the three,
 \[
     M(n) \;\le\; \ell_2^{\mathrm{dir}}(n) \;\le\; k_2^{\mathrm{dir}}(n) \;\le\; M(n),
@@ -813,14 +813,14 @@ Every simple digraph $D$ on $n$ vertices can be made \emph{one-directional bipar
 Call $x$ \emph{source-like} if $d^+(x) \ge d^-(x)$ and \emph{sink-like} otherwise, and write $S$ and $T$ for the two classes, so $V = S \cup T$. Delete every in-arc of a source-like vertex and every out-arc of a sink-like vertex. A source-like $x$ marks $d^-(x) = \min(d^+(x), d^-(x))$ arcs for deletion and a sink-like $x$ marks $d^+(x) = \min(d^+(x), d^-(x))$ arcs, so the number deleted is at most the displayed sum, an arc counted twice by that estimate only making it safer. An arc $(a,b)$ survives only if $a$ is not sink-like and $b$ is not source-like, that is, only if $a \in S$ and $b \in T$. So what remains runs entirely from $S$ to $T$ and has at most $|S|\,|T|$ arcs. Two non-negative integers of sum $n$ have product at most $\floor{n^2/4}$: writing them as $n/2 \pm t$ gives the product $n^2/4 - t^2$, largest at the smallest admissible $|t|$, which is $0$ for even $n$ and $1/2$ for odd $n$, giving $n^2/4$ and $(n^2-1)/4$ respectively, and both equal $\floor{n^2/4}$. Hence at most $\floor{n^2/4}$ arcs remain. Adding the two counts gives the display.
 \end{proof}
 
-\begin{conjecture}[The counting core, with proof,\aimedal\readfirst{1}]\label{lem:two-step-budget}
+\begin{lemma}[The counting core]\label{lem:two-step-budget}
 Every $C$-budgeted simple digraph $D$ on $n \ge 2$ vertices satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4C(n-1).
 \]
-\end{conjecture}
+\end{lemma}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Induct on $n$. The claim is immediate at $n = 2$, where a simple digraph has at most $2$ arcs and the right-hand side is $1 + 4C \ge 5$. Let $n \ge 3$ and split on the minimum total degree.
 
 If some vertex $v$ has $d(v) < n/2$, then $d(v) \le \floor{n/2}$ because $d(v)$ is an integer. Deleting a vertex only removes routes, so $D - v$ is $C$-budgeted too, and the induction hypothesis together with the floor identity above gives
@@ -845,7 +845,7 @@ and \Cref{lem:smaller-half-deletion} converts that into the claim.
 
 \Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:basecases}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. Neither proof below assumes anything about the shape of $D$.
 
-\begin{proof}[Proposed proof of \Cref{thm:dir-arc-linear-error}]
+\begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
 By \Cref{lem:feasible-budgeted} a simple digraph with $\lec^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
 
 For the two-sided asymptotic statement, \Cref{const:augmented-bipartite} gives
@@ -979,7 +979,7 @@ For $k \ge 1$, take $D$ with $\lec^{\max}(D) \le k$ and let $R$ be a reachabilit
 Taking $k = m-1$ gives $L_m^{\mathrm{dir}}(n) \le (m-1)M(n)$, matching the lower bound.
 \end{proof}
 
-\begin{conjecture}[The directed multigraph value at $n = 7$, $m = 3$, with proof,\aimedal]\label{cor:dir-multi-n7}
+\begin{conjecture}[The directed multigraph value at $n = 7$, $m = 3$, with proof,\aimedal\readfirst{2}]\label{cor:dir-multi-n7}
 $L_3^{\mathrm{dir}}(7) = 24$.
 \end{conjecture}
 
@@ -1472,7 +1472,7 @@ always a cut vertex, and the blocks and cut vertices hang together in a tree, th
 the proof is precisely an induction over that tree.
 \end{primer}
 
-\begin{conjecture}[Incidence rank lemma, with proof,\aimedal]\label{lem:incidence-rank}
+\begin{conjecture}[Incidence rank lemma, with proof,\aimedal\readfirst{10}]\label{lem:incidence-rank}
 Let $G$ be a connected loopless multigraph with a partition $V(G)=X \mathbin{\dot\cup} Z$ such that
 (i) $Z$ is independent, (ii) no edge incident to $Z$ is parallel to another
 edge, (iii) every $z \in Z$ has degree at least $2$, and (iv)
@@ -2067,7 +2067,7 @@ from $n=9$.
 
 The remaining four of the sixteen variants orient the Berge edge. They are grouped here rather than with the undirected hypergraph bounds above because the questions they raise are different ones: not which decomposition controls the rank of an incidence graph, but how much a single edge with one tail and many heads can carry, and whether the way it is oriented changes the answer. The first result gives a pair of bounds a factor of four apart, and the last closes that factor for the model the program measures.
 
-\begin{conjecture}[Directed hypergraphs: first bounds, with proof,\aimedal]\label{prop:dir-hyper-first}
+\begin{conjecture}[Directed hypergraphs: first bounds, with proof,\aimedal\readfirst{4}]\label{prop:dir-hyper-first}
 Let $n\ge r\ge2$ and $m\ge2$. Model a directed $r$-uniform hyperedge as a
 tail vertex together with $r-1$ head vertices, a Berge route entering at the
 tail and leaving at a head. If every ordered pair of vertices has at most $m-1$
@@ -2120,7 +2120,7 @@ multihypergraph. Its edges are distinct, so the resulting directed hypergraph
 is simple.
 \end{proof}
 
-\begin{conjecture}[Bounded outgoing hyperedge count, with proof,\aimedal]\label{const:bounded-outdegree-hyper}
+\begin{conjecture}[Bounded outgoing hyperedge count, with proof,\aimedal\readfirst{5}]\label{const:bounded-outdegree-hyper}
 For $n\ge r\ge2$ and $m\ge2$, give every vertex
 $d=\min\{m-1,\binom{n-1}{r-1}\}$ distinct outgoing forward hyperedges.
 Their head sets may be any $d$ distinct $(r-1)$-subsets of the other vertices.
@@ -2155,7 +2155,7 @@ two results place all three. The first is that backward needs no separate study,
 and the second is that the general model, despite admitting more hyperedges on a
 single vertex set, obeys the very same first-order bound as forward.
 
-\begin{conjecture}[Backward is the reverse of forward, with proof,\aimedal]\label{lem:dir-hyper-duality}
+\begin{conjecture}[Backward is the reverse of forward, with proof,\aimedal\readfirst{6}]\label{lem:dir-hyper-duality}
 Reversing every hyperarc, $(T, H) \mapsto (H, T)$, is an edge-count-preserving
 bijection between the forward directed $r$-uniform hypergraphs and the backward
 ones on the same vertices, and the reverse $\HH^{R}$ satisfies
@@ -2172,7 +2172,7 @@ and the same interior vertices. It therefore preserves both kinds of
 disjointness, all maximum local connectivities and the hyperedge count.
 \end{proof}
 
-\begin{conjecture}[The general model obeys the forward bound, with proof,\aimedal]\label{prop:dir-hyper-general}
+\begin{conjecture}[The general model obeys the forward bound, with proof,\aimedal\readfirst{7}]\label{prop:dir-hyper-general}
 Let a directed $r$-uniform hyperedge be any split into a non-empty tail set $T$ and
 head set $H$. If every ordered pair has at most $m-1$ hyperedge-disjoint, or at most
 $m-1$ internally vertex-disjoint, directed Berge routes, then
@@ -2343,7 +2343,7 @@ and a hyperedge has only $r$ vertices in all to obstruct with. That counts the
 leftovers without ever needing the two sides to be independent, which is exactly
 what the general model denies.
 
-\begin{conjecture}[The general orientation model shares the constant, with proof,\aimedal]\label{thm:dir-hyper-general-constant}
+\begin{conjecture}[The general orientation model shares the constant, with proof,\aimedal\readfirst{8}]\label{thm:dir-hyper-general-constant}
 Let $r \ge 2$ and $m \ge 2$, and let a directed $r$-uniform hyperedge be any split
 $(T, H)$ into a non-empty tail set and a non-empty head set, as in
 \Cref{prop:dir-hyper-general}. Every such multihypergraph $\HH$ on $n \ge 2$
