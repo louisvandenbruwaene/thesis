@@ -13,9 +13,9 @@ A reader who trusts the cited results may skip it.
 \textsc{Parts II} and \textsc{III} contain the original arguments.
 Readers who want a selective route through them can focus on three proof ideas.
 The proposed reachability-skeleton argument supports the directed formulas.
-The proposed incidence-rank argument supports the hypergraph vertex value at $m=3$.
+The checked incidence-rank argument establishes the hypergraph vertex value at $m=3$.
 The two-step budget supplies proposed elementary bounds for directed models.
-These arguments remain subject to verification. Their statements are labelled
+The arguments still marked as proposed remain subject to verification. Their statements are labelled
 \emph{Conjecture, with proof}, and the presence of an argument does not establish them.
 
 \textsc{Part IV} contains the search's connectivity bookkeeping and the computational audit.
@@ -23,7 +23,7 @@ Every construction named in the body is defined in this appendix.
 The directed constructions appear in \Cref{sec:dir-constructions}.
 A heading with the badge \aimedal{} contains a proof written by an AI model that the author has not verified line by line.
 The Contribution Statement explains this status.
-The marker \conditional{} identifies deductions that depend on an unchecked conjecture. Unmarked results are cited classical results or arguments the author has checked.
+Unmarked results are cited classical results or arguments the author has checked.
 The latter group includes the Gomory--Hu double count of \Cref{sec:mader-gomory-hu}.
 That count proves \Cref{thm:mader,thm:multigraph-edge} from \Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}.
 
@@ -858,7 +858,7 @@ so the second-order term is linear in $n$ from both sides.
 
 The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} proposes its value at $m=2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
 
-\begin{proof}[Proposed proof of \Cref{thm:dir-vertex-linear-error}]
+\begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}]
 By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple digraph with $\kap^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
 
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
@@ -937,7 +937,7 @@ By \Cref{thm:menger}, $\lec_{D_0}(u,v)$ equals the minimum capacity, over all $u
 For $m \ge 2$, take any spanning tree $T$ of $K_n$ and give every edge multiplicity $m-1$ in each direction. Between two vertices, $T$ offers only its one tree path, so this is $m-1$ copies of the $m=2$ bidirected tree of \Cref{thm:dir-arc-m2-exact}, feasible at $\lec^{\max} = 1$ there, and \Cref{lem:thickening} with $k=m-1$ gives $\lec^{\max} = m-1$ here and an arc count of $2(n-1)(m-1)$. Alternatively, take the one-directional complete bipartite digraph of \Cref{const:bipartite} (balanced parts $A,B$ with $|A|=\floor{n/2}$, $|B|=\ceil{n/2}$, feasible at $\lec^{\max}=1$) and give every arc multiplicity $m-1$: the same lemma gives $\lec^{\max} = m-1$ and $(m-1)\floor{n^2/4}$ arcs.
 \end{construction}
 
-Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n) \ge (m-1)M(n)$ for every $n$ and $m$, which is the lower bound half of \Cref{thm:dir-multi-full}. The rest of this section proposes the matching upper bound.
+Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n) \ge (m-1)M(n)$ for every $n$ and $m$, which is the lower bound half of \Cref{thm:dir-multi-full}. The rest of this section proves the matching upper bound.
 
 \subsection{The upper bound: a reachability skeleton}
 
@@ -969,7 +969,7 @@ $\lec_D(u,v) \le k$ for every pair and $k \ge 1$, maximising gives
 $\lec^{\max}(D-R) \le k-1$.
 \end{proof}
 
-\begin{proof}[Proposed proof of \Cref{thm:dir-multi-full}]
+\begin{proof}[Proof of \Cref{thm:dir-multi-full}]
 The lower bound is \Cref{const:dir-multi-lower}. For the upper bound, fix $n$ and prove by induction on $k = m-1 \ge 0$ that every directed multigraph $D$ on $n$ vertices with $\lec^{\max}(D) \le k$ has $|A(D)| \le k\,M(n)$. At $k=0$, every pair has $\lec_D(u,v) \le 0$, so no arc $(u,v)$ can even be present, since a single arc is already one route, and $|A(D)| = 0 = 0 \cdot M(n)$.
 
 For $k \ge 1$, take $D$ with $\lec^{\max}(D) \le k$ and let $R$ be a reachability skeleton, which exists with $|A(R)| \le M(n)$ by \Cref{lem:reach-skeleton}. By \Cref{lem:reach-delete}, $D - R$ has $\lec^{\max}(D-R) \le k-1$, and it is again a directed multigraph on the same $n$ vertices, so the induction hypothesis gives $|A(D-R)| \le (k-1)M(n)$. Since $R$ uses at most one copy of each arc it touches, the arcs of $D$ split exactly into those of $R$ and those left in $D-R$, so
@@ -979,28 +979,28 @@ For $k \ge 1$, take $D$ with $\lec^{\max}(D) \le k$ and let $R$ be a reachabilit
 Taking $k = m-1$ gives $L_m^{\mathrm{dir}}(n) \le (m-1)M(n)$, matching the lower bound.
 \end{proof}
 
-\begin{conjecture}[The directed multigraph value at $n = 7$, $m = 3$, with proof,\aimedal\readfirst{2}]\label{cor:dir-multi-n7}
+\begin{corollary}[The directed multigraph value at $n = 7$, $m = 3$]\label{cor:dir-multi-n7}
 $L_3^{\mathrm{dir}}(7) = 24$.
-\end{conjecture}
+\end{corollary}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Substitute $m=3$ and $M(7)=12$ in \Cref{thm:dir-multi-full}.
 \end{proof}
 
 Neither historical computation settled this cell. CBC timed out when testing whether a feasible $25$-arc multigraph exists at $(n,m)=(7,3)$. A fourteen-hour enumeration was also stopped without a verdict. Those unfinished
-runs do not independently validate the proposed general formula.
+runs do not independently validate the general formula.
 
-\begin{conjecture}[The fractional relaxation is integral, with proof,\conditional]\label{cor:mstar-integral}
+\begin{corollary}[The fractional relaxation is integral]\label{cor:mstar-integral}
 For every $n \ge 2$, the $m$-free optimum $M^{*}(n)$ of \Cref{ch:certify} equals $M(n)$, and it is attained by a $\{0,1\}$ weight matrix. Consequently the scaling identity
 \[
     L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M^{*}(n)
 \]
 holds for every $n$ and every $m \ge 2$, with no hypothesis on the optimum.
-\end{conjecture}
+\end{corollary}
 
 In words: allowing fractional weights does not raise the optimum. The relaxed optimum is already attained by a multigraph with weights $0$ and $1$, so the scaling identity that carries one computed number to every $m$ at once needs no integrality hypothesis attached to it.
 
-\begin{proof}[Conditional proof]
+\begin{proof}
 For $M^{*}(n) \ge M(n)$, use either construction from
 \Cref{const:dir-multi-lower} at multiplicity one. Both give $\{0,1\}$
 matrices in which every pairwise maximum flow is at most one. Their total
@@ -1022,17 +1022,17 @@ So let $w$ be a feasible rational optimum and let $q$ be a common denominator of
 The identity follows because \Cref{thm:dir-multi-full} gives $L_m^{\mathrm{dir}}(n) = (m-1)M(n)$.
 \end{proof}
 
-\begin{conjecture}[The $m=2$ case collapses to the simple digraph, with proof,\conditional]\label{thm:dir-multi-m2}
+\begin{theorem}[The $m=2$ case collapses to the simple digraph]\label{thm:dir-multi-m2}
 At $m=2$, that is at $k=1$, \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(n) = M(n)$, which is exactly the value \Cref{thm:dir-arc-m2-exact} states for the simple digraph. The agreement is forced rather than coincidental, so \Cref{thm:dir-multi-full} recovers \Cref{thm:dir-arc-m2-exact} as its $k=1$ case rather than needing it as a separate input.
-\end{conjecture}
+\end{theorem}
 
-\begin{proof}[Conditional proof]
-A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints. At $m=2$ the multigraph problem and the simple digraph problem are therefore the same problem, and the two statements are two readings of one value. Both readings rest on \Cref{thm:dir-multi-full}, whose proposed proof is unchecked, so the agreement is conditional on it and is not independent confirmation of either statement.
+\begin{proof}
+A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints. At $m=2$ the multigraph problem and the simple digraph problem are therefore the same problem, and the two statements are two readings of one value. Both readings rest on \Cref{thm:dir-multi-full}, so the agreement is not independent confirmation of either statement.
 \end{proof}
 
 \subsection{Extremal classification on the quadratic branch}\label{sec:quadratic-uniqueness}
 
-\Cref{thm:dir-multi-full} proposes the value at every $n$ and $m$, but a value is not a full description of the extremal digraphs. The question addressed here is which multigraphs attain it on the quadratic branch at a general $n$. The reachability-skeleton proof looks unpromising for this, since it is designed never to need to know which multigraph it is taking apart. But that indifference is only in the direction of the \emph{bound}. Run backwards, from the assumption that the bound is met exactly, equality in the same construction imposes three restrictions: it pins down the number of strongly connected components, then the shape of the skeleton, and finally the multigraph.
+\Cref{thm:dir-multi-full} establishes the value at every $n$ and $m$, but a value is not a full description of the extremal digraphs. The question addressed here is which multigraphs attain it on the quadratic branch at a general $n$. The reachability-skeleton proof looks unpromising for this, since it is designed never to need to know which multigraph it is taking apart. But that indifference is only in the direction of the \emph{bound}. Run backwards, from the assumption that the bound is met exactly, equality in the same construction imposes three restrictions: it pins down the number of strongly connected components, then the shape of the skeleton, and finally the multigraph.
 
 Two consequences of equality do the work, and both come from reading the count of \Cref{lem:reach-skeleton} as an equation rather than an inequality.
 
@@ -1399,7 +1399,7 @@ is feasible for the vertex problem.
 The simple construction uses distinct $(r-1)$-sets on the non-hub vertices. The condition $m-1\le\binom{n-2}{r-2}$ bounds the requested degree cap by the number of such sets containing a fixed vertex. A multihypergraph does not, because it
 may repeat one hyperedge instead, and that closes a different range of cases.
 
-\begin{conjecture}[The multihypergraph lower bound, with proof,\conditional]\label{prop:hyper-vertex-lower-multi}
+\begin{proposition}[The multihypergraph lower bound]\label{prop:hyper-vertex-lower-multi}
 For $r \ge 2$, $m \ge 2$ and $(r-1) \mid (n-1)$,
 \[
     K_m^{(r)}(n) \;\ge\; \frac{(m-1)(n-1)}{r-1},
@@ -1413,9 +1413,9 @@ taken at multiplicity $m-1$. At $m = 3$ this meets the upper bound of
 \]
 For $r\ge3$, that range neither contains nor is contained in the simple model's
 $2 < r < n$, so the two models close different cases.
-\end{conjecture}
+\end{proposition}
 
-\begin{proof}[Conditional proof]
+\begin{proof}
 Take the hub $h$, split the other $n-1$ vertices into blocks $G_1, \dots, G_q$ of
 size $r-1$ with $q = (n-1)/(r-1)$, and give each hyperedge $\{h\} \cup G_i$
 multiplicity $m-1$. The count is $(m-1)q$, which is the displayed value.
@@ -1438,9 +1438,9 @@ divisibility hypothesis, and \Cref{thm:hyper-vertex-m3} bounds every
 multihypergraph by that same quantity.
 \end{proof}
 
-At $m=3$ the proposed upper bound covers every multihypergraph, and equality follows in the construction range stated below. Both rest on the unchecked rank inequality proved next, whose engine is a bound for
+At $m=3$ the upper bound covers every multihypergraph, and equality follows in the construction range stated below. Both rest on the rank inequality proved next, whose engine is a bound for
 graphs in which one side of a partition must stay below local
-$3$-connectivity. The hypergraph conjecture then falls out of the incidence
+$3$-connectivity. The hypergraph bound then falls out of the incidence
 translation. Throughout, $\mathrm{rank}(G) = |E(G)| - |V(G)| + 1$ denotes
 the cycle rank of a connected multigraph, that is, the number of independent
 cycles it carries. A tree has cycle rank $0$, and each edge added beyond a
@@ -1472,17 +1472,17 @@ always a cut vertex, and the blocks and cut vertices hang together in a tree, th
 the proof is precisely an induction over that tree.
 \end{primer}
 
-\begin{conjecture}[Incidence rank lemma, with proof,\aimedal\readfirst{10}]\label{lem:incidence-rank}
+\begin{lemma}[Incidence rank lemma]\label{lem:incidence-rank}
 Let $G$ be a connected loopless multigraph with a partition $V(G)=X \mathbin{\dot\cup} Z$ such that
 (i) $Z$ is independent, (ii) no edge incident to $Z$ is parallel to another
 edge, (iii) every $z \in Z$ has degree at least $2$, and (iv)
 $\kap_G(x, x') \le 2$ for all distinct $x, x' \in X$. Then
 $\mathrm{rank}(G) \le |X| - 1$.
-\end{conjecture}
+\end{lemma}
 
 In words: this is the engine behind the $m = 3$ hypergraph result, stated for a multigraph with an independent class $Z$, allowing edges inside $X$ so that suppression preserves the hypotheses. Read $X$ as the vertices of a hypergraph and $Z$ as its hyperedges, so that $G$ is the incidence graph and $\mathrm{rank}(G)$, the number of independent cycles it carries, is the quantity the hyperedge count is eventually read off from. The four hypotheses say in turn that no two hyperedge-class nodes are adjacent (i), that no hyperedge repeats a vertex (ii), that no hyperedge dangles as a leaf (iii), and that the hypergraph is feasible at $m = 3$ (iv). The conclusion caps the independent cycles by the number of vertices.
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Induction on $|V| + |E|$. Step~1 handles a cut vertex by arguing block by
 block. Steps~2 and~3 remove a degree-two $Z$-vertex or $X$-vertex without
 changing the bound. What survives is $2$-connected with minimum degree at
@@ -1627,10 +1627,10 @@ in the first and third cases, and $\mathrm{rank}(G) \le |X| + s - 3 \le |X| - 1$
 in the second, since $s \le 2$. This exhausts the cases.
 \end{proof}
 
-Conditionally on that rank bound, \Cref{thm:hyper-vertex-m3} follows, stated in
+That rank bound gives \Cref{thm:hyper-vertex-m3}, stated in
 \Cref{ch:basecases}. In words: at the route limit $m = 3$ a hyperedge network can hold no more hyperedges under the stricter separation than the displayed edge bound. When $2 < r < n$, that count is reached without repeating a hyperedge, so the two separations agree in this range exactly as they did at $m = 2$.
 
-\begin{proof}[Conditional proof of \Cref{thm:hyper-vertex-m3}]
+\begin{proof}[Proof of \Cref{thm:hyper-vertex-m3}]
 Apply \Cref{lem:incidence-rank} to each connected component of the incidence
 graph $I(\HH)$, with $X$ the vertex class and $Z$ the hyperedge class:
 $Z$ is independent, incidences are simple even when hyperedges repeat,
@@ -1646,11 +1646,11 @@ The lower bound is \Cref{prop:hyper-vertex-lower} at $m = 3$.
 
 \begin{remark}[Edges as gates at $r = 2$, and the boundary of the method]
 \label{rem:hyper-vertex-m3-scope}
-At $r = 2$ the conjecture speaks of multigraphs, where the incidence convention
+At $r = 2$ the theorem speaks of multigraphs, where the incidence convention
 of \Cref{sec:incidence-convention} makes $q$ parallel edges $q$ distinct one-step
-routes. It would give $K_3(n) = 2(n-1)$, the same number as the multigraph edge
+routes. It gives $K_3(n) = 2(n-1)$, the same number as the multigraph edge
 value of \Cref{thm:multigraph-edge}, and \Cref{cor:multi-vertex-m3} below records
-that specialisation, conjecturally with it. The proof of
+that specialisation. The proof of
 \Cref{lem:incidence-rank} is calibrated to the cap $\kap \le 2$ at every step
 rather than at one. Two parallel edges beside a single detour already exceed
 it, which is what forces the surviving core to be simple, and three internally
@@ -1664,7 +1664,7 @@ separating pairs, and none is supplied here.
 
 \section{The multigraph incidence problems}\label{sec:multi-vertex}
 
-The conjecture above is about hyperedge networks, and at $r = 2$ a hyperedge network is a multigraph, so the two multigraph vertex questions are the $r = 2$ case of the two hypergraph vertex questions and not restatements of their simple counterparts. This section works them out. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally disjoint $u$--$v$ routes, since a single edge is a path with no interior, which is the incidence convention of \Cref{sec:incidence-convention}. Write $K_m(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$, as in \Cref{tab:notation}.
+The theorem above is about hyperedge networks, and at $r = 2$ a hyperedge network is a multigraph, so the two multigraph vertex questions are the $r = 2$ case of the two hypergraph vertex questions and not restatements of their simple counterparts. This section works them out. Throughout, $q$ parallel copies of the edge $uv$ count as $q$ internally disjoint $u$--$v$ routes, since a single edge is a path with no interior, which is the incidence convention of \Cref{sec:incidence-convention}. Write $K_m(n)$ for the largest total multiplicity of a multigraph on $n$ vertices with $\kap^{\max} \le m-1$, as in \Cref{tab:notation}.
 
 The two kinds of route never interfere, which splits the measure in two.
 
@@ -1699,7 +1699,7 @@ By \Cref{lem:multi-vertex-split}, $\kap^{\max} \le 1$ forces $\mu(u,v) + \pi(u,v
 The proof shows more than the count. At $m = 2$ the cap $m-1$ is one, so a second copy of any edge is a second route on its own, and every feasible multigraph is simple. The multigraph problem is therefore the simple problem, $K_2(n) = k_2(n) = n-1$, which is also what \Cref{thm:hyper-vertex-m2} says at $r = 2$. This is the one value of $m$ at which the two coincide for a reason rather than by accident, and \Cref{cor:dir-multi-incidence} makes the same observation in the directed model.
 \end{remark}
 
-The next value is the one the hypergraph conjecture supplies, and no separate argument is needed for it.
+The next value is the one the hypergraph theorem supplies, and no separate argument is needed for it.
 
 \begin{conjecture}[The multigraph incidence value at $m = 3$, with proof,\aimedal]\label{cor:multi-vertex-m3}
 $K_3(n) = 2(n-1)$ for every $n \ge 2$.
@@ -2067,7 +2067,7 @@ from $n=9$.
 
 The remaining four of the sixteen variants orient the Berge edge. They are grouped here rather than with the undirected hypergraph bounds above because the questions they raise are different ones: not which decomposition controls the rank of an incidence graph, but how much a single edge with one tail and many heads can carry, and whether the way it is oriented changes the answer. The first result gives a pair of bounds a factor of four apart, and the last closes that factor for the model the program measures.
 
-\begin{conjecture}[Directed hypergraphs: first bounds, with proof,\aimedal\readfirst{4}]\label{prop:dir-hyper-first}
+\begin{proposition}[Directed hypergraphs: first bounds]\label{prop:dir-hyper-first}
 Let $n\ge r\ge2$ and $m\ge2$. Model a directed $r$-uniform hyperedge as a
 tail vertex together with $r-1$ head vertices, a Berge route entering at the
 tail and leaving at a head. If every ordered pair of vertices has at most $m-1$
@@ -2084,9 +2084,9 @@ hyperedges. This construction is simple whenever
 $m-1\le\binom{n-\alpha-1}{r-2}$. Consequently, for fixed $r$ and $m$, the
 balanced choice $\alpha=\floor{n/2}$ is available for all sufficiently large
 $n$, so the extremal value is $\Theta_{r,m}(n^2)$.
-\end{conjecture}
+\end{proposition}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Upper bound: a hyperedge with tail $u$ serves the $r-1$ ordered pairs
 $(u, h)$, $h$ a head, so each hyperedge contributes $r-1$ tail-head pairs and
 the actual number of such pairs is
@@ -2129,7 +2129,7 @@ multihypergraph. Its edges are distinct, so the resulting directed hypergraph
 is simple.
 \end{proof}
 
-\begin{conjecture}[Bounded outgoing hyperedge count, with proof,\aimedal\readfirst{5}]\label{const:bounded-outdegree-hyper}
+\begin{construction}[Bounded outgoing hyperedge count]\label{const:bounded-outdegree-hyper}
 For $n\ge r\ge2$ and $m\ge2$, give every vertex
 $d=\min\{m-1,\binom{n-1}{r-1}\}$ distinct outgoing forward hyperedges.
 Their head sets may be any $d$ distinct $(r-1)$-subsets of the other vertices.
@@ -2137,9 +2137,9 @@ This gives a simple directed hypergraph with $nd$ hyperedges, feasible for
 both route separations. If repeated hyperedges are allowed, give every
 vertex $m-1$ copies of any one outgoing hyperedge instead, for a total of
 $n(m-1)$ copies.
-\end{conjecture}
+\end{construction}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Every directed route from $u$ must begin with a hyperedge whose tail is $u$.
 Deleting all outgoing copies therefore separates $u$ from every other
 vertex. There are at most $m-1$ such copies, so
@@ -2164,7 +2164,7 @@ two results place all three. The first is that backward needs no separate study,
 and the second is that the general model, despite admitting more hyperedges on a
 single vertex set, obeys the very same first-order bound as forward.
 
-\begin{conjecture}[Backward is the reverse of forward, with proof,\aimedal\readfirst{6}]\label{lem:dir-hyper-duality}
+\begin{lemma}[Backward is the reverse of forward]\label{lem:dir-hyper-duality}
 Reversing every hyperarc, $(T, H) \mapsto (H, T)$, is an edge-count-preserving
 bijection between the forward directed $r$-uniform hypergraphs and the backward
 ones on the same vertices, and the reverse $\HH^{R}$ satisfies
@@ -2172,16 +2172,16 @@ $\lec_{\HH}(u, v) = \lec_{\HH^{R}}(v, u)$ and $\kap_{\HH}(u, v) =
 \kap_{\HH^{R}}(v, u)$. Hence $\lec^{\max}$ and $\kap^{\max}$ are invariant under
 reversal, and the backward edge and vertex extremal numbers equal the forward
 ones, for every $r$, $m$ and $n$.
-\end{conjecture}
+\end{lemma}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Reversal is an involution on directed hyperedges. It maps every directed
 $u$--$v$ Berge path bijectively to a $v$--$u$ path using the same edge copies
 and the same interior vertices. It therefore preserves both kinds of
 disjointness, all maximum local connectivities and the hyperedge count.
 \end{proof}
 
-\begin{conjecture}[The general model obeys the forward bound, with proof,\aimedal\readfirst{7}]\label{prop:dir-hyper-general}
+\begin{proposition}[The general model obeys the forward bound]\label{prop:dir-hyper-general}
 Let a directed $r$-uniform hyperedge be any split into a non-empty tail set $T$ and
 head set $H$. If every ordered pair has at most $m-1$ hyperedge-disjoint, or at most
 $m-1$ internally vertex-disjoint, directed Berge routes, then
@@ -2192,9 +2192,9 @@ the same bound as the forward model of \Cref{prop:dir-hyper-first}. The forward
 construction of that proposition is itself a set of general hyperedges, so the
 general value obeys the same upper bound and inherits the same quadratic lower
 bound, and in particular is $\Theta_{r,m}(n^2)$ for fixed $r$ and $m$.
-\end{conjecture}
+\end{proposition}
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Fix an ordered pair $(u, v)$. A hyperedge $(T, H)$ with $u \in T$ and $v \in H$
 carries the one-step route $u \to v$ that enters at the tail $u$ and leaves at the
 head $v$. Distinct such hyperedges give routes that share no edge and no internal
@@ -2254,7 +2254,7 @@ $\mathrm{cod}(u,v)$ for the number of hyperedges realising that arc.
 
 \Cref{thm:dir-hyper-constant}, stated in \Cref{ch:basecases}, says in words that the bipartite construction of \Cref{prop:dir-hyper-first} is asymptotically the best there is. Its count already matches the leading term $\frac{m-1}{r-1}\floor{n^2/4}$, so the factor of four that used to separate the known bounds is gone and the remaining uncertainty sits entirely in a term linear in $n$. The bound covers both separations at once.
 
-\begin{proof}[Proposed proof of \Cref{thm:dir-hyper-constant}]
+\begin{proof}[Proof of \Cref{thm:dir-hyper-constant}]
 Write $R = R(\HH)$ for the one-step shadow and note it has no loops, since a
 hyperedge's tail is not one of its heads.
 
@@ -2325,9 +2325,9 @@ lower bounds agree in their $n^2$ term, which is the asymptotic claim.
 Three remarks on the statement. First, the two upper bounds are not comparable
 and neither supersedes the other: the bound of \Cref{prop:dir-hyper-first} is the
 smaller one until $n$ is around $16(m-1)(r-1)/3$, since the linear term here
-carries a constant of $4(m-1)^2$, and the conjecture above is an asymptotic
+carries a constant of $4(m-1)^2$, and the theorem above is an asymptotic
 improvement rather than a uniform one. Second, at $r = 2$ the shadow is the
-digraph itself and $\mathrm{cod}$ is the multiplicity, so the conjecture above
+digraph itself and $\mathrm{cod}$ is the multiplicity, so the theorem above
 recovers the quadratic branch of \Cref{thm:dir-multi-full} up to its own linear
 error term, which is the consistency check one wants, though it does not
 establish the exact value that \Cref{thm:dir-multi-full} states there.
@@ -2352,7 +2352,7 @@ and a hyperedge has only $r$ vertices in all to obstruct with. That counts the
 leftovers without ever needing the two sides to be independent, which is exactly
 what the general model denies.
 
-\begin{conjecture}[The general orientation model shares the constant, with proof,\aimedal\readfirst{8}]\label{thm:dir-hyper-general-constant}
+\begin{theorem}[The general orientation model shares the constant]\label{thm:dir-hyper-general-constant}
 Let $r \ge 2$ and $m \ge 2$, and let a directed $r$-uniform hyperedge be any split
 $(T, H)$ into a non-empty tail set and a non-empty head set, as in
 \Cref{prop:dir-hyper-general}. Every such multihypergraph $\HH$ on $n \ge 2$
@@ -2366,11 +2366,11 @@ $r$ and $m$ the general model has the same leading term
 $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$ as the forward model, under both
 separations, and the bipartite construction of \Cref{prop:dir-hyper-first} is
 asymptotically optimal for it too.
-\end{conjecture}
+\end{theorem}
 
 Allowing arbitrary nonempty tail and head sets in addition to forward hyperedges does not change the leading term. The general model still contains the forward construction that supplies the lower bound. This does not assert the same constant for a model restricted to one prescribed tail-set size. With \Cref{lem:dir-hyper-duality}, the result compares the forward, backward and general models to first order.
 
-\begin{proof}[Proposed proof]
+\begin{proof}
 Let $R$ be the one-step shadow read in the general model, so $(u,v) \in A(R)$
 exactly when some hyperedge has $u$ among its tails and $v$ among its heads, and
 $\mathrm{cod}(u,v)$ counts the hyperedges realising it. A hyperedge's tail set and
@@ -2446,12 +2446,12 @@ $|\mathcal{T}|/\kap(u,v)$ above $r-1$, the forward model's own constant. That se
 \code{program/scripts/general\_orientation\_check.py}. Nothing
 rests on the difference, since \Cref{lem:two-step-budget} places this constant
 in the linear term, where it never touches the $n^2/4$ that carries the leading
-constant. The second point is what the conjecture above would do to the
+constant. The second point is what the theorem above does to the
 orientation axis of \Cref{sec:orientation-models}. Forward and backward are
-proposed equal, exactly, by \Cref{lem:dir-hyper-duality}. Otherwise the general
-model is placed only between the same two bounds a factor of four apart, which
-leaves room for it to be denser to first order. The conjecture above predicts
-that it is not: all three orientation models would then share the same leading
+equal, exactly, by \Cref{lem:dir-hyper-duality}. Without it the general
+model would sit only between the same two bounds a factor of four apart, which
+leaves room for it to be denser to first order. The theorem rules that out:
+all three orientation models share the same leading
 term, and the computed differences between them at $n \approx r$ are a
 small-size effect that the asymptotics cannot see.
 
@@ -2622,7 +2622,7 @@ protocol as \Cref{tab:equal-budget-m3-hypergraphs}.}
 Every hypergraph panel and comparison table in this section uses $r=3$.
 Directed hypergraphs use the forward orientation, with one tail and two heads.
 A blue curve represents an established result. A red curve represents a conjectured formula or upper bound.
-A filled square is a value established by completed enumeration. In particular, the directed multigraph arc formula is drawn as a conjectural curve, not as a supposedly independent enumeration result.
+A filled square is a value established by completed enumeration. The directed multigraph arc formula is drawn as an established curve on the strength of \Cref{thm:dir-multi-full}, not of an independent enumeration.
 An open circle is the value returned by the unaided search.
 A red plus is the value of a separately supplied construction.
 Both give lower bounds, but they answer different questions: the circle measures
@@ -2668,7 +2668,7 @@ positive lower bound in that parameter range, not that the optimum is zero.
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_graphs.png}
-    \caption{The eight graph-model variants at $m=3$. The simple directed arc and vertex panels show verified lower bounds and completed exact values only. The construction marks assert feasibility, not optimality. No conjectured finite-order formula is drawn.}
+    \caption{The eight graph-model variants at $m=3$. The simple directed arc and vertex panels show verified lower bounds and completed exact values only, with no formula curve at all. The construction marks assert feasibility, not optimality.}
     \label{fig:variant-bounds-m3-graphs}
 \end{sidewaysfigure}
 

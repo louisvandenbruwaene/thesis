@@ -41,6 +41,15 @@ from the frozen record.
   with none feasible, and an eleven-hyperedge family exhibited at
   $\lambda^{\max} = 5$. The value is 11 against the bound of 12.
 
+> **Superseded on 8 September 2026 for one panel.** `thm:dir-multi-full` was
+> verified by the author that day, so the directed multigraph arc panel now
+> carries a proved curve rather than a conjectural one at both $m = 3$ and
+> $m = 6$, and its row of `tab:variant-values` prints proved values rather than
+> $\stackrel{?}{=}$ ones. The two graph grids and the value table were
+> regenerated and re-verified with
+> `program/scripts/verify_variant_grids.py`, which reported no mismatches and
+> byte-identical redraws. Everything else below still holds as written.
+
 **The two $m = 6$ grids.** `variant_bounds_m6_graphs.png` and
 `variant_bounds_m6_hypergraphs.png` were read against the panel data and
 `tab:variant-values`. Status badges, exact squares, and the presence or absence

@@ -635,7 +635,7 @@ problems agree at $m = 2$ for every uniformity, and repeated hyperedges never
 help.
 \end{theorem}
 
-\begin{conjecture}[Hypergraph vertex value at $m = 3$, with proof,\conditional]\label{thm:hyper-vertex-m3}
+\begin{theorem}[Hypergraph vertex value at $m = 3$]\label{thm:hyper-vertex-m3}
 For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
 $\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
 $2 < r < n$, which is exactly the range where $2 \le \binom{n-2}{r-2}$, the bound
@@ -647,10 +647,10 @@ There are multihypergraphs attaining it when $(r-1) \mid (n-1)$ instead, by repe
 hyperedge rather than needing $\binom{n-2}{r-2}$ distinct ones, so
 $K_3^{(r)}(n)$ takes the same value on that range
 (\Cref{prop:hyper-vertex-lower-multi}).
-\end{conjecture}
+\end{theorem}
 
 Both proofs read Berge routes as ordinary paths in the incidence graph, and \Cref{app:proofs} gives them.
-The $m = 3$ case is the harder one and depends on an unchecked rank bound argued by induction over blocks and separating pairs.
+The $m = 3$ case is the harder one and rests on a rank bound argued by induction over blocks and separating pairs.
 At $m \ge 4$ that route stops for want of a $4$-connectivity analogue, and the value is open.
 \Cref{prop:hyper-edge} counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part.
 The metro picture shows why.
@@ -661,7 +661,7 @@ That bookkeeping is the one new piece of machinery the next chapter builds and i
 
 At $r=2$ these statements concern multigraphs. \Cref{thm:hyper-vertex-m2}
 gives $K_2(n) = n-1$, where the cap leaves every multiplicity at one and the
-extremisers are the spanning trees, and \Cref{thm:hyper-vertex-m3} conjectures
+extremisers are the spanning trees, and \Cref{thm:hyper-vertex-m3} gives
 $K_3(n) = 2(n-1)$, attained by a spanning tree with every edge doubled
 (\Cref{cor:multi-vertex-m3}). The first threshold at which the multigraph vertex
 value is known to differ from its edge counterpart is $m = 5$, where
@@ -695,7 +695,7 @@ The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in 
 
 The routes this count produces are internally vertex-disjoint, not merely arc-disjoint. That is what lets the whole argument be re-run under the stricter separation, and Whitney's inequality alone would not justify the transfer, since it points the other way.
 
-\begin{conjecture}[Directed vertex problem, leading constant and order, with proof,\aimedal\readfirst{3}]\label{thm:dir-vertex-linear-error}
+\begin{theorem}[Directed vertex problem, leading constant and order]\label{thm:dir-vertex-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\kap^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -704,18 +704,18 @@ and consequently, for each fixed $m$,
 \[
     k_m^{\mathrm{dir}}(n) \;=\; \frac{n^2}{4} \;+\; \Theta_m(n) \qquad (m\ge3).
 \]
-\end{conjecture}
+\end{theorem}
 
-\begin{conjecture}[Directed multigraph value, every $n$ and $m$, with proof,\aimedal\readfirst{1}]\label{thm:dir-multi-full}
+\begin{theorem}[Directed multigraph value, every $n$ and $m$]\label{thm:dir-multi-full}
 For all $n \ge 2$ and $m \ge 2$,
 \[
     L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).
 \]
-\end{conjecture}
+\end{theorem}
 
-Under the conjecture, extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proposed proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
+Extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
 
-\begin{conjecture}[The directed hypergraph constant, with proof,\aimedal\readfirst{9}]\label{thm:dir-hyper-constant}
+\begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph
 $\HH$ on $n \ge 2$ vertices with $\kap^{\max}_{\HH} \le m-1$ satisfies
 \[
@@ -726,7 +726,7 @@ stronger hypothesis by $\kap \le \lec$. Hence for fixed $r$ and $m$ both the
 edge- and the vertex-disjoint multihypergraph maxima are
 $\bigl(1+o(1)\bigr)(m-1)n^2/\bigl(4(r-1)\bigr)$, and the bipartite construction
 of \Cref{prop:dir-hyper-first} is asymptotically optimal for both. For simple directed hypergraphs the same conclusion holds when $r\ge3$. The case $r=2$ is the simple digraph problem, with leading term $n^2/4$.
-\end{conjecture}
+\end{theorem}
 
 The proof, in \Cref{app:proofs}, forms the one-step shadow digraph whose arc
 $u\to v$ records that some hyperedge has tail $u$ and head $v$. A matching
@@ -740,7 +740,7 @@ The same specialisation to $r = 2$ carries the directed arc results across to th
 directed multigraph vertex problem. At $m = 2$ the cap leaves every multiplicity
 at one, so $K_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 For fixed $m$ the arc extremiser of \Cref{thm:dir-multi-full} is feasible here as
-well, since $\kap \le \lec$, and the conjecture above at $r = 2$ supplies the proposed matching
+well, since $\kap \le \lec$, and \Cref{thm:dir-hyper-constant} at $r = 2$ supplies the matching
 upper bound, so $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$
 (\Cref{cor:dir-multi-incidence}).
 

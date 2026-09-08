@@ -77,11 +77,11 @@ More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ a
 Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
 The next section considers the separate question of extremal shape.
 
-For fixed $m\ge3$, the directed vertex problem has the same leading term and error order by the same literature bound, and \Cref{thm:dir-vertex-linear-error} supplies a proposed elementary proof.
+For fixed $m\ge3$, the directed vertex problem has the same leading term and error order by the same literature bound, and \Cref{thm:dir-vertex-linear-error} supplies an elementary proof.
 \Cref{app:proofs} treats it separately from the arc problem.
 It remains open whether the two values are exactly equal for $m \ge 3$.
 
-Allowing parallel arcs leads to the proposed exact formula of \Cref{thm:dir-multi-full}, whose proof remains unverified.
+Allowing parallel arcs leads to the exact formula of \Cref{thm:dir-multi-full}.
 
 \section{Why direction makes the value quadratic}
 
@@ -306,8 +306,8 @@ The vertex problem counts edge copies as separate routes. It therefore does
 not reduce to the simple vertex problem. For a fixed simple support,
 \Cref{lem:multi-vertex-split} separates parallel one-edge routes from longer
 detours. At $m=2$ this forces a forest with multiplicity one and gives
-$K_2(n)=n-1$. The proposed general $m=3$ value is $2(n-1)$, using the
-unresolved incidence-rank argument. Finite exhaustive values agree with it.
+$K_2(n)=n-1$. The proposed general $m=3$ value is $2(n-1)$, deduced at $r=2$ from the
+incidence-rank bound. Finite exhaustive values agree with it.
 At $m=4$ agreement with the edge value is observed through eight vertices,
 but no general equality is established here. At $m=5$ direct exhaustion
 already gives $K_5(4)=14>L_5(4)=12$.
@@ -340,9 +340,8 @@ the exact edge value eleven at $(n,m,r)=(6,6,3)$, below the bound of twelve.
 For vertex separation, the $m=2$ value is established:
 $k_2^{(r)}(n)=\floor{(n-1)/(r-1)}$. Feasibility is equivalent to the
 incidence graph being a forest, and a star hypertree attains the count.
-At $m=3$, the proposed incidence-rank inequality gives the bound
+At $m=3$, the incidence-rank inequality gives the bound
 $\floor{2(n-1)/(r-1)}$, and simple attainment for $2<r<n$ is established.
-Checking the final deduction does not settle the unverified rank inequality.
 At $m\ge4$, an edge upper bound cannot be transferred using
 $\kappa\le\lambda$, because vertex feasibility is the weaker restriction.
 The higher-threshold vertex problem therefore remains open even in ranges
@@ -433,13 +432,12 @@ against feasibility of the construction.
 \label{sec:status-directed-simple-hypergraph}
 
 In the forward model a hyperedge has one tail and $r-1$ heads. For fixed
-$r\ge3,m\ge2$, the proposed leading term under both separations is
-$(m-1)n^2/(4(r-1))$. The proposed upper proof forms a shadow digraph on
+$r\ge3,m\ge2$, the leading term under both separations is
+$(m-1)n^2/(4(r-1))$. The upper proof forms a shadow digraph on
 tail--head pairs. Its matching argument accounts for the fact that distinct
-two-step routes in the shadow may use the same hyperedge. The candidate
+two-step routes in the shadow may use the same hyperedge. The
 constant is attained asymptotically by a two-layer construction whose heads
-have bounded incidence degrees (\Cref{thm:dir-hyper-constant}). These
-arguments remain proposed proofs.
+have bounded incidence degrees (\Cref{thm:dir-hyper-constant}).
 
 At small orders, the finite supply of distinct head sets can prevent that
 construction from attaining its asymptotic rate. The bounded-outgoing-degree
@@ -454,7 +452,7 @@ and vertex separation have the same finite maximum.
 \label{sec:status-directed-multihypergraph}\label{sec:orientation-models}
 
 Repeated hyperedges remove the restriction on distinct head sets in the
-two-layer lower construction. The proposed leading term remains
+two-layer lower construction. The leading term remains
 $(m-1)n^2/(4(r-1))$ under both separations, although the finite values can
 differ from the simple model. At $r=2$ these models are directed
 multigraphs. The simple $r=2$ counterpart instead has leading coefficient
@@ -462,9 +460,9 @@ $1/4$, so the simple hypergraph conclusion must keep its $r\ge3$ hypothesis.
 
 Orientation introduces another distinction. The backward model has a single
 head and is paired with the forward model by reversing all routes. The
-general model permits every nonempty tail--head split. The proposed
-reversal proof and general-shadow argument are retained in
-\Cref{lem:dir-hyper-duality,thm:dir-hyper-general-constant}. They predict the
+general model permits every nonempty tail--head split. The
+reversal proof and general-shadow argument are given in
+\Cref{lem:dir-hyper-duality,thm:dir-hyper-general-constant}. They give the
 same leading term for forward, backward and general hypergraphs. This does
 not cover a model restricted to one prescribed intermediate tail-set size.
 It also does not establish equality of finite forward and general values

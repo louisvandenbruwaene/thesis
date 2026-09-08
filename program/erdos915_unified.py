@@ -587,7 +587,7 @@ def _hyper_vertex_simple_proved(n: int, m: int, r: int) -> int | None:
     ``m = 2``: unconditional (``thm:hyper-vertex-m2``: repeated hyperedges
     never help at ``kappa^max <= 1``, so the star hypertree, itself simple,
     attains the bound for every ``n``, ``r``).
-    ``m = 3``: conjectured for simple hypergraphs only when
+    ``m = 3``: proved, attained by simple hypergraphs only when
     ``2 <= C(n-2, r-2)`` (``thm:hyper-vertex-m3``, ``rem:hyper-vertex-m3-scope``).
     ``m >= 4``: open (``rem:hyper-vertex-m3-scope``).
     """

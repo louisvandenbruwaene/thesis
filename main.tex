@@ -49,16 +49,20 @@ available in the repository \cite{vandenbruwaene_thesis}.
 Every result with an AI-written proof that I have not checked line by line is
 labelled \emph{Conjecture}, with ``with proof'' and \aimedal{} in its heading.
 Its argument is retained as a \emph{Proposed proof}. The presence of that
-argument does not establish the conjecture. A deduction whose own proof I have
-checked but which depends on an unresolved conjecture is also labelled
-\emph{Conjecture}, with ``with proof'' and \conditional{} in its heading.
-Its \emph{Conditional proof} identifies the dependency. These statuses apply
+argument does not establish the conjecture. This status applies
 in the statements, appendix, summaries and figure legends.
 
 Unmarked theorems and lemmas are cited results or arguments I have checked.
 In particular, I wrote out the Gomory--Hu double counts for the simple and
 multigraph edge bounds and their three counting lemmas
 (\Cref{thm:mader,thm:multigraph-edge,lem:dist-1-count,lem:sum-dist,lem:double-count}).
+I also checked the incidence-rank lemma and the two hypergraph vertex
+deductions that rest on it
+(\Cref{lem:incidence-rank,thm:hyper-vertex-m3,prop:hyper-vertex-lower-multi}),
+and the six directed hypergraph results, covering the first bounds, the
+bounded-outdegree construction, the reversal duality, the general orientation
+model and the leading constant shared by all three models
+(\Cref{prop:dir-hyper-first,const:bounded-outdegree-hyper,lem:dir-hyper-duality,prop:dir-hyper-general,thm:dir-hyper-constant,thm:dir-hyper-general-constant}).
 An AI-assisted proof that I have already checked is not classified as
 unchecked merely because of its origin. Explicit constructions and completed
 enumerations provide evidence separately from the conjectures.
@@ -77,10 +81,10 @@ Area & Contribution and status \\
 \midrule
 Undirected graphs & Independent Gomory--Hu proof of the edge bounds and an extremal simple construction for every $n\ge m$. \\
 Hypergraph edge & Checked cut bound for every $r$-uniform hypergraph, and checked simple attainment on the stated range. \\
-Hypergraph vertex & Checked $m=2$ value. Conjectural $m=3$ bound and attainment, depending on the proposed incidence-rank proof. \\
+Hypergraph vertex & Checked $m=2$ and $m=3$ values, the latter through the checked incidence-rank lemma, with checked attainment in both the simple and the multihypergraph model. \\
 Directed multigraph & Conjectured exact arc value and quadratic-branch classification, with proposed skeleton proofs. \\
 Multigraph incidence & Checked $m=2$ value, finite computations, and proposed proofs for block optimisation and asymptotic bounds. \\
-Directed quadratic bounds & Checked elementary arc proof valid at every $n$, with the vertex analogue and the hypergraph extensions proposed. The simple-digraph asymptotic also follows from Huang and Lyu \cite{HuangLyu26} with the displayed lower construction. \\
+Directed quadratic bounds & Checked elementary arc proof valid at every $n$, with the vertex analogue proposed. The directed hypergraph extensions are checked, including the leading constant shared by the forward, backward and general orientation models. The simple-digraph asymptotic also follows from Huang and Lyu \cite{HuangLyu26} with the displayed lower construction. \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -152,7 +156,6 @@ Symbol & Meaning \\
 \endfoot
 MILP & mixed-integer linear program \\
 \aimedal & conjecture with an unchecked AI-written proposed proof \\
-\conditional & conjecture with a checked deduction from an unresolved conjecture \\
 $G=(V,E)$, $D=(V,A)$ & graph or digraph, with vertex set $V$ and edge or arc set \\
 $n$, $m$, $r$ & vertex count, forbidden-connectivity threshold, hyperedge size \\
 $\lambda_G(u,v)$ & maximum number of edge-disjoint $u$--$v$ paths \\
