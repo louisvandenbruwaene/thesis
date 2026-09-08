@@ -90,6 +90,38 @@ cross references replaced by short words:
 `variant_table_all.tex` are `\input` straight from `../figures/`, so those three
 need no maintenance at all.
 
+## The seminarie decks
+
+`seminarie/` holds two self-contained decks. Neither loads `thesis-beamer.tex`
+or `../shared/`, because both files live one directory deeper than those, so
+each copies the colours, the graph vocabulary and the theme out of
+`../../preamble.tex`. That copy is the same drift risk the rule above describes.
+
+| File | Frames | Character |
+|---|---|---|
+| `seminarie/main.tex` | 41 | the results deck: every theorem, table and grid in order |
+| `seminarie/seminarie.tex` | 22 | the picture-led deck, built to the author's own outline |
+
+```bash
+cd slides/seminarie
+latexmk -pdf seminarie.tex
+```
+
+`seminarie.tex` follows an outline the author dictated rather than the thesis's
+own order. Part I unfolds the question: the title translated into plain words, a
+graph as $E + V$, then $\ell_m(n)$ with an arrow from $\lambda^{\max}$ down to
+$\lambda(u,v)$ and the routes that define it, the same cascade again for
+$\kappa$, and the three model toggles presented as a red pill and a blue pill.
+Part II is the program: the two encodings, the max-flow checker as one input and
+one output, the three transformations that feed it, the three efficiency
+measures, and solving against searching. It closes with the search's energy
+function, what the search rediscovers, the status of the sixteen variants, what
+is new and what is left.
+
+Two figures in it are drawn for the deck and are not in the thesis: the balance
+on the plain-words frame and the two pills. Everything else is a thesis picture,
+copied with the same coordinates the chapter uses.
+
 ## The two decks
 
 The ten-minute version is the spine on its own:
