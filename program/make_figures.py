@@ -644,7 +644,15 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         exact = _exact_points(range(first, stop), m, exact_seconds, **kw)
         if i == 8:
             exact = _with_settled_cells(exact, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
-        conjectural = (kw["directed"] or
+        # Direction alone no longer implies a conjectural formula. Two directed
+        # graph values are proved: the multigraph arc value at every m
+        # (thm:dir-multi-full) and the two simple directed values at m = 2
+        # (thm:dir-arc-m2-exact, thm:dir-vertex-m2-exact). Every other directed
+        # panel, hypergraphs included, still draws a conjecture.
+        directed_proved = kw["directed"] and not is_hyper and (
+            (not kw.get("simple", True) and kw["separation"] == "edge")
+            or (kw.get("simple", True) and m == 2))
+        conjectural = ((kw["directed"] and not directed_proved) or
                        (not kw.get("simple", True) and kw["separation"] == "vertex" and m > 2) or
                        (is_hyper and m > 2))
         curve_key = "conj" if conjectural else "proved"

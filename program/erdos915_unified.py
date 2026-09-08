@@ -522,10 +522,10 @@ def simple_undirected_vertex_m5(n: int) -> int:
 
 
 def directed_arc_m2(n: int) -> int:
-    """``ell_2^dir(n) = max(2(n-1), floor(n^2/4))``.  Conjectured (thm:dir-arc-m2-exact).
+    """``ell_2^dir(n) = max(2(n-1), floor(n^2/4))`` (thm:dir-arc-m2-exact).
 
-    The unchecked proposed proof uses the reachability skeleton of
-    lem:reach-skeleton, so it inducts on nothing and needs no base case.
+    The proof uses the reachability skeleton of lem:reach-skeleton, so it
+    inducts on nothing and needs no base case.
     """
     # The max picks whichever of the two competing constructions wins at this n:
     # the linear hub (double star) versus the quadratic one-directional wall.
@@ -550,14 +550,15 @@ def directed_arc_lower_bound(n: int, m: int) -> int:
 def hypergraph_edge(n: int, m: int, r: int) -> int:
     """``floor((m-1)(n-1)/(r-1))`` hyperedges for the ``r``-uniform edge problem.
 
-    Conjectured as an upper bound for every ``r``-uniform hypergraph, simple or
+    A proved upper bound for every ``r``-uniform hypergraph, simple or
     not (``prop:hyper-edge``, cut induction). Attained by a
     MULTIhypergraph (a repeated-hyperedge star) whenever ``(r-1) | (n-1)``.
     Attained by a SIMPLE hypergraph whenever
     ``m - 1 <= C(n-2, r-2)`` (``thm:simple-hyper-edge``). This is a sufficient
     condition, not a necessary one. Outside both conditions the formula
-    remains a conjectured upper bound and individual cells may still attain it. Use
-    ``_hyper_edge_simple_proved`` to test the proposed attainment condition.
+    remains an upper bound with attainment unsettled, and individual cells may
+    still attain it. Use ``_hyper_edge_simple_proved`` to test the attainment
+    condition.
     The sixteen-panel grids include both simple and multi models.
     """
     return ((m - 1) * (n - 1)) // (r - 1)
@@ -565,10 +566,10 @@ def hypergraph_edge(n: int, m: int, r: int) -> int:
 
 def _hyper_edge_simple_proved(n: int, m: int, r: int) -> int | None:
     """``hypergraph_edge(n, m, r)``, gated to where a SIMPLE hypergraph is
-    conjectured to attain it (``thm:simple-hyper-edge``: ``m - 1 <= C(n-2, r-2)``).
+    proved to attain it (``thm:simple-hyper-edge``: ``m - 1 <= C(n-2, r-2)``).
 
-    The legacy function name is retained. This evaluates a conjecture, not
-    an optimality certificate. Returns ``None`` outside its stated range for
+    This is an attainment range, not an optimality certificate for every cell.
+    Returns ``None`` outside its stated range for
     the cell. That does not establish nonattainment. Some cells do fail to
     attain the bound, for example ``n = r = m = 3`` gives 2 while only one
     3-set exists, so the simple maximum there is 1.
@@ -586,7 +587,7 @@ def _hyper_vertex_simple_proved(n: int, m: int, r: int) -> int | None:
     ``m = 2``: unconditional (``thm:hyper-vertex-m2``: repeated hyperedges
     never help at ``kappa^max <= 1``, so the star hypertree, itself simple,
     attains the bound for every ``n``, ``r``).
-    ``m = 3``: conjectured for simple hypergraphs only when
+    ``m = 3``: proved, attained by simple hypergraphs only when
     ``2 <= C(n-2, r-2)`` (``thm:hyper-vertex-m3``, ``rem:hyper-vertex-m3-scope``).
     ``m >= 4``: open (``rem:hyper-vertex-m3-scope``).
     """

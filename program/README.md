@@ -16,12 +16,15 @@ program for a different case.
 
 ## Proposed proofs and result status
 
-The thesis labels unchecked AI arguments as conjectures with proofs. In
-particular, the directed multigraph arc formula is not a verified upper
-bound. `solve(exhaustive=True)` returns its named construction as `lower`,
-with `complete=False`, rather than certifying optimality. Hypergraph formula
-helpers with legacy `_proved` names evaluate the proposed attainment formulas;
-they are not certificates. Figure legends distinguish conjectural curves from
+The thesis labels unchecked AI arguments as conjectures with proofs. The
+directed multigraph arc formula is no longer one of them: it is proved. The
+solver stays conservative all the same, since a formula is not an enumeration.
+`solve(exhaustive=True)` returns its named construction as `lower`, with
+`complete=False`, rather than certifying optimality from the formula. Hypergraph formula
+helpers with `_proved` names evaluate an attainment formula rather than
+certifying a cell. The edge cut bound, its simple attainment range and the
+`m = 3` vertex bound are all established, the last through the incidence-rank
+lemma, which is now proved. Figure legends distinguish conjectural curves from
 completed enumerations.
 
 The specialised directed multigraph structural enumerators retain conjectural
