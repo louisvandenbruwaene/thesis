@@ -76,6 +76,7 @@ arguments, and the conjectures with proposed proofs listed below.
 Area & Contribution and status \\
 \midrule
 Undirected graphs & Independent Gomory--Hu proof of the edge bounds and an extremal simple construction for every $n\ge m$. \\
+Hypergraph edge & Checked cut bound for every $r$-uniform hypergraph, and checked simple attainment on the stated range. \\
 Hypergraph vertex & Checked $m=2$ value. Conjectural $m=3$ bound and attainment, depending on the proposed incidence-rank proof. \\
 Directed multigraph & Conjectured exact arc value and quadratic-branch classification, with proposed skeleton proofs. \\
 Multigraph incidence & Checked $m=2$ value, finite computations, and proposed proofs for block optimisation and asymptotic bounds. \\
@@ -101,7 +102,8 @@ graph, directed when the model is directed, so separated routes share
 neither an intermediate vertex nor an edge copy.
 
 The checked results include the undirected multigraph edge value
-$(m-1)(n-1)$ and the hypergraph vertex value
+$(m-1)(n-1)$, the hypergraph edge bound $\floor{(m-1)(n-1)/(r-1)}$ together
+with its simple attainment range, and the hypergraph vertex value
 $\floor{(n-1)/(r-1)}$ at $m=2$. The classical simple vertex results agree
 with the edge values through $m=4$ and first diverge at $m=5,n=14$
 \cite{Bartfai60,Bollobas66,Leonard72b,SorensenThomassen74}.

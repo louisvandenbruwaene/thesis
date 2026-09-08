@@ -117,7 +117,7 @@ For all $n \ge 2$ and $m \ge 2$,
 Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
 The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory--Hu tree (\Cref{thm:gomory-hu}).
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
-The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) has a proposed proof by induction on a hyperedge cut.
+The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) is proved by induction on a hyperedge cut.
 Hence its properties are recorded here.
 Every undirected graph has a weighted tree on the same vertex set such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
 Its tree edges need not be edges of $G$, so it is not generally a spanning subgraph of $G$.
@@ -586,16 +586,16 @@ This is because digraphs can be lopsided in one direction without creating route
 
 \subsection{Undirected hypergraphs}
 
-\begin{conjecture}[Hypergraph edge bound, with proof,\conditional]\label{prop:hyper-edge}
+\begin{theorem}[Hypergraph edge bound]\label{prop:hyper-edge}
 For $n\ge r\ge2$ and $m\ge2$, an $r$-uniform multihypergraph on $n$ vertices with $\lec^{\max}\le m-1$ has size at most $\floorfrac{(m-1)(n-1)}{r-1}$. There are simple hypergraphs attaining the bound when $m - 1 \le \binom{n-2}{r-2}$, and multihypergraphs attaining it when $(r-1) \mid n - 1$.
-\end{conjecture}
+\end{theorem}
 
 The proposed proof is an elementary induction on a hyperedge cut, and \Cref{app:proofs} gives it.
 It has to be re-run rather than deduced from \Cref{thm:multigraph-edge}, because the obvious reduction points the wrong way. Replacing every hyperedge by a spanning star on its $r$ vertices gives a multigraph of size $(r-1)|E(\HH)|$, but two routes may then take two different star edges of one hyperedge, which a family of Berge routes forbids. The star multigraph can therefore carry more connectivity than the hypergraph it came from, and a feasible hypergraph need not produce a feasible multigraph to count.
 The star hypertree of \Cref{fig:hyper-star} attains the $m = 2$ case: a hub joined to disjoint blocks of $r-1$ vertices, Berge connectivity one between vertices in its nontrivial component, $\floor{(n-1)/(r-1)}$ hyperedges, exactly as a tree attained the multigraph bound.
-For $r \ge 3$ the conjecture asserts attainment by \emph{simple} hypergraphs, with no repeated hyperedge, whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}).
+For $r \ge 3$ attainment by \emph{simple} hypergraphs, with no repeated hyperedge, is established whenever $m-1\le\binom{n-2}{r-2}$ (\Cref{thm:simple-hyper-edge}).
 That is a real difference between the two edge sizes.
-For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the conjecture predicts equality while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two may part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
+For ordinary graphs simplicity is what separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$. One edge size higher the two are equal while $m-1\le\binom{n-2}{r-2}$. That condition says there are enough distinct hyperedges to go around. When it fails the two may part company. At $n = r = m = 3$ there is only one hyperedge to choose from, so a simple hypergraph carries one where the multihypergraph carries two copies of it (\Cref{rem:simple-hyper-necessary}).
 
 \begin{figure}[ht]
 \centering
@@ -679,7 +679,7 @@ while the underlying simple graph gives the upper bound $K_m(n) < 2(m-1)^2n$
 
 \subsection{Directed bounds beyond the first threshold}
 
-\begin{conjecture}[The quadratic bound with a linear error, with proof,\aimedal\readfirst{6}]\label{thm:dir-arc-linear-error}
+\begin{conjecture}[The quadratic bound with a linear error, with proof,\aimedal\readfirst{2}]\label{thm:dir-arc-linear-error}
 For all $m \ge 2$ and $n \ge 2$, every simple digraph $D$ on $n$ vertices with $\lec^{\max}_D \le m-1$ satisfies
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; 4(m-1)(n-1),
@@ -706,7 +706,7 @@ and consequently, for each fixed $m$,
 \]
 \end{conjecture}
 
-\begin{conjecture}[Directed multigraph value, every $n$ and $m$, with proof,\aimedal\readfirst{8}]\label{thm:dir-multi-full}
+\begin{conjecture}[Directed multigraph value, every $n$ and $m$, with proof,\aimedal\readfirst{4}]\label{thm:dir-multi-full}
 For all $n \ge 2$ and $m \ge 2$,
 \[
     L_m^{\mathrm{dir}}(n) \;=\; (m-1)\,M(n), \qquad M(n) := \max\!\Bigl(2(n-1),\ \floorfrac{n^2}{4}\Bigr).

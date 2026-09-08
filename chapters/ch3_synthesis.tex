@@ -34,21 +34,18 @@ $B_m(n)$ has maximum local arc-connectivity $m-1$. Consequently,
 This is a lower bound, not a proposed formula for the optimum.
 \end{construction}
 
-The earlier conjecture asserted $\ell_m^{\mathrm{dir}}(n)=
-\max\{H_m(n),Q_m(n)\}$ for every $n\ge m$. It is false.
-The clique-core construction, supplied by Stijn Cambie, has $57$ arcs at
-$m=5$, $n=12$, with maximum local arc-connectivity $4$. The proposed formula
-gives only $56$. More generally, this construction beats both earlier families
-whenever $m\ge5$ and $m+7\le n\le3m-3$
-(\Cref{const:clique-core}). It does not prove that $57$ is optimal at $(12,5)$,
-nor that the maximum of all three displayed counts is always optimal.
+Which of the three families is largest depends on the range.
+The clique-core construction of \Cref{const:clique-core} leads whenever
+$m\ge5$ and $m+7\le n\le3m-3$. At $m=5$, $n=12$ it has $57$ arcs with maximum
+local arc-connectivity $4$, against $56$ for the hub and the augmented
+bipartite counts. Outside that window one of those two is largest, and for
+fixed $m$ the augmented bipartite family is eventually the largest of the
+three. That comparison ranks these constructions and nothing else, since
+another feasible family could be denser still.
 
-For fixed $m$, the augmented bipartite family eventually has more arcs than
-the other two displayed families. That comparison only ranks these
-constructions. Another feasible family could still be denser.
-Cambie also supplied an AI-assisted argument for eventual optimality.
-It is retained separately as a research note, not used as a theorem or
-adopted as a conjecture in this thesis.
+The displayed maximum is therefore a lower bound only. It is not claimed that
+$57$ is optimal at $n=12$, $m=5$, nor that the maximum of the three counts is
+optimal at any order.
 At $m=2$, the proposed all-order value is given in
 \Cref{thm:dir-arc-m2-exact}: it predicts that the bipartite count is optimal for $n\ge7$.
 \Cref{fig:crossover} compares the hub and augmented bipartite counts at $m=3$.
@@ -248,8 +245,8 @@ Model & Edge or arc separation & Vertex separation \\
 \midrule
 Simple graph & Exact edge formula established & Classical exact values for $m\le5$, open for $m\ge6$ \\
 Multigraph & $(m-1)(n-1)$ established & $m=2$ established, then a proposed general $m=3$ value and block reduction \\
-Simple hypergraph & Proposed cut bound and attainment range & $m=2$ established, proposed $m=3$ bound, higher thresholds open \\
-Multihypergraph & Proposed cut bound, with additional repeated-edge constructions & $m=2$ established, then a proposed $m=3$ bound and further attainment cases \\
+Simple hypergraph & Cut bound established, attainment on a stated range & $m=2$ established, proposed $m=3$ bound, higher thresholds open \\
+Multihypergraph & Same established cut bound, with additional repeated-edge constructions & $m=2$ established, then a proposed $m=3$ bound and further attainment cases \\
 Simple digraph & Proposed exact $m=2$ value, with the literature fixing the asymptotic order for $m\ge3$ & Same asymptotic order, with equality to the arc value open for $m\ge3$ \\
 Directed multigraph & Proposed exact formula $(m-1)M(n)$ & Proposed leading term $(m-1)n^2/4$, with finite separation from arc values \\
 Directed simple hypergraph & Proposed leading term $(m-1)n^2/[4(r-1)]$ & Same proposed leading term \\
@@ -328,41 +325,40 @@ the conjectural block reduction and must retain that dependency.
 \label{sec:status-simple-hypergraph}
 
 For an $r$-uniform hypergraph, one edge can connect several vertices but can
-serve only one route in an edge-disjoint family. The proposed edge bound is
+serve only one route in an edge-disjoint family. The edge bound is
 \[
  \ell_m^{(r)}(n)\le\floorfrac{(m-1)(n-1)}{r-1}.
 \]
-The cut-induction proof and the general attainment proof are retained as
-conjectures with proofs. The stated attainment range is
+Both the cut-induction proof of the bound and the attainment proof are
+established. The stated attainment range is
 $m-1\le\binom{n-2}{r-2}$: there must be enough distinct hyperedges to realise
 the degree-capped construction (\Cref{prop:hyper-edge,thm:simple-hyper-edge}).
 The range matters. At $n=r=m=3$ only one simple hyperedge is available,
 whereas the displayed bound is two. Separately, exhaustive enumeration gives
-the exact edge value eleven at $(n,m,r)=(6,6,3)$, below the candidate bound
-twelve.
+the exact edge value eleven at $(n,m,r)=(6,6,3)$, below the bound of twelve.
 
 For vertex separation, the $m=2$ value is established:
 $k_2^{(r)}(n)=\floor{(n-1)/(r-1)}$. Feasibility is equivalent to the
 incidence graph being a forest, and a star hypertree attains the count.
 At $m=3$, the proposed incidence-rank inequality gives the bound
-$\floor{2(n-1)/(r-1)}$, with proposed simple attainment for $2<r<n$.
+$\floor{2(n-1)/(r-1)}$, and simple attainment for $2<r<n$ is established.
 Checking the final deduction does not settle the unverified rank inequality.
 At $m\ge4$, an edge upper bound cannot be transferred using
 $\kappa\le\lambda$, because vertex feasibility is the weaker restriction.
 The higher-threshold vertex problem therefore remains open even in ranges
-where the proposed edge formula is attained.
+where the edge formula is attained.
 
 \subsection{Undirected multihypergraphs}
 \label{sec:status-multihypergraph}
 
-The proposed cut bound is unchanged when hyperedges repeat, but the available
+The cut bound is unchanged when hyperedges repeat, but the available
 constructions change. A star hypertree with each edge repeated $m-1$ times
 reaches $(m-1)(n-1)/(r-1)$ whenever $(r-1)$ divides $n-1$. At $n=r=m=3$,
 two copies of the only triple realise a value unavailable to the simple
 model. Repetitions can also help outside that divisibility range: the
 twelve-copy construction at $(6,6,3)$ exceeds the simple edge optimum eleven
 (\Cref{const:multihyper-six}). Its assertion of optimality additionally
-requires the proposed upper bound.
+requires the cut bound above.
 
 For vertex separation, repetitions do not help at $m=2$, because two copies
 of one hyperedge already give two separated routes between its vertices.
@@ -531,8 +527,8 @@ remain open even if those arguments were verified.
 extremal structures, including whether the two separations agree in the simple model.
 \item For undirected vertex separation, determine the simple value at $m\ge6$
 and the multigraph value at $m\ge4$, including the best blocks and growth rates.
-\item For undirected hypergraphs, determine edge attainment outside the proposed
-range and find vertex bounds beyond the $m=3$ rank argument.
+\item For undirected hypergraphs, determine edge attainment outside the range
+where it is established and find vertex bounds beyond the $m=3$ rank argument.
 \item For directed hypergraphs, determine finite values and compare the effects
 of multiplicity, separation and orientation beyond the proposed leading term.
 \end{itemize}

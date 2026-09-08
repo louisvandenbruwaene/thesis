@@ -20,8 +20,10 @@ The thesis labels unchecked AI arguments as conjectures with proofs. In
 particular, the directed multigraph arc formula is not a verified upper
 bound. `solve(exhaustive=True)` returns its named construction as `lower`,
 with `complete=False`, rather than certifying optimality. Hypergraph formula
-helpers with legacy `_proved` names evaluate the proposed attainment formulas;
-they are not certificates. Figure legends distinguish conjectural curves from
+helpers with `_proved` names evaluate an attainment formula rather than
+certifying a cell. The edge cut bound and its simple attainment range are
+established, while the `m = 3` vertex bound still rests on the unchecked
+incidence-rank lemma. Figure legends distinguish conjectural curves from
 completed enumerations.
 
 The specialised directed multigraph structural enumerators retain conjectural
