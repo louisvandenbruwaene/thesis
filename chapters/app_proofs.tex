@@ -2573,6 +2573,27 @@ The protocol is stated in \Cref{sec:equal-budget}. Its raw records are in
 Both sets include full witnesses. The replacement manifest records which
 original record each new trial replaces and the clock change used to run it.
 
+The original solver used a calendar clock for its stopping rule. Nineteen runs
+had a discrepancy between that clock and the independently measured monotonic
+duration. They are retained in the data but excluded from equal-budget
+statistics. Each flagged trial was repeated with the same frozen search code
+and seed, changing only its deadline clock to a monotonic one. The replacement
+takes its original slot regardless of which run found more edges. Selecting
+the better of the two would give those slots an unfair additional chance.
+The discarded attempts are counted separately as extra computation.
+
+The timing rule is cooperative, so a connectivity calculation already in
+progress can overrun its target. Monotonic time also has platform-specific
+behaviour during system suspension. The records therefore include calendar
+duration, monotonic duration and CPU time. The computer was not isolated from
+other work, so this is a comparison under equal allocated search durations,
+not a controlled comparison of processor efficiency.
+
+The selected runs used $57657.7$ seconds of measured monotonic search time
+against the $57600$-second total allocation. Including the discarded originals
+raises the saved search time to $58690.8$ seconds. These totals exclude
+validation and reporting and are not calendar durations of the experiment.
+
 The report separates original outcomes from replacement outcomes and names
 the selected record for every seed. An independent validator rebuilds the
 flow networks from the saved witnesses using a separate gate construction

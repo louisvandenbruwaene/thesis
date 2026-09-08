@@ -645,72 +645,6 @@ At a fixed step interval it measures the exact value again.
 \Cref{sec:cheap-checker} gives the bookkeeping,
 and the regression test that holds the fast walk to the naive one step for step.
 
-\section{An equal search allocation across all variants}\label{sec:equal-budget}
-
-A separate experiment gives each of the sixteen variants one hour of search
-in total. This is one hour per variant, not per parameter case. Each variant
-is tested at $n=6,8,10,12$ and $m=3,6$. Each of these eight cases receives
-three runs with initial seeds $0$, $1000000$ and $2000000$, each with a
-$150$-second stopping target. Thus every variant receives
-$8\cdot3\cdot150=3600$ seconds of allocated search.
-
-All runs start empty. No construction, known optimum or earlier incumbent is
-supplied to the search. Graph variants use tabu search and hypergraph variants
-use random greedy growth. Hypergraphs have rank $3$ and directed hypergraphs
-use the forward convention. Runs are serial, with the variant order rotated
-between cases. Validation and reporting take place outside the search budget.
-
-The original solver used a calendar clock for its stopping rule. Nineteen runs
-had a discrepancy between that clock and the independently measured monotonic
-duration. They are retained in the data but excluded from equal-budget
-statistics. Each flagged trial was repeated with the same frozen search code
-and seed, changing only its deadline clock to a monotonic one. The replacement
-takes its original slot regardless of which run found more edges. Selecting
-the better of the two would give those slots an unfair additional chance.
-The discarded attempts are counted separately as extra computation.
-
-The timing rule is cooperative, so a connectivity calculation already in
-progress can overrun its target. Monotonic time also has platform-specific
-behaviour during system suspension. The records therefore include calendar
-duration, monotonic duration and CPU time. The computer was not isolated from
-other work, so this is a comparison under equal allocated search durations,
-not a controlled comparison of processor efficiency.
-
-\Cref{tab:equal-budget-summary} compares the unaided outcomes with a separately
-supplied construction count $C$. Reaching $C$ need not mean reaching the
-optimum. Failing to reach it measures a limitation of these particular runs,
-not a failure of the construction. The detailed tables in
-\Cref{sec:equal-budget-details} retain the minimum, median and maximum across
-the three seeds instead of replacing a search value by $C$.
-
-\begin{table}[htbp]
-\centering
-\scriptsize
-\input{figures/equal_budget_summary.tex}
-\caption{Eight parameter cases per variant under a one-hour total search
-allocation. The first count records cases where the best of three seeds
-reaches or exceeds the supplied construction count $C$. The second requires
-all three seeds to do so. Neither column counts proved optima.}
-\label{tab:equal-budget-summary}
-\end{table}
-
-\begin{samepage}
-Across the $128$ parameter cases, the best run reaches or exceeds $C$ in $74$
-cases and falls short in $54$. All three seeds reach $C$ in $68$ cases. In
-$8$ cases the search improves on the supplied construction, which confirms
-why $C$ is a comparison value rather than an asserted optimum.
-The limitations are substantial in some directed models. For example, at
-$n=12$ and $m=6$ the directed multigraph arc search returns $110$ in every
-run, while the supplied construction has $180$ arcs. Thus the successful
-small validation cases below do not imply reliable recovery of the dense
-families at larger orders.\par
-\end{samepage}
-
-The selected runs used $57657.7$ seconds of measured monotonic search time
-against the $57600$-second total allocation. Including the discarded originals
-raises the saved search time to $58690.8$ seconds. These totals exclude
-validation and reporting and are not calendar durations of the experiment.
-
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
 Before addressing open cases, the search is tested on settled ones.
@@ -724,7 +658,7 @@ In all seven validation cases in \Cref{tab:rediscovery}, it reaches the establis
     \centering
     \small
     \input{figures/rediscovery_table.tex}
-    \caption{Seven short validation runs. Each uses unaided tabu search, initial seed zero and a two-second stopping target per case. Elapsed times include the search and may slightly exceed the target because deadline checks are cooperative. The search count and known optimum are separate columns. These are not one-hour benchmarks.}
+    \caption{Seven short validation runs. Each uses unaided tabu search, initial seed zero and a two-second stopping target per case. Elapsed times include the search and may slightly exceed the target because deadline checks are cooperative. The search count and known optimum are separate columns. These are not the one-hour allocations of \Cref{sec:equal-budget}.}
     \label{tab:rediscovery}
 \end{table}
 
@@ -801,3 +735,51 @@ At $n=7$ and $m=4$, it has $36$ arcs and $\lambda^{\max}=3$.
 Its count equals $2(n-1)(m-1)$.
 Neither witness alone proves optimality.
 Each is an exactly measured feasible graph and therefore a lower bound.
+
+\section{An equal search allocation across all variants}\label{sec:equal-budget}
+
+A separate experiment gives each of the sixteen variants one hour of search
+in total. This is one hour per variant, not per parameter case. Each variant
+is tested at $n=6,8,10,12$ and $m=3,6$. Each of these eight cases receives
+three runs with initial seeds $0$, $1000000$ and $2000000$, each with a
+$150$-second stopping target. Thus every variant receives
+$8\cdot3\cdot150=3600$ seconds of allocated search.
+
+All runs start empty. No construction, known optimum or earlier incumbent is
+supplied to the search. Graph variants use tabu search and hypergraph variants
+use random greedy growth. Hypergraphs have rank $3$ and directed hypergraphs
+use the forward convention. Runs are serial, with the variant order rotated
+between cases. Validation and reporting take place outside the search budget.
+
+\Cref{tab:equal-budget-summary} compares the unaided outcomes with a separately
+supplied construction count $C$. Reaching $C$ need not mean reaching the
+optimum. Failing to reach it measures a limitation of these particular runs,
+not a failure of the construction. The detailed tables in
+\Cref{sec:equal-budget-details} retain the minimum, median and maximum across
+the three seeds instead of replacing a search value by $C$. That section also
+records the raw witnesses, the runs excluded for a clock discrepancy together
+with their timing replacements, and the measured search time against the
+allocation.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\input{figures/equal_budget_summary.tex}
+\caption{Eight parameter cases per variant under a one-hour total search
+allocation. The first count records cases where the best of three seeds
+reaches or exceeds the supplied construction count $C$. The second requires
+all three seeds to do so. Neither column counts proved optima.}
+\label{tab:equal-budget-summary}
+\end{table}
+
+\begin{samepage}
+Across the $128$ parameter cases, the best run reaches or exceeds $C$ in $74$
+cases and falls short in $54$. All three seeds reach $C$ in $68$ cases. In
+$8$ cases the search improves on the supplied construction, which confirms
+why $C$ is a comparison value rather than an asserted optimum.
+The limitations are substantial in some directed models. For example, at
+$n=12$ and $m=6$ the directed multigraph arc search returns $110$ in every
+run, while the supplied construction has $180$ arcs. Thus the successful
+small validation cases above do not imply reliable recovery of the dense
+families at larger orders.\par
+\end{samepage}
