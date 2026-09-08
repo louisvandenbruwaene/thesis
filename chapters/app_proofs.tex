@@ -635,7 +635,7 @@ The two constructions above give $\ell_2^{\mathrm{dir}}(n) \ge M(n)$. For the up
 so all three are equal. The same argument also proves it directly: in the claim above, $P$ shares no \emph{arc} with $(u,v)$ either, since $P$ runs inside $R$ and $(u,v)$ does not, so $\lec_D(u,v) \ge 2$ follows by the identical sentence.
 \end{proof}
 
-\begin{conjecture}[The two directed feasible families at $m=2$, with proof,\aimedal]\label{lem:directed-m2-families}
+\begin{conjecture}[The two directed feasible families at $m=2$, with proof,\aimedal\readfirst{1}]\label{lem:directed-m2-families}
 A digraph satisfies $\lec^{\max}\le1$ if and only if it satisfies $\kap^{\max}\le1$ under the incidence convention.
 \end{conjecture}
 \begin{proof}[Proposed proof]
@@ -889,7 +889,7 @@ The crude per-vertex bound therefore loses nothing within this relaxation, and t
 
 One thing \Cref{thm:dir-arc-linear-error} does not say is how far a feasible digraph is from the bipartite shape, since its dense case deletes arcs but its sparse case argues by induction instead. \Cref{lem:smaller-half-deletion} gives that structural statement directly, at the cost of a weaker bound, and the two are not comparable: at $m = n = 3$ the display below reads $11$ against the conjecture's $18$, and \Cref{thm:dir-arc-linear-error} only becomes the smaller of the two past the crossover of its $4(m-1)(n-1)$ with the $\sqrt{m}\,n^{3/2}$ below. Dropping the lower-order terms puts that crossover near $16(m-1)^2/m$, a rough estimate reading $21.3$ at $m = 3$ and $36$ at $m = 4$. Solved exactly, it falls between $19$ and $20$ at $m = 3$ and between $33$ and $34$ at $m = 4$. The second conclusion is a \emph{bipartisation} bound: a lower-order number of deletions leaves the digraph a subgraph of a one-directional bipartite digraph. It does not say that the partition is balanced or that the surviving arcs fill it, so it stops short of a stability statement in the usual sense, which would need a near-extremality hypothesis to start from.
 
-\begin{conjecture}[Quadratic bound and bipartisation, with proof,\aimedal]\label{prop:dir-arc-stability}
+\begin{conjecture}[Quadratic bound and bipartisation, with proof,\aimedal\readfirst{2}]\label{prop:dir-arc-stability}
 Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. Then deleting at most $\sqrt{m}\, n^{3/2}$ arcs leaves $D$ a subgraph of a one-directional bipartite digraph, and
 \[
     |A(D)| \;\le\; \floorfrac{n^2}{4} \;+\; \sqrt{m}\, n^{3/2}.
@@ -1054,7 +1054,7 @@ With $q = n$ the two arborescences of Step 1 of that proof are empty, so $R$ con
 
 The next lemma is where the skeleton's minimality, which had only been used to make it small, is used to make it \emph{shallow}. This restricts the paths that can occur in an extremal skeleton.
 
-\begin{conjecture}[A minimal bipartite skeleton has no long path, with proof,\aimedal]\label{lem:skeleton-shallow}
+\begin{conjecture}[A minimal bipartite skeleton has no long path, with proof,\aimedal\readfirst{3}]\label{lem:skeleton-shallow}
 Let $R$ be as in \Cref{lem:equality-forces}, with parts $A$ and $B$. Then $R$ contains no directed path with three arcs.
 \end{conjecture}
 
@@ -1701,7 +1701,7 @@ The proof shows more than the count. At $m = 2$ the cap $m-1$ is one, so a secon
 
 The next value is the one the hypergraph theorem supplies, and no separate argument is needed for it.
 
-\begin{conjecture}[The multigraph incidence value at $m = 3$, with proof,\aimedal]\label{cor:multi-vertex-m3}
+\begin{conjecture}[The multigraph incidence value at $m = 3$, with proof,\aimedal\readfirst{4}]\label{cor:multi-vertex-m3}
 $K_3(n) = 2(n-1)$ for every $n \ge 2$.
 \end{conjecture}
 
@@ -1732,7 +1732,7 @@ By \Cref{lem:multi-vertex-split}, a feasible multigraph on top of a fixed connec
 \]
 The obvious guess is that cycles must always pay for themselves against this bound: each independent cycle costs $m-1$ units of route capacity. The next conjecture shows a single triangle already fails to pay, for $m \ge 5$, and packing many of them compounds the failure into a gap that grows with $n$.
 
-\begin{conjecture}[A bouquet of thickened cliques, and how it beats the thickened tree, with proof,\aimedal]\label{thm:clique-chain-vertex}
+\begin{conjecture}[A bouquet of thickened cliques, and how it beats the thickened tree, with proof,\aimedal\readfirst{9}]\label{thm:clique-chain-vertex}
 Fix $3 \le r \le m$, the order of the clique block rather than the hyperedge uniformity of \Cref{tab:notation}, and set $q = m+1-r \ge 1$, the multiplicity of a thickened $K_r$ that saturates the vertex cap on $r$ vertices (the ``thickened complete graph'' construction above, restricted to a block of size $r$ rather than all of $n$). Let $1 \le k \le \lfloor (n-1)/(r-1) \rfloor$. Take $k$ copies of $K_r$ that all share one common vertex and are otherwise disjoint, thicken every edge of every copy to multiplicity $q$, and attach any leftover vertices as a pendant path at multiplicity $m-1$. This multigraph is feasible, $\kap^{\max} \le m-1$, and its total multiplicity is exactly
 \[
     (m-1)(n-1) \;+\; k \cdot \mathrm{gain}(r,m),
@@ -1769,7 +1769,7 @@ What is not open is the order, and to say that the bouquet is
 a lower bound of the right order there has to be a matching upper bound. There
 is one, and it comes from the underlying simple graph rather than cycle rank.
 
-\begin{conjecture}[An upper bound of the same order, with proof,\aimedal]\label{prop:multi-vertex-upper}
+\begin{conjecture}[An upper bound of the same order, with proof,\aimedal\readfirst{8}]\label{prop:multi-vertex-upper}
 For all $m \ge 2$ and $n \ge 2$,
 \[
     K_m(n) \;\le\; (m-1)\,k_m(n) \;<\; 2(m-1)^2\,n .
@@ -1800,7 +1800,7 @@ The lower bounds above are constructions and the upper bound is a density count,
 
 Two observations do it. The first is already in the section, one line further than it was taken.
 
-\begin{conjecture}[The objective in closed form, with proof,\aimedal]\label{lem:multi-vertex-objective}
+\begin{conjecture}[The objective in closed form, with proof,\aimedal\readfirst{10}]\label{lem:multi-vertex-objective}
 For a simple graph $G_0$ on $n$ vertices with $\kap^{\max}_{G_0} \le m-1$, the largest total multiplicity of a feasible multigraph with underlying simple graph exactly $G_0$ is
 \[
     W_m(G_0) \;:=\; \sum_{uv \in E(G_0)} \bigl(m - \kap_{G_0}(u,v)\bigr) ,
@@ -1953,7 +1953,7 @@ use the absence of orientation. The directed statement is the same one with dire
 routes, and it is worth writing down because it is what carries the arc results across
 to $K_m^{\mathrm{dir}}(n)$ without any asymptotic argument.
 
-\begin{conjecture}[Splitting the directed vertex measure, with proof,\aimedal]\label{lem:multi-vertex-split-dir}
+\begin{conjecture}[Splitting the directed vertex measure, with proof,\aimedal\readfirst{5}]\label{lem:multi-vertex-split-dir}
 Let $D$ be a multidigraph with multiplicity function $\mu$ and underlying simple
 digraph $D_0$. For an ordered pair $u \ne v$, write $\pi(u,v)$ for the largest number
 of pairwise internally disjoint directed $u$--$v$ paths of length at least two in
@@ -1982,7 +1982,7 @@ is itself feasible: on an arc, $\kap_{D_0}(u,v) = 1 + \pi(u,v) \le \mu(u,v) + \p
 directly. So $|A(D_0)| \le k_m^{\mathrm{dir}}(n)$ by definition.
 \end{proof}
 
-\begin{conjecture}[The directed multigraph incidence value, with proof,\aimedal]\label{cor:dir-multi-incidence}
+\begin{conjecture}[The directed multigraph incidence value, with proof,\aimedal\readfirst{6}]\label{cor:dir-multi-incidence}
 For every $n \ge 2$,
 \[
     K_2^{\mathrm{dir}}(n) \;=\; k_2^{\mathrm{dir}}(n) \;=\; \ell_2^{\mathrm{dir}}(n)
@@ -2024,7 +2024,7 @@ Hanging $k$ such blocks off one shared vertex, pairwise disjoint otherwise, uses
 $k(b-1)+1$ vertices, and blocks of different sizes may be mixed.
 \end{construction}
 
-\begin{conjecture}[The directed incidence value is a block problem too, with proof,\aimedal]\label{prop:dir-multi-vertex-blocks}
+\begin{conjecture}[The directed incidence value is a block problem too, with proof,\aimedal\readfirst{7}]\label{prop:dir-multi-vertex-blocks}
 Let $D$ be a multidigraph with underlying simple digraph $D_0$, and take the blocks of
 the underlying undirected graph of $D_0$. Then $\kap_D$ agrees with the value measured
 inside a block on every pair joined by an arc, and is at most $1$ on every pair split
