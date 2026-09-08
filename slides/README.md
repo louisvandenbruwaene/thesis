@@ -100,7 +100,7 @@ each copies the colours, the graph vocabulary and the theme out of
 | File | Frames | Character |
 |---|---|---|
 | `seminarie/main.tex` | 41 | the results deck: every theorem, table and grid in order |
-| `seminarie/seminarie.tex` | 22 | the picture-led deck, built to the author's own outline |
+| `seminarie/seminarie.tex` | 21 | the picture-led deck, built to the author's own outline |
 
 ```bash
 cd slides/seminarie
@@ -109,17 +109,21 @@ latexmk -pdf seminarie.tex
 
 `seminarie.tex` follows an outline the author dictated rather than the thesis's
 own order. Part I unfolds the question: the title translated into plain words, a
-graph as $E + V$, then $\ell_m(n)$ with an arrow from $\lambda^{\max}$ down to
-$\lambda(u,v)$ and the routes that define it, the same cascade again for
-$\kappa$, and the three model toggles presented as a red pill and a blue pill.
-Part II is the program: the two encodings, the max-flow checker as one input and
-one output, the three transformations that feed it, the three efficiency
-measures, and solving against searching. It closes with the search's energy
-function, what the search rediscovers, the status of the sixteen variants, what
-is new and what is left.
+graph as $E + V$ drawn in one layout, then $\ell_m(n)$ with an arrow from
+$\lambda^{\max}$ down to $\lambda(u,v)$ and the routes that define it, the same
+cascade again for $\kappa$, and the three model toggles as a blue pill against a
+red one. Part II is the program: the two encodings, the max-flow checker as one
+matrix in and one number out, the three transformations that feed it, the three
+efficiency measures, and solving against searching. It closes with the search's
+energy function, what the search rediscovers, the status of the sixteen
+variants, what is new and what is left.
 
-Two figures in it are drawn for the deck and are not in the thesis: the balance
-on the plain-words frame and the two pills. Everything else is a thesis picture,
+**Two house rules the author set for this deck.** No frame carries a line of
+text along its bottom edge, so the builders take no caption and every frame's
+content is centred with `\vfill`. And a frame says only what its own picture
+needs, so the program frames carry a heading and a drawing and nothing else.
+
+The two pills are drawn for the deck. Every other picture is a thesis picture,
 copied with the same coordinates the chapter uses.
 
 ## The two decks

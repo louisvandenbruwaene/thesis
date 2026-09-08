@@ -183,39 +183,16 @@
 % ============================================================================
 %  FRAME BUILDERS
 % ============================================================================
-\newcommand{\figframe}[3]{%
+\newcommand{\tikzframescaled}[3]{%
   \begin{frame}{#1}
     \vfill
     \begin{center}
-    \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{#2}
+    \adjustbox{max totalheight=0.74\textheight}{\resizebox{#3\textwidth}{!}{#2}}
     \end{center}
-    \vspace{3pt}
-    \noindent{\footnotesize\color{black!60} #3}\par
     \vfill
   \end{frame}%
 }
-\newcommand{\figframetall}[3]{%
-  \begin{frame}{#1}
-    \vspace{-2pt}
-    \begin{center}
-    \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{#2}
-    \end{center}
-    \vspace{1pt}
-    \noindent{\tiny\color{black!60} #3}\par
-  \end{frame}%
-}
-\newcommand{\tikzframescaled}[4]{%
-  \begin{frame}{#1}
-    \vfill
-    \begin{center}
-    \adjustbox{max totalheight=0.64\textheight}{\resizebox{#4\textwidth}{!}{#2}}
-    \end{center}
-    \vspace{8pt}
-    \noindent{\footnotesize\color{black!60} #3}\par
-    \vfill
-  \end{frame}%
-}
-\newcommand{\tikzframe}[3]{\tikzframescaled{#1}{#2}{#3}{1.0}}
+\newcommand{\tikzframe}[2]{\tikzframescaled{#1}{#2}{1.0}}
 
 % --- a capsule, for the model-choice frames --------------------------------
 % #1 colour, #2 rotation in degrees, #3 scale
@@ -238,14 +215,13 @@
 
 % one row of the transformation frame: a caption column and a picture column
 % clamped independently, so neither can ever run into the other
-\newcommand{\transrow}[3]{%
+\newcommand{\transrow}[2]{%
   \noindent
   \parbox[c]{0.235\textwidth}{\raggedright
-    {\footnotesize\color{KULblauw3b}\bfseries #1}\\[2pt]
-    {\scriptsize\color{black!55} #2}}%
+    {\color{KULblauw3b}\bfseries #1}}%
   \hfill
   \parbox[c]{0.735\textwidth}{\centering
-    \adjustbox{max width=0.72\linewidth, max totalheight=0.30\textheight}{#3}}\par}
+    \adjustbox{max width=0.72\linewidth, max totalheight=0.30\textheight}{#2}}\par}
 
 \title{Maximising Edge Density Subject to Connectivity Constraints}
 \author{Louis Vandenbruwaene}
@@ -280,10 +256,10 @@
 \begin{frame}{The title, in plain words}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.70\textheight}{\resizebox{0.94\textwidth}{!}{%
+\adjustbox{max totalheight=0.62\textheight}{\resizebox{0.72\textwidth}{!}{%
 \begin{tikzpicture}
   % --- the formal title ---------------------------------------------------
-  \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,3.9)
+  \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,1.55)
     {Maximising edge density in graphs\\under connectivity constraints};
   \node[draw=KULblauw1!35, rounded corners=4pt, line width=0.9pt,
         fit={(formal)}, inner sep=9pt] (fbox) {};
@@ -294,42 +270,12 @@
     node[midway, right=4pt, font=\scriptsize\itshape, text=black!50] {translation};
 
   % --- the plain sentence -------------------------------------------------
-  \node[font=\bfseries, align=center] (plain) at (0,1.75)
+  \node[font=\bfseries, align=center] (plain) at (0,-0.75)
     {networks with {\color{vertexorange!85!black}many links}
      and {\color{KULblauw1}low connectivity}};
 
-  % --- the balance ---------------------------------------------------------
-  \begin{scope}[shift={(0,-1.55)}]
-    % stand
-    \fill[KULblauw3b!85] (0,0) -- (-0.62,-1.45) -- (0.62,-1.45) -- cycle;
-    \draw[line width=2.4pt, KULblauw3b!85, line cap=round] (-1.05,-1.45) -- (1.05,-1.45);
-    % the beam tips to the left: the edge side is the heavy one
-    \begin{scope}[rotate around={9:(0,0.18)}]
-      \draw[line width=2.4pt, KULblauw3b, line cap=round] (-3.1,0.18) -- (3.1,0.18);
-      \fill[KULblauw3b] (0,0.18) circle (0.13);
-      % left pan: edges
-      \draw[line width=0.9pt, KULblauw3b!55] (-3.1,0.18) -- (-3.1,-0.55);
-      \draw[line width=2.2pt, vertexorange, line cap=round]
-        (-3.85,-0.55) .. controls (-3.1,-1.12) .. (-2.35,-0.55);
-      % right pan: connectivity
-      \draw[line width=0.9pt, KULblauw3b!55] (3.1,0.18) -- (3.1,-0.55);
-      \draw[line width=2.2pt, KULblauw1, line cap=round]
-        (2.35,-0.55) .. controls (3.1,-1.12) .. (3.85,-0.55);
-    \end{scope}
-    % pan labels, upright and clear of the beam
-    \node[font=\small\bfseries, text=vertexorange!85!black, align=center]
-      at (-3.35,1.55) {EDGES\\[1pt]{\scriptsize as many as possible}};
-    \node[font=\small\bfseries, text=KULblauw1, align=center]
-      at (3.35,1.55) {CONNECTIVITY\\[1pt]{\scriptsize capped at $m-1$}};
-    \node[font=\Large\bfseries, text=vertexorange!85!black] at (-3.35,0.95) {$\uparrow$};
-    \node[font=\Large\bfseries, text=KULblauw1]             at (3.35,0.95) {$\downarrow$};
-  \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{4pt}
-\noindent{\footnotesize\color{black!60}
-Push the edge count up while holding every pair of vertices weakly joined. The
-whole thesis is that one trade-off, asked over and over in different models.}\par
 \vfill
 \end{frame}
 
@@ -341,14 +287,16 @@ whole thesis is that one trade-off, asked over and over in different models.}\pa
 \begin{center}
 \adjustbox{max totalheight=0.68\textheight}{\resizebox{0.96\textwidth}{!}{%
 \begin{tikzpicture}
-  % ---- E: eight loose edges, no endpoints ---------------------------------
+  % ---- E: the eight edges in the graph's own layout, no vertices drawn -----
   \begin{scope}[shift={(0,0)}]
-    \foreach \i/\x/\y/\a in {1/-0.75/1.35/12, 2/0.75/1.35/-12,
-                             3/-0.75/0.45/-9, 4/0.75/0.45/9,
-                             5/-0.75/-0.45/14, 6/0.75/-0.45/-14,
-                             7/-0.75/-1.35/-7, 8/0.75/-1.35/7} {
-      \draw[gline, rotate around={\a:(\x,\y)}] (\x-0.58,\y) -- (\x+0.58,\y);
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \coordinate (e\i) at (\ang:1.35);
     }
+    \draw[gline] (e0)--(e1) (e0)--(e2) (e0)--(e3)
+                 (e1)--(e2) (e1)--(e4)
+                 (e2)--(e3) (e2)--(e4)
+                 (e3)--(e4);
     \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$E$};
     \node[font=\small, text=black!60] at (0,-2.5) {eight edges};
   \end{scope}
@@ -386,11 +334,6 @@ whole thesis is that one trade-off, asked over and over in different models.}\pa
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{6pt}
-\noindent{\footnotesize\color{black!60}
-An edge joins a pair of vertices, and $|E(G)|$ is the number being maximised.
-The picture is $K_5-\{04,13\}$, the running example: five vertices, eight
-edges.}\par
 \vfill
 \end{frame}
 
@@ -460,11 +403,6 @@ edges.}\par
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{2pt}
-\noindent{\footnotesize\color{black!60}
-Menger's theorem gives the same number a second face: $\lec_G(u,v)$ is also the
-fewest edges whose removal cuts every $u$--$v$ route. That is the face the
-program will measure.}\par
 \end{frame}
 
 % ============================================================================
@@ -532,71 +470,91 @@ program will measure.}\par
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{2pt}
-\noindent{\footnotesize\color{black!60}
-Whitney's inequality $\kap_G(u,v)\le\lec_G(u,v)$: avoiding shared vertices is at
-least as demanding as avoiding shared edges. Here the two agree, but they need
-not.}\par
 \end{frame}
 
 % ============================================================================
-%  4b.  WHERE THE TWO PART COMPANY
+%  5.  THE CHOICE: TWO PILLS, THREE ROWS
 % ============================================================================
-\tikzframescaled{Where the two part company}{%
-\begin{tikzpicture}[scale=1.35,
-    pA/.style={grA, line width=2.2pt},
-    pB/.style={grB, line width=2.2pt}]
-  \node[gvertex]  (s) at (0,0)      {$s$};
-  \node[gvertex]  (a) at (1.4,0.9)  {};
-  \node[gvertex]  (c) at (1.4,-0.9) {};
-  \node[gvcut, minimum size=6.5mm] (w) at (2.8,0) {$w$};
-  \node[gvertex]  (b) at (4.2,0.9)  {};
-  \node[gvertex]  (d) at (4.2,-0.9) {};
-  \node[gvertex]  (t) at (5.6,0)    {$t$};
-  \draw[pA] (s)--(a)--(w)--(b)--(t);
-  \draw[pB] (s)--(c)--(w)--(d)--(t);
-  \node[font=\small, text=KULblauw3b]  at (2.8,-1.75) {$\lec(s,t)=2$};
-  \node[font=\small, text=vertexpurple] at (2.8,-2.35) {$\kap(s,t)=1$};
-\end{tikzpicture}}{%
-Two routes that share no edge are still forced through the single vertex $w$.
-Every toggle in this thesis is chosen because it moves the answer, and this one
-does.}{0.66}
-
-% ============================================================================
-%  5.  THE CHOICE: THREE TOGGLES
-% ============================================================================
-{
-\setbeamercolor{background canvas}{bg=black!92}
-\setbeamercolor{normal text}{fg=white}
-\usebeamercolor[fg]{normal text}
 \begin{frame}[plain]
-\vspace{0.7cm}
+\vfill
 \begin{center}
-{\color{white!70}\large THREE CHOICES TO MAKE}\\[0.9cm]
-\adjustbox{max totalheight=0.52\textheight}{\resizebox{0.80\textwidth}{!}{%
-\begin{tikzpicture}
-  \shade[inner color=pillBlue!70, outer color=black!92, opacity=0.60]
-    (-3.4,0) circle (3.1);
-  \shade[inner color=pillRed!70, outer color=black!92, opacity=0.60]
-    (3.4,0) circle (3.1);
-  \begin{scope}[shift={(-3.4,0)}]\pillshape{pillBlue}{-16}{1.30}\end{scope}
-  \begin{scope}[shift={(3.4,0)}]\pillshape{pillRed}{16}{1.30}\end{scope}
-  \node[font=\bfseries, text=white, align=center] at (-3.4,-2.15)
-    {the graph you already know};
-  \node[font=\bfseries, text=white, align=center] at (3.4,-2.15)
-    {seven more models};
-  \node[font=\scriptsize, text=white!60, align=center] at (-3.4,-2.85)
-    {simple, non-hyper, undirected};
-  \node[font=\scriptsize, text=white!60, align=center] at (3.4,-2.85)
-    {toggle multiplicity, arity, direction};
+\adjustbox{max totalheight=0.90\textheight}{\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+   word/.style={font=\Large\bfseries},
+   picL/.style={anchor=center},
+   rowsep/.style={black!10, line width=0.7pt}]
+
+  % ---- the two pills -------------------------------------------------------
+  \begin{scope}[shift={(-3.7,5.0)}]\pillshape{pillBlue}{-14}{1.25}\end{scope}
+  \begin{scope}[shift={(3.7,5.0)}]\pillshape{pillRed}{14}{1.25}\end{scope}
+
+  % ---- row 1: multiplicity -------------------------------------------------
+  \node[word, text=pillBlue!80!black, anchor=east] at (-1.9, 2.1) {simple};
+  \node[word, text=pillRed!80!black,  anchor=west] at ( 1.9, 2.1) {multi};
+  \begin{scope}[shift={(-5.6,2.1)}, scale=0.95]
+    \node[gvertex] (s1) at (90:0.78) {};
+    \node[gvertex] (s2) at (210:0.78) {};
+    \node[gvertex] (s3) at (330:0.78) {};
+    \draw[gline] (s1)--(s2) (s2)--(s3) (s3)--(s1);
+  \end{scope}
+  \begin{scope}[shift={(5.6,2.1)}, scale=0.95]
+    \node[gvertex] (g1) at (90:0.78) {};
+    \node[gvertex] (g2) at (210:0.78) {};
+    \node[gvertex] (g3) at (330:0.78) {};
+    \draw[gline] (g1) to[bend left=22] (g2);
+    \draw[gline] (g1) -- (g2);
+    \draw[gline] (g1) to[bend right=22] (g2);
+    \draw[gline] (g2) to[bend left=15] (g3);
+    \draw[gline] (g2) to[bend right=15] (g3);
+    \draw[gline] (g3) -- (g1);
+  \end{scope}
+
+  % ---- row 2: arity --------------------------------------------------------
+  \node[word, text=pillBlue!80!black, anchor=east] at (-1.9,-0.9) {graph};
+  \node[word, text=pillRed!80!black,  anchor=west] at ( 1.9,-0.9) {hyper};
+  \begin{scope}[shift={(-5.6,-0.9)}, scale=0.85]
+    \coordinate (A) at (-0.9,-0.9); \coordinate (B) at (0.9,-0.9);
+    \coordinate (C) at (0.9, 0.9);  \coordinate (D) at (-0.9,0.9);
+    \begin{scope}[on background layer]
+      \draw[metro, metroB] (A) -- (B);
+      \draw[metro, metroC] (B) -- (C);
+      \draw[metro, metroD] (C) -- (D);
+    \end{scope}
+    \foreach \p in {A,B,C,D} {\node[metrostop] at (\p) {};}
+  \end{scope}
+  \begin{scope}[shift={(5.6,-0.9)}, scale=0.85]
+    \coordinate (Ah) at (-0.9,-0.9); \coordinate (Bh) at (0.9,-0.9);
+    \coordinate (Ch) at (0.9, 0.9);  \coordinate (Dh) at (-0.9,0.9);
+    \begin{scope}[on background layer]
+      \draw[metro, metroB] (-0.9,-0.82) -- (0.9,-0.82) -- (0.9,0.9);
+      \draw[metro, metroC] (-0.9,0.9) -- (-0.9,-0.98) -- (0.9,-0.98);
+      \draw[metro, metroD] (-0.9,-0.9) -- (0.9,0.9) -- (-0.9,0.9);
+    \end{scope}
+    \foreach \p in {Ah,Bh,Ch,Dh} {\node[metrostop] at (\p) {};}
+  \end{scope}
+
+  % ---- row 3: direction ----------------------------------------------------
+  \node[word, text=pillBlue!80!black, anchor=east] at (-1.9,-3.9) {undirected};
+  \node[word, text=pillRed!80!black,  anchor=west] at ( 1.9,-3.9) {directed};
+  \begin{scope}[shift={(-5.6,-3.9)}, scale=0.95]
+    \node[gvertex] (u1) at (90:0.85) {};
+    \node[gvertex] (u2) at (210:0.85) {};
+    \node[gvertex] (u3) at (330:0.85) {};
+    \draw[gline] (u1)--(u2) (u2)--(u3) (u3)--(u1);
+  \end{scope}
+  \begin{scope}[shift={(5.6,-3.9)}, scale=0.95, >=Stealth]
+    \node[gvertex] (v1) at (90:0.85) {};
+    \node[gvertex] (v2) at (210:0.85) {};
+    \node[gvertex] (v3) at (330:0.85) {};
+    \draw[gdir] (v1) to[bend right=14] (v2);
+    \draw[gdir] (v2) to[bend right=14] (v3);
+    \draw[gdir] (v3) to[bend right=14] (v1);
+    \draw[gdir] (v2) to[bend right=14] (v1);
+  \end{scope}
 \end{tikzpicture}}}
-\\[0.9cm]
-{\color{white!80}\normalsize
-$2\ \text{multiplicity}\;\times\;2\ \text{arity}\;\times\;2\ \text{direction}\;=\;8$ models,
-\ and each is asked twice, for $\lec$ and for $\kap$: \textbf{16 variants}.}
 \end{center}
+\vfill
 \end{frame}
-}
 
 % ---- choice 1: multiplicity ------------------------------------------------
 \begin{frame}{Choice 1 of 3: multiplicity}
@@ -606,7 +564,7 @@ $2\ \text{multiplicity}\;\times\;2\ \text{arity}\;\times\;2\ \text{direction}\;=
 \centering
 {\pillicon{pillBlue}}\ \ {\large\bfseries simple}\\[2pt]
 {\scriptsize\color{black!60} at most one edge per pair}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.6]
   \node[gvertex] (s1) at (90:0.78) {};
   \node[gvertex] (s2) at (210:0.78) {};
@@ -623,7 +581,7 @@ $2\ \text{multiplicity}\;\times\;2\ \text{arity}\;\times\;2\ \text{direction}\;=
 \centering
 {\pillicon{pillRed}}\ \ {\large\bfseries multigraph}\\[2pt]
 {\scriptsize\color{black!60} parallel copies allowed}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.6]
   \node[gvertex] (g1) at (90:0.78) {};
   \node[gvertex] (g2) at (210:0.78) {};
@@ -637,11 +595,6 @@ $2\ \text{multiplicity}\;\times\;2\ \text{arity}\;\times\;2\ \text{direction}\;=
 \end{tikzpicture}}\\[10pt]
 {\footnotesize\color{black!60} $\mu(u,v)\in\{0,\ldots,m-1\}$}
 \end{columns}
-\vspace{10pt}
-\noindent{\footnotesize\color{black!60}
-A parallel copy is a route of its own, so the cap is spent on multiplicity
-before it is spent on new neighbours. The extremal function is written
-$L_m(n)$ rather than $\ell_m(n)$.}\par
 \end{frame}
 
 % ---- choice 2: arity -------------------------------------------------------
@@ -652,7 +605,7 @@ $L_m(n)$ rather than $\ell_m(n)$.}\par
 \centering
 {\pillicon{pillBlue}}\ \ {\large\bfseries graph}\\[2pt]
 {\scriptsize\color{black!60} every line serves two stops}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.45]
   \coordinate (A) at (-0.9,-0.9); \coordinate (B) at (0.9,-0.9);
   \coordinate (C) at (0.9, 0.9);  \coordinate (D) at (-0.9,0.9);
@@ -673,7 +626,7 @@ $L_m(n)$ rather than $\ell_m(n)$.}\par
 \centering
 {\pillicon{pillRed}}\ \ {\large\bfseries hypergraph}\\[2pt]
 {\scriptsize\color{black!60} a line serves three or more}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.45]
   \coordinate (A) at (-0.9,-0.9); \coordinate (B) at (0.9,-0.9);
   \coordinate (C) at (0.9, 0.9);  \coordinate (D) at (-0.9,0.9);
@@ -686,11 +639,6 @@ $L_m(n)$ rather than $\ell_m(n)$.}\par
 \end{tikzpicture}}\\[10pt]
 {\footnotesize\color{black!60} $r\ge 2$, hyperedges span $r$ vertices}
 \end{columns}
-\vspace{10pt}
-\noindent{\footnotesize\color{black!60}
-Routes become Berge paths, riding a hyperedge from any member to any other. The
-encoding changes with the model: a hypergraph is stored as a list of
-hyperedges, not as a matrix.}\par
 \end{frame}
 
 % ---- choice 3: direction ---------------------------------------------------
@@ -701,7 +649,7 @@ hyperedges, not as a matrix.}\par
 \centering
 {\pillicon{pillBlue}}\ \ {\large\bfseries undirected}\\[2pt]
 {\scriptsize\color{black!60} an edge is an unordered pair}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.6]
   \node[gvertex] (u1) at (90:0.85) {};
   \node[gvertex] (u2) at (210:0.85) {};
@@ -718,7 +666,7 @@ hyperedges, not as a matrix.}\par
 \centering
 {\pillicon{pillRed}}\ \ {\large\bfseries directed}\\[2pt]
 {\scriptsize\color{black!60} an arc is an ordered pair}\\[12pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+\adjustbox{max totalheight=0.46\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.6, >=Stealth]
   \node[gvertex] (d1) at (90:0.85) {};
   \node[gvertex] (d2) at (210:0.85) {};
@@ -730,12 +678,6 @@ hyperedges, not as a matrix.}\par
 \end{tikzpicture}}\\[10pt]
 {\footnotesize\color{black!60} value quadratic in $n$}
 \end{columns}
-\vspace{10pt}
-\noindent{\footnotesize\color{black!60}
-One-way traffic is the toggle that changes the order of the answer: a route
-from $u$ to $v$ no longer doubles as a route from $v$ to $u$, so a graph can
-hold on the order of $n^2/4$ arcs under the same cap. These are the open
-cases.}\par
 \end{frame}
 
 % ============================================================================
@@ -797,12 +739,6 @@ cases.}\par
 \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{6pt}
-\noindent{\footnotesize\color{black!60}
-A matrix would be too large and too sparse for hyperedges, so the model splits
-in two: every non-hypergraph is one multiplicity matrix, symmetric when
-undirected and binary when simple, and every hypergraph is a list of vertex
-sets, with the tail marked when directed.}\par
 \vfill
 \end{frame}
 
@@ -810,60 +746,30 @@ sets, with the tail marked when directed.}\par
 %  9.  MAX FLOW: IN AND OUT
 % ============================================================================
 \begin{frame}{Measuring: one max-flow computation}
-\vspace{2pt}
+\vfill
 \begin{center}
-\adjustbox{max totalheight=0.56\textheight}{\resizebox{0.98\textwidth}{!}{%
+\adjustbox{max totalheight=0.66\textheight}{\resizebox{0.92\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
    iobox/.style={rounded corners=4pt, draw=black!22, fill=black!3,
-                 inner sep=9pt, align=center},
+                 inner sep=11pt, align=center},
    pipe/.style={-{Stealth[length=3.4mm]}, line width=1.6pt, KULblauw1!70}]
 
-  % ---- input --------------------------------------------------------------
-  \node[iobox] (in) at (0,0) {%
-    \begin{tikzpicture}[>=Stealth, scale=1.45]
-      \node[smallvertex] (A) at (0,0)     {$1$};
-      \node[smallvertex] (B) at (2.1,0)   {$2$};
-      \node[smallvertex] (C) at (1.05,1.8){$3$};
-      \draw[arc] (A) to[bend left=17]  (B);
-      \draw[arc] (A) to[bend right=17] node[below, font=\scriptsize, text=black!60]{$2$} (B);
-      \draw[arc] (A) -- node[left, font=\scriptsize, text=black!60]{$1$} (C);
-      \draw[arc] (B) to[bend left=17]  node[right, font=\scriptsize, text=black!60, pos=0.5]{$1$} (C);
-      \draw[arc] (C) to[bend left=17]  node[left,  font=\scriptsize, text=black!60, pos=0.5]{$1$} (B);
-    \end{tikzpicture}};
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=2pt of in]
-    {INPUT\ \ directed multigraph};
-  \node[font=\scriptsize, text=black!55, below=2pt of in]
-    {capacities are the multiplicities $\mu(u,v)$};
+  \node[iobox] (in) at (0,0)
+    {$\begin{pmatrix} 0 & 2 & 1 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}$};
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=3pt of in] {INPUT};
 
-  % ---- the checker ---------------------------------------------------------
-  \node[iobox, fill=KULblauw3a!12, draw=KULblauw1!45, minimum width=42mm] (box) at (6.6,0)
-    {{\bfseries integer max flow}\\[3pt]
-     {\scriptsize run once per ordered pair}\\[1pt]
-     {\scriptsize keep the largest value}};
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=2pt of box] {THE CHECKER};
+  \node[iobox, fill=KULblauw3a!12, draw=KULblauw1!45, minimum width=34mm] (box) at (5.4,0)
+    {\bfseries max flow};
 
-  % ---- output --------------------------------------------------------------
-  \node[iobox, fill=vertexorange!8, draw=vertexorange!45] (out) at (12.4,0)
-    {{\Large$\lmax_G\;=\;3$}\\[4pt]
-     {\scriptsize attained at the pair $(1,2)$}};
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=2pt of out]
-    {OUTPUT\ \ one number};
+  \node[iobox, fill=vertexorange!8, draw=vertexorange!45] (out) at (10.4,0)
+    {\Large$\lmax\;=\;3$};
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=3pt of out] {OUTPUT};
 
   \draw[pipe] (in) -- (box);
   \draw[pipe] (box) -- (out);
 \end{tikzpicture}}}
 \end{center}
-\vspace{6pt}
-\begin{center}
-{\normalsize
-$\lec_G(u,v)\;\overset{\text{Menger}}{=}\;$ smallest $u$--$v$ cut
-$\;\overset{\text{Ford--Fulkerson}}{=}\;$ largest $u$--$v$ flow}
-\end{center}
-\vspace{4pt}
-\noindent{\footnotesize\color{black!60}
-So the connectivity question is a flow question, and the whole program has one
-numerical primitive. Every other variant is transformed until it becomes this
-input.}\par
+\vfill
 \end{frame}
 
 % ============================================================================
@@ -871,7 +777,7 @@ input.}\par
 % ============================================================================
 \begin{frame}{Transformations: everything becomes this one input}
 \vspace{4pt}
-\transrow{undirected $\to$ directed}{one edge becomes two arcs}{%
+\transrow{undirected $\to$ directed}{%
 \begin{tikzpicture}[>=Stealth]
   \node[smallvertex] (u) at (0,0) {$u$};
   \node[smallvertex] (v) at (2.0,0) {$v$};
@@ -884,7 +790,7 @@ input.}\par
 \end{tikzpicture}}
 
 \vspace{9pt}
-\transrow{hypergraph $\to$ graph}{a hyperedge becomes a gate}{%
+\transrow{hypergraph $\to$ graph}{%
 \begin{tikzpicture}[>=Stealth]
 \coordinate (a) at (0.0, 0.0); \coordinate (b) at (1.0, 0.0); \coordinate (c) at (2.0, 0.0);
 \begin{scope}[on background layer]\draw[metro, metroA] (a)--(b)--(c);\end{scope}
@@ -907,7 +813,7 @@ input.}\par
 \end{tikzpicture}}
 
 \vspace{9pt}
-\transrow{$\kap \to \lec$}{a vertex becomes a gate too}{%
+\transrow{$\kap \to \lec$}{%
 \begin{tikzpicture}[>=Stealth]
 \node[vertex] (v) at (1.0, 0) {$v$};
 \draw[->, edge] (0.0,  0.6) -- (v);
@@ -924,11 +830,6 @@ input.}\par
 \draw[->, edge] (vo) -- (8.0, -0.6);
 \end{tikzpicture}}
 
-\vspace{9pt}
-\noindent{\footnotesize\color{black!60}
-A gate is the only bottleneck on the routes through it, so its capacity is
-exactly what a route must spend. The three are applied in this order, and the
-gates themselves are never split.}\par
 \end{frame}
 
 % ============================================================================
@@ -941,9 +842,8 @@ gates themselves are never split.}\par
 % ---- pruning --------------------------------------------------------------
 \column{0.315\textwidth}
 \centering
-{\color{KULblauw3b}\bfseries Pruning}\\[1pt]
-{\scriptsize\color{black!55} cut a branch, not a graph}\\[8pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+{\large\color{KULblauw3b}\bfseries pruning}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.0, >=Stealth,
    live/.style={gvertex, minimum size=5mm},
    dead/.style={gvsink, minimum size=5mm},
@@ -966,17 +866,13 @@ gates themselves are never split.}\par
   \node[font=\tiny, vertexred, align=center]    at (-1.2,-3.15) {over\\the cap};
   \node[font=\tiny, vertexred, align=center]    at (1.2,-3.15)  {over\\the cap};
   \node[font=\tiny, vertexorange!80!black, align=center] at (2.9,-3.15) {cannot\\win};
-\end{tikzpicture}}\\[6pt]
-{\scriptsize\color{black!60}
-Adding an edge never lowers connectivity, so a partial graph already over the
-cap condemns every completion.}
+\end{tikzpicture}}
 
 % ---- generating search ----------------------------------------------------
 \column{0.315\textwidth}
 \centering
-{\color{KULblauw3b}\bfseries Generating search}\\[1pt]
-{\scriptsize\color{black!55} do not check the same graph twice}\\[8pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+{\large\color{KULblauw3b}\bfseries generating search}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[scale=1.0, >=Stealth, tiny/.style={gvertex, minimum size=3.6mm}]
   % two drawings of one and the same isomorphism class
   \begin{scope}[shift={(-1.15,0)}]
@@ -1003,46 +899,33 @@ cap condemns every completion.}
     \draw[gline] (d1)--(d2) (d2)--(d3) (d3)--(d1) (d1)--(d4);
   \end{scope}
   \node[font=\tiny, text=black!55] at (0.7,-3.5) {one representative};
-\end{tikzpicture}}\\[6pt]
-{\scriptsize\color{black!60}
-\texttt{nauty}'s \texttt{geng} lists one support per class; the program then
-decorates its edges with arc multiplicities.}
+\end{tikzpicture}}
 
 % ---- the C helper ---------------------------------------------------------
 \column{0.315\textwidth}
 \centering
-{\color{KULblauw3b}\bfseries A compiled inner loop}\\[1pt]
-{\scriptsize\color{black!55} the same flow, faster}\\[8pt]
-\adjustbox{max totalheight=0.355\textheight, max width=\linewidth}{%
+{\large\color{KULblauw3b}\bfseries C: faster max flow}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
 \begin{tikzpicture}[>=Stealth]
   \node[rounded corners=4pt, draw=KULblauw1!45, fill=KULblauw3a!12,
-        minimum width=36mm, minimum height=13mm, align=center, font=\small]
-        (py) at (0,0) {\texttt{erdos915\_unified.py}\\[1pt]{\scriptsize the correctness path}};
+        minimum width=38mm, minimum height=12mm, font=\small]
+        (py) at (0,0) {\texttt{erdos915\_unified.py}};
   \node[rounded corners=3pt, draw=black!45, fill=black!8,
-        minimum width=26mm, minimum height=10mm, align=center, font=\small]
-        (c) at (0,-2.4) {\texttt{\_erdos\_fast.c}\\[1pt]{\scriptsize optional}};
-  \draw[-{Stealth[length=2.4mm]}, line width=1.1pt, KULblauw1!70]
-    (py.south) -- node[right, font=\tiny, text=black!55]{small hot paths} (c.north);
+        minimum width=30mm, minimum height=12mm, font=\small]
+        (c) at (0,-2.4) {\texttt{\_erdos\_fast.c}};
+  \draw[-{Stealth[length=2.4mm]}, line width=1.1pt, KULblauw1!70] (py.south) -- (c.north);
   \draw[-{Stealth[length=2.4mm]}, line width=1.1pt, black!35]
-    (c.west) to[out=180,in=180] node[left, font=\tiny, text=black!55]{same answer} (py.west);
-\end{tikzpicture}}\\[6pt]
-{\scriptsize\color{black!60}
-Capacities too large for safe \texttt{int32} arithmetic fall back to the Python
-integer path, so a speed-up cannot change an answer.}
+    (c.west) to[out=180,in=180] (py.west);
+\end{tikzpicture}}
 
 \end{columns}
-\vspace{9pt}
-\noindent{\footnotesize\color{black!60}
-None of the three changes what is proved. Only infeasible branches and branches
-that cannot beat the incumbent are discarded, so a sweep that finishes returns
-exactly what the blind walk would have returned.}\par
 \end{frame}
 
 % ============================================================================
 %  12.  SOLVING vs SEARCHING
 % ============================================================================
 \begin{frame}{Solving versus searching}
-\vspace{2pt}
+\vfill
 \begin{center}
 \adjustbox{max totalheight=0.20\textheight}{\resizebox{0.66\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
@@ -1061,35 +944,27 @@ exactly what the blind walk would have returned.}\par
 \vspace{10pt}
 \begin{columns}[T,onlytextwidth]
 \column{0.47\textwidth}
-{\large\color{vertexgreen!55!black}\bfseries Solving}\\[2pt]
-{\scriptsize\color{black!55} walk the whole space}
-\vspace{7pt}
-\begin{itemize}\setlength{\itemsep}{4pt}\small
-  \item[\color{vertexgreen!60!black}\textbullet] every graph on $n$ vertices, measured
-  \item[\color{vertexgreen!60!black}\textbullet] \textbf{finishes} $\Rightarrow$ the exact value at that $n$, upper bound included
-  \item[\color{vertexgreen!60!black}\textbullet] \textbf{times out} $\Rightarrow$ only the best graph seen, a lower bound
+{\large\color{vertexgreen!55!black}\bfseries solving}
+\vspace{9pt}
+\begin{itemize}\setlength{\itemsep}{6pt}\small
+  \item[\color{vertexgreen!60!black}\textbullet] walk every graph on $n$ vertices
+  \item[\color{vertexgreen!60!black}\textbullet] finishes $\Rightarrow$ the exact value
+  \item[\color{vertexgreen!60!black}\textbullet] times out $\Rightarrow$ a lower bound
 \end{itemize}
 
 \column{0.06\textwidth}
 \centering\vspace{0.9cm}{\color{black!22}\large vs}
 
 \column{0.47\textwidth}
-{\large\color{vertexorange!80!black}\bfseries Searching}\\[2pt]
-{\scriptsize\color{black!55} steer through the space}
-\vspace{7pt}
-\begin{itemize}\setlength{\itemsep}{4pt}\small
-  \item[\color{vertexorange!85!black}\textbullet] tabu search on the energy $\Phi$, from the empty graph
+{\large\color{vertexorange!80!black}\bfseries searching}
+\vspace{9pt}
+\begin{itemize}\setlength{\itemsep}{6pt}\small
+  \item[\color{vertexorange!85!black}\textbullet] steer by the energy $\Phi$
   \item[\color{vertexorange!85!black}\textbullet] reaches sizes the sweep cannot
-  \item[\color{vertexorange!85!black}\textbullet] \textbf{always} exhibits a graph, so \textbf{always} only a lower bound
+  \item[\color{vertexorange!85!black}\textbullet] always a lower bound
 \end{itemize}
 \end{columns}
-\vspace{8pt}
-\hspace*{0.9cm}{\color{KULblauw3a}\rule{0.82\paperwidth}{1.1pt}}
-\vspace{7pt}
-\begin{center}
-{\normalsize\color{KULblauw3b}\bfseries
-A value is settled only where a proof and a construction meet.}
-\end{center}
+\vfill
 \end{frame}
 
 % ============================================================================
@@ -1133,12 +1008,6 @@ $\Phi(G)\;=\;
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vspace{6pt}
-\noindent{\footnotesize\color{black!60}
-Tabu search, started from the empty graph on $n=6$ at $m=3$, walks downhill in
-$\Phi$ and forbids recently touched edges so it cannot walk straight back.
-Its endpoint here, the multiplicity-$2$ star with ten edges, is the known
-extremiser $L_3(6)=10$.}\par
 \end{frame}
 
 % ============================================================================
@@ -1176,10 +1045,7 @@ extremiser $L_3(6)=10$.}\par
     \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
     \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\dir}(n)=12$};
   \end{scope}
-\end{tikzpicture}}{%
-Told only to pack in edges, the search returns the named constructions. That is
-the check on the machine. It still only ever exhibits a graph, so it proposes a
-lower bound and never an upper one.}{0.95}
+\end{tikzpicture}}{0.95}
 
 % ============================================================================
 %  15.  THE SIXTEEN VARIANTS
@@ -1248,10 +1114,6 @@ lower bound and never an upper one.}{0.95}
   \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
 \end{tikzpicture}}}
 \end{center}
-\vspace{2pt}
-\noindent{\tiny\color{black!60}
-Every leaf is one extremal function and its colour is that leaf's status. The
-open and conjectural leaves sit in the directed half of the tree.}\par
 \end{frame}
 
 % ============================================================================
@@ -1281,11 +1143,6 @@ open and conjectural leaves sit in the directed half of the tree.}\par
   \item[{\color{regimeConjectured}$\blacksquare$}] Whether the directed vertex value equals the arc value at $m\ge3$, which Whitney's inequality does not hand over
   \item[{\color{regimeOpen}$\blacksquare$}] The exact values behind the leading terms now settled, one-way and for hyperedges alike
 \end{itemize}
-
-\vspace{22pt}
-\centering
-{\color{black!55}\small The map is filled in where the arguments reached,}\\[3pt]
-{\color{black!55}\small and the blanks are marked where they did not.}
 \vfill
 \end{frame}
 
@@ -1308,13 +1165,12 @@ open and conjectural leaves sit in the directed half of the tree.}\par
 \item control
 \end{itemize}
 \end{columns}
-\vspace{8pt}
-\hspace*{0.9cm}{\color{KULblauw3a}\rule{0.82\paperwidth}{1.1pt}}
 \vfill
 \begin{center}
 {\Large\color{KULblauw3b}\bfseries It's a tool.}\\[8pt]
 {\normalsize short leash\ \ $+$\ \ AI proofs\ \ $=$\ \ argumented conjecture\ \aimedal}
 \end{center}
+\vfill
 \vfill
 \end{frame}
 
