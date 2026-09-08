@@ -84,10 +84,10 @@ Area & Contribution and status \\
 \midrule
 Undirected graphs & Independent Gomory--Hu proof of the edge bounds and an extremal simple construction for every $n\ge m$. \\
 Hypergraph edge & Checked cut bound for every $r$-uniform hypergraph, and checked simple attainment on the stated range. \\
-Hypergraph vertex & Checked $m=2$ and $m=3$ values, the latter through the checked incidence-rank lemma, with checked attainment in both the simple and the multihypergraph model. \\
+Hypergraph vertex & Checked $m=2$ value and $m=3$ upper bound through the incidence-rank lemma, with checked attainment on the stated simple and multihypergraph ranges. \\
 Directed multigraph & Checked exact arc value for every $n$ and $m$. The extremal classification on the quadratic branch remains conjectural, with a proposed skeleton proof. \\
 Multigraph incidence & Checked $m=2$ value, finite computations, and proposed proofs for block optimisation and asymptotic bounds. \\
-Directed quadratic bounds & Checked elementary arc proof valid at every $n$, with the vertex analogue proposed, and a checked bipartisation bound giving the shape of a feasible digraph at a weaker error. The directed hypergraph extensions are checked, including the leading constant shared by the forward, backward and general orientation models. The simple-digraph asymptotic also follows from Huang and Lyu \cite{HuangLyu26} with the displayed lower construction. \\
+Directed quadratic bounds & Checked elementary arc and vertex bounds valid at every $n$, and a checked bipartisation bound giving the shape of a feasible digraph at a weaker error. The directed hypergraph extensions are checked, including the leading constant shared by the forward, backward and general orientation models. The simple-digraph asymptotic also follows from Huang and Lyu \cite{HuangLyu26} with the displayed lower construction. \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -101,10 +101,7 @@ Mader's bound is
 \[
  \ell_m(n)\le\floorfrac{m(n-1)}2.
 \]
-This thesis gives an independent proof through Gomory--Hu trees and a
-construction attaining equality for every $n\ge m\ge2$. It then studies
-sixteen variants obtained by changing direction, multiplicity, hyperedge
-size and route separation. Vertex separation is measured in the incidence
+An independent Gomory--Hu proof and matching construction establish equality for $n\ge m\ge2$. The thesis studies sixteen variants in direction, multiplicity, hyperedge size and separation. Vertex separation is measured in the incidence
 graph, directed when the model is directed, so separated routes share
 neither an intermediate vertex nor an edge copy.
 
@@ -116,29 +113,33 @@ $\max(2(n-1),\floor{n^2/4})$ at $m=2$ under both separations. The classical simp
 with the edge values through $m=4$ and first diverge at $m=5,n=14$
 \cite{Bartfai60,Bollobas66,Leonard72b,SorensenThomassen74}.
 
-Further results are presented as \emph{conjectures with proofs}, with the
-verification status explained in the Contribution Statement. They include
-the directed multigraph arc formula
+The checked directed multigraph arc formula is
 \[
- L_m^{\mathrm{dir}}(n)=(m-1)\max\!\left(2(n-1),\floorfrac{n^2}4\right),
+ L_m^{\mathrm{dir}}(n)=(m-1)\max\!\left(2(n-1),\floorfrac{n^2}4\right).
 \]
-the hypergraph vertex bound $\floor{2(n-1)/(r-1)}$ at $m=3$, and the directed
-hypergraph leading term $(m-1)n^2/(4(r-1))$ for fixed $r\ge3,m\ge2$.
-Their proposed arguments use reachability skeletons, incidence rank and
-two-step route counts. For simple digraphs, the asymptotic
-$n^2/4+\Theta_m(n)$ at fixed $m\ge3$ also follows from the cited theorem of
-Huang and Lyu and the feasible augmented bipartite construction. The proposed
-elementary argument gives an explicit bound at every order. The exact
-simple directed value remains open for $m\ge3$.
+Its proof repeatedly removes a sparse subgraph preserving reachability.
+The checked incidence-rank argument gives the hypergraph vertex upper bound
+$\floor{2(n-1)/(r-1)}$ at $m=3$, with equality in the stated attainment
+ranges. Checked directed hypergraph arguments establish the leading term
+$(m-1)n^2/(4(r-1))$ for fixed $r\ge3,m\ge2$, under both separations and
+in the forward, backward and general orientation models.
+For simple digraphs, checked elementary arguments give explicit bounds at
+every order and the asymptotic form $n^2/4+\Theta_m(n)$ for fixed $m\ge3$.
+That asymptotic form also follows from the cited theorem of Huang and Lyu
+and the feasible augmented bipartite construction. The exact simple directed
+value remains open for $m\ge3$.
 
-The companion program measures connectivity with maximum flow, enumerates
-small instances and searches larger ones. Graphs use multiplicity matrices
-and tabu search. Hypergraphs use hyperedge lists and random greedy growth.
-Completed enumeration establishes a finite optimum, while heuristic searches
-give feasible witnesses and lower bounds. An experiment allocates one hour
-to each variant and compares the unaided search with separately supplied
-constructions. Chapter~3 explains the status and remaining questions for
-each variant. The appendix retains the full arguments and computational audit.
+Thirteen further statements retain the status \emph{conjecture with proposed
+proof}, as explained in the Contribution Statement. They concern block
+reductions, multigraph incidence bounds and the classification of directed
+multigraph extremisers. Their included arguments have not been verified
+line by line by the author and are not used as established results.
+
+The companion program uses maximum flow for connectivity, exhaustive
+search for finite optima, and tabu search or random greedy growth for
+larger instances. Heuristic results are lower bounds. An equal-time
+experiment compares unaided search with supplied constructions. The appendix
+contains the proofs, proposed proofs and computational audit.
 
 \chapter*{Abbreviations and Symbols}
 \addcontentsline{toc}{chapter}{Abbreviations and Symbols}

@@ -492,7 +492,7 @@ The lower bound is attained by a spanning tree with every edge thickened to $m-1
 In simple graphs the edge and vertex problems give the same answer for $m \le 4$, and three papers together say so. The vertex values came first: $k_3$ from B\'{a}rtfai \cite{Bartfai60} and $k_4$ from Bollob\'{a}s \cite{Bollobas66}. Leonard \cite{Leonard72b} then proved that the two separations agree throughout $2 \le m \le 4$, in the same paper that settled the edge value at $m = 5$, a year before \Cref{thm:mader} covered every $m$ at once.
 
 \begin{theorem}[B\'{a}rtfai \cite{Bartfai60}, Bollob\'{a}s \cite{Bollobas66}, Leonard \cite{Leonard72b}]\label{thm:leonard}
-For all $n \ge m$ and $m \le 4$,
+For all $n\ge m$ and $2\le m\le4$,
 \[
     k_m(n) = \ell_m(n) = \floorfrac{m(n-1)}{2}.
 \]
@@ -530,7 +530,7 @@ For simple digraphs,
 \]
 \end{theorem}
 
-Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The proposed upper-bound proof is in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, the larger feasible family, and the arc value follows from it.
+Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper-bound proof is in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, the larger feasible family, and the arc value follows from it.
 
 \begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
@@ -674,7 +674,7 @@ measure splits into parallel copies plus longer detours
 over the blocks of the underlying simple graph (\Cref{thm:multi-vertex-blocks}).
 In the block-packing regime, the proposed analysis of complete bipartite blocks gives an asymptotic rate of
 $(3-2\sqrt{2}+o_m(1))m^2$ per added vertex (\Cref{thm:multi-vertex-bipartite}),
-while the underlying simple graph gives the upper bound $K_m(n) < 2(m-1)^2n$
+while a further proposed argument using the underlying simple graph gives the upper bound $K_m(n) < 2(m-1)^2n$
 (\Cref{prop:multi-vertex-upper}).
 
 \subsection{Directed bounds beyond the first threshold}

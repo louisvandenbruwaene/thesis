@@ -652,9 +652,12 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         directed_proved = kw["directed"] and not is_hyper and (
             (not kw.get("simple", True) and kw["separation"] == "edge")
             or (kw.get("simple", True) and m == 2))
-        conjectural = ((kw["directed"] and not directed_proved) or
-                       (not kw.get("simple", True) and kw["separation"] == "vertex" and m > 2) or
-                       (is_hyper and m > 2))
+        # Hypergraph curves carry proved upper bounds, not claims of equality.
+        # The edge cut bound holds for every m, and the vertex rank bound for
+        # m <= 3. Higher-threshold vertex rows have no theorem curve above.
+        conjectural = (not is_hyper and (
+            (kw["directed"] and not directed_proved) or
+            (not kw.get("simple", True) and kw["separation"] == "vertex" and m > 2)))
         curve_key = "conj" if conjectural else "proved"
         panel = dict(
             status=("conjectured" if conjectural else "proved") if theorem else "open",

@@ -291,7 +291,7 @@ In the directed model, the tail is specified with a pointer and the multihypergr
 Using these representations for all graph variants means iteration traverses all possible representation states easily.
 Walking those possibilities, measuring each candidate with the checker and keeping the densest feasible graph settles a bound exactly.
 If the enumeration hits its deadline before finishing, the returned graph is labelled as a lower bound.
-Completed enumerations establish the small cases reported in the audit. For directed multigraphs under arc separation, \code{solve(exhaustive=True)} instead evaluates the conjectured formula and returns a named witness, explicitly labelled as a lower bound. This branch supplies no enumeration markers in the figures. The specialised structural enumerators use that same conjectured formula for prefix pruning, so their completeness is conditional and they cannot independently prove it.
+Completed enumerations establish the small cases reported in the audit. For directed multigraphs under arc separation, \code{solve(exhaustive=True)} instead evaluates the established formula and returns a named witness, explicitly labelled as a lower bound. This branch supplies no enumeration markers in the figures. The specialised structural enumerators use that same formula for prefix pruning. Its proved bound justifies those prunings, but the enumerations cannot serve as independent proofs of the formula they assume.
 
 \begin{figure}[ht]
     \centering
@@ -468,7 +468,7 @@ At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-ta
 The search so far treats one pair $(n,m)$ at a time.
 For a directed multigraph, scaling can instead check every threshold at a fixed $n$ in one pass.
 It divides all multiplicities by $m-1$.
-The formula in \Cref{thm:dir-multi-full} now supplies a lower-bound witness in \code{solve}. The cut formulation can provide a separate finite check, provided its optional cuts are valid independently of that conjecture.
+The formula in \Cref{thm:dir-multi-full} now supplies a lower-bound witness in \code{solve}. The cut formulation can provide a separate finite check, provided its optional cuts are valid independently of that theorem.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
 The resulting weights satisfy $w(u,v)\in[0,1]$.

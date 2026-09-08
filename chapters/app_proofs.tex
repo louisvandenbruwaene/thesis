@@ -12,9 +12,9 @@ The appendix has four parts, and they do not carry equal weight.
 A reader who trusts the cited results may skip it.
 \textsc{Parts II} and \textsc{III} contain the original arguments.
 Readers who want a selective route through them can focus on three proof ideas.
-The proposed reachability-skeleton argument supports the directed formulas.
-The checked incidence-rank argument establishes the hypergraph vertex value at $m=3$.
-The two-step budget supplies proposed elementary bounds for directed models.
+The checked reachability-skeleton argument establishes the directed multigraph arc formula.
+The checked incidence-rank argument establishes the hypergraph vertex upper bound at $m=3$, with equality in the stated attainment ranges.
+The checked two-step budget supplies elementary bounds for directed graphs and hypergraphs.
 The arguments still marked as proposed remain subject to verification. Their statements are labelled
 \emph{Conjecture, with proof}, and the presence of an argument does not establish them.
 
@@ -428,7 +428,7 @@ question rather than a conjecture, since the sizes reached are well below those
 at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 \end{remark}
 
-\apppart{Part II. The directed results}{The three constructions the body names but does not define, the reachability skeleton that both exact directed results run on, the value at $m=2$ under both separations, the structural propositions that bound the frontier at $m \ge 3$, and the proposed proof that covers the directed multigraph problem at every $n$ and every $m$.}
+\apppart{Part II. The directed results}{The three constructions the body names but does not define, the reachability skeleton that both exact directed results run on, the value at $m=2$ under both separations, the structural propositions that bound the frontier at $m \ge 3$, and the checked proof of the directed multigraph arc value at every $n$ and every $m$.}
 
 \section{The directed constructions}\label{sec:dir-constructions}
 
@@ -456,7 +456,7 @@ At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\
 
 \section{The reachability skeleton}\label{sec:reach-skeleton}
 
-One proposed tool supports both directed formulas, so its conjecture and proposed proof come first. The object is a thin subdigraph that carries the whole
+One checked lemma supports both directed formulas, so its statement and proof come first. The object is a thin subdigraph that carries the whole
 reachability relation of $D$ and nothing else. \Cref{sec:dir-arc-m2} uses it
 once in the proposed $m=2$ argument under both separations, and
 \Cref{sec:dir-multi} uses it $m-1$ times over, peeling one copy of each of its
@@ -648,7 +648,7 @@ This argument explains the identical node counts in \Cref{tab:basecase-search}: 
 
 
 The exhaustive searches independently give the maxima $2,4,6,8,10,12$ at $2\le n\le7$.
-The multigraph formula is a related conjecture built on the same skeleton argument, so it is not independent corroboration of that argument.
+The general multigraph theorem uses the same skeleton argument, so it is not independent corroboration of that argument.
 
 \begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
 The skeleton argument proposes the value at $m=2$ (\Cref{thm:dir-vertex-m2-exact}, conditional on \Cref{lem:reach-skeleton}). For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
@@ -915,11 +915,11 @@ Equality in both $\min(a,b)\le\sqrt{ab}$ and Cauchy--Schwarz would require balan
 
 The vertex problem at $m \ge 3$ is therefore open in the same narrow sense as the arc problem rather than in the wide one. Its leading constant is $\tfrac14$ unconditionally, the term after it is linear in $n$, and since $\ell_m^{\mathrm{dir}}(n) \le k_m^{\mathrm{dir}}(n)$ with both now inside $n^2/4 + \Theta_m(n)$, the two values agree to first order. The linear coefficient and the bounded correction remain undetermined here, as does the question whether the two values coincide exactly.
 
-\section{A proposed formula for the directed multigraph problem}\label{sec:dir-multi}
+\section{The directed multigraph arc formula}\label{sec:dir-multi}
 
-The conjectured formula has a linear branch from thickened bidirected trees and a quadratic branch from one-way complete bipartite digraphs. The construction proves a lower bound. The proposed upper-bound proof below depends on the unchecked reachability-skeleton argument.
+The exact formula has a linear branch from thickened bidirected trees and a quadratic branch from one-way complete bipartite digraphs. These constructions attain the lower bound. The upper proof uses the checked reachability-skeleton lemma.
 
-The proposed argument deletes a sparse subgraph preserving reachability. If that skeleton has the claimed size, repeating the deletion controls the total multiplicity.
+Removing a reachability skeleton lowers every positive local arc-connectivity by at least one. Repeating the deletion controls the total multiplicity.
 
 \subsection{The lower bound: thickening}
 
@@ -2621,7 +2621,7 @@ protocol as \Cref{tab:equal-budget-m3-hypergraphs}.}
 \Cref{fig:variant-bounds-m3-graphs,fig:variant-bounds-m3-hyper,fig:variant-bounds-m6-graphs,fig:variant-bounds-m6-hyper} record the finite data behind \Cref{fig:variant-tree-status,tab:summary}.
 Every hypergraph panel and comparison table in this section uses $r=3$.
 Directed hypergraphs use the forward orientation, with one tail and two heads.
-A blue curve represents an established result. A red curve represents a conjectured formula or upper bound.
+A blue curve represents an established value or upper bound, as specified in its panel. A red curve represents a conjectured formula. An upper-bound curve does not assert attainment.
 A filled square is a value established by completed enumeration. The directed multigraph arc formula is drawn as an established curve on the strength of \Cref{thm:dir-multi-full}, not of an independent enumeration.
 An open circle is the value returned by the unaided search.
 A red plus is the value of a separately supplied construction.
@@ -2675,7 +2675,7 @@ positive lower bound in that parameter range, not that the optimum is zero.
 \begin{sidewaysfigure}[p]
     \centering
     \includegraphics[width=0.98\textheight]{figures/variant_bounds_m3_hypergraphs.png}
-    \caption{The eight hypergraph-model variants at $m=3$. The red curve is the proved upper bound of \Cref{prop:hyper-edge}. Attainment is established only on the stated range, so the curve is drawn as a conjectured value outside it. A lower-bound point below it does not alone prove that the bound is unattainable. Only an exact square below it establishes such a gap.}
+    \caption{The eight hypergraph-model variants at $m=3$. The blue curves are the established upper bounds of \Cref{prop:hyper-edge,thm:hyper-vertex-m3}. They remain upper bounds outside the stated attainment ranges. A lower-bound point below it does not alone prove that the bound is unattainable. Only an exact square below it establishes such a gap.}
     \label{fig:variant-bounds-m3-hyper}
 \end{sidewaysfigure}
 
@@ -2705,12 +2705,11 @@ A simple hypergraph then has one hyperedge, while a multihypergraph attains the 
 \Cref{tab:variant-values} gives the same data numerically.
 Blue entries are established, red entries are conjectural, and gold entries record lower bounds in open cases.
 A bold green entry is machine-checked exact.
-The prefixes $\stackrel{?}{\le}$ and $\stackrel{?}{=}$ mark a conjectured upper bound and a conjectured value respectively.
+The prefix $\le$ marks an established upper bound whose attainment is not supplied at that cell. The prefix $\stackrel{?}{=}$ marks a conjectured value.
 The prefix $\ge$ marks a verified construction without a matching upper bound.
 A blank hypergraph cell at $n=2$ omits the degenerate zero value: no $3$-element hyperedge can be formed.
 The simple hypergraph cell at $m=6$, $n=6$ reads a bold $11$ against the bound of $12$ drawn as the curve above it, which is the gap the enumeration just described settles.
-The corresponding multihypergraph edge cell records a conjectured upper bound of $12$.
-The twelve-copy construction reaches that count, but its optimality still depends on the proposed upper-bound proof.
+The corresponding multihypergraph edge cell is the established value $12$: the twelve-copy construction meets the checked cut upper bound. It is printed as a theorem-derived value, not as an independent enumeration.
 The vertex construction also gives $12$ without settling that optimum.
 
 \begin{table}[p]

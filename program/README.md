@@ -27,9 +27,9 @@ certifying a cell. The edge cut bound, its simple attainment range and the
 lemma, which is now proved. Figure legends distinguish conjectural curves from
 completed enumerations.
 
-The specialised directed multigraph structural enumerators retain conjectural
-prefix pruning. Their completeness depends on that bound, so they cannot
-independently establish it. The cut-counting MILP uses unconditional box bounds
+The specialised directed multigraph structural enumerators use formula-based
+prefix pruning. The now-proved bound justifies that pruning, but these runs
+cannot independently establish the formula they assume. The cut-counting MILP uses unconditional box bounds
 for its optional deletion constraints. Frozen experiments retain the historical
 code and observations that produced them.
 

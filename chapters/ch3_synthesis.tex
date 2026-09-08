@@ -73,7 +73,7 @@ follows independently from Huang and Lyu \cite{HuangLyu26} and the displayed
 lower construction, as explained in \Cref{sec:status-simple-directed}.
 The linear coefficient remains unknown among the results proved in this thesis.
 Even identifying it would leave the exact bounded correction to establish.
-More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ above $n^2/4$, while the proposed elementary upper bound allows $4(m-1)n$. These inequalities do not show that a unique limiting linear coefficient exists.
+More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ above $n^2/4$, while the checked elementary upper bound allows $4(m-1)n$. These inequalities do not show that a unique limiting linear coefficient exists.
 Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
 The next section considers the separate question of extremal shape.
 
@@ -245,12 +245,12 @@ Model & Edge or arc separation & Vertex separation \\
 \midrule
 Simple graph & Exact edge formula established & Classical exact values for $m\le5$, open for $m\ge6$ \\
 Multigraph & $(m-1)(n-1)$ established & $m=2$ established, then a proposed general $m=3$ value and block reduction \\
-Simple hypergraph & Cut bound established, attainment on a stated range & $m=2$ established, proposed $m=3$ bound, higher thresholds open \\
-Multihypergraph & Same established cut bound, with additional repeated-edge constructions & $m=2$ established, then a proposed $m=3$ bound and further attainment cases \\
+Simple hypergraph & Cut bound established, attainment on a stated range & $m=2$ established, $m=3$ bound established with stated attainment, higher thresholds open \\
+Multihypergraph & Same established cut bound, with additional repeated-edge constructions & $m=2$ established, $m=3$ bound and stated attainment established \\
 Simple digraph & Exact $m=2$ value established, with the literature fixing the asymptotic order for $m\ge3$ & Same asymptotic order, with equality to the arc value open for $m\ge3$ \\
-Directed multigraph & Proposed exact formula $(m-1)M(n)$ & Proposed leading term $(m-1)n^2/4$, with finite separation from arc values \\
-Directed simple hypergraph & Proposed leading term $(m-1)n^2/[4(r-1)]$ & Same proposed leading term \\
-Directed multihypergraph & Same proposed leading term & Same proposed leading term \\
+Directed multigraph & Exact arc formula $(m-1)M(n)$ established & Proposed leading term $(m-1)n^2/4$, with finite separation from arc values \\
+Directed simple hypergraph & Leading term $(m-1)n^2/[4(r-1)]$ established & Same established leading term \\
+Directed multihypergraph & Same established leading term & Same established leading term \\
 \bottomrule
 \end{tabularx}
 \caption{Status index. Here $m\ge2$, hypergraph rows use $r\ge3$, and
@@ -361,7 +361,7 @@ requires the cut bound above.
 
 For vertex separation, repetitions do not help at $m=2$, because two copies
 of one hyperedge already give two separated routes between its vertices.
-The established value is again $\floor{(n-1)/(r-1)}$. The proposed $m=3$
+The established value is again $\floor{(n-1)/(r-1)}$. The established $m=3$
 upper bound is the same as for simple hypergraphs, and the repeated star
 supplies the additional attainment cases stated in
 \Cref{prop:hyper-vertex-lower-multi}. At larger thresholds, finite witnesses
@@ -404,18 +404,20 @@ the larger vertex-feasible family.
 \subsection{Directed multigraphs}
 \label{sec:status-directed-multigraph}
 
-For arc separation the proposed exact formula is
-$L_m^{\mathrm{dir}}(n)=(m-1)M(n)$. The proposed proof removes a
-reachability-preserving subgraph at each level of the route cap. The
-thickened bidirected tree and balanced one-way bipartite graph provide
-matching lower constructions. The general upper bound, fractional
-integrality consequence and classification for $n\ge\max(8,2m)$ retain
-conjectural status. Historical solver checks cover small orders, but the
-unfinished $n=7$ computation supplies no independent upper bound.
+For arc separation the exact formula is
+$L_m^{\mathrm{dir}}(n)=(m-1)M(n)$. The checked proof removes a
+reachability-preserving subgraph at each level of the route cap.
+The thickened bidirected tree and balanced one-way bipartite graph attain
+the two branches. The fractional optimum is also $M(n)$ by the checked
+rational-scaling argument (\Cref{cor:mstar-integral}). The classification
+for $n\ge\max(8,2m)$ remains conjectural, with its proposed proof retained
+in \Cref{thm:dir-multi-uniqueness}. Historical solver checks cover small
+orders. The unfinished $n=7$ run supplies no independent upper bound,
+but that value now follows from the checked general theorem.
 
 For vertex separation, multiplicity and longer detours can favour different
 constructions. Direct enumeration gives $K_6^{\mathrm{dir}}(3)=24$, whereas
-the arc candidate at that order has twenty arcs. Thus the arc construction
+the established arc maximum at that order is twenty arcs. Thus the arc construction
 is not even a universal finite optimum for the vertex problem. The proposed
 leading term is $(m-1)n^2/4+O_m(n)$, with proposed lower constructions from
 thickened complete digraph blocks at small orders and the bipartite family
@@ -527,7 +529,7 @@ and the multigraph value at $m\ge4$, including the best blocks and growth rates.
 \item For undirected hypergraphs, determine edge attainment outside the range
 where it is established and find vertex bounds beyond the $m=3$ rank argument.
 \item For directed hypergraphs, determine finite values and compare the effects
-of multiplicity, separation and orientation beyond the proposed leading term.
+of multiplicity, separation and orientation beyond the established leading term.
 \end{itemize}
 The computations supply examples and finite checks for these questions.
 Extending them to arbitrary orders requires a verified general argument.
