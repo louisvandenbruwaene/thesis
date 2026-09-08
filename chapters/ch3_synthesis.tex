@@ -37,8 +37,8 @@ This is a lower bound, not a proposed formula for the optimum.
 Which of the three families is largest depends on the range.
 The clique-core construction of \Cref{const:clique-core} leads whenever
 $m\ge5$ and $m+7\le n\le3m-3$. At $m=5$, $n=12$ it has $57$ arcs with maximum
-local arc-connectivity $4$, against $56$ for the hub and the augmented
-bipartite counts. Outside that window one of those two is largest, and for
+local arc-connectivity $4$, against $55$ for the hub and $56$ for the augmented
+bipartite count. Outside that window one of those two is largest, and for
 fixed $m$ the augmented bipartite family is eventually the largest of the
 three. That comparison ranks these constructions and nothing else, since
 another feasible family could be denser still.
@@ -46,8 +46,8 @@ another feasible family could be denser still.
 The displayed maximum is therefore a lower bound only. It is not claimed that
 $57$ is optimal at $n=12$, $m=5$, nor that the maximum of the three counts is
 optimal at any order.
-At $m=2$, the proposed all-order value is given in
-\Cref{thm:dir-arc-m2-exact}: it predicts that the bipartite count is optimal for $n\ge7$.
+At $m=2$, the all-order value is given in
+\Cref{thm:dir-arc-m2-exact}, and the bipartite count is optimal for $n\ge7$.
 \Cref{fig:crossover} compares the hub and augmented bipartite counts at $m=3$.
 
 \begin{figure}[t]
@@ -61,10 +61,11 @@ At $m=3$, exhaustive search proves the values $6,9,12,15$ for $n=3,4,5,6$.
 The two separation conditions agree at every one of these orders (\Cref{rem:dir-vertex-m3}).
 The search does not settle $n=7$.
 
-The earlier decomposition conjecture has been removed as well.
-It would force the quadratic upper bound as soon as that branch exceeds the
-hub bound, which already happens at $m=5$, $n=12$.
-The counterexample therefore refutes that structural assertion too.
+The clique-core digraph is also a counterexample to the earlier decomposition
+conjecture, which has been removed. That conjecture would force the quadratic
+upper bound as soon as that branch exceeds the hub bound, which already happens
+at $m=5$, $n=12$, and its $57$ arcs exceed the $56$ that the decomposition would
+impose there (\Cref{const:clique-core}).
 
 For fixed $m\ge3$, the augmented bipartite count has the same leading term and the same order of error as the optimum.
 The proof of \Cref{thm:dir-arc-linear-error} gives an elementary

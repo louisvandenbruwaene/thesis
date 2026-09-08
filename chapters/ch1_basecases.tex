@@ -117,13 +117,13 @@ For all $n \ge 2$ and $m \ge 2$,
 Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
 The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory--Hu tree (\Cref{thm:gomory-hu}).
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
-The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}). The hypergraph bound (\Cref{prop:hyper-edge}) is proved by induction on a hyperedge cut.
-Hence its properties are recorded here.
+The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}), so its properties are recorded here.
 Every undirected graph has a weighted tree on the same vertex set such that $\lec_G(u, v)$ equals the lightest edge on the tree path from $u$ to $v$.
 Its tree edges need not be edges of $G$, so it is not generally a spanning subgraph of $G$.
 All $\binom{n}{2}$ local connectivities are therefore encoded by just $n - 1$ weights.
 The largest of them, $\lec_G^{\max}$, is simply the heaviest edge of the tree.
 The proof (\Cref{app:proofs}) uses a double counting argument on that tree.
+The hypergraph bound (\Cref{prop:hyper-edge}) uses no tree at all and is proved by induction on a hyperedge cut.
 
 \section{Variants of the problem}
 

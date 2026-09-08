@@ -458,7 +458,7 @@ At $m = 3$, $n = 10$ this is the digraph that refutes the natural first guess $\
 
 One checked lemma supports both directed formulas, so its statement and proof come first. The object is a thin subdigraph that carries the whole
 reachability relation of $D$ and nothing else. \Cref{sec:dir-arc-m2} uses it
-once in the proposed $m=2$ argument under both separations, and
+once in the $m=2$ argument under both separations, and
 \Cref{sec:dir-multi} uses it $m-1$ times over, peeling one copy of each of its
 arcs per unit of the cap.
 
@@ -565,7 +565,7 @@ This section proves the two $m=2$ values.
 The vertex upper bound uses \Cref{lem:reach-skeleton}.
 The arc upper bound then follows because every arc-feasible digraph is vertex-feasible.
 The completed enumerations in \Cref{tab:basecase-search} establish the values independently for $2\le n\le7$.
-They do not establish the all-order conjectures.
+They establish only those finite cases. The all-order values are what the two theorems below prove.
 
 \begin{lemma}[Two-hop lemma]\label{lem:two-hop-arc}
 Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$ containing a vertex $r$ with $d^+(r) = n-1$. Then every $v \ne r$ has at most $m-2$ in-arcs from $V \setminus \{r, v\}$.
@@ -651,7 +651,7 @@ The exhaustive searches independently give the maxima $2,4,6,8,10,12$ at $2\le n
 The general multigraph theorem uses the same skeleton argument, so it is not independent corroboration of that argument.
 
 \begin{remark}[The directed vertex problem at $m \ge 3$]\label{rem:dir-vertex-m3}
-The skeleton argument proposes the value at $m=2$ (\Cref{thm:dir-vertex-m2-exact}, conditional on \Cref{lem:reach-skeleton}). For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
+The skeleton argument gives the value at $m=2$ (\Cref{thm:dir-vertex-m2-exact}, through \Cref{lem:reach-skeleton}). For $m\ge3$, the vertex problem is separate: the arc constructions belong to the smaller arc-feasible family and give no upper bound on $k_m^{\mathrm{dir}}(n)$. What can be said is computational. Running the exhaustive search of \Cref{ch:certify} under both feasibility tests at $m = 3$ gives
 \[
 \begin{array}{r|ccccc}
     n & 2 & 3 & 4 & 5 & 6 \\ \hline
@@ -856,7 +856,7 @@ For the two-sided asymptotic statement, \Cref{const:augmented-bipartite} gives
 so the second-order term is linear in $n$ from both sides.
 \end{proof}
 
-The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} proposes its value at $m=2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
+The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} gives its value at $m=2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
 
 \begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}]
 By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple digraph with $\kap^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
@@ -2238,7 +2238,7 @@ class, and those running backwards, entirely idle. The factor of four is exactly
 that difference, $n^2$ against $n^2/4$, and it is the same difference that
 appears in the simple directed problem, where \Cref{const:augmented-bipartite}
 has a complete one-directional bipartite part and only $O_m(n)$ additional internal arcs. There, \Cref{thm:dir-arc-linear-error}
-proposes that the bipartite pattern is right to first order, that no
+establishes that the bipartite pattern is right to first order, that no
 arrangement recovers the idle pairs. If that phenomenon is a feature of
 directedness rather than of graphs specifically, then it is the upper bound here
 that should come down by a factor of four, not the construction that should
@@ -2783,7 +2783,7 @@ which a partial candidate is extended along several branches and a proved bound
 discards, or \emph{prunes}, a branch that cannot reach the target. A search
 \emph{node} is one such partial candidate.
 
-The directed $m=2$ values for $2\le n\le7$ were established by completed pruned exhaustive searches, separately under arc and vertex separation. Each completed row in \Cref{tab:basecase-search} is a finite upper-bound computation with a matching witness. The all-order conjectures do not follow from these rows. The two runs have identical node counts because their feasible families agree at $m=2$, as explained in \Cref{sec:dir-arc-m2}.
+The directed $m=2$ values for $2\le n\le7$ were established by completed pruned exhaustive searches, separately under arc and vertex separation. Each completed row in \Cref{tab:basecase-search} is a finite upper-bound computation with a matching witness. The all-order values do not follow from these rows alone. The two runs have identical node counts because their feasible families agree at $m=2$, as explained in \Cref{sec:dir-arc-m2}.
 
 \begin{table}[ht]
   \centering
@@ -2808,9 +2808,10 @@ The directed $m=2$ values for $2\le n\le7$ were established by completed pruned 
   completed. Neither column is load-bearing. These were the base cases of an
   earlier induction, which \Cref{sec:dir-arc-m2} has replaced by an argument
   from \Cref{lem:reach-skeleton} that runs at every $n$ at once, so both columns
-  now corroborate rather than prove. The node counts coincide as a computed fact, not by
-  construction: the feasibility prune switches between the arc and the vertex
-  flow test with the separation, and at these sizes the two happen to cut the
+  now corroborate rather than prove. The node counts coincide because the two feasible
+  families coincide at $m=2$ (\Cref{lem:directed-m2-families}): the feasibility
+  prune switches between the arc and the vertex flow test with the separation,
+  but at $m=2$ the two tests accept the same partial digraphs and so cut the
   tree in the same places. The wall times do not coincide, with the vertex run at $n = 7$ taking
   $3125$\,s against the arc run's $718$\,s. Full logs:
   \code{program/logs/basecase\_search\_log.txt} and
