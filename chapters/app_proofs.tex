@@ -1709,7 +1709,7 @@ $K_3(n) = 2(n-1)$ for every $n \ge 2$.
 The upper bound is \Cref{thm:hyper-vertex-m3} at $r = 2$, where the displayed bound $q(r-1) \le 2(n-1)$ reads $q \le 2(n-1)$ and $q$ is the total multiplicity. Its proof asks only that hyperedge-nodes have degree $r \ge 2$, which holds at $r = 2$. For the lower bound take a spanning tree and give every edge multiplicity two. A tree edge $uv$ has $\pi(u,v) = 0$, so $\kap(u,v) = 2$ by \Cref{lem:multi-vertex-split}, and a non-adjacent pair is joined by the unique tree path, so $\kap = 1$. Nothing exceeds $2 = m-1$, and the count is $2(n-1)$.
 \end{proof}
 
-At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ they agree for every $n \le 8$, since $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}, and whether they agree at every $n$ is open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives agreement for every tested $n \le 8$, since $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}; extending that conclusion to every $n$ still depends on the unchecked block reduction and is open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
 
 \begin{itemize}
     \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
@@ -1765,9 +1765,9 @@ Optimising $r$ widens the gap further. Treated as continuous, the gain per added
 
 The clique bouquet need not be optimal. At $m = 5$, $n = 7$ the best clique bouquet uses three triangles and gives
 $27$ and the block computation of \Cref{tab:multi-vertex-blocks} gives $29$.
-What is not open is the order, and to say that the bouquet is
-a lower bound of the right order there has to be a matching upper bound. There
-is one, and it comes from the underlying simple graph rather than cycle rank.
+The constructions establish a quadratic-in-$m$ lower bound once many blocks
+fit. A matching upper bound would require the next, unchecked proposition; it
+comes from the underlying simple graph rather than cycle rank.
 
 \begin{conjecture}[An upper bound of the same order, with proof,\aimedal]\label{prop:multi-vertex-upper}
 For all $m \ge 2$ and $n \ge 2$,
@@ -1786,13 +1786,27 @@ Let $G$ be feasible, with underlying simple graph $G_0$.
 \emph{The simple problem is linearly bounded.} Suppose $G_0$ had average degree at least $4(m-1)$. By Mader's density theorem \cite{Mader72}, a graph of average degree at least $4k$ contains a $(k+1)$-connected subgraph, so with $k = m-1$ some subgraph $H \subseteq G_0$ is $m$-connected. An $m$-connected graph has more than $m$ vertices and, by the global form of Menger's theorem \cite[Ch.~3]{Diestel17}, any two of them are joined by $m$ internally disjoint paths inside $H$ and hence inside $G_0$. That contradicts $\kap^{\max}_{G_0} \le m-1$. So the average degree is below $4(m-1)$, that is $2|E(G_0)|/n < 4(m-1)$, giving $k_m(n) < 2(m-1)n$ and the second inequality.
 \end{proof}
 
-Combining the two directions, first letting $n/m\to\infty$ so that optimised blocks can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$, yields
+If both the preceding lower construction and the next proposed upper bound are
+eventually verified, then first letting $n/m\to\infty$ so that optimised blocks
+can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$,
+would yield
 \[
     \Bigl(\tfrac{1}{8} + o_m(1)\Bigr) m^2 \, n
     \;\le\; K_m(n) \;<\; 2 m^2 n ,
 \]
 where the $o_m(1)$ vanishes as $m$ grows,
-so $K_m(n) = \Theta(m^2 n)$ in that large-$n$ regime. This qualification is necessary: for example $K_m(2)=m-1$, so no estimate of order $m^2n$ can hold uniformly when $n$ is fixed. The bouquet of \Cref{thm:clique-chain-vertex} has the right joint order once many blocks fit, and what separates the two sides is a constant factor tending to $16$. \Cref{thm:multi-vertex-bipartite} below improves the lower constant and brings that factor down to $6 + 4\sqrt{2} \approx 11.66$. The upper bound is crude, since it throws away the $-\sum \pi$ correction entirely and charges every edge the full $m-1$. The first inequality, $K_m(n) \le (m-1)k_m(n)$, is the more informative half. It says that this variant can never outrun the simple vertex problem by more than the multiplicity cap, which ties the least understood of the sixteen to the one with the longest history. It is tight at $m = 2$, where both sides read $n-1$ by \Cref{rem:multi-vertex-m2-simple}.
+so the proposed result would give $K_m(n) = \Theta(m^2 n)$ in that large-$n$
+regime. This qualification is necessary: for example $K_m(2)=m-1$, so no
+estimate of order $m^2n$ can hold uniformly when $n$ is fixed. The bouquet of
+\Cref{thm:clique-chain-vertex} has the right joint order once many blocks fit,
+conditional on that upper bound. \Cref{thm:multi-vertex-bipartite} below
+proposes a stronger lower constant. The upper-bound argument is crude, since
+it throws away the $-\sum \pi$ correction entirely and charges every edge the
+full $m-1$. The first inequality, $K_m(n) \le (m-1)k_m(n)$, is the more
+informative half. It says that this variant can never outrun the simple vertex
+problem by more than the multiplicity cap, which ties the least understood of
+the sixteen to the one with the longest history. It is tight at $m = 2$, where
+both sides read $n-1$ by \Cref{rem:multi-vertex-m2-simple}.
 
 \subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
 
