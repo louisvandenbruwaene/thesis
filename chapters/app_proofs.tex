@@ -1765,9 +1765,9 @@ Optimising $r$ widens the gap further. Treated as continuous, the gain per added
 
 The clique bouquet need not be optimal. At $m = 5$, $n = 7$ the best clique bouquet uses three triangles and gives
 $27$ and the block computation of \Cref{tab:multi-vertex-blocks} gives $29$.
-The constructions establish a quadratic-in-$m$ lower bound once many blocks
-fit. A matching upper bound would require the next, unchecked proposition; it
-comes from the underlying simple graph rather than cycle rank.
+The proposed construction would give a quadratic-in-$m$ lower bound once many
+blocks fit. A matching upper bound would require the next, unchecked
+proposition; it comes from the underlying simple graph rather than cycle rank.
 
 \begin{conjecture}[An upper bound of the same order, with proof,\aimedal]\label{prop:multi-vertex-upper}
 For all $m \ge 2$ and $n \ge 2$,
@@ -1786,8 +1786,8 @@ Let $G$ be feasible, with underlying simple graph $G_0$.
 \emph{The simple problem is linearly bounded.} Suppose $G_0$ had average degree at least $4(m-1)$. By Mader's density theorem \cite{Mader72}, a graph of average degree at least $4k$ contains a $(k+1)$-connected subgraph, so with $k = m-1$ some subgraph $H \subseteq G_0$ is $m$-connected. An $m$-connected graph has more than $m$ vertices and, by the global form of Menger's theorem \cite[Ch.~3]{Diestel17}, any two of them are joined by $m$ internally disjoint paths inside $H$ and hence inside $G_0$. That contradicts $\kap^{\max}_{G_0} \le m-1$. So the average degree is below $4(m-1)$, that is $2|E(G_0)|/n < 4(m-1)$, giving $k_m(n) < 2(m-1)n$ and the second inequality.
 \end{proof}
 
-If both the preceding lower construction and the next proposed upper bound are
-eventually verified, then first letting $n/m\to\infty$ so that optimised blocks
+If both the preceding proposed lower construction and the next proposed upper
+bound are eventually verified, then first letting $n/m\to\infty$ so that optimised blocks
 can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$,
 would yield
 \[
