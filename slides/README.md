@@ -10,8 +10,8 @@ cd slides/seminarie
 latexmk -pdf seminarie.tex
 ```
 
-`seminarie/seminarie.pdf` is the previous rendering and has not been rebuilt
-after the 9 September 2026 source review.
+`seminarie/seminarie.pdf` was rebuilt with the 9 September 2026 source-review
+corrections in commit `8e901ce`. Rebuild it again after editing the deck source.
 
 Earlier decks (`talk_10`, `talk_60`, `final_presentation`, and
 `seminarie/main.tex`) and their shared styles are in `../old_stuff/slides/`.

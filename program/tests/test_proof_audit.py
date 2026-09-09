@@ -2,6 +2,8 @@
 
 import subprocess
 import unittest
+import io
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from scripts import review_simplified_proofs as review
@@ -10,6 +12,15 @@ from scripts.two_step_budget_check import kappa_dir
 
 
 class IndependentFlowRegressions(unittest.TestCase):
+    def test_clique_bouquet_checker_runs_against_the_current_api(self):
+        from scripts import multi_vertex_clique_check
+
+        # Exercise the standalone entry point: helper-only tests missed its
+        # obsolete parallel_routes keyword. main asserts counts and feasibility
+        # for eight bouquets, with an independent flow check when available.
+        with redirect_stdout(io.StringIO()):
+            multi_vertex_clique_check.main()
+
     def test_arc_flow_can_reroute_an_earlier_path(self):
         # BFS first takes 0-1-3-5. A second route requires cancelling 1-3.
         arcs = {(0, 1), (0, 2), (1, 3), (1, 4), (2, 3), (3, 5), (4, 5)}

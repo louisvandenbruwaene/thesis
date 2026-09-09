@@ -55,9 +55,14 @@ an entry point and an exit point joined by a single arc whose capacity is the mu
 Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity,
 so the one arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
 A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit,
-which is what forces a route to cross it from tail to head.
+which is what forces a route to cross it from tail to head (\Cref{fig:dir-hyper-gadget}).
 The directed hypergraph's flow network is just a restricted version of the undirected one.
 Another representation for multihypergraphs is a separate gate with capacity one for each hyperedge.
+The two representations have the same maximum flow: a family of routes through
+separate copies maps to a flow through the merged gates. Conversely, decompose
+an integral flow through the merged network into paths. At most $q$ paths use
+a gate of capacity $q$, so they can be assigned distinct copies of that
+hyperedge, each with the same permitted entrances and exits.
 
 The hypergraph Menger argument (\Cref{thm:menger-hyper}) explains that the resulting maximum flow is exactly the Berge connectivity.
 \Cref{fig:hyper-gadget-example} shows four gate-disjoint routes in a whole hypergraph.
@@ -72,9 +77,10 @@ A max-flow from $u^{\mathrm{out}}$ to $v^{\mathrm{in}}$ in the split network the
 For a multigraph the arc carrying an adjacency keeps its full capacity
 $\mu(u,v)$, and only the internal arc of a vertex is a unit. That is the
 incidence convention of \Cref{sec:incidence-convention} written as a network:
-parallel copies stay separate routes while the vertex they run through does not,
-so the split network measures $K_m(n)$ and $K_m^{\mathrm{dir}}(n)$ rather than
-the value of the underlying simple graph.
+parallel copies stay separate routes while the vertex they run through does not.
+The split network measures $\kap_G(u,v)$ for the supplied graph and endpoints;
+maximising over endpoint pairs tests feasibility, and maximising the edge count
+over feasible graphs gives $K_m(n)$ or $K_m^{\mathrm{dir}}(n)$.
 Notice how the undirected or hypergraph transformation is done beforehand and
 the gates aren't split by this step.
 
@@ -450,7 +456,10 @@ The blind sweep is omitted after $n=4$, where $2^{n(n-1)}$ assignments already t
 Each additional vertex multiplies the assignment count by $2^{2n}$, and the
 connectivity check on one assignment grows with it, the recorded step from
 $n=3$ to $n=4$ costing about twice its count ratio.
-Carrying both factors forward gives about an hour at $n=5$ and several weeks at $n=6$.
+Keeping the per-assignment cost fixed gives about $27$ minutes at $n=5$
+and $19$ days at $n=6$. If that cost doubles at each step, the estimates
+become about $54$ minutes and $76$ days respectively. These are extrapolations,
+not measured runtimes.
 This is the growth shown in \Cref{fig:complexity}.
 
 Below $n=5$, fixed overhead dominates the two remaining methods.

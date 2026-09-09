@@ -1,14 +1,14 @@
-"""Verify the clique-chain refutation of conj:multi-vertex.
+"""Finite checks of the clique bouquets in thm:clique-chain-vertex.
 
-conj:multi-vertex (app_proofs.tex) claims K_m^multi(n) = (m-1)(n-1) for all
-n >= m+2. This script builds the clique-chain construction of
-multi_vertex_clique_chains.md, checks feasibility TWO independent ways
+The former conjecture that K_m(n) = (m-1)(n-1) for all n >= m+2 has been
+removed from the thesis. This script builds the clique-bouquet construction,
+checks feasibility TWO independent ways
 (the thesis program's exceeds_bound, and a from-scratch networkx max-flow on
 a hand-built split network), and confirms the exact gain formula.
 
 Run: python3 program/scripts/multi_vertex_clique_check.py
-Needs the thesis program on the path (run from program/, or adjust sys.path)
-and networkx (only used for the independent cross-check).
+The thesis program is located relative to this file. NetworkX is optional
+and supplies the independent cross-check when installed.
 """
 
 import sys
@@ -36,9 +36,10 @@ def build_clique_bouquet(n, m, r, k):
     """k copies of K_r ALL SHARING vertex 0 and otherwise disjoint, every edge
     at multiplicity m+1-r, leftover vertices as a pendant path at m-1.
 
-    Sharing a vertex rather than bridging is what makes k as large as
-    floor((n-1)/(r-1)) instead of floor(n/r): a bridge would spend a whole
-    vertex on the join alone."""
+    Sharing one vertex uses r-1 new vertices per additional block. Disjoint
+    blocks joined by bridges still use r vertices each; the bridges add edges,
+    not vertices. The respective packing limits are floor((n-1)/(r-1)) and
+    floor(n/r)."""
     assert k * (r - 1) + 1 <= n
     q = m + 1 - r
     assert q >= 1, "r too large for this m (need r <= m so blocks are non-empty)"
@@ -88,10 +89,9 @@ def main():
     for m, r, k in cases:
         n = k * (r - 1) + 1 + 4
         g = build_clique_bouquet(n, m, r, k)
-        total = int(g.mu.sum() // 2)
+        total = g.edge_count()
         predicted = (m - 1) * (n - 1) + k * gain(r, m)
-        feasible_program = not exceeds_bound(g, m - 1, separation="vertex",
-                                              parallel_routes=True)
+        feasible_program = not exceeds_bound(g, m - 1, separation="vertex")
         tree_val = (m - 1) * (n - 1)
         line = (f"  m={m:3d} r={r:2d} k={k:2d} n={n:3d}  total={total:6d} "
                 f"predicted={predicted:6d}  match={total == predicted}  "
@@ -114,7 +114,10 @@ def main():
         print(f"  m={m:3d}: best r*={best_r:3d}  gain(r*)={gain(best_r, m):6d}"
               f"  rate={best_rate:8.2f}")
 
-    print("\nALL CHECKS PASSED: conj:multi-vertex is refuted for every m >= 5.\n(Note: this construction is a lower bound of the right order, NOT the exact\nvalue. At m=5,n=7 it gives 27 and an unfinished exhaustive search found 28.)")
+    print("\nALL FINITE CHECKS PASSED for the listed clique bouquets.\n"
+          "These checks corroborate the count and feasibility on those cases;\n"
+          "the general construction retains its proposed-proof status in\n"
+          "thm:clique-chain-vertex. Its count is a lower bound, not an exact optimum.")
 
 
 if __name__ == "__main__":

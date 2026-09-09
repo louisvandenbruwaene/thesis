@@ -37,6 +37,17 @@ class BlockBouquetLowerBound(unittest.TestCase):
     # per-vertex rate rises with b, so each n below is one single block.
     BLOCK_SWEEP_M6 = {2: 5, 3: 12, 4: 19, 5: 26, 6: 33, 7: 40, 8: 47}
 
+    def test_it_includes_feasible_cliques_beyond_the_saved_sweep(self):
+        import erdos915_unified as e
+
+        for n, m in ((4, 10), (5, 10), (6, 12)):
+            graph = e.Graph(n, e.MULTI_UNDIRECTED)
+            for u in range(n):
+                for v in range(u + 1, n):
+                    graph.set_multiplicity(u, v, m + 1 - n)
+            self.assertLessEqual(e.max_connectivity(graph, vertex_split=True), m - 1)
+            self.assertGreaterEqual(block_bouquet_lower_bound(n, m), graph.edge_count())
+
     def test_it_matches_the_independent_block_sweep_at_m6(self):
         for n, expected in self.BLOCK_SWEEP_M6.items():
             self.assertEqual(block_bouquet_lower_bound(n, 6), expected, f"n={n}")

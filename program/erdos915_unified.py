@@ -769,13 +769,16 @@ def _hyper_capacity_matrix(hypergraph: Hypergraph, *, vertex_split: bool = False
     variants are thus the same construction with a boolean or two flipped, not
     separate measures.
 
-    Merging copies cannot change any measured value.  Giving each of ``q`` copies
-    its own capacity-one gate puts ``q`` parallel arcs between the same pair of
-    nodes, and replacing parallel arcs by one arc of their summed capacity leaves
-    every cut's capacity untouched, hence the min cut and the max flow too.  This
-    is the standard parallel-arc reduction, so the merged network is the same
-    network drawn once rather than a different one, and it is the network
-    ``fig:hyper-gadget`` and ``thm:menger-hyper`` describe.
+    Merging identical copies preserves the maximum flow. A route family in the
+    separate-copy network maps to an integral flow through the merged gates:
+    at most ``q`` routes use any class of ``q`` copies. Conversely, decompose
+    an integral flow in the merged network into paths and discard cycles.
+    At most ``q`` paths use a gate of capacity ``q``; assign them distinct
+    original copies. Identical copies have the same allowed entrances and
+    exits, so every assigned path lifts. The original-vertex gates still
+    enforce internal disjointness when requested. Separate copies have distinct
+    gate nodes, so this is not merely combining parallel arcs with common
+    endpoints, nor does it identify every cut of the two networks.
 
     Vertices index ``0..base-1`` (``base = 2n`` split, else ``n``); the gate of the
     ``i``-th distinct hyperedge indexes ``base+2i`` (in) and ``base+2i+1`` (out).
@@ -866,7 +869,9 @@ def double_star(n: int, m: int, directed: bool = True) -> Graph:
     For a digraph the hub carries ``m-1`` arcs in *both* directions to each
     leaf, attaining ``2(n-1)(m-1)`` arcs with ``lambda^max = m-1``.  For an
     undirected multigraph it attains ``(m-1)(n-1)`` edges.  This is the
-    small-``n`` extremiser of the multigraph problems.
+    extremiser for the undirected edge problem at every ``n >= 2``, and for
+    the directed arc problem while ``2(n-1) >= floor(n^2/4)``. No general
+    vertex-separation optimality is asserted.
     """
     variant = MULTI_DIRECTED if directed else MULTI_UNDIRECTED
     graph = Graph(n, variant)
@@ -3702,8 +3707,8 @@ def plot_complexity_growth(path: str | Path) -> None:
     at a generous budget of 10^9 candidates.  The count does not depend on the
     edge-versus-vertex separation, because both search the very same set of
     graphs, so one pair of panels covers all of those variants at once.
-    Direction doubles the number of cells to fill, which is the whole difference
-    between the two panels.
+    Direction multiplies the number of cells by two for graphs and by three
+    for the forward 3-uniform hypergraphs shown here.
     """
     ns = list(range(2, 13))
 
