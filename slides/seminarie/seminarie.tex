@@ -885,11 +885,15 @@
   \node[gvertex, minimum size=11mm, font=\small] (vi) at (1.0,0) {$v^{\mathrm{in}}$};
   \node[gvertex, minimum size=11mm, font=\small] (vo) at (3.0,0) {$v^{\mathrm{out}}$};
   \draw[->, gline, color=KULblauw3b] (vi) --
-    node[above, font=\scriptsize]{cap $1$ for $v\notin\{s,t\}$} (vo);
+    node[above, font=\scriptsize]{cap $1$} (vo);
   \draw[->, gline] (0.0,  0.6) -- (vi);
   \draw[->, gline] (0.0, -0.6) -- (vi);
   \draw[->, gline] (vo) -- (4.0,  0.6);
-  \draw[->, gline] (vo) -- (4.0, -0.6);}
+  \draw[->, gline] (vo) -- (4.0, -0.6);
+  % the gate is what caps an intermediate vertex; the endpoints are bypassed,
+  % so the split has to say which vertex it is drawn for
+  \node[font=\scriptsize, text=black!55, align=center] at (0,-1.9)
+    {every intermediate vertex is split this way\\the flow itself runs from $s^{\mathrm{out}}$ to $t^{\mathrm{in}}$};}
 
 % ============================================================================
 %  11.  EFFICIENCY
@@ -946,10 +950,9 @@
   \end{scope}
   \node[draw=black!25, densely dashed, rounded corners=4pt, line width=0.8pt,
         fit={(-2.0,-1.0) (2.7,1.0)}] (bag) {};
-  \node[font=\tiny, text=black!55, anchor=south] at (0.35,1.15)
-    {one class, drawn twice};
+
   \draw[-{Stealth[length=2.4mm]}, line width=1.2pt, KULblauw1!70]
-    (0.35,-1.2) -- (0.35,-1.95) node[midway, right=2pt, font=\tiny, text=black!55]{\texttt{geng}};
+    (0.35,-1.2) -- (0.35,-1.95) node[midway, right=2pt, font=\tiny, text=black!55]{};
   \begin{scope}[shift={(0.35,-2.75)}]
     \node[gvertex, minimum size=4.2mm](d1) at (0,0.45){};
     \node[gvertex, minimum size=4.2mm](d2) at (-0.6,-0.4){};
@@ -957,7 +960,6 @@
     \node[gvertex, minimum size=4.2mm](d4) at (1.4,0.3){};
     \draw[gline] (d1)--(d2) (d2)--(d3) (d3)--(d1) (d1)--(d4);
   \end{scope}
-  \node[font=\tiny, text=black!55] at (0.7,-3.5) {one representative};
 \end{tikzpicture}}
 
 % ---- the C helper ---------------------------------------------------------
@@ -986,7 +988,9 @@
 \begin{frame}{Solving versus searching}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.20\textheight}{\resizebox{0.66\textwidth}{!}{%
+% The four boxes are a wide, short strip, so width is what binds: resize to
+% almost the full text width and keep the height clamp only as a safety net.
+\adjustbox{max totalheight=0.60\textheight}{\resizebox{0.92\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
   rolenode/.style={rounded corners=2.5pt, draw, very thick, align=center,
      minimum width=23mm, minimum height=12mm, font=\sffamily\footnotesize},
@@ -994,35 +998,12 @@
   \node[rolenode, fill=roleModel!16,    draw=roleModel]    (mod) at (0,0)     {\textbf{MODEL}\\[1pt]\scriptsize $\mu$ matrix or list};
   \node[rolenode, fill=roleMeasure!16,  draw=roleMeasure]  (mea) at (3.6,0)   {\textbf{MEASURE}\\[1pt]\scriptsize max-flow checker};
   \node[rolenode, fill=roleProve!18,    draw=roleProve]    (pro) at (7.6,0.85){\textbf{SOLVE}\\[1pt]\scriptsize enumeration};
-  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (7.6,-0.85){\textbf{SEARCH}\\[1pt]\scriptsize tabu};
+  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (7.6,-0.85){\textbf{SEARCH}\\[1pt]\scriptsize tabu or random greedy};
   \draw[flow] (mod) -- (mea);
   \draw[flow] (mea) -- (pro);
   \draw[flow] (mea) -- (dis);
 \end{tikzpicture}}}
 \end{center}
-\vspace{10pt}
-\begin{columns}[T,onlytextwidth]
-\column{0.47\textwidth}
-{\large\color{vertexgreen!55!black}\bfseries solving}
-\vspace{9pt}
-\begin{itemize}\setlength{\itemsep}{6pt}\small
-  \item[\color{vertexgreen!60!black}\textbullet] walk every graph on $n$ vertices
-  \item[\color{vertexgreen!60!black}\textbullet] finishes $\Rightarrow$ the exact value
-  \item[\color{vertexgreen!60!black}\textbullet] times out $\Rightarrow$ a lower bound
-\end{itemize}
-
-\column{0.06\textwidth}
-\centering\vspace{0.9cm}{\color{black!22}\large vs}
-
-\column{0.47\textwidth}
-{\large\color{vertexorange!80!black}\bfseries searching}
-\vspace{9pt}
-\begin{itemize}\setlength{\itemsep}{6pt}\small
-  \item[\color{vertexorange!85!black}\textbullet] steer by the energy $\Phi$
-  \item[\color{vertexorange!85!black}\textbullet] reaches sizes the sweep cannot
-  \item[\color{vertexorange!85!black}\textbullet] always a lower bound
-\end{itemize}
-\end{columns}
 \vfill
 \end{frame}
 
@@ -1104,6 +1085,10 @@ $\Phi(G)\;=\;
     \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
     \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\dir}(n)=12$};
   \end{scope}
+  % the thesis figure carries the same caveat: these are family members drawn
+  % at the reported sizes, not the graphs the saved runs returned
+  \node[font=\scriptsize, text=black!55] at (-0.2,-3.5)
+    {examples of the families, not the saved search witnesses};
 \end{tikzpicture}}{0.95}
 
 % ============================================================================
@@ -1166,40 +1151,14 @@ $\Phi(G)\;=\;
   \node[vtleaf, fill=regimeProved!16, minimum width=8mm]  (leg1) at (0,-1.5) {};
   \node[anchor=west, font=\scriptsize] at (0.9,-1.5) {exact value established in the graph domain};
   \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]    (leg3) at (9.4,-1.5) {};
-  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {exact value open, asymptotic bounds only};
+  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {general exact value open, bounds and small cases known};
   \node[vtleaf, fill=regimePartial!20, minimum width=8mm] (leg4) at (9.4,-2.5) {};
   \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {partial results or a conjectural general formula};
 \end{tikzpicture}}}
 \end{center}
 \end{frame}
 
-% ============================================================================
-%  18.  AI
-% ============================================================================
-\begin{frame}{AI: curse or blessing?}
-\vspace{4pt}
-\begin{columns}[T,onlytextwidth]
-\column{0.48\textwidth}
-{\large\color{vertexgreen!60!black}\bfseries Pros}
-\begin{itemize}
-\item \LaTeX{} typesetting
-\item length \& complexity of generated text
-\end{itemize}
-\column{0.48\textwidth}
-{\large\color{vertexred}\bfseries Cons}
-\begin{itemize}
-\item length \& complexity of generated text
-\item control
-\end{itemize}
-\end{columns}
-\vfill
-\begin{center}
-{\Large\color{KULblauw3b}\bfseries It's a tool.}\\[8pt]
-{\normalsize short leash\ \ $+$\ \ AI proofs\ \ $=$\ \ argumented conjecture\ \aimedal}
-\end{center}
-\vfill
-\vfill
-\end{frame}
+
 
 % ============================================================================
 %  THANK YOU
@@ -1218,6 +1177,27 @@ $\Phi(G)\;=\;
 %  model, then direction, then separation.  Every formula and every computed
 %  number below is one the thesis states today.
 % ============================================================================
+
+% ---- 0. what the badges on the next sixteen frames mean --------------------
+% The precise reading of PROPOSED lived only in the source comments and the
+% README, so a viewer of the delivered deck had no way to read the chips.
+\begin{frame}{Backup: the sixteen variants}
+\vfill
+\begin{center}
+{\small
+\begin{tabular}{@{}r@{\hspace{12pt}}p{0.68\textwidth}@{}}
+\multicolumn{2}{@{}l@{}}{\color{black!45}\footnotesize\bfseries WHAT IS KNOWN ABOUT A BOUND}\\[5pt]
+\sProved    & established, with a proof the author has checked \\[4pt]
+\sProposed  & conjecture with a proposed proof the author has not checked line by line \\[4pt]
+\sOpen      & no general value established \\[12pt]
+\multicolumn{2}{@{}l@{}}{\color{black!45}\footnotesize\bfseries WHAT A CONSTRUCTION IS WORTH}\\[5pt]
+\tExtremal  & attains the maximum in the stated range \\[4pt]
+\tNear      & the densest family reached here, with no matching upper bound \\[4pt]
+\tAsym      & matches the leading term of the upper bound \\
+\end{tabular}}
+\end{center}
+\vfill
+\end{frame}
 
 % ---- 1. simple graph, undirected, edge -------------------------------------
 \vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}
@@ -1250,7 +1230,7 @@ literature show why they cannot fix $c_m$.}
   \item for fixed $m\ge3$, $\ell_m^{\dir}(n)=n^2/4+\Theta_m(n)$; the linear coefficient is open
   \item the clique-core example disproves the earlier hub-versus-bipartite formula
 \end{vlist}}
-{\cAugBip}{augmented bipartite digraph \ \tNear}
+{\cAugBip}{augmented bipartite digraph \ \tAsym}
 {Enumeration confirms $m=2$ through $n=7$. Tabu returns $6$, $10$ and $12$ at
 $n=4$, $6$ and $7$.}
 
@@ -1260,9 +1240,9 @@ $n=4$, $6$ and $7$.}
 {the same bipartite family \ \sProved}
 {\begin{vlist}
   \item equality with the arc value at $m\ge3$ is open: an arc upper bound does
-        not constrain the larger vertex-feasible family
+        not constrain the vertex-feasible family, which contains it
 \end{vlist}}
-{\cAugBip}{augmented bipartite digraph \ \tNear}
+{\cAugBip}{augmented bipartite digraph \ \tAsym}
 {Enumeration confirms $m=2$ through $n=7$, and the two separations agree in the
 completed $m=3$ runs through $n=6$.}
 
@@ -1301,7 +1281,7 @@ $191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
   \item the classification of the extremisers for $n\ge\max(8,2m)$ stays
         \sProposed
 \end{vlist}}
-{\cBidirTree}{thickened bidirected tree \ \tExtremal}
+{\cBidirTree}{thickened bidirected tree \ \tExtremal\ \ {\scriptsize\color{black!50}linear branch, $n\le7$}}
 {Tabu returns the double star at $m=3$: $12$ at $n=4$ and $16$ at $n=5$.}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
@@ -1313,7 +1293,7 @@ $191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
         $K_6^{\dir}(3)=24$ against an established arc maximum of $20$
   \item the exact correction and the best block shapes are open
 \end{vlist}}
-{\cThickBip}{thickened one-way bipartite digraph \ \tNear}
+{\cThickBip}{thickened one-way bipartite digraph \ \tAsym}
 {Direct enumeration gives $K_6^{\dir}(3)=24$.}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
@@ -1339,8 +1319,8 @@ $191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
         vertex feasibility being the weaker restriction
 \end{vlist}}
 {\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
-{No counterexample at $m=4$ across eleven $(n,r)$ cells; the $r=2$ case fails
-at $m=5$.}
+{No simple hypergraph beat the edge value at $m=4$ in eleven $(n,r)$ cells.
+At $r=2$ the two maxima first differ at $m=5$: $33$ against $32$.}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
@@ -1363,7 +1343,7 @@ optimum of $11$.}
   \item repetition does not help at $m=2$: two copies of one hyperedge are
         already two separated routes
 \end{vlist}}
-{\cRepStar}{repeated star hypertree \ \tExtremal}
+{\cRepStar}{repeated star hypertree \ \tExtremal\ \ {\scriptsize\color{black!50}$m\le3$, and $(r-1)\mid(n-1)$ at $m=3$}}
 {The twelve-copy edge witness at $(6,6,3)$ is a vertex lower bound, and does not
 prove the vertex maximum is twelve.}
 
@@ -1383,7 +1363,7 @@ direct degree-cut feasibility check.}
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}
 {$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved}
-{the same constant \ \sProved}
+{the same constant \ \sProved\ \ {\scriptsize\color{black!50}two-layer, $r\ge3$, fixed $m$ and $r$ as $n\to\infty$}}
 {\begin{vlist}
   \item the shadow argument re-runs under the stricter separation, so the
         leading term is the same

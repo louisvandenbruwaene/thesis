@@ -19,8 +19,9 @@ program for a different case.
 The thesis labels unchecked AI arguments as conjectures with proofs. The
 directed multigraph arc formula is no longer one of them: it is proved. The
 solver stays conservative all the same, since a formula is not an enumeration.
-`solve(exhaustive=True)` returns its named construction as `lower`, with
-`complete=False`, rather than certifying optimality from the formula. Hypergraph formula
+For directed multigraphs under arc separation, `solve(exhaustive=True)` returns
+the named construction as `lower`, with `complete=False`, rather than certifying
+optimality from the formula. Every other branch still enumerates. Hypergraph formula
 helpers with `_proved` names evaluate an attainment formula rather than
 certifying a cell. The edge cut bound, its simple attainment range and the
 `m = 3` vertex bound are all established, the last through the incidence-rank
@@ -64,7 +65,16 @@ everything the text points at is inside it.
 
 ## Requirements
 
-Install with `pip install -r requirements.txt`. The core needs only `numpy` and
+Set the environment up as the root `README.md` does, from the repository root:
+
+```
+python3 -m venv .venv
+.venv/bin/python3 -m pip install -r program/requirements-lock.txt
+```
+
+The lock file pins the versions the recorded runs used, and it is what the
+`../.venv/bin/python3` commands below assume. `requirements.txt` lists the same
+dependencies unpinned. The core needs only `numpy` and
 `scipy`: the model, the connectivity checker, the search, the enumeration, the
 random-model sampling, and the self-check all run on those two alone, because connectivity is measured by integer max-flow on a capacity matrix (Menger).
 Small capped checks can use the optional C helper; capacities too large for
@@ -345,5 +355,6 @@ rendering no longer reruns these archived experiments or refreshes their assets.
 The solver records (`logs/certificate_log.txt`, `logs/basecase_search_log.txt`,
 `logs/basecase_search_vertex_log.txt`) were produced by the named finite
 routines on the directed cases; the appendix now tabulates them rather than
-printing them verbatim. Randomised searches use fixed seeds. The SA-versus-tabu
-timings are the documented exception, because their stopping rule is wall-clock.
+printing them verbatim. Randomised searches use fixed seeds. Fixed seeds do not make a timed search
+outcome reproducible across machines or system loads, and that applies to the
+SA-versus-tabu comparison as it does to the other timed runs.
