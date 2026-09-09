@@ -628,10 +628,14 @@
 %  5.  THE THREE MODEL CHOICES, ALL EIGHT MODELS ON ONE FRAME
 %      (the same picture as \Cref{fig:eight-models} in ../../chapters/ch1)
 % ============================================================================
-\begin{frame}{Three toggles, eight models}
+\begin{frame}{}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.96\textwidth}{!}{%
+% The panels are wider than they are tall, so the text block's side margins are
+% what holds the picture back, not the height. \makebox keeps the line exactly
+% \textwidth while the picture inside it reaches into both margins.
+\makebox[\textwidth][c]{%
+\adjustbox{max totalheight=0.88\textheight}{\resizebox{1.12\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
     mv/.style={gvertex, minimum size=5.5mm},
     me/.style={gline},
@@ -646,7 +650,6 @@
     \node[mv] (s3) at (330:0.78) {};
     \draw[me] (s1)--(s2)  (s2)--(s3)  (s3)--(s1);
     \node[font=\itshape] at (0,-1.75) {simple graph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {one edge per pair};
   \end{scope}
   % (b) multigraph: K_3 with a triple edge and a double edge, the third single
   \begin{scope}[shift={(4.30,0)}]
@@ -660,7 +663,6 @@
     \draw[me] (g2) to[bend right=15] (g3);
     \draw[me] (g3) -- (g1);
     \node[font=\itshape] at (0,-1.75) {multigraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel edges $\mu(u,v)\!\ge\!1$};
   \end{scope}
   % (c) simple hypergraph: three distinct size-3 hyperedges, metro-style, on the
   %     four corner stations. Two share the bottom stretch and run parallel side
@@ -675,7 +677,6 @@
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges span $r\!\ge\!3$};
   \end{scope}
   % (d) multihypergraph: one repeated hyperedge {A,B,C} (two parallel red lines
   %     side by side) plus one ordinary hyperedge {B,C,D} drawn diagonally
@@ -689,7 +690,6 @@
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {multihypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
   % (a) simple digraph: directed triangle with one bidirected pair
   \begin{scope}[shift={(0,-4.5)}]
@@ -701,7 +701,6 @@
     \draw[darc] (s3d) to[bend right=14] (s1d);
     \draw[darc] (s2d) to[bend right=14] (s1d);
     \node[font=\itshape] at (0,-1.75) {simple digraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {one arc per ordered pair};
   \end{scope}
   % (b) directed multigraph: a triple arc, a bidirected pair, a single arc
   \begin{scope}[shift={(4.3,-4.5)}]
@@ -715,7 +714,6 @@
     \draw[darc] (g3d) to[bend right=12] (g2d);
     \draw[darc] (g3d) to[bend right=14] (g1d);
     \node[font=\itshape] at (0,-1.75) {directed multigraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel and opposite arcs};
   \end{scope}
   % (c) directed hypergraph: each hyperedge is a metro-styled star whose tail is
   %     the middle station of the undirected line, so the arcs land on the very
@@ -733,7 +731,6 @@
     \end{scope}
     \foreach \p in {Ad,Bd,Cd,Dd} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an edge};
   \end{scope}
   % (d) directed multihypergraph: the red hyperedge is repeated, so each of its
   %     arcs is a parallel pair straddling the edge
@@ -750,9 +747,8 @@
     \end{scope}
     \foreach \p in {Am,Bm,Cm,Dm} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed multihypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
   \end{scope}
-\end{tikzpicture}}}
+\end{tikzpicture}}}}
 \end{center}
 \vfill
 \end{frame}
