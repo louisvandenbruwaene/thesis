@@ -1,0 +1,1433 @@
+% ============================================================================
+%  Erdos Problem 915 -- seminarie deck (rebuild, Sept 2026)
+%  Outline dictated by Louis: translation, E+V=G, the lambda cascade, the
+%  kappa cascade, the red/blue pill model choices, then the program half
+%  (modelling, max flow, transformations, efficiency, solving vs searching).
+%
+%  Self-contained, exactly like main.tex in this directory: the colours, the
+%  graph vocabulary and the theme are copied from ../../preamble.tex so the
+%  file builds on its own.
+%
+%  Build:  cd slides/seminarie && latexmk -pdf seminarie.tex
+% ============================================================================
+\documentclass[aspectratio=1610,11pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{calc,arrows.meta,positioning,backgrounds,fit,shadows,decorations.markings}
+
+\graphicspath{{../../figures/}{../../}}
+
+% ============================================================================
+%  COLOURS  (KU Leuven palette + the thesis's semantic graph colours)
+% ============================================================================
+\definecolor{KULblauw1}{RGB}{29,141,176}
+\definecolor{KULblauw3a}{RGB}{82,189,236}
+\definecolor{KULblauw3b}{RGB}{30,110,135}
+\definecolor{vertexred}{RGB}{200,80,80}
+\definecolor{vertexpurple}{RGB}{140,80,160}
+\definecolor{vertexgreen}{RGB}{60,160,80}
+\definecolor{vertexorange}{RGB}{220,140,40}
+
+\definecolor{metroA}{RGB}{200,80,80}
+\definecolor{metroB}{RGB}{29,141,176}
+\definecolor{metroC}{RGB}{60,160,80}
+\definecolor{metroD}{RGB}{220,140,40}
+\definecolor{metroE}{RGB}{140,80,160}
+\definecolor{metroF}{RGB}{120,120,120}
+
+\definecolor{roleModel}{RGB}{82,189,236}
+\definecolor{roleMeasure}{RGB}{29,141,176}
+\definecolor{roleProve}{RGB}{60,160,80}
+\definecolor{roleDiscover}{RGB}{220,140,40}
+
+% the two pills of the model choice
+\definecolor{pillRed}{RGB}{198,52,52}
+\definecolor{pillBlue}{RGB}{40,110,190}
+
+\colorlet{regimeProved}{KULblauw1}
+\colorlet{regimeConjectured}{vertexred}
+\colorlet{regimeOpen}{vertexorange}
+\colorlet{regimePartial}{vertexpurple}
+
+\definecolor{vtProved}{HTML}{1D8DB0}
+\definecolor{vtConjectured}{HTML}{E05050}
+\definecolor{vtOpen}{HTML}{E6B800}
+\definecolor{vtExact}{HTML}{3CA050}
+\definecolor{vtSearch}{HTML}{9B5DE5}
+
+% ============================================================================
+%  THE CANONICAL THESIS GRAPH VOCABULARY  (copied from preamble.tex)
+% ============================================================================
+\tikzset{
+  gvertex/.style={circle, draw=KULblauw1, fill=KULblauw1!15, line width=1pt,
+                  minimum size=6mm, inner sep=0pt, font=\small,
+                  drop shadow={shadow xshift=0.4pt, shadow yshift=-0.5pt,
+                               fill=black, opacity=0.18}},
+  gline/.style ={line width=1.3pt, KULblauw1!75, line cap=round},
+  gfaint/.style={line width=0.9pt, KULblauw1!40, line cap=round},
+  gvhub/.style ={gvertex, draw=vertexorange, fill=vertexorange!18},
+  gvsink/.style={gvertex, draw=vertexred,    fill=vertexred!15},
+  gvcut/.style ={gvertex, draw=vertexpurple, fill=vertexpurple!20},
+  gvnew/.style ={gvertex, draw=vertexorange, fill=vertexorange!22},
+  gmulti/.style={gline},
+  gdir/.style     ={-{Stealth[length=2.2mm]}, line width=1.1pt, KULblauw1!75, line cap=round},
+  gdirfaint/.style={-{Stealth[length=1.8mm]}, line width=0.8pt, KULblauw1!40, line cap=round},
+  gcut/.style     ={-{Stealth[length=2.2mm]}, line width=1.2pt, densely dashed, vertexred},
+  gcutedge/.style ={line width=1.2pt, densely dashed, vertexred},
+  grA/.style={line width=2.6pt, vertexorange,        line cap=round},
+  grB/.style={line width=2.6pt, vertexgreen!70!black, line cap=round},
+  grC/.style={line width=2.6pt, vertexpurple,         line cap=round},
+  grAd/.style={grA, -{Stealth[length=2.8mm]}},
+  grBd/.style={grB, -{Stealth[length=2.8mm]}},
+  grCd/.style={grC, -{Stealth[length=2.8mm]}},
+  gcurve/.style ={bend left=14},
+  gcurveR/.style={bend right=14},
+  vertex/.style={gvertex},
+  smallvertex/.style={gvertex, minimum size=16pt, font=\scriptsize},
+  edge/.style={gline},
+  arc/.style={gdir},
+  metro/.style={line width=3.4pt, line cap=round, line join=round, rounded corners=4pt},
+  metrostop/.style={circle, draw=black!72, fill=white, line width=1pt,
+                     minimum size=6mm, inner sep=0pt, font=\scriptsize\bfseries},
+  hnode/.style={rectangle, draw=KULblauw3b, fill=white, minimum size=13pt,
+                inner sep=1pt, line width=1pt, font=\scriptsize\bfseries},
+  vtroot/.style={rectangle, rounded corners=3pt, draw=KULblauw3b, very thick,
+                 minimum width=26mm, minimum height=9mm, font=\sffamily\small\bfseries},
+  vtmodel/.style={rectangle, rounded corners=3pt, draw=KULblauw3b, thick,
+                  minimum width=20mm, minimum height=8mm, font=\sffamily\small},
+  vtdir/.style={rectangle, rounded corners=2.5pt, draw=KULblauw3b!70,
+                minimum width=19mm, minimum height=7mm, font=\scriptsize},
+  vtleaf/.style={rectangle, rounded corners=2pt, draw=KULblauw3b!70,
+                 minimum width=12mm, minimum height=6.5mm, font=\scriptsize},
+  vtedge/.style={KULblauw3b!55, line width=0.9pt},
+}
+
+% ---- styles this deck adds: the definition cascade of frames 3 and 4 -------
+% A formula is split across several nodes glued at their baselines, so the
+% token being defined is its own node an arrow can leave from.
+\tikzset{
+  form/.style={inner sep=1pt, outer sep=0pt, font=\large},
+  tok/.style={inner xsep=4pt, inner ysep=3pt, outer sep=0pt, font=\large,
+              rounded corners=2.5pt, fill=KULblauw3a!22, draw=KULblauw1!55,
+              line width=0.8pt},
+  tokv/.style={tok, fill=vertexpurple!18, draw=vertexpurple!65},
+  casc/.style={-{Stealth[length=2.6mm]}, line width=1.1pt, KULblauw1!70},
+  cascv/.style={casc, draw=vertexpurple!70},
+  saying/.style={font=\footnotesize\itshape, text=black!55},
+}
+
+% ============================================================================
+%  NOTATION SHORTHANDS  (copied from preamble.tex)
+% ============================================================================
+\newcommand*{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand*{\floorfrac}[2]{\floor{\frac{#1}{#2}}}
+\newcommand{\lec}{\lambda}
+\newcommand{\kap}{\kappa}
+\newcommand{\lmax}{\lambda^{\max}}
+\newcommand{\kmax}{\kappa^{\max}}
+\newcommand{\dir}{\mathrm{dir}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\Erdos}{Erd\H{o}s}
+\newtheorem{proposition}{Proposition}
+% carried over from ../../preamble.tex: marks a result whose proof here was
+% written by an AI model and not checked line by line by the author.
+\newcommand{\aimedal}{\,[AI]}
+
+% ============================================================================
+%  THEME
+% ============================================================================
+\setbeamertemplate{navigation symbols}{}
+\usefonttheme{professionalfonts}
+\setbeamercolor{structure}{fg=KULblauw1}
+\setbeamercolor{frametitle}{fg=KULblauw3b}
+\setbeamercolor{title}{fg=KULblauw3b}
+\setbeamercolor{normal text}{fg=black!88}
+\setbeamercolor{itemize item}{fg=KULblauw1}
+\setbeamerfont{frametitle}{series=\bfseries,size=\large}
+\setbeamerfont{title}{series=\bfseries}
+\setbeamertemplate{itemize item}{\small\raise0.5pt\hbox{\textbullet}}
+
+\setbeamertemplate{frametitle}{%
+  \vskip4pt%
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.9cm,rightskip=0.9cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vskip2pt%
+  \hspace*{0.9cm}{\color{KULblauw3a}\rule{0.82\paperwidth}{1.1pt}}%
+  \vskip1pt%
+}
+
+\setbeamertemplate{footline}{%
+  \hbox{%
+    \begin{beamercolorbox}[wd=0.72\paperwidth,ht=2.4ex,dp=1.2ex,leftskip=0.9cm]{}%
+      {\scriptsize\color{black!45}\Erdos{} Problem 915}%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=0.28\paperwidth,ht=2.4ex,dp=1.2ex,rightskip=0.9cm]{}%
+      \hfill{\scriptsize\color{black!45}\insertframenumber\,/\,\inserttotalframenumber}%
+    \end{beamercolorbox}%
+  }%
+}
+\setbeamersize{text margin left=0.9cm,text margin right=0.9cm}
+
+% ============================================================================
+%  FRAME BUILDERS
+% ============================================================================
+\newcommand{\tikzframescaled}[3]{%
+  \begin{frame}{#1}
+    \vfill
+    \begin{center}
+    \adjustbox{max totalheight=0.74\textheight}{\resizebox{#3\textwidth}{!}{#2}}
+    \end{center}
+    \vfill
+  \end{frame}%
+}
+\newcommand{\tikzframe}[2]{\tikzframescaled{#1}{#2}{1.0}}
+
+% --- a capsule, for the model-choice frames --------------------------------
+% #1 colour, #2 rotation in degrees, #3 scale
+\newcommand{\pillshape}[3]{%
+  \begin{scope}[rotate=#2, scale=#3]
+    \begin{scope}
+      \clip[rounded corners=4.5mm] (-1.55,-0.45) rectangle (1.55,0.45);
+      \fill[#1!88!black] (-1.55,-0.45) rectangle (1.55,0.45);
+      \fill[#1!42!white] (-1.55,-0.45) rectangle (0,0.45);
+      \fill[white, opacity=0.28] (-1.42,0.10) rectangle (1.30,0.29);
+      \fill[black, opacity=0.10] (-0.03,-0.45) rectangle (0.03,0.45);
+    \end{scope}
+    \draw[black!30, line width=0.7pt, rounded corners=4.5mm]
+      (-1.55,-0.45) rectangle (1.55,0.45);
+  \end{scope}}
+
+% a small pill used as a bullet-sized icon
+\newcommand{\pillicon}[1]{%
+  \tikz[baseline=-0.6ex]{\pillshape{#1}{-18}{0.34}}}
+
+% one row of the transformation frame: a caption column and a picture column
+% clamped independently, so neither can ever run into the other
+% a small coloured status chip, as ../thesis-beamer.tex draws it
+\newcommand{\chip}[2]{\tikz[baseline=-0.55ex]{\node[rounded corners=2pt,
+   fill=#1,text=white,inner xsep=5pt,inner ysep=2pt,
+   font=\tiny\bfseries]{#2};}}
+
+% what is known about one bound, and what a construction is worth
+\newcommand{\sProved}{\chip{regimeProved}{PROVED}}
+\newcommand{\sProposed}{\chip{regimePartial}{PROPOSED}}
+\newcommand{\sOpen}{\chip{regimeOpen}{OPEN}}
+\newcommand{\tExtremal}{\chip{vertexgreen!70!black}{EXTREMAL}}
+\newcommand{\tNear}{\chip{vertexorange!85!black}{NEAR-EXTREMAL}}
+\newcommand{\tAsym}{\chip{KULblauw1}{ASYMPTOTICALLY EXTREMAL}}
+
+% one variant: the two bounds with their status, a construction, and what was
+% computed.  #1 title, #2 symbol, #3 upper, #4 lower, #5 notes, #6 picture,
+% #7 picture caption, #8 computed
+\newcommand{\vframe}[8]{%
+\begin{frame}{#1}
+\vspace{-1pt}
+\noindent{\large\color{KULblauw3b}$#2$}\par
+\vspace{7pt}
+\begin{columns}[T,onlytextwidth]
+\column{0.585\textwidth}
+  {\footnotesize
+   \noindent\parbox[t]{1.02cm}{\strut{\color{black!40}\bfseries\scriptsize UPPER}}%
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.32cm\relax}{\strut\raggedright #3}\par
+   \vspace{8pt}
+   \noindent\parbox[t]{1.02cm}{\strut{\color{black!40}\bfseries\scriptsize LOWER}}%
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.32cm\relax}{\strut\raggedright #4}\par}
+  \vspace{10pt}
+  {\footnotesize #5}
+\column{0.395\textwidth}
+  \centering
+  \adjustbox{max totalheight=0.33\textheight}{\resizebox{0.86\linewidth}{!}{#6}}\\[6pt]
+  {\scriptsize\color{black!60} #7}
+\end{columns}
+\vspace{11pt}
+\noindent{\scriptsize\color{vertexpurple!80!black}\bfseries COMPUTED}\par
+\noindent{\footnotesize\color{black!70} #8}\par
+\vfill
+\end{frame}}
+
+% the bullets inside a variant frame
+\newenvironment{vlist}{\begin{itemize}\setlength{\itemsep}{4pt}%
+  \setlength{\topsep}{0pt}}{\end{itemize}}
+
+% ============================================================================
+%  THE NAMED CONSTRUCTIONS, drawn small enough to sit beside a bound
+% ============================================================================
+\newcommand{\cHub}{\begin{tikzpicture}
+  \node[gvhub, minimum size=5mm] (h) at (0,0) {};
+  \foreach \i in {0,...,5}{\node[gvertex, minimum size=4.2mm] (p\i) at ({90+60*\i}:1.35) {};}
+  \foreach \i in {0,...,5}{\draw[gline] (h)--(p\i);}
+  \draw[gline] (p0)--(p1) (p2)--(p3) (p4)--(p5);
+\end{tikzpicture}}
+
+\newcommand{\cBlocks}{\begin{tikzpicture}
+  \node[gvcut, minimum size=5mm] (c) at (0,0) {};
+  \node[gvertex, minimum size=4.2mm] (a1) at (-1.45,0.9)  {};
+  \node[gvertex, minimum size=4.2mm] (a2) at (-2.05,0)    {};
+  \node[gvertex, minimum size=4.2mm] (a3) at (-1.45,-0.9) {};
+  \draw[gline] (c)--(a1) (a1)--(a2) (a2)--(a3) (a3)--(c) (a1)--(a3) (c)--(a2);
+  \node[gvertex, minimum size=4.2mm] (b1) at (1.45,0.9)  {};
+  \node[gvertex, minimum size=4.2mm] (b2) at (2.05,0)    {};
+  \node[gvertex, minimum size=4.2mm] (b3) at (1.45,-0.9) {};
+  \draw[gline] (c)--(b1) (b1)--(b2) (b2)--(b3) (b3)--(c) (b1)--(b3) (c)--(b2);
+\end{tikzpicture}}
+
+\newcommand{\cAugBip}{\begin{tikzpicture}[>=Stealth]
+  \foreach \i/\y in {1/1.0,2/0.0,3/-1.0}
+    {\node[gvertex, minimum size=4.2mm] (a\i) at (-1.7,\y) {};}
+  \foreach \j/\y in {1/1.35,2/0.45,3/-0.45,4/-1.35}
+    {\node[gvertex, minimum size=4.2mm] (b\j) at (1.7,\y) {};}
+  \foreach \i in {1,2,3}{\foreach \j in {1,2,3,4}{\draw[gdirfaint] (a\i)--(b\j);}}
+  % Every b_j takes its m-2 = 1 arc from its CYCLIC predecessor, so the arcs
+  % inside B close up.  Drawn as a path they would leave b_1 without one, and
+  % the pair (a, b_1) would then carry a single route instead of m-1 = 2, one
+  % arc short of the count the frame's own lower bound displays.
+  \foreach \j/\k in {1/2,2/3,3/4}
+    {\draw[-{Stealth[length=2mm]}, line width=1.1pt, vertexorange!85!black]
+       (b\j) to[bend right=55] (b\k);}
+  \draw[-{Stealth[length=2mm]}, line width=1.1pt, vertexorange!85!black]
+    (b4) to[out=-42,in=42,looseness=1.55] (b1);
+  \node[font=\scriptsize, text=black!55] at (-1.7,-1.75) {$A$};
+  \node[font=\scriptsize, text=black!55] at ( 1.7,-1.95) {$B$};
+\end{tikzpicture}}
+
+\newcommand{\cThickTree}{\begin{tikzpicture}
+  \node[gvhub, minimum size=5mm] (h) at (0,0) {};
+  \foreach \i in {0,...,4}{\node[gvertex, minimum size=4.2mm] (p\i) at ({90+72*\i}:1.45) {};
+    \draw[gline] (h) to[bend left=16] (p\i);
+    \draw[gline] (h) -- (p\i);
+    \draw[gline] (h) to[bend right=16] (p\i);}
+\end{tikzpicture}}
+
+% a complete bipartite block with every edge thickened: a MULTIgraph block,
+% which is what the m^2 n bounds are built from
+\newcommand{\cThickBlock}{\begin{tikzpicture}
+  \node[gvertex, minimum size=4.8mm] (x) at (-1.75,0) {};
+  \node[gvertex, minimum size=4.8mm] (y) at ( 1.75,0) {};
+  \foreach \i/\yy in {1/1.1, 2/0, 3/-1.1}{
+    \node[gvertex, minimum size=4.2mm] (m\i) at (0,\yy) {};
+    \draw[gline] (x) to[bend left=13]  (m\i);
+    \draw[gline] (x) to[bend right=13] (m\i);
+    \draw[gline] (m\i) to[bend left=13]  (y);
+    \draw[gline] (m\i) to[bend right=13] (y);}
+\end{tikzpicture}}
+
+% the one-way bipartite digraph with every arc thickened
+\newcommand{\cThickBip}{\begin{tikzpicture}[>=Stealth]
+  \foreach \i/\y in {1/0.9,2/-0.9}
+    {\node[gvertex, minimum size=4.4mm] (a\i) at (-1.9,\y) {};}
+  \foreach \j/\y in {1/1.35,2/0,3/-1.35}
+    {\node[gvertex, minimum size=4.4mm] (b\j) at (1.9,\y) {};}
+  \foreach \i in {1,2}{\foreach \j in {1,2,3}{
+    \draw[gdir] (a\i) to[bend left=14]  (b\j);
+    \draw[gdir] (a\i) to[bend right=14] (b\j);}}
+  \node[font=\scriptsize, text=black!55] at (-1.9,-1.75) {$A$};
+  \node[font=\scriptsize, text=black!55] at ( 1.9,-2.2)  {$B$};
+\end{tikzpicture}}
+
+\newcommand{\cBidirTree}{\begin{tikzpicture}[>=Stealth]
+  \node[gvhub, minimum size=5mm] (h) at (0,0) {};
+  \foreach \i in {0,1,2}{\node[gvertex, minimum size=4.2mm] (p\i) at ({90+120*\i}:1.6) {};
+    \draw[gdir] (h)   to[bend left=30] (p\i);
+    \draw[gdir] (h)   to[bend left=11] (p\i);
+    \draw[gdir] (p\i) to[bend left=30] (h);
+    \draw[gdir] (p\i) to[bend left=11] (h);}
+\end{tikzpicture}}
+
+\newcommand{\cStarHyper}{\begin{tikzpicture}
+  \coordinate (c) at (0,0);
+  \foreach \i/\a in {1/90, 2/210, 3/330}{
+    \coordinate (u\i) at (\a:1.6);
+    \coordinate (w\i) at ({\a+38}:1.6);}
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (u1) -- (c) -- (w1);
+    \draw[metro, metroB] (u2) -- (c) -- (w2);
+    \draw[metro, metroC] (u3) -- (c) -- (w3);
+  \end{scope}
+  \node[metrostop, minimum size=5.4mm] at (c) {};
+  \foreach \i in {1,2,3}{\node[metrostop, minimum size=4.6mm] at (u\i) {};
+                         \node[metrostop, minimum size=4.6mm] at (w\i) {};}
+\end{tikzpicture}}
+
+\newcommand{\cRepStar}{\begin{tikzpicture}
+  \coordinate (c) at (0,0);
+  \foreach \i/\a in {1/90, 2/210, 3/330}{
+    \coordinate (u\i) at (\a:1.75);
+    \coordinate (w\i) at ({\a+38}:1.75);}
+  \begin{scope}[on background layer]
+    \foreach \i/\col in {1/metroA, 2/metroB, 3/metroC}{
+      \draw[metro, \col, line width=2.5pt]
+        (u\i) to[bend left=10]  (c) to[bend left=10]  (w\i);
+      \draw[metro, \col, line width=2.5pt]
+        (u\i) to[bend right=10] (c) to[bend right=10] (w\i);}
+  \end{scope}
+  \node[metrostop, minimum size=5.4mm] at (c) {};
+  \foreach \i in {1,2,3}{\node[metrostop, minimum size=4.6mm] at (u\i) {};
+                         \node[metrostop, minimum size=4.6mm] at (w\i) {};}
+\end{tikzpicture}}
+
+\newcommand{\cTwoLayer}{\begin{tikzpicture}
+  \coordinate (t1) at (-1.8, 0.8); \coordinate (t2) at (-1.8,-0.8);
+  \foreach \j/\y in {1/1.5, 2/0.5, 3/-0.5, 4/-1.5}{\coordinate (q\j) at (1.8,\y);}
+  \begin{scope}[on background layer]
+    \tikzset{hedge/.style={metro, line width=2.6pt, -{Stealth[length=2.6mm]},
+                           shorten >=2.2mm, shorten <=1.8mm}}
+    \draw[hedge, metroA] (t1) -- (q1);  \draw[hedge, metroA] (t1) -- (q2);
+    \draw[hedge, metroB] (t1) -- (q3);  \draw[hedge, metroB] (t1) -- (q4);
+    \draw[hedge, metroC] (t2) -- (q2);  \draw[hedge, metroC] (t2) -- (q3);
+  \end{scope}
+  \foreach \i in {1,2}{\node[metrostop, minimum size=5mm] at (t\i) {};}
+  \foreach \j in {1,...,4}{\node[metrostop, minimum size=4.4mm] at (q\j) {};}
+  \node[font=\scriptsize, text=black!55] at (-1.8,-1.85) {tails};
+  \node[font=\scriptsize, text=black!55] at ( 1.8,-2.05) {heads};
+\end{tikzpicture}}
+
+% the same two layers with each hyperedge repeated, which is what the
+% multihypergraph model buys: the distinct-head-set restriction is lifted
+\newcommand{\cTwoLayerRep}{\begin{tikzpicture}
+  \coordinate (t1) at (-1.8, 0.8); \coordinate (t2) at (-1.8,-0.8);
+  \foreach \j/\y in {1/1.5, 2/0.5, 3/-0.5, 4/-1.5}{\coordinate (q\j) at (1.8,\y);}
+  \begin{scope}[on background layer]
+    \tikzset{hedger/.style={metro, line width=2.3pt, -{Stealth[length=2.4mm]},
+                            shorten >=2.2mm, shorten <=1.8mm}}
+    \foreach \sx/\dx/\col in {t1/q1/metroA, t1/q2/metroA,
+                              t2/q3/metroC, t2/q4/metroC}{
+      \draw[hedger, \col] (\sx) to[bend left=9]  (\dx);
+      \draw[hedger, \col] (\sx) to[bend right=9] (\dx);}
+  \end{scope}
+  \foreach \i in {1,2}{\node[metrostop, minimum size=5mm] at (t\i) {};}
+  \foreach \j in {1,...,4}{\node[metrostop, minimum size=4.4mm] at (q\j) {};}
+  \node[font=\scriptsize, text=black!55] at (-1.8,-1.85) {tails};
+  \node[font=\scriptsize, text=black!55] at ( 1.8,-2.05) {heads};
+\end{tikzpicture}}
+
+% one model choice: the two pills, the two words, the two pictures
+% #1 blue word, #2 blue picture, #3 red word, #4 red picture
+\newcommand{\choiceframe}[4]{%
+\begin{frame}[plain]
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.86\textheight}{\resizebox{0.84\textwidth}{!}{%
+\begin{tikzpicture}
+  \begin{scope}[shift={(-4.4,3.9)}]\pillshape{pillBlue}{-14}{1.30}\end{scope}
+  \begin{scope}[shift={(4.4,3.9)}]\pillshape{pillRed}{14}{1.30}\end{scope}
+  \node[font=\Huge\bfseries, text=pillBlue!80!black] at (-4.4,1.55) {#1};
+  \node[font=\Huge\bfseries, text=pillRed!80!black]  at ( 4.4,1.55) {#3};
+  \begin{scope}[shift={(-4.4,-1.6)}]#2\end{scope}
+  \begin{scope}[shift={( 4.4,-1.6)}]#4\end{scope}
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}}
+
+% one transformation: the label on top, the picture under it
+% #1 label, #2 picture, drawn centred on the origin
+\newcommand{\transframe}[2]{%
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\color{KULblauw3b}\fontsize{27}{32}\selectfont\bfseries\boldmath #1}\\[26pt]
+\adjustbox{max totalheight=0.46\textheight}{\resizebox{0.74\textwidth}{!}{%
+  \begin{tikzpicture}#2\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}}
+
+\title{Maximising Edge Density Subject to Connectivity Constraints}
+\author{Louis Vandenbruwaene}
+\date{Academic Year 2026--2027}
+
+\begin{document}
+
+% ============================================================================
+%  TITLE
+% ============================================================================
+\begin{frame}[plain]
+\vspace{1.9cm}
+\hspace*{0.5cm}\begin{minipage}{0.9\textwidth}
+  {\color{black!40}\large EXTREMAL GRAPH THEORY}\\[10pt]
+  {\color{KULblauw3b}\fontsize{32}{36}\selectfont\bfseries \Erdos{} Problem 915}\\[8pt]
+  {\color{KULblauw1}\Large Maximising Edge Density Subject to Connectivity Constraints}
+
+  \vspace{1.4cm}
+  {\large\bfseries Louis Vandenbruwaene}\\[3pt]
+  {\small\color{black!70}Promotor: Dr.\ Stijn Cambie}\\[2pt]
+  {\small\color{black!70}KU Leuven, Master of Mathematics}
+\end{minipage}
+\begin{tikzpicture}[remember picture,overlay]
+  \node[anchor=south east] at ($(current page.south east)+(-0.8,0.5)$)
+    {\includegraphics[height=1.0cm]{LogoKULeuven.png}};
+\end{tikzpicture}
+\end{frame}
+
+% ============================================================================
+%  1.  THE TITLE, TRANSLATED
+% ============================================================================
+\begin{frame}{The title, in plain words}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.62\textheight}{\resizebox{0.72\textwidth}{!}{%
+\begin{tikzpicture}
+  % --- the formal title ---------------------------------------------------
+  \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,1.55)
+    {Maximising edge density in graphs\\under connectivity constraints};
+  \node[draw=KULblauw1!35, rounded corners=4pt, line width=0.9pt,
+        fit={(formal)}, inner sep=9pt] (fbox) {};
+
+  % --- the translation arrow ----------------------------------------------
+  \draw[-{Stealth[length=3.4mm]}, line width=1.4pt, KULblauw1!70]
+    (fbox.south) -- ++(0,-0.85)
+    node[midway, right=4pt, font=\scriptsize\itshape, text=black!50] {translation};
+
+  % --- the plain sentence -------------------------------------------------
+  \node[font=\bfseries, align=center] (plain) at (0,-0.75)
+    {networks with {\color{vertexorange!85!black}many links}
+     and {\color{KULblauw1}low connectivity}};
+
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  2.  E + V = G
+% ============================================================================
+\begin{frame}{A graph is edges and vertices}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.68\textheight}{\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}
+  % ---- E: the eight edges in the graph's own layout, no vertices drawn -----
+  \begin{scope}[shift={(0,0)}]
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \coordinate (e\i) at (\ang:1.35);
+    }
+    \draw[gline] (e0)--(e1) (e0)--(e2) (e0)--(e3)
+                 (e1)--(e2) (e1)--(e4)
+                 (e2)--(e3) (e2)--(e4)
+                 (e3)--(e4);
+    \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$E$};
+    \node[font=\small, text=black!60] at (0,-2.5) {eight edges};
+  \end{scope}
+
+  \node[font=\Huge, text=black!45] at (2.4,0) {$+$};
+
+  % ---- V: five loose vertices ---------------------------------------------
+  \begin{scope}[shift={(4.8,0)}]
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \node[gvertex] at (\ang:1.35) {$\i$};
+    }
+    \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$V$};
+    \node[font=\small, text=black!60] at (0,-2.5) {five vertices};
+  \end{scope}
+
+  \node[font=\Huge, text=black!45] at (7.2,0) {$=$};
+
+  % ---- G: the two put together --------------------------------------------
+  \begin{scope}[shift={(9.9,0)}]
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \coordinate (v\i) at (\ang:1.35);
+    }
+    \draw[gline] (v0)--(v1) (v0)--(v2) (v0)--(v3)
+                 (v1)--(v2) (v1)--(v4)
+                 (v2)--(v3) (v2)--(v4)
+                 (v3)--(v4);
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \node[gvertex] at (\ang:1.35) {$\i$};
+    }
+    \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$G$};
+    \node[font=\small, text=black!60] at (0,-2.5) {a graph};
+  \end{scope}
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  3.  ERDOS 915, UNFOLDED  (edge version)
+% ============================================================================
+\begin{frame}{\Erdos{} Problem 915}
+\vspace{-2pt}
+\begin{center}
+\adjustbox{max totalheight=0.74\textheight}{\resizebox{0.99\textwidth}{!}{%
+\begin{tikzpicture}[
+   cbox/.style={draw=black!14, fill=black!3, rounded corners=4pt,
+                inner xsep=8pt, inner ysep=7pt}]
+
+  % ---- the problem ---------------------------------------------------------
+  \node[form, anchor=base west] (a1) at (-6.4,3.5)
+    {$\ell_m(n)\;=\;\max_{|V(G)|=n}\bigl\{\,|E(G)|\;\;:\;\;$};
+  \node[tok, anchor=base west] (a2) at (a1.base east) {$\lmax_G$};
+  \node[form, anchor=base west] (a3) at (a2.base east) {$\;\le\;m-1\,\bigr\}$};
+  \node[saying, anchor=south west] at (-6.4,4.15)
+    {as many edges as possible, subject to the cap};
+
+  % ---- the graph-wide maximum ---------------------------------------------
+  \node[form, anchor=base west] (b1) at (-5.9,1.1)
+    {$\lmax_G\;=\;\max\limits_{u\neq v}\;$};
+  \node[tok, anchor=base west] (b2) at (b1.base east) {$\lec_G(u,v)$};
+  \node[saying, anchor=base west] at (b2.base east)
+    {\ \ over every pair of vertices};
+
+  % ---- the local quantity --------------------------------------------------
+  \node[form, anchor=base west, align=left] (c1) at (-5.4,-1.4)
+    {$\lec_G(u,v)\;=\;$
+     \begin{minipage}{7.3cm}
+       the largest number of $u$--$v$ routes\\
+       that share {\color{vertexred}no edge}: one colour each
+     \end{minipage}};
+
+  \begin{scope}[on background layer]
+    \node[cbox, fit=(a1)(a2)(a3)] (boxA) {};
+    \node[cbox, fit=(b1)(b2)]     (boxB) {};
+    \node[cbox, fit=(c1)]         (boxC) {};
+  \end{scope}
+
+  \draw[casc] (a2.south) to[out=-90,in=95] ($(boxB.north)+(0.6,0)$);
+  \draw[casc] (b2.south) to[out=-90,in=95] ($(boxC.north)+(0.9,0)$);
+
+  % ---- the picture: Menger's routes, without the cut -----------------------
+  \begin{scope}[shift={(9.9,0.6)}, scale=1.72]
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \coordinate (v\i) at (\ang:1.5);
+    }
+    \draw[gline] (v0)--(v1) (v0)--(v2) (v0)--(v3)
+                 (v1)--(v2) (v1)--(v4)
+                 (v2)--(v3) (v2)--(v4)
+                 (v3)--(v4);
+    \draw[grA] (v1)--(v0)--(v3);
+    \draw[grB] (v1)--(v2)--(v3);
+    \draw[grC] (v1)--(v4)--(v3);
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \node[gvertex] at (\ang:1.5) {$\i$};
+    }
+    \node[font=\small\bfseries, text=KULblauw3b] at (0,-2.15) {$\lec(1,3)=3$};
+    \node[font=\scriptsize, text=black!60, align=center] at (0,-2.75)
+      {three routes from $1$ to $3$,\\three colours, no edge reused};
+  \end{scope}
+\end{tikzpicture}}}
+\end{center}
+\end{frame}
+
+% ============================================================================
+%  4.  THE SAME QUESTION UNDER VERTEX SEPARATION
+% ============================================================================
+\begin{frame}{The same question, vertex by vertex}
+\vspace{-2pt}
+\begin{center}
+\adjustbox{max totalheight=0.74\textheight}{\resizebox{0.99\textwidth}{!}{%
+\begin{tikzpicture}[
+   cbox/.style={draw=black!14, fill=black!3, rounded corners=4pt,
+                inner xsep=8pt, inner ysep=7pt}]
+
+  \node[form, anchor=base west] (a1) at (-6.4,3.5)
+    {$k_m(n)\;=\;\max_{|V(G)|=n}\bigl\{\,|E(G)|\;\;:\;\;$};
+  \node[tokv, anchor=base west] (a2) at (a1.base east) {$\kmax_G$};
+  \node[form, anchor=base west] (a3) at (a2.base east) {$\;\le\;m-1\,\bigr\}$};
+  \node[saying, anchor=south west] at (-6.4,4.15)
+    {the same cap, read on vertices instead of edges};
+
+  \node[form, anchor=base west] (b1) at (-5.9,1.1)
+    {$\kmax_G\;=\;\max\limits_{u\neq v}\;$};
+  \node[tokv, anchor=base west] (b2) at (b1.base east) {$\kap_G(u,v)$};
+  \node[saying, anchor=base west] at (b2.base east)
+    {\ \ over every pair of vertices};
+
+  \node[form, anchor=base west, align=left] (c1) at (-5.4,-1.4)
+    {$\kap_G(u,v)\;=\;$
+     \begin{minipage}{7.3cm}
+       the largest number of $u$--$v$ routes\\
+       that share {\color{vertexpurple}no interior vertex}
+     \end{minipage}};
+
+  \begin{scope}[on background layer]
+    \node[cbox, fit=(a1)(a2)(a3)] (boxA) {};
+    \node[cbox, fit=(b1)(b2)]     (boxB) {};
+    \node[cbox, fit=(c1)]         (boxC) {};
+  \end{scope}
+
+  \draw[cascv] (a2.south) to[out=-90,in=95] ($(boxB.north)+(0.6,0)$);
+  \draw[cascv] (b2.south) to[out=-90,in=95] ($(boxC.north)+(0.9,0)$);
+
+  % ---- the picture: now the interior VERTICES carry the colours ------------
+  \begin{scope}[shift={(9.9,0.6)}, scale=1.72]
+    \foreach \i in {0,...,4} {
+      \pgfmathsetmacro{\ang}{90 + 72*\i}
+      \coordinate (v\i) at (\ang:1.5);
+    }
+    \draw[gline] (v0)--(v1) (v0)--(v2) (v0)--(v3)
+                 (v1)--(v2) (v1)--(v4)
+                 (v2)--(v3) (v2)--(v4)
+                 (v3)--(v4);
+    \draw[grA] (v1)--(v0)--(v3);
+    \draw[grB] (v1)--(v2)--(v3);
+    \draw[grC] (v1)--(v4)--(v3);
+    % endpoints stay house blue, the three interior vertices take a colour each
+    \node[gvertex] at (v1) {$1$};
+    \node[gvertex] at (v3) {$3$};
+    \node[gvertex, draw=vertexorange,  fill=vertexorange!30]  at (v0) {$0$};
+    \node[gvertex, draw=vertexgreen!70!black, fill=vertexgreen!30] at (v2) {$2$};
+    \node[gvertex, draw=vertexpurple,  fill=vertexpurple!30]  at (v4) {$4$};
+    \node[font=\small\bfseries, text=vertexpurple] at (0,-2.15) {$\kap(1,3)=3$};
+    \node[font=\scriptsize, text=black!60, align=center] at (0,-2.75)
+      {each route keeps its own interior\\vertex: $0$, $2$ and $4$};
+  \end{scope}
+\end{tikzpicture}}}
+\end{center}
+\end{frame}
+
+% ============================================================================
+%  5.  THE THREE MODEL CHOICES, ONE FRAME EACH
+% ============================================================================
+\choiceframe{simple}{%
+  \begin{scope}[scale=1.55]
+    \node[gvertex] (sa) at (90:0.78) {};
+    \node[gvertex] (sb) at (210:0.78) {};
+    \node[gvertex] (sc) at (330:0.78) {};
+    \draw[gline] (sa)--(sb) (sb)--(sc) (sc)--(sa);
+  \end{scope}}{multi}{%
+  \begin{scope}[scale=1.55]
+    \node[gvertex] (ma) at (90:0.78) {};
+    \node[gvertex] (mb) at (210:0.78) {};
+    \node[gvertex] (mc) at (330:0.78) {};
+    \draw[gline] (ma) to[bend left=22] (mb);
+    \draw[gline] (ma) -- (mb);
+    \draw[gline] (ma) to[bend right=22] (mb);
+    \draw[gline] (mb) to[bend left=15] (mc);
+    \draw[gline] (mb) to[bend right=15] (mc);
+    \draw[gline] (mc) -- (ma);
+  \end{scope}}
+
+\choiceframe{non-hypergraph}{%
+  \begin{scope}[scale=1.35]
+    \coordinate (ga) at (-0.9,-0.9); \coordinate (gb) at (0.9,-0.9);
+    \coordinate (gc) at (0.9, 0.9);  \coordinate (gd) at (-0.9,0.9);
+    \begin{scope}[on background layer]
+      \draw[metro, metroB] (ga) -- (gb);
+      \draw[metro, metroC] (gb) -- (gc);
+      \draw[metro, metroD] (gc) -- (gd);
+    \end{scope}
+    \foreach \p in {ga,gb,gc,gd} {\node[metrostop] at (\p) {};}
+  \end{scope}}{hypergraph}{%
+  \begin{scope}[scale=1.35]
+    \coordinate (ha) at (-0.9,-0.9); \coordinate (hb) at (0.9,-0.9);
+    \coordinate (hc) at (0.9, 0.9);  \coordinate (hd) at (-0.9,0.9);
+    \begin{scope}[on background layer]
+      \draw[metro, metroB] (-0.9,-0.82) -- (0.9,-0.82) -- (0.9,0.9);
+      \draw[metro, metroC] (-0.9,0.9) -- (-0.9,-0.98) -- (0.9,-0.98);
+      \draw[metro, metroD] (-0.9,-0.9) -- (0.9,0.9) -- (-0.9,0.9);
+    \end{scope}
+    \foreach \p in {ha,hb,hc,hd} {\node[metrostop] at (\p) {};}
+  \end{scope}}
+
+\choiceframe{undirected}{%
+  \begin{scope}[scale=1.55]
+    \node[gvertex] (ua) at (90:0.85) {};
+    \node[gvertex] (ub) at (210:0.85) {};
+    \node[gvertex] (uc) at (330:0.85) {};
+    \draw[gline] (ua)--(ub) (ub)--(uc) (uc)--(ua);
+  \end{scope}}{directed}{%
+  \begin{scope}[scale=1.55, >=Stealth]
+    \node[gvertex] (da) at (90:0.85) {};
+    \node[gvertex] (db) at (210:0.85) {};
+    \node[gvertex] (dc) at (330:0.85) {};
+    \draw[gdir] (da) to[bend right=14] (db);
+    \draw[gdir] (db) to[bend right=14] (dc);
+    \draw[gdir] (dc) to[bend right=14] (da);
+    \draw[gdir] (db) to[bend right=14] (da);
+  \end{scope}}
+
+% ============================================================================
+%  DIVIDER
+% ============================================================================
+\begin{frame}[plain]
+\vfill
+\hspace*{1.4cm}\begin{minipage}{0.85\textwidth}
+  {\color{black!35}\large PART II}\\[8pt]
+  {\color{KULblauw3b}\fontsize{28}{32}\selectfont\bfseries The program}\\[10pt]
+  {\color{black!55}\large Sixteen variants, one flow computation.}
+\end{minipage}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  8.  MODELLING: THE TWO ENCODINGS
+% ============================================================================
+\begin{frame}{Modelling: two encodings}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.60\textheight}{\resizebox{0.76\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+% ---- non-hypergraphs: one multiplicity matrix -----------------------------
+\node[vertex] (A) at (0,   0)   {$1$};
+\node[vertex] (B) at (2.0, 0)   {$2$};
+\node[vertex] (C) at (1.0, 1.7) {$3$};
+\draw[arc] (A) to[bend left=15]  (B);
+\draw[arc] (A) to[bend right=15] (B);
+\draw[arc] (B) to[bend left=15]  (C);
+\draw[arc] (C) to[bend left=15]  (B);
+\draw[arc] (A) -- (C);
+\node[font=\small] at (1.0, -0.8) {directed multigraph $G$};
+\node at (3.3, 0.55) {$\xrightarrow{\;\mu\;}$};
+\node at (5.4, 0.55) {$\begin{pmatrix}
+  {\color{vertexred}\mathbf 0} & 2 & 1 \\
+  0 & {\color{vertexred}\mathbf 0} & 1 \\
+  0 & 1 & {\color{vertexred}\mathbf 0}\end{pmatrix}$};
+\node[font=\small] at (5.4, -0.8) {multiplicity matrix $\mu$};
+\node[font=\scriptsize, vertexred] at (5.4, -1.3) {Diag($\mu$)$=0$ (no loops)};
+% ---- hypergraphs: a list of hyperedges ------------------------------------
+\begin{scope}[yshift=-3.5cm]
+  \coordinate (p1) at (0.0, 0.6);
+  \coordinate (p2) at (0.0,-0.6);
+  \coordinate (p3) at (1.1, 0.0);
+  \coordinate (p4) at (2.2, 0.6);
+  \coordinate (p5) at (2.2,-0.6);
+  \begin{scope}[on background layer]
+    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p1);
+    \draw[metro, metroA, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p2);
+    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p4);
+    \draw[metro, metroB, -{Stealth[length=2.6mm]}, shorten >=2mm, shorten <=1.4mm] (p3) -- (p5);
+  \end{scope}
+  \foreach \p/\lbl in {p1/1,p2/2,p3/3,p4/4,p5/5} {\node[smallvertex] at (\p) {$\lbl$};}
+  \node[font=\small] at (1.1,-1.25) {directed hypergraph $H$};
+  \node at (3.3, 0.0) {$\longrightarrow$};
+  \node[font=\small, align=left] at (5.9, 0.0)
+    {list of hyperedges:\\[3pt] $e_1: \{3\ |\ 1,2\}$\\[1pt] $e_2:\{3\ |\ 4,5\}$};
+\end{scope}
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  9.  MAX FLOW: IN AND OUT
+% ============================================================================
+\begin{frame}{Measuring: max flow over every pair}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.66\textheight}{\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+   iobox/.style={rounded corners=4pt, draw=black!22, fill=black!3,
+                 inner sep=11pt, align=center},
+   pipe/.style={-{Stealth[length=3.4mm]}, line width=1.6pt, KULblauw1!70}]
+
+  \node[iobox] (in) at (0,0)
+    {$\begin{pmatrix} 0 & 2 & 1 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}$};
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=3pt of in] {INPUT};
+
+  \node[iobox, fill=KULblauw3a!12, draw=KULblauw1!45, minimum width=34mm] (box) at (5.4,0)
+    {\bfseries max flow\\over every pair};
+
+  \node[iobox, fill=vertexorange!8, draw=vertexorange!45] (out) at (10.4,0)
+    {\Large$\lmax_G\;=\;3$};
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=3pt of out] {OUTPUT};
+
+  \draw[pipe] (in) -- (box);
+  \draw[pipe] (box) -- (out);
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  10.  THE THREE TRANSFORMATIONS, ONE FRAME EACH
+% ============================================================================
+\transframe{undirected $\to$ directed}{%
+  \node[gvertex] (u) at (-3.4,0) {$u$};
+  \node[gvertex] (v) at (-1.4,0) {$v$};
+  \draw[gline] (u) -- node[above, font=\scriptsize, text=black!55]{$\mu$} (v);
+  \draw[->, very thick, color=KULblauw3b] (-0.6,0) -- (0.6,0);
+  \node[gvertex] (u2) at (1.4,0) {$u$};
+  \node[gvertex] (v2) at (3.4,0) {$v$};
+  \draw[gdir] (u2) to[bend left=20]
+    node[above, font=\scriptsize, text=black!55]{cap $\mu$} (v2);
+  \draw[gdir] (v2) to[bend left=20]
+    node[below, font=\scriptsize, text=black!55]{cap $\mu$} (u2);}
+
+\transframe{hypergraph $\to$ non-hypergraph}{%
+  \coordinate (ha) at (-3.3,0); \coordinate (hb) at (-2.3,0);
+  \coordinate (hc) at (-1.3,0);
+  \begin{scope}[on background layer]\draw[metro, metroA] (ha)--(hb)--(hc);\end{scope}
+  \node[smallvertex] at (ha) {$a$};
+  \node[smallvertex] at (hb) {$b$};
+  \node[smallvertex] at (hc) {$c$};
+  \draw[->, very thick, color=KULblauw3b] (-0.45,0) -- (0.65,0);
+  \node[smallvertex] (a2) at (1.3, 1.05) {$a$};
+  \node[smallvertex] (b2) at (1.3, 0.00) {$b$};
+  \node[smallvertex] (c2) at (1.3,-1.05) {$c$};
+  \node[hnode, fill=metroA!70, minimum size=15pt] (em) at (3.35, 0.62) {$e^-$};
+  \node[hnode, fill=metroA!70, minimum size=15pt] (ep) at (3.35,-0.62) {$e^+$};
+  \draw[gdirfaint] (a2) to[bend left=8]
+    node[above, font=\scriptsize, text=black!55, pos=0.55]{$\infty$} (em);
+  \draw[gdirfaint] (b2) to[bend left=10] (em);
+  \draw[gdirfaint] (c2) to[bend left=22] (em);
+  \draw[gdirfaint] (ep) to[bend left=22] (a2);
+  \draw[gdirfaint] (ep) to[bend left=10] (b2);
+  \draw[gdirfaint] (ep) to[bend left=8]
+    node[below, font=\scriptsize, text=black!55, pos=0.45]{$\infty$} (c2);
+  \draw[gdir, line width=1.6pt, color=KULblauw3b] (em) --
+    node[right, font=\scriptsize]{cap $\mu$} (ep);}
+
+\transframe{$\kap \;\to\; \lec$}{%
+  \node[gvertex] (vv) at (-3.0,0) {$v$};
+  \draw[->, gline] (-4.0,  0.6) -- (vv);
+  \draw[->, gline] (-4.0, -0.6) -- (vv);
+  \draw[->, gline] (vv) -- (-2.0,  0.6);
+  \draw[->, gline] (vv) -- (-2.0, -0.6);
+  \draw[->, very thick, color=KULblauw3b] (-1.2,0) -- (-0.2,0);
+  \node[gvertex, minimum size=11mm, font=\small] (vi) at (1.0,0) {$v^{\mathrm{in}}$};
+  \node[gvertex, minimum size=11mm, font=\small] (vo) at (3.0,0) {$v^{\mathrm{out}}$};
+  \draw[->, gline, color=KULblauw3b] (vi) --
+    node[above, font=\scriptsize]{cap $1$ for $v\notin\{s,t\}$} (vo);
+  \draw[->, gline] (0.0,  0.6) -- (vi);
+  \draw[->, gline] (0.0, -0.6) -- (vi);
+  \draw[->, gline] (vo) -- (4.0,  0.6);
+  \draw[->, gline] (vo) -- (4.0, -0.6);}
+
+% ============================================================================
+%  11.  EFFICIENCY
+% ============================================================================
+\begin{frame}{Efficiency: three ways to make the sweep finish}
+\vspace{2pt}
+\begin{columns}[T,onlytextwidth]
+
+% ---- pruning --------------------------------------------------------------
+\column{0.315\textwidth}
+\centering
+{\large\color{KULblauw3b}\bfseries pruning}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
+\begin{tikzpicture}[scale=1.0, >=Stealth,
+   live/.style={gvertex, minimum size=5mm},
+   dead/.style={gvsink, minimum size=5mm},
+   bnd/.style={gvhub, minimum size=5mm},
+   best/.style={gvertex, draw=vertexgreen!70!black, fill=vertexgreen!18, minimum size=5mm}]
+  \node[live] (r)  at (0,0)       {};
+  \node[live] (l)  at (-2.0,-1.2) {};
+  \node[live] (rr) at (2.0,-1.2)  {};
+  \draw[gline] (r) -- node[above left,  font=\tiny, pos=0.6]{add} (l);
+  \draw[gline] (r) -- node[above right, font=\tiny, pos=0.6]{skip} (rr);
+  \node[best] (l1) at (-2.9,-2.5) {};
+  \node[dead] (l2) at (-1.2,-2.5) {};
+  \node[dead] (r1) at (1.2,-2.5)  {};
+  \node[bnd]  (r2) at (2.9,-2.5)  {};
+  \draw[gline] (l)--(l1);
+  \draw[line width=1pt, vertexred!60] (l)--(l2);
+  \draw[line width=1pt, vertexred!60] (rr)--(r1);
+  \draw[line width=1pt, vertexorange!70] (rr)--(r2);
+  \node[font=\tiny, vertexgreen!50!black, align=center] at (-2.9,-3.15) {best\\so far};
+  \node[font=\tiny, vertexred, align=center]    at (-1.2,-3.15) {over\\the cap};
+  \node[font=\tiny, vertexred, align=center]    at (1.2,-3.15)  {over\\the cap};
+  \node[font=\tiny, vertexorange!80!black, align=center] at (2.9,-3.15) {cannot\\win};
+\end{tikzpicture}}
+
+% ---- generating search ----------------------------------------------------
+\column{0.315\textwidth}
+\centering
+{\large\color{KULblauw3b}\bfseries generating search}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
+\begin{tikzpicture}[scale=1.0, >=Stealth, tiny/.style={gvertex, minimum size=3.6mm}]
+  % two drawings of one and the same isomorphism class
+  \begin{scope}[shift={(-1.15,0)}]
+    \node[tiny](a1) at (0,0.5){}; \node[tiny](a2) at (-0.5,-0.35){};
+    \node[tiny](a3) at (0.5,-0.35){}; \node[tiny](a4) at (1.2,0.4){};
+    \draw[gfaint] (a1)--(a2) (a2)--(a3) (a3)--(a1) (a1)--(a4);
+  \end{scope}
+  \begin{scope}[shift={(1.55,0)}]
+    \node[tiny](b1) at (0,-0.35){}; \node[tiny](b2) at (0.55,0.5){};
+    \node[tiny](b3) at (-0.55,0.5){}; \node[tiny](b4) at (0.9,-0.6){};
+    \draw[gfaint] (b1)--(b2) (b2)--(b3) (b3)--(b1) (b1)--(b4);
+  \end{scope}
+  \node[draw=black!25, densely dashed, rounded corners=4pt, line width=0.8pt,
+        fit={(-2.0,-1.0) (2.7,1.0)}] (bag) {};
+  \node[font=\tiny, text=black!55, anchor=south] at (0.35,1.15)
+    {one class, drawn twice};
+  \draw[-{Stealth[length=2.4mm]}, line width=1.2pt, KULblauw1!70]
+    (0.35,-1.2) -- (0.35,-1.95) node[midway, right=2pt, font=\tiny, text=black!55]{\texttt{geng}};
+  \begin{scope}[shift={(0.35,-2.75)}]
+    \node[gvertex, minimum size=4.2mm](d1) at (0,0.45){};
+    \node[gvertex, minimum size=4.2mm](d2) at (-0.6,-0.4){};
+    \node[gvertex, minimum size=4.2mm](d3) at (0.6,-0.4){};
+    \node[gvertex, minimum size=4.2mm](d4) at (1.4,0.3){};
+    \draw[gline] (d1)--(d2) (d2)--(d3) (d3)--(d1) (d1)--(d4);
+  \end{scope}
+  \node[font=\tiny, text=black!55] at (0.7,-3.5) {one representative};
+\end{tikzpicture}}
+
+% ---- the C helper ---------------------------------------------------------
+\column{0.315\textwidth}
+\centering
+{\large\color{KULblauw3b}\bfseries C: faster max flow}\\[12pt]
+\adjustbox{max totalheight=0.52\textheight, max width=\linewidth}{%
+\begin{tikzpicture}[>=Stealth]
+  \node[rounded corners=4pt, draw=KULblauw1!45, fill=KULblauw3a!12,
+        minimum width=38mm, minimum height=12mm, font=\small]
+        (py) at (0,0) {\texttt{erdos915\_unified.py}};
+  \node[rounded corners=3pt, draw=black!45, fill=black!8,
+        minimum width=30mm, minimum height=12mm, font=\small]
+        (c) at (0,-2.4) {\texttt{\_erdos\_fast.c}};
+  \draw[-{Stealth[length=2.4mm]}, line width=1.1pt, KULblauw1!70] (py.south) -- (c.north);
+  \draw[-{Stealth[length=2.4mm]}, line width=1.1pt, black!35]
+    (c.west) to[out=180,in=180] (py.west);
+\end{tikzpicture}}
+
+\end{columns}
+\end{frame}
+
+% ============================================================================
+%  12.  SOLVING vs SEARCHING
+% ============================================================================
+\begin{frame}{Solving versus searching}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.20\textheight}{\resizebox{0.66\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+  rolenode/.style={rounded corners=2.5pt, draw, very thick, align=center,
+     minimum width=23mm, minimum height=12mm, font=\sffamily\footnotesize},
+  flow/.style={->, thick, KULblauw3b!70}]
+  \node[rolenode, fill=roleModel!16,    draw=roleModel]    (mod) at (0,0)     {\textbf{MODEL}\\[1pt]\scriptsize $\mu$ matrix or list};
+  \node[rolenode, fill=roleMeasure!16,  draw=roleMeasure]  (mea) at (3.6,0)   {\textbf{MEASURE}\\[1pt]\scriptsize max-flow checker};
+  \node[rolenode, fill=roleProve!18,    draw=roleProve]    (pro) at (7.6,0.85){\textbf{SOLVE}\\[1pt]\scriptsize enumeration};
+  \node[rolenode, fill=roleDiscover!20, draw=roleDiscover] (dis) at (7.6,-0.85){\textbf{SEARCH}\\[1pt]\scriptsize tabu};
+  \draw[flow] (mod) -- (mea);
+  \draw[flow] (mea) -- (pro);
+  \draw[flow] (mea) -- (dis);
+\end{tikzpicture}}}
+\end{center}
+\vspace{10pt}
+\begin{columns}[T,onlytextwidth]
+\column{0.47\textwidth}
+{\large\color{vertexgreen!55!black}\bfseries solving}
+\vspace{9pt}
+\begin{itemize}\setlength{\itemsep}{6pt}\small
+  \item[\color{vertexgreen!60!black}\textbullet] walk every graph on $n$ vertices
+  \item[\color{vertexgreen!60!black}\textbullet] finishes $\Rightarrow$ the exact value
+  \item[\color{vertexgreen!60!black}\textbullet] times out $\Rightarrow$ a lower bound
+\end{itemize}
+
+\column{0.06\textwidth}
+\centering\vspace{0.9cm}{\color{black!22}\large vs}
+
+\column{0.47\textwidth}
+{\large\color{vertexorange!80!black}\bfseries searching}
+\vspace{9pt}
+\begin{itemize}\setlength{\itemsep}{6pt}\small
+  \item[\color{vertexorange!85!black}\textbullet] steer by the energy $\Phi$
+  \item[\color{vertexorange!85!black}\textbullet] reaches sizes the sweep cannot
+  \item[\color{vertexorange!85!black}\textbullet] always a lower bound
+\end{itemize}
+\end{columns}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  13.  THE SEARCH: ONE NUMBER PER GRAPH
+% ============================================================================
+\begin{frame}{The search: one number per graph}
+\vspace{6pt}
+\begin{center}
+{\large
+$\Phi(G)\;=\;
+ \underbrace{-\,|E(G)|}_{\substack{\text{\normalsize reward}\\[1pt]
+   \text{\scriptsize\color{black!55} more edges, lower energy}}}
+ \;+\;
+ \underbrace{\Lambda\cdot\max\bigl(0,\;c^{\max}(G)-(m-1)\bigr)}
+   _{\substack{\text{\normalsize penalty}\\[1pt]
+   \text{\scriptsize\color{black!55} discourages excess connectivity}}}$}
+\end{center}
+\vspace{22pt}
+\begin{center}
+\adjustbox{max totalheight=0.30\textheight}{\resizebox{0.80\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth, tv/.style={gvertex, minimum size=4mm}]
+  \begin{scope}[shift={(0,0)}]
+    \foreach \ang in {90,150,210,270,330,30} {\node[tv] at (\ang:1.15) {};}
+    \node[font=\small] at (0,-1.85) {$\Phi=0$};
+  \end{scope}
+  \node[font=\Large, text=black!35] at (2.5,0) {$\to$};
+  \begin{scope}[shift={(5.0,0)}]
+    \node[gvhub, minimum size=4.6mm] (h) at (0,0) {};
+    \foreach \ang in {90,150,210,270} {\node[tv] (p\ang) at (\ang:1.15) {};
+      \draw[gline] (h) -- (p\ang);}
+    \foreach \ang in {330} {\node[tv] at (\ang:1.15) {};}
+    \node[font=\small] at (0,-1.85) {$\Phi=-4$};
+  \end{scope}
+  \node[font=\Large, text=black!35] at (7.5,0) {$\to$};
+  \begin{scope}[shift={(10.0,0)}]
+    \node[gvhub, minimum size=4.6mm] (h2) at (0,0) {};
+    \foreach \ang in {90,162,234,306,18} {\node[tv] (q\ang) at (\ang:1.15) {};
+      \draw[gline] (h2) to[gcurve]  (q\ang);
+      \draw[gline] (h2) to[gcurveR] (q\ang);}
+    \node[font=\small] at (0,-1.85) {$\Phi=-10$ at $m=3$};
+  \end{scope}
+\end{tikzpicture}}}
+\end{center}
+\end{frame}
+
+% ============================================================================
+%  14.  WHAT THE SEARCH REDISCOVERS
+% ============================================================================
+\tikzframescaled{Extremal families the search rediscovers}{%
+\begin{tikzpicture}[>=Stealth]
+  \begin{scope}[shift={(-7.5,0)}]
+    \foreach \i/\x in {1/0,2/1.0,3/2.0,4/3.0,5/4.0,6/5.0} {
+      \node[gvertex, minimum size=5mm] (t\i) at (\x,0) {};
+    }
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {\draw[gline] (t\i) -- (t\j);}
+    \node[font=\footnotesize\itshape] at (2.5,-0.9) {tree};
+    \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
+  \end{scope}
+  \begin{scope}[shift={(0,0.3)}]
+    \node[gvhub, minimum size=6mm] (h2) at (0,0) {};
+    \foreach \ang in {90,162,234,306,18} {
+      \node[gvertex, minimum size=5mm] (l2\ang) at (\ang:1.5) {};
+      \draw[gline] (h2) to[gcurve]  (l2\ang);
+      \draw[gline] (h2) to[gcurveR] (l2\ang);
+    }
+    \node[font=\footnotesize\itshape] at (0,-2.0) {multigraph star};
+    \node[font=\scriptsize] at (0,-2.5) {$n=6$, $m=3$, $L_3(n)=10$};
+  \end{scope}
+  \begin{scope}[shift={(5.2,0.3)}]
+    \node[gvhub, minimum size=6mm] (h3) at (0,0) {};
+    \foreach \ang in {90,210,330} {
+      \node[gvertex, minimum size=5mm] (l3\ang) at (\ang:1.9) {};
+      \draw[gdir] (h3)     to[bend left=30]  (l3\ang);
+      \draw[gdir] (h3)     to[bend left=11]  (l3\ang);
+      \draw[gdir] (l3\ang) to[bend left=30]  (h3);
+      \draw[gdir] (l3\ang) to[bend left=11]  (h3);
+    }
+    \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
+    \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\dir}(n)=12$};
+  \end{scope}
+\end{tikzpicture}}{0.95}
+
+% ============================================================================
+%  15.  THE SIXTEEN VARIANTS
+% ============================================================================
+\begin{frame}{Status of the sixteen variants}
+\vspace{-4pt}
+\begin{center}
+\adjustbox{max totalheight=0.62\textheight}{\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+  \node[vtroot, fill=KULblauw3a!18]  (root) at (9.0,3.9) {Problem 915};
+  \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6)  {simple};
+  \node[vtmodel, fill=KULblauw3a!12] (multi)  at (6.6,2.6)  {multi};
+  \node[vtmodel, fill=KULblauw3a!12] (hyper)  at (11.4,2.6) {hyper};
+  \node[vtmodel, fill=KULblauw3a!12] (mhyper) at (16.2,2.6) {multi-hyper};
+  \draw[vtedge] (root) -- (simple);
+  \draw[vtedge] (root) -- (multi);
+  \draw[vtedge] (root) -- (hyper);
+  \draw[vtedge] (root) -- (mhyper);
+  \node[vtdir, fill=KULblauw3a!8]  (d0) at (0.6,1.3)  {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d1) at (3.0,1.3)  {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d2) at (5.4,1.3)  {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d3) at (7.8,1.3)  {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d4) at (10.2,1.3) {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d5) at (12.6,1.3) {directed};
+  \node[vtdir, fill=KULblauw3a!8]  (d6) at (15.0,1.3) {undirected};
+  \node[vtdir, fill=KULblauw3a!8]  (d7) at (17.4,1.3) {directed};
+  \draw[vtedge] (simple) -- (d0);
+  \draw[vtedge] (simple) -- (d1);
+  \draw[vtedge] (multi)  -- (d2);
+  \draw[vtedge] (multi)  -- (d3);
+  \draw[vtedge] (hyper)  -- (d4);
+  \draw[vtedge] (hyper)  -- (d5);
+  \draw[vtedge] (mhyper) -- (d6);
+  \draw[vtedge] (mhyper) -- (d7);
+  \node[vtleaf, fill=regimeProved!16]      (l0)  at (0,0)    {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l1)  at (1.2,0)  {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l2)  at (2.4,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l3)  at (3.6,0)  {vertex};
+  \node[vtleaf, fill=regimeProved!16]      (l4)  at (4.8,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
+  \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l7)  at (8.4,0)  {vertex};
+  \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l11) at (13.2,0) {vertex};
+  \node[vtleaf, fill=regimePartial!20]     (l12) at (14.4,0) {edge};
+  \node[vtleaf, fill=regimePartial!20]     (l13) at (15.6,0) {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l14) at (16.8,0) {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l15) at (18.0,0) {vertex};
+  \draw[vtedge] (d0) -- (l0);  \draw[vtedge] (d0) -- (l1);
+  \draw[vtedge] (d1) -- (l2);  \draw[vtedge] (d1) -- (l3);
+  \draw[vtedge] (d2) -- (l4);  \draw[vtedge] (d2) -- (l5);
+  \draw[vtedge] (d3) -- (l6);  \draw[vtedge] (d3) -- (l7);
+  \draw[vtedge] (d4) -- (l8);  \draw[vtedge] (d4) -- (l9);
+  \draw[vtedge] (d5) -- (l10); \draw[vtedge] (d5) -- (l11);
+  \draw[vtedge] (d6) -- (l12); \draw[vtedge] (d6) -- (l13);
+  \draw[vtedge] (d7) -- (l14); \draw[vtedge] (d7) -- (l15);
+  \node[vtleaf, fill=regimeProved!16, minimum width=8mm]  (leg1) at (0,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (0.9,-1.5) {exact value established in the graph domain};
+  \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]    (leg3) at (9.4,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {exact value open, asymptotic bounds only};
+  \node[vtleaf, fill=regimePartial!20, minimum width=8mm] (leg4) at (9.4,-2.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {partial results or a conjectural general formula};
+\end{tikzpicture}}}
+\end{center}
+\end{frame}
+
+% ============================================================================
+%  18.  AI
+% ============================================================================
+\begin{frame}{AI: curse or blessing?}
+\vspace{4pt}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+{\large\color{vertexgreen!60!black}\bfseries Pros}
+\begin{itemize}
+\item \LaTeX{} typesetting
+\item length \& complexity of generated text
+\end{itemize}
+\column{0.48\textwidth}
+{\large\color{vertexred}\bfseries Cons}
+\begin{itemize}
+\item length \& complexity of generated text
+\item control
+\end{itemize}
+\end{columns}
+\vfill
+\begin{center}
+{\Large\color{KULblauw3b}\bfseries It's a tool.}\\[8pt]
+{\normalsize short leash\ \ $+$\ \ AI proofs\ \ $=$\ \ argumented conjecture\ \aimedal}
+\end{center}
+\vfill
+\vfill
+\end{frame}
+
+% ============================================================================
+%  THANK YOU
+% ============================================================================
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\color{KULblauw3b}\fontsize{40}{46}\selectfont\bfseries Thank you}\\[16pt]
+{\color{black!45}\normalsize \texttt{github.com/louisvandenbruwaene/thesis}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  BACKUP: THE SIXTEEN VARIANTS, ONE FRAME EACH
+%  Order and status colour follow fig:variant-tree-status in ch3_synthesis.tex:
+%  model, then direction, then separation.  Every formula and every computed
+%  number below is one the thesis states today.
+% ============================================================================
+
+% ---- 1. simple graph, undirected, edge -------------------------------------
+\vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}
+{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}Mader, via Gomory--Hu}}
+{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}for every $n\ge m$}}
+{\begin{vlist}
+  \item the two meet for $n\ge m$, so the value is exact there
+  \item for $n<m$ it is $\binom n2$: not even $K_n$ carries $m$ routes
+\end{vlist}}
+{\cHub}{hub-and-spokes \ \tExtremal}
+{Tabu search returns the tree at $n=6$, $m=2$: $5=\ell_2(6)$.}
+
+% ---- 2. simple graph, undirected, vertex -----------------------------------
+\vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}
+{$k_m(n)=\ell_m(n)$ for $m\le4$, \ $k_5(n)=\floorfrac{8n}{3}-4$ for $n\ge14$ \ \sProved\newline{\scriptsize\color{black!50}$m\ge6$:} \sOpen}
+{$c_m>m/2$ for $m\ge5$ \ \sProposed\ \ {\scriptsize\color{black!50}under the block formulation}}
+{\begin{vlist}
+  \item at $m=5$ the two agree to $n=13$, first gap $33$ against $32$ at $n=14$
+  \item $c_m=\lim_n k_m(n)/(n-1)$, and $m/2<c_m\le2(m-1)$ for $m\ge5$
+\end{vlist}}
+{\cBlocks}{$2$-connected blocks at a cut vertex \ \tNear}
+{Block sweeps reach small blocks only, and the recursive constructions in the
+literature show why they cannot fix $c_m$.}
+
+% ---- 3. simple digraph, directed, arc --------------------------------------
+\vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}
+{$M(n)=\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$ at $m=2$ \ \sProved\newline $\floorfrac{n^2}{4}+4(m-1)(n-1)$ at every $n$ \ \sProved}
+{$\tfrac{n^2}{4}+\tfrac{(m-2)n}{2}+O_m(1)$ \ \sProved}
+{\begin{vlist}
+  \item for fixed $m\ge3$, $\ell_m^{\dir}(n)=n^2/4+\Theta_m(n)$; the linear coefficient is open
+  \item the clique-core example disproves the earlier hub-versus-bipartite formula
+\end{vlist}}
+{\cAugBip}{augmented bipartite digraph \ \tNear}
+{Enumeration confirms $m=2$ through $n=7$. Tabu returns $6$, $10$ and $12$ at
+$n=4$, $6$ and $7$.}
+
+% ---- 4. simple digraph, directed, vertex -----------------------------------
+\vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}
+{$M(n)$ at $m=2$ \ \sProved\newline $\tfrac{n^2}{4}+\Theta_m(n)$ for fixed $m\ge3$ \ \sProved}
+{the same bipartite family \ \sProved}
+{\begin{vlist}
+  \item equality with the arc value at $m\ge3$ is open: an arc upper bound does
+        not constrain the larger vertex-feasible family
+\end{vlist}}
+{\cAugBip}{augmented bipartite digraph \ \tNear}
+{Enumeration confirms $m=2$ through $n=7$, and the two separations agree in the
+completed $m=3$ runs through $n=6$.}
+
+% ---- 5. multigraph, undirected, edge ---------------------------------------
+\vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}
+{$(m-1)(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}a cut count, any shape}}
+{$(m-1)(n-1)$ \ \sProved}
+{\begin{vlist}
+  \item exact for every $n$ and $m$
+  \item multiplicity removes the simple graph's distance-one restriction
+\end{vlist}}
+{\cThickTree}{tree, every edge repeated $m-1$ times \ \tExtremal}
+{Tabu search returns the multiplicity-$2$ star at $n=6$, $m=3$: $10=L_3(6)$.}
+
+% ---- 6. multigraph, undirected, vertex -------------------------------------
+\vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}
+{$K_2(n)=n-1$, $K_3(n)=2(n-1)$ \ \sProved\newline $K_m(n)\le(2+o(1))\,m^2n$ \ \sProposed}
+{$K_3(n)\ge2(n-1)$ \ \sProved\newline $K_m(n)\ge(3-2\sqrt2+o(1))\,m^2n$ \ \sProposed}
+{\begin{vlist}
+  \item the two coefficients bracket the growth as $m\to\infty$ with
+        $n/m\to\infty$, and no common limit is established
+  \item parallel copies are separated routes, so this is not the simple problem:
+        $K_5(4)=14$ against $L_5(4)=12$
+\end{vlist}}
+{\cThickBlock}{thickened complete bipartite block \ \tNear}
+{$K_5(4)=14$ and $K_5(5)=19$ by exhaustion. A nine-vertex sweep over all
+$191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
+
+% ---- 7. directed multigraph, arc -------------------------------------------
+\vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}
+{$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}a sparse skeleton per unit of $m-1$}}
+{$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}two branches, both attained}}
+{\begin{vlist}
+  \item exact for every $n$ and $m$, and the fractional optimum is $M(n)$ too,
+        so one $m$-free optimisation bounds every threshold
+  \item the classification of the extremisers for $n\ge\max(8,2m)$ stays
+        \sProposed
+\end{vlist}}
+{\cBidirTree}{thickened bidirected tree \ \tExtremal}
+{Tabu returns the double star at $m=3$: $12$ at $n=4$ and $16$ at $n=5$.}
+
+% ---- 8. directed multigraph, vertex ----------------------------------------
+\vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}
+{$(m-1)\tfrac{n^2}{4}+O_m(n)$ \ \sProved}
+{$(m-1)\floor{n^2/4}$, thickened bipartite \ \sProved}
+{\begin{vlist}
+  \item the arc extremiser is not even a finite optimum here:
+        $K_6^{\dir}(3)=24$ against an established arc maximum of $20$
+  \item the exact correction and the best block shapes are open
+\end{vlist}}
+{\cThickBip}{thickened one-way bipartite digraph \ \tNear}
+{Direct enumeration gives $K_6^{\dir}(3)=24$.}
+
+% ---- 9. simple hypergraph, undirected, edge --------------------------------
+\vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}
+{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}induction on a hyperedge cut}}
+{the same value \ \sProved\ \ {\scriptsize\color{black!50}when $m-1\le\binom{n-2}{r-2}$}}
+{\begin{vlist}
+  \item one hyperedge spans $r$ vertices but serves only one route
+  \item outside that range attainment is not guaranteed: at $n=r=m=3$
+        the bound reads $2$ and only one hyperedge exists
+\end{vlist}}
+{\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
+{Exhaustive enumeration gives $11$ at $(n,m,r)=(6,6,3)$, below the bound $12$.}
+
+% ---- 10. simple hypergraph, undirected, vertex -----------------------------
+\vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}
+{$\floorfrac{n-1}{r-1}$ at $m=2$, \ $\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \sProved\newline{\scriptsize\color{black!50}$m\ge4$:} \sOpen}
+{a star at $m=2$, a degree-capped hub at $m=3$ \ \sProved\newline {\scriptsize\color{black!50}$m=3$ for $2<r<n$}}
+{\begin{vlist}
+  \item $m=2$ is feasible exactly when the incidence graph is a forest
+  \item $m=3$ comes from the incidence-rank inequality
+  \item $\kap\le\lec$ carries an edge bound the wrong way, since vertex
+        feasibility is the weaker restriction
+\end{vlist}}
+{\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
+{No counterexample at $m=4$ across eleven $(n,r)$ cells. The $r=2$ case of the
+same problem fails at $m=5$.}
+
+% ---- 11. multihypergraph, undirected, edge ---------------------------------
+\vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
+{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}unchanged by repetition}}
+{$\dfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}when $(r-1)\mid(n-1)$}}
+{\begin{vlist}
+  \item the constructions change even though the bound does not
+  \item at $n=r=m=3$, two copies of the only triple reach a value the simple
+        model cannot
+\end{vlist}}
+{\cRepStar}{star hypertree, edges repeated $m-1$ times \ \tExtremal}
+{A twelve-copy construction at $(n,m,r)=(6,6,3)$ exceeds the simple edge
+optimum of $11$.}
+
+% ---- 12. multihypergraph, undirected, vertex -------------------------------
+\vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}
+{$\floorfrac{n-1}{r-1}$ at $m=2$, \ $\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \sProved\newline{\scriptsize\color{black!50}larger $m$:} \sOpen}
+{the repeated star adds attainment cases at $m=3$ \ \sProved}
+{\begin{vlist}
+  \item repetition does not help at $m=2$: two copies of one hyperedge are
+        already two separated routes
+\end{vlist}}
+{\cRepStar}{repeated star hypertree \ \tExtremal}
+{The twelve-copy edge witness at $(6,6,3)$ is a vertex lower bound, and does not
+prove the vertex maximum is twelve.}
+
+% ---- 13. directed simple hypergraph, arc -----------------------------------
+\vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}
+{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved\ \ {\scriptsize\color{black!50}shadow digraph}}
+{the same constant \ \sProved\ \ {\scriptsize\color{black!50}two-layer, $r\ge3$}}
+{\begin{vlist}
+  \item the two meet, so the leading term is settled and the finite exact values
+        are \sOpen
+  \item the matching argument covers distinct two-step routes sharing one hyperedge
+\end{vlist}}
+{\cTwoLayer}{two-layer construction \ \tAsym}
+{At $n=m=6$, $r=3$, five distinct outgoing hyperedges per tail give $30$, with a
+direct degree-cut feasibility check.}
+
+% ---- 14. directed simple hypergraph, vertex --------------------------------
+\vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}
+{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved}
+{the same constant \ \sProved}
+{\begin{vlist}
+  \item the shadow argument re-runs under the stricter separation, so the
+        leading term is the same
+  \item whether the finite edge and vertex maxima agree is \sOpen
+\end{vlist}}
+{\cTwoLayer}{two-layer construction \ \tAsym}
+{Random greedy growth with shuffled restarts measures what the implemented
+search finds, and establishes no optimum.}
+
+% ---- 15. directed multihypergraph, arc -------------------------------------
+\vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}
+{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved\ \ {\scriptsize\color{black!50}forward, backward and general alike}}
+{the same constant \ \sProved\ \ {\scriptsize\color{black!50}repeats lift the head-set limit}}
+{\begin{vlist}
+  \item the finite values can differ from the simple model, and are \sOpen
+  \item at $r=2$ these are directed multigraphs, where the simple coefficient is
+        $1/4$ instead, which is why $r\ge3$ is kept
+\end{vlist}}
+{\cTwoLayerRep}{two-layer, hyperedges repeated \ \tAsym}
+{The plotted experiments use rank three and the forward convention. General
+orientations are checked separately in the appendix.}
+
+% ---- 16. directed multihypergraph, vertex ----------------------------------
+\vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}
+{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved}
+{the same constant \ \sProved}
+{\begin{vlist}
+  \item the same leading term under both separations
+  \item finite exact values \sOpen, and whether forward and general agree once
+        $n>r$ is open too
+\end{vlist}}
+{\cTwoLayerRep}{two-layer, hyperedges repeated \ \tAsym}
+{The rank-three forward-convention runs are not an exhaustive comparison of the
+three orientation models.}
+
+\end{document}
