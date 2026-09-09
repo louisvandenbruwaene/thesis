@@ -538,7 +538,7 @@ def directed_arc_lower_bound(n: int, m: int) -> int:
     ``max(m(n-1), floor((n+m-2)^2/4))``.  The two branches are the hub
     construction (``const:directed-hub``) and the shifted-partition augmented
     bipartite construction (``const:augmented-bipartite``).  Proved as a lower
-    bound for all ``m`` after capping at the complete digraph, and conjecturally exact at
+    bound for all ``m`` after capping at the complete digraph, and exact at
     ``m = 2``. The all-order equality is false: the clique-core construction
     has 57 arcs at ``m = 5, n = 12``, where this bound is 56. The thesis makes no general optimality claim for this two-family bound.
     """
@@ -601,19 +601,19 @@ def _hyper_vertex_simple_proved(n: int, m: int, r: int) -> int | None:
 
 
 def _mstar(k: int) -> int:
-    """Candidate ``M(k) = max(2(k-1), floor(k^2/4))``.
+    """Established ``M*(k) = max(2(k-1), floor(k^2/4))``.
 
-    Its claimed equality with the fractional optimum remains conjectural.
-    Formula evaluation must not be treated as an independent upper bound.
+    Equality with the fractional optimum is cor:mstar-integral.
+    Formula evaluation is not an independent computational certificate.
     """
     return max(2 * (k - 1), (k * k) // 4)
 
 
 def directed_multigraph_arc(n: int, m: int) -> int:
-    """Conjectured ``L_m^dir(n) = (m-1) max(2(n-1), floor(n^2/4))``.
+    """Proved ``L_m^dir(n) = (m-1) max(2(n-1), floor(n^2/4))``.
 
-    The proposed skeleton proof is unchecked. The formula is attained by
-    explicit feasible constructions, so it supplies a lower bound.
+    The skeleton proof is thm:dir-multi-full. Both branches are attained by
+    explicit feasible constructions.
     """
     return (m - 1) * _mstar(n)
 
@@ -1396,7 +1396,7 @@ def _undirected_capacity_graph(graph: Graph) -> nx.Graph:
     capacity_graph.add_nodes_from(graph.vertices())
     # One undirected edge per adjacency, capacity = multiplicity (its edge count).
     for u, v, multiplicity in graph.edges():
-        capacity_graph.add_edge(u, v, capacity=float(multiplicity))
+        capacity_graph.add_edge(u, v, capacity=multiplicity)
     return capacity_graph
 
 
@@ -1453,7 +1453,7 @@ class ProofResult:
         first cell whose solve timed out.
         """
         # Undo the (m-1) scaling: one proved M*(n) yields every m.
-        if not math.isfinite(self.scaled_optimum):
+        if not self.solver_claims_optimal() or not math.isfinite(self.scaled_optimum):
             return None
         return (m - 1) * int(round(self.scaled_optimum))
 
@@ -1647,6 +1647,10 @@ def prove_directed_multigraph(
     prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
     elapsed = time.time() - start
     status = _PULP_STATUS.get(pulp.LpStatus[prob.status], "LIMIT")
+    # CBC can report LpStatusOptimal for a time-limited feasible incumbent.
+    # PuLP's separate solution status distinguishes it from a proved optimum.
+    if status == "OPTIMAL" and prob.sol_status != pulp.LpSolutionOptimal:
+        status = "LIMIT"
 
     weight_matrix = None
     if status == "OPTIMAL":
@@ -2744,8 +2748,9 @@ def solve(
             at ``n = r = 4, m = 4`` where forward reaches 4.  Ignored by every
             matrix model and by undirected hypergraphs.
         exhaustive: ``True`` requests an exact method, ``False`` requests discovery.
-            The directed multigraph arc branch returns a construction lower bound
-            in either mode, because its general upper-bound proof is unchecked.
+            In exhaustive mode the directed multigraph arc branch supplies a
+            construction attaining the proved formula. It retains ``bound='lower'``
+            and ``complete=False`` because no enumeration is performed.
         separation: ``"edge"`` or ``"vertex"`` disjointness (matrix models).
             Under ``"vertex"`` the routes are internally disjoint paths of the
             incidence graph (``sec:incidence-convention``), so ``q`` parallel
@@ -2849,7 +2854,7 @@ def solve(
         return SolveResult(n, m, label, separation, value, bound, method,
                            time.monotonic() - start, done, witness, note)
 
-    # The proposed formula supplies a named witness, not a verified upper bound.
+    # Supply a named extremiser, without recording a completed enumeration.
     if directed and separation == "edge":
         value = directed_multigraph_arc(n, m)
         witness = _directed_witness(n, m, simple)
@@ -2863,9 +2868,9 @@ def solve(
                 f"{witness_value} arcs")
         return SolveResult(
             n, m, label, separation, value, "lower",
-            "closed form (conjectured optimality)",
+            "closed form (established value)",
             time.monotonic() - start, False, witness,
-            "named construction only; the proposed upper-bound proof is unchecked")
+            "named construction attaining the proved value; no enumeration performed")
 
     # EXHAUSTIVE otherwise (undirected, or vertex separation): brute force.
     value, witness, done = _brute_force_matrix(
@@ -3232,7 +3237,7 @@ def plot_edge_vertex_divergence(max_n: int, path: str | Path) -> None:
 # NOTE: plot_degree_threshold generated the 2-D random-sampling threshold figure
 # (the old Figure 4.2) removed from the thesis on 2026-06-20.  Kept here so the
 # threshold phenomenon can be restored; see
-# research_notes/removed_threshold_phenomenon.md for the recipe.  (Its 3-D
+# old_stuff/research_notes/removed_threshold_phenomenon.md for the recipe.  (Its 3-D
 # companion plot_conn_threshold_3d is still used, for the appendix.)
 def plot_degree_threshold(
     path: str | Path, *, n: int = 12, m: int = 4, alpha: float = 0.5,
@@ -4941,28 +4946,28 @@ def _surface_known_value(vkey: str, n: int, m: int) -> int | None:
     tri_hyp = math.comb(n, 3)
     if vkey == "simple_undirected_edge":            # Mader, all m
         return min(simple_undirected_edge(n, m), tri_simple)
-    if vkey == "simple_undirected_vertex":          # Leonard, m<=4
-        return min(simple_undirected_edge(n, m), tri_simple) if m <= 4 else None
+    if vkey == "simple_undirected_vertex":          # Leonard m<=4; Sorensen-Thomassen m=5
+        if m <= 4:
+            return min(simple_undirected_edge(n, m), tri_simple)
+        if m == 5:
+            return simple_undirected_vertex_m5(n) if n >= 6 else tri_simple
+        return None
     if vkey == "simple_directed_edge":              # exact only at m=2
-        return None  # proposed proof remains unchecked
+        return min(directed_arc_m2(n), tri_dir) if m == 2 else None
     if vkey == "simple_directed_vertex":            # exact only at m=2
-        return None  # proposed proof remains unchecked
+        return min(directed_arc_m2(n), tri_dir) if m == 2 else None
     if vkey == "multi_undirected_edge":             # multi-tree bound, all m
         return min(multigraph_undirected_edge(n, m), (m - 1) * tri_simple)
     if vkey == "multi_undirected_vertex":           # thm:hyper-vertex-m2/m3 at r=2: K_m(n)=(m-1)(n-1), m<=3
-        return min((m - 1) * (n - 1), (m - 1) * tri_simple) if m == 2 else None
+        return min((m - 1) * (n - 1), (m - 1) * tri_simple) if m <= 3 else None
     if vkey == "multi_directed_edge":               # thm:dir-multi-full, all n and m
-        return None  # proposed proof remains unchecked
+        return min(directed_multigraph_arc(n, m), (m - 1) * tri_dir)
     if vkey == "multi_directed_vertex":             # cor:dir-multi-incidence, exact m=2 (= M(n))
-        return None  # proposed proof remains unchecked
+        return min(directed_arc_m2(n), tri_dir) if m == 2 else None
     if vkey == "hyper_undirected_edge":             # Gomory-Hu, simple-attaining iff m-1<=C(n-2,r-2)
-        if m != 2:
-            return None
         known = _hyper_edge_simple_proved(n, m, 3)
         return min(known, tri_hyp) if known is not None else None
     if vkey == "hyper_undirected_vertex":           # incidence-rank lemma; see _hyper_vertex_simple_proved
-        if m != 2:
-            return None
         known = _hyper_vertex_simple_proved(n, m, 3)
         return min(known, tri_hyp) if known is not None else None
     # hyper_directed_edge, hyper_directed_vertex: open (new model), no formula.
@@ -5492,9 +5497,8 @@ def enumerate_extremal_directed_multigraphs(
     induced-subgraph arc bound on every completed prefix, and exact flow checks
     on completed prefixes (induced flows only grow, so a violation is final).
 
-    SOUNDNESS LIMITATION: prefix pruning uses the conjectured formula
-    directed_multigraph_arc. Completeness is conditional on this bound at every
-    prefix size, so this routine is not an independent proof of that formula.
+    Prefix pruning uses the proved formula directed_multigraph_arc at every
+    prefix size. Thus this routine is not an independent proof of that formula.
     Returns multiplicity matrices, deduplicated up to vertex permutation when
     ``up_to_iso`` is set.  Deduplication is STREAMED through a canonical form
     (:func:`_canonical_form`) as graphs are found, so peak memory is bounded by
@@ -5509,8 +5513,7 @@ def enumerate_extremal_directed_multigraphs(
             order.append((i, j))
             order.append((j, i))
     block_end = {j: 2 * ((j + 1) * j // 2) for j in range(1, n)}  # prefix length
-    # Conjectural prefix cap: returned witnesses are checkable, but completeness
-    # depends on the proposed bound and cannot certify that same bound.
+    # Proved prefix cap; an enumeration using it cannot independently certify it.
     prefix_cap = {j: directed_multigraph_arc(j, m) for j in range(2, n + 1)}
 
     mu = np.zeros((n, n), dtype=int)
@@ -5742,9 +5745,9 @@ def enumerate_extremal_directed_multigraphs_via_generation(
     prefix feasibility check (induced max-flows only grow, so a prefix that
     already exceeds the cap is dead).
 
-    Completeness is conditional: support enumeration is exhaustive, but the
-    induced-arc prefix pruning uses the conjectured directed_multigraph_arc
-    bound. This is structural evidence, not an independent optimality proof.
+    Support enumeration is exhaustive, and induced-arc prefix pruning uses the
+    proved directed_multigraph_arc bound. This is structural evidence, not an
+    independent proof of that bound.
 
     Requires nauty's ``geng`` on PATH.  For ``n <= 6`` it returns the same set
     of isomorphism classes as :func:`enumerate_extremal_directed_multigraphs`;

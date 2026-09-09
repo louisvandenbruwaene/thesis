@@ -7,9 +7,10 @@ the augmented bipartite B_{k-1,k} + any fixed-point-free permutation of B.
 
 Simulated annealing on the penalty objective  E = -|arcs| + P * (#pairs with
 lambda >= 3), toggling one arc per step, Metropolis acceptance, geometric cool.
-Reaching E with 0 violations and |arcs| = Q(n) is an extremiser; we record the
+Reaching 0 violations and |arcs| = Q(n) gives a candidate extremiser; we record the
 structural family (bipartite-form |A| + B-cycle-type, or NON-bipartite) of every
-extremiser hit, to test whether the bipartite family is the whole story.
+candidate hit, to test whether the bipartite family is the whole story.
+The output's historical "extremiser" label is conditional on Q(n) being optimal.
 """
 import random
 import math

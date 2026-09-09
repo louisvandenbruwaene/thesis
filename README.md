@@ -31,9 +31,9 @@ Then, from `program/`:
 ```
 
 The core needs only NumPy and SciPy. PuLP backs the solver checks; Matplotlib
-and NetworkX are optional and guarded for everything above. The three block
-sweeps in `program/scripts/` are the exception: `multi_vertex_blocks.py`,
-`multi_vertex_blocks_b9.py` and `simple_vertex_blocks.py` each require NetworkX
-and nauty's `geng` on `PATH`.
+and NetworkX support plotting and additional algorithms. Standalone scripts
+can have extra requirements: in particular, the block sweeps require NetworkX
+and nauty's `geng` on `PATH`. Consult each script's imports and usage notes
+before running it.
 
 Appendix A.13 of the thesis gives the full audit instructions.

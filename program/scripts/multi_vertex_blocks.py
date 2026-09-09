@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The multigraph vertex problem (incidence convention) as a BLOCK problem.
 
-Backs research_notes/multi_vertex_blocks.md and the thesis results
+Backs old_stuff/research_notes/multi_vertex_blocks.md and the thesis results
 lem:multi-vertex-objective, thm:multi-vertex-blocks, thm:multi-vertex-bipartite
 and tab:multi-vertex-exact.
 

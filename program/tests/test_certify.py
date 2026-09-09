@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
+import erdos915_unified as e
 
 from erdos915_unified import (
     MULTI_DIRECTED,
@@ -19,6 +20,23 @@ from erdos915_unified import (
 
 @unittest.skipUnless(PULP_AVAILABLE, "the MILP solver check needs the optional pulp")
 class SolverCheck(unittest.TestCase):
+    def test_time_limited_cbc_incumbent_is_not_an_optimum(self):
+        def stopped_with_incumbent(problem, solver):
+            problem.assignStatus(e.pulp.LpStatusOptimal,
+                                 e.pulp.LpSolutionIntegerFeasible)
+            return e.pulp.LpStatusOptimal
+
+        with patch.object(e.pulp.LpProblem, "solve", stopped_with_incumbent), \
+             patch.object(e, "_pick_solver", return_value=None):
+            result = prove_directed_multigraph(3)
+        self.assertEqual(result.status, "LIMIT")
+        self.assertFalse(result.solver_claims_optimal())
+        self.assertIsNone(result.value_for(3))
+
+    def test_finite_incumbent_cannot_be_scaled_into_proved_value(self):
+        result = e.ProofResult(3, "LIMIT", 4.0, False, 1.0, None)
+        self.assertIsNone(result.value_for(3))
+
     def test_independent_solver_does_not_use_conjectured_formula(self):
         with patch("erdos915_unified._mstar", side_effect=AssertionError("conjectural bound used")):
             result = prove_directed_multigraph(3, time_limit=30.0)

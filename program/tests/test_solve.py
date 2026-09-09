@@ -97,13 +97,13 @@ class Solve(unittest.TestCase):
         self.assertTrue(r.proven)
         self.assertEqual(r.value, 4)  # a spanning tree on 5 vertices
 
-    def test_directed_multigraph_formula_does_not_certify_optimality(self):
-        # A matching construction cannot certify an unchecked upper bound.
+    def test_directed_multigraph_formula_does_not_claim_enumeration(self):
+        # A theorem-backed construction is not a completed enumeration.
         r = solve(4, 3, directed=True, simple=False, exhaustive=True, max_seconds=120.0)
         self.assertFalse(r.proven)
         self.assertFalse(r.complete)
         self.assertEqual(r.bound, "lower")
-        self.assertIn("unchecked", r.note)
+        self.assertIn("no enumeration performed", r.note)
         self.assertEqual(r.value, 12)  # L_3^dir(4) = 2(n-1)(m-1) = 12
         self.assertIn("closed form", r.method)
 

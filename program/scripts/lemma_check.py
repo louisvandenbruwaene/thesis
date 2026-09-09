@@ -89,7 +89,7 @@ def analyse(arcs, n):
     for (u, v) in arcs:
         if u in set(R) and v in set(R):
             indeg_R[v] += 1
-    max_indeg_R = max(indeg_R.values()) if R else 0
+    max_indeg_R = max(indeg_R.values(), default=0)
     return dict(sigma=len(S), rho=len(R), into_S=into_S,
                 feasibleR=feasibleR, max_indeg_R=max_indeg_R)
 

@@ -12,6 +12,25 @@ import erdos915_unified as e
 
 
 class IntegerArithmetic(unittest.TestCase):
+    @unittest.skipUnless(e.NETWORKX_AVAILABLE, "optional networkx is unavailable")
+    def test_gomory_hu_preserves_integer_capacity_above_float_precision(self):
+        g = e.Graph(2, e.MULTI_UNDIRECTED)
+        q = 2**53 + 1
+        g.set_multiplicity(0, 1, q)
+        self.assertEqual(e.max_edge_connectivity_via_tree(g), q)
+
+    @unittest.skipUnless(e.NETWORKX_AVAILABLE, "optional networkx is unavailable")
+    def test_attachment_check_covers_every_six_vertex_tree(self):
+        import networkx as nx
+        from scripts.saturated_attachment_check import TREES_6
+
+        listed = [nx.Graph(edges) for edges in TREES_6]
+        expected = list(nx.nonisomorphic_trees(6))
+        self.assertEqual(len(listed), len(expected))
+        for tree in expected:
+            self.assertEqual(sum(nx.is_isomorphic(tree, candidate)
+                                 for candidate in listed), 1)
+
     def test_large_multiplicities_are_not_truncated(self):
         for directed in (False, True):
             g = e.Graph(2, e.Variant(directed=directed, simple=False))

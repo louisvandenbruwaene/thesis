@@ -92,7 +92,8 @@ def check_family():
         allbad = allbad and bad
         print(f"  k={k} n={n}: arcs={len(arcs)} Q={Q} lambda^max={lam} "
               f"sigma={len(S)} maxRindeg={mx}  (H) FAILS={bad}")
-    print("=> (H) is FALSE for every odd n>=9:", allbad)
+    print("=> H-violating Q(n)-arc witnesses at all tested orders "
+          "(counterexamples to extremal H only if Q(n) is optimal):", allbad)
     N = 9
 
 

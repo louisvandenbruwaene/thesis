@@ -73,7 +73,8 @@ One more library backs the solver check and two are optional:
 
 - `pulp` backs the MILP solver checks (`prove_directed_multigraph` and
   `prove_integral_arc_bound`): one solver-agnostic cut-counting model that runs on
-  CBC (bundled with `pulp`) by default and on Gurobi by passing `use_gurobi=True`.
+  Gurobi when available, otherwise CBC (bundled with `pulp`). Pass
+  `use_gurobi=False` to force CBC, or `use_gurobi=True` to request Gurobi.
   These routines raise a clear message if called without `pulp`.
 - `matplotlib` is needed only to render the figures (`make_figures.py` and the
   `plot_*` routines). Without it everything else still runs.
@@ -336,7 +337,9 @@ were produced; rerun those calls to check them.
 | `figures/sa_vs_tabu_convergence.pdf` | SA against tabu, wall-clock timed (offcut only) |
 
 **Offcut only** means the figure is no longer referenced from `main.tex`. It is
-preserved for `offcuts.tex`, the record of removed material. Normal figure
+preserved under `old_stuff/figures/` in the private source repository alongside
+`old_stuff/offcuts.tex`, the record of removed material. Paths in the offcut
+rows above describe their original locations. Normal figure
 rendering no longer reruns these archived experiments or refreshes their assets.
 
 The solver records (`logs/certificate_log.txt`, `logs/basecase_search_log.txt`,

@@ -2,10 +2,10 @@
 """Targeted search for an (H)-violating extremiser (directed_arc_m3_reduction.md).
 
 (H) says every m=3 extremiser has its non-source set R of maximum in-degree <= 1.
-Fix the arc count at the extremal value Q(n) = floor((n+1)^2/4) and try to
+Fix the arc count at the conjectured value Q(n) = floor((n+1)^2/4) and try to
 MAXIMISE the maximum R-in-degree while staying feasible (lambda^max <= 2).  If a
 feasible digraph with exactly Q(n) arcs and an R-vertex of in-degree >= 2 exists,
-the search may find it -- that would REFUTE (H).  If many restarts stay pinned at
+the search may find it -- that refutes (H) if Q(n) is optimal. If restarts stay pinned at
 1, that is direct evidence for (H) at the first quadratic sizes n = 9, 10, which
 are past exhaustion (so untestable before).
 
@@ -76,7 +76,7 @@ def max_R_indegree(arcs, n):
     for (u, v) in arcs:
         if u in R and v in R:
             indeg_R[v] += 1
-    return max(indeg_R.values()) if R else 0
+    return max(indeg_R.values(), default=0)
 
 
 def augmented_bipartite(k):
@@ -138,7 +138,7 @@ def search(k, restarts=40, steps=300, seed=0):
 def main():
     for k in (5, 6):           # n = 9, 11 (odd quadratic). k=5 -> n=9 is the seam.
         best, n, arcs = search(k, restarts=12, steps=80, seed=k)
-        verdict = ("REFUTES (H): found a Q(n)-arc feasible digraph with R-in-degree 2"
+        verdict = ("Violates H at the conjectured target: Q(n) arcs, R-in-degree 2"
                    if best >= 2 else
                    "no (H)-violating extremiser found (max R-in-degree stayed 1)")
         print(f"n={n} (k={k}), arcs=Q(n)={Q(n)}: best max-R-in-degree found = {best}"

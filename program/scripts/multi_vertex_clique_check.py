@@ -84,7 +84,7 @@ def independent_worst_kappa(g):
 def main():
     cases = [(5, 3, 1), (5, 3, 3), (6, 3, 3), (8, 3, 4),
               (10, 6, 1), (10, 6, 2), (15, 8, 2), (20, 11, 2)]
-    print("formula check: K(n,m,r) == (m-1)(n-1) + floor(n/r)*gain(r,m)")
+    print("construction count = (m-1)(n-1) + k*gain(r,m)")
     for m, r, k in cases:
         n = k * (r - 1) + 1 + 4
         g = build_clique_bouquet(n, m, r, k)
@@ -108,7 +108,7 @@ def main():
     for m in [5, 10, 20, 30, 50]:
         best_r, best_rate = None, -1
         for r in range(3, m + 1):
-            rate = gain(r, m) / r
+            rate = gain(r, m) / (r - 1)
             if rate > best_rate:
                 best_rate, best_r = rate, r
         print(f"  m={m:3d}: best r*={best_r:3d}  gain(r*)={gain(best_r, m):6d}"
