@@ -2,11 +2,17 @@
 
 Master's thesis of Louis Vandenbruwaene, KU Leuven, supervised by Stijn Cambie.
 
-This repository holds the two things the thesis hands a reader:
+This repository holds what the thesis hands a reader:
 
 - `main.pdf` — the thesis.
 - `program/` — the companion program, its tests, the standalone scripts, the
   recorded machine values and the run transcripts the computational audit cites.
+- `slides/` — the seminar deck, source and built PDF.
+- `popularising_summary/` — the one-page summary for a general reader.
+
+Only `main.pdf` and `program/` are cited by the thesis. The deck and the
+summary are separate deliverables, published here so that the talk and the
+short account travel with the work they describe.
 
 Every file path printed in the thesis is relative to this repository, or to a
 base directory named where the path is given, as the equal-budget records do.

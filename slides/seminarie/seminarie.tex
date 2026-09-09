@@ -289,9 +289,15 @@
   \foreach \j/\y in {1/1.35,2/0.45,3/-0.45,4/-1.35}
     {\node[gvertex, minimum size=4.2mm] (b\j) at (1.7,\y) {};}
   \foreach \i in {1,2,3}{\foreach \j in {1,2,3,4}{\draw[gdirfaint] (a\i)--(b\j);}}
+  % Every b_j takes its m-2 = 1 arc from its CYCLIC predecessor, so the arcs
+  % inside B close up.  Drawn as a path they would leave b_1 without one, and
+  % the pair (a, b_1) would then carry a single route instead of m-1 = 2, one
+  % arc short of the count the frame's own lower bound displays.
   \foreach \j/\k in {1/2,2/3,3/4}
     {\draw[-{Stealth[length=2mm]}, line width=1.1pt, vertexorange!85!black]
        (b\j) to[bend right=55] (b\k);}
+  \draw[-{Stealth[length=2mm]}, line width=1.1pt, vertexorange!85!black]
+    (b4) to[out=-42,in=42,looseness=1.55] (b1);
   \node[font=\scriptsize, text=black!55] at (-1.7,-1.75) {$A$};
   \node[font=\scriptsize, text=black!55] at ( 1.7,-1.95) {$B$};
 \end{tikzpicture}}
@@ -1229,7 +1235,7 @@ $\Phi(G)\;=\;
 {$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}Mader, via Gomory--Hu}}
 {$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}for every $n\ge m$}}
 {\begin{vlist}
-  \item the two meet, so the value is exact at every order
+  \item the two meet for $n\ge m$, so the value is exact there
   \item for $n<m$ it is $\binom n2$: not even $K_n$ carries $m$ routes
 \end{vlist}}
 {\cHub}{hub-and-spokes \ \tExtremal}

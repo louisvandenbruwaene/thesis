@@ -5,9 +5,19 @@
 #
 # main is the working branch. It tracks EVERYTHING and is pushed to the private
 # `backup` remote only. The public repository is a generated snapshot carrying
-# just what the thesis hands a reader: main.pdf, program/ and README.md. Nothing
+# just what the thesis hands a reader: main.pdf, program/, README.md, the
+# seminar deck in slides/ and the one-page popularising_summary/. Nothing
 # is kept private by .gitignore any more; it is kept private by not being copied
 # here. So if you ever want a file public, add it to the archive line below.
+#
+# Whole directories are copied, so only tracked files travel. slides/ and
+# popularising_summary/ hold their sources and their built PDFs and nothing
+# else: their LaTeX intermediates are gitignored, so no .aux or .log reaches
+# the snapshot. Check that again if either directory gains a tracked file.
+#
+# The hand-in bundle is deliberately narrower. build_handin.sh still carries
+# main.pdf and program/ alone, because the deck and the summary are separate
+# faculty deliverables rather than part of the thesis submission.
 #
 # A plain `git push` goes to `backup`, never to origin: this script is the only
 # thing that writes to the public repository.
@@ -25,7 +35,8 @@ wt=.public-snapshot
 stage=$(mktemp -d "$PWD/.publish-build.XXXXXX")
 trap 'rm -rf "$stage"' 0
 # Check archive creation before replacing anything in the public worktree.
-git archive --format=tar HEAD main.pdf program README.md > "$stage/snapshot.tar"
+git archive --format=tar HEAD main.pdf program README.md slides popularising_summary \
+    > "$stage/snapshot.tar"
 
 git fetch -q origin
 git worktree remove --force "$wt" 2>/dev/null || true
