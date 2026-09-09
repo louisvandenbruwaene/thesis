@@ -1,7 +1,7 @@
 % ============================================================================
 %  Erdos Problem 915 -- seminarie deck (rebuild, Sept 2026)
 %  Outline dictated by Louis: translation, E+V=G, the lambda cascade, the
-%  kappa cascade, the red/blue pill model choices, then the program half
+%  kappa cascade, the eight graph models, then the program half
 %  (modelling, max flow, transformations, efficiency, solving vs searching).
 %
 %  Self-contained, exactly like main.tex in this directory: the colours, the
@@ -55,10 +55,6 @@
 \definecolor{roleMeasure}{RGB}{29,141,176}
 \definecolor{roleProve}{RGB}{60,160,80}
 \definecolor{roleDiscover}{RGB}{220,140,40}
-
-% the two pills of the model choice
-\definecolor{pillRed}{RGB}{198,52,52}
-\definecolor{pillBlue}{RGB}{40,110,190}
 
 \colorlet{regimeProved}{KULblauw1}
 \colorlet{regimeConjectured}{vertexred}
@@ -189,25 +185,6 @@
   \end{frame}%
 }
 \newcommand{\tikzframe}[2]{\tikzframescaled{#1}{#2}{1.0}}
-
-% --- a capsule, for the model-choice frames --------------------------------
-% #1 colour, #2 rotation in degrees, #3 scale
-\newcommand{\pillshape}[3]{%
-  \begin{scope}[rotate=#2, scale=#3]
-    \begin{scope}
-      \clip[rounded corners=4.5mm] (-1.55,-0.45) rectangle (1.55,0.45);
-      \fill[#1!88!black] (-1.55,-0.45) rectangle (1.55,0.45);
-      \fill[#1!42!white] (-1.55,-0.45) rectangle (0,0.45);
-      \fill[white, opacity=0.28] (-1.42,0.10) rectangle (1.30,0.29);
-      \fill[black, opacity=0.10] (-0.03,-0.45) rectangle (0.03,0.45);
-    \end{scope}
-    \draw[black!30, line width=0.7pt, rounded corners=4.5mm]
-      (-1.55,-0.45) rectangle (1.55,0.45);
-  \end{scope}}
-
-% a small pill used as a bullet-sized icon
-\newcommand{\pillicon}[1]{%
-  \tikz[baseline=-0.6ex]{\pillshape{#1}{-18}{0.34}}}
 
 % one row of the transformation frame: a caption column and a picture column
 % clamped independently, so neither can ever run into the other
@@ -414,24 +391,6 @@
   \node[font=\scriptsize, text=black!55] at ( 1.8,-2.05) {heads};
 \end{tikzpicture}}
 
-% one model choice: the two pills, the two words, the two pictures
-% #1 blue word, #2 blue picture, #3 red word, #4 red picture
-\newcommand{\choiceframe}[4]{%
-\begin{frame}[plain]
-\vfill
-\begin{center}
-\adjustbox{max totalheight=0.80\textheight}{\resizebox{0.84\textwidth}{!}{%
-\begin{tikzpicture}
-  \begin{scope}[shift={(-4.4,3.9)}]\pillshape{pillBlue}{-14}{1.30}\end{scope}
-  \begin{scope}[shift={(4.4,3.9)}]\pillshape{pillRed}{14}{1.30}\end{scope}
-  \node[font=\Huge\bfseries, text=pillBlue!80!black] at (-4.4,1.55) {#1};
-  \node[font=\Huge\bfseries, text=pillRed!80!black]  at ( 4.4,1.55) {#3};
-  \begin{scope}[shift={(-4.4,-1.6)}]#2\end{scope}
-  \begin{scope}[shift={( 4.4,-1.6)}]#4\end{scope}
-\end{tikzpicture}}}
-\end{center}
-\end{frame}}
-
 % one transformation: the label on top, the picture under it
 % #1 label, #2 picture, drawn centred on the origin
 \newcommand{\transframe}[2]{%
@@ -465,8 +424,8 @@
 % ============================================================================
 %  1.  THE TITLE, TRANSLATED
 % ============================================================================
-\begin{frame}{The title, in plain words}
-\vfill
+\begin{frame}{}
+\vspace{1cm}
 \begin{center}
 \adjustbox{max totalheight=0.72\textheight}{\resizebox{0.72\textwidth}{!}{%
 \begin{tikzpicture}
@@ -493,8 +452,7 @@
 % ============================================================================
 %  2.  E + V = G
 % ============================================================================
-\begin{frame}{A graph is edges and vertices}
-\vfill
+\begin{frame}{Graph}
 \begin{center}
 \adjustbox{max totalheight=0.80\textheight}{\resizebox{0.96\textwidth}{!}{%
 \begin{tikzpicture}
@@ -509,7 +467,6 @@
                  (e2)--(e3) (e2)--(e4)
                  (e3)--(e4);
     \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$E$};
-    \node[font=\small, text=black!60] at (0,-2.5) {eight edges};
   \end{scope}
 
   \node[font=\Huge, text=black!45] at (2.4,0) {$+$};
@@ -521,7 +478,6 @@
       \node[gvertex] at (\ang:1.35) {$\i$};
     }
     \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$V$};
-    \node[font=\small, text=black!60] at (0,-2.5) {five vertices};
   \end{scope}
 
   \node[font=\Huge, text=black!45] at (7.2,0) {$=$};
@@ -541,7 +497,6 @@
       \node[gvertex] at (\ang:1.35) {$\i$};
     }
     \node[font=\bfseries\Large, text=KULblauw3b] at (0,2.35) {$G$};
-    \node[font=\small, text=black!60] at (0,-2.5) {a graph};
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
@@ -562,15 +517,12 @@
     {$\ell_m(n)\;=\;\max_{|V(G)|=n}\bigl\{\,|E(G)|\;\;:\;\;$};
   \node[tok, anchor=base west] (a2) at (a1.base east) {$\lmax_G$};
   \node[form, anchor=base west] (a3) at (a2.base east) {$\;\le\;m-1\,\bigr\}$};
-  \node[saying, anchor=south west] at (-6.4,4.15)
-    {as many edges as possible, subject to the cap};
+
 
   % ---- the graph-wide maximum ---------------------------------------------
   \node[form, anchor=base west] (b1) at (-5.9,1.1)
     {$\lmax_G\;=\;\max\limits_{u\neq v}\;$};
   \node[tok, anchor=base west] (b2) at (b1.base east) {$\lec_G(u,v)$};
-  \node[saying, anchor=base west] at (b2.base east)
-    {\ \ over every pair of vertices};
 
   % ---- the local quantity --------------------------------------------------
   \node[form, anchor=base west, align=left] (c1) at (-5.4,-1.4)
@@ -590,7 +542,7 @@
   \draw[casc] (b2.south) to[out=-90,in=95] ($(boxC.north)+(0.9,0)$);
 
   % ---- the picture: Menger's routes, without the cut -----------------------
-  \begin{scope}[shift={(9.9,0.6)}, scale=1.72]
+  \begin{scope}[shift={(9.9,0.6)}, scale=1.9]
     \foreach \i in {0,...,4} {
       \pgfmathsetmacro{\ang}{90 + 72*\i}
       \coordinate (v\i) at (\ang:1.5);
@@ -606,9 +558,6 @@
       \pgfmathsetmacro{\ang}{90 + 72*\i}
       \node[gvertex] at (\ang:1.5) {$\i$};
     }
-    \node[font=\small\bfseries, text=KULblauw3b] at (0,-2.15) {$\lec(1,3)=3$};
-    \node[font=\scriptsize, text=black!60, align=center] at (0,-2.75)
-      {three routes from $1$ to $3$,\\three colours, no edge reused};
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
@@ -628,14 +577,12 @@
     {$k_m(n)\;=\;\max_{|V(G)|=n}\bigl\{\,|E(G)|\;\;:\;\;$};
   \node[tokv, anchor=base west] (a2) at (a1.base east) {$\kmax_G$};
   \node[form, anchor=base west] (a3) at (a2.base east) {$\;\le\;m-1\,\bigr\}$};
-  \node[saying, anchor=south west] at (-6.4,4.15)
-    {the same cap, read on vertices instead of edges};
+
 
   \node[form, anchor=base west] (b1) at (-5.9,1.1)
     {$\kmax_G\;=\;\max\limits_{u\neq v}\;$};
   \node[tokv, anchor=base west] (b2) at (b1.base east) {$\kap_G(u,v)$};
-  \node[saying, anchor=base west] at (b2.base east)
-    {\ \ over every pair of vertices};
+
 
   \node[form, anchor=base west, align=left] (c1) at (-5.4,-1.4)
     {$\kap_G(u,v)\;=\;$
@@ -654,7 +601,7 @@
   \draw[cascv] (b2.south) to[out=-90,in=95] ($(boxC.north)+(0.9,0)$);
 
   % ---- the picture: now the interior VERTICES carry the colours ------------
-  \begin{scope}[shift={(9.9,0.6)}, scale=1.72]
+  \begin{scope}[shift={(9.9,0.6)}, scale=1.9]
     \foreach \i in {0,...,4} {
       \pgfmathsetmacro{\ang}{90 + 72*\i}
       \coordinate (v\i) at (\ang:1.5);
@@ -672,74 +619,143 @@
     \node[gvertex, draw=vertexorange,  fill=vertexorange!30]  at (v0) {$0$};
     \node[gvertex, draw=vertexgreen!70!black, fill=vertexgreen!30] at (v2) {$2$};
     \node[gvertex, draw=vertexpurple,  fill=vertexpurple!30]  at (v4) {$4$};
-    \node[font=\small\bfseries, text=vertexpurple] at (0,-2.15) {$\kap(1,3)=3$};
-    \node[font=\scriptsize, text=black!60, align=center] at (0,-2.75)
-      {each route keeps its own interior\\vertex: $0$, $2$ and $4$};
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
 \end{frame}
 
 % ============================================================================
-%  5.  THE THREE MODEL CHOICES, ONE FRAME EACH
+%  5.  THE THREE MODEL CHOICES, ALL EIGHT MODELS ON ONE FRAME
+%      (the same picture as \Cref{fig:eight-models} in ../../chapters/ch1)
 % ============================================================================
-\choiceframe{simple}{%
-  \begin{scope}[scale=1.55]
-    \node[gvertex] (sa) at (90:0.78) {};
-    \node[gvertex] (sb) at (210:0.78) {};
-    \node[gvertex] (sc) at (330:0.78) {};
-    \draw[gline] (sa)--(sb) (sb)--(sc) (sc)--(sa);
-  \end{scope}}{multi}{%
-  \begin{scope}[scale=1.55]
-    \node[gvertex] (ma) at (90:0.78) {};
-    \node[gvertex] (mb) at (210:0.78) {};
-    \node[gvertex] (mc) at (330:0.78) {};
-    \draw[gline] (ma) to[bend left=22] (mb);
-    \draw[gline] (ma) -- (mb);
-    \draw[gline] (ma) to[bend right=22] (mb);
-    \draw[gline] (mb) to[bend left=15] (mc);
-    \draw[gline] (mb) to[bend right=15] (mc);
-    \draw[gline] (mc) -- (ma);
-  \end{scope}}
-
-\choiceframe{non-hypergraph}{%
-  \begin{scope}[scale=1.35]
-    \coordinate (ga) at (-0.9,-0.9); \coordinate (gb) at (0.9,-0.9);
-    \coordinate (gc) at (0.9, 0.9);  \coordinate (gd) at (-0.9,0.9);
+\begin{frame}{Three toggles, eight models}
+\vfill
+\begin{center}
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth,
+    mv/.style={gvertex, minimum size=5.5mm},
+    me/.style={gline},
+    ml/.style={metro, line width=2.8pt},
+    stn/.style={metrostop, minimum size=5mm},
+    darc/.style={gdir},
+    hstar/.style={metro, line width=2.7pt, -{Stealth[length=2.8mm]}, shorten >=3.2mm, shorten <=2.4mm}]
+  % (a) simple graph: K_3 triangle, single edges only
+  \begin{scope}[shift={(0,0)}]
+    \node[mv] (s1) at (90:0.78) {};
+    \node[mv] (s2) at (210:0.78) {};
+    \node[mv] (s3) at (330:0.78) {};
+    \draw[me] (s1)--(s2)  (s2)--(s3)  (s3)--(s1);
+    \node[font=\itshape] at (0,-1.75) {simple graph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {one edge per pair};
+  \end{scope}
+  % (b) multigraph: K_3 with a triple edge and a double edge, the third single
+  \begin{scope}[shift={(4.30,0)}]
+    \node[mv] (g1) at (90:0.78) {};
+    \node[mv] (g2) at (210:0.78) {};
+    \node[mv] (g3) at (330:0.78) {};
+    \draw[me] (g1) to[bend left=22] (g2);
+    \draw[me] (g1) -- (g2);
+    \draw[me] (g1) to[bend right=22] (g2);
+    \draw[me] (g2) to[bend left=15] (g3);
+    \draw[me] (g2) to[bend right=15] (g3);
+    \draw[me] (g3) -- (g1);
+    \node[font=\itshape] at (0,-1.75) {multigraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel edges $\mu(u,v)\!\ge\!1$};
+  \end{scope}
+  % (c) simple hypergraph: three distinct size-3 hyperedges, metro-style, on the
+  %     four corner stations. Two share the bottom stretch and run parallel side
+  %     by side there; the third runs diagonally corner to corner.
+  \begin{scope}[shift={(8.60,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      \draw[metro, metroB] (ga) -- (gb);
-      \draw[metro, metroC] (gb) -- (gc);
-      \draw[metro, metroD] (gc) -- (gd);
+      \draw[ml, metroB] (-0.85,-0.77) -- (0.85,-0.77) -- (0.85,0.85);
+      \draw[ml, metroC] (-0.85,0.85) -- (-0.85,-0.93) -- (0.85,-0.93);
+      \draw[ml, metroD] (-0.85,-0.85) -- (0.85,0.85) -- (-0.85,0.85);
     \end{scope}
-    \foreach \p in {ga,gb,gc,gd} {\node[metrostop] at (\p) {};}
-  \end{scope}}{hypergraph}{%
-  \begin{scope}[scale=1.35]
-    \coordinate (ha) at (-0.9,-0.9); \coordinate (hb) at (0.9,-0.9);
-    \coordinate (hc) at (0.9, 0.9);  \coordinate (hd) at (-0.9,0.9);
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {hyperedges span $r\!\ge\!3$};
+  \end{scope}
+  % (d) multihypergraph: one repeated hyperedge {A,B,C} (two parallel red lines
+  %     side by side) plus one ordinary hyperedge {B,C,D} drawn diagonally
+  \begin{scope}[shift={(12.90,0)}]
+    \coordinate (A) at (-0.85,-0.85); \coordinate (B) at (0.85,-0.85);
+    \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
-      \draw[metro, metroB] (-0.9,-0.82) -- (0.9,-0.82) -- (0.9,0.9);
-      \draw[metro, metroC] (-0.9,0.9) -- (-0.9,-0.98) -- (0.9,-0.98);
-      \draw[metro, metroD] (-0.9,-0.9) -- (0.9,0.9) -- (-0.9,0.9);
+      \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);
+      \draw[ml, metroA!55!black] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);
+      \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);
     \end{scope}
-    \foreach \p in {ha,hb,hc,hd} {\node[metrostop] at (\p) {};}
-  \end{scope}}
-
-\choiceframe{undirected}{%
-  \begin{scope}[scale=1.55]
-    \node[gvertex] (ua) at (90:0.85) {};
-    \node[gvertex] (ub) at (210:0.85) {};
-    \node[gvertex] (uc) at (330:0.85) {};
-    \draw[gline] (ua)--(ub) (ub)--(uc) (uc)--(ua);
-  \end{scope}}{directed}{%
-  \begin{scope}[scale=1.55, >=Stealth]
-    \node[gvertex] (da) at (90:0.85) {};
-    \node[gvertex] (db) at (210:0.85) {};
-    \node[gvertex] (dc) at (330:0.85) {};
-    \draw[gdir] (da) to[bend right=14] (db);
-    \draw[gdir] (db) to[bend right=14] (dc);
-    \draw[gdir] (dc) to[bend right=14] (da);
-    \draw[gdir] (db) to[bend right=14] (da);
-  \end{scope}}
+    \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {multihypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
+  \end{scope}
+  % (a) simple digraph: directed triangle with one bidirected pair
+  \begin{scope}[shift={(0,-4.5)}]
+    \node[mv] (s1d) at (90:0.78) {};
+    \node[mv] (s2d) at (210:0.78) {};
+    \node[mv] (s3d) at (330:0.78) {};
+    \draw[darc] (s1d) to[bend right=14] (s2d);
+    \draw[darc] (s2d) to[bend right=14] (s3d);
+    \draw[darc] (s3d) to[bend right=14] (s1d);
+    \draw[darc] (s2d) to[bend right=14] (s1d);
+    \node[font=\itshape] at (0,-1.75) {simple digraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {one arc per ordered pair};
+  \end{scope}
+  % (b) directed multigraph: a triple arc, a bidirected pair, a single arc
+  \begin{scope}[shift={(4.3,-4.5)}]
+    \node[mv] (g1d) at (90:0.78) {};
+    \node[mv] (g2d) at (210:0.78) {};
+    \node[mv] (g3d) at (330:0.78) {};
+    \draw[darc] (g1d) to[bend left=22] (g2d);
+    \draw[darc] (g1d) to[bend right=0] (g2d);
+    \draw[darc] (g1d) to[bend right=22] (g2d);
+    \draw[darc] (g2d) to[bend right=12] (g3d);
+    \draw[darc] (g3d) to[bend right=12] (g2d);
+    \draw[darc] (g3d) to[bend right=14] (g1d);
+    \node[font=\itshape] at (0,-1.75) {directed multigraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {parallel and opposite arcs};
+  \end{scope}
+  % (c) directed hypergraph: each hyperedge is a metro-styled star whose tail is
+  %     the middle station of the undirected line, so the arcs land on the very
+  %     same edges. Blue and green share the bottom edge, one arc each way.
+  \begin{scope}[shift={(8.6,-4.5)}]
+    \coordinate (Ad) at (-0.85,-0.85); \coordinate (Bd) at (0.85,-0.85);
+    \coordinate (Cd) at (0.85, 0.85);  \coordinate (Dd) at (-0.85,0.85);
+    \begin{scope}[on background layer]
+      \draw[hstar, metroB] (Bd) to[bend left=16] (Ad);
+      \draw[hstar, metroB] (Bd) to (Cd);
+      \draw[hstar, metroC] (Ad) to[bend left=16] (Bd);
+      \draw[hstar, metroC] (Ad) to (Dd);
+      \draw[hstar, metroD] (Cd) to (Ad);
+      \draw[hstar, metroD] (Cd) to (Dd);
+    \end{scope}
+    \foreach \p in {Ad,Bd,Cd,Dd} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {directed hypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an edge};
+  \end{scope}
+  % (d) directed multihypergraph: the red hyperedge is repeated, so each of its
+  %     arcs is a parallel pair straddling the edge
+  \begin{scope}[shift={(12.9,-4.5)}]
+    \coordinate (Am) at (-0.85,-0.85); \coordinate (Bm) at (0.85,-0.85);
+    \coordinate (Cm) at (0.85, 0.85);  \coordinate (Dm) at (-0.85,0.85);
+    \begin{scope}[on background layer]
+      \draw[hstar, metroA] (Bm) to[bend left=16] (Am);
+      \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Am);
+      \draw[hstar, metroA!55!black] (Bm) to[bend left=16] (Cm);
+      \draw[hstar, metroA] (Bm) to[bend right=16] (Cm);
+      \draw[hstar, metroB] (Dm) to (Bm);
+      \draw[hstar, metroB] (Dm) to (Cm);
+    \end{scope}
+    \foreach \p in {Am,Bm,Cm,Dm} {\node[stn] at (\p) {};}
+    \node[font=\itshape] at (0,-1.75) {directed multihypergraph};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {a hyperedge repeated};
+  \end{scope}
+\end{tikzpicture}}}
+\end{center}
+\vfill
+\end{frame}
 
 % ============================================================================
 %  DIVIDER
