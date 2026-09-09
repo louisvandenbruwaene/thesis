@@ -815,7 +815,7 @@
   % a quarter-turned equals sign between the two. One node with align=center, so
   % the whole stack is centred on the matrix box whatever its widest line is.
   \node[font=\scriptsize\bfseries, text=KULblauw3b, below=4pt of in, align=center]
-    {INPUT\\[3pt]
+    (inlab) {INPUT\\[3pt]
      \rotatebox{90}{\normalfont\LARGE\color{black!55}$=$}\\[3pt]
      \normalfont\large\itshape\color{black!55} directed multigraph};
 
@@ -824,7 +824,11 @@
 
   \node[iobox, fill=vertexorange!8, draw=vertexorange!45] (out) at (10.4,0)
     {\Large$\lmax_G\;=\;3$};
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, below=4pt of out] {OUTPUT};
+  % The matrix box is taller than the result box, so below=of each would put the
+  % two words at different heights. |- takes the x of the result box and the y
+  % of the INPUT line, which sets them on one line.
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, anchor=north]
+    at (out |- inlab.north) {OUTPUT};
 
   \draw[pipe] (in) -- (box);
   \draw[pipe] (box) -- (out);
