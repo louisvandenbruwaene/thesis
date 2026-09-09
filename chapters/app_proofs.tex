@@ -1661,7 +1661,7 @@ against $|X| - 1 = 1$. For $m = 4$ the analogous question asks for a different
 bound relative to $\kap \le 3$, taken apart along $3$-cuts rather than along
 separating pairs, and none is supplied here.
 A finite sweep at $m=4$ is discussed in \Cref{sec:variant-grids}, together
-with the limitations of its surviving record.
+with what it does and does not settle.
 \end{remark}
 
 \section{The multigraph incidence problems}\label{sec:multi-vertex}
@@ -2743,8 +2743,8 @@ It supplies the exhaustive computation the branch and bound could not, so the va
 The smallest analogous gap occurs at $n=r=m=3$.
 A simple hypergraph then has one hyperedge, while a multihypergraph attains the bound with two copies.
 
-\paragraph{Historical evidence at the next vertex threshold.}
-\Cref{thm:hyper-vertex-m3} establishes the vertex bound at $m=3$; its rank
+\paragraph{Finite evidence at the next vertex threshold.}
+\Cref{thm:hyper-vertex-m3} establishes the vertex bound at $m=3$, and its rank
 argument does not establish the $m=4$ case
 (\Cref{rem:hyper-vertex-m3-scope}). The standalone script
 \code{program/scripts/hyper\_vertex\_m4\_search.py} tests the proposed value
@@ -2755,20 +2755,25 @@ with one further hyperedge. Its eleven parameter pairs satisfy
 $4\le n\le9$, $r\in\{n-2,n-1\}$ and $r\ge3$.
 
 An archived research note dated 31 July 2026 reports that the target was
-attained and one further hyperedge excluded in all eleven cases. No separate
-raw completion transcript has been located, and these searches have not
-been rerun for this account. The results are therefore retained as historical
-reports, rather than added as independently audited exact values to the
-tables. The note also reports that the script's $r=2$ cross-check finds
-counterexamples at $m=5$, consistent with the multigraph witnesses discussed
-in \Cref{sec:multi-vertex}. These checks concern multihypergraphs, not only
-simple hypergraphs, and do not establish the formula for arbitrary $n,r$.
+attained and one further hyperedge excluded in all eleven cases. Both halves
+were rerun for this account and reproduce that outcome, in fourteen and
+thirteen seconds, and their transcript is
+\code{program/logs/hyper\_vertex\_m4\_log.txt}. Exhaustiveness rests on the
+script's own two prunings, that feasibility is monotone under adding hyperedges
+and that no prefix may leave two vertices in $m$ common hyperedges, so these
+pairs are recorded here rather than entered in the generated tables, which
+report the main program's own enumerations. The $r=2$ cross-check holds at
+$m=3$ and at $m=4$ and fails at $m=5$, where it returns a feasible multigraph
+of $13$ edges against the formula's $12$ at $n=4$ and $17$ against $16$ at
+$n=5$, consistent with the multigraph witnesses discussed in
+\Cref{sec:multi-vertex}. These checks concern multihypergraphs, not only simple
+hypergraphs, and do not establish the formula for arbitrary $n$ and $r$.
 
 For a hypergraph on $n$ vertices with $b$ hyperedges of size $r$ and connected
 incidence graph, the cycle rank is $b(r-1)-n+1$. At $m=4$, exceeding the
 displayed edge-count target is therefore equivalent to exceeding cycle rank
 $2(n-1)$. A stronger incidence-rank argument is one possible route to a
-general bound; the finite search does not supply it.
+general bound, and the finite search does not supply it.
 
 \Cref{tab:variant-values} gives the data from the four grids numerically.
 Blue entries are established, red entries are conjectural, and gold entries record lower bounds in open cases.
