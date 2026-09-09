@@ -3256,7 +3256,8 @@ def plot_degree_threshold(
     *measured* mean binding degree (in units of ``m``) against the probability
     that a sample already contains a pair of (Berge) edge-connectivity at least
     ``m``.  The vertical line at degree ``= m`` is the asymptotic threshold the
-    degree argument of thm:gnp-threshold predicts; at the fixed small ``m`` a
+    classical binomial-random-graph degree argument predicts (this thesis proves
+    no such theorem, and states none: the line is a reference, not a claim); at the fixed small ``m`` a
     computation can reach the curves are ORDERED rather than coincident -- a
     directed multigraph forces the pair at the least degree (heavy parallel edges
     concentrate connectivity), a directed hypergraph at the most (a hyperedge
@@ -5168,8 +5169,10 @@ def plot_conn_threshold_3d(
     which for a graph is p*(n-1) = m, giving p* = m/n, but for an r-uniform
     binomial hypergraph is p*C(n-1, r-1) = m, giving p* = m/C(n-1, r-1) =
     Theta(m/n^(r-1)).  Plotting the hypergraph panel against m/n would put the
-    line in the wrong place by a factor of order n^(r-2).  Only the graph panels
-    are covered by thm:gnp-threshold; the hypergraph panel is an observation.
+    line in the wrong place by a factor of order n^(r-2).  The classical random-graph
+    threshold argument covers only the graph panels, and the hypergraph panel is an
+    observation.  Neither is a result of this thesis, and this plot is exploratory:
+    it produces no thesis figure.
 
     Three panels: undirected edge (uses ``n``), directed arc (uses ``n``),
     hypergraph edge (uses min(n, 8) to keep flow computation fast).

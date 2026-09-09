@@ -656,6 +656,20 @@ At a fixed step interval it measures the exact value again.
 \Cref{sec:cheap-checker} gives the bookkeeping,
 and the regression test that holds the fast walk to the naive one step for step.
 
+\paragraph{An optional compiled helper.}
+The steps that do call the checker run inside the innermost loop, so the
+program can load a small C helper for them, \code{\_erdos\_fast.so}, built from
+the \code{\_erdos\_fast.c} shipped with the program. It supplies three routines:
+the capped max-flow and the canonical form used for isomorphism reduction, both
+taken at $n\le7$, and the pairwise excess predicate, taken at $n\le16$. Each
+call is guarded. The flow routines are used only when the capacities and the
+capped flow value fit in a signed $32$-bit integer, and the canonical key only
+at that same width, because the key is a byte encoding and a wider one would
+order the relabellings differently. When a guard fails, or when the helper was
+never built, the program runs the pure-Python routine instead. The two paths
+return the same values on every input either of them accepts, so the helper
+changes how long a search runs and never what it reports.
+
 \section{Rediscovering the known extremisers}\label{sec:rediscovery}
 
 Before addressing open cases, the search is tested on settled ones.

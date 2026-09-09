@@ -4,7 +4,8 @@ from pathlib import Path
 import re
 import unittest
 
-from check_proof_status import check_proof_status, strip_comments
+from check_proof_status import (
+    check_proof_status, conjecture_index, conjecture_table, strip_comments)
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = 'chapters/app_proofs.tex'
@@ -69,3 +70,38 @@ class ProofStatus(unittest.TestCase):
                     self.assertIn('CONJECTURE WITHOUT PROOF: ' + label,
                                   check_proof_status(changed))
         self.assertGreater(count, 0)
+
+
+class ConjectureIndex(unittest.TestCase):
+    """The generated index has to list the live conjectures, and only those."""
+
+    def live(self):
+        # The same sweep the --table generator uses, so a conjecture added to
+        # any chapter is compared rather than silently left out.
+        sources = {str(path.relative_to(ROOT)): path.read_text(encoding='utf-8')
+                   for path in sorted((ROOT / 'chapters').glob('*.tex'))}
+        return conjecture_index(sources), sources
+
+    def test_index_matches_the_live_conjectures(self):
+        rows, sources = self.live()
+        found = {label for label, _, _ in rows}
+        expected = set()
+        for source in sources.values():
+            expected |= set(re.findall(
+                r'\\begin\{conjecture\}\[[^\n]*\]\\label\{([^}]+)\}', source))
+        self.assertEqual(found, expected)
+        self.assertEqual(len(rows), len(found))
+
+    def test_every_row_carries_a_claim_without_its_status_suffix(self):
+        rows, _ = self.live()
+        for label, claim, _ in rows:
+            with self.subTest(label=label):
+                self.assertTrue(claim)
+                self.assertNotIn('with proof', claim)
+                self.assertNotIn(r'\aimedal', claim)
+
+    def test_generated_table_is_current(self):
+        rows, _ = self.live()
+        table = ROOT / 'figures' / 'conjecture_table.tex'
+        self.assertEqual(table.read_text(encoding='utf-8'), conjecture_table(rows),
+                         'run: .venv/bin/python3 check_proof_status.py --table')

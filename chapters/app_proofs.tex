@@ -27,6 +27,24 @@ Unmarked results are cited classical results or arguments the author has checked
 The latter group includes the Gomory--Hu double count of \Cref{sec:mader-gomory-hu}.
 That count proves \Cref{thm:mader,thm:multigraph-edge} from \Cref{lem:dist-1-count,lem:sum-dist,lem:double-count}.
 
+\Cref{tab:conjecture-index} indexes every statement that carries the badge, so
+a reader can separate the checked results from the proposed ones without
+reading the appendix through. The table is generated from the same source walk
+that enforces the marking, so a renamed or added conjecture changes its own row.
+
+\begin{table}[htbp]
+\centering\small
+\renewcommand{\arraystretch}{1.2}
+\input{figures/conjecture_table}
+\caption{Index of the statements whose proofs are proposed rather than checked.
+Each is stated as \emph{Conjecture, with proof} and carries \aimedal{} in its
+heading. The proposed arguments are retained as research notes and do not
+establish these statements. Some entries are dependencies of others: for
+instance \Cref{lem:equality-forces,lem:skeleton-shallow} are the two steps of
+\Cref{thm:dir-multi-uniqueness}.}
+\label{tab:conjecture-index}
+\end{table}
+
 % ---------------------------------------------------------------------------
 % These appendix figures use the SHARED thesis TikZ styles (../shared/tikz-
 % styles.tex), so they match the blue KU Leuven look of the body figures.  The
