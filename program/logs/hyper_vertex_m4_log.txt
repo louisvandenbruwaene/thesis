@@ -1,0 +1,23 @@
+m = 4: conjectured k_4^(r)(n) = floor(3(n-1)/(r-1))
+  n   r  target  target attained  target+1 feasible      verdict
+  4   3       4             True              False        holds
+  5   3       6             True              False        holds
+  5   4       4             True              False        holds
+  6   4       5             True              False        holds
+  6   5       3             True              False        holds
+  7   5       4             True              False        holds
+  7   6       3             True              False        holds
+  8   6       4             True              False        holds
+  8   7       3             True              False        holds
+  9   7       4             True              False        holds
+  9   8       3             True              False        holds
+
+r=2 cross-check: formula predicts (m-1)(n-1)
+  m=3 n=4: formula=  6 attained=True formula+1 feasible=False
+  m=3 n=5: formula=  8 attained=True formula+1 feasible=False
+  m=4 n=4: formula=  9 attained=True formula+1 feasible=False
+  m=4 n=5: formula= 12 attained=True formula+1 feasible=False
+  m=5 n=4: formula= 12 attained=True formula+1 feasible=True  <-- FORMULA FAILS
+      witness multiplicities {(0, 1): 4, (0, 2): 3, (0, 3): 3, (2, 3): 3} total=13
+  m=5 n=5: formula= 16 attained=True formula+1 feasible=True  <-- FORMULA FAILS
+      witness multiplicities {(0, 1): 4, (0, 2): 4, (0, 3): 3, (0, 4): 3, (3, 4): 3} total=17
