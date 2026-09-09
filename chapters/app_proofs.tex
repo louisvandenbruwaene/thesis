@@ -742,7 +742,7 @@ displayed cuts and identities and enumerates all $4094$ nontrivial cuts of the
 twelve-vertex example.
 
 The same example refutes the earlier decomposition conjecture. A partition
-with all arcs from a nonempty $A$ to $B$, no arcs inside $A$, and no arcs
+with all arcs from a non-empty $A$ to $B$, no arcs inside $A$, and no arcs
 from $B$ to $A$ would give
 \[
  |A(D)|\le |B|(n-|B|)+(m-2)|B|
@@ -874,7 +874,7 @@ For the two-sided asymptotic statement, \Cref{const:augmented-bipartite} gives
 so the second-order term is linear in $n$ from both sides.
 \end{proof}
 
-The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} gives its value at $m=2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family the larger of the two, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
+The second application is the directed \emph{vertex} problem. \Cref{thm:dir-vertex-m2-exact} gives its value at $m=2$, and for $m \ge 3$ this thesis has been careful to record that it does not follow from the arc case: Whitney's $\kap \le \lec$ makes the vertex-feasible family contain the arc-feasible one, so an arc upper bound restricts nothing there. That remains true of the \emph{bound}. What carries across is the route-counting, because the family \Cref{lem:feasible-budgeted} exhibits happens to be disjoint in the stronger sense as well, which is why that lemma is stated for both separations at once and why the argument never needs the arc value.
 
 \begin{proof}[Proof of \Cref{thm:dir-vertex-linear-error}]
 By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple digraph with $\kap^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
@@ -1769,7 +1769,7 @@ in range precisely when $m \ge 5$.
 \begin{proof}[Proposed proof]
 Write $G_0$ for the underlying simple graph.
 
-\emph{Feasibility.} Different clique copies and pendant edges meet only at their attachment vertices. Whenever such an attachment separates two nonempty pieces, it is a cut vertex. So a path of length $\ge 2$ between two vertices of the same block cannot leave that block and come back: to do so it would have to pass through the shared vertex twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside its $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally-disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or nonadjacent with either endpoint on the pendant path, a single cut vertex separates them, so $\kap_G(u,v) \le 1$. If $u,v$ are adjacent along the pendant path, then the edge lies on no cycle, and \Cref{lem:multi-vertex-split} gives $\kap_G(u,v)=\mu(u,v)+\pi(u,v)=(m-1)+0=m-1$.
+\emph{Feasibility.} Different clique copies and pendant edges meet only at their attachment vertices. Whenever such an attachment separates two non-empty pieces, it is a cut vertex. So a path of length $\ge 2$ between two vertices of the same block cannot leave that block and come back: to do so it would have to pass through the shared vertex twice. Hence for an edge $uv$ inside a block, every route counted by $\pi(u,v)$ stays inside its $K_r$, where deleting $uv$ leaves $u,v$ joined by exactly $r-2$ pairwise internally disjoint two-step routes, one through each of the other block vertices, and by Menger no more, since those same $r-2$ vertices are a cut of that size. So $\pi(u,v) = r-2$ and, by \Cref{lem:multi-vertex-split}, $\kap_G(u,v) = q + (r-2) = m-1$ exactly, never over. For $u,v$ in different blocks, or non-adjacent with either endpoint on the pendant path, a single cut vertex separates them, so $\kap_G(u,v) \le 1$. If $u,v$ are adjacent along the pendant path, then the edge lies on no cycle, and \Cref{lem:multi-vertex-split} gives $\kap_G(u,v)=\mu(u,v)+\pi(u,v)=(m-1)+0=m-1$.
 
 \emph{Count.} Since $q \ge 1$, every block edge is present, so $G_0$ is connected and $|E(G_0)| = n - 1 + \mathrm{rank}(G_0)$. This is where the hypothesis $r \le m$ is used: at $r = m+1$ the multiplicity $q$ would drop to zero, the blocks would carry no edges at all, and $G_0$ would fall apart into isolated vertices. Only the $k$ blocks contribute to $\mathrm{rank}(G_0)$ or to $\sum \pi$, since the pendant edges have $\pi = 0$ and lie in no cycle. Each $K_r$ has rank $(r-1)(r-2)/2$ and contributes $\binom{r}{2}(r-2)$ to the sum, since each of its $\binom{r}{2}$ edges has $\pi = r-2$. Substituting into $(m-1)(n-1+\mathrm{rank}(G_0)) - \sum \pi$,
 \[
@@ -1789,7 +1789,7 @@ The clique bouquet need not be optimal. At $m = 5$, $n = 7$ the best clique bouq
 $27$ and the block computation of \Cref{tab:multi-vertex-blocks} gives $29$.
 The proposed construction would give a quadratic-in-$m$ lower bound once many
 blocks fit. A matching upper bound would require the next, unchecked
-proposition; it comes from the underlying simple graph rather than cycle rank.
+proposition. It comes from the underlying simple graph rather than cycle rank.
 
 \begin{conjecture}[An upper bound of the same order, with proof,\aimedal]\label{prop:multi-vertex-upper}
 For all $m \ge 2$ and $n \ge 2$,
@@ -2405,7 +2405,7 @@ separations, and the bipartite construction of \Cref{prop:dir-hyper-first} is
 asymptotically optimal for it too.
 \end{theorem}
 
-Allowing arbitrary nonempty tail and head sets in addition to forward hyperedges does not change the leading term. The general model still contains the forward construction that supplies the lower bound. This does not assert the same constant for a model restricted to one prescribed tail-set size. With \Cref{lem:dir-hyper-duality}, the result compares the forward, backward and general models to first order.
+Allowing arbitrary non-empty tail and head sets in addition to forward hyperedges does not change the leading term. The general model still contains the forward construction that supplies the lower bound. This does not assert the same constant for a model restricted to one prescribed tail-set size. With \Cref{lem:dir-hyper-duality}, the result compares the forward, backward and general models to first order.
 
 \begin{proof}
 Let $R$ be the one-step shadow read in the general model, so $(u,v) \in A(R)$

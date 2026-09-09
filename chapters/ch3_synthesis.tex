@@ -245,7 +245,7 @@ separate established results, conjectures with proofs and finite evidence.}
 Model & Edge or arc separation & Vertex separation \\
 \midrule
 Simple graph & Exact edge formula established & Classical exact values for $m\le5$, open for $m\ge6$ \\
-Multigraph & $(m-1)(n-1)$ established & $m=2,3$ established; proposed general block reduction \\
+Multigraph & $(m-1)(n-1)$ established & $m=2,3$ established, with a proposed general block reduction \\
 Simple hypergraph & Cut bound established, attainment on a stated range & $m=2$ established, $m=3$ bound established with stated attainment, higher thresholds open \\
 Multihypergraph & Same established cut bound, with additional repeated-edge constructions & $m=2$ established, $m=3$ bound and stated attainment established \\
 Simple digraph & Exact $m=2$ value established, with the literature fixing the asymptotic order for $m\ge3$ & Same asymptotic order, with equality to the arc value open for $m\ge3$ \\
@@ -313,7 +313,7 @@ construction give $K_3(n)=2(n-1)$
 (\Cref{thm:hyper-vertex-m3,prop:hyper-vertex-lower-multi}). Finite exhaustive values agree with it.
 At $m=4$ the computed block scores through eight vertices agree with the
 thickened-tree rate. Turning these into whole-graph optima requires the
-proposed block reduction; no general equality is established here. At $m=5$ direct exhaustion
+proposed block reduction, and no general equality is established here. At $m=5$ direct exhaustion
 already gives $K_5(4)=14>L_5(4)=12$.
 
 The proposed block reduction explains how a favourable small support could
@@ -470,7 +470,7 @@ $1/4$, so the simple hypergraph conclusion must keep its $r\ge3$ hypothesis.
 
 Orientation introduces another distinction. The backward model has a single
 head and is paired with the forward model by reversing all routes. The
-general model permits every nonempty tail--head split. The
+general model permits every non-empty tail--head split. The
 reversal proof and general-shadow argument are given in
 \Cref{lem:dir-hyper-duality,thm:dir-hyper-general-constant}. They give the
 same leading term for forward, backward and general hypergraphs. This does

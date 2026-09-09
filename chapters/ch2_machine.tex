@@ -33,10 +33,10 @@ If the enumeration cannot finish within the time limit, the best graph so far is
 It is therefore important to distinguish between the densest graph possible and the densest graph found.
 A completed enumeration gives an exact extremal value. An unfinished enumeration gives only a lower bound.
 In the vertex-disjoint and hypergraph cases the graph will be transformed before the flow can be measured.
-This ensures that every variant shares the same integer max-flow engine no matter the implementation.
+This ensures that every variant shares the same integer max-flow engine.
 Thus the whole question reduces to a flow computation:
-A \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
-Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges/arcs in a minimum cut.
+a \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
+Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges or arcs in a minimum cut.
 For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities.
 For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$.
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
@@ -78,11 +78,11 @@ For a multigraph the arc carrying an adjacency keeps its full capacity
 $\mu(u,v)$, and only the internal arc of a vertex is a unit. That is the
 incidence convention of \Cref{sec:incidence-convention} written as a network:
 parallel copies stay separate routes while the vertex they run through does not.
-The split network measures $\kap_G(u,v)$ for the supplied graph and endpoints;
-maximising over endpoint pairs tests feasibility, and maximising the edge count
+The split network measures $\kap_G(u,v)$ for the supplied graph and endpoints.
+Maximising over endpoint pairs tests feasibility, and maximising the edge count
 over feasible graphs gives $K_m(n)$ or $K_m^{\mathrm{dir}}(n)$.
 Notice how the undirected or hypergraph transformation is done beforehand and
-the gates aren't split by this step.
+the gates are not split by this step.
 
 \begin{figure}[htbp]
 \centering
