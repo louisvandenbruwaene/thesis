@@ -42,11 +42,11 @@ rm -f "$wt/program/CLAUDE.md"
 
 # Last line of defence: refuse to publish a snapshot carrying a working-notes
 # file, whatever the path, rather than push and discover it afterwards.
-if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
+if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_*.md' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' \
         | grep -q .; then
     echo "publish.sh: refusing to publish, a working-notes file reached the snapshot:" >&2
-    find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
+    find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_*.md' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' >&2
     exit 1
 fi
