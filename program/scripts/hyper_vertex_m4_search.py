@@ -1,6 +1,6 @@
 """Search for a counterexample to k_m^(r)(n) = floor((m-1)(n-1)/(r-1)).
 
-Backs research_notes/hyper_vertex_m4.md. Self-contained: standard library
+Backs old_stuff/research_notes/hyper_vertex_m4.md. Self-contained: standard library
 only, own Edmonds-Karp, own incidence-graph model, no dependence on the
 thesis program it corroborates.
 

@@ -21,7 +21,8 @@ thesis's own function; the tabu searcher is implemented here:
 
 Fairness: both are given the same wall-clock budget per case and the same random
 seeds across restarts; we compare the best feasible edge count reached and the
-time to first reach the known optimum.  Run from anywhere.
+time spent searching. The comparison target is a construction value, not
+necessarily a proved optimum. Run from anywhere.
 """
 from __future__ import annotations
 
@@ -159,7 +160,7 @@ def run(cases, budget=6.0):
     print("=" * 76)
     print(f"TABU vs SIMULATED ANNEALING   (equal {budget:.0f}s wall-clock per method)")
     print("SA = the thesis's own best_of_searches (independent annealer restarts).")
-    print(f"{'variant':<18} {'n':>2} {'m':>2} | {'opt':>4} | "
+    print(f"{'variant':<18} {'n':>2} {'m':>2} | {'C':>4} | "
           f"{'SA best':>7} | {'tabu best':>9} | verdict")
     print("-" * 76)
     for variant, n, m in cases:
@@ -185,9 +186,9 @@ def run(cases, budget=6.0):
                    f"TABU +{tb_best - sa_best}" if tb_best > sa_best else
                    f"SA +{sa_best - tb_best}")
         if opt is not None:
-            verdict += (" (both opt)" if sa_best >= opt and tb_best >= opt else
-                        " (tabu=opt)" if tb_best >= opt else
-                        " (SA=opt)" if sa_best >= opt else " (neither opt)")
+            verdict += (" (both reach C)" if sa_best >= opt and tb_best >= opt else
+                        " (tabu reaches C)" if tb_best >= opt else
+                        " (SA reaches C)" if sa_best >= opt else " (neither reaches C)")
         opts = str(opt) if opt is not None else " ?"
         print(f"{variant.name:<18} {n:>2} {m:>2} | {opts:>4} | "
               f"{sa_best:>7} | {tb_best:>9} | {verdict}")

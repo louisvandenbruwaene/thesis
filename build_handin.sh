@@ -33,17 +33,18 @@ git show HEAD:main.pdf > "$stage/bundle/main.pdf"
 
 # Last line of defence, the same one publish.sh runs: refuse to hand in a
 # bundle carrying a working-notes file, whatever the path.
-if find "$stage/bundle" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+if find "$stage/bundle" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' \
         | grep -q .; then
     echo "build_handin.sh: refusing to build, a working-notes file reached the bundle:" >&2
-    find "$stage/bundle" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+    find "$stage/bundle" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' >&2
     exit 1
 fi
 
 if [ -e handin ] || [ -L handin ]; then
-    previous=$(mktemp -d handin.previous.XXXXXX)
+    mkdir -p old_stuff/builds
+    previous=$(mktemp -d old_stuff/builds/handin.previous.XXXXXX)
     mv handin "$previous/handin"
     echo "Previous bundle retained in $previous/handin"
 fi

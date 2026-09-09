@@ -469,7 +469,7 @@ def block_bouquet_lower_bound(n: int, m: int) -> int:
     ``b = 2`` is the single edge at multiplicity ``m-1``, so the thickened tree is
     the ``b = 2`` case and this is never worse than it.  It returns the tree's
     ``(m-1)(n-1)`` at ``m <= 4``, where no better block is known and the value is
-    settled only at ``m <= 2``, and beats it from ``m = 5`` on, where
+    settled at ``m <= 3``, and beats it from ``m = 5`` on, where
     ``thm:clique-chain-vertex`` proposes that the tree is not extremal.
 
     Everything this returns is a LOWER bound: the knapsack reduction it follows
@@ -651,13 +651,14 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         # panel, hypergraphs included, still draws a conjecture.
         directed_proved = kw["directed"] and not is_hyper and (
             (not kw.get("simple", True) and kw["separation"] == "edge")
-            or (kw.get("simple", True) and m == 2))
+            or m == 2)
         # Hypergraph curves carry proved upper bounds, not claims of equality.
         # The edge cut bound holds for every m, and the vertex rank bound for
         # m <= 3. Higher-threshold vertex rows have no theorem curve above.
         conjectural = (not is_hyper and (
             (kw["directed"] and not directed_proved) or
-            (not kw.get("simple", True) and kw["separation"] == "vertex" and m > 2)))
+            (not kw["directed"] and not kw.get("simple", True)
+             and kw["separation"] == "vertex" and m > 3)))
         curve_key = "conj" if conjectural else "proved"
         panel = dict(
             status=("conjectured" if conjectural else "proved") if theorem else "open",

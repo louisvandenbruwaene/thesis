@@ -5,6 +5,20 @@ import unittest
 from unittest.mock import patch
 
 from scripts import review_simplified_proofs as review
+from scripts.quadratic_branch_uniqueness import routes_at_least
+from scripts.two_step_budget_check import kappa_dir
+
+
+class IndependentFlowRegressions(unittest.TestCase):
+    def test_arc_flow_can_reroute_an_earlier_path(self):
+        # BFS first takes 0-1-3-5. A second route requires cancelling 1-3.
+        arcs = {(0, 1), (0, 2), (1, 3), (1, 4), (2, 3), (3, 5), (4, 5)}
+        self.assertTrue(routes_at_least(dict.fromkeys(arcs, 1), 6, 0, 5, 2))
+        self.assertFalse(routes_at_least(dict.fromkeys(arcs, 1), 6, 0, 5, 3))
+
+    def test_direct_arc_counts_as_one_vertex_disjoint_route(self):
+        self.assertEqual(kappa_dir(2, {(0, 1)}, 0, 1), 1)
+        self.assertEqual(kappa_dir(3, {(0, 1), (0, 2), (2, 1)}, 0, 1), 2)
 
 
 class SeparatingPairBookkeeping(unittest.TestCase):

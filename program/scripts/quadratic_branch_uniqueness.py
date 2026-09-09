@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Extremal UNIQUENESS for directed multigraphs on the quadratic branch.
 
-Backs research_notes/quadratic_branch_uniqueness.md and the thesis result
+Backs old_stuff/research_notes/quadratic_branch_uniqueness.md and the thesis result
 thm:dir-multi-uniqueness.
 
 thm:dir-multi-full peels m-1 reachability skeletons, each of at most
@@ -20,8 +20,10 @@ f(q) = 2(n-q) + floor(q^2/4) is UNIQUELY maximised at q = n, which forces:
 
 This script checks the conclusion directly: a DFS over mu(i,j) in {0..m-1} for
 i < j (that is, over acyclic multigraphs in a fixed topological order) with the
-degree constraint and the monotone-feasibility prune, enumerating every
-extremal multigraph.  The claim is that the only one is (m-1)*B(n/2,n/2).
+degree constraint and the monotone-feasibility prune. Completeness for all
+extremisers depends on the proposed structural reduction above; this script
+only enumerates its regular acyclic candidate family. The conjectured full
+classification in the thesis is restricted to n >= max(8, 2*m).
 
 Self-contained: standard library only, own capped arc-disjoint-route counter.
 
@@ -54,13 +56,14 @@ def routes_at_least(mu: dict, n: int, s: int, t: int, k: int) -> bool:
         v = t
         while par[v] is not None:
             res[(par[v], v)] -= 1
+            res[(v, par[v])] = res.get((v, par[v]), 0) + 1
             v = par[v]
         found += 1
     return True
 
 
 def enumerate_extremal(n: int, m: int, verbose: bool = True):
-    """Every extremal multigraph on the quadratic branch, up to relabelling."""
+    """Regular acyclic candidates on the even-order quadratic branch."""
     assert n % 2 == 0, "the exact-regularity step needs n even"
     assert (n * n) // 4 > 2 * (n - 1), "n must be on the quadratic branch"
     target = (m - 1) * ((n * n) // 4)

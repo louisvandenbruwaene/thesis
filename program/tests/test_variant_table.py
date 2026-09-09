@@ -151,6 +151,11 @@ class DirectedHypergraphLowerBound(unittest.TestCase):
 
 
 class VariantTableClaims(unittest.TestCase):
+    def test_m3_multigraph_vertex_curve_uses_the_established_upper_bound(self):
+        panel = gather_variant_grid(3)[5]
+        self.assertEqual(panel["status"], "proved")
+        self.assertEqual(_panel_cell(panel, 8), ("14", "vtProved", False))
+
     def _bound_panel(self, attained):
         return {
             "proved": ([6], [12]),

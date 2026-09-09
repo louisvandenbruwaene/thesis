@@ -107,7 +107,8 @@ def run_pipeline(n: int, tool: str = "directg", arc_count: int | None = None):
         cmd = f"geng -q {n} | watercluster2 T"
     else:
         raise ValueError(f"unknown tool {tool!r}")
-    res = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+    res = subprocess.run(["bash", "-o", "pipefail", "-c", cmd],
+                         capture_output=True, text=True, check=True)
     graphs = _parse_text_digraphs(res.stdout, n)
     if tool == "watercluster2" and arc_count is not None:
         graphs = [mu for mu in graphs if int(mu.sum()) == arc_count]
@@ -130,7 +131,8 @@ def count_pipeline(n: int, tool: str = "directg") -> int:
         cmd, pat = f"geng -q {n} | watercluster2", r"graphs:\s*(\d+)"
     else:
         raise ValueError(f"unknown tool {tool!r}")
-    res = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+    res = subprocess.run(["bash", "-o", "pipefail", "-c", cmd],
+                         capture_output=True, text=True, check=True)
     blob = res.stdout + res.stderr
     match = re.search(pat, blob)
     if not match:

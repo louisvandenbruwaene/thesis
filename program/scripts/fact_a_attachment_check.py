@@ -40,7 +40,7 @@ from collections import deque
 
 import numpy as np
 
-LOGDIR = "/Users/chief/Projects/thesis/program/logs"
+LOGDIR = Path(__file__).resolve().parents[1] / "logs"
 CAP = 2          # feasibility threshold: lambda^max <= 2  (m = 3)
 
 
@@ -177,6 +177,8 @@ def run_case(npz_path: str, dmin: int, label: str,
              crosscheck: bool = False) -> int:
     data = np.load(npz_path)
     keys = sorted(data.files, key=lambda k: int(k[1:]))
+    if not keys:
+        raise ValueError("Empty class archive cannot certify an exhaustive attachment check")
     print(f"{label}: {len(keys)} classes from {npz_path}", flush=True)
     if crosscheck:
         _crosscheck_classes(data, keys, dmin)
@@ -273,8 +275,8 @@ def main() -> None:
     survivors += run_case(f"{LOGDIR}/n6_t18_classes.npz", 7,
                           "case B (delta=7, 18-arc H)", crosscheck)
     if survivors == 0:
-        print("FACT (a) PROVED along the delta-split route: "
-              "L_3^dir(7) = 24, M*(7) = 12.", flush=True)
+        print("No attachments survive. Given complete input classifications and "
+              "the stated reduction, this proves L_3^dir(7) = 24.", flush=True)
     else:
         print("fact (a) REFUTED: inspect the survivors above.", flush=True)
 

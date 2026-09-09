@@ -67,4 +67,4 @@ git tag "$tag" "$commit"
 
 echo "revision.tex written: $short (tag $tag, $date)"
 echo "Now rebuild:  latexmk -pdf -g main.tex   (-g is required, see the header)"
-echo "Then push the tag:  git push origin $tag"
+echo "Then push the source tag to the private remote:  git push backup $tag"

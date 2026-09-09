@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verification for the two-step budget lemma and its three consequences.
 
-Backs research_notes/two_step_budget.md and, through it, the thesis results
+Backs old_stuff/research_notes/two_step_budget.md and, through it, the thesis results
 lem:two-step-budget, thm:dir-vertex-linear-error, thm:dir-hyper-constant and
 prop:multi-vertex-upper.
 
@@ -105,7 +105,7 @@ def kappa_dir(n, arcs, u, v) -> int:
     for x in range(n):
         cap[(("in", x), ("out", x))] = INF if x in (u, v) else 1
     for (a, b) in arcs:
-        cap[(("out", a), ("in", b))] = INF
+        cap[(("out", a), ("in", b))] = 1
     return maxflow(cap, ("out", u), ("in", v))
 
 

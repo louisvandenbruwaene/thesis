@@ -60,6 +60,9 @@ offcuts.pdf
 handin/
 .handin-build.*/
 handin.previous.*/
+old_stuff/builds/
+old_stuff/references/
+.publish-build.*/
 
 # Everything else in this working tree IS tracked, on the private main branch.
 # The public repository at origin is a generated snapshot built by publish.sh

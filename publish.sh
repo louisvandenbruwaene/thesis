@@ -22,6 +22,10 @@ fi
 
 src=$(git rev-parse --short=12 HEAD)
 wt=.public-snapshot
+stage=$(mktemp -d "$PWD/.publish-build.XXXXXX")
+trap 'rm -rf "$stage"' 0
+# Check archive creation before replacing anything in the public worktree.
+git archive --format=tar HEAD main.pdf program README.md > "$stage/snapshot.tar"
 
 git fetch -q origin
 git worktree remove --force "$wt" 2>/dev/null || true
@@ -29,7 +33,7 @@ git worktree add -q -B public "$wt" origin/main
 
 # Replace the snapshot wholesale, so a file deleted on main disappears here too.
 find "$wt" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-git archive HEAD main.pdf program README.md | tar -x -C "$wt"
+tar -xf "$stage/snapshot.tar" -C "$wt"
 
 # Whole directories are copied above, so anything private living INSIDE one has
 # to be named here. program/CLAUDE.md is the program's development history and
@@ -38,11 +42,11 @@ rm -f "$wt/program/CLAUDE.md"
 
 # Last line of defence: refuse to publish a snapshot carrying a working-notes
 # file, whatever the path, rather than push and discover it afterwards.
-if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' \
         | grep -q .; then
     echo "publish.sh: refusing to publish, a working-notes file reached the snapshot:" >&2
-    find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_STATUS.md' \
+    find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW*' \
         -o -iname 'SIMPLIFIED_AI_PROOFS*' -o -iname 'PLAN_*' -o -iname 'mistakes found*' >&2
     exit 1
 fi

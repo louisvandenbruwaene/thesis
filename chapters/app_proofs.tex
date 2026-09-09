@@ -1162,7 +1162,7 @@ hypergraph whose incidence graph is a tree.
 $(r-1)|E(\HH)| \le (m-1)(n-1)$. Dividing and rounding down, because
 $|E(\HH)|$ is an integer, gives the stated floor.
 
-\emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the hypergraph whose hyperedges are $\{h\} \cup G_i$, one per group. Its incidence graph is a tree, so this shape is called a \emph{star hypertree}. Give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges. That conjecture assumes $r \ge 3$, which leaves only $r = 2$, and there the hypothesis reads $m-1 \le \binom{n-2}{0} = 1$, forcing $m = 2$. The floor is then $n-1$ and a spanning tree attains it, with no repeated edge and every local edge-connectivity equal to one.
+\emph{Lower bound.} When $(r-1) \mid (n-1)$, take a hub $h$ and split the other $n-1$ vertices into groups $G_1, G_2, \dots$ of size $r-1$ each. Form the hypergraph whose hyperedges are $\{h\} \cup G_i$, one per group. Its incidence graph is a tree, so this shape is called a \emph{star hypertree}. Give each hyperedge multiplicity $m-1$. Every non-hub vertex lies in exactly $m-1$ hyperedges, which form a cut isolating it, so by \Cref{thm:menger-hyper} every pair has Berge connectivity at most $m-1$, while the count is $\frac{(m-1)(n-1)}{r-1}$. For general $n$ under the hypothesis $m-1 \le \binom{n-2}{r-2}$, \Cref{thm:simple-hyper-edge} below attains the floor exactly, without even needing repeated hyperedges. That theorem assumes $r \ge 3$, which leaves only $r = 2$, and there the hypothesis reads $m-1 \le \binom{n-2}{0} = 1$, forcing $m = 2$. The floor is then $n-1$ and a spanning tree attains it, with no repeated edge and every local edge-connectivity equal to one.
 \end{proof}
 
 The next theorem avoids multiplicities throughout its stated range: for $r \ge 3$ and $m-1\le\binom{n-2}{r-2}$, \emph{simple} $r$-uniform hypergraphs already attain the same bound. This is in sharp contrast to the graph case $r = 2$, where simplicity costs the factor that separates Mader's $\floor{m(n-1)/2}$ from the multigraph value $(m-1)(n-1)$.
@@ -1709,7 +1709,7 @@ $K_3(n) = 2(n-1)$ for every $n \ge 2$.
 The upper bound is \Cref{thm:hyper-vertex-m3} at $r = 2$, where the displayed bound $q(r-1) \le 2(n-1)$ reads $q \le 2(n-1)$ and $q$ is the total multiplicity. Its proof asks only that hyperedge-nodes have degree $r \ge 2$, which holds at $r = 2$. For the lower bound take a spanning tree and give every edge multiplicity two. A tree edge $uv$ has $\pi(u,v) = 0$, so $\kap(u,v) = 2$ by \Cref{lem:multi-vertex-split}, and a non-adjacent pair is joined by the unique tree path, so $\kap = 1$. Nothing exceeds $2 = m-1$, and the count is $2(n-1)$.
 \end{proof}
 
-At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives agreement for every tested $n \le 8$, since $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}; extending that conclusion to every $n$ still depends on the unchecked block reduction and is open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}. Turning these block scores into values of $K_4(n)$, even within the tested block range, depends on the unchecked block reduction; agreement for every $n$ remains open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
 
 \begin{itemize}
     \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
@@ -1761,7 +1761,7 @@ At $r = 3$, $\mathrm{gain}(3,m) = m-4$: zero at $m = 4$, matching the absence of
 
 Sharing a vertex lets more clique blocks fit. Disjoint copies of $K_r$ use $r$ vertices each, even when bridges join them, so at most $\lfloor n/r \rfloor$ copies fit. With one shared vertex, each new copy instead uses only $r-1$ new vertices. For example, at $m = 10$, $r = 6$ and $n = 11$, two shared-vertex copies carry $150$ edges counted with multiplicity. Only one disjoint copy fits, carrying $75$, and attaching the five remaining vertices by bridges of multiplicity $9$ brings its count to $120$.
 
-Optimising $r$ widens the gap further. Treated as continuous, the gain per added vertex, which is $\mathrm{gain}(r,m)/(r-1)$, peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$. Packing blocks of that size therefore gives $K_m(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1-O(m))$. In particular the per-vertex rate is quadratic in $m$ once $n/m\to\infty$, a different order from the tree's linear rate.
+Optimising $r$ widens the gap further. Treated as continuous, the gain per added vertex, which is $\mathrm{gain}(r,m)/(r-1)$, peaks near $r \sim (m+1)/2$, where it is $\Theta(m^2)$. Subject to the proposed construction, packing blocks of that size would give $K_m(n) \ge \bigl((m-1) + \Theta(m^2)\bigr)(n-1-O(m))$. In particular the per-vertex rate is quadratic in $m$ once $n/m\to\infty$, a different order from the tree's linear rate.
 
 The clique bouquet need not be optimal. At $m = 5$, $n = 7$ the best clique bouquet uses three triangles and gives
 $27$ and the block computation of \Cref{tab:multi-vertex-blocks} gives $29$.
@@ -1887,8 +1887,8 @@ in \Cref{sec:transcripts}.
   \caption[Best score of one block]{$g_m(b)$, the largest $W_m$ a single
   $2$-connected block on $b$ vertices can score, by exhaustion over every
   $2$-connected graph of that order. A dash marks a size at which no feasible
-  block exists, which at $m=2$ is every $b \ge 3$. Feeding this row into the
-  knapsack of \Cref{thm:multi-vertex-blocks} gives $K_m(n)$ for $n \le 8$. At
+  block exists, which at $m=2$ is every $b \ge 3$. Under the proposed reduction,
+  feeding this row into the knapsack of \Cref{thm:multi-vertex-blocks} would give $K_m(n)$ for $n \le 8$. At
   $m=5$, $n=7$ it returns the $29$ quoted above, against the $27$ that
   \Cref{thm:clique-chain-vertex} reaches. The per-vertex rate $g_m(b)/(b-1)$ is
   still rising at $b=8$ in every row from $m=5$ on, while at $m=3$ it falls and
@@ -1898,11 +1898,14 @@ in \Cref{sec:transcripts}.
 \end{table}
 
 One cell beyond the table is known. An exhaustive sweep of the $2$-connected
-graphs on nine vertices gives $g_6(9) = 54$, attained by a block with fourteen
+graphs on nine vertices with at least fourteen edges gives $g_6(9) = 54$, attained by a block with fourteen
 edges, run from the standalone script
 \code{program/scripts/multi\_vertex\_blocks\_b9.py}. A single block of that order
 beats every split of the same budget, the best of which reach $52$, so
-$K_6(9) = 54$. Its rate $54/8$ exceeds the $47/7$ of $b=8$, which is the $m=6$
+$K_6(9) = 54$ would follow from the proposed block reduction. Supports with
+at most thirteen edges cannot improve the score: each edge contributes at
+most $m-2=4$, so their score is at most $52$.
+The rate $54/8$ exceeds the $47/7$ of $b=8$, which is the $m=6$
 row still rising at $b=9$ exactly as the caption warns.
 
 The winning blocks are never complete once $b \ge 5$, and from $m = 4$ on their

@@ -201,7 +201,7 @@ construction proves a lower bound even when its optimality remains open.
   \node[vtleaf, fill=regimeOpen!22]        (l3)  at (3.6,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l4)  at (4.8,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
-  \node[vtleaf, fill=regimePartial!20]     (l6)  at (7.2,0)  {edge};
+  \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
   \node[vtleaf, fill=regimeOpen!22]        (l7)  at (8.4,0)  {vertex};
   \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
@@ -245,7 +245,7 @@ separate established results, conjectures with proofs and finite evidence.}
 Model & Edge or arc separation & Vertex separation \\
 \midrule
 Simple graph & Exact edge formula established & Classical exact values for $m\le5$, open for $m\ge6$ \\
-Multigraph & $(m-1)(n-1)$ established & $m=2$ established, then a proposed general $m=3$ value and block reduction \\
+Multigraph & $(m-1)(n-1)$ established & $m=2,3$ established; proposed general block reduction \\
 Simple hypergraph & Cut bound established, attainment on a stated range & $m=2$ established, $m=3$ bound established with stated attainment, higher thresholds open \\
 Multihypergraph & Same established cut bound, with additional repeated-edge constructions & $m=2$ established, $m=3$ bound and stated attainment established \\
 Simple digraph & Exact $m=2$ value established, with the literature fixing the asymptotic order for $m\ge3$ & Same asymptotic order, with equality to the arc value open for $m\ge3$ \\
@@ -307,10 +307,12 @@ The vertex problem counts edge copies as separate routes. It therefore does
 not reduce to the simple vertex problem. For a fixed simple support,
 \Cref{lem:multi-vertex-split} separates parallel one-edge routes from longer
 detours. At $m=2$ this forces a forest with multiplicity one and gives
-$K_2(n)=n-1$. The proposed general $m=3$ value is $2(n-1)$, deduced at $r=2$ from the
-incidence-rank bound. Finite exhaustive values agree with it.
-At $m=4$ agreement with the edge value is observed through eight vertices,
-but no general equality is established here. At $m=5$ direct exhaustion
+$K_2(n)=n-1$. At $m=3$, the incidence-rank bound at $r=2$ and the doubled-tree
+construction give $K_3(n)=2(n-1)$
+(\Cref{thm:hyper-vertex-m3,prop:hyper-vertex-lower-multi}). Finite exhaustive values agree with it.
+At $m=4$ the computed block scores through eight vertices agree with the
+thickened-tree rate. Turning these into whole-graph optima requires the
+proposed block reduction; no general equality is established here. At $m=5$ direct exhaustion
 already gives $K_5(4)=14>L_5(4)=12$.
 
 The proposed block reduction explains how a favourable small support could
@@ -419,8 +421,10 @@ but that value now follows from the checked general theorem.
 For vertex separation, multiplicity and longer detours can favour different
 constructions. Direct enumeration gives $K_6^{\mathrm{dir}}(3)=24$, whereas
 the established arc maximum at that order is twenty arcs. Thus the arc construction
-is not even a universal finite optimum for the vertex problem. The proposed
-leading term is $(m-1)n^2/4+O_m(n)$, with proposed lower constructions from
+is not even a universal finite optimum for the vertex problem. The checked
+shadow bound at $r=2$, together with the bipartite lower construction, gives
+$K_m^{\mathrm{dir}}(n)=(m-1)n^2/4+O_m(n)$
+(\Cref{thm:dir-hyper-constant}), with proposed lower constructions from
 thickened complete digraph blocks at small orders and the bipartite family
 at large orders. The exact correction and the most effective block shapes
 remain open (\Cref{cor:dir-multi-incidence,prop:dir-multi-vertex-blocks}).
@@ -474,8 +478,8 @@ once $n>r$.
 The plotted experiments use rank three and the forward convention. They do
 not constitute an exhaustive comparison of the three orientation models.
 Standalone checks of general orientations are described in the appendix.
-The remaining tasks are to verify the proposed general bounds and then
-determine finite exact values and any next-order differences between models.
+The remaining tasks are to determine finite exact values and any next-order
+differences between models.
 
 \subsection{Reading the finite data}
 

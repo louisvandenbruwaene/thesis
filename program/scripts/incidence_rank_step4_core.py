@@ -39,7 +39,7 @@ def partitions(G):
 
 def search(n):
     out = subprocess.run(['geng', '-q', '-c', '-d3', str(n)],
-                         capture_output=True, text=True).stdout.split()
+                         capture_output=True, text=True, check=True).stdout.split()
     kept = 0
     for g6 in out:
         G = nx.from_graph6_bytes(g6.encode())
