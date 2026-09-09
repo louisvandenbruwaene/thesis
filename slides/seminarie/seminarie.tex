@@ -10,13 +10,18 @@
 %
 %  Build:  cd slides/seminarie && latexmk -pdf seminarie.tex
 % ============================================================================
-\documentclass[aspectratio=1610,11pt]{beamer}
+% kulakbeamer is KU Leuven's own corporate beamer class, vendored here beside
+% the deck with the four assets its `kul' option loads: the background, the
+% title page, the outline page and the logo. It supplies the house palette
+% (KULblauw1/3a/3b below are its own values), the frame titles, the footline
+% and the title page, so this file sets none of those itself.
+\documentclass[kul,aspectratio=169]{kulakbeamer}
 
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
 \usepackage{amsmath,amssymb}
+% Latin Modern Sans, which the class loads, has no italic shape. Substituting
+% the slanted one lets \emph and \textit work without a font-shape warning.
+\DeclareFontShape{T1}{lmss}{m}{it}{<->ssub*lmss/m/sl}{}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{multirow}
@@ -147,38 +152,29 @@
 % ============================================================================
 %  THEME
 % ============================================================================
-\setbeamertemplate{navigation symbols}{}
-\usefonttheme{professionalfonts}
-\setbeamercolor{structure}{fg=KULblauw1}
-\setbeamercolor{frametitle}{fg=KULblauw3b}
-\setbeamercolor{title}{fg=KULblauw3b}
-\setbeamercolor{normal text}{fg=black!88}
-\setbeamercolor{itemize item}{fg=KULblauw1}
-\setbeamerfont{frametitle}{series=\bfseries,size=\large}
-\setbeamerfont{title}{series=\bfseries}
+% The class already sets the navigation symbols, the frame title, the footline,
+% the palette and the margins. The only things added here are the deck's own
+% bullet and a frame title that keeps its rule, so the pictures below still sit
+% under a visible line rather than floating under bare text.
 \setbeamertemplate{itemize item}{\small\raise0.5pt\hbox{\textbullet}}
-
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+% The class's own footline is raised into the background's blue strip but has
+% no height, so beamer hands the text area the whole page and a picture runs
+% under the strip. Giving the box the strip's height stops the text area above
+% it. The section name is dropped: the deck's sections are part dividers, and
+% printing an empty one left a dangling separator in every footline.
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=11pt,dp=11pt,leftskip=0.74cm]{}%
+    {\color{white}\scriptsize\insertframenumber\ \textperiodcentered\ \Erdos{} Problem 915}%
+  \end{beamercolorbox}%
+}
 \setbeamertemplate{frametitle}{%
   \vskip4pt%
-  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.9cm,rightskip=0.9cm]{frametitle}%
-    \usebeamerfont{frametitle}\insertframetitle%
-  \end{beamercolorbox}%
-  \vskip2pt%
-  \hspace*{0.9cm}{\color{KULblauw3a}\rule{0.82\paperwidth}{1.1pt}}%
+  \hspace*{0.74cm}{\usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}\insertframetitle}%
+  \vskip3pt%
+  \hspace*{0.74cm}{\color{KULblauw3a}\rule{0.86\paperwidth}{1.1pt}}%
   \vskip1pt%
 }
-
-\setbeamertemplate{footline}{%
-  \hbox{%
-    \begin{beamercolorbox}[wd=0.72\paperwidth,ht=2.4ex,dp=1.2ex,leftskip=0.9cm]{}%
-      {\scriptsize\color{black!45}\Erdos{} Problem 915}%
-    \end{beamercolorbox}%
-    \begin{beamercolorbox}[wd=0.28\paperwidth,ht=2.4ex,dp=1.2ex,rightskip=0.9cm]{}%
-      \hfill{\scriptsize\color{black!45}\insertframenumber\,/\,\inserttotalframenumber}%
-    \end{beamercolorbox}%
-  }%
-}
-\setbeamersize{text margin left=0.9cm,text margin right=0.9cm}
 
 % ============================================================================
 %  FRAME BUILDERS
@@ -187,7 +183,7 @@
   \begin{frame}{#1}
     \vfill
     \begin{center}
-    \adjustbox{max totalheight=0.74\textheight}{\resizebox{#3\textwidth}{!}{#2}}
+    \adjustbox{max totalheight=0.80\textheight}{\resizebox{#3\textwidth}{!}{#2}}
     \end{center}
     \vfill
   \end{frame}%
@@ -233,32 +229,38 @@
 % #7 picture caption, #8 computed
 \newcommand{\vframe}[8]{%
 \begin{frame}{#1}
-\vspace{-1pt}
+\vfill
 \noindent{\large\color{KULblauw3b}$#2$}\par
-\vspace{7pt}
+\vspace{2pt}
 \begin{columns}[T,onlytextwidth]
-\column{0.585\textwidth}
-  {\footnotesize
-   \noindent\parbox[t]{1.02cm}{\strut{\color{black!40}\bfseries\scriptsize UPPER}}%
-   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.32cm\relax}{\strut\raggedright #3}\par
-   \vspace{8pt}
-   \noindent\parbox[t]{1.02cm}{\strut{\color{black!40}\bfseries\scriptsize LOWER}}%
-   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.32cm\relax}{\strut\raggedright #4}\par}
-  \vspace{10pt}
-  {\footnotesize #5}
-\column{0.395\textwidth}
+\column{0.685\textwidth}
+  {\small
+   \noindent\parbox[t]{1.26cm}{\strut{\color{black!40}\bfseries\footnotesize UPPER}}%
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #3}\par
+   \vspace{5pt}
+   \noindent\parbox[t]{1.26cm}{\strut{\color{black!40}\bfseries\footnotesize LOWER}}%
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #4}\par}
+  \vspace{6pt}
+  {\small #5}
+\column{0.295\textwidth}
   \centering
-  \adjustbox{max totalheight=0.33\textheight}{\resizebox{0.86\linewidth}{!}{#6}}\\[6pt]
-  {\scriptsize\color{black!60} #7}
+  \adjustbox{max totalheight=0.28\textheight}{\resizebox{\linewidth}{!}{#6}}\par
+  \vspace{5pt}
+  % \\ inside \centering left a sub-point overfull box on every variant frame;
+  % ending the paragraph and setting the caption in its own box does not.
+  \parbox{\linewidth}{\centering\footnotesize\color{black!60} #7}
 \end{columns}
-\vspace{11pt}
-\noindent{\scriptsize\color{vertexpurple!80!black}\bfseries COMPUTED}\par
-\noindent{\footnotesize\color{black!70} #8}\par
+% The COMPUTED label sits on the same line as its sentence rather than above
+% it. At \small the old stacked form cost a whole line and pushed the last
+% sentence under the footer strip on the densest frames.
+\vspace{6pt}
+\noindent{\footnotesize\color{vertexpurple!80!black}\bfseries COMPUTED\ \ }%
+{\small\color{black!70} #8}\par
 \vfill
 \end{frame}}
 
 % the bullets inside a variant frame
-\newenvironment{vlist}{\begin{itemize}\setlength{\itemsep}{4pt}%
+\newenvironment{vlist}{\begin{itemize}\setlength{\itemsep}{2pt}%
   \setlength{\topsep}{0pt}}{\end{itemize}}
 
 % ============================================================================
@@ -418,7 +420,7 @@
 \begin{frame}[plain]
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.86\textheight}{\resizebox{0.84\textwidth}{!}{%
+\adjustbox{max totalheight=0.80\textheight}{\resizebox{0.84\textwidth}{!}{%
 \begin{tikzpicture}
   \begin{scope}[shift={(-4.4,3.9)}]\pillshape{pillBlue}{-14}{1.30}\end{scope}
   \begin{scope}[shift={(4.4,3.9)}]\pillshape{pillRed}{14}{1.30}\end{scope}
@@ -428,7 +430,6 @@
   \begin{scope}[shift={( 4.4,-1.6)}]#4\end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}}
 
 % one transformation: the label on top, the picture under it
@@ -441,35 +442,25 @@
 \adjustbox{max totalheight=0.46\textheight}{\resizebox{0.74\textwidth}{!}{%
   \begin{tikzpicture}#2\end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}}
 
-\title{Maximising Edge Density Subject to Connectivity Constraints}
+% The title block matches the thesis cover: same title, same subtitle, same
+% promotor line. The short title is what the class prints in every footline.
+\title[\Erdos{} 915]{Maximising Edge Density in Graphs\\Subject to Connectivity Constraints}
+\subtitle{\Erdos{} Problem 915, from Proof to Search}
 \author{Louis Vandenbruwaene}
-\date{Academic Year 2026--2027}
+\institute{KU Leuven \textperiodcentered\ Faculty of Science
+           \textperiodcentered\ Promotor: Dr.\ Stijn Cambie}
+\date{Academic year 2026--2027}
 
 \begin{document}
 
 % ============================================================================
-%  TITLE
+%  TITLE  (the class's own KU Leuven title page)
 % ============================================================================
-\begin{frame}[plain]
-\vspace{1.9cm}
-\hspace*{0.5cm}\begin{minipage}{0.9\textwidth}
-  {\color{black!40}\large EXTREMAL GRAPH THEORY}\\[10pt]
-  {\color{KULblauw3b}\fontsize{32}{36}\selectfont\bfseries \Erdos{} Problem 915}\\[8pt]
-  {\color{KULblauw1}\Large Maximising Edge Density Subject to Connectivity Constraints}
-
-  \vspace{1.4cm}
-  {\large\bfseries Louis Vandenbruwaene}\\[3pt]
-  {\small\color{black!70}Promotor: Dr.\ Stijn Cambie}\\[2pt]
-  {\small\color{black!70}KU Leuven, Master of Mathematics}
-\end{minipage}
-\begin{tikzpicture}[remember picture,overlay]
-  \node[anchor=south east] at ($(current page.south east)+(-0.8,0.5)$)
-    {\includegraphics[height=1.0cm]{LogoKULeuven.png}};
-\end{tikzpicture}
-\end{frame}
+\begin{titleframe}
+\titlepage
+\end{titleframe}
 
 % ============================================================================
 %  1.  THE TITLE, TRANSLATED
@@ -477,7 +468,7 @@
 \begin{frame}{The title, in plain words}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.62\textheight}{\resizebox{0.72\textwidth}{!}{%
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.72\textwidth}{!}{%
 \begin{tikzpicture}
   % --- the formal title ---------------------------------------------------
   \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,1.55)
@@ -497,7 +488,6 @@
 
 \end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}
 
 % ============================================================================
@@ -506,7 +496,7 @@
 \begin{frame}{A graph is edges and vertices}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.68\textheight}{\resizebox{0.96\textwidth}{!}{%
+\adjustbox{max totalheight=0.80\textheight}{\resizebox{0.96\textwidth}{!}{%
 \begin{tikzpicture}
   % ---- E: the eight edges in the graph's own layout, no vertices drawn -----
   \begin{scope}[shift={(0,0)}]
@@ -555,16 +545,14 @@
   \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}
 
 % ============================================================================
 %  3.  ERDOS 915, UNFOLDED  (edge version)
 % ============================================================================
 \begin{frame}{\Erdos{} Problem 915}
-\vspace{-2pt}
 \begin{center}
-\adjustbox{max totalheight=0.74\textheight}{\resizebox{0.99\textwidth}{!}{%
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.99\textwidth}{!}{%
 \begin{tikzpicture}[
    cbox/.style={draw=black!14, fill=black!3, rounded corners=4pt,
                 inner xsep=8pt, inner ysep=7pt}]
@@ -630,9 +618,8 @@
 %  4.  THE SAME QUESTION UNDER VERTEX SEPARATION
 % ============================================================================
 \begin{frame}{The same question, vertex by vertex}
-\vspace{-2pt}
 \begin{center}
-\adjustbox{max totalheight=0.74\textheight}{\resizebox{0.99\textwidth}{!}{%
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.99\textwidth}{!}{%
 \begin{tikzpicture}[
    cbox/.style={draw=black!14, fill=black!3, rounded corners=4pt,
                 inner xsep=8pt, inner ysep=7pt}]
@@ -773,7 +760,7 @@
 \begin{frame}{Modelling: two encodings}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.60\textheight}{\resizebox{0.76\textwidth}{!}{%
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{0.76\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
 % ---- non-hypergraphs: one multiplicity matrix -----------------------------
 \node[vertex] (A) at (0,   0)   {$1$};
@@ -813,7 +800,6 @@
 \end{scope}
 \end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}
 
 % ============================================================================
@@ -822,7 +808,7 @@
 \begin{frame}{Measuring: max flow over every pair}
 \vfill
 \begin{center}
-\adjustbox{max totalheight=0.66\textheight}{\resizebox{0.92\textwidth}{!}{%
+\adjustbox{max totalheight=0.70\textheight}{\resizebox{0.92\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
    iobox/.style={rounded corners=4pt, draw=black!22, fill=black!3,
                  inner sep=11pt, align=center},
@@ -843,7 +829,6 @@
   \draw[pipe] (box) -- (out);
 \end{tikzpicture}}}
 \end{center}
-\vfill
 \end{frame}
 
 % ============================================================================
@@ -1122,7 +1107,7 @@ $\Phi(G)\;=\;
 \begin{frame}{Status of the sixteen variants}
 \vspace{-4pt}
 \begin{center}
-\adjustbox{max totalheight=0.62\textheight}{\resizebox{\textwidth}{!}{%
+\adjustbox{max totalheight=0.72\textheight}{\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}
   \node[vtroot, fill=KULblauw3a!18]  (root) at (9.0,3.9) {Problem 915};
   \node[vtmodel, fill=KULblauw3a!12] (simple) at (1.8,2.6)  {simple};
@@ -1220,7 +1205,6 @@ $\Phi(G)\;=\;
 {\color{KULblauw3b}\fontsize{40}{46}\selectfont\bfseries Thank you}\\[16pt]
 {\color{black!45}\normalsize \texttt{github.com/louisvandenbruwaene/thesis}}
 \end{center}
-\vfill
 \end{frame}
 
 % ============================================================================
@@ -1342,16 +1326,16 @@ $191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}
 {$\floorfrac{n-1}{r-1}$ at $m=2$, \ $\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \sProved\newline{\scriptsize\color{black!50}$m\ge4$:} \sOpen}
-{a star at $m=2$, a degree-capped hub at $m=3$ \ \sProved\newline {\scriptsize\color{black!50}$m=3$ for $2<r<n$}}
+{star at $m=2$, degree-capped hub at $m=3$ \ \sProved\newline {\scriptsize\color{black!50}$m=3$ for $2<r<n$}}
 {\begin{vlist}
   \item $m=2$ is feasible exactly when the incidence graph is a forest
   \item $m=3$ comes from the incidence-rank inequality
-  \item $\kap\le\lec$ carries an edge bound the wrong way, since vertex
-        feasibility is the weaker restriction
+  \item an edge bound does not transfer: $\kap\le\lec$ points the wrong way,
+        vertex feasibility being the weaker restriction
 \end{vlist}}
 {\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
-{No counterexample at $m=4$ across eleven $(n,r)$ cells. The $r=2$ case of the
-same problem fails at $m=5$.}
+{No counterexample at $m=4$ across eleven $(n,r)$ cells; the $r=2$ case fails
+at $m=5$.}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}

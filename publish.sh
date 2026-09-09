@@ -51,6 +51,17 @@ tar -xf "$stage/snapshot.tar" -C "$wt"
 # is not part of the submission.
 rm -f "$wt/program/CLAUDE.md"
 
+# kulakbeamer.cls and its three page images are KU Leuven's corporate identity
+# template, handed to members through the university's own templates page. The
+# deck needs them to compile and they are tracked here so it always does, but
+# they are KU Leuven's to distribute, not this repository's. slides/README.md
+# tells a reader where to get them.
+rm -f "$wt/slides/seminarie/kulakbeamer.cls" \
+      "$wt/slides/seminarie/kuleuvenBackground.pdf" \
+      "$wt/slides/seminarie/kuleuvenOutline.pdf" \
+      "$wt/slides/seminarie/kuleuvenTitlepage.pdf" \
+      "$wt/slides/seminarie/kuleuvenLogo.pdf"
+
 # Last line of defence: refuse to publish a snapshot carrying a working-notes
 # file, whatever the path, rather than push and discover it afterwards.
 if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_*.md' \
