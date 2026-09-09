@@ -17,6 +17,13 @@
 #    file it pulls in must exist, and something must \Cref it.  A float on a
 #    [p] page that nothing references is reachable only by where LaTeX floated
 #    it, and latexmk reports nothing.
+#    Panels count separately.  An earlier version read the whole float body and
+#    took the FIRST \label in it, so in a figure built from subfigures one cited
+#    panel answered for all of them: fig:dir-hyper-gadget sat unreferenced with
+#    this gate reporting clean.  The body is now split into the outer float and
+#    its panels, and each panel needs its own label, caption and \Cref.  The
+#    outer float is reached through whichever panel the text points at, so its
+#    own label does not have to be cited as well.
 set -e
 cd "$(dirname "$0")"
 PY=.venv/bin/python3
@@ -51,15 +58,36 @@ import os
 sources = {f: open(f, encoding='utf-8').read()
            for f in ['main.tex'] + sorted(glob.glob('chapters/*.tex'))}
 everything = '\n'.join(sources.values())
+SUBFIGURE = re.compile(r'\\begin\{subfigure\}.*?\\end\{subfigure\}', re.S)
+
+def cited(label):
+    return bool(re.search(r'\\Cref\{[^}]*\b' + re.escape(label) + r'\b', everything))
+
 for name, text in sources.items():
     for env in ('figure', 'sidewaysfigure', 'table'):
         for m in re.finditer(r'\\begin\{' + env + r'\*?\}(.*?)\\end\{' + env + r'\*?\}', text, re.S):
             body = m.group(1)
-            label = re.search(r'\\label\{([^}]+)\}', body)
+            # The outer float's own label and caption sit outside its panels, so
+            # cut the panels out before reading them.  Each panel is then judged
+            # on its own text and cannot hide behind a cited sibling.
+            panels = SUBFIGURE.findall(body)
+            outer = SUBFIGURE.sub('', body)
+            panel_labels = []
+            for panel in panels:
+                sub = re.search(r'\\label\{([^}]+)\}', panel)
+                if not sub:
+                    print("UNLABELLED SUBFIGURE: %s: %s" % (name, env)); bad = 1; continue
+                sub = sub.group(1)
+                panel_labels.append(sub)
+                if not re.search(r'\\caption', panel):
+                    print("SUBFIGURE WITHOUT CAPTION: %s" % sub); bad = 1
+                if not cited(sub):
+                    print("SUBFIGURE NEVER \\Cref-ED: %s" % sub); bad = 1
+            label = re.search(r'\\label\{([^}]+)\}', outer)
             if not label:
                 print("UNLABELLED FLOAT: %s: %s" % (name, env)); bad = 1; continue
             label = label.group(1)
-            if not re.search(r'\\caption', body):
+            if not re.search(r'\\caption', outer):
                 print("FLOAT WITHOUT CAPTION: %s" % label); bad = 1
             for target in re.findall(r'\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}', body):
                 if not os.path.exists(target):
@@ -67,7 +95,7 @@ for name, text in sources.items():
             for target in re.findall(r'\\input\{([^}]+)\}', body):
                 if not (os.path.exists(target) or os.path.exists(target + '.tex')):
                     print("FLOAT MISSING FILE: %s wants %s" % (label, target)); bad = 1
-            if not re.search(r'\\Cref\{[^}]*\b' + re.escape(label) + r'\b', everything):
+            if not cited(label) and not any(cited(p) for p in panel_labels):
                 print("FLOAT NEVER \\Cref-ED: %s" % label); bad = 1
 sys.exit(bad)
 PYEOF
