@@ -121,9 +121,18 @@ energy function, what the search rediscovers and the status of the sixteen
 variants.
 
 The talk ends on the AI frame and a thank-you frame. After it come sixteen
-backup frames, one per variant, in the order and with the status colour of
-`fig:variant-tree-status`: the extremal function's symbol, a status chip, the
-formulas, and what was computed for that variant. **They copy the chapter's
+backup frames, one per variant, in the order of `fig:variant-tree-status`: the
+extremal function's symbol, its upper and lower bound each with a
+PROVED/PROPOSED/OPEN chip, a drawing of the named construction tagged
+EXTREMAL, NEAR-EXTREMAL or ASYMPTOTICALLY EXTREMAL, and what was computed for
+that variant.
+
+**A bound's chip is read off the source, never off the prose.** PROVED means the
+result sits in a `theorem`, `proposition`, `lemma` or `corollary` with no
+`\aimedal`; PROPOSED means a `conjecture`, or a badged result. That is why the
+directed multigraph arc formula is PROVED here while its extremiser
+classification is PROPOSED: `thm:dir-multi-full` carries no badge and
+`thm:dir-multi-uniqueness` is a badged conjecture. **They copy the chapter's
 status colouring, so they are the same drift risk as everything else here.**
 If `ch3_synthesis.tex` re-marks a leaf, `\vframe`'s chip and the deck's copy of
 the tree both have to follow. That has already happened once: the deck's tree
