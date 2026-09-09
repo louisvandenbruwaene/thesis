@@ -811,19 +811,20 @@
 
   \node[iobox] (in) at (0,0)
     {$\begin{pmatrix} 0 & 2 & 1 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}$};
-  % Anchored on the matrix box's left corner rather than centred above it, so
-  % the qualifier grows rightward into the empty space before the max-flow box
-  % and the picture's bounding box does not move.
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, anchor=south west]
-    at ([yshift=3pt]in.north west)
-    {INPUT \normalfont\itshape\color{black!55}$=$ directed multigraph};
+  % INPUT sits under the matrix, with the model it encodes stacked under it and
+  % a quarter-turned equals sign between the two. One node with align=center, so
+  % the whole stack is centred on the matrix box whatever its widest line is.
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, below=4pt of in, align=center]
+    {INPUT\\[3pt]
+     \rotatebox{90}{\normalfont\LARGE\color{black!55}$=$}\\[3pt]
+     \normalfont\large\itshape\color{black!55} directed multigraph};
 
   \node[iobox, fill=KULblauw3a!12, draw=KULblauw1!45, minimum width=34mm] (box) at (5.4,0)
     {\bfseries max flow\\over every pair};
 
   \node[iobox, fill=vertexorange!8, draw=vertexorange!45] (out) at (10.4,0)
     {\Large$\lmax_G\;=\;3$};
-  \node[font=\scriptsize\bfseries, text=KULblauw3b, above=3pt of out] {OUTPUT};
+  \node[font=\scriptsize\bfseries, text=KULblauw3b, below=4pt of out] {OUTPUT};
 
   \draw[pipe] (in) -- (box);
   \draw[pipe] (box) -- (out);
