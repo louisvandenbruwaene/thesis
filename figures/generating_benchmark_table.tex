@@ -2,8 +2,10 @@
 % directed simple digraphs, m=2. Generated classification is GIVEN the optimal
 % target count and does not independently prove optimality. Blind sweep
 % omitted past n=4, where 2^(n(n-1)) assignments already cost 6.3s. Each
-% further vertex multiplies the assignment count by 2^(2n), so n=5 is roughly
-% an hour and n=6 is weeks. Reproduced by
+% further vertex multiplies the assignment count by 2^(2n), and the per-
+% assignment check grows too: the recorded n=3 to n=4 step cost about twice
+% its count ratio. Both factors together put n=5 near an hour and n=6 at
+% weeks. Reproduced by
 % program/scripts/generating_search_benchmark.py against erdos915_unified.py.
 \begin{tabular}{rrrrr}
 \toprule

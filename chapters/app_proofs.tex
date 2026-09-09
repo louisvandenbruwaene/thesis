@@ -56,7 +56,7 @@ That count proves \Cref{thm:mader,thm:multigraph-edge} from \Cref{lem:dist-1-cou
 }
 
 % ---------------------------------------------------------------------------
-% Part dividers. The appendix is one chapter, so its ten sections would
+% Part dividers. The appendix is one chapter, so its thirteen sections would
 % otherwise present as a flat list longer than any body chapter. \apppart draws
 % a labelled rule before each group and writes the group into the table of
 % contents, so a reader can find the directed work or the hypergraph work
@@ -1701,12 +1701,14 @@ The proof shows more than the count. At $m = 2$ the cap $m-1$ is one, so a secon
 
 The next value is the one the hypergraph theorem supplies, and no separate argument is needed for it.
 
-\begin{conjecture}[The multigraph incidence value at $m = 3$, with proof,\aimedal]\label{cor:multi-vertex-m3}
+\begin{corollary}[The multigraph incidence value at $m = 3$]\label{cor:multi-vertex-m3}
 $K_3(n) = 2(n-1)$ for every $n \ge 2$.
-\end{conjecture}
+\end{corollary}
 
-\begin{proof}[Proposed proof]
-The upper bound is \Cref{thm:hyper-vertex-m3} at $r = 2$, where the displayed bound $q(r-1) \le 2(n-1)$ reads $q \le 2(n-1)$ and $q$ is the total multiplicity. Its proof asks only that hyperedge-nodes have degree $r \ge 2$, which holds at $r = 2$. For the lower bound take a spanning tree and give every edge multiplicity two. A tree edge $uv$ has $\pi(u,v) = 0$, so $\kap(u,v) = 2$ by \Cref{lem:multi-vertex-split}, and a non-adjacent pair is joined by the unique tree path, so $\kap = 1$. Nothing exceeds $2 = m-1$, and the count is $2(n-1)$.
+\begin{proof}
+Apply \Cref{thm:hyper-vertex-m3,prop:hyper-vertex-lower-multi} at $r=2$.
+The divisibility condition is automatic, and the doubled star attains the
+upper bound $2(n-1)$.
 \end{proof}
 
 At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}. Turning these block scores into values of $K_4(n)$, even within the tested block range, depends on the unchecked block reduction; agreement for every $n$ remains open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
@@ -1999,7 +2001,7 @@ is itself feasible: on an arc, $\kap_{D_0}(u,v) = 1 + \pi(u,v) \le \mu(u,v) + \p
 directly. So $|A(D_0)| \le k_m^{\mathrm{dir}}(n)$ by definition.
 \end{proof}
 
-\begin{conjecture}[The directed multigraph incidence value, with proof,\aimedal]\label{cor:dir-multi-incidence}
+\begin{corollary}[The directed multigraph incidence value]\label{cor:dir-multi-incidence}
 For every $n \ge 2$,
 \[
     K_2^{\mathrm{dir}}(n) \;=\; k_2^{\mathrm{dir}}(n) \;=\; \ell_2^{\mathrm{dir}}(n)
@@ -2012,20 +2014,15 @@ and for each fixed $m \ge 2$,
 \]
 so that $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$ and the bipartite digraph of
 \Cref{thm:dir-multi-full} is asymptotically optimal for this variant too.
-\end{conjecture}
+\end{corollary}
 
-\begin{proof}[Proposed proof]
-At $m = 2$ the cap is one, so \Cref{lem:multi-vertex-split-dir} forces $\mu(u,v) \le 1$
-on every ordered pair and every feasible multidigraph is simple. Hence
-$K_2^{\mathrm{dir}}(n) = k_2^{\mathrm{dir}}(n)$, which is $\ell_2^{\mathrm{dir}}(n)$ by
-\Cref{thm:dir-vertex-m2-exact} and the displayed value by \Cref{thm:dir-arc-m2-exact}.
-
-For general $m$ the lower bound is the arc extremiser. \Cref{thm:dir-multi-full} supplies
-a multidigraph with $(m-1)M(n)$ arcs and $\lec^{\max} \le m-1$, and $\kap \le \lec$, so
-that same multidigraph is feasible here. The upper bound is \Cref{thm:dir-hyper-constant}
-at $r = 2$, where a forward directed $2$-uniform multihypergraph is a multidigraph and
-the displayed bound reads as stated. Both sides have leading term $(m-1)n^2/4$, since
-$M(n) = \floor{n^2/4}$ for $n \ge 7$, and the difference is linear in $n$ for fixed $m$.
+\begin{proof}
+At $m=2$, two parallel arcs would themselves give two internally disjoint
+routes, so every feasible multidigraph is simple. The exact value therefore
+follows from \Cref{thm:dir-vertex-m2-exact,thm:dir-arc-m2-exact}.
+For general $m$, \Cref{thm:dir-multi-full} and $\kap\le\lec$ give the lower
+bound, while \Cref{thm:dir-hyper-constant} at $r=2$ gives the upper bound.
+Since $M(n)=\floor{n^2/4}$ for $n\ge7$, these bounds imply the stated asymptotic.
 \end{proof}
 
 The exhaustive values agree and stay strictly inside these bounds where both are known:
