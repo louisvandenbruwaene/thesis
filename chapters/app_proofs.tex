@@ -260,7 +260,7 @@ For all $n \ge m \ge 2$ the graph $H_{m,n}$ has $\floorfrac{m(n-1)}{2}$ edges an
 The edge count is $(n-1) + \floorfrac{(m-2)(n-1)}{2} = \floorfrac{m(n-1)}{2}$, since $(m-2)(n-1)$ and $m(n-1)$ have the same parity. For the connectivity, any two distinct vertices include at least one spoke vertex $v_i$, whose total degree is at most $1 + (m-2) = m-1$. \Cref{lem:degree-bound} then gives $\lec(u,v) \le m-1$.
 \end{proof}
 
-The upper bound above proves \Cref{thm:mader}, and it uses no relation between $n$ and $m$: the Gomory--Hu tree has $n-1$ edges whatever $m$ is. \Cref{thm:extremal-existence} adds that the bound is attained once $n \ge m$, which is where that hypothesis is needed and where it belongs. For $n<m$, the complete graph is itself feasible and the bound is slack except at $(n,m)=(2,3)$, where the floor creates the isolated equality noted in the main text. Equality then holds systematically from $n=m$ onward. The proof also reveals which graphs are extremal: equality forces both inequalities in the chain to be tight.
+The upper bound above proves \Cref{thm:mader}, and it uses no relation between $n$ and $m$: the Gomory--Hu tree has $n-1$ edges whatever $m$ is. \Cref{thm:extremal-existence} adds that the bound is attained once $n \ge m$, which is where that hypothesis is needed and where it belongs. For $n<m$, the complete graph is itself feasible and the bound is slack except at $(n,m)=(2,3)$, where the floor creates the isolated equality noted in the main text. Equality then holds systematically from $n=m$ onward. The proof also reveals which graphs are extremal: equality forces zero total slack when $m(n-1)$ is even and exactly one unit of slack when it is odd.
 
 \begin{theorem}[Characterisation of equality]\label{thm:extremal-char}
 Let $G$ be simple with $\lec^{\max}_G \le m-1$ and $|E(G)| = \floorfrac{m(n-1)}{2}$, and let $T$ be a Gomory--Hu tree of $G$. If $m(n-1)$ is even, then every tree edge has weight exactly $m-1$, every tree edge is also an edge of $G$, and every edge of $G$ joins vertices at tree distance at most $2$. If $m(n-1)$ is odd, there is exactly one unit of slack, located in exactly one of three places: one tree edge has weight $m-2$, or one tree edge is not an edge of $G$, or one edge of $G$ joins vertices at tree distance $3$. Everything else is tight.
@@ -466,7 +466,7 @@ arcs per unit of the cap.
 Let $D$ be a directed multigraph. A spanning subdigraph $R \subseteq D$, using at most one copy of each arc it uses (no parallel copies, even if $D$ has them), is a \emph{reachability skeleton} of $D$ if, for every pair of vertices $u \ne v$, $u$ reaches $v$ by some directed path in $R$ exactly when $u$ reaches $v$ by some directed path in $D$.
 \end{definition}
 
-A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular every parallel copy of every arc. It is a caricature of $D$: thin, and faithful on reachability, but not on the number of disjoint paths. The lemma below says such a skeleton always exists and is never too big. That one fact is what both later arguments run on. At $m = 2$ the skeleton turns out to be the whole digraph, which is the content of \Cref{thm:dir-vertex-m2-exact}, and at a general $m$ deleting it repeatedly is what \Cref{lem:reach-delete} makes pay.
+A reachability skeleton keeps every yes-or-no fact about who can reach whom and discards everything else, in particular all but one copy of each arc it keeps. It is a caricature of $D$: thin, and faithful on reachability, but not on the number of disjoint paths. The lemma below says such a skeleton always exists and is never too big. That one fact is what both later arguments run on. At $m = 2$ the skeleton turns out to be the whole digraph, which is the content of \Cref{thm:dir-vertex-m2-exact}, and at a general $m$ deleting it repeatedly is what \Cref{lem:reach-delete} makes pay.
 
 \begin{lemma}[A sparse reachability skeleton always exists]\label{lem:reach-skeleton}
 Every loopless directed multigraph $D$ on $n \ge 2$ vertices has a reachability skeleton $R$ with $|A(R)| \le M(n)$.
@@ -604,11 +604,11 @@ Whitney's inequality is easy to misread: the tempting direction is the wrong one
 \[
     \{D : \lec^{\max}_D \le m-1\} \;\subseteq\; \{D : \kap^{\max}_D \le m-1\}.
 \]
-Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem, and not the other way round. The vertex-feasible family is the larger of the two, so the inequality between the extremal numbers it hands over for free is
+Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem, and not the other way round. The vertex-feasible family contains the arc-feasible one, so the inequality between the extremal numbers it hands over for free is
 \[
     k_m^{\mathrm{dir}}(n) \;\ge\; \ell_m^{\mathrm{dir}}(n),
 \]
-and an upper bound for the arc problem says nothing at all about the vertex problem. The gap is not vacuous: two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$, so there really are digraphs in the difference of the two families. Whitney therefore gives one thing, that an arc construction is a vertex \emph{lower} bound, and the vertex upper bound has to be proved separately. The proof below does that, and \Cref{ch:synthesis} treats the two separations the same way for $m \ge 3$, where the vertex problem stays open without assuming that the two optima coincide.
+and an upper bound for the arc problem says nothing at all about the vertex problem. Local arc and vertex connectivities can differ, since two routes that share an interior vertex but no arc are counted by $\lec$ and not by $\kap$. That alone does not show that the two families differ at a given threshold, and at $m=2$ they coincide, as \Cref{lem:directed-m2-families} shows. Whitney therefore gives one thing, that an arc construction is a vertex \emph{lower} bound, and the vertex upper bound has to be proved separately. The proof below does that, and \Cref{ch:synthesis} treats the two separations the same way for $m \ge 3$, where the vertex problem stays open without assuming that the two optima coincide.
 \end{remark}
 
 \begin{proof}[Proof of \Cref{thm:dir-vertex-m2-exact}]
@@ -941,7 +941,7 @@ Taking whichever of the two constructions is larger gives $L_m^{\mathrm{dir}}(n)
 
 \subsection{The upper bound: a reachability skeleton}
 
-An upper bound needs a deletion that is guaranteed to lower every positive connectivity, paired with a bound on how much it removes. Deleting a vertex preserves feasibility, but need not lower every positive pairwise connectivity. Once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is guaranteed to carry a controllable share of the arcs, which is exactly the fractional remainder above. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead, and the reachability skeleton of \Cref{sec:reach-skeleton} is one: general enough to always exist, sparse enough to bound by \Cref{lem:reach-skeleton}, and, as the next lemma shows, specific enough that removing it lowers every positive pairwise connectivity by at least one.
+An upper bound needs a deletion that is guaranteed to lower every positive connectivity, paired with a bound on how much it removes. Deleting a vertex preserves feasibility, but need not lower every positive pairwise connectivity. Once multiplicities are free to sit anywhere between $0$ and $m-1$, no single vertex is guaranteed to carry a controllable share of the arcs. The fix is to stop insisting on a vertex and delete a whole \emph{subgraph} instead, and the reachability skeleton of \Cref{sec:reach-skeleton} is one: general enough to always exist, sparse enough to bound by \Cref{lem:reach-skeleton}, and, as the next lemma shows, specific enough that removing it lowers every positive pairwise connectivity by at least one.
 
 
 \begin{lemma}[Deleting a skeleton lowers every positive connectivity]\label{lem:reach-delete}
@@ -1396,8 +1396,8 @@ particular hyperedge-disjoint under our definition), so the same hypergraph
 is feasible for the vertex problem.
 \end{proof}
 
-The simple construction uses distinct $(r-1)$-sets on the non-hub vertices. The condition $m-1\le\binom{n-2}{r-2}$ bounds the requested degree cap by the number of such sets containing a fixed vertex. A multihypergraph does not, because it
-may repeat one hyperedge instead, and that closes a different range of cases.
+The simple construction uses distinct $(r-1)$-sets on the non-hub vertices. The condition $m-1\le\binom{n-2}{r-2}$ bounds the requested degree cap by the number of such sets containing a fixed vertex. A multihypergraph does not need distinct sets, because it
+may repeat a hyperedge instead, and that closes a different range of cases.
 
 \begin{proposition}[The multihypergraph lower bound]\label{prop:hyper-vertex-lower-multi}
 For $r \ge 2$, $m \ge 2$ and $(r-1) \mid (n-1)$,
@@ -1788,8 +1788,8 @@ Let $G$ be feasible, with underlying simple graph $G_0$.
 \emph{The simple problem is linearly bounded.} Suppose $G_0$ had average degree at least $4(m-1)$. By Mader's density theorem \cite{Mader72}, a graph of average degree at least $4k$ contains a $(k+1)$-connected subgraph, so with $k = m-1$ some subgraph $H \subseteq G_0$ is $m$-connected. An $m$-connected graph has more than $m$ vertices and, by the global form of Menger's theorem \cite[Ch.~3]{Diestel17}, any two of them are joined by $m$ internally disjoint paths inside $H$ and hence inside $G_0$. That contradicts $\kap^{\max}_{G_0} \le m-1$. So the average degree is below $4(m-1)$, that is $2|E(G_0)|/n < 4(m-1)$, giving $k_m(n) < 2(m-1)n$ and the second inequality.
 \end{proof}
 
-If both the preceding proposed lower construction and the next proposed upper
-bound are eventually verified, then first letting $n/m\to\infty$ so that optimised blocks
+If the proposed lower construction and the proposed upper bound of
+\Cref{prop:multi-vertex-upper} are both eventually verified, then first letting $n/m\to\infty$ so that optimised blocks
 can be packed with only $O(m)$ unused vertices, and then letting $m\to\infty$,
 would yield
 \[
@@ -1960,8 +1960,9 @@ the cap $m-1$. The finite sweep of \Cref{tab:multi-vertex-blocks} shows that
 adding a few edges inside the small side improves this clean family at $m = 7$
 and $m = 8$, and that at $m = 4$, $5$ and $6$ the extremal blocks are mostly
 of other shapes, the $K_{2,5}$ tying at $m = 6$, $b = 7$ being the one that is
-not. The answer is therefore a block optimisation problem. In the regime
-$m\to\infty$ with $n/m\to\infty$, the construction gives
+not. Under the proposed block reduction the answer becomes a block optimisation
+problem. If the proposed lower and upper bounds are verified, then in the regime
+$m\to\infty$ with $n/m\to\infty$ the construction gives
 $K_m(n)/(m^2n) \ge 3-2\sqrt2-o(1)$ and the upper bound gives
 $K_m(n)/(m^2n)<2$. These inequalities do not establish that this ratio has a
 limit. Its possible limiting value and the blocks needed for sharper bounds
@@ -1970,9 +1971,9 @@ remain open here.
 \subsection{The directed problem}\label{sec:multi-vertex-dir}
 
 Everything above splits the measure into copies and detours, and that split does not
-use the absence of orientation. The directed statement is the same one with directed
-routes, and it is worth writing down because it is what carries the arc results across
-to $K_m^{\mathrm{dir}}(n)$ without any asymptotic argument.
+use the absence of orientation. The proposed splitting identity also has a directed version, the same one with
+directed routes. The checked corollary below separately gives the exact value at
+$m=2$ and the leading term for every fixed $m$.
 
 \begin{conjecture}[Splitting the directed vertex measure, with proof,\aimedal]\label{lem:multi-vertex-split-dir}
 Let $D$ be a multidigraph with multiplicity function $\mu$ and underlying simple
@@ -2485,7 +2486,8 @@ small-size effect that the asymptotics cannot see.
 \Cref{ch:certify} states that the search avoids most calls to the checker by tracking a bound on $\lambda^{\max}$ rather than recomputing it. This section records how the shortcut works and how it is checked against the value the naive implementation would have returned.
 
 Here the \emph{binding connectivity} is $\lambda^{\max}$, the largest local
-connectivity over all pairs. A \emph{capped predicate} is the yes-or-no test
+connectivity over all pairs, and the same discussion applies with $\kap^{\max}$
+under vertex separation. A \emph{capped predicate} is the yes-or-no test
 that asks whether this value exceeds a prescribed cap and may stop as soon as
 one violating pair is found. The \emph{energy} is the numerical objective used
 by the search to compare two proposed states. Its connectivity penalty is
@@ -2599,7 +2601,7 @@ validation and reporting and are not calendar durations of the experiment.
 The report separates original outcomes from replacement outcomes and names
 the selected record for every seed. An independent validator rebuilds the
 flow networks from the saved witnesses using a separate gate construction
-and NetworkX's implementation of the Edmonds and Karp algorithm. It calls neither the thesis
+and NetworkX's implementation of the Edmonds--Karp algorithm. It calls neither the thesis
 connectivity checker nor its compiled helper. Agreement is a cross-check of
 feasibility and counts, not a proof of search optimality.
 

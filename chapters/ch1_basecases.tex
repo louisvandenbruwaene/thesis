@@ -1,7 +1,7 @@
 A network is useful not only because it connects, but because it connects in more than one way.
 A single road between two towns is a liability and a second independent road is insurance.
 The mathematical content of that intuition is the number of routes between two points that share no segment and the question this thesis circles is how many connections a network can hold before some pair of points is forced to have too many such routes.
-This chapter gives the foundation for the question and its variants and goes over the results that can be proven using logical arguments.
+This chapter gives the foundation for the question and its variants and goes over the results that can be established by proof.
 
 \section{Graphs and routes}
 
@@ -131,7 +131,7 @@ So far the problem has been stated for simple graphs, but the same question rema
 Each assumption made so far will be toggled to create a lattice of variants and the thesis will explore each node of that lattice.
 
 The first is \emph{arity}: an edge joins exactly two vertices and a \emph{hyperedge} joins $r \ge 2$ vertices.
-Hence such \emph{hypergraphs} use \emph{Berge paths}, which aligns with the path definition above.
+Hence such \emph{hypergraphs} use \emph{Berge paths}, consistent with the path definition above.
 The size of a hypergraph counts its hyperedges with their multiplicity, exactly as the size of a graph counts its edges.
 The second is \emph{multiplicity}: a \emph{simple} graph or hypergraph carries at most one copy of each edge, so $\mu \le 1$ throughout, while a \emph{multigraph} allows parallel copies.
 The third is \emph{direction}: a directed edge, called an arc, is an ordered pair of vertices and a directed hyperedge has one tail and $r-1$ heads.
@@ -433,8 +433,9 @@ share neither an intermediate vertex nor an edge copy. The second half of that i
 what the hypergraph needs, since two Berge routes can run through the same
 hyperedge without ever meeting at a vertex, and a hyperedge that may carry only
 one route at a time is the whole difficulty of the model.
-For a simple graph the definition changes nothing, because an edge lies on a
-route exactly when both of its endpoints do. For a multigraph it says that $q$
+For a simple graph the definition changes nothing: two internally vertex-disjoint
+$u$--$v$ paths can share an edge only if that edge is $uv$ itself, and the single
+copy of $uv$ carries at most one of them. For a multigraph it says that $q$
 parallel copies of $uv$ are $q$ separated routes, exactly as $q$ copies of a
 hyperedge are, since each copy supplies its own interior edge-node and no interior original vertex. So the
 two multigraph vertex variants are questions of their own, written $K_m(n)$ and
@@ -713,7 +714,7 @@ For all $n \ge 2$ and $m \ge 2$,
 \]
 \end{theorem}
 
-Extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc, and the parity obstruction that stopped the vertex-deletion induction never arises. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
+Extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
 
 \begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph

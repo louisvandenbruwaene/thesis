@@ -2,7 +2,7 @@
 The previous chapter gave insight into the problem and some variants, but left most of the harder questions open.
 This chapter will serve as a finite check of the results and conjectures by testing them on small graphs through brute-force enumeration.
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
-Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those statements are naive because they are based on small graphs only.
+Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those conjectures are supported only by small graphs.
 Larger graph spaces will be scoured by a heuristic, namely tabu search.
 A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the cap.
 The archive is the repository at \url{https://github.com/louisvandenbruwaene/thesis} and every file path quoted in this thesis is relative to it, or to a base directory named where the path is given, with the commands and the audit trail collected in \Cref{sec:transcripts}.
@@ -19,9 +19,9 @@ All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is s
 Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices with a tail distinguished in the directed model.
 \Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
 Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
-All possible graphs of a given size will later be checked to see if they are extremal for the given size and connectivity restraint.
+The enumeration considers graphs of a fixed order and maximises their edge count subject to the connectivity constraint.
 Matrices are iterated as a depth-first search with entries in $\{0,1\}$ for simple graphs and in $\{0,\ldots,m-1\}$ for multigraphs, and the diagonal is always zero.
-Hypergraphs are implemented similarly from the ground up as there are no matrix tools for them.
+Hypergraphs are implemented similarly from the ground up, over their lists of hyperedges rather than a matrix.
 Notice how depth-first search is memory-efficient.
 
 
@@ -52,8 +52,8 @@ That is why the other variants will have to be transformed into such a flow netw
 Undirected multigraphs have a natural identification with a directed multigraph, obtained by replacing every edge with a pair of arcs going in opposite directions.
 To transform a multihypergraph, replace each distinct hyperedge with a helper gate,
 an entry point and an exit point joined by a single arc whose capacity is the multiplicity of the hyperedge.
-Every member of the hyperedge then flows into the entry and out of the exit at unlimited capacity,
-so the one arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
+Each member vertex then gets an arc of unlimited capacity to the entry point and one back from the exit point,
+so the single arc between them is the only bottleneck (\Cref{fig:hyper-gadget}).
 A directed hyperedge is wired the same way, except that only its tail reaches the entry and only its heads leave the exit,
 which is what forces a route to cross it from tail to head (\Cref{fig:dir-hyper-gadget}).
 The directed hypergraph's flow network is just a restricted version of the undirected one.
@@ -286,12 +286,12 @@ the gates aren't split by this step.
 \label{fig:checker-gadgets}
 \end{figure}
 
-\section{Checking every graph of a fixed size}\label{sec:certification-standard}
+\section{Checking every graph of a fixed order}\label{sec:certification-standard}
 The connectivity checker works on all variants but measures only one graph at a time.
 To establish an exact value by enumeration, every feasible graph must either be checked or excluded by a sound pruning argument. This is one route to an upper bound. A mathematical theorem can establish it without enumeration.
 A simple graph on $n$ vertices is a choice of $\mu(u,v) \in \{0,1\}$ on each off-diagonal entry, a multigraph a choice in $\{0,\dots,m-1\}$,
 and a digraph varies every ordered pair rather than only the upper triangle.
-A hypergraph is not a matrix at all, so it is enumerated over its own list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
+A hypergraph is stored as a list rather than a matrix, so it is enumerated over that list: a subset of all $\binom{n}{r}$ possible vertex sets of size $r$.
 In the directed model, the tail is specified with a pointer and the multihypergraphs have multiplicities for each hyperedge.
 \Cref{fig:matrix-rep} shows how a directed multigraph and hypergraph are represented.
 Using these representations for all graph variants means iteration traverses all possible representation states easily.
@@ -319,7 +319,7 @@ It decides both directions of a pair independently, turning two undirected state
 Which change costs more depends on $m$ and on the model.
 Directed hypergraphs are especially numerous because each hyperedge also requires a
 choice of tail and heads.
-These variants are particularly costly to enumerate, even where a conjecture predicts their leading term.
+These variants are particularly costly to enumerate, even where their leading term is established.
 The separation, by contrast, does not change the enumeration: edge and vertex disjointness
 start from the same candidate space, but use different feasibility tests. Their pruning and running times can therefore differ.
 
@@ -367,7 +367,7 @@ start from the same candidate space, but use different feasibility tests. Their 
 The number of graphs the checker must visit grows as $2^{\binom{n}{2}}$ for simple undirected graphs and $2^{n(n-1)}$ for digraphs,
 and capping multiplicities at $m-1$, so that each run ranges over the $m$ values $\{0,\dots,m-1\}$, raises the base from two to $m$,
 giving $m^{\binom{n}{2}}$ undirected multigraphs and $m^{n(n-1)}$ directed ones.
-The enumeration is exact wherever it finishes and it does so only for the smallest sizes.
+The enumeration is exact wherever it finishes and it does so only for the smallest orders.
 \Cref{fig:complexity} measures exactly how fast the search space grows.
 
 \subsection{Pruned search}
@@ -501,14 +501,14 @@ Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 
 On the linear branch, \Cref{const:dir-multi-lower} supplies the double star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
-For $n\le6$, this is the larger term of the candidate $M(n)$.
+For $n\le6$, this is the larger term of the established value $M(n)$.
 The historical solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
 At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
 It then overtakes it.
 The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
-Thus the construction attaining the candidate $M(n)$ changes at the crossover.
+Thus the construction attaining $M(n)$ changes at the crossover.
 
-What would generalise is integrality.
+The general statement is integrality.
 \Cref{cor:mstar-integral} states that some $\{0,1\}$ matrix always attains $M^{*}(n)$, and that this optimum equals $M(n)$.
 An explicit construction gives attainment from below.
 Clearing denominators from a rational optimum reduces the reverse inequality to \Cref{thm:dir-multi-full}.
@@ -556,7 +556,7 @@ The finite optimisation is retained only as an independent check of the cases $n
 \end{figure}
 
 \section{The heuristic search}
-So far, iterating all graphs of a fixed size that meet the connectivity constraint and counting their edges was a blind walk.
+So far, iterating all graphs of a fixed order that meet the connectivity constraint and counting their edges was a blind walk.
 Apart from pruning, there is nothing that steers the walk towards better candidates because they all need to be checked anyway.
 From a certain point onwards, that will become impossible due to the massive number of possible graphs.
 The goal then becomes finding the densest possible graphs in such an efficient and guided way that they are
@@ -662,7 +662,7 @@ Before addressing open cases, the search is tested on settled ones.
 Each run starts from the empty graph.
 The search is given the edge-count objective and the connectivity cap, and retains only feasible witnesses. Its intermediate states may be infeasible.
 It receives no description of the known extremal construction.
-In all seven validation cases in \Cref{tab:rediscovery}, it reaches the established value. This is a statement about those runs, not a claim that it succeeds at every size or throughout the sixteen-variant grids.
+In all seven validation cases in \Cref{tab:rediscovery}, it reaches the established value. This is a statement about those runs, not a claim that it succeeds at every order or throughout the sixteen-variant grids.
 \Cref{tab:rediscovery} compares the densest witness with the theoretical value.
 
 \begin{table}[ht]
