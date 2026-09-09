@@ -1319,8 +1319,8 @@ $191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
         vertex feasibility being the weaker restriction
 \end{vlist}}
 {\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
-{No simple hypergraph beat the edge value at $m=4$ in eleven $(n,r)$ cells.
-At $r=2$ the two maxima first differ at $m=5$: $33$ against $32$.}
+{Enumeration at $m=3$, $r=3$ gives $1$, $3$, $4$ for $n=3,4,5$: the bound
+$\lfloor2(n-1)/(r-1)\rfloor$ from $n=4$ on, one short at $n=r=3$.}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
@@ -1345,7 +1345,9 @@ optimum of $11$.}
 \end{vlist}}
 {\cRepStar}{repeated star hypertree \ \tExtremal\ \ {\scriptsize\color{black!50}$m\le3$, and $(r-1)\mid(n-1)$ at $m=3$}}
 {The twelve-copy edge witness at $(6,6,3)$ is a vertex lower bound, and does not
-prove the vertex maximum is twelve.}
+prove the vertex maximum is twelve. An exhaustive sweep at $m=4$ attains
+$\lfloor3(n-1)/(r-1)\rfloor$ and excludes one more in eleven $(n,r)$ cells, all
+$r\ge3$. At $r=2$ that formula already fails at $m=5$.}
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}
