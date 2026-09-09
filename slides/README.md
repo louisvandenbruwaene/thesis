@@ -100,7 +100,7 @@ each copies the colours, the graph vocabulary and the theme out of
 | File | Frames | Character |
 |---|---|---|
 | `seminarie/main.tex` | 41 | the results deck: every theorem, table and grid in order |
-| `seminarie/seminarie.tex` | 22 | the picture-led deck, built to the author's own outline |
+| `seminarie/seminarie.tex` | 37 | the picture-led deck, built to the author's own outline |
 
 ```bash
 cd slides/seminarie
@@ -117,8 +117,17 @@ pictures, no other mark on the frame. `\transframe` does the same for the three
 transformations, a label on top and its picture under it. Part II is the program: the two encodings, the max-flow checker as one
 matrix in and one number out, the three transformations that feed it, the three
 efficiency measures, and solving against searching. It closes with the search's
-energy function, what the search rediscovers, the status of the sixteen
-variants, what is new and what is left.
+energy function, what the search rediscovers and the status of the sixteen
+variants.
+
+The talk ends on the AI frame and a thank-you frame. After it come sixteen
+backup frames, one per variant, in the order and with the status colour of
+`fig:variant-tree-status`: the extremal function's symbol, a status chip, the
+formulas, and what was computed for that variant. **They copy the chapter's
+status colouring, so they are the same drift risk as everything else here.**
+If `ch3_synthesis.tex` re-marks a leaf, `\vframe`'s chip and the deck's copy of
+the tree both have to follow. That has already happened once: the deck's tree
+was carrying the retired red *conjectured* regime and five stale leaves.
 
 **Two house rules the author set for this deck.** No frame carries a line of
 text along its bottom edge, so the builders take no caption and every frame's

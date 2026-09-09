@@ -215,6 +215,30 @@
 
 % one row of the transformation frame: a caption column and a picture column
 % clamped independently, so neither can ever run into the other
+% a small coloured status chip, as ../thesis-beamer.tex draws it
+\newcommand{\chip}[2]{\tikz[baseline=-0.55ex]{\node[rounded corners=2pt,
+   fill=#1,text=white,inner xsep=5pt,inner ysep=2pt,
+   font=\scriptsize\bfseries]{#2};}}
+
+% one variant: its symbol, its status, the result, and what was computed
+% #1 title, #2 symbol, #3 chip colour, #4 chip word, #5 result, #6 computed
+\newcommand{\vframe}[6]{%
+\begin{frame}{#1}
+\vspace{1pt}
+\noindent{\large\color{KULblauw3b}$#2$}\hfill\chip{#3}{#4}\par
+\vspace{12pt}
+#5
+\vspace{13pt}
+\noindent{\scriptsize\color{vertexpurple!80!black}\bfseries COMPUTED}\par
+\vspace{1pt}
+\noindent{\footnotesize\color{black!70} #6}\par
+\vfill
+\end{frame}}
+
+% the bullets inside a variant frame
+\newenvironment{vlist}{\footnotesize\begin{itemize}\setlength{\itemsep}{4pt}%
+  \setlength{\topsep}{0pt}}{\end{itemize}}
+
 % one model choice: the two pills, the two words, the two pictures
 % #1 blue word, #2 blue picture, #3 red word, #4 red picture
 \newcommand{\choiceframe}[4]{%
@@ -956,12 +980,12 @@ $\Phi(G)\;=\;
   \draw[vtedge] (mhyper) -- (d7);
   \node[vtleaf, fill=regimeProved!16]      (l0)  at (0,0)    {edge};
   \node[vtleaf, fill=regimePartial!20]     (l1)  at (1.2,0)  {vertex};
-  \node[vtleaf, fill=regimeConjectured!16] (l2)  at (2.4,0)  {edge};
-  \node[vtleaf, fill=regimeConjectured!16] (l3)  at (3.6,0)  {vertex};
+  \node[vtleaf, fill=regimeOpen!22]        (l2)  at (2.4,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l3)  at (3.6,0)  {vertex};
   \node[vtleaf, fill=regimeProved!16]      (l4)  at (4.8,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l5)  at (6.0,0)  {vertex};
-  \node[vtleaf, fill=regimeProved!16]      (l6)  at (7.2,0)  {edge};
-  \node[vtleaf, fill=regimeConjectured!16] (l7)  at (8.4,0)  {vertex};
+  \node[vtleaf, fill=regimePartial!20]     (l6)  at (7.2,0)  {edge};
+  \node[vtleaf, fill=regimeOpen!22]        (l7)  at (8.4,0)  {vertex};
   \node[vtleaf, fill=regimePartial!20]     (l8)  at (9.6,0)  {edge};
   \node[vtleaf, fill=regimePartial!20]     (l9)  at (10.8,0) {vertex};
   \node[vtleaf, fill=regimeOpen!22]        (l10) at (12.0,0) {edge};
@@ -978,46 +1002,14 @@ $\Phi(G)\;=\;
   \draw[vtedge] (d5) -- (l10); \draw[vtedge] (d5) -- (l11);
   \draw[vtedge] (d6) -- (l12); \draw[vtedge] (d6) -- (l13);
   \draw[vtedge] (d7) -- (l14); \draw[vtedge] (d7) -- (l15);
-  \node[vtleaf, fill=regimeProved!16, minimum width=8mm]      (leg1) at (0,-1.5) {};
-  \node[anchor=west, font=\scriptsize] at (0.9,-1.5) {closed form proved for every $n$ and $m$};
-  \node[vtleaf, fill=regimeConjectured!16, minimum width=8mm] (leg2) at (0,-2.5) {};
-  \node[anchor=west, font=\scriptsize] at (0.9,-2.5) {conjectured, matching certified small $n$};
-  \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]        (leg3) at (9.4,-1.5) {};
-  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {leading constant proved, exact value open};
-  \node[vtleaf, fill=regimePartial!20, minimum width=8mm]     (leg4) at (9.4,-2.5) {};
-  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {exact on stated parameter ranges, open outside them};
+  \node[vtleaf, fill=regimeProved!16, minimum width=8mm]  (leg1) at (0,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (0.9,-1.5) {exact value established in the graph domain};
+  \node[vtleaf, fill=regimeOpen!22, minimum width=8mm]    (leg3) at (9.4,-1.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-1.5) {exact value open, asymptotic bounds only};
+  \node[vtleaf, fill=regimePartial!20, minimum width=8mm] (leg4) at (9.4,-2.5) {};
+  \node[anchor=west, font=\scriptsize] at (10.3,-2.5) {partial results or a conjectural general formula};
 \end{tikzpicture}}}
 \end{center}
-\end{frame}
-
-% ============================================================================
-%  16.  WHAT IS NEW
-% ============================================================================
-\begin{frame}{What is new here}
-\vfill
-\begin{itemize}\setlength{\itemsep}{13pt}
-  \item[\color{KULblauw1}\textbf{1}] \textbf{One-way multigraphs, solved for every $n$ and every $m$}\\
-        {\small\color{black!60} $L_m^{\dir}(n)=(m-1)\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$, by deleting a sparse reachability-preserving subgraph once per unit of $m-1$ rather than a vertex at a time. The quadratic extremisers are classified for $n\ge\max(8,2m)$.}
-  \item[\color{KULblauw1}\textbf{2}] \textbf{One-way simple graphs: an unconditional quadratic bound}\\
-        {\small\color{black!60} $|A(D)|\le\floorfrac{n^2}{4}+4(m-1)(n-1)$, with no hypothesis on the shape of the extremiser, so the leading constant and the order of the next term are theorems. The same count re-runs under the stricter separation.}
-  \item[\color{KULblauw1}\textbf{3}] \textbf{Hyperedge networks: the vertex problem at $m=2$ and $m=3$, and a directed leading term}\\
-        {\small\color{black!60} $\floor{2(n-1)/(r-1)}$ is a universal $m=3$ bound from a new incidence-graph rank lemma, attained for $r\ge3$ when $2\le\binom{n-2}{r-2}$. One-way, the leading term is $(m-1)n^2/\bigl(4(r-1)\bigr)$ under both separations.}
-\end{itemize}
-\vfill
-\end{frame}
-
-% ============================================================================
-%  17.  WHAT IS LEFT
-% ============================================================================
-\begin{frame}{What is left}
-\vfill
-\begin{itemize}\setlength{\itemsep}{12pt}
-  \item[{\color{regimePartial}$\blacksquare$}] The undirected \emph{vertex} problem at $m\ge6$, open since 1974
-  \item[{\color{regimeConjectured}$\blacksquare$}] The decomposition that would turn the directed conjecture into a theorem: that every extremal non-hub digraph splits as $A\cup B$ with no arc coming back
-  \item[{\color{regimeConjectured}$\blacksquare$}] Whether the directed vertex value equals the arc value at $m\ge3$, which Whitney's inequality does not hand over
-  \item[{\color{regimeOpen}$\blacksquare$}] The exact values behind the leading terms now settled, one-way and for hyperedges alike
-\end{itemize}
-\vfill
 \end{frame}
 
 % ============================================================================
@@ -1047,5 +1039,236 @@ $\Phi(G)\;=\;
 \vfill
 \vfill
 \end{frame}
+
+% ============================================================================
+%  THANK YOU
+% ============================================================================
+\begin{frame}[plain]
+\vfill
+\begin{center}
+{\color{KULblauw3b}\fontsize{40}{46}\selectfont\bfseries Thank you}\\[16pt]
+{\color{black!45}\normalsize \texttt{github.com/louisvandenbruwaene/thesis}}
+\end{center}
+\vfill
+\end{frame}
+
+% ============================================================================
+%  BACKUP: THE SIXTEEN VARIANTS, ONE FRAME EACH
+%  Order and status colour follow fig:variant-tree-status in ch3_synthesis.tex:
+%  model, then direction, then separation.  Every formula and every computed
+%  number below is one the thesis states today.
+% ============================================================================
+
+% ---- 1. simple graph, undirected, edge -------------------------------------
+\vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}{regimeProved}{ESTABLISHED}{%
+\[
+ \ell_m(n)=
+ \begin{cases}
+ \binom n2, & n<m,\\[2pt]
+ \floorfrac{m(n-1)}{2}, & n\ge m.
+ \end{cases}
+\]
+\begin{vlist}
+  \item Mader's upper bound, attained by hub-and-spokes for every $n\ge m$
+  \item Gomory--Hu double count: at most $n-1$ edges sit at tree distance one,
+        every other edge is charged to two cuts
+\end{vlist}}{%
+Tabu search returns the tree at $n=6$, $m=2$: $5=\ell_2(6)$.}
+
+% ---- 2. simple graph, undirected, vertex -----------------------------------
+\vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}{regimePartial}{PARTIAL}{%
+\[
+ k_m(n)=\ell_m(n)\ \ (m\le4),
+ \qquad
+ k_5(n)=\floorfrac{8n}{3}-4\ \ (n\ge14).
+\]
+\begin{vlist}
+  \item at $m=5$ the two agree through $n=13$, and the first gap is $33$
+        against $32$ at $n=14$
+  \item $m\ge6$ open since 1974. The block formulation would make it a
+        knapsack over feasible $2$-connected blocks with rate
+        $c_m=\lim_n k_m(n)/(n-1)$, and $m/2<c_m\le2(m-1)$ under it
+\end{vlist}}{%
+Finite block sweeps inspect small blocks only, and the recursive constructions
+in the literature show why they cannot fix $c_m$.}
+
+% ---- 3. simple digraph, directed, arc --------------------------------------
+\vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}{regimeOpen}{OPEN}{%
+\[
+ \ell_2^{\dir}(n)=M(n)=\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr),
+ \qquad
+ \ell_m^{\dir}(n)=\tfrac{n^2}{4}+\Theta_m(n).
+\]
+\begin{vlist}
+  \item upper $n^2/4+(m-1)n+O_m(1)$ for large $n$, from Huang and Lyu at
+        $t=m-1$, and this thesis adds an elementary bound valid at every $n$
+  \item lower $n^2/4+(m-2)n/2+O_m(1)$, the augmented bipartite digraph
+  \item the exact value and the linear coefficient are open, and the
+        clique-core example disproves the earlier hub-versus-bipartite formula
+\end{vlist}}{%
+Enumeration confirms $m=2$ through $n=7$. Tabu returns $6$, $10$ and $12$ at
+$n=4$, $6$ and $7$.}
+
+% ---- 4. simple digraph, directed, vertex -----------------------------------
+\vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}{regimeOpen}{OPEN}{%
+\[
+ k_2^{\dir}(n)=M(n),
+ \qquad
+ k_m^{\dir}(n)=\tfrac{n^2}{4}+\Theta_m(n)\ \ (m\ge3).
+\]
+\begin{vlist}
+  \item the $m=2$ argument never mentions the separation, so it runs for
+        $\kap$ and the arc value follows from it
+  \item whether the two agree for $m\ge3$ is open: an arc upper bound does not
+        constrain the larger vertex-feasible family
+\end{vlist}}{%
+Enumeration confirms $m=2$ through $n=7$, and the two separations agree in the
+completed $m=3$ runs through $n=6$.}
+
+% ---- 5. multigraph, undirected, edge ---------------------------------------
+\vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}{regimeProved}{ESTABLISHED}{%
+\[ L_m(n)=(m-1)(n-1). \]
+\begin{vlist}
+  \item a tree with every edge repeated $m-1$ times attains it
+  \item the upper bound counts cuts, so it holds whatever shape a feasible
+        multigraph has
+\end{vlist}}{%
+Tabu search returns the multiplicity-$2$ star at $n=6$, $m=3$: $10=L_3(6)$.}
+
+% ---- 6. multigraph, undirected, vertex -------------------------------------
+\vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}{regimePartial}{PARTIAL}{%
+\[ K_2(n)=n-1, \qquad K_3(n)=2(n-1)\ \text{\small(proposed)}. \]
+\begin{vlist}
+  \item parallel copies are separated routes under the incidence convention,
+        so this is not the simple problem under another name: $K_5(4)=14$
+        against $L_5(4)=12$
+  \item the proposed block reduction gives order $m^2n$, with coefficients
+        between $3-2\sqrt2$ and $2$ and neither a common limit nor the best
+        blocks established
+\end{vlist}}{%
+Exhaustion gives $K_5(4)=14$ and $K_5(5)=19$. A nine-vertex sweep over all
+$191826$ two-connected graphs gives $g_6(9)=54$.}
+
+% ---- 7. directed multigraph, arc -------------------------------------------
+\vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}{regimePartial}{PARTIAL}{%
+\[ L_m^{\dir}(n)=(m-1)M(n), \qquad M(n)=\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr). \]
+\begin{vlist}
+  \item one reachability-preserving subgraph is removed per unit of $m-1$,
+        rather than a vertex at a time
+  \item the fractional optimum is $M(n)$ too, so one $m$-free optimisation
+        bounds every threshold at once
+  \item the classification of the extremisers for $n\ge\max(8,2m)$ stays
+        conjectural
+\end{vlist}}{%
+Tabu returns the double star at $m=3$: $12$ at $n=4$ and $16$ at $n=5$.}
+
+% ---- 8. directed multigraph, vertex ----------------------------------------
+\vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{regimeOpen}{OPEN}{%
+\[ K_m^{\dir}(n)=(m-1)\tfrac{n^2}{4}+O_m(n) \quad\text{\small(proposed)}. \]
+\begin{vlist}
+  \item the arc extremiser is not even a finite optimum here:
+        $K_6^{\dir}(3)=24$ against the established arc maximum of $20$
+  \item the exact correction and the most effective block shapes are open
+\end{vlist}}{%
+Direct enumeration gives $K_6^{\dir}(3)=24$.}
+
+% ---- 9. simple hypergraph, undirected, edge --------------------------------
+\vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}{regimePartial}{PARTIAL}{%
+\[ \ell_m^{(r)}(n)\le\floorfrac{(m-1)(n-1)}{r-1}. \]
+\begin{vlist}
+  \item cut induction for the bound, and attainment established on
+        $m-1\le\binom{n-2}{r-2}$
+  \item off that range the supply of distinct hyperedges runs out: at
+        $n=r=m=3$ the bound reads $2$ and only one hyperedge exists
+\end{vlist}}{%
+Exhaustive enumeration gives $11$ at $(n,m,r)=(6,6,3)$, below the bound $12$.}
+
+% ---- 10. simple hypergraph, undirected, vertex -----------------------------
+\vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}{regimePartial}{PARTIAL}{%
+\[ k_2^{(r)}(n)=\floorfrac{n-1}{r-1}, \qquad k_3^{(r)}(n)\le\floorfrac{2(n-1)}{r-1}. \]
+\begin{vlist}
+  \item $m=2$ is feasible exactly when the incidence graph is a forest, and a
+        star hypertree attains the count
+  \item $m=3$ comes from the incidence-rank inequality, with simple attainment
+        for $2<r<n$
+  \item $m\ge4$ open: $\kap\le\lec$ carries an edge bound the wrong way, since
+        vertex feasibility is the weaker restriction
+\end{vlist}}{%
+No counterexample at $m=4$ across eleven $(n,r)$ cells. The $r=2$ case of the
+same problem fails at $m=5$.}
+
+% ---- 11. multihypergraph, undirected, edge ---------------------------------
+\vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}{regimePartial}{PARTIAL}{%
+\[ L_m^{(r)}(n)\le\floorfrac{(m-1)(n-1)}{r-1}. \]
+\begin{vlist}
+  \item the cut bound is unchanged by repetition, the constructions are not
+  \item a star hypertree with every edge repeated $m-1$ times reaches
+        $(m-1)(n-1)/(r-1)$ whenever $(r-1)$ divides $n-1$
+  \item at $n=r=m=3$, two copies of the only triple reach a value the simple
+        model cannot
+\end{vlist}}{%
+A twelve-copy construction at $(n,m,r)=(6,6,3)$ exceeds the simple edge
+optimum of $11$.}
+
+% ---- 12. multihypergraph, undirected, vertex -------------------------------
+\vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}{regimePartial}{PARTIAL}{%
+\[ K_2^{(r)}(n)=\floorfrac{n-1}{r-1}, \qquad K_3^{(r)}(n)\le\floorfrac{2(n-1)}{r-1}. \]
+\begin{vlist}
+  \item repetition does not help at $m=2$: two copies of one hyperedge are
+        already two separated routes
+  \item at $m=3$ the bound is the one above, and the repeated star supplies
+        further attainment cases
+  \item larger thresholds open
+\end{vlist}}{%
+The twelve-copy edge witness at $(6,6,3)$ is a vertex lower bound, and does not
+prove the vertex maximum is twelve.}
+
+% ---- 13. directed simple hypergraph, arc -----------------------------------
+\vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}{regimeOpen}{OPEN}{%
+\[ \ell_m^{\dir\,(r)}(n)=(1+o(1))\,\frac{(m-1)n^2}{4(r-1)} \qquad (r\ge3). \]
+\begin{vlist}
+  \item a shadow digraph on tail--head pairs, with a matching argument for the
+        distinct two-step routes that share one hyperedge
+  \item attained asymptotically by a two-layer construction whose heads have
+        bounded incidence degree
+  \item finite exact values open
+\end{vlist}}{%
+At $n=m=6$, $r=3$, giving each tail five distinct outgoing hyperedges produces
+$30$ of them, with a direct degree-cut feasibility check.}
+
+% ---- 14. directed simple hypergraph, vertex --------------------------------
+\vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}{regimeOpen}{OPEN}{%
+\[ k_m^{\dir\,(r)}(n)=(1+o(1))\,\frac{(m-1)n^2}{4(r-1)} \qquad (r\ge3). \]
+\begin{vlist}
+  \item the shadow argument re-runs under the stricter separation, so the
+        leading term is the same
+  \item whether the finite edge and vertex maxima agree is open
+\end{vlist}}{%
+Random greedy growth with shuffled restarts measures what the implemented
+search finds, and establishes no optimum.}
+
+% ---- 15. directed multihypergraph, arc -------------------------------------
+\vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}{regimeOpen}{OPEN}{%
+\[ L_m^{\dir\,(r)}(n)=(1+o(1))\,\frac{(m-1)n^2}{4(r-1)} \qquad (r\ge3). \]
+\begin{vlist}
+  \item repetition removes the distinct-head-set restriction in the two-layer
+        construction, so the finite values can differ from the simple model
+  \item forward, backward and general orientations share this leading term
+  \item at $r=2$ these are directed multigraphs, and the simple $r=2$
+        coefficient is $1/4$ instead, which is why $r\ge3$ is kept
+\end{vlist}}{%
+The plotted experiments use rank three and the forward convention. General
+orientations are checked separately in the appendix.}
+
+% ---- 16. directed multihypergraph, vertex ----------------------------------
+\vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}{regimeOpen}{OPEN}{%
+\[ K_m^{\dir\,(r)}(n)=(1+o(1))\,\frac{(m-1)n^2}{4(r-1)} \qquad (r\ge3). \]
+\begin{vlist}
+  \item the same established leading term under both separations
+  \item finite exact values open, and whether forward and general agree once
+        $n>r$ is open
+\end{vlist}}{%
+The rank-three forward-convention runs are not an exhaustive comparison of the
+three orientation models.}
 
 \end{document}
