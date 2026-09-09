@@ -100,7 +100,7 @@ each copies the colours, the graph vocabulary and the theme out of
 | File | Frames | Character |
 |---|---|---|
 | `seminarie/main.tex` | 41 | the results deck: every theorem, table and grid in order |
-| `seminarie/seminarie.tex` | 21 | the picture-led deck, built to the author's own outline |
+| `seminarie/seminarie.tex` | 20 | the picture-led deck, built to the author's own outline |
 
 ```bash
 cd slides/seminarie
@@ -112,7 +112,8 @@ own order. Part I unfolds the question: the title translated into plain words, a
 graph as $E + V$ drawn in one layout, then $\ell_m(n)$ with an arrow from
 $\lambda^{\max}$ down to $\lambda(u,v)$ and the routes that define it, the same
 cascade again for $\kappa$, and the three model toggles as a blue pill against a
-red one. Part II is the program: the two encodings, the max-flow checker as one
+red one, one frame each, drawn by `\choiceframe`: two pills, two words, two
+pictures, no other mark on the frame. Part II is the program: the two encodings, the max-flow checker as one
 matrix in and one number out, the three transformations that feed it, the three
 efficiency measures, and solving against searching. It closes with the search's
 energy function, what the search rediscovers, the status of the sixteen

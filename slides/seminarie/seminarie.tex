@@ -513,7 +513,7 @@
     \draw[gline] (mc) -- (ma);
   \end{scope}}
 
-\choiceframe{graph}{%
+\choiceframe{non-hypergraph}{%
   \begin{scope}[scale=1.35]
     \coordinate (ga) at (-0.9,-0.9); \coordinate (gb) at (0.9,-0.9);
     \coordinate (gc) at (0.9, 0.9);  \coordinate (gd) at (-0.9,0.9);
@@ -523,7 +523,7 @@
       \draw[metro, metroD] (gc) -- (gd);
     \end{scope}
     \foreach \p in {ga,gb,gc,gd} {\node[metrostop] at (\p) {};}
-  \end{scope}}{hyper}{%
+  \end{scope}}{hypergraph}{%
   \begin{scope}[scale=1.35]
     \coordinate (ha) at (-0.9,-0.9); \coordinate (hb) at (0.9,-0.9);
     \coordinate (hc) at (0.9, 0.9);  \coordinate (hd) at (-0.9,0.9);
