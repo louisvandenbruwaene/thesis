@@ -13,8 +13,8 @@ These are not equivalent tasks and their times are not solver speed-up ratios:
              parallel=False. It is GIVEN the known optimal arc count and only
              lists feasible classes at that count; it does not prove the optimum.
 
-The blind sweep is only run for n <= 4: at n = 5 the 2^20 assignments already
-cost tens of minutes with this reference implementation, the same growth
+The blind sweep is only run for n <= 4: at n = 5 the 2^20 assignments are
+estimated to cost tens of minutes with this reference implementation, the same growth
 fig:complexity plots. Requires nauty's geng on PATH.
 """
 from __future__ import annotations

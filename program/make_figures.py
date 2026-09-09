@@ -431,9 +431,11 @@ def _best_known_block(b: int, m: int) -> int:
     knapsack to one construction family understates it.  Where the exhaustive
     sweep of ``scripts/multi_vertex_blocks.py`` reaches, ``_BLOCK_SWEEP`` holds
     its answer, which is ``g_m(b)`` exactly and is what ``tab:multi-vertex-blocks``
-    prints.  Beyond that range the value is the larger of the two exhibited
+    prints.  Beyond that range the value is the largest of the three exhibited
     families:
 
+    * the thickened clique on ``b <= m`` vertices at multiplicity ``m+1-b``,
+      carrying ``b(b-1)(m+1-b)/2`` edges;
     * the thickened theta of ``sec:multi-vertex``, two poles joined to each of
       the other ``b-2`` vertices at multiplicity ``m-2`` and to each other at
       ``max(0, m+1-b)``, feasible exactly for ``b <= m+1``; and
@@ -450,6 +452,8 @@ def _best_known_block(b: int, m: int) -> int:
     if swept is not None:
         return swept
     best = 0
+    if b <= m:
+        best = b * (b - 1) * (m + 1 - b) // 2
     if b <= m + 1:
         best = max(best, 2 * (b - 2) * (m - 2) + max(0, m + 1 - b))
     for s in range(1, b // 2 + 1):

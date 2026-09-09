@@ -122,7 +122,7 @@ def enumerate_extremal(n: int, m: int, verbose: bool = True):
     if verbose:
         print(f"  n={n} m={m}: target {target} arcs, every degree {deg_exact}, "
               f"multiplicity cap {cap}")
-        print(f"    DFS nodes {visited[0]}, extremal multigraphs found "
+        print(f"    DFS nodes {visited[0]}, regular acyclic candidates found "
               f"{len(found)}")
         print(f"    all of them equal (m-1)*B({n//2},{n//2}): "
               f"{all(is_thickened_bipartite(g) for g in found)}")
@@ -133,11 +133,13 @@ def main() -> None:
     if os.environ.get("N"):
         enumerate_extremal(int(os.environ["N"]), int(os.environ.get("M", "3")))
         return
-    print("extremal multigraphs at |A| = (m-1)*floor(n^2/4), quadratic branch")
-    print("the proof in the thesis covers n >= 2m; the rows with n < 2m are")
-    print("outside it and are checked here to see whether it holds anyway\n")
+    print("regular acyclic candidates at |A| = (m-1)*floor(n^2/4)")
+    print("the proposed classification covers n >= max(8, 2m). This search")
+    print("checks only the regular acyclic family, including outside that range; ")
+    print("it does not independently establish the full classification.\n")
     for (n, m) in [(8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (10, 2), (10, 3)]:
-        covered = "covered by the proof" if n >= 2 * m else "OUTSIDE the proof"
+        covered = ("within the proposed classification range" if n >= max(8, 2 * m)
+                   else "OUTSIDE the proposed classification range")
         print(f"[{covered}]")
         enumerate_extremal(n, m)
         print()
