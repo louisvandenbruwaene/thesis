@@ -210,43 +210,54 @@
 \newcommand{\sProved}{\chip{regimeProved}{PROVED}}
 \newcommand{\sProposed}{\chip{regimePartial}{PROPOSED}}
 \newcommand{\sOpen}{\chip{regimeOpen}{OPEN}}
+% A value settled at one size by exhausting the finite search space. It is not a
+% bound and it is not a proof: it is a computation, so it gets its own word and
+% is never dressed as PROVED.
+\newcommand{\sComputed}{\chip{black!45}{COMPUTED}}
 \newcommand{\tExtremal}{\chip{vertexgreen!70!black}{EXTREMAL}}
 \newcommand{\tNear}{\chip{vertexorange!85!black}{NEAR-EXTREMAL}}
 \newcommand{\tAsym}{\chip{KULblauw1}{ASYMPTOTICALLY EXTREMAL}}
 
-% one variant: the two bounds with the idea behind each, a witness drawn at the
-% size the numbers refer to, and where else the value is known.
-% #1 title, #2 symbol, #3 upper, #4 lower, #5 notes, #6 picture,
-% #7 picture caption, #8 scope
-\newcommand{\vframe}[8]{%
+% The regime of a whole variant, in the three colours and the wording of the
+% status tree, so a backup frame and the tree cannot drift apart: the chip here
+% is the colour that variant's leaf carries there.
+\newcommand{\rgProved}{\chip{regimeProved}{EXACT VALUE ESTABLISHED}}
+\newcommand{\rgOpen}{\chip{regimeOpen}{GENERAL VALUE OPEN}}
+\newcommand{\rgPartial}{\chip{regimePartial}{PARTIAL OR CONJECTURAL}}
+
+% one variant: its regime, the two bounds with the idea behind each, a witness
+% drawn at the size the numbers refer to, and the results the sketch uses.
+% #1 title, #2 symbol, #3 regime, #4 upper, #5 lower, #6 sketch, #7 picture,
+% #8 picture caption, #9 uses
+\newcommand{\vframe}[9]{%
 \begin{frame}{#1}
 \vfill
-\noindent{\large\color{KULblauw3b}$#2$}\par
-\vspace{2pt}
+\noindent{\large\color{KULblauw3b}$#2$}\hfill#3\par
+\vspace{0pt}
 \begin{columns}[T,onlytextwidth]
 \column{0.685\textwidth}
   {\small
    \noindent\parbox[t]{1.26cm}{\strut{\color{black!40}\bfseries\footnotesize UPPER}}%
-   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #3}\par
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #4}\par
    \vspace{5pt}
    \noindent\parbox[t]{1.26cm}{\strut{\color{black!40}\bfseries\footnotesize LOWER}}%
-   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #4}\par}
+   \hspace{6pt}\parbox[t]{\dimexpr\linewidth-1.56cm\relax}{\strut\raggedright #5}\par}
   \vspace{6pt}
-  {\small #5}
+  {\small #6}
 \column{0.295\textwidth}
   \centering
-  \adjustbox{max totalheight=0.28\textheight}{\resizebox{\linewidth}{!}{#6}}\par
+  \adjustbox{max totalheight=0.28\textheight}{\resizebox{\linewidth}{!}{#7}}\par
   \vspace{5pt}
   % \\ inside \centering left a sub-point overfull box on every variant frame;
   % ending the paragraph and setting the caption in its own box does not.
-  \parbox{\linewidth}{\centering\footnotesize\color{black!60} #7}
+  \parbox{\linewidth}{\centering\footnotesize\color{black!60} #8}
 \end{columns}
 % The label sits on the same line as its sentence rather than above it. At
 % \small the old stacked form cost a whole line and pushed the last sentence
 % under the footer strip on the densest frames.
-\vspace{6pt}
+\vspace{4pt}
 \noindent{\footnotesize\color{vertexpurple!80!black}\bfseries USES\ \ }%
-{\footnotesize\color{black!70} #8}\par
+{\footnotesize\color{black!70} #9}\par
 \vfill
 \end{frame}}
 
@@ -1307,21 +1318,26 @@ $\Phi(G)\;=\;
 \noindent{\color{black!45}\footnotesize\bfseries HOW TO READ THE NEXT SIXTEEN FRAMES}\par
 \vspace{7pt}
 \noindent Each frame takes one variant, fixes a small size, and evaluates the
-formula there, so the general rule and a number you can check sit side by side.\par
-\vspace{10pt}
-\begin{tabular}{@{}r@{\hspace{12pt}}p{0.70\linewidth}@{}}
+formula there. Top right it carries its leaf's colour from the status tree.\par
+\vspace{9pt}
+\noindent\rgProved\ \ \rgPartial\ \ \rgOpen\par
+\vspace{3pt}
+\noindent{\footnotesize\color{black!55}the three regimes of the tree, in its
+colours: each frame carries its own, top right}\par
+\vspace{9pt}
+\begin{tabular}{@{}r@{\hspace{10pt}}p{0.68\linewidth}@{}}
 {\color{black!40}\bfseries\footnotesize UPPER}
-           & the formula, with any condition it needs \\[6pt]
+           & the formula, with any condition it needs \\[5pt]
 {\color{black!40}\bfseries\footnotesize LOWER}
-           & what the construction achieves, as a formula too \\[6pt]
+           & what the construction achieves, as a formula too \\[5pt]
+\sProved   & a bound with a proof behind it \\[4pt]
+\sComputed & a value found by exhausting a finite search space, which is a
+             computation and is never called a proof \\[5pt]
 {\color{KULblauw1}\bfseries\footnotesize 1.\,2.\,3.}
-           & a sketch of the argument, upper bound first, ending with what
-             attains it \\[6pt]
-{\color{vertexpurple!80!black}\bfseries\footnotesize USES}
-           & the results the sketch leans on, numbered as in the thesis \\[6pt]
-\tExtremal & the drawing is that witness, and beside it the size and the value
-             both bounds meet at, so every vertex and every edge on it can be
-             counted against that number \\
+           & a sketch, upper bound first, ending with what attains it, then the
+             results it leans on \\[5pt]
+\tExtremal & the drawing is that witness, with the size and the shared value
+             beside it, so it can be counted against that number \\
 \end{tabular}}
 \end{minipage}
 \end{center}
@@ -1329,20 +1345,20 @@ formula there, so the general rule and a number you can check sit side by side.\
 \end{frame}
 
 % ---- 1. simple graph, undirected, edge -------------------------------------
-\vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}
+\vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}{\rgProved}
 {$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge m$}}
 {$\floorfrac{m(n-1)}{2}$ \ \sProved}
 {\begin{vsteps}
-  \vstep{a Gomory--Hu tree summarises every pairwise connectivity in $n-1$ cuts}
-  \vstep{each cut has capacity at most $m-1$, so together they carry $(m-1)(n-1)$}
+  \vstep{a Gomory--Hu tree holds every pairwise connectivity in $n-1$ cuts}
+  \vstep{each has capacity at most $m-1$, so they carry $(m-1)(n-1)$ in all}
   \vstep{every edge is charged to two of those cuts, which halves the count}
   \vstep{a star with a degree-$(m-2)$ spoke graph on its leaves attains it}
 \end{vsteps}}
 {\cHub}{\atsize{n=7,\ m=3}{9} \ \tExtremal}
-{Mader 1.2 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ double count A.5--A.7 \ \textperiodcentered\ \ hub-and-spokes A.8 \ \textperiodcentered\ \ near-regular A.9}
+{Mader 1.2 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ double count A.5--7 \ \textperiodcentered\ \ hub-and-spokes A.8--9}
 
 % ---- 2. simple graph, undirected, vertex -----------------------------------
-\vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}
+\vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}{\rgPartial}
 {$k_m(n)=\ell_m(n)$ \ \sProved\ \ {\scriptsize\color{black!50}$m\le4$}}
 {$\floorfrac{m(n-1)}{2}$ \ \sProved}
 {\begin{vsteps}
@@ -1356,7 +1372,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {B\'artfai--Bollob\'as--Leonard 1.4 \ \textperiodcentered\ \ S{\o}rensen--Thomassen 1.5 \ \textperiodcentered\ \ degree bound A.3}
 
 % ---- 3. simple digraph, directed, arc --------------------------------------
-\vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}
+\vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}{\rgOpen}
 {$M(n)=\max\bigl(2(n-1),\floor{n^2/4}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
 {$\floorfrac{n^2}{4}$ \ \sProved}
 {\begin{vsteps}
@@ -1371,7 +1387,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Arc value at $m=2$ 1.6 \ \textperiodcentered\ \ skeleton A.18--A.19 \ \textperiodcentered\ \ two-hop A.20 \ \textperiodcentered\ \ the two $m=2$ families A.25 \ \textperiodcentered\ \ directed hub A.15 \ \textperiodcentered\ \ one-way bipartite A.16}
 
 % ---- 4. simple digraph, directed, vertex -----------------------------------
-\vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}
+\vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}{\rgOpen}
 {$M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
 {$\floorfrac{n^2}{4}$ \ \sProved}
 {\begin{vsteps}
@@ -1387,7 +1403,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Vertex value at $m=2$ 1.7 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deletion monotonicity A.23 \ \textperiodcentered\ \ one-way bipartite A.16}
 
 % ---- 5. multigraph, undirected, edge ---------------------------------------
-\vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}
+\vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}{\rgProved}
 {$(m-1)(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}every $n$ and $m$}}
 {$(m-1)(n-1)$ \ \sProved}
 {\begin{vsteps}
@@ -1401,7 +1417,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Multigraph edge value 1.3 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ thickened tree A.36}
 
 % ---- 6. multigraph, undirected, vertex -------------------------------------
-\vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}
+\vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}{\rgPartial}
 {$2(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=3$}}
 {$(m-1)(n-1)$ \ \sProved}
 {\begin{vsteps}
@@ -1416,7 +1432,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Splitting the vertex measure A.54 \ \textperiodcentered\ \ value at $m=2$ A.55 \ \textperiodcentered\ \ value at $m=3$ A.57 \ \textperiodcentered\ \ incidence rank A.52}
 
 % ---- 7. directed multigraph, arc -------------------------------------------
-\vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}
+\vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}{\rgProved}
 {$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}every $n$ and $m$}}
 {$(m-1)\cdot2(n-1)$ \ \sProved}
 {\begin{vsteps}
@@ -1431,22 +1447,23 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree A.36 \ \textperiodcentered\ \ integrality A.39}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
-\vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}
-{exhaustive enumeration \ \sProved}
+\vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{\rgOpen}
+{$(m-1)\floorfrac{n^2}{4}+4(m-1)^2(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}reads $210$ here, far from tight}}
 {$n(n-1)(m+1-n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{$\kap$ splits as $\mu+\pi$ again: direct copies plus disjoint detours}
-  \vstep{with one other vertex there is exactly one detour, so each direction
-         stops at $m-2=4$ rather than at the cap of five}
+  \vstep{where all six directions are present each pair has exactly one detour,
+         so its multiplicity stops at $m-2=4$ rather than at the cap of five}
   \vstep{the six directions give $6\times4=24$, and enumeration leaves exactly
          one isomorphism class}
   \vstep{it is the complete digraph thickened, the $b=3$ block of A.65}
 \end{vsteps}}
-{\cTriFour}{\atsize{n=3,\ m=6}{24} \ \tExtremal}
+{\cTriFour}{\atsize{n=3,\ m=6}{24}\par
+   \vspace{2pt}\sComputed\ \tExtremal}
 {Directed incidence value A.64 \ \textperiodcentered\ \ splitting the vertex measure A.54 \ \textperiodcentered\ \ thickened complete digraph A.65}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
-\vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}
+\vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved}
 {$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m-1\le\binom{n-2}{r-2}$}}
 {\begin{vsteps}
@@ -1461,7 +1478,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49 \ \textperiodcentered\ \ lower bound A.50}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
-\vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}
+\vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{n-1}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
 {$\floorfrac{n-1}{r-1}$ \ \sProved}
 {\begin{vsteps}
@@ -1477,7 +1494,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
-\vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
+\vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}unchanged by repetition}}
 {$\dfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$(r-1)\mid(n-1)$}}
 {\begin{vsteps}
@@ -1492,7 +1509,7 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ multihypergraph lower bound A.51 \ \textperiodcentered\ \ twelve copies on six vertices A.48}
 
 % ---- 12. multihypergraph, undirected, vertex -------------------------------
-\vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}
+\vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{2(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m=3$}}
 {$\dfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$(r-1)\mid(n-1)$}}
 {\begin{vsteps}
@@ -1507,8 +1524,8 @@ formula there, so the general rule and a number you can check sit side by side.\
 {Vertex value at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ multihypergraph lower bound A.51}
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
-\vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}
-{exhaustive enumeration \ \sProved}
+\vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}{\rgOpen}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
 {$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved}
 {\begin{vsteps}
   \vstep{every route out of a vertex has to start with one of that vertex's own
@@ -1520,13 +1537,14 @@ formula there, so the general rule and a number you can check sit side by side.\
          digraph carries the route cap onto two-step routes}
   \vstep{at this size enumeration closes the gap, and $4\times2=8$}
 \end{vsteps}}
-{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8} \ \tExtremal\par
+{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8}\par
+   \vspace{2pt}\sComputed\ \tExtremal\par
    {\scriptsize\color{black!55}one tail of the four, each doing the same}}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ one-step shadow A.71 \ \textperiodcentered\ \ two-step budget A.28}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
-\vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}
-{exhaustive enumeration \ \sProved}
+\vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}{\rgOpen}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
 {$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved}
 {\begin{vsteps}
   \vstep{the outgoing cut never looks at interior vertices at all}
@@ -1536,41 +1554,47 @@ formula there, so the general rule and a number you can check sit side by side.\
          stricter separation for the same reason}
   \vstep{whether the two separations keep one value at larger sizes is open}
 \end{vsteps}}
-{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8} \ \tExtremal\par
+{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8}\par
+   \vspace{2pt}\sComputed\ \tExtremal\par
    {\scriptsize\color{black!55}one tail of the four, each doing the same}}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68}
 
 % ---- 15. directed multihypergraph, arc -------------------------------------
-\vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}
-{exhaustive enumeration \ \sProved}
+\vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}{\rgOpen}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved}
 {$n(m-1)$ \ \sProved}
 {\begin{vsteps}
+  \vstep{counting tail--head pairs gives the upper bound: each hyperedge covers
+         $r-1$ of them, and no ordered pair takes more than $m-1$}
   \vstep{the outgoing cut caps each tail at $m-1$ copies, whatever those copies
-         are, so with repeats allowed the count is simply $n(m-1)$}
+         are, so with repeats allowed the construction reaches $n(m-1)$}
   \vstep{at this size a tail has only one possible head set, the other two
          vertices, so repetition is the only way to grow at all}
-  \vstep{lifting that limit on distinct head sets is the whole difference from
-         the simple model}
-  \vstep{forward, backward and general orientations share the growth rate,
-         backward being the reverse of forward}
+  \vstep{the two meet here, both reading $6$, so the value needs no search:
+         it is the smallest size at which the counting bound is already tight}
 \end{vsteps}}
-{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6} \ \tExtremal\par
+{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
+   \vspace{2pt}\tExtremal\par
    {\scriptsize\color{black!55}one tail of the three, each doing the same}}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ backward reverses forward A.69}
 
 % ---- 16. directed multihypergraph, vertex ----------------------------------
-\vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}
-{exhaustive enumeration \ \sProved}
+\vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}{\rgOpen}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved}
 {$n(m-1)$ \ \sProved}
 {\begin{vsteps}
-  \vstep{the outgoing cut ignores interior vertices, so it gives both
-         separations at once here too and the arc witness carries over}
+  \vstep{the pair count bounds this variant too, and the outgoing cut ignores
+         interior vertices, so both bounds carry over from the arc problem
+         unchanged}
+  \vstep{they meet here as well, so this size is settled by argument rather
+         than by search}
   \vstep{the general model, which allows every non-empty tail--head split, obeys
          the forward bound and shares its constant}
   \vstep{whether forward and general agree at a fixed $n>r$, and not merely in
          the growth rate, is open}
 \end{vsteps}}
-{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6} \ \tExtremal\par
+{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
+   \vspace{2pt}\tExtremal\par
    {\scriptsize\color{black!55}one tail of the three, each doing the same}}
 {General orientation constant A.72 \ \textperiodcentered\ \ general obeys forward A.70 \ \textperiodcentered\ \ backward reverses forward A.69 \ \textperiodcentered\ \ bounded outgoing count A.68}
 
