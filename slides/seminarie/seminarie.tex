@@ -422,16 +422,24 @@
   \node[font=\scriptsize, text=black!55] at ( 1.7,-1.95) {$B$};
 \end{tikzpicture}}
 
-% the n = 3 directed multigraph whose maximum was settled by enumeration. The
-% six directions are drawn once each; the multiplicity they carry is what the
-% caption states, since the winning assignment is a search result and not a
-% named family.
-\newcommand{\cExhaustTri}{\begin{tikzpicture}[>=Stealth]
-  \foreach \i/\a in {1/90,2/210,3/330}
-    {\node[gvertex, minimum size=5.2mm] (v\i) at (\a:1.3) {};}
+% The n = 3, m = 6 directed multigraph maximum, recovered by enumerating every
+% multiplicity matrix at 24 arcs: one isomorphism class, and a completely
+% regular one. Every ordered pair carries four copies, so all 24 arcs are on
+% the page as four strands per direction, eight in each braid.
+\newcommand{\cTriFour}{\begin{tikzpicture}[>=Stealth]
+  % The arrowheads sit mid-arc rather than at the target. Twenty-four heads all
+  % landing on three nodes was an unreadable spike, and mid-arc heads leave each
+  % strand traceable along its own length.
+  \tikzset{strand/.style={line width=1.05pt, KULblauw1!85,
+      shorten >=1.8mm, shorten <=1.8mm, postaction={decorate},
+      decoration={markings,
+        mark=at position 0.56 with {\arrow{Stealth[length=2.3mm]}}}}}
+  \foreach \i/\a in {1/90, 2/210, 3/330}{\coordinate (v\i) at (\a:2.05);}
   \foreach \i/\j in {1/2, 2/3, 3/1}{
-    \draw[gdir] (v\i) to[bend left=17] (v\j);
-    \draw[gdir] (v\j) to[bend left=17] (v\i);}
+    \foreach \b in {10, 24, 38, 52}{
+      \draw[strand] (v\i) to[bend left=\b] (v\j);
+      \draw[strand] (v\j) to[bend left=\b] (v\i);}}
+  \foreach \i in {1,2,3}{\node[gvertex, minimum size=6mm] at (v\i) {};}
 \end{tikzpicture}}
 
 % bounded outgoing hyperedge count at n = 4, r = 3: every vertex is the tail of
@@ -1368,14 +1376,15 @@ once.}
 {$24$ \ \sProved}
 {$24$ \ \sProved}
 {\begin{vlist}
-  \item three vertices, every direction present, and the copies on them capped
-        so that no ordered pair carries six separated routes
-  \item the winner here is a search result rather than a named family, and the
-        arc extremiser does not reach it: twenty arcs against twenty-four
+  \item every one of the six directions carries four copies: three vertices,
+        twenty-four arcs, and it is the only shape that reaches the maximum
+  \item four is the cap, not five, because an ordered pair also picks up one
+        route through the third vertex, which brings it to five in total
+  \item the arc extremiser does not reach this: twenty arcs against twenty-four
 \end{vlist}}
-{\cExhaustTri}{$n=3$, $m=6$, up to five copies per direction \ \tExtremal}
-{Settled by enumerating every directed multigraph on three vertices. Larger
-sizes stay open.}
+{\cTriFour}{$n=3$, $m=6$ \ \tExtremal}
+{Enumerating every directed multigraph on three vertices leaves this one
+isomorphism class. Larger sizes stay open.}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
 \vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}
