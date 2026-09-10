@@ -11,7 +11,6 @@ Asking the two ends to be distinct rules out loops, which some texts do admit an
 We write $V(G)$ for the set of vertices, $E(G)$ for the multiset of edges, and $\mu(u,v)$ for the \emph{multiplicity} of a pair, the number of copies of the edge joining $u$ and $v$.
 The \emph{size} $|E(G)| = \sum_{\{u,v\}} \mu(u,v)$, the sum running over unordered pairs of distinct vertices, counts the edges with their multiplicity, and it is the very quantity this thesis tries to make as large as possible under certain constraints.
 If $\mu(u,v) \le 1$ for every pair, so that no edge is repeated, $G$ is a \emph{simple graph}.
-A repeated edge joins two vertices exactly as a single edge does, so what separates the two notions is the multiplicity rather than the number of ends.
 One pictures such a simple graph by representing the vertices as dots and the edges as lines between them.
 
 \begin{figure}[ht]
@@ -52,8 +51,7 @@ The pair with the most such paths determines the value for the whole graph:
 \]
 For a graph with fewer than two vertices, we set this maximum to zero.
 The same convention applies to the other maximum local connectivities below.
-A theorem of Menger \cite{Menger27}, recalled in \Cref{app:proofs}, gives this quantity a second face: $\lec_G(u, v)$ also equals the least number of edges one must remove to cut every route from $u$ to $v$ (\Cref{fig:menger}).
-The maximum number of edge-disjoint paths between a pair is exactly the number of edges in the minimum cut between them when every edge has unit capacity.
+A theorem of Menger \cite{Menger27}, recalled in \Cref{app:proofs}, gives an equivalent cut description: $\lec_G(u, v)$ also equals the least number of edges one must remove to cut every route from $u$ to $v$ (\Cref{fig:menger}).
 
 \begin{figure}[ht]
 \centering
@@ -127,15 +125,14 @@ The hypergraph bound (\Cref{prop:hyper-edge}) uses no tree at all and is proved 
 
 \section{Variants of the problem}
 
-So far the problem has been stated for simple graphs, but the same question remains unanswered in a more general setting.
-Each assumption made so far will be toggled to create a lattice of variants and the thesis will explore each node of that lattice.
+Changing the assumptions gives eight network models, each with two notions of route separation.
 
 The first is \emph{arity}: an edge joins exactly two vertices and a \emph{hyperedge} joins $r \ge 2$ vertices.
-Hence such \emph{hypergraphs} use \emph{Berge paths}, consistent with the path definition above.
+In an $r$-uniform hypergraph, every hyperedge contains exactly $r$ vertices. A \emph{Berge path} alternates distinct vertices and distinct hyperedge copies, with each hyperedge containing the vertices immediately before and after it.
 The size of a hypergraph counts its hyperedges with their multiplicity, exactly as the size of a graph counts its edges.
 The second is \emph{multiplicity}: a \emph{simple} graph or hypergraph carries at most one copy of each edge, so $\mu \le 1$ throughout, while a \emph{multigraph} allows parallel copies.
 The third is \emph{direction}: a directed edge, called an arc, is an ordered pair of vertices and a directed hyperedge has one tail and $r-1$ heads.
-These three toggles create a lattice of eight models, shown in \Cref{fig:eight-models}.
+These three choices give the eight models shown in \Cref{fig:eight-models}.
 
 \begin{figure}[ht]
 \centering
@@ -259,7 +256,7 @@ These three toggles create a lattice of eight models, shown in \Cref{fig:eight-m
     \end{scope}
     \foreach \p in {Ad,Bd,Cd,Dd} {\node[stn] at (\p) {};}
     \node[font=\itshape] at (0,-1.75) {directed hypergraph};
-    \node[font=\scriptsize, text=black!65] at (0,-2.25) {two share an edge};
+    \node[font=\scriptsize, text=black!65] at (0,-2.25) {overlapping hyperedges};
   \end{scope}
   % (d) directed multihypergraph: the SAME two hyperedges as fig:four-models,
   %     {A,B,C} red repeated and {B,C,D} blue, as metro stars on the same edges
@@ -484,7 +481,7 @@ Some remaining variants are included to complete that map rather than because th
 \subsection{Undirected graphs}
 
 \begin{theorem}\label{thm:multigraph-edge}
-For undirected multigraphs on $n$ vertices, $L_m(n) = (m-1)(n-1)$.
+For $n\ge1$ and $m\ge2$, undirected multigraphs satisfy $L_m(n) = (m-1)(n-1)$.
 \end{theorem}
 
 \Cref{app:proofs} gives the full proof which also uses the Gomory--Hu tree.
@@ -531,7 +528,9 @@ For simple digraphs,
 \]
 \end{theorem}
 
-Two constructions give the lower bound, one on each branch, and \Cref{fig:simple-digraph-m2} draws both. The first is a hub joined to every other vertex in both directions, which reaches $2(n-1)$ arcs. That branch has no unique extremiser, since any tree on $n$ vertices with every edge taken in both directions reaches $2(n-1)$ arcs too, the tree offering each pair only its one path in each direction, and the bidirected star is the case of it drawn here. The second sends every arc from one half of the vertices to the other and none back, which reaches $\floor{n^2/4}$. \Cref{sec:dir-constructions} defines both and checks that neither carries a second route between any pair. The upper-bound proof is in \Cref{sec:dir-arc-m2} and takes a few lines. Every digraph has a thin \emph{reachability skeleton}, a subdigraph carrying exactly the same who-reaches-whom relation, and \Cref{sec:reach-skeleton} shows one can always be found with at most $M(n)$ arcs. At $m = 2$ a feasible digraph can spare none of its arcs to that thinning, since an arc whose endpoints are still joined by a longer route inside the skeleton would give that pair two independent routes. So the digraph is its own skeleton and inherits the skeleton's count. The argument never mentions $n$, so it needs no base cases, and it never mentions the separation, so it is run for $\kap$, whose feasible family contains the arc-feasible one, and the arc value follows from it.
+The two constructions in \Cref{fig:simple-digraph-m2} attain the two terms: a bidirected star has $2(n-1)$ arcs, and a balanced complete bipartite digraph with all arcs in one direction has $\floor{n^2/4}$. Each is feasible because every ordered pair has at most one directed path. Any bidirected tree attains the first count; the star is the illustrated example (\Cref{sec:dir-constructions}).
+
+For the upper bound, a \emph{reachability skeleton} is a subdigraph preserving which vertices can reach which others. \Cref{lem:reach-skeleton} bounds its size by $M(n)=\max(2(n-1),\floor{n^2/4})$. At $m=2$, omitting any arc would leave another route between its endpoints, giving two internally vertex-disjoint paths. A feasible digraph must therefore equal its skeleton. This proves the upper bound under vertex separation and hence under arc separation (\Cref{sec:dir-arc-m2}).
 
 \begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
@@ -581,7 +580,7 @@ For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.
 \label{fig:simple-digraph-m2}
 \end{figure}
 
-The hub leads for $n < 7$ and the bipartite wall leads for $n > 7$.
+The hub leads for $n < 7$ and the one-way complete bipartite digraph leads for $n > 7$.
 Notice how the directed value is quadratic in $n$ for large $n$, while the undirected value is linear.
 This is because digraphs can be lopsided in one direction without creating routes back.
 
@@ -637,7 +636,7 @@ help.
 \end{theorem}
 
 \begin{theorem}[Hypergraph vertex value at $m = 3$]\label{thm:hyper-vertex-m3}
-For $r \ge 2$, every $r$-uniform multihypergraph on $n$ vertices with
+For $r \ge 2$ and $n\ge1$, every $r$-uniform multihypergraph on $n$ vertices with
 $\kap^{\max} \le 2$ has at most $\floorfrac{2(n-1)}{r-1}$ hyperedges. For
 $2 < r < n$, which is exactly the range where $2 \le \binom{n-2}{r-2}$, the bound
 is attained by a simple hypergraph, so
@@ -650,15 +649,9 @@ $K_3^{(r)}(n)$ takes the same value on that range
 (\Cref{prop:hyper-vertex-lower-multi}).
 \end{theorem}
 
-Both proofs read Berge routes as ordinary paths in the incidence graph, and \Cref{app:proofs} gives them.
-The $m = 3$ case is the harder one and rests on a rank bound argued by induction over blocks and separating pairs.
-At $m \ge 4$ that route stops for want of a $4$-connectivity analogue, and the value is open.
-\Cref{prop:hyper-edge} counts hyperedges, but it does not say how to \emph{measure} the Berge connectivity of a hypergraph we are handed, and that measurement is the new part.
-The metro picture shows why.
-An ordinary edge is a one-stop link between a single pair, so policing edge-disjointness means watching each pair on its own.
-A hyperedge is a whole line: it stops at all $r$ of its vertices and so touches $\binom{r}{2}$ pairs at once, yet like a line that can run only one train at a time it may serve only one route.
-When several routes want to board the same line at different stations, the checker must wave exactly one through and turn the rest away and it must do this for every line simultaneously.
-That bookkeeping is the one new piece of machinery the next chapter builds and it is why the hypergraph rejoins the family only once the checker is in place.
+Both proofs use the incidence graph (\Cref{sec:hyper-vertex-proof}). At $m=3$, the main step bounds its cycle rank by decomposing it at cut vertices and separating pairs. No corresponding bound for $m\ge4$ is established here.
+
+To measure hyperedge-disjoint routes, the checker must allow each hyperedge copy to serve at most one route, even when routes enter it at different vertices. Chapter~2 enforces this with a capacity gate for each hyperedge (\Cref{fig:hyper-gadget}).
 
 At $r=2$ these statements concern multigraphs. \Cref{thm:hyper-vertex-m2}
 gives $K_2(n) = n-1$, where the cap leaves every multiplicity at one and the
@@ -667,8 +660,7 @@ $K_3(n) = 2(n-1)$, attained by a spanning tree with every edge doubled
 (\Cref{cor:multi-vertex-m3}). The first threshold at which the multigraph vertex
 value is known to differ from its edge counterpart is $m = 5$, where
 $K_5(4) = 14$ against $L_5(4) = 12$. Whether they agree at $m = 4$ is open. From
-$m = 5$ the value also parts company with the thickened tree, which a single
-grafted triangle already beats
+$m = 5$ the value also parts company with the thickened tree, which the proposed construction with an attached triangle would beat
 (\Cref{thm:clique-chain-vertex}). \Cref{app:proofs} works the problem out. The
 measure splits into parallel copies plus longer detours
 (\Cref{lem:multi-vertex-split}), which is used in a proposed reduction to a knapsack
@@ -692,7 +684,7 @@ so for each fixed $m$,
 and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of the augmented bipartite count hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
 \end{theorem}
 
-The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to the wall plus a linear correction.
+The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to $\floor{n^2/4}$ plus a linear correction.
 
 The routes this count produces are internally vertex-disjoint, not merely arc-disjoint. That is what lets the whole argument be re-run under the stricter separation, and Whitney's inequality alone would not justify the transfer, since it points the other way.
 
@@ -745,4 +737,4 @@ well, since $\kap \le \lec$, and \Cref{thm:dir-hyper-constant} at $r = 2$ suppli
 upper bound, so $K_m^{\mathrm{dir}}(n) = (m-1)n^2/4 + O_m(n)$
 (\Cref{cor:dir-multi-incidence}).
 
-For the simple directed arc problem, a matching upper bound for the constructions of \Cref{const:directed-comparison} remains open here when $m\ge3$. The literature bound of Huang and Lyu, together with the displayed construction, independently establishes that the value is $n^2/4+\Theta_m(n)$. Determining the linear contribution, and then the bounded correction if such an expansion holds, would require sharper bounds. That coefficient is not out of reach either: a feasible digraph has at most $m-1$ two-step routes between any ordered pair, so it contains no $m$ such routes with common endpoints, and the Tur\'an theorem of Huang and Lyu for that family replaces the coefficient $4(m-1)$ above by $m-1$ once $n$ is large in terms of $m$ \cite{HuangLyu26}.
+For the simple directed arc problem, a matching upper bound for the constructions of \Cref{const:directed-comparison} remains open here when $m\ge3$. A feasible digraph has at most $m-1$ two-step routes between any ordered pair. Huang and Lyu's Tur\'an theorem therefore replaces the upper coefficient $4(m-1)$ by $m-1$ for sufficiently large $n$ \cite{HuangLyu26}. Together with the augmented bipartite construction, this independently gives $n^2/4+\Theta_m(n)$.

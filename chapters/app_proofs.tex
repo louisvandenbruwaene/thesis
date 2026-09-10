@@ -309,7 +309,7 @@ Substituting $|E_1| = (n-1) - S_3$ into the first and equating it with the secon
 The whole characterisation reads off that last identity. If $m(n-1)$ is even, equality $|E| = m(n-1)/2$ forces $S_1 = S_2 = S_3 = 0$. If $m(n-1)$ is odd the floor absorbs exactly one unit, so $S_1 + S_2 + S_3 = 1$ and exactly one of the three slacks equals one.
 \end{proof}
 
-For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique} that the search of \Cref{ch:discover} rediscovers.
+For $m = 2$ the characterisation says the extremal graphs are exactly the spanning trees: every tree edge must carry weight one and lie in $G$, so $G$ contains its own Gomory--Hu tree and has only $n-1$ edges to spend. For $m = 4$ and $n \equiv 1 \pmod{3}$ it is consistent with the trees of $K_4$ blocks glued at shared cut vertices, the case of \Cref{const:shared-clique}.
 
 \begin{remark}[Forcing and avoiding counts]\label{rem:threshold-convention}\label{rem:threshold-audit}
 This thesis maximises the number of edges while avoiding $m$ disjoint routes
@@ -398,7 +398,7 @@ At $m = 4$ the picture is $h_4(b) = 2(b-1)$ for every $b \ge 4$, so the rate $h_
 
 At every $m$ it identifies the Bollob\'as--Erd\H{o}s construction, as many copies of $K_m$ sharing one vertex as fit, as the case $b = m$: $h_m(m) = \binom{m}{2}$ and the rate is exactly $m/2$. Their conjecture is precisely the assertion $c_m = m/2$, that no block beats $K_m$. Exhaustive computation over all $2$-connected graphs on at most nine vertices, of which there are $194066$ at the top size alone, confirms that none does, for every $m \le 8$: the rate $m/2$ is attained and never exceeded. That sweep runs from its own standalone script, \code{program/scripts/simple\_vertex\_blocks.py}, rather than from the main program, so it corroborates the checker instead of sharing code with it. A \emph{bouquet} is a collection of blocks sharing one common vertex and otherwise disjoint. Since its rate is a weighted average of the rates of its blocks, a counterexample must contain a single $2$-connected block that beats $m/2$ on its own, and by the computation such a block needs at least ten vertices.
 
-The reason the computation does not reach further is structural rather than a matter of processor time. The conjecture is false. Leonard disproved it first, at $m = 5$, with an explicit graph on $57$ vertices \cite{Leonard73BE}, and Mader showed that the difference $k_m(n) - mn/2$ is unbounded for $m \ge 6$ \cite{Mader73}. What replaces it, and what the rest of this section leans on, is a lower bound of S\o{}rensen and Thomassen \cite{SorensenThomassen74}: for each fixed $m$,
+The finite agreement does not extend to all orders: the conjecture is false. Leonard disproved it first, at $m = 5$, with an explicit graph on $57$ vertices \cite{Leonard73BE}, and Mader showed that the difference $k_m(n) - mn/2$ is unbounded for $m \ge 6$ \cite{Mader73}. What replaces it, and what the rest of this section leans on, is a lower bound of S\o{}rensen and Thomassen \cite{SorensenThomassen74}: for each fixed $m$,
 \[
     c_m \;\ge\; \frac{m(m-1)-2}{2m-3} \;=\; \frac{m}{2} + \frac{1}{4} + O(1/m) ,
 \]
@@ -573,7 +573,7 @@ triangle} is the three-vertex pattern $x\to y$, $y\to z$, $x\to z$.
   \node[font=\small] at (2.6,2.0) {$R$};
 \end{scope}
 \end{tikzpicture}}
-\caption[A reachability skeleton]{A small instance of \Cref{lem:reach-skeleton}. In $D$ (left) three bidirected pairs $A = \{a_1,a_2\}$, $B = \{b_1,b_2\}$, $C = \{c_1,c_2\}$ are the strongly connected components, joined by $a_2 \to b_1$, $b_2 \to c_1$, and $a_1 \to c_2$. Contracting each pair to a point gives a condensation $Q_0$ on three points, carrying all three arcs $A \to B$, $B \to C$ and $A \to C$. That is exactly the transitively-closed triangle the proof rules out of the thinned $Q$. The arc $A \to C$ is redundant, since $A$ already reaches $C$ through $B$, so the transitive reduction $Q$ keeps only $A \to B$ and $B \to C$. The underlying graph of $Q$ is then a path on three points, triangle-free as claimed. The reachability skeleton $R$ (right) reflects exactly this: every SCC keeps both of its internal arcs (an in- and an out-arborescence on two vertices is just the pair itself), while of the three component-crossing arcs of $D$ only the two witnesses of $Q$'s two arcs survive. The direct arc $a_1 \to c_2$ is dropped, yet $a_1$ still reaches $c_2$ in $R$: first $a_1 \to a_2$, then $a_2 \to b_1$, then $b_1 \to b_2$, then $b_2 \to c_1$, then $c_1 \to c_2$.}
+\caption[A reachability skeleton]{The construction of \Cref{lem:reach-skeleton}. Each bidirected pair $A,B,C$ is a strongly connected component. Contracting the pairs gives $A\to B\to C$ and the redundant arc $A\to C$. Delete that arc to obtain the triangle-free transitive reduction. The skeleton $R$ keeps the internal arcs of each pair and the two remaining connections between pairs. Although $a_1\to c_2$ is removed, $a_1$ still reaches $c_2$ through $B$.}
 \label{fig:skeleton-example}
 \end{figure}
 
@@ -615,14 +615,14 @@ Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ t
 since arc-disjoint paths in $D - v_0$ are still arc-disjoint paths in $D$, and internally vertex-disjoint paths in $D - v_0$ are still internally vertex-disjoint paths in $D$. The two statements are proved by the same one-line observation because deleting a vertex only removes routes, never creates any, and it cannot make two surviving routes share anything they did not share before.
 \end{lemma}
 
-In words: deleting a vertex can never manufacture independent routes. Every route surviving in $D - v_0$ was already a route in $D$, so no pair comes out of the deletion better connected than it went in. It is stated here because it is elementary and directed, and it is used in \Cref{sec:two-step-budget}, where the sparse case of \Cref{lem:two-step-budget} deletes a vertex of low degree and needs to know the budget survives. It holds for both separations alike.
+\Cref{lem:subdigraph-monotone} justifies the low-degree vertex deletion in \Cref{sec:two-step-budget}.
 
 \begin{remark}[Which way Whitney runs]\label{rem:whitney-direction}
 Whitney's inequality is easy to misread: the tempting direction is the wrong one. From $\kap_D(u,v) \le \lec_D(u,v)$ for every pair it follows that $\kap^{\max}_D \le \lec^{\max}_D$, hence that
 \[
     \{D : \lec^{\max}_D \le m-1\} \;\subseteq\; \{D : \kap^{\max}_D \le m-1\}.
 \]
-Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem, and not the other way round. The vertex-feasible family contains the arc-feasible one, so the inequality between the extremal numbers it hands over for free is
+Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem; Whitney's inequality alone does not give the converse. The vertex-feasible family contains the arc-feasible one, so the inequality between the extremal numbers it hands over for free is
 \[
     k_m^{\mathrm{dir}}(n) \;\ge\; \ell_m^{\mathrm{dir}}(n),
 \]
@@ -861,7 +861,7 @@ Otherwise $d(x) \ge n/2$ for every vertex. By the estimate for $\min(a,b)$ above
 and \Cref{lem:smaller-half-deletion} converts that into the claim.
 \end{proof}
 
-\Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:basecases}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced bipartite wall, which holds $\floor{n^2/4}$ arcs. The wall's quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. Neither proof below assumes anything about the shape of $D$.
+\Cref{thm:dir-arc-linear-error}, stated in \Cref{ch:basecases}, says in words that a feasible simple digraph is never more than a linear amount denser than the balanced one-way complete bipartite digraph, which holds $\floor{n^2/4}$ arcs. Its quadratic term is therefore the leading term, and what remains in question is how large the linear correction is. Neither proof below assumes anything about the shape of $D$.
 
 \begin{proof}[Proof of \Cref{thm:dir-arc-linear-error}]
 By \Cref{lem:feasible-budgeted} a simple digraph with $\lec^{\max}_D \le m-1$ is $(m-1)$-budgeted, so \Cref{lem:two-step-budget} at $C = m-1$ gives the stated bound.
@@ -882,7 +882,7 @@ By \Cref{lem:feasible-budgeted} again, now under its second hypothesis, a simple
 For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bipartite} has $\lec^{\max} \le m-1$, hence $\kap^{\max} \le m-1$ by Whitney, so for $n \ge m$ it witnesses $k_m^{\mathrm{dir}}(n) \ge \floor{(n+m-2)^2/4}$. For fixed $m\ge3$ this is $n^2/4 + \Theta_m(n)$, and at $m=2$ \Cref{thm:dir-vertex-m2-exact} gives the sharper $n^2/4+O(1)$ asymptotic.
 \end{proof}
 
-These bounds leave a gap in the linear coefficient. Exact eventual equality would also determine the bounded correction. The augmented bipartite construction supplies a lower linear contribution of $(m-2)n/2+O_m(1)$, whereas \Cref{thm:dir-arc-linear-error} allows $4(m-1)n$ above the quadratic term. For $m\ge3$, the ratio of these linear coefficients is $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. That is the factor at every $n$. Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} cited in \Cref{ch:basecases} lowers the upper end to $m-1$, and the factor with it to $2(m-1)/(m-2)$: four at $m = 3$, and tending to two. \Cref{rem:case2-tight} explains why the existing degree estimates alone do not close that gap.
+These bounds leave a gap in the linear coefficient. Exact eventual equality would also determine the bounded correction. The augmented bipartite construction supplies a lower linear contribution of $(m-2)n/2+O_m(1)$, whereas \Cref{thm:dir-arc-linear-error} allows $4(m-1)n$ above the quadratic term. For $m\ge3$, the ratio of these linear coefficients is $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. This compares coefficients, not the finite bounds including their constant and rounding terms. Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} cited in \Cref{ch:basecases} lowers the upper end to $m-1$, and the factor with it to $2(m-1)/(m-2)$: four at $m = 3$, and tending to two. \Cref{rem:case2-tight} explains why the existing degree estimates alone do not close that gap.
 
 \begin{remark}[The dense case's coefficient needs a new inequality]\label{rem:case2-tight}
 One might hope to cut the coefficient of the dense case, the one where every $d(x) \ge n/2$, using the observation that in the augmented bipartite construction one whole side has $\min(d^+, d^-) = 0$, so summing the worst-case bound for $\min(d^+,d^-)$ at every vertex looks wasteful. That observation alone does not cut the coefficient. The value four is the best universal coefficient obtainable from the two facts that case uses, the budget $\sum_x d^+(x)\,d^-(x) \le C n(n-1)$ of \Cref{lem:budget-degree-sum} and the floor $d(x) \ge n/2$. Read $C = m-1$ throughout what follows.
@@ -905,7 +905,7 @@ Conversely, fix $m$ and take $n$ large. Assign $t=n/4$ to as many abstract verti
 The crude per-vertex bound therefore loses nothing within this relaxation, and the reason is that its two sources of slack close at that very point. The estimate $\min(a,b)\le2ab/(a+b)$ is an equality only when $d^+(x) = d^-(x)$, and the floor substitution $d(x) \to n/2$ is an equality only when $d(x) = n/2$. Both hold at once exactly when $d^+(x) = d^-(x) = n/4$, which is the profile the relaxed optimum concentrates on. Cutting the constant therefore needs a second and independent inequality, one that constrains interference among the handful of expensive near-balanced vertices themselves rather than a sharper reading of the one already in hand.
 \end{remark}
 
-One thing \Cref{thm:dir-arc-linear-error} does not say is how far a feasible digraph is from the bipartite shape, since its dense case deletes arcs but its sparse case argues by induction instead. \Cref{lem:smaller-half-deletion} gives that structural statement directly, at the cost of a weaker bound, and the two are not comparable: at $m = n = 3$ the display below reads $11$ against the $18$ of \Cref{thm:dir-arc-linear-error}, and \Cref{thm:dir-arc-linear-error} only becomes the smaller of the two past the crossover of its $4(m-1)(n-1)$ with the $\sqrt{m}\,n^{3/2}$ below. Dropping the lower-order terms puts that crossover near $16(m-1)^2/m$, a rough estimate reading $21.3$ at $m = 3$ and $36$ at $m = 4$. Solved exactly, it falls between $19$ and $20$ at $m = 3$ and between $33$ and $34$ at $m = 4$. The second conclusion is a \emph{bipartisation} bound: a lower-order number of deletions leaves the digraph a subgraph of a one-directional bipartite digraph. It does not say that the partition is balanced or that the surviving arcs fill it, so it stops short of a stability statement in the usual sense, which would need a near-extremality hypothesis to start from.
+The linear-error bound controls the number of arcs. The next proposition also controls their arrangement: after deleting $O(\sqrt m\,n^{3/2})$ arcs, every remaining arc goes from one part of a partition to the other. This is called a \emph{bipartisation bound}. It does not guarantee balanced parts or that all possible cross-part arcs remain. For fixed $m$, its error is larger than the linear error of \Cref{thm:dir-arc-linear-error}, although it can give a smaller numerical bound at small orders.
 
 \begin{proposition}[Quadratic bound and bipartisation]\label{prop:dir-arc-stability}
 Let $D$ be a simple digraph on $n \ge 2$ vertices with $\lec^{\max}_D \le m-1$. Then deleting at most $\sqrt{m}\, n^{3/2}$ arcs leaves $D$ a subgraph of a one-directional bipartite digraph, and
@@ -1088,7 +1088,7 @@ Let $m \ge 2$ and $n \ge \max(8,\, 2m)$, so that $M(n) = \floor{n^2/4}$ and $n$ 
 where $B_{a,b}$ has all arcs from its part of size $a$ to its part of size $b$, and every displayed arc has multiplicity exactly $m-1$. Thus there is one isomorphism class when $n$ is even and two when $n$ is odd, interchanged by reversing every arc.
 \end{conjecture}
 
-In words: past $n = \max(8, 2m)$ the underlying bipartite shape is forced. Split the vertices as evenly as possible, choose either part as the source, run every arc from it to the other part, and repeat each arc $m-1$ times. When $n$ is odd the two choices give two non-isomorphic digraphs, because the source has different size, and they are reversals of one another.
+The conjecture asserts that for $n\ge\max(8,2m)$ the underlying bipartite shape is forced. Split the vertices as evenly as possible, choose either part as the source, run every arc from it to the other part, and repeat each arc $m-1$ times. When $n$ is odd the two choices give two non-isomorphic digraphs, because the source has different size, and they are reversals of one another.
 
 \begin{proof}[Proposed proof]
 Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \ge \beta = |B| = \floor{n/2}$.
@@ -1448,8 +1448,7 @@ separates the pair and \Cref{thm:menger-hyper} caps $\kap(u,w)$ at $m-1$.
 
 If $u \in G_i$ and $w \in G_j$ with $i \ne j$, then two different blocks meet only
 at $h$, so every $u$--$w$ Berge route has $h$ in its interior. Two internally
-vertex-disjoint routes cannot both use $h$ there, so $\kap(u,w) \le 1$. Hence
-$\kap^{\max} = m-1$ and the hypergraph is feasible.
+vertex-disjoint routes cannot both use $h$ there, so $\kap(u,w) \le 1$. Hence $\kap^{\max}=m-1$ when at least one hyperedge is present. At $n=1$ the construction is empty and $\kap^{\max}=0$. In both cases it is feasible.
 
 At $m = 3$ the count is $2(n-1)/(r-1)$, which is $\floor{2(n-1)/(r-1)}$ under the
 divisibility hypothesis, and \Cref{thm:hyper-vertex-m3} bounds every
@@ -1832,7 +1831,7 @@ both sides read $n-1$ by \Cref{rem:multi-vertex-m2-simple}.
 
 \subsection{The value is a block problem}\label{sec:multi-vertex-blocks}
 
-The lower bounds above are constructions and the upper bound is a density count, and neither says what an extremiser looks like. This section reduces the whole question to one about $2$-connected graphs: the number of vertices in play stops being $n$ and becomes the size of a single block.
+The lower bounds above are constructions and the upper bound is a density count, and neither says what an extremiser looks like. The proposed reduction would turn this into an optimisation over $2$-connected graphs and single-edge blocks: the number of vertices in play stops being $n$ and becomes the size of a single block.
 
 Two observations do it. The first is already in the section, one line further than it was taken.
 
@@ -1880,7 +1879,7 @@ Each block inherits feasibility, $\kap^{\max}_B \le \kap^{\max}_{G_0} \le m-1$ b
 \emph{Every multiset is realised.} Given blocks $B_1, \dots, B_t$ with $\sum (b_i - 1) \le n-1$, take one common vertex and attach the $B_i$ to it, pairwise disjoint otherwise, leaving any spare vertices isolated. The result uses $1 + \sum (b_i-1) \le n$ vertices. Its blocks are exactly the $B_i$, so by the first paragraph its $\kap$ agrees with $\kap_{B_i}$ on pairs inside a block and equals at most $1$ on pairs split between two blocks, which the shared vertex separates. So the graph is feasible and scores $\sum_i W_m(B_i)$, and choosing each $B_i$ optimal gives $\sum_i g_m(b_i)$. This proves $\ge$.
 \end{proof}
 
-The reduction changes what has to be searched: enumerate $2$-connected simple
+If verified, the reduction would change what has to be searched: enumerate $2$-connected simple
 graphs, evaluate $W_m$, and solve the resulting knapsack. A sweep through eight
 vertices gives \Cref{tab:multi-vertex-blocks} and agrees with the independent
 exhaustive routine wherever both finish. It runs from a standalone script,
@@ -2051,8 +2050,7 @@ Since $M(n)=\floor{n^2/4}$ for $n\ge7$, these bounds imply the stated asymptotic
 The exhaustive values agree and stay strictly inside these bounds where both are known:
 $K_6^{\mathrm{dir}}(3) = 24$ against the lower bound $(m-1)M(3) = 20$, so the arc
 extremiser read through $\kap \le \lec$ is a lower bound for the incidence problem and
-not its value. What beats it at that size is a block, and the block argument of
-\Cref{thm:multi-vertex-blocks} carries over to directed routes without change.
+not its value. What beats it at that size is a block, and \Cref{prop:dir-multi-vertex-blocks} proposes a corresponding block argument for directed routes.
 
 \begin{construction}[Thickened complete digraph, and its bouquet]\label{const:dir-multi-vertex-blocks}
 For $2 \le b \le m$, take the complete digraph on $b$ vertices and give every arc

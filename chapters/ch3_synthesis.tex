@@ -61,11 +61,7 @@ At $m=3$, exhaustive search proves the values $6,9,12,15$ for $n=3,4,5,6$.
 The two separation conditions agree at every one of these orders (\Cref{rem:dir-vertex-m3}).
 The search does not settle $n=7$.
 
-The clique-core digraph is also a counterexample to the earlier decomposition
-conjecture, which has been removed. That conjecture would force the quadratic
-upper bound as soon as that branch exceeds the hub bound, which already happens
-at $m=5$, $n=12$, and its $57$ arcs exceed the $56$ that the decomposition would
-impose there (\Cref{const:clique-core}).
+The $57$-arc example also rules out a general decomposition that would limit every feasible digraph to the augmented bipartite count, which is $56$ here (\Cref{const:clique-core}).
 
 For fixed $m\ge3$, the augmented bipartite count has the same leading term and the same order of error as the optimum.
 The proof of \Cref{thm:dir-arc-linear-error} gives an elementary
@@ -150,11 +146,11 @@ For eventual exactness, the argument must explain why no configuration has more
 arcs than the augmented bipartite construction once $n$ is sufficiently large
 in terms of $m$. The clique-core examples show why a restriction on $n$ is needed.
 \Cref{prop:dir-arc-stability,thm:dir-arc-linear-error} address this structure in two ways.
-In \emph{size}, the extremal value lies within $O_m(n)$ of the wall's count.
+In \emph{size}, the extremal value lies within $O_m(n)$ of the balanced bipartite count.
 The remaining uncertainty includes the linear coefficient and the bounded correction.
 In \emph{shape}, the bipartisation bound says every feasible digraph becomes a subgraph of a one-directional bipartite graph after deleting $O(\sqrt{m}\,n^{3/2})$ arcs.
 This weaker error comes from an argument that does not induct on a low-degree vertex.
-The undirected problem has no analogous obstacle, because Mader's degree-counting argument closes it in a few lines.
+For the undirected edge problem, the Gomory--Hu double count gives a matching upper bound (\Cref{sec:mader-gomory-hu}).
 The quadratic phenomenon is therefore the reason the directed and undirected problems differ in difficulty.
 
 \section{Current status of the sixteen variants}
@@ -366,7 +362,7 @@ requires the cut bound above.
 For vertex separation, repetitions do not help at $m=2$, because two copies
 of one hyperedge already give two separated routes between its vertices.
 The established value is again $\floor{(n-1)/(r-1)}$. The established $m=3$
-upper bound is the same as for simple hypergraphs, and the repeated star
+upper bound is the same as for simple hypergraphs, and the star hypertree with every hyperedge repeated twice
 supplies the additional attainment cases stated in
 \Cref{prop:hyper-vertex-lower-multi}. At larger thresholds, finite witnesses
 and the simple-model lower bounds remain available, but the edge upper bound
@@ -539,5 +535,3 @@ where it is established and find vertex bounds beyond the $m=3$ rank argument.
 \item For directed hypergraphs, determine finite values and compare the effects
 of multiplicity, separation and orientation beyond the established leading term.
 \end{itemize}
-The computations supply examples and finite checks for these questions.
-Extending them to arbitrary orders requires a verified general argument.

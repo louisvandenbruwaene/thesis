@@ -3,8 +3,8 @@ The previous chapter gave insight into the problem and some variants, but left m
 This chapter will serve as a finite check of the results and conjectures by testing them on small graphs through brute-force enumeration.
 It will also be the foundation of conjectures for the open cases, by discovering extremal graphs or at least sufficiently dense graphs.
 Pattern recognition on the discovered values, or even a family of extremal graphs, then lets conjectures be made, although those conjectures are supported only by small graphs.
-Larger graph spaces will be scoured by a heuristic, namely tabu search.
-A guided search is needed there because only a small fraction of the search space is extremal: assigning edges at random gives a binomially distributed edge count, so almost every graph lands far from the cap.
+Larger instances use tabu search for graphs and random greedy growth for hypergraphs.
+Random edge assignments do not enforce the connectivity cap. Guided search instead uses the checker to find dense feasible examples.
 The archive is the repository at \url{https://github.com/louisvandenbruwaene/thesis} and every file path quoted in this thesis is relative to it, or to a base directory named where the path is given, with the commands and the audit trail collected in \Cref{sec:transcripts}.
 \Cref{fig:spine} diagrams the program's architecture, showing how the modelled graphs are fed to the checker and how the results are used to either certify or discover bounds.
 \begin{figure}[ht]
@@ -18,11 +18,11 @@ The archive is the repository at \url{https://github.com/louisvandenbruwaene/the
 All non-hypergraphs are represented using one multiplicity matrix $\mu$: it is symmetric when undirected and binary when simple.
 Hypergraphs are stored as (multi)sets of hyperedges, which are sets of vertices with a tail distinguished in the directed model.
 \Cref{fig:matrix-rep} shows this encoding for a directed multigraph and hypergraph.
-Matrix or tensor representations for hypergraphs are thus not recommended due to their size and sparsity.
+Hyperedge lists store the edges that are present without allocating an entry for every possible hyperedge.
 The enumeration considers graphs of a fixed order and maximises their edge count subject to the connectivity constraint.
 Matrices are iterated as a depth-first search with entries in $\{0,1\}$ for simple graphs and in $\{0,\ldots,m-1\}$ for multigraphs, and the diagonal is always zero.
 Hypergraphs are implemented similarly from the ground up, over their lists of hyperedges rather than a matrix.
-Notice how depth-first search is memory-efficient.
+Depth-first search stores the current branch rather than all candidates at once.
 
 
 \section{Measuring}
@@ -34,10 +34,10 @@ It is therefore important to distinguish between the densest graph possible and 
 A completed enumeration gives an exact extremal value. An unfinished enumeration gives only a lower bound.
 In the vertex-disjoint and hypergraph cases the graph will be transformed before the flow can be measured.
 This ensures that every variant shares the same integer max-flow engine.
-Thus the whole question reduces to a flow computation:
+Testing one pair reduces to a flow computation:
 a \emph{maximum flow} asks how much can be pushed from one point to another through a network whose links each carry a limited capacity.
 Menger's theorem (\Cref{thm:menger}) already turned $\lambda(u,v)$ into the number of edges or arcs in a minimum cut.
-For a simple graph, $\lambda(u,v)$ is therefore also the capacity of a cut over a network with unit capacities.
+For a simple graph, $\lambda(u,v)$ is therefore the minimum cut capacity when every edge has unit capacity.
 For a multigraph, the parallel copies can be combined into one link whose capacity is their multiplicity $\mu(u,v)$.
 In the directed case these capacities follow the direction of the arcs, while in the undirected case they are available in either direction.
 The max-flow/min-cut theorem of Ford and Fulkerson \cite{FordFulkerson56} says that this smallest cut has exactly the value of a maximum flow.
@@ -499,7 +499,7 @@ Scaling then gives
 The reverse inequality needs a $\{0,1\}$ matrix of weight $M^{*}(n)$.
 Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 
-On the linear branch, \Cref{const:dir-multi-lower} supplies the double star.
+On the linear branch, \Cref{const:dir-multi-lower} supplies the bidirected star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
 For $n\le6$, this is the larger term of the established value $M(n)$.
 The historical solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
@@ -514,7 +514,7 @@ An explicit construction gives attainment from below.
 Clearing denominators from a rational optimum reduces the reverse inequality to \Cref{thm:dir-multi-full}.
 Scaling the integral maximiser by $m-1$ gives the lower bound $(m-1)M^{*}(n)$.
 The preceding scaling argument gives the matching upper bound unconditionally.
-The finite optimisation is retained only as an independent check of the cases $n\le6$, and \Cref{sec:transcripts} records what it ran.
+The historical finite optimisation is retained as supporting evidence for $3\le n\le6$, without a replayable upper-bound certificate, and \Cref{sec:transcripts} records what it ran.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
@@ -583,31 +583,16 @@ and the walk perturbs itself when it stalls.
 Simulated annealing is an alternative on the same energy and neighbourhood \cite{KirkpatrickGelattVecchi83}.
 It accepts worsening moves with the probability given by the Metropolis rule \cite{Metropolis53}.
 That probability decreases as the run cools.
-At an equal wall-clock budget, annealing is the weaker engine here.
+In the reported comparison with equal time budgets, annealing finds fewer arcs.
 For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph construction, while annealing reaches $20$ arcs.
 For the simple digraph, tabu reaches $18$ arcs and annealing reaches $16$.
 Matrix-model discovery uses tabu search. Supplied constructions are reported separately from the search outcomes.
 Annealing is retained for the comparison above and as an independent cross-check in the program's self-test,
-where agreement between two unrelated walks is worth more than the speed of either.
+where agreement provides an additional check on the search implementations.
 
-Allowing the walk above the cap is a search strategy, not a requirement for reaching every feasible graph.
-Removing an edge can only lower $\lambda^{\max}$ and $\kappa^{\max}$, never raise them,
-so every subgraph of a feasible graph is again feasible, and the empty graph is feasible trivially.
-From any feasible target we can therefore delete edges one at a time down to the empty graph
-without ever crossing the cap, and reading that path backward builds the target up the same way.
-The feasible region is connected through the empty graph by single-edge moves that stay inside it,
-so a walk that never went infeasible could in principle visit every feasible graph there is.
-We let the walk become infeasible because reachability and efficiency are different questions.
-A feasible graph can be locally maximal even when it is far from globally optimal.
-Escaping it may require exchanging one edge for another.
-Removing first and then adding stays feasible, but the removal temporarily worsens the objective.
-Reversing the order keeps the edge count high, but the addition may temporarily violate the connectivity cap.
-Allowing both orders gives the walk another short route across a local barrier.
-Infeasibility is a search device, not a target.
-A single walk depends on its starting point and random seed.
-The program therefore runs several independent restarts until the wall-clock budget expires.
-It keeps the densest witness found by any restart.
-The restarts share no state and can run on separate processor cores.
+Every feasible graph can be reduced to the empty graph by deleting edges, and the reverse sequence stays feasible. Thus temporary infeasibility is not necessary to reach a target. It can nevertheless help the search: exchanging edges may require either a removal that lowers the edge count or an addition that temporarily exceeds the cap. Tabu search permits both while retaining only feasible results.
+
+Several independent restarts run until the time budget expires, and the densest feasible witness is retained. Restarts share no state and can run on separate processor cores.
 
 \subsection{Random greedy growth for hypergraphs}
 
@@ -723,12 +708,12 @@ In all seven validation cases in \Cref{tab:rediscovery}, it reaches the establis
       \draw[gdir] (l3\ang) to[bend left=30]  (h3);
       \draw[gdir] (l3\ang) to[bend left=11]  (h3);
     }
-    \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
+    \node[font=\footnotesize\itshape] at (0,-2.4) {bidirected star, doubled arcs};
     \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\mathrm{dir}}(n)=12$};
   \end{scope}
 \end{tikzpicture}%
 }
-\caption{Examples from the extremal families discussed alongside \Cref{tab:rediscovery}, drawn at the reported sizes. The path illustrates the tree family but is not the saved search witness. \Cref{fig:simple-digraph-m2} shows a bidirected star, which ties the one-directional wall at $n=7$.}
+\caption{Examples from the extremal families discussed alongside \Cref{tab:rediscovery}, drawn at the reported sizes. The path illustrates the tree family but is not the saved search witness. \Cref{fig:simple-digraph-m2} shows a bidirected star, which ties the one-way complete bipartite digraph at $n=7$.}
 \label{fig:rediscovery-gallery}
 \end{figure}
 
@@ -744,18 +729,18 @@ The directed multigraph run finds the same star with both directions present at 
 It is the thickened tree of \Cref{const:dir-multi-lower}.
 
 The simple directed run finds a bidirected star at $n=4$.
-At $n=7$ it finds twelve arcs, where the hub and the one-directional wall tie (\Cref{fig:simple-digraph-m2}).
+At $n=7$ it finds twelve arcs, where the hub and the one-way complete bipartite digraph tie (\Cref{fig:simple-digraph-m2}).
 This is the crossover predicted by \Cref{thm:dir-arc-m2-exact}.
 The search carries none of these names.
 It finds the constructions solely by optimising under the connectivity cap.
 
 The seven successful cases do not establish reliable performance past $n=7$.
-At $n=8$ and $m=2$, a bidirected star has fourteen arcs, whereas a one-directional balanced wall has sixteen.
-Moving from a completed hub to the one-directional wall requires many coordinated arc changes (\Cref{fig:simple-digraph-m2}).
+At $n=8$ and $m=2$, a bidirected star has fourteen arcs, whereas a balanced one-way complete bipartite digraph has sixteen.
+Moving from a completed hub to the one-way complete bipartite digraph requires many coordinated arc changes (\Cref{fig:simple-digraph-m2}).
 Single-arc moves can therefore make the star a difficult state to escape. This explains a possible search obstruction, not a proof that every run must stall there.
 The explicit construction and its connectivity check supply the sixteen-arc lower bound independently of whether an unaided run finds it.
 
-The double star of \Cref{fig:rediscovery-gallery} provides another witness beyond the search range.
+The bidirected star family illustrated in \Cref{fig:rediscovery-gallery} also supplies witnesses at larger orders and multiplicities.
 At $n=7$ and $m=4$, it has $36$ arcs and $\lambda^{\max}=3$.
 Its count equals $2(n-1)(m-1)$.
 Neither witness alone proves optimality.
