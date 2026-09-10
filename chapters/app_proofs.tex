@@ -695,8 +695,7 @@ For the connectivity, fix $a \in A$ and $b \in B$. Consider the following routes
 The augmented bipartite construction gives a quadratic lower bound, but it
 does not describe every extremal digraph. The following construction is denser
 than both the hub and the augmented bipartite families on a range of orders, so
-$\ell_m^{\mathrm{dir}}$ is not the maximum of those two counts, and the
-decomposition proposed alongside that formula does not hold either.
+$\ell_m^{\mathrm{dir}}$ is not the maximum of those two counts.
 
 \begin{construction}[Clique-core counterexample]\label{const:clique-core}
 Let $n\ge m\ge2$, put $p=n-m$, $a=\ceil{p/2}$ and $b=\floor{p/2}$.
@@ -741,17 +740,6 @@ The independent script \code{program/scripts/clique\_core\_check.py} checks the
 displayed cuts and identities and enumerates all $4094$ nontrivial cuts of the
 twelve-vertex example.
 
-The same example refutes the earlier decomposition conjecture. A partition
-with all arcs from a non-empty $A$ to $B$, no arcs inside $A$, and no arcs
-from $B$ to $A$ would give
-\[
- |A(D)|\le |B|(n-|B|)+(m-2)|B|
-          \le\floorfrac{(n+m-2)^2}{4}.
-\]
-For the first inequality, fix $a\in A$ and $b\in B$. The direct path and
-the two-step paths through the internal in-neighbours of $b$ force
-$d_B^-(b)\le m-2$. At $m=5$, $n=12$, this would bound every extremiser
-by $56$, contradicting the feasible graph with $57$ arcs.
 At $n=3m-3$, the excess over the quadratic value is still one, so any
 threshold beyond which the augmented bipartite count is always optimal would have to be at least $3m-2$ for $m\ge5$. This necessary condition does not establish that such a threshold exists.
 
