@@ -633,9 +633,12 @@
 \begin{center}
 % The panels are wider than they are tall, so the text block's side margins are
 % what holds the picture back, not the height. \makebox keeps the line exactly
-% \textwidth while the picture inside it reaches into both margins.
+% \textwidth while the picture inside it reaches into both margins. The factor
+% must stay under paperwidth/textwidth (here about 1.0975) or the outer panels
+% are clipped past the physical page edge; 1.08 bleeds into the margins with a
+% small buffer to spare.
 \makebox[\textwidth][c]{%
-\adjustbox{max totalheight=0.88\textheight}{\resizebox{1.12\textwidth}{!}{%
+\adjustbox{max totalheight=0.88\textheight}{\resizebox{1.08\textwidth}{!}{%
 \begin{tikzpicture}[>=Stealth,
     mv/.style={gvertex, minimum size=5.5mm},
     me/.style={gline},
