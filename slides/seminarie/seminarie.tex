@@ -214,9 +214,10 @@
 \newcommand{\tNear}{\chip{vertexorange!85!black}{NEAR-EXTREMAL}}
 \newcommand{\tAsym}{\chip{KULblauw1}{ASYMPTOTICALLY EXTREMAL}}
 
-% one variant: the two bounds with their status, a construction, and what was
-% computed.  #1 title, #2 symbol, #3 upper, #4 lower, #5 notes, #6 picture,
-% #7 picture caption, #8 computed
+% one variant: the two bounds with the idea behind each, a witness drawn at the
+% size the numbers refer to, and where else the value is known.
+% #1 title, #2 symbol, #3 upper, #4 lower, #5 notes, #6 picture,
+% #7 picture caption, #8 scope
 \newcommand{\vframe}[8]{%
 \begin{frame}{#1}
 \vfill
@@ -240,11 +241,11 @@
   % ending the paragraph and setting the caption in its own box does not.
   \parbox{\linewidth}{\centering\footnotesize\color{black!60} #7}
 \end{columns}
-% The COMPUTED label sits on the same line as its sentence rather than above
-% it. At \small the old stacked form cost a whole line and pushed the last
-% sentence under the footer strip on the densest frames.
+% The label sits on the same line as its sentence rather than above it. At
+% \small the old stacked form cost a whole line and pushed the last sentence
+% under the footer strip on the densest frames.
 \vspace{6pt}
-\noindent{\footnotesize\color{vertexpurple!80!black}\bfseries COMPUTED\ \ }%
+\noindent{\footnotesize\color{vertexpurple!80!black}\bfseries SCOPE\ \ }%
 {\small\color{black!70} #8}\par
 \vfill
 \end{frame}}
@@ -1275,9 +1276,12 @@ $\Phi(G)\;=\;
 numbers, rather than a rule for general $n$ and $m$.\par
 \vspace{11pt}
 \begin{tabular}{@{}r@{\hspace{12pt}}p{0.70\linewidth}@{}}
-\sProved   & established at that size, upper bound and lower bound alike \\[7pt]
-\tExtremal & the drawing is a witness meeting the upper bound exactly, so every
-             vertex and every edge on it can be counted \\
+{\color{black!40}\bfseries\footnotesize UPPER}
+           & the number, and in grey beside it why nothing can beat it \\[7pt]
+{\color{black!40}\bfseries\footnotesize LOWER}
+           & the number, and in grey what attains it \\[7pt]
+\tExtremal & the drawing is that witness, at that size, so every vertex and
+             every edge on it can be counted \\
 \end{tabular}}
 \end{minipage}
 \end{center}
@@ -1286,23 +1290,28 @@ numbers, rather than a rule for general $n$ and $m$.\par
 
 % ---- 1. simple graph, undirected, edge -------------------------------------
 \vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}
-{$9$ \ \sProved}
-{$9$ \ \sProved}
+{$9$ \ \sProved\ \ {\scriptsize\color{black!50}$n-1$ cuts, each of capacity at most $m-1$}}
+{$9$ \ \sProved\ \ {\scriptsize\color{black!50}a star with a matching on its leaves}}
 {\begin{vlist}
-  \item the drawing is a hub joined to six leaves, with a perfect matching added
-        among the leaves: seven vertices, nine edges
+  \item the Gomory--Hu tree summarises every pairwise connectivity in $n-1$
+        cuts, and charging each edge of the graph to one of them counts every
+        edge twice
+  \item that second charge is what simplicity buys, and it is the whole reason
+        the count is halved
 \end{vlist}}
 {\cHub}{$n=7$, $m=3$ \ \tExtremal}
-{Exact at every size with $n\ge m$, by Mader's theorem via Gomory--Hu.}
+{Exact at every size with $n\ge m$. Below that not even the complete graph
+carries $m$ routes, so every edge is allowed.}
 
 % ---- 2. simple graph, undirected, vertex -----------------------------------
 \vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}
-{$9$ \ \sProved}
-{$9$ \ \sProved}
+{$9$ \ \sProved\ \ {\scriptsize\color{black!50}proved equal to the edge value while $m\le4$}}
+{$9$ \ \sProved\ \ {\scriptsize\color{black!50}the same graph: every leaf has degree two}}
 {\begin{vlist}
-  \item the same graph as the edge problem, because the vertex and edge values
-        coincide while $m$ is at most four
-  \item from $m=5$ the two part company, and the general value is open
+  \item the edge bound does not simply transfer, because a vertex-feasible
+        graph is the weaker restriction and there are more of them
+  \item in the drawing no pair can beat two routes on degree grounds alone,
+        which is why the same graph settles both problems here
 \end{vlist}}
 {\cHub}{$n=7$, $m=3$ \ \tExtremal}
 {Exact for $m\le4$ at every $n$. At $m=5$ the two agree up to $n=13$ and first
@@ -1310,13 +1319,14 @@ differ at $n=14$.}
 
 % ---- 3. simple digraph, directed, arc --------------------------------------
 \vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}
-{$12$ \ \sProved}
-{$12$ \ \sProved}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}at $m=2$ a feasible digraph is its own skeleton}}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}every arc from three tails to four heads}}
 {\begin{vlist}
-  \item the drawing sends every arc from three tails to four heads: seven
-        vertices, twelve arcs
-  \item a hub bidirected to six spokes also holds twelve, so at this size the
-        two branches tie and the witness is not unique
+  \item a reachability skeleton is a subdigraph preserving who reaches whom,
+        and at $m=2$ nothing can be spared: drop an arc and the route replacing
+        it would be a second disjoint one, breaching the cap
+  \item a skeleton holds at most $\max(2(n-1),\floor{n^2/4})$ arcs, and at seven
+        vertices those two branches tie, so a bidirected hub does just as well
 \end{vlist}}
 {\cBipDir}{$n=7$, $m=2$ \ \tExtremal}
 {Exact at every $n$ for $m=2$. For $m\ge3$ only the growth rate is settled, and
@@ -1324,36 +1334,42 @@ the exact values stay open.}
 
 % ---- 4. simple digraph, directed, vertex -----------------------------------
 \vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}
-{$12$ \ \sProved}
-{$12$ \ \sProved}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}the skeleton argument is already a vertex argument}}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}the same digraph}}
 {\begin{vlist}
-  \item the same digraph as the arc problem: at $m=2$ the two separations agree
-        at every size
+  \item the two routes that argument produces are internally vertex-disjoint,
+        not merely arc-disjoint, so it proves the vertex bound first and the arc
+        bound follows
+  \item that direction matters: Whitney's inequality alone would not justify
+        carrying a bound the other way
 \end{vlist}}
 {\cBipDir}{$n=7$, $m=2$ \ \tExtremal}
 {Exact at every $n$ for $m=2$. Whether arc and vertex agree for $m\ge3$ is open.}
 
 % ---- 5. multigraph, undirected, edge ---------------------------------------
 \vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}
-{$10$ \ \sProved}
-{$10$ \ \sProved}
+{$10$ \ \sProved\ \ {\scriptsize\color{black!50}the same $n-1$ cuts, with no second charge to halve}}
+{$10$ \ \sProved\ \ {\scriptsize\color{black!50}a spanning tree at multiplicity $m-1$}}
 {\begin{vlist}
-  \item the drawing is a hub joined to five leaves with every edge doubled: six
-        vertices, ten edges
-  \item any tree does as well as the star, since only the cut count matters
+  \item the same charge to the Gomory--Hu tree runs, but parallel copies mean
+        nothing forces an edge to be counted twice, so the bound is a clean
+        product rather than a halved one
+  \item the missing factor of two is exactly what simplicity was buying next
+        door, and any tree shape does as well as the star
 \end{vlist}}
 {\cThickTree}{$n=6$, $m=3$ \ \tExtremal}
-{Exact at every size, by a count on a single cut.}
+{Exact at every $n$ and every $m$.}
 
 % ---- 6. multigraph, undirected, vertex -------------------------------------
 \vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}
-{$10$ \ \sProved}
-{$10$ \ \sProved}
+{$10$ \ \sProved\ \ {\scriptsize\color{black!50}routes split into direct copies plus detours}}
+{$10$ \ \sProved\ \ {\scriptsize\color{black!50}a doubled tree: a tree edge has no detour}}
 {\begin{vlist}
-  \item the same graph as the edge problem, because the vertex and edge values
-        coincide at $m=3$
-  \item from $m=4$ the general value is open, and parallel copies then buy more
-        than the simple problem allows
+  \item between two vertices the count is exactly the multiplicity of their own
+        edge plus the number of disjoint detours around it, so feasibility caps
+        those two together at $m-1$
+  \item on a tree edge there is no detour at all, which is what lets the
+        multiplicity run all the way up to $m-1$
 \end{vlist}}
 {\cThickTree}{$n=6$, $m=3$ \ \tExtremal}
 {Exact at $m=2$ and $m=3$ for every $n$. Beyond that only single sizes are
@@ -1361,26 +1377,28 @@ settled, such as $14$ at $n=4$, $m=5$ by exhaustion.}
 
 % ---- 7. directed multigraph, arc -------------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}
-{$12$ \ \sProved}
-{$12$ \ \sProved}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}peel off $m-1$ skeletons, one at a time}}
+{$12$ \ \sProved\ \ {\scriptsize\color{black!50}a bidirected tree at multiplicity $m-1$}}
 {\begin{vlist}
-  \item the drawing is a hub bidirected to three spokes with every arc doubled:
-        four vertices, twelve arcs
+  \item removing one copy of every skeleton arc costs each reachable pair one
+        route, so $m-1$ peels account for every arc in the digraph
+  \item it is the $m=2$ skeleton again, now used $m-1$ times over, which is why
+        the answer is that value multiplied by $m-1$
 \end{vlist}}
 {\cBidirTree}{$n=4$, $m=3$ \ \tExtremal}
-{Exact at every size, and one threshold-free optimisation settles all of them at
-once.}
+{Exact at every $n$ and every $m$, and a single threshold-free optimisation
+settles all of them at once.}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}
-{$24$ \ \sProved}
-{$24$ \ \sProved}
+{$24$ \ \sProved\ \ {\scriptsize\color{black!50}direct copies plus detours, once more}}
+{$24$ \ \sProved\ \ {\scriptsize\color{black!50}four copies on each of the six directions}}
 {\begin{vlist}
-  \item every one of the six directions carries four copies: three vertices,
-        twenty-four arcs, and it is the only shape that reaches the maximum
-  \item four is the cap, not five, because an ordered pair also picks up one
-        route through the third vertex, which brings it to five in total
-  \item the arc extremiser does not reach this: twenty arcs against twenty-four
+  \item with only one other vertex available, an ordered pair has exactly one
+        detour, so its multiplicity stops at four rather than at the cap of
+        five, and $6\times4$ gives the answer
+  \item the arc extremiser does not reach it: twenty arcs against twenty-four,
+        since vertex feasibility is the weaker restriction
 \end{vlist}}
 {\cTriFour}{$n=3$, $m=6$ \ \tExtremal}
 {Enumerating every directed multigraph on three vertices leaves this one
@@ -1388,13 +1406,14 @@ isomorphism class. Larger sizes stay open.}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
 \vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}
-{$4$ \ \sProved}
-{$4$ \ \sProved}
+{$4$ \ \sProved\ \ {\scriptsize\color{black!50}induction on a hyperedge cut, with no tree at all}}
+{$4$ \ \sProved\ \ {\scriptsize\color{black!50}a hub and four disjoint pairs of leaves}}
 {\begin{vlist}
-  \item the drawing is a hub and four disjoint pairs of leaves, one hyperedge
-        per pair: nine vertices, four hyperedges
-  \item a hyperedge spans three vertices but still serves only one route, which
-        is why the count divides by two
+  \item a hyperedge spans $r$ vertices but still serves only one route, and
+        cutting one off divides what remains by $r-1$
+  \item the reduction to graphs points the wrong way: replacing a hyperedge by a
+        star on its vertices would let two routes take two of those edges, which
+        Berge routes forbid
 \end{vlist}}
 {\cStarHyper}{$n=9$, $r=3$, $m=2$ \ \tExtremal}
 {Exact whenever there are enough distinct hyperedges to go round, which holds
@@ -1402,37 +1421,40 @@ here. It can fail at the smallest sizes, such as $n=r=m=3$.}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}
-{$4$ \ \sProved}
-{$4$ \ \sProved}
+{$4$ \ \sProved\ \ {\scriptsize\color{black!50}at $m=2$ the incidence graph must be a forest}}
+{$4$ \ \sProved\ \ {\scriptsize\color{black!50}the same hypergraph: its incidence graph is a tree}}
 {\begin{vlist}
-  \item the same hypergraph as the edge problem: at $m=2$ the two separations
-        agree for every uniformity
-  \item at $m=2$ a hypergraph is feasible exactly when its incidence graph is a
-        forest, and this one is a tree
+  \item a cycle in the incidence graph would be two disjoint routes on its own,
+        so a forest on the $n$ vertices and the hyperedges together carries at
+        most one edge fewer than it has nodes
+  \item each hyperedge contributes $r$ of those incidence edges, and that
+        inequality rearranges directly into the bound
 \end{vlist}}
 {\cStarHyper}{$n=9$, $r=3$, $m=2$ \ \tExtremal}
-{Exact at $m=2$ and $m=3$. From $m=4$ the general value is open, since an edge
-bound does not carry over to vertex separation.}
+{Exact at $m=2$ and at $m=3$, where the same graph's cycle rank is bounded
+instead. From $m=4$ it is open.}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
-{$6$ \ \sProved}
-{$6$ \ \sProved}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}the same hyperedge cut, unchanged by repetition}}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}three pairs, each hyperedge taken $m-1$ times}}
 {\begin{vlist}
-  \item the drawing is a hub and three disjoint pairs of leaves, each hyperedge
-        taken twice: seven vertices, six hyperedges
-  \item repetition leaves the bound where it was but changes which shapes reach
-        it
+  \item the cut argument never asks whether hyperedges are distinct, so
+        repetition leaves the bound exactly where it was and only changes which
+        shapes can reach it
+  \item at the smallest sizes it genuinely buys something: two copies of the
+        only available triple reach a count no simple hypergraph can
 \end{vlist}}
 {\cRepStar}{$n=7$, $r=3$, $m=3$ \ \tExtremal}
 {Exact whenever the pairs divide the leaves evenly, which is the case here.}
 
 % ---- 12. multihypergraph, undirected, vertex -------------------------------
 \vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}
-{$6$ \ \sProved}
-{$6$ \ \sProved}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}the incidence graph again, now by its cycle rank}}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}the same hypergraph}}
 {\begin{vlist}
-  \item the same hypergraph as the edge problem
+  \item at $m=3$ the step is to bound the incidence graph's cycle rank by
+        decomposing it at its cut vertices and separating pairs
   \item repetition buys nothing at $m=2$, where two copies of one hyperedge are
         already two separated routes, but it does buy something from $m=3$
 \end{vlist}}
@@ -1441,38 +1463,44 @@ bound does not carry over to vertex separation.}
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}
-{$8$ \ \sProved}
-{$8$ \ \sProved}
+{$8$ \ \sProved\ \ {\scriptsize\color{black!50}enumeration at this size}}
+{$8$ \ \sProved\ \ {\scriptsize\color{black!50}two outgoing hyperedges on every vertex}}
 {\begin{vlist}
-  \item every vertex is the tail of two hyperedges, each carrying two of the
-        other three as heads: four vertices, eight hyperedges
-  \item one tail is drawn in full, in orange, and the other three repeat it
-        around the square
+  \item every route out of a vertex has to start with one of that vertex's own
+        outgoing hyperedges, so deleting those cuts it off and the outgoing
+        count alone caps every pair it reaches
+  \item that gives feasibility at any size; it is the matching upper bound that
+        is available here only by enumeration
+  \item one tail is drawn in orange, and the other three repeat it around the
+        square
 \end{vlist}}
 {\cBoundedOutdeg}{$n=4$, $r=3$, $m=3$ \ \tExtremal}
-{Deleting a vertex's own outgoing copies cuts it off, which is why the count per
-tail is capped. Larger sizes have a settled growth rate but open exact values.}
+{Only the growth rate is settled in general, by a shadow digraph that carries
+the hypergraph's route cap onto two-step routes.}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}
-{$8$ \ \sProved}
-{$8$ \ \sProved}
+{$8$ \ \sProved\ \ {\scriptsize\color{black!50}enumeration at this size}}
+{$8$ \ \sProved\ \ {\scriptsize\color{black!50}the same hypergraph}}
 {\begin{vlist}
-  \item the same hypergraph as the arc problem, which is feasible for both
-        separations at once
+  \item the outgoing cut never looks at interior vertices, so it establishes the
+        arc bound and the vertex bound in one go
+  \item the shadow argument behind the general growth rate re-runs under the
+        stricter separation for the same reason
 \end{vlist}}
 {\cBoundedOutdeg}{$n=4$, $r=3$, $m=3$ \ \tExtremal}
 {Whether the two separations keep the same exact value at larger sizes is open.}
 
 % ---- 15. directed multihypergraph, arc -------------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}
-{$6$ \ \sProved}
-{$6$ \ \sProved}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}enumeration at this size}}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}$m-1$ copies of the one hyperedge each tail has}}
 {\begin{vlist}
-  \item at this size a tail has only one possible hyperedge, the other two
-        vertices, so it takes two copies of it: three vertices, six hyperedges
-  \item repetition is what lifts the limit on distinct head sets, and it is the
-        whole difference from the simple model
+  \item the outgoing cut caps each tail again, and at this size a tail has just
+        one possible head set, the other two vertices, so repetition is the only
+        way to grow at all
+  \item lifting that limit on distinct head sets is the whole difference from
+        the simple model
 \end{vlist}}
 {\cRepTriHyper}{$n=3$, $r=3$, $m=3$ \ \tExtremal}
 {Forward, backward and general orientations share the same growth rate. The
@@ -1480,10 +1508,11 @@ exact values at larger sizes are open.}
 
 % ---- 16. directed multihypergraph, vertex ----------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}
-{$6$ \ \sProved}
-{$6$ \ \sProved}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}enumeration at this size}}
+{$6$ \ \sProved\ \ {\scriptsize\color{black!50}the same hypergraph}}
 {\begin{vlist}
-  \item the same hypergraph as the arc problem
+  \item the outgoing cut gives both separations at once here too, so the arc
+        witness needs no adjustment
 \end{vlist}}
 {\cRepTriHyper}{$n=3$, $r=3$, $m=3$ \ \tExtremal}
 {Whether forward and general orientations agree once $n$ passes $r$ is open.}
