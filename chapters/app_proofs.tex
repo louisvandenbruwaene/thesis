@@ -414,7 +414,7 @@ whose removal disconnects a graph. A
 $2$-cuts into pieces with no such separator. A graph is \emph{$3$-connected}
 when it remains connected after any two vertices are deleted.
 
-Their witness is built by a recursion, described here in the language of this section, since it says why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The arrangement is cyclic, and three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the classical triconnected one along separating pairs \cite{Tutte66,HopcroftTarjan73}. S\o{}rensen and Thomassen also treat the $3$-connected case at $m=5$ \cite{SorensenThomassen74}. This does not supply a general theorem for every $m$. A decomposition along separating pairs would have to control both its pieces and the routes created when those pieces are reassembled.
+Their witness is built by a recursion, described here in the language of this section, since it says why the blocks above cannot find it. Start from $G^0 = K_m$ minus an edge, and form $G^{j}$ from two fresh copies of $G^0$ together with $G^{j-1}$, identifying one vertex of each with one vertex of the next, the three identifications arranged in a \emph{cycle}. Each step adds $2m-3$ vertices and $m(m-1)-2$ edges, which is the rate above. The arrangement is cyclic, and three graphs glued in a cycle at three vertices have no cut vertex at all, so $G^{j}$ is $2$-connected and is a \emph{single block}. \Cref{thm:simple-vertex-blocks} therefore sees it as one indivisible object of size $m + (2m-3)j$ and gets no purchase on it. What the graph does have is $2$-cuts, one pair of identification vertices separating each copy from the rest, so the decomposition that would see it is the classical triconnected one along separating pairs \cite{Tutte66,HopcroftTarjan73}. S\o{}rensen and Thomassen also treat the $3$-connected case at $m=5$ \cite{SorensenThomassen74}. This does not supply a general theorem for every $m$.
 
 It also explains the sizes. The recursion beats the rate $m/2$ only once $j > 2/(m-4)$, so the smallest member of the family that outruns a bouquet of $K_m$'s has $26$ vertices at $m = 5$, $24$ at $m = 6$ and $18$ at $m = 7$, against the nine that exhaustive enumeration reaches. The construction was rebuilt and checked here at $m = 5, 6, 7$ and $j \le 3$, by the standalone script \code{program/scripts/st\_construction.py}: the vertex and edge counts match the formulas exactly, every member is $2$-connected, and every member has $\kap^{\max} = m-1$, so each is feasible and none contains the forbidden $m$ internally disjoint paths.
 
@@ -677,7 +677,7 @@ The skeleton argument gives the value at $m=2$ (\Cref{thm:dir-vertex-m2-exact}, 
     k_3^{\mathrm{dir}}(n)    & 2 & 6 & 9 & 12 & 15
 \end{array}
 \]
-with every entry proved complete, so the two separations agree at every size the exhaustion reaches, and from $n = 3$ onwards both match the construction lower bound $\max(m(n-1), \floor{(n+m-2)^2/4})$. The table stops at $n = 6$ because that is where the exhaustion stops: at $n = 7$ neither sweep closes inside an hour and a half, and each returns the construction's $18$ as a bare lower bound. That construction formula applies only for $n\ge m$. At $n=2$, the complete digraph instead gives the maximum of $2$ arcs. Agreement over five sizes is evidence and not a proof, and the natural next question is structural rather than numerical: to separate the two problems one needs a digraph where some pair carries strictly more arc-disjoint routes than internally disjoint ones \emph{and} where that slack pays for extra arcs. The two demands pull against each other, which is perhaps why no small example does both.
+with every entry proved complete, so the two separations agree at every size the exhaustion reaches, and from $n = 3$ onwards both match the construction lower bound $\max(m(n-1), \floor{(n+m-2)^2/4})$. The table stops at $n = 6$ because that is where the exhaustion stops: at $n = 7$ neither sweep closes inside an hour and a half, and each returns the construction's $18$ as a bare lower bound. That construction formula applies only for $n\ge m$. At $n=2$, the complete digraph instead gives the maximum of $2$ arcs. Agreement over five sizes is evidence and not a proof, and the natural next question is structural rather than numerical: to separate the two problems one needs a digraph where some pair carries strictly more arc-disjoint routes than internally disjoint ones \emph{and} where that slack pays for extra arcs. The two demands pull against each other.
 \end{remark}
 
 \begin{lemma}[The augmented bipartite digraph is feasible]\label{lem:augmented-feasible}
@@ -822,7 +822,7 @@ For the lower bound, the augmented bipartite digraph of \Cref{const:augmented-bi
 These bounds leave a gap in the linear coefficient. Exact eventual equality would also determine the bounded correction. The augmented bipartite construction supplies a lower linear contribution of $(m-2)n/2+O_m(1)$, whereas \Cref{thm:dir-arc-linear-error} allows $4(m-1)n$ above the quadratic term. For $m\ge3$, the ratio of these linear coefficients is $8(m-1)/(m-2)$: sixteen at $m = 3$, and tending to eight as $m$ grows. This compares coefficients, not the finite bounds including their constant and rounding terms. Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} cited in \Cref{ch:basecases} lowers the upper end to $m-1$, and the factor with it to $2(m-1)/(m-2)$: four at $m = 3$, and tending to two. \Cref{rem:case2-tight} explains why the existing degree estimates alone do not close that gap.
 
 \begin{remark}[The dense case's coefficient needs a new inequality]\label{rem:case2-tight}
-One might hope to cut the coefficient of the dense case, the one where every $d(x) \ge n/2$, using the observation that in the augmented bipartite construction one whole side has $\min(d^+, d^-) = 0$, so summing the worst-case bound for $\min(d^+,d^-)$ at every vertex looks wasteful. That observation alone does not cut the coefficient. The value four is the best universal coefficient obtainable from the two facts that case uses, the budget $\sum_x d^+(x)\,d^-(x) \le C n(n-1)$ of \Cref{lem:budget-degree-sum} and the floor $d(x) \ge n/2$. Read $C = m-1$ throughout what follows.
+In the dense case, the one where every $d(x) \ge n/2$, the value four is the best universal coefficient obtainable from the two facts that case uses, the budget $\sum_x d^+(x)\,d^-(x) \le C n(n-1)$ of \Cref{lem:budget-degree-sum} and the floor $d(x) \ge n/2$. Cutting it therefore needs a further inequality. Read $C = m-1$ throughout what follows.
 
 Think of the budget as money and of $t_x = \min(d^+(x), d^-(x))$ as what each vertex buys with it. At a vertex with $d(x)=s\ge n/2$, one also has $s\ge2t$. Hence the cheapest possible cost for a given $t$ is the two-branch function
 \[
@@ -1039,7 +1039,7 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 \emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the cap. Hence $D$ is the multiplicity-$(m-1)$ one-directional complete bipartite digraph on these two parts, and their product $\floor{n^2/4}$ forces their sizes to be $\ceil{n/2}$ and $\floor{n/2}$. Either size may be the source size, giving exactly the two displayed possibilities (which coincide up to isomorphism when $n$ is even).
 \end{proof}
 
-Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the proposed argument does not cover this range, and it is not known to fail either. Nothing in the argument suggests a boundary there: the step is a lower bound on one pair's connectivity, and losing it removes a contradiction rather than supplying a counterexample. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
+Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the proposed argument does not cover this range. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
 
 
 \apppart{Part III. The hypergraph results}{The edge bound through an elementary cut induction, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
@@ -1614,8 +1614,7 @@ since two $X$-vertices joined by three parallel edges have cycle rank two
 against $|X| - 1 = 1$. For $m = 4$ the analogous question asks for a different
 bound relative to $\kap \le 3$, taken apart along $3$-cuts rather than along
 separating pairs, and none is supplied here.
-A finite sweep at $m=4$ is discussed in \Cref{sec:variant-grids}, together
-with what it does and does not settle.
+A finite sweep at $m=4$ is discussed in \Cref{sec:variant-grids}.
 \end{remark}
 
 \section{The multigraph incidence problems}\label{sec:multi-vertex}
@@ -1920,9 +1919,8 @@ not. Under the proposed block reduction the answer becomes a block optimisation
 problem. If the proposed lower and upper bounds are verified, then in the regime
 $m\to\infty$ with $n/m\to\infty$ the construction gives
 $K_m(n)/(m^2n) \ge 3-2\sqrt2-o(1)$ and the upper bound gives
-$K_m(n)/(m^2n)<2$. These inequalities do not establish that this ratio has a
-limit. Its possible limiting value and the blocks needed for sharper bounds
-remain open here.
+$K_m(n)/(m^2n)<2$. Whether this ratio has a limit, what that limit is, and
+the blocks needed for sharper bounds all remain open here.
 
 \subsection{The directed problem}\label{sec:multi-vertex-dir}
 
@@ -2304,8 +2302,7 @@ recovers the quadratic branch of \Cref{thm:dir-multi-full} up to its own linear
 error term, which is the consistency check one wants, though it does not
 establish the exact value that \Cref{thm:dir-multi-full} states there.
 
-Third, the general orientation model can look out of reach, but the obstacle
-and the way past it are both short to state. The proof above uses
+Third, the general orientation model needs one change. The proof above uses
 the forward model twice, once for the entering hyperedges and once for the leaving ones, in both cases to know that a hyperedge
 has a single tail. That is what makes Step 2's matching legitimate: the leaving
 hyperedges have pairwise distinct tails and so are automatically distinct from
@@ -2411,7 +2408,7 @@ and lower bounds agree in their $n^2$ term.
 \end{proof}
 
 Two remarks on that proof. The constant $2r+1$ is not
-optimised and is not claimed to be sharp: it is what the crude estimate
+optimised: it is what the estimate
 $|U| \le 2M$ gives, and a search over deliberately adversarial instances, in which
 every target shares both its entrance and its exit with another, never drives
 $|\mathcal{T}|/\kap(u,v)$ above $r-1$, the forward model's own constant. That search runs from the standalone script
@@ -2641,7 +2638,6 @@ The comparison tables below print the applicable limit on every search row.
 Enumeration has a separate budget: $60$ seconds per case by default,
 $1800$ seconds for simple directed graphs and $120$ seconds for multigraph
 vertex separation. Enumeration stops sampling a panel after its first timeout.
-This is a sampling rule, not a proof that every larger case would also time out.
 The standalone computation at $(m,n,r)=(6,6,3)$ is a separate experiment.
 
 The original record saves values and requested budgets, but not each run's
@@ -2720,13 +2716,13 @@ $m=3$ and at $m=4$ and fails at $m=5$, where it returns a feasible multigraph
 of $13$ edges against the formula's $12$ at $n=4$ and $17$ against $16$ at
 $n=5$, consistent with the multigraph witnesses discussed in
 \Cref{sec:multi-vertex}. These checks concern multihypergraphs, not only simple
-hypergraphs, and do not establish the formula for arbitrary $n$ and $r$.
+hypergraphs.
 
 For a hypergraph on $n$ vertices with $b$ hyperedges of size $r$ and connected
 incidence graph, the cycle rank is $b(r-1)-n+1$. At $m=4$, exceeding the
 displayed edge-count target is therefore equivalent to exceeding cycle rank
 $2(n-1)$. A stronger incidence-rank argument is one possible route to a
-general bound, and the finite search does not supply it.
+general bound.
 
 \Cref{tab:variant-values} gives the data from the four grids numerically.
 Blue entries are established, red entries are conjectural, and gold entries record lower bounds in open cases.

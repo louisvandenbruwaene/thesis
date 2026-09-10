@@ -58,9 +58,8 @@ follows independently from Huang and Lyu \cite{HuangLyu26} and the displayed
 lower construction, as explained in \Cref{sec:status-simple-directed}.
 The linear coefficient remains unknown among the results proved in this thesis.
 Even identifying it would leave the exact bounded correction to establish.
-More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ above $n^2/4$, while the checked elementary upper bound allows $4(m-1)n$. These inequalities do not show that a unique limiting linear coefficient exists.
+More precisely, the construction gives a linear contribution $(m-2)n/2+O_m(1)$ above $n^2/4$, while the checked elementary upper bound allows $4(m-1)n$.
 Once $n$ is large in terms of $m$, the Tur\'an theorem of Huang and Lyu \cite{HuangLyu26} lowers the upper end to $m-1$ (\Cref{ch:basecases}).
-The next section considers the separate question of extremal shape.
 
 For fixed $m\ge3$, the directed vertex problem has the same leading term and error order by the same literature bound, and \Cref{thm:dir-vertex-linear-error} supplies an elementary proof.
 \Cref{app:proofs} treats it separately from the arc problem.
@@ -354,9 +353,7 @@ upper bound is the same as for simple hypergraphs, and the star hypertree with e
 supplies the additional attainment cases stated in
 \Cref{prop:hyper-vertex-lower-multi}. At larger thresholds, finite witnesses
 and the simple-model lower bounds remain available, but the edge upper bound
-does not establish vertex optimality. In particular a twelve-copy edge
-witness is also a vertex lower bound, without proving the vertex maximum
-is twelve.
+does not establish vertex optimality.
 A finite sweep provides further evidence at $m=4$, with its scope and its
 limits discussed in \Cref{sec:variant-grids}.
 
@@ -455,16 +452,13 @@ head and is paired with the forward model by reversing all routes. The
 general model permits every non-empty tail--head split. The
 reversal proof and general-shadow argument are given in
 \Cref{lem:dir-hyper-duality,thm:dir-hyper-general-constant}. They give the
-same leading term for forward, backward and general hypergraphs. This does
-not cover a model restricted to one prescribed intermediate tail-set size.
-It also does not establish equality of finite forward and general values
-once $n>r$.
+same leading term for all three orientations. Whether the forward and general
+models also agree at a fixed $n>r$, and not only in that leading term, is open.
 
-The plotted experiments use rank three and the forward convention. They do
-not constitute an exhaustive comparison of the three orientation models.
+The plotted experiments all use $r=3$ and the forward orientation.
 Standalone checks of general orientations are described in the appendix.
-The remaining tasks are to determine finite exact values and any next-order
-differences between models.
+The remaining tasks are to determine the exact values at fixed $n$ and any
+next-order differences between the models.
 
 \subsection{Reading the finite data}
 
@@ -499,12 +493,6 @@ of that recording and lack individual witnesses or elapsed times in some
 cells. Their reported values can be redrawn, but timed searches need not
 repeat identically on another machine. The audit gives the commands and
 distinguishes these levels of reproducibility.
-
-Several mathematical questions remain beyond those checks. Agreement on
-small instances does not verify a general proposed proof. A feasible graph
-does not prove an upper bound. Solver checks without a replayable matching
-bound do not replace an argument. The conjectures with proofs
-therefore remain separate from the finite computational evidence.
 
 \section{Open problems}
 

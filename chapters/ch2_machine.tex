@@ -450,7 +450,7 @@ Both allow edges in both directions, but they do not assign the repeated arc mul
 \Cref{tab:generating-benchmark} records historical timings for three different single-core tasks. The distinction matters: they are not three equivalent ways of discovering an unknown optimum.
 The blind sweep maximises the arc count over all matrix assignments.
 The pruned depth-first search also maximises it, but starts with a supplied feasible construction as an incumbent.
-The \texttt{geng} pipeline is given the already known extremal arc count and lists the feasible isomorphism classes at that target. Finding representatives there does not rule out a larger feasible count, so this last run does not prove the optimum independently.
+The \texttt{geng} pipeline is given the already known extremal arc count and lists the feasible isomorphism classes at that target, which does not rule out a larger feasible count.
 
 The blind sweep is omitted after $n=4$, where $2^{n(n-1)}$ assignments already take $6.3$\,s.
 Each additional vertex multiplies the assignment count by $2^{2n}$, and the
@@ -612,15 +612,12 @@ can prevent several later choices, and this procedure makes no exchanges or
 temporarily infeasible moves within a pass. The shuffled restarts explore
 different choices. An interrupted pass still supplies a feasible lower bound.
 
-The current tabu engine changes entries of a multiplicity matrix and is not
-implemented for the hyperedge-list representation. Extending it would require
-hyperedge moves and corresponding tabu bookkeeping. A full neighbourhood scan
-would consider $\binom{n}{r}$ types in an undirected simple hypergraph and
-$r\binom{n}{r}$ in the forward directed model, with feasibility measured in
-the expanded gate network. This motivates the simpler implementation, but
-does not establish a performance advantage: no hypergraph tabu comparison was
-run. The equal-allocation experiment below compares the implemented searches,
-including their different methods.
+The tabu engine changes entries of a multiplicity matrix, so hypergraphs are
+searched by random greedy growth instead. A full tabu neighbourhood scan there
+would consider $\binom{n}{r}$ hyperedge types in an undirected simple
+hypergraph and $r\binom{n}{r}$ in the forward directed model, with feasibility
+measured in the expanded gate network. The equal-allocation experiment below
+compares the implemented searches.
 
 \subsection{Measuring only near the connectivity cap}
 Removing an edge, arc, or hyperedge can never raise $\lambda^{\max}$, while adding one raises it by at most one.
@@ -734,10 +731,9 @@ This is the crossover predicted by \Cref{thm:dir-arc-m2-exact}.
 The search carries none of these names.
 It finds the constructions solely by optimising under the connectivity cap.
 
-The seven successful cases do not establish reliable performance past $n=7$.
 At $n=8$ and $m=2$, a bidirected star has fourteen arcs, whereas a balanced one-way complete bipartite digraph has sixteen.
 Moving from a completed hub to the one-way complete bipartite digraph requires many coordinated arc changes (\Cref{fig:simple-digraph-m2}).
-Single-arc moves can therefore make the star a difficult state to escape. This explains a possible search obstruction, not a proof that every run must stall there.
+Single-arc moves can therefore make the star a difficult state to escape.
 The explicit construction and its connectivity check supply the sixteen-arc lower bound independently of whether an unaided run finds it.
 
 The bidirected star family illustrated in \Cref{fig:rediscovery-gallery} also supplies witnesses at larger orders and multiplicities.
