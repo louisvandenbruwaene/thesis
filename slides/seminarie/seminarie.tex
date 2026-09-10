@@ -294,12 +294,13 @@
   \node[font=\scriptsize, text=black!55] at ( 1.7,-1.95) {$B$};
 \end{tikzpicture}}
 
+% a tree on 6 vertices (hub + 5 leaves) with every edge doubled: 10 edges,
+% the exact witness for L_3(6) and K_3(6) alike
 \newcommand{\cThickTree}{\begin{tikzpicture}
   \node[gvhub, minimum size=5mm] (h) at (0,0) {};
   \foreach \i in {0,...,4}{\node[gvertex, minimum size=4.2mm] (p\i) at ({90+72*\i}:1.45) {};
-    \draw[gline] (h) to[bend left=16] (p\i);
-    \draw[gline] (h) -- (p\i);
-    \draw[gline] (h) to[bend right=16] (p\i);}
+    \draw[gline] (h) to[bend left=14] (p\i);
+    \draw[gline] (h) to[bend right=14] (p\i);}
 \end{tikzpicture}}
 
 % a complete bipartite block with every edge thickened: a MULTIgraph block,
@@ -337,19 +338,23 @@
     \draw[gdir] (p\i) to[bend left=11] (h);}
 \end{tikzpicture}}
 
+% the star hypertree at n = 9, r = 3: a hub and four disjoint pairs of leaves,
+% one hyperedge per pair, so the picture holds all nine vertices and all four
+% hyperedges the bound allows
 \newcommand{\cStarHyper}{\begin{tikzpicture}
   \coordinate (c) at (0,0);
-  \foreach \i/\a in {1/90, 2/210, 3/330}{
-    \coordinate (u\i) at (\a:1.6);
-    \coordinate (w\i) at ({\a+38}:1.6);}
+  \foreach \i/\a in {1/55, 2/145, 3/235, 4/325}{
+    \coordinate (u\i) at (\a:1.65);
+    \coordinate (w\i) at ({\a+40}:1.65);}
   \begin{scope}[on background layer]
     \draw[metro, metroA] (u1) -- (c) -- (w1);
     \draw[metro, metroB] (u2) -- (c) -- (w2);
     \draw[metro, metroC] (u3) -- (c) -- (w3);
+    \draw[metro, metroD] (u4) -- (c) -- (w4);
   \end{scope}
   \node[metrostop, minimum size=5.4mm] at (c) {};
-  \foreach \i in {1,2,3}{\node[metrostop, minimum size=4.6mm] at (u\i) {};
-                         \node[metrostop, minimum size=4.6mm] at (w\i) {};}
+  \foreach \i in {1,2,3,4}{\node[metrostop, minimum size=4.6mm] at (u\i) {};
+                           \node[metrostop, minimum size=4.6mm] at (w\i) {};}
 \end{tikzpicture}}
 
 \newcommand{\cRepStar}{\begin{tikzpicture}
@@ -402,6 +407,60 @@
   \foreach \j in {1,...,4}{\node[metrostop, minimum size=4.4mm] at (q\j) {};}
   \node[font=\scriptsize, text=black!55] at (-1.8,-1.85) {tails};
   \node[font=\scriptsize, text=black!55] at ( 1.8,-2.05) {heads};
+\end{tikzpicture}}
+
+% ---- the exact small witnesses the variant frames quote --------------------
+% B_{3,4}, every arc from A to B: 7 vertices, 12 arcs, which is floor(n^2/4)
+% at n = 7 and so one of the two extremisers of M(7)
+\newcommand{\cBipDir}{\begin{tikzpicture}[>=Stealth]
+  \foreach \i/\y in {1/1.0,2/0.0,3/-1.0}
+    {\node[gvertex, minimum size=4.2mm] (a\i) at (-1.7,\y) {};}
+  \foreach \j/\y in {1/1.35,2/0.45,3/-0.45,4/-1.35}
+    {\node[gvertex, minimum size=4.2mm] (b\j) at (1.7,\y) {};}
+  \foreach \i in {1,2,3}{\foreach \j in {1,2,3,4}{\draw[gdir] (a\i)--(b\j);}}
+  \node[font=\scriptsize, text=black!55] at (-1.7,-1.75) {$A$};
+  \node[font=\scriptsize, text=black!55] at ( 1.7,-1.95) {$B$};
+\end{tikzpicture}}
+
+% the n = 3 directed multigraph whose maximum was settled by enumeration. The
+% six directions are drawn once each; the multiplicity they carry is what the
+% caption states, since the winning assignment is a search result and not a
+% named family.
+\newcommand{\cExhaustTri}{\begin{tikzpicture}[>=Stealth]
+  \foreach \i/\a in {1/90,2/210,3/330}
+    {\node[gvertex, minimum size=5.2mm] (v\i) at (\a:1.3) {};}
+  \foreach \i/\j in {1/2, 2/3, 3/1}{
+    \draw[gdir] (v\i) to[bend left=17] (v\j);
+    \draw[gdir] (v\j) to[bend left=17] (v\i);}
+\end{tikzpicture}}
+
+% bounded outgoing hyperedge count at n = 4, r = 3: every vertex is the tail of
+% two hyperedges. One tail is drawn in full (orange) and the other three repeat
+% the pattern around the square, for 4 x 2 = 8 hyperedges.
+\newcommand{\cBoundedOutdeg}{\begin{tikzpicture}
+  \foreach \i/\a in {1/90, 2/0, 3/270, 4/180}{\coordinate (v\i) at (\a:1.35);}
+  \begin{scope}[on background layer]
+    \draw[metro, metroA] (v1) -- (v2) -- (v3);
+    \draw[metro, metroB] (v1) -- (v3) -- (v4);
+  \end{scope}
+  \node[gvhub, minimum size=5.2mm] at (v1) {};
+  \foreach \i in {2,3,4}{\node[metrostop, minimum size=4.6mm] at (v\i) {};}
+\end{tikzpicture}}
+
+% n = r = 3, repeats allowed: a tail has only one possible hyperedge, namely the
+% other two vertices, so it takes m - 1 = 2 copies of it. One tail is drawn,
+% the other two repeat it, for 3 x 2 = 6 copies.
+\newcommand{\cRepTriHyper}{\begin{tikzpicture}
+  \foreach \i/\a in {1/90, 2/210, 3/330}{\coordinate (v\i) at (\a:1.3);}
+  \begin{scope}[on background layer]
+    \draw[metro, metroA, line width=2.5pt]
+      (v2) to[bend left=11] (v1) to[bend left=11] (v3);
+    \draw[metro, metroA, line width=2.5pt]
+      (v2) to[bend right=11] (v1) to[bend right=11] (v3);
+  \end{scope}
+  \node[gvhub, minimum size=5.2mm] at (v1) {};
+  \node[metrostop, minimum size=4.6mm] at (v2) {};
+  \node[metrostop, minimum size=4.6mm] at (v3) {};
 \end{tikzpicture}}
 
 % one transformation: the label on top, the picture under it
@@ -1200,221 +1259,224 @@ $\Phi(G)\;=\;
 \begin{frame}{Backup: the sixteen variants}
 \vfill
 \begin{center}
+\begin{minipage}{0.82\textwidth}
 {\small
-\begin{tabular}{@{}r@{\hspace{12pt}}p{0.68\textwidth}@{}}
-\multicolumn{2}{@{}l@{}}{\color{black!45}\footnotesize\bfseries WHAT IS KNOWN ABOUT A BOUND}\\[5pt]
-\sProved    & established, with a proof the author has checked \\[4pt]
-\sProposed  & conjecture with a proposed proof the author has not checked line by line \\[4pt]
-\sOpen      & no general value established \\[12pt]
-\multicolumn{2}{@{}l@{}}{\color{black!45}\footnotesize\bfseries WHAT A CONSTRUCTION IS WORTH}\\[5pt]
-\tExtremal  & attains the maximum in the stated range \\[4pt]
-\tNear      & the densest family reached here, with no matching upper bound \\[4pt]
-\tAsym      & matches the leading term of the upper bound \\
+\noindent{\color{black!45}\footnotesize\bfseries HOW TO READ THE NEXT SIXTEEN FRAMES}\par
+\vspace{7pt}
+\noindent Each frame fixes one small size and gives the two bounds there as
+numbers, rather than a rule for general $n$ and $m$.\par
+\vspace{11pt}
+\begin{tabular}{@{}r@{\hspace{12pt}}p{0.70\linewidth}@{}}
+\sProved   & established at that size, upper bound and lower bound alike \\[7pt]
+\tExtremal & the drawing is a witness meeting the upper bound exactly, so every
+             vertex and every edge on it can be counted \\
 \end{tabular}}
+\end{minipage}
 \end{center}
 \vfill
 \end{frame}
 
 % ---- 1. simple graph, undirected, edge -------------------------------------
 \vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}
-{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}Mader, via Gomory--Hu}}
-{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}for every $n\ge m$}}
+{$9$ \ \sProved}
+{$9$ \ \sProved}
 {\begin{vlist}
-  \item the two meet for $n\ge m$, so the value is exact there
-  \item for $n<m$ it is $\binom n2$: not even $K_n$ carries $m$ routes
+  \item the drawing is a hub joined to six leaves, with a perfect matching added
+        among the leaves: seven vertices, nine edges
 \end{vlist}}
-{\cHub}{hub-and-spokes \ \tExtremal}
-{Tabu search returns the tree at $n=6$, $m=2$: $5=\ell_2(6)$.}
+{\cHub}{$n=7$, $m=3$ \ \tExtremal}
+{Exact at every size with $n\ge m$, by Mader's theorem via Gomory--Hu.}
 
 % ---- 2. simple graph, undirected, vertex -----------------------------------
 \vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}
-{$k_m(n)=\ell_m(n)$ for $m\le4$, \ $k_5(n)=\floorfrac{8n}{3}-4$ for $n\ge14$ \ \sProved\newline{\scriptsize\color{black!50}$m\ge6$:} \sOpen}
-{$c_m>m/2$ for $m\ge5$ \ \sProposed\ \ {\scriptsize\color{black!50}under the block formulation}}
+{$9$ \ \sProved}
+{$9$ \ \sProved}
 {\begin{vlist}
-  \item at $m=5$ the two agree to $n=13$, first gap $33$ against $32$ at $n=14$
-  \item $c_m=\lim_n k_m(n)/(n-1)$, and $m/2<c_m\le2(m-1)$ for $m\ge5$
+  \item the same graph as the edge problem, because the vertex and edge values
+        coincide while $m$ is at most four
+  \item from $m=5$ the two part company, and the general value is open
 \end{vlist}}
-{\cBlocks}{$2$-connected blocks at a cut vertex \ \tNear}
-{Block sweeps reach small blocks only, and the recursive constructions in the
-literature show why they cannot fix $c_m$.}
+{\cHub}{$n=7$, $m=3$ \ \tExtremal}
+{Exact for $m\le4$ at every $n$. At $m=5$ the two agree up to $n=13$ and first
+differ at $n=14$.}
 
 % ---- 3. simple digraph, directed, arc --------------------------------------
 \vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}
-{$M(n)=\max\bigl(2(n-1),\floorfrac{n^2}{4}\bigr)$ at $m=2$ \ \sProved\newline $\floorfrac{n^2}{4}+4(m-1)(n-1)$ at every $n$ \ \sProved}
-{$\tfrac{n^2}{4}+\tfrac{(m-2)n}{2}+O_m(1)$ \ \sProved}
+{$12$ \ \sProved}
+{$12$ \ \sProved}
 {\begin{vlist}
-  \item for fixed $m\ge3$, $\ell_m^{\dir}(n)=n^2/4+\Theta_m(n)$; the linear coefficient is open
-  \item this family refutes the first guess $\max(m(n-1),\floorfrac{n^2}{4})$ at $m=3$, $n=10$
+  \item the drawing sends every arc from three tails to four heads: seven
+        vertices, twelve arcs
+  \item a hub bidirected to six spokes also holds twelve, so at this size the
+        two branches tie and the witness is not unique
 \end{vlist}}
-{\cAugBip}{augmented bipartite digraph \ \tAsym}
-{Enumeration confirms $m=2$ through $n=7$. Tabu returns $6$, $10$ and $12$ at
-$n=4$, $6$ and $7$.}
+{\cBipDir}{$n=7$, $m=2$ \ \tExtremal}
+{Exact at every $n$ for $m=2$. For $m\ge3$ only the growth rate is settled, and
+the exact values stay open.}
 
 % ---- 4. simple digraph, directed, vertex -----------------------------------
 \vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}
-{$M(n)$ at $m=2$ \ \sProved\newline $\tfrac{n^2}{4}+\Theta_m(n)$ for fixed $m\ge3$ \ \sProved}
-{the same bipartite family \ \sProved}
+{$12$ \ \sProved}
+{$12$ \ \sProved}
 {\begin{vlist}
-  \item equality with the arc value at $m\ge3$ is open: an arc upper bound does
-        not constrain the vertex-feasible family, which contains it
+  \item the same digraph as the arc problem: at $m=2$ the two separations agree
+        at every size
 \end{vlist}}
-{\cAugBip}{augmented bipartite digraph \ \tAsym}
-{Enumeration confirms $m=2$ through $n=7$, and the two separations agree in the
-completed $m=3$ runs through $n=6$.}
+{\cBipDir}{$n=7$, $m=2$ \ \tExtremal}
+{Exact at every $n$ for $m=2$. Whether arc and vertex agree for $m\ge3$ is open.}
 
 % ---- 5. multigraph, undirected, edge ---------------------------------------
 \vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}
-{$(m-1)(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}a cut count, any shape}}
-{$(m-1)(n-1)$ \ \sProved}
+{$10$ \ \sProved}
+{$10$ \ \sProved}
 {\begin{vlist}
-  \item exact for every $n$ and $m$
-  \item multiplicity removes the simple graph's distance-one restriction
+  \item the drawing is a hub joined to five leaves with every edge doubled: six
+        vertices, ten edges
+  \item any tree does as well as the star, since only the cut count matters
 \end{vlist}}
-{\cThickTree}{tree, every edge repeated $m-1$ times \ \tExtremal}
-{Tabu search returns the multiplicity-$2$ star at $n=6$, $m=3$: $10=L_3(6)$.}
+{\cThickTree}{$n=6$, $m=3$ \ \tExtremal}
+{Exact at every size, by a count on a single cut.}
 
 % ---- 6. multigraph, undirected, vertex -------------------------------------
 \vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}
-{$K_2(n)=n-1$, $K_3(n)=2(n-1)$ \ \sProved\newline $K_m(n)\le(2+o(1))\,m^2n$ \ \sProposed}
-{$K_3(n)\ge2(n-1)$ \ \sProved\newline $K_m(n)\ge(3-2\sqrt2+o(1))\,m^2n$ \ \sProposed}
+{$10$ \ \sProved}
+{$10$ \ \sProved}
 {\begin{vlist}
-  \item the two coefficients bracket the growth as $m\to\infty$ with
-        $n/m\to\infty$, and no common limit is established
-  \item parallel copies are separated routes, so this is not the simple problem:
-        $K_5(4)=14$ against $L_5(4)=12$
+  \item the same graph as the edge problem, because the vertex and edge values
+        coincide at $m=3$
+  \item from $m=4$ the general value is open, and parallel copies then buy more
+        than the simple problem allows
 \end{vlist}}
-{\cThickBlock}{thickened complete bipartite block \ \tNear}
-{$K_5(4)=14$ and $K_5(5)=19$ by exhaustion. A nine-vertex sweep over all
-$191826$ two-connected graphs with at least fourteen edges gives $g_6(9)=54$.}
+{\cThickTree}{$n=6$, $m=3$ \ \tExtremal}
+{Exact at $m=2$ and $m=3$ for every $n$. Beyond that only single sizes are
+settled, such as $14$ at $n=4$, $m=5$ by exhaustion.}
 
 % ---- 7. directed multigraph, arc -------------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}
-{$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}a sparse skeleton per unit of $m-1$}}
-{$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}two branches, both attained}}
+{$12$ \ \sProved}
+{$12$ \ \sProved}
 {\begin{vlist}
-  \item exact for every $n$ and $m$, and the fractional optimum is $M(n)$ too,
-        so one $m$-free optimisation bounds every threshold
-  \item the classification of the extremisers for $n\ge\max(8,2m)$ stays
-        \sProposed
+  \item the drawing is a hub bidirected to three spokes with every arc doubled:
+        four vertices, twelve arcs
 \end{vlist}}
-{\cBidirTree}{thickened bidirected tree \ \tExtremal\ \ {\scriptsize\color{black!50}linear branch, $n\le7$}}
-{Tabu returns the double star at $m=3$: $12$ at $n=4$ and $16$ at $n=5$.}
+{\cBidirTree}{$n=4$, $m=3$ \ \tExtremal}
+{Exact at every size, and one threshold-free optimisation settles all of them at
+once.}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}
-{$(m-1)\tfrac{n^2}{4}+O_m(n)$ \ \sProved}
-{$(m-1)\floor{n^2/4}$, thickened bipartite \ \sProved}
+{$24$ \ \sProved}
+{$24$ \ \sProved}
 {\begin{vlist}
-  \item the arc extremiser is not even a finite optimum here:
-        $K_6^{\dir}(3)=24$ against an established arc maximum of $20$
-  \item the exact correction and the best block shapes are open
+  \item three vertices, every direction present, and the copies on them capped
+        so that no ordered pair carries six separated routes
+  \item the winner here is a search result rather than a named family, and the
+        arc extremiser does not reach it: twenty arcs against twenty-four
 \end{vlist}}
-{\cThickBip}{thickened one-way bipartite digraph \ \tAsym}
-{Direct enumeration gives $K_6^{\dir}(3)=24$.}
+{\cExhaustTri}{$n=3$, $m=6$, up to five copies per direction \ \tExtremal}
+{Settled by enumerating every directed multigraph on three vertices. Larger
+sizes stay open.}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
 \vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}
-{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}induction on a hyperedge cut}}
-{the same value \ \sProved\ \ {\scriptsize\color{black!50}when $m-1\le\binom{n-2}{r-2}$}}
+{$4$ \ \sProved}
+{$4$ \ \sProved}
 {\begin{vlist}
-  \item one hyperedge spans $r$ vertices but serves only one route
-  \item outside that range attainment is not guaranteed: at $n=r=m=3$
-        the bound reads $2$ and only one hyperedge exists
+  \item the drawing is a hub and four disjoint pairs of leaves, one hyperedge
+        per pair: nine vertices, four hyperedges
+  \item a hyperedge spans three vertices but still serves only one route, which
+        is why the count divides by two
 \end{vlist}}
-{\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
-{Exhaustive enumeration gives $11$ at $(n,m,r)=(6,6,3)$, below the bound $12$.}
+{\cStarHyper}{$n=9$, $r=3$, $m=2$ \ \tExtremal}
+{Exact whenever there are enough distinct hyperedges to go round, which holds
+here. It can fail at the smallest sizes, such as $n=r=m=3$.}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}
-{$\floorfrac{n-1}{r-1}$ at $m=2$, \ $\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \sProved\newline{\scriptsize\color{black!50}$m\ge4$:} \sOpen}
-{star at $m=2$, degree-capped hub at $m=3$ \ \sProved\newline {\scriptsize\color{black!50}$m=3$ for $2<r<n$}}
+{$4$ \ \sProved}
+{$4$ \ \sProved}
 {\begin{vlist}
-  \item $m=2$ is feasible exactly when the incidence graph is a forest
-  \item $m=3$ comes from the incidence-rank inequality
-  \item an edge bound does not transfer: $\kap\le\lec$ points the wrong way,
-        vertex feasibility being the weaker restriction
+  \item the same hypergraph as the edge problem: at $m=2$ the two separations
+        agree for every uniformity
+  \item at $m=2$ a hypergraph is feasible exactly when its incidence graph is a
+        forest, and this one is a tree
 \end{vlist}}
-{\cStarHyper}{star hypertree ($m=2$) \ \tExtremal}
-{Enumeration at $m=3$, $r=3$ gives $1$, $3$, $4$ for $n=3,4,5$: the bound
-$\lfloor2(n-1)/(r-1)\rfloor$ from $n=4$ on, one short at $n=r=3$.}
+{\cStarHyper}{$n=9$, $r=3$, $m=2$ \ \tExtremal}
+{Exact at $m=2$ and $m=3$. From $m=4$ the general value is open, since an edge
+bound does not carry over to vertex separation.}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}
-{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}unchanged by repetition}}
-{$\dfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}when $(r-1)\mid(n-1)$}}
+{$6$ \ \sProved}
+{$6$ \ \sProved}
 {\begin{vlist}
-  \item the constructions change even though the bound does not
-  \item at $n=r=m=3$, two copies of the only triple reach a value the simple
-        model cannot
+  \item the drawing is a hub and three disjoint pairs of leaves, each hyperedge
+        taken twice: seven vertices, six hyperedges
+  \item repetition leaves the bound where it was but changes which shapes reach
+        it
 \end{vlist}}
-{\cRepStar}{star hypertree, edges repeated $m-1$ times \ \tExtremal}
-{A twelve-copy construction at $(n,m,r)=(6,6,3)$ exceeds the simple edge
-optimum of $11$.}
+{\cRepStar}{$n=7$, $r=3$, $m=3$ \ \tExtremal}
+{Exact whenever the pairs divide the leaves evenly, which is the case here.}
 
 % ---- 12. multihypergraph, undirected, vertex -------------------------------
 \vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}
-{$\floorfrac{n-1}{r-1}$ at $m=2$, \ $\floorfrac{2(n-1)}{r-1}$ at $m=3$ \ \sProved\newline{\scriptsize\color{black!50}larger $m$:} \sOpen}
-{the repeated star adds attainment cases at $m=3$ \ \sProved}
+{$6$ \ \sProved}
+{$6$ \ \sProved}
 {\begin{vlist}
-  \item repetition does not help at $m=2$: two copies of one hyperedge are
-        already two separated routes
+  \item the same hypergraph as the edge problem
+  \item repetition buys nothing at $m=2$, where two copies of one hyperedge are
+        already two separated routes, but it does buy something from $m=3$
 \end{vlist}}
-{\cRepStar}{repeated star hypertree \ \tExtremal\ \ {\scriptsize\color{black!50}$m\le3$, and $(r-1)\mid(n-1)$ at $m=3$}}
-{The twelve-copy edge witness at $(6,6,3)$ is a vertex lower bound, and does not
-prove the vertex maximum is twelve. A sweep at $m=4$ attains
-$\lfloor3(n-1)/(r-1)\rfloor$ and excludes one more in eleven multihypergraph
-cases, all $r\ge3$.}
+{\cRepStar}{$n=7$, $r=3$, $m=3$ \ \tExtremal}
+{Exact at $m=2$ and $m=3$. Larger thresholds are open.}
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}
-{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved\ \ {\scriptsize\color{black!50}shadow digraph}}
-{the same constant \ \sProved\ \ {\scriptsize\color{black!50}two-layer, $r\ge3$}}
+{$8$ \ \sProved}
+{$8$ \ \sProved}
 {\begin{vlist}
-  \item the two meet, so the leading term is settled and the finite exact values
-        are \sOpen
-  \item the matching argument covers distinct two-step routes sharing one hyperedge
+  \item every vertex is the tail of two hyperedges, each carrying two of the
+        other three as heads: four vertices, eight hyperedges
+  \item one tail is drawn in full, in orange, and the other three repeat it
+        around the square
 \end{vlist}}
-{\cTwoLayer}{two-layer construction \ \tAsym}
-{At $n=m=6$, $r=3$, five distinct outgoing hyperedges per tail give $30$, with a
-direct degree-cut feasibility check.}
+{\cBoundedOutdeg}{$n=4$, $r=3$, $m=3$ \ \tExtremal}
+{Deleting a vertex's own outgoing copies cuts it off, which is why the count per
+tail is capped. Larger sizes have a settled growth rate but open exact values.}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}
-{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved}
-{the same constant \ \sProved\ \ {\scriptsize\color{black!50}two-layer, $r\ge3$, fixed $m$ and $r$ as $n\to\infty$}}
+{$8$ \ \sProved}
+{$8$ \ \sProved}
 {\begin{vlist}
-  \item the shadow argument re-runs under the stricter separation, so the
-        leading term is the same
-  \item whether the finite edge and vertex maxima agree is \sOpen
+  \item the same hypergraph as the arc problem, which is feasible for both
+        separations at once
 \end{vlist}}
-{\cTwoLayer}{two-layer construction \ \tAsym}
-{Random greedy growth with shuffled restarts measures what the implemented
-search finds, and establishes no optimum.}
+{\cBoundedOutdeg}{$n=4$, $r=3$, $m=3$ \ \tExtremal}
+{Whether the two separations keep the same exact value at larger sizes is open.}
 
 % ---- 15. directed multihypergraph, arc -------------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}
-{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved\ \ {\scriptsize\color{black!50}forward, backward and general alike}}
-{the same constant \ \sProved\ \ {\scriptsize\color{black!50}repeats lift the head-set limit}}
+{$6$ \ \sProved}
+{$6$ \ \sProved}
 {\begin{vlist}
-  \item the finite values can differ from the simple model, and are \sOpen
-  \item at $r=2$ these are directed multigraphs, where the simple coefficient is
-        $1/4$ instead, which is why $r\ge3$ is kept
+  \item at this size a tail has only one possible hyperedge, the other two
+        vertices, so it takes two copies of it: three vertices, six hyperedges
+  \item repetition is what lifts the limit on distinct head sets, and it is the
+        whole difference from the simple model
 \end{vlist}}
-{\cTwoLayerRep}{two-layer, hyperedges repeated \ \tAsym}
-{The plotted experiments use rank three and the forward convention. General
-orientations are checked separately in the appendix.}
+{\cRepTriHyper}{$n=3$, $r=3$, $m=3$ \ \tExtremal}
+{Forward, backward and general orientations share the same growth rate. The
+exact values at larger sizes are open.}
 
 % ---- 16. directed multihypergraph, vertex ----------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}
-{$(1+o(1))\dfrac{(m-1)n^2}{4(r-1)}$ \ \sProved}
-{the same constant \ \sProved}
+{$6$ \ \sProved}
+{$6$ \ \sProved}
 {\begin{vlist}
-  \item the same leading term under both separations
-  \item finite exact values \sOpen, and whether forward and general agree once
-        $n>r$ is open too
+  \item the same hypergraph as the arc problem
 \end{vlist}}
-{\cTwoLayerRep}{two-layer, hyperedges repeated \ \tAsym}
-{The rank-three forward-convention runs are not an exhaustive comparison of the
-three orientation models.}
+{\cRepTriHyper}{$n=3$, $r=3$, $m=3$ \ \tExtremal}
+{Whether forward and general orientations agree once $n$ passes $r$ is open.}
 
 \end{document}
