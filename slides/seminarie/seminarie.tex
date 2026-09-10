@@ -17,6 +17,19 @@
 % and the title page, so this file sets none of those itself.
 \documentclass[kul,aspectratio=169]{kulakbeamer}
 
+% kulakbeamer.cls hard-forces aspectratio=169 on every option it sees (see its
+% own \DeclareOption*), so passing a different aspectratio here has no effect.
+% Louis presents on a MacBook whose screen is 2560x1664 = 20:13 (~1.54:1), not
+% 16:9 (1.78:1); every fullscreen PDF viewer he tried (Brave's Present mode,
+% Preview's Full Screen) fills the screen rather than letterboxing, so the
+% 16:9 page gets its right edge cropped. Overriding the physical page size
+% straight after the class loads sidesteps the class's forced option and
+% removes the mismatch entirely. The KU Leuven background/titlepage/outline
+% art is flat colour bars and a logo box (no photography), so the ~7% extra
+% height this stretches them by is not visible.
+\setlength{\paperwidth}{16cm}
+\setlength{\paperheight}{10.4cm}
+
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
 % Latin Modern Sans, which the class loads, has no italic shape. Substituting
