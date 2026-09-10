@@ -11,41 +11,31 @@ extremal value would additionally require an upper bound for every feasible
 digraph.
 
 \begin{construction}[Competing dense directed families]\label{const:directed-comparison}
-For $n\ge m\ge2$, choose the densest of the directed hub, the augmented
-bipartite digraph and the clique-core digraph
-(\Cref{const:directed-hub,const:augmented-bipartite,const:clique-core}).
+For $n\ge m\ge2$, choose the denser of the directed hub and the augmented
+bipartite digraph
+(\Cref{const:directed-hub,const:augmented-bipartite}).
 Their respective arc counts are
 \[
  H_m(n)=m(n-1),\qquad
- Q_m(n)=\floorfrac{(n+m-2)^2}{4},\qquad
- B_m(n)=\floorfrac{(n+m-3)^2}{4}+2(m-1).
+ Q_m(n)=\floorfrac{(n+m-2)^2}{4}.
 \]
-These three letters name arc \emph{counts} of the three directed constructions
-rather than the digraphs themselves. Two similar symbols elsewhere name graphs:
+These two letters name arc \emph{counts} of the two directed constructions
+rather than the digraphs themselves. A similar symbol elsewhere names a graph:
 $H_{m,n}$ is the undirected hub-and-spokes graph of \Cref{const:hub-spokes},
 which carries $\floor{m(n-1)/2}$ edges and is distinct from the directed hub
-count $H_m(n)$ above, and $B_{p,q}$ is the one-directional complete bipartite
-digraph of \Cref{const:bipartite}.
-Each of the three directed constructions defining $H_m(n)$, $Q_m(n)$ and
-$B_m(n)$ has maximum local arc-connectivity $m-1$. Consequently,
+count $H_m(n)$ above.
+Both directed constructions defining $H_m(n)$ and $Q_m(n)$ have maximum local
+arc-connectivity $m-1$. Consequently,
 \[
- \ell_m^{\mathrm{dir}}(n)\ge \max\{H_m(n),Q_m(n),B_m(n)\}.
+ \ell_m^{\mathrm{dir}}(n)\ge \max\{H_m(n),Q_m(n)\}.
 \]
 This is a lower bound, not a proposed formula for the optimum.
 \end{construction}
 
-Which of the three families is largest depends on the range.
-The clique-core construction of \Cref{const:clique-core} leads whenever
-$m\ge5$ and $m+7\le n\le3m-3$. At $m=5$, $n=12$ it has $57$ arcs with maximum
-local arc-connectivity $4$, against $55$ for the hub and $56$ for the augmented
-bipartite count. Outside that window one of those two is largest, and for
-fixed $m$ the augmented bipartite family is eventually the largest of the
-three. That comparison ranks these constructions and nothing else, since
-another feasible family could be denser still.
-
-The displayed maximum is therefore a lower bound only. It is not claimed that
-$57$ is optimal at $n=12$, $m=5$, nor that the maximum of the three counts is
-optimal at any order.
+Which of the two families is larger depends on the range, and for fixed $m$
+the augmented bipartite family is eventually the larger. By
+\Cref{thm:dir-arc-linear-error} the optimum exceeds the bipartite count by at
+most $O_m(n)$, so this family is within a linear amount of extremal.
 At $m=2$, the all-order value is given in
 \Cref{thm:dir-arc-m2-exact}, and the bipartite count is optimal for $n\ge7$.
 \Cref{fig:crossover} compares the hub and augmented bipartite counts at $m=3$.
@@ -142,7 +132,7 @@ At $m=3$ and $n=10$, the construction has thirty arcs while the hub has twenty-s
 The quadratic term is what the directed upper bound has to account for.
 For eventual exactness, the argument must explain why no configuration has more
 arcs than the augmented bipartite construction once $n$ is sufficiently large
-in terms of $m$. The clique-core examples show why a restriction on $n$ is needed.
+in terms of $m$.
 \Cref{prop:dir-arc-stability,thm:dir-arc-linear-error} address this structure in two ways.
 In \emph{size}, the extremal value lies within $O_m(n)$ of the balanced bipartite count.
 The remaining uncertainty includes the linear coefficient and the bounded correction.
@@ -393,10 +383,8 @@ self-contained elementary proof with an explicit upper bound valid at
 every $n$, rather than a new asymptotic consequence unavailable from the
 literature.
 
-The exact value and the linear coefficient remain unresolved. The
-clique-core example disproves the earlier hub-versus-bipartite formula,
-and ranking the three displayed families does not prove that any eventually
-wins over every feasible digraph. The two separations agree in the completed
+The exact value and the linear coefficient remain unresolved.
+The two separations agree in the completed
 $m=3$ computations through $n=6$. Whether they agree generally for $m\ge3$
 is a further question, because an arc upper bound alone does not constrain
 the larger vertex-feasible family.

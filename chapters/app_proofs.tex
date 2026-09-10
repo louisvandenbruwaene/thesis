@@ -450,7 +450,7 @@ at which the Bollob\'as--Erd\H{o}s conjecture itself first fails.
 
 \section{The directed constructions}\label{sec:dir-constructions}
 
-Three basic shapes supply the directed lower bounds used below. The additional clique-core construction appears in \Cref{const:clique-core}. \Cref{ch:basecases} shows the first two side by side in \Cref{fig:simple-digraph-m2} and records what they reach. Here each is defined precisely and its connectivity checked.
+Three basic shapes supply the directed lower bounds used below. \Cref{ch:basecases} shows the first two side by side in \Cref{fig:simple-digraph-m2} and records what they reach. Here each is defined precisely and its connectivity checked.
 
 \begin{construction}[Directed hub]\label{const:directed-hub}
 For $n \ge m \ge 2$, take a hub $h$ and label the other $N = n-1$ vertices $0, \dots, N-1$. Add the $2N$ hub arcs $h \to i$ and $i \to h$, and on the non-hub vertices the $(m-2)N$ ring arcs $i \to i+j \bmod N$ for $j = 1, \dots, m-2$. The total is $m(n-1)$ arcs and every non-hub vertex has $d^+ = d^- = m-1$.
@@ -691,57 +691,6 @@ For the connectivity, fix $a \in A$ and $b \in B$. Consider the following routes
 \end{proof}
 
 \section{Structural propositions on the directed frontier}
-
-The augmented bipartite construction gives a quadratic lower bound, but it
-does not describe every extremal digraph. The following construction is denser
-than both the hub and the augmented bipartite families on a range of orders, so
-$\ell_m^{\mathrm{dir}}$ is not the maximum of those two counts.
-
-\begin{construction}[Clique-core counterexample]\label{const:clique-core}
-Let $n\ge m\ge2$, put $p=n-m$, $a=\ceil{p/2}$ and $b=\floor{p/2}$.
-Take disjoint sets $S,C,T$ of sizes $a,m,b$, with
-$C=\{c_1,\ldots,c_m\}$. Include exactly the arcs
-\[
- c_i\to c_j\ (i\ne j),\qquad
- S\to\{c_1,\ldots,c_{m-1}\},\qquad
- \{c_1,\ldots,c_{m-2}\}\to T,\qquad S\to T.
-\]
-An arrow between sets means that all arcs in that direction are present.
-\end{construction}
-
-The following cuts verify feasibility. In each row, $X$ contains the starting
-vertex and excludes the terminal vertex, and the capacity counts arcs leaving $X$.
-\[
-\begin{array}{c|c|c}
-\text{ordered pair}&X&\text{capacity}\\ \hline
-c_i,c_j\ (i\ne j)&\{c_i\}\cup T&m-1\\
-s,c_j&\{s\}\cup T&m-1\\
-c_i,t&C\cup(T\setminus\{t\})&m-2\\
-s,t&\{s\}\cup C\cup(T\setminus\{t\})&m-1
-\end{array}
-\]
-All other ordered pairs are unreachable. Each pair of distinct core vertices
-also has the direct path and $m-2$ two-step paths inside $C$, so
-$\lec_D^{\max}=m-1$. The arc count is
-\[
- |A(D)|=m(m-1)+(m-1)a+(m-2)b+ab
-       =\floorfrac{(n+m-3)^2}{4}+2(m-1)=:B_m(n).
-\]
-Indeed, $a(b+1)=\floor{(p+1)^2/4}$. Subtracting the old branches gives
-\[
- B_m(n)-m(n-1)=\floorfrac{(p+1)^2}{4}-2p,\qquad
- B_m(n)-\floorfrac{(n+m-2)^2}{4}=m-1-\floor{p/2}.
-\]
-Both differences are positive when $m\ge5$ and $7\le p\le2m-3$.
-At $m=5$, $n=12$, the four arc classes contribute $20+16+9+12=57$,
-whereas the earlier formula gives $\max(55,56)=56$.
-This establishes a lower bound, not the exact value of $\ell_5^{\mathrm{dir}}(12)$.
-The independent script \code{program/scripts/clique\_core\_check.py} checks the
-displayed cuts and identities and enumerates all $4094$ nontrivial cuts of the
-twelve-vertex example.
-
-At $n=3m-3$, the excess over the quadratic value is still one, so any
-threshold beyond which the augmented bipartite count is always optimal would have to be at least $3m-2$ for $m\ge5$. This necessary condition does not establish that such a threshold exists.
 
 \subsection{The two-step budget}\label{sec:two-step-budget}
 
