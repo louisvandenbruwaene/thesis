@@ -62,6 +62,11 @@ rm -f "$wt/slides/seminarie/kulakbeamer.cls" \
       "$wt/slides/seminarie/kuleuvenTitlepage.pdf" \
       "$wt/slides/seminarie/kuleuvenLogo.pdf"
 
+# cheatsheet.tex/.pdf are Louis's own speaker notes for presenting the seminar
+# deck, not a deliverable a reader should see.
+rm -f "$wt/slides/seminarie/cheatsheet.tex" \
+      "$wt/slides/seminarie/cheatsheet.pdf"
+
 # Last line of defence: refuse to publish a snapshot carrying a working-notes
 # file, whatever the path, rather than push and discover it afterwards.
 if find "$wt" -iname 'CLAUDE.md' -o -iname 'TASKS.md' -o -iname 'REVIEW_*.md' \

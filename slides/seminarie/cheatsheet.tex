@@ -1,0 +1,152 @@
+% ============================================================================
+%  Erdos Problem 915 -- presentation cheat sheet
+%  Same 16 variants and the same formulas/status/techniques as the sixteen
+%  \vframe backup slides in seminarie.tex (search that file for \vframe{ to
+%  find the full four-step derivation this page compresses to one line).
+%  This is a standalone reference card, not a beamer slide: one landscape
+%  page, meant to be glanced at while speaking, not projected.
+%
+%  Self-contained like seminarie.tex: colours copied from ../../preamble.tex
+%  so this file builds on its own.
+%
+%  Build:  cd slides/seminarie && latexmk -pdf cheatsheet.tex
+% ============================================================================
+\documentclass[9pt]{extarticle}
+\usepackage[a4paper,landscape,margin=0.9cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{enumitem}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{16pt}
+\setlength{\columnseprule}{0.4pt}
+
+% ---- colours (KU Leuven palette + thesis semantic colours) -----------------
+\definecolor{KULblauw1}{RGB}{29,141,176}
+\definecolor{KULblauw3a}{RGB}{82,189,236}
+\definecolor{KULblauw3b}{RGB}{30,110,135}
+\definecolor{vertexpurple}{RGB}{140,80,160}
+\definecolor{vertexorange}{RGB}{220,140,40}
+\colorlet{regimeProved}{KULblauw1}
+\colorlet{regimeOpen}{vertexorange}
+\colorlet{regimePartial}{vertexpurple}
+
+% ---- notation shorthands (copied from preamble.tex) ------------------------
+\newcommand*{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand*{\floorfrac}[2]{\floor{\frac{#1}{#2}}}
+\newcommand{\dir}{\mathrm{dir}}
+\newcommand{\Erdos}{Erd\H{o}s}
+
+% ---- a small status pill, no tikz needed ------------------------------------
+\newcommand{\chip}[2]{\colorbox{#1}{\textcolor{white}{\scriptsize\bfseries\ #2\ }}}
+\newcommand{\sProved}{\chip{regimeProved}{PROVED}}
+\newcommand{\sPartial}{\chip{regimePartial}{PARTIAL}}
+\newcommand{\sOpen}{\chip{regimeOpen}{OPEN}}
+
+% ---- one group header --------------------------------------------------
+\newcommand{\Group}[1]{%
+  \vspace{5pt}\noindent{\color{KULblauw3b}\bfseries\normalsize #1}\par
+  \vspace{1pt}{\color{KULblauw3a}\rule{\linewidth}{1pt}}\par\vspace{3pt}}
+
+% ---- one variant: symbol, name, status chip, upper line, lower line --------
+% the UB/LB lines each carry: formula, its condition (grey), the one-clause
+% technique (after the em dash) -- exactly what the vframe's formula slot and
+% first vstep say, condensed to a single clause
+\newcommand{\V}[5]{%
+  \noindent{\large\color{KULblauw3b}$#1$}\ \ {\bfseries #2}\hfill#3\par
+  \vspace{1pt}
+  \noindent\makebox[13pt][l]{\color{black!40}\bfseries\tiny UP}#4\par
+  \noindent\makebox[13pt][l]{\color{black!40}\bfseries\tiny LO}#5\par
+  \vspace{6pt}}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries\color{KULblauw3b}\Erdos{} Problem 915 --- Cheat Sheet}\\[2pt]
+{\footnotesize\color{black!55}the sixteen variants, one line per bound
+ \quad\textperiodcentered\quad
+ \sProved\ exact value established
+ \quad \sPartial\ partial or conjectural
+ \quad \sOpen\ general value open}
+\end{center}
+\vspace{2pt}
+
+\begin{multicols}{2}
+
+\Group{Simple graphs}
+
+\V{\ell_m(n)}{edge}{\sProved}
+  {$\floorfrac{m(n-1)}{2}$, {\scriptsize\color{black!50}$n\ge m\ge2$} --- Gomory--Hu tree, double-counted against Mader's degree bound}
+  {same formula --- hub-and-spokes graph, spoke degree $\le m-2$}
+
+\V{k_m(n)}{vertex}{\sPartial}
+  {$=\ell_m(n)$ {\scriptsize\color{black!50}$m\le4$} --- edge bound does not transfer ($\kappa\le\lambda$ is the wrong direction), equal anyway up to $m=4$}
+  {$\floorfrac{m(n-1)}{2}$ --- same hub-and-spokes; S{\o}rensen--Thomassen overtakes it from $m=5,\,n\ge14$}
+
+\V{\ell_m^{\dir}(n)}{arc}{\sOpen}
+  {$M(n)=\max(2(n-1),\floor{n^2/4})$ {\scriptsize\color{black!50}$m=2$} --- reachability skeleton (at $m=2$ a feasible digraph is its own skeleton)}
+  {$M(n)$ --- bidirected hub / one-way bipartite digraph}
+
+\V{k_m^{\dir}(n)}{vertex}{\sOpen}
+  {$M(n)$ {\scriptsize\color{black!50}$m=2$} --- skeleton routes are already vertex-disjoint, so vertex bound comes first, arc bound follows}
+  {$\floor{n^2/4}$ --- one-way bipartite digraph}
+
+\Group{Multigraphs}
+
+\V{L_m(n)}{edge}{\sProved}
+  {$(m-1)(n-1)$, every $n,m$ --- Gomory--Hu, $n-1$ cuts each of capacity $\le m-1$}
+  {same formula --- any spanning tree at multiplicity $m-1$}
+
+\V{K_m(n)}{vertex}{\sPartial}
+  {$2(n-1)$ {\scriptsize\color{black!50}$m=3$} --- $\kappa(u,v)=$ copies of the edge $+$ disjoint detours, capped together}
+  {$(m-1)(n-1)$ --- doubled tree: no detours, so the whole cap goes to multiplicity}
+
+\V{L_m^{\dir}(n)}{arc}{\sProved}
+  {$(m-1)M(n)$, every $n,m$ --- peel a reachability skeleton off $m-1$ times}
+  {same formula --- thickened bidirected tree / one-way bipartite digraph}
+
+\V{K_m^{\dir}(n)}{vertex}{\sOpen}
+  {$(m-1)\floor{n^2/4}+4(m-1)^2(n-1)$ {\scriptsize\color{black!50}not tight}}
+  {$n(n-1)(m+1-n)$ {\scriptsize\color{black!50}proposed, $2\le n\le m$} --- thickened complete digraph, unique isomorphism class at $n=3,m=6$}
+
+\columnbreak
+\Group{Hypergraphs ($r=3$)}
+
+\V{\ell_m^{(r)}(n)}{edge}{\sPartial}
+  {$\floorfrac{(m-1)(n-1)}{r-1}$ --- cut induction on trace hypergraphs (Berge forbids the graph reduction)}
+  {same formula {\scriptsize\color{black!50}$m-1\le\binom{n-2}{r-2}$} --- star hypertree / degree-capped hub}
+
+\V{k_m^{(r)}(n)}{vertex}{\sPartial}
+  {$\floorfrac{n-1}{r-1}$ {\scriptsize\color{black!50}$m=2$} --- incidence graph is a forest ($r|E|\le n+|E|-1$)}
+  {$\floorfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$r\ge3$, $m-1\le\binom{n-2}{r-2}$} --- star hypertree}
+
+\V{\ell_m^{\dir\,(r)}(n)}{arc}{\sOpen}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$ {\scriptsize\color{black!50}not tight} --- tail--head shadow digraph}
+  {$n\cdot\min(m-1,\binom{n-1}{r-1})$ {\scriptsize\color{black!50}$n\ge r$} --- bounded outgoing hyperedge count}
+
+\V{k_m^{\dir\,(r)}(n)}{vertex}{\sOpen}
+  {same as arc}
+  {same as arc --- outgoing cut never looks at interior vertices, one argument serves both}
+
+\Group{Multihypergraphs ($r=3$)}
+
+\V{L_m^{(r)}(n)}{edge}{\sPartial}
+  {$\floorfrac{(m-1)(n-1)}{r-1}$, unchanged by repetition --- same cut induction, repetition-blind}
+  {$\dfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$(r-1)\mid(n-1)$} --- star hypertree, every hyperedge repeated $m-1$ times}
+
+\V{K_m^{(r)}(n)}{vertex}{\sPartial}
+  {$\floorfrac{2(n-1)}{r-1}$ {\scriptsize\color{black!50}$m=3$} --- incidence-graph cycle rank via cut vertices / separating pairs}
+  {$\dfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$(r-1)\mid(n-1)$} --- repeated star hypertree}
+
+\V{L_m^{\dir\,(r)}(n)}{arc}{\sOpen}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$ --- tail--head pair counting}
+  {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$} --- every tail gets $m-1$ copies; meets the bound exactly at $n=r$}
+
+\V{K_m^{\dir\,(r)}(n)}{vertex}{\sOpen}
+  {same as arc}
+  {same as arc --- general (any tail/head split) orientation shares the same constant}
+
+\end{multicols}
+\end{document}
