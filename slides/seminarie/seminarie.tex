@@ -398,7 +398,7 @@
     \foreach \i/\col in {1/metroA, 2/metroB, 3/metroC}{
       \draw[metro, \col, line width=2.5pt]
         (u\i) to[bend left=10]  (c) to[bend left=10]  (w\i);
-      \draw[metro, \col!55!black, line width=2.5pt]
+      \draw[metro, \col!45!white, line width=2.5pt]
         (u\i) to[bend right=10] (c) to[bend right=10] (w\i);}
   \end{scope}
   \node[metrostop, minimum size=5.4mm] at (c) {};
@@ -504,9 +504,9 @@
 % n = r = 3, repeats allowed: a tail has only one possible hyperedge, namely the
 % other two vertices, so it takes m - 1 = 2 copies of it. All three tails are
 % drawn in full, each its own colour, the two copies of a tail's hyperedge
-% shaded full/dark the way the eight-models frame shades a repeated
+% shaded full/light the way the eight-models frame shades a repeated
 % hyperedge (its multihypergraph and directed multihypergraph panels both
-% darken the repeat with !55!black, never lighten it, so this follows suit).
+% lighten the repeat with !45!white, so this follows suit).
 % As in \cFullTriHyper every arc bends the SAME way (left) so a forward arc
 % and its reverse land on opposite sides instead of retracing each other;
 % the two copies of one arc then nest at different bend radii.
@@ -517,16 +517,16 @@
   \begin{scope}[on background layer]
     \draw[hstar, metroA]          (v1) to[bend left=16] (v2);
     \draw[hstar, metroA]          (v1) to[bend left=16] (v3);
-    \draw[hstar, metroA!55!black] (v1) to[bend left=30] (v2);
-    \draw[hstar, metroA!55!black] (v1) to[bend left=30] (v3);
+    \draw[hstar, metroA!45!white] (v1) to[bend left=30] (v2);
+    \draw[hstar, metroA!45!white] (v1) to[bend left=30] (v3);
     \draw[hstar, metroB]          (v2) to[bend left=16] (v3);
     \draw[hstar, metroB]          (v2) to[bend left=16] (v1);
-    \draw[hstar, metroB!55!black] (v2) to[bend left=30] (v3);
-    \draw[hstar, metroB!55!black] (v2) to[bend left=30] (v1);
+    \draw[hstar, metroB!45!white] (v2) to[bend left=30] (v3);
+    \draw[hstar, metroB!45!white] (v2) to[bend left=30] (v1);
     \draw[hstar, metroC]          (v3) to[bend left=16] (v1);
     \draw[hstar, metroC]          (v3) to[bend left=16] (v2);
-    \draw[hstar, metroC!55!black] (v3) to[bend left=30] (v1);
-    \draw[hstar, metroC!55!black] (v3) to[bend left=30] (v2);
+    \draw[hstar, metroC!45!white] (v3) to[bend left=30] (v1);
+    \draw[hstar, metroC!45!white] (v3) to[bend left=30] (v2);
   \end{scope}
   \foreach \i in {1,2,3}{\node[metrostop, minimum size=5mm] at (v\i) {};}
 \end{tikzpicture}}
@@ -828,7 +828,7 @@
     \coordinate (C) at (0.85, 0.85);  \coordinate (D) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[ml, metroA] (-0.85,-0.93) -- (0.93,-0.93) -- (0.93,0.85);
-      \draw[ml, metroA!55!black] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);
+      \draw[ml, metroA!45!white] (-0.85,-0.77) -- (0.77,-0.77) -- (0.77,0.85);
       \draw[ml, metroB] (0.85,-0.85) -- (-0.85,0.85) -- (0.85,0.85);
     \end{scope}
     \foreach \p in {A,B,C,D} {\node[stn] at (\p) {};}
@@ -882,8 +882,8 @@
     \coordinate (Cm) at (0.85, 0.85);  \coordinate (Dm) at (-0.85,0.85);
     \begin{scope}[on background layer]
       \draw[hstar, metroA] (Bm) to[bend left=16] (Am);
-      \draw[hstar, metroA!55!black] (Bm) to[bend right=16] (Am);
-      \draw[hstar, metroA!55!black] (Bm) to[bend left=16] (Cm);
+      \draw[hstar, metroA!45!white] (Bm) to[bend right=16] (Am);
+      \draw[hstar, metroA!45!white] (Bm) to[bend left=16] (Cm);
       \draw[hstar, metroA] (Bm) to[bend right=16] (Cm);
       \draw[hstar, metroB] (Dm) to (Bm);
       \draw[hstar, metroB] (Dm) to (Cm);
