@@ -474,25 +474,31 @@
   \foreach \i in {1,2,3}{\node[gvertex, minimum size=6mm] at (v\i) {};}
 \end{tikzpicture}}
 
-% bounded outgoing hyperedge count at n = 4, r = 3: every vertex is the tail of
-% two hyperedges. One tail is drawn in full (orange) and the other three repeat
-% the pattern around the square, for 4 x 2 = 8 hyperedges.
+% bounded outgoing hyperedge count at n = r = 3: every vertex is the tail of
+% exactly one hyperedge, to the other two, so all three hyperedges fit on the
+% page fully drawn, no "the rest repeat this" caption needed.
 % A directed hyperedge is one tail and r-1 heads, so it is drawn the way the
 % eight-models frame draws them: a fan of arrows leaving the tail, one per head,
-% all in the hyperedge's own colour. The two fans share the far vertex, so their
-% arcs to it are bent apart to keep both visible.
-\newcommand{\cBoundedOutdeg}{\begin{tikzpicture}[
-    hstar/.style={metro, line width=2.7pt, -{Stealth[length=2.8mm]},
+% all in the hyperedge's own colour. Bending every arc left (not left/right
+% pairs) is what separates a tail's two arrows from the reverse arrows next to
+% them: a forward arc and its reverse bend to the SAME visual side under
+% "bend left" on both, since reversing the direction of travel also reverses
+% which way is "left" -- pairing left with right would instead retrace the
+% same curve and hide one colour under the other, which is what the first
+% attempt at this picture did.
+\newcommand{\cFullTriHyper}{\begin{tikzpicture}[
+    hstar/.style={metro, line width=2.6pt, -{Stealth[length=2.8mm]},
                   shorten >=3.0mm, shorten <=2.4mm}]
-  \foreach \i/\a in {1/90, 2/0, 3/270, 4/180}{\coordinate (v\i) at (\a:1.6);}
+  \foreach \i/\a in {1/90, 2/210, 3/330}{\coordinate (v\i) at (\a:1.7);}
   \begin{scope}[on background layer]
-    \draw[hstar, metroA] (v1) to (v2);
-    \draw[hstar, metroA] (v1) to[bend left=13] (v3);
-    \draw[hstar, metroB] (v1) to (v4);
-    \draw[hstar, metroB] (v1) to[bend right=13] (v3);
+    \draw[hstar, metroA] (v1) to[bend left=22] (v2);
+    \draw[hstar, metroA] (v1) to[bend left=22] (v3);
+    \draw[hstar, metroB] (v2) to[bend left=22] (v3);
+    \draw[hstar, metroB] (v2) to[bend left=22] (v1);
+    \draw[hstar, metroC] (v3) to[bend left=22] (v1);
+    \draw[hstar, metroC] (v3) to[bend left=22] (v2);
   \end{scope}
-  \node[gvhub, minimum size=5.2mm] at (v1) {};
-  \foreach \i in {2,3,4}{\node[metrostop, minimum size=4.6mm] at (v\i) {};}
+  \foreach \i in {1,2,3}{\node[gvertex, minimum size=5.2mm] at (v\i) {};}
 \end{tikzpicture}}
 
 % n = r = 3, repeats allowed: a tail has only one possible hyperedge, namely the
@@ -1555,7 +1561,7 @@ The badge at top right matches the status tree.\par
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}{\rgOpen}
-{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $6$ here, not tight}}
 {$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{every route out of a vertex has to start with one of that vertex's own
@@ -1565,16 +1571,15 @@ The badge at top right matches the status tree.\par
          is feasible at any size}
   \vstep{for large $n$ a separate bipartite construction is asymptotically optimal;
          a shadow digraph supplies its upper bound}
-  \vstep{at this size enumeration closes the gap, and $4\times2=8$}
+  \vstep{at this size enumeration closes the gap, and $3\times1=3$}
 \end{vsteps}}
-{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8}\par
-   \vspace{2pt}\sComputed\ \tExtremal\par
-   {\scriptsize\color{black!55}one tail of the four, each doing the same}}
+{\cFullTriHyper}{\atsize{n=3,\ r=3,\ m=3}{3}\par
+   \vspace{2pt}\sComputed\ \tExtremal}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ one-step shadow A.71 \ \textperiodcentered\ \ two-step bound A.32}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}{\rgOpen}
-{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
+{$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $6$ here, not tight}}
 {$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{the outgoing cut never looks at interior vertices at all}
@@ -1584,9 +1589,8 @@ The badge at top right matches the status tree.\par
          stricter separation for the same reason}
   \vstep{whether the two separations keep one value at larger sizes is open}
 \end{vsteps}}
-{\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8}\par
-   \vspace{2pt}\sComputed\ \tExtremal\par
-   {\scriptsize\color{black!55}one tail of the four, each doing the same}}
+{\cFullTriHyper}{\atsize{n=3,\ r=3,\ m=3}{3}\par
+   \vspace{2pt}\sComputed\ \tExtremal}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68}
 
 % ---- 15. directed multihypergraph, arc -------------------------------------
