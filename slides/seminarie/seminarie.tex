@@ -502,23 +502,31 @@
 \end{tikzpicture}}
 
 % n = r = 3, repeats allowed: a tail has only one possible hyperedge, namely the
-% other two vertices, so it takes m - 1 = 2 copies of it. One tail is drawn,
-% the other two repeat it, for 3 x 2 = 6 copies. Each copy is its own fan of
-% arrows out of the tail, and the two copies are shaded as the eight-models
-% frame shades a repeated hyperedge.
-\newcommand{\cRepTriHyper}{\begin{tikzpicture}[
-    hstar/.style={metro, line width=2.5pt, -{Stealth[length=2.7mm]},
+% other two vertices, so it takes m - 1 = 2 copies of it. All three tails are
+% drawn in full, each its own colour, the two copies of a tail's hyperedge
+% shaded dark/light the way the eight-models frame shades a repeated
+% hyperedge. As in \cFullTriHyper every arc bends the SAME way (left) so a
+% forward arc and its reverse land on opposite sides instead of retracing
+% each other; the two copies of one arc then nest at different bend radii.
+\newcommand{\cFullRepTriHyper}{\begin{tikzpicture}[
+    hstar/.style={metro, line width=2.4pt, -{Stealth[length=2.6mm]},
                   shorten >=3.0mm, shorten <=2.4mm}]
-  \foreach \i/\a in {1/90, 2/210, 3/330}{\coordinate (v\i) at (\a:1.6);}
+  \foreach \i/\a in {1/90, 2/210, 3/330}{\coordinate (v\i) at (\a:1.9);}
   \begin{scope}[on background layer]
-    \draw[hstar, metroA]           (v1) to[bend left=13]  (v2);
-    \draw[hstar, metroA]           (v1) to[bend right=13] (v3);
-    \draw[hstar, metroA!55!black]  (v1) to[bend right=13] (v2);
-    \draw[hstar, metroA!55!black]  (v1) to[bend left=13]  (v3);
+    \draw[hstar, metroA]          (v1) to[bend left=16] (v2);
+    \draw[hstar, metroA]          (v1) to[bend left=16] (v3);
+    \draw[hstar, metroA!50!white] (v1) to[bend left=30] (v2);
+    \draw[hstar, metroA!50!white] (v1) to[bend left=30] (v3);
+    \draw[hstar, metroB]          (v2) to[bend left=16] (v3);
+    \draw[hstar, metroB]          (v2) to[bend left=16] (v1);
+    \draw[hstar, metroB!50!white] (v2) to[bend left=30] (v3);
+    \draw[hstar, metroB!50!white] (v2) to[bend left=30] (v1);
+    \draw[hstar, metroC]          (v3) to[bend left=16] (v1);
+    \draw[hstar, metroC]          (v3) to[bend left=16] (v2);
+    \draw[hstar, metroC!50!white] (v3) to[bend left=30] (v1);
+    \draw[hstar, metroC!50!white] (v3) to[bend left=30] (v2);
   \end{scope}
-  \node[gvhub, minimum size=5.2mm] at (v1) {};
-  \node[metrostop, minimum size=4.6mm] at (v2) {};
-  \node[metrostop, minimum size=4.6mm] at (v3) {};
+  \foreach \i in {1,2,3}{\node[gvertex, minimum size=5.2mm] at (v\i) {};}
 \end{tikzpicture}}
 
 % one transformation: the label on top, the picture under it
@@ -1607,9 +1615,8 @@ The badge at top right matches the status tree.\par
   \vstep{the two meet here, both reading $6$, so the value needs no search:
          $n(m-1)$ equals the counting bound exactly when $n=r$}
 \end{vsteps}}
-{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
-   \vspace{2pt}\tExtremal\par
-   {\scriptsize\color{black!55}one tail of the three, each doing the same}}
+{\cFullRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
+   \vspace{2pt}\tExtremal}
 {Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ backward reverses forward A.69}
 
 % ---- 16. directed multihypergraph, vertex ----------------------------------
@@ -1627,9 +1634,8 @@ The badge at top right matches the status tree.\par
   \vstep{whether forward and general agree at a fixed $n>r$, and not merely in
          the growth rate, is open}
 \end{vsteps}}
-{\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
-   \vspace{2pt}\tExtremal\par
-   {\scriptsize\color{black!55}one tail of the three, each doing the same}}
+{\cFullRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
+   \vspace{2pt}\tExtremal}
 {General orientation constant A.72 \ \textperiodcentered\ \ general obeys forward A.70 \ \textperiodcentered\ \ backward reverses forward A.69 \ \textperiodcentered\ \ bounded outgoing count A.68}
 
 \end{document}
