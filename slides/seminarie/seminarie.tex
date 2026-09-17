@@ -555,7 +555,7 @@
 \begin{tikzpicture}
   % --- the formal title ---------------------------------------------------
   \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,1.55)
-    {Maximising edge density in graphs\\under connectivity constraints};
+    {Maximising edge density in graphs\\subject to connectivity constraints};
   \node[draw=KULblauw1!35, rounded corners=4pt, line width=0.9pt,
         fit={(formal)}, inner sep=9pt] (fbox) {};
 
@@ -1192,7 +1192,7 @@ according to the separation; $\Lambda>0$ is the penalty weight.}
     }
     \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {\draw[gline] (t\i) -- (t\j);}
     \node[font=\footnotesize\itshape] at (2.5,-0.9) {tree};
-    \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
+    \node[font=\scriptsize] at (2.5,-1.4) {$\ell_2(6)=5$};
   \end{scope}
   \begin{scope}[shift={(0,0.3)}]
     \node[gvhub, minimum size=6mm] (h2) at (0,0) {};
@@ -1202,7 +1202,7 @@ according to the separation; $\Lambda>0$ is the penalty weight.}
       \draw[gline] (h2) to[gcurveR] (l2\ang);
     }
     \node[font=\footnotesize\itshape] at (0,-2.0) {multigraph star};
-    \node[font=\scriptsize] at (0,-2.5) {$n=6$, $m=3$, $L_3(n)=10$};
+    \node[font=\scriptsize] at (0,-2.5) {$L_3(6)=10$};
   \end{scope}
   \begin{scope}[shift={(5.2,0.3)}]
     \node[gvhub, minimum size=6mm] (h3) at (0,0) {};
@@ -1214,7 +1214,7 @@ according to the separation; $\Lambda>0$ is the penalty weight.}
       \draw[gdir] (l3\ang) to[bend left=11]  (h3);
     }
     \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
-    \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\dir}(n)=12$};
+    \node[font=\scriptsize] at (0,-2.9) {$L_3^{\dir}(4)=12$};
   \end{scope}
   % the thesis figure carries the same caveat: these are family members drawn
   % at the reported sizes, not the graphs the saved runs returned
@@ -1399,7 +1399,7 @@ The badge at top right matches the status tree.\par
 % ---- 3. simple digraph, directed, arc --------------------------------------
 \vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}{\rgOpen}
 {$M(n)=\max\bigl(2(n-1),\floor{n^2/4}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
-{$\floorfrac{n^2}{4}$ \ \sProved}
+{$M(n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{a reachability skeleton is a subdigraph preserving who reaches whom}
   \vstep{at $m=2$ a feasible digraph \emph{is} its own skeleton: drop an arc and
@@ -1460,22 +1460,23 @@ The badge at top right matches the status tree.\par
 % ---- 7. directed multigraph, arc -------------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}{\rgProved}
 {$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}every $n$ and $m$}}
-{$(m-1)\cdot2(n-1)$ \ \sProved}
+{$(m-1)M(n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{inside any feasible multigraph there is a sparse reachability skeleton}
   \vstep{removing one copy of each of its arcs costs every reachable pair at least
          one route, so the graph stays feasible one threshold lower}
   \vstep{$m-1$ such peels account for every arc, giving $m-1$ times the $m=2$
          value, and the fractional relaxation is integral so nothing is lost}
-  \vstep{a bidirected tree at multiplicity $m-1$ attains the linear branch}
+  \vstep{at multiplicity $m-1$, a bidirected tree attains the linear branch and
+         a one-way bipartite digraph the quadratic one}
 \end{vsteps}}
 {\cBidirTree}{\atsize{n=4,\ m=3}{12} \ \tExtremal}
-{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree A.36 \ \textperiodcentered\ \ integrality A.39}
+{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree and bipartite digraph A.36 \ \textperiodcentered\ \ integrality A.39}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{\rgOpen}
 {$(m-1)\floorfrac{n^2}{4}+4(m-1)^2(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}reads $210$ here, far from tight}}
-{$n(n-1)(m+1-n)$ \ \sProposed\ \ {\scriptsize\color{black!50}$2\le n\le m$}}
+{$n(n-1)(m+1-n)$ \ \sProved\ \ {\scriptsize\color{black!50}$2\le n\le m$}}
 {\begin{vsteps}
   \vstep{the proposed general argument splits $\kap$ into direct copies
          plus internally disjoint detours}
@@ -1483,7 +1484,7 @@ The badge at top right matches the status tree.\par
          so its multiplicity stops at $m-2=4$ rather than at the cap of five}
   \vstep{the six directions give $6\times4=24$, and enumeration leaves exactly
          one isomorphism class}
-  \vstep{it is the complete digraph thickened, the $b=3$ block of A.65}
+  \vstep{it is the thickened complete digraph of A.65, cut at size $m-1$}
 \end{vsteps}}
 {\cTriFour}{\atsize{n=3,\ m=6}{24}\par
    \vspace{2pt}\sComputed\ \tExtremal}
@@ -1504,12 +1505,12 @@ The badge at top right matches the status tree.\par
          degree-capped hyperedges attains the stated general range}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49 \ \textperiodcentered\ \ lower bound A.50}
+{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{n-1}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
-{$\floorfrac{n-1}{r-1}$ \ \sProved}
+{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$r\ge3$, $m-1\le\binom{n-2}{r-2}$}}
 {\begin{vsteps}
   \vstep{at $m=2$ feasibility says exactly that the incidence graph is a forest,
          since a cycle in it would already be two disjoint routes}
@@ -1520,7 +1521,7 @@ The badge at top right matches the status tree.\par
   \vstep{the star hypertree's incidence graph is a tree, so it attains it}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
+{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ general lower bound A.50 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}{\rgPartial}
@@ -1600,7 +1601,7 @@ The badge at top right matches the status tree.\par
   \vstep{at this size a tail has only one possible head set, the other two
          vertices, so repetition is the only way to grow at all}
   \vstep{the two meet here, both reading $6$, so the value needs no search:
-         it is the smallest size at which the counting bound is already tight}
+         $n(m-1)$ equals the counting bound exactly when $n=r$}
 \end{vsteps}}
 {\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
    \vspace{2pt}\tExtremal\par
