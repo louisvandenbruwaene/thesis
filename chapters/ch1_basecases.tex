@@ -112,7 +112,7 @@ For all $n \ge 2$ and $m \ge 2$,
 \]
 \end{theorem}
 
-Notice how $n \ge m$ is not needed for the inequality itself, and is generally needed to attain equality, since a graph on $n < m$ vertices cannot exceed the edge count $\binom{n}{2}$ of the complete graph on it, which falls short of $\floor{m(n-1)/2}$ once $m$ exceeds $n$. The floor can still let a small case through by coincidence: $K_2$ attains $\floor{3/2} = 1$ at $n = 2$, $m = 3$.
+The inequality does not require $n \ge m$, but attaining equality generally does. For $2\le n<m$, the complete graph is feasible and gives the exact value $\ell_m(n)=\binom{n}{2}$. This is strictly below $\floor{m(n-1)/2}$ except at $(n,m)=(2,3)$, where $K_2$ attains $\floor{3/2}=1$.
 The proof given in \Cref{app:proofs} was discovered independently of Mader and uses the Gomory--Hu tree (\Cref{thm:gomory-hu}).
 The shared clique graph is then generalised to an extremal construction that exists for all values of $n\ge m$ (\Cref{thm:extremal-existence}).
 The very same Gomory--Hu tree returns for the multigraph variant (\Cref{thm:multigraph-edge}), so its properties are recorded here.
