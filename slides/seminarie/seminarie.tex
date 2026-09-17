@@ -210,9 +210,8 @@
 \newcommand{\sProved}{\chip{regimeProved}{PROVED}}
 \newcommand{\sProposed}{\chip{regimePartial}{PROPOSED}}
 \newcommand{\sOpen}{\chip{regimeOpen}{OPEN}}
-% A value settled at one size by exhausting the finite search space. It is not a
-% bound and it is not a proof: it is a computation, so it gets its own word and
-% is never dressed as PROVED.
+% A finite optimum established by completed enumeration. The separate badge
+% distinguishes computational certification from a general analytic proof.
 \newcommand{\sComputed}{\chip{black!45}{COMPUTED}}
 \newcommand{\tExtremal}{\chip{vertexgreen!70!black}{EXTREMAL}}
 \newcommand{\tNear}{\chip{vertexorange!85!black}{NEAR-EXTREMAL}}
@@ -266,9 +265,8 @@
   \setlength{\topsep}{0pt}}{\end{itemize}}
 
 % The witness caption: the size the drawing is at, then the count it reaches.
-% Upper and lower agree on every one of these frames, so the shared value is
-% stated once, here beside the thing you can count it on, rather than repeated
-% on both bound lines where it said nothing new.
+% The count beside the drawing is the witness size. When the displayed upper
+% bound is loose, a separate completed enumeration can establish optimality.
 \newcommand{\atsize}[2]{$#1$\ \ {\normalsize\color{KULblauw3b}$\mathbf{#2}$}}
 
 % The proof sketch: numbered because the steps are meant to be read in order,
@@ -557,7 +555,7 @@
 \begin{tikzpicture}
   % --- the formal title ---------------------------------------------------
   \node[font=\bfseries, text=KULblauw3b, align=center] (formal) at (0,1.55)
-    {Maximising edge density in graphs\\under connectivity constraints};
+    {Maximising edge density in graphs\\subject to connectivity constraints};
   \node[draw=KULblauw1!35, rounded corners=4pt, line width=0.9pt,
         fit={(formal)}, inner sep=9pt] (fbox) {};
 
@@ -1151,6 +1149,10 @@ $\Phi(G)\;=\;
    _{\substack{\text{\normalsize penalty}\\[1pt]
    \text{\scriptsize\color{black!55} discourages excess connectivity}}}$}
 \end{center}
+\begin{center}
+{\footnotesize\color{black!55}$c^{\max}$ is $\lambda^{\max}$ or $\kappa^{\max}$,
+according to the separation; $\Lambda>0$ is the penalty weight.}
+\end{center}
 \vspace{22pt}
 \begin{center}
 \adjustbox{max totalheight=0.30\textheight}{\resizebox{0.80\textwidth}{!}{%
@@ -1190,7 +1192,7 @@ $\Phi(G)\;=\;
     }
     \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {\draw[gline] (t\i) -- (t\j);}
     \node[font=\footnotesize\itshape] at (2.5,-0.9) {tree};
-    \node[font=\scriptsize] at (2.5,-1.4) {$n=6$, $\ell_2(n)=5$};
+    \node[font=\scriptsize] at (2.5,-1.4) {$\ell_2(6)=5$};
   \end{scope}
   \begin{scope}[shift={(0,0.3)}]
     \node[gvhub, minimum size=6mm] (h2) at (0,0) {};
@@ -1200,7 +1202,7 @@ $\Phi(G)\;=\;
       \draw[gline] (h2) to[gcurveR] (l2\ang);
     }
     \node[font=\footnotesize\itshape] at (0,-2.0) {multigraph star};
-    \node[font=\scriptsize] at (0,-2.5) {$n=6$, $m=3$, $L_3(n)=10$};
+    \node[font=\scriptsize] at (0,-2.5) {$L_3(6)=10$};
   \end{scope}
   \begin{scope}[shift={(5.2,0.3)}]
     \node[gvhub, minimum size=6mm] (h3) at (0,0) {};
@@ -1212,7 +1214,7 @@ $\Phi(G)\;=\;
       \draw[gdir] (l3\ang) to[bend left=11]  (h3);
     }
     \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
-    \node[font=\scriptsize] at (0,-2.9) {$n=4$, $m=3$, $L_3^{\dir}(n)=12$};
+    \node[font=\scriptsize] at (0,-2.9) {$L_3^{\dir}(4)=12$};
   \end{scope}
   % the thesis figure carries the same caveat: these are family members drawn
   % at the reported sizes, not the graphs the saved runs returned
@@ -1287,7 +1289,31 @@ $\Phi(G)\;=\;
 \end{center}
 \end{frame}
 
+\begin{frame}{AI: from reviewer to worker}
+\begin{center}
 
+\textbf{Scale of output = double-edged sword}
+\\
+\vspace{5mm}
+\textbf{Numerical reliability}
+\\
+\vspace{5mm}
+\textbf{Parrot proofs}
+\\
+\vspace{5mm}
+\textbf{AI = deceiving tool}
+\\
+\vspace{5mm}
+\textbf{Master's thesis = Understanding frontier research}
+\\
+\vspace{5mm}
+\textbf{Applied + pure mathematics}
+\\
+\vspace{5mm}
+\textbf{$\forall$ $m,n$ $\exists$ 32 problems}
+\end{center}
+
+\end{frame}
 
 % ============================================================================
 %  THANK YOU
@@ -1317,27 +1343,24 @@ $\Phi(G)\;=\;
 {\small
 \noindent{\color{black!45}\footnotesize\bfseries HOW TO READ THE NEXT SIXTEEN FRAMES}\par
 \vspace{7pt}
-\noindent Each frame takes one variant, fixes a small size, and evaluates the
-formula there. Top right it carries its leaf's colour from the status tree.\par
+\noindent Each frame gives bounds and a small witness for one variant.
+The badge at top right matches the status tree.\par
 \vspace{9pt}
 \noindent\rgProved\ \ \rgPartial\ \ \rgOpen\par
 \vspace{3pt}
-\noindent{\footnotesize\color{black!55}the three regimes of the tree, in its
-colours: each frame carries its own, top right}\par
-\vspace{9pt}
+\vspace{6pt}
 \begin{tabular}{@{}r@{\hspace{10pt}}p{0.68\linewidth}@{}}
 {\color{black!40}\bfseries\footnotesize UPPER}
            & the formula, with any condition it needs \\[5pt]
 {\color{black!40}\bfseries\footnotesize LOWER}
            & what the construction achieves, as a formula too \\[5pt]
-\sProved   & a bound with a proof behind it \\[4pt]
-\sComputed & a value found by exhausting a finite search space, which is a
-             computation and is never called a proof \\[5pt]
+\sProved   & a checked or cited mathematical bound \\[4pt]
+\sProposed & a conjecture whose proposed proof the author has not
+             checked line by line \\[4pt]
+\sComputed & a finite optimum established by completed enumeration \\[5pt]
 {\color{KULblauw1}\bfseries\footnotesize 1.\,2.\,3.}
-           & a sketch, upper bound first, ending with what attains it, then the
-             results it leans on \\[5pt]
-\tExtremal & the drawing is that witness, with the size and the shared value
-             beside it, so it can be counted against that number \\
+           & a sketch of the bounds and construction \\[5pt]
+\tExtremal & a witness attaining the optimum at the displayed parameters \\
 \end{tabular}}
 \end{minipage}
 \end{center}
@@ -1346,21 +1369,23 @@ colours: each frame carries its own, top right}\par
 
 % ---- 1. simple graph, undirected, edge -------------------------------------
 \vframe{Simple graph \textperiodcentered\ edge}{\ell_m(n)}{\rgProved}
-{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge m$}}
 {$\floorfrac{m(n-1)}{2}$ \ \sProved}
+{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge m\ge2$}}
 {\begin{vsteps}
   \vstep{a Gomory--Hu tree holds every pairwise connectivity in $n-1$ cuts}
-  \vstep{each has capacity at most $m-1$, so they carry $(m-1)(n-1)$ in all}
-  \vstep{every edge is charged to two of those cuts, which halves the count}
-  \vstep{a star with a degree-$(m-2)$ spoke graph on its leaves attains it}
+  \vstep{their total capacity is at most $(m-1)(n-1)$}
+  \vstep{at most $n-1$ edges cross only one tree cut; all others cross at least
+         two, so $2|E|-(n-1)\le(m-1)(n-1)$}
+  \vstep{a hub with an almost regular spoke graph of maximum degree $m-2$
+         attains the bound when $n\ge m$}
 \end{vsteps}}
 {\cHub}{\atsize{n=7,\ m=3}{9} \ \tExtremal}
-{Mader 1.2 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ double count A.5--7 \ \textperiodcentered\ \ hub-and-spokes A.8--9}
+{Mader 1.2 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ double count A.5--7 \ \textperiodcentered\ \ hub-and-spokes A.8--10}
 
 % ---- 2. simple graph, undirected, vertex -----------------------------------
 \vframe{Simple graph \textperiodcentered\ vertex}{k_m(n)}{\rgPartial}
 {$k_m(n)=\ell_m(n)$ \ \sProved\ \ {\scriptsize\color{black!50}$m\le4$}}
-{$\floorfrac{m(n-1)}{2}$ \ \sProved}
+{$\floorfrac{m(n-1)}{2}$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge m\ge2$}}
 {\begin{vsteps}
   \vstep{the edge bound does not transfer: $\kap\le\lec$ makes vertex
          feasibility the weaker restriction, so there are more graphs to beat}
@@ -1374,7 +1399,7 @@ colours: each frame carries its own, top right}\par
 % ---- 3. simple digraph, directed, arc --------------------------------------
 \vframe{Simple digraph \textperiodcentered\ arc}{\ell_m^{\dir}(n)}{\rgOpen}
 {$M(n)=\max\bigl(2(n-1),\floor{n^2/4}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
-{$\floorfrac{n^2}{4}$ \ \sProved}
+{$M(n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{a reachability skeleton is a subdigraph preserving who reaches whom}
   \vstep{at $m=2$ a feasible digraph \emph{is} its own skeleton: drop an arc and
@@ -1408,13 +1433,14 @@ colours: each frame carries its own, top right}\par
 {$(m-1)(n-1)$ \ \sProved}
 {\begin{vsteps}
   \vstep{the same Gomory--Hu charge: $n-1$ cuts, each of capacity at most $m-1$}
-  \vstep{but parallel copies mean nothing forces an edge to be counted twice}
-  \vstep{so no halving and no floor: the bound is the clean product, and the
-         missing factor of two is exactly what simplicity was buying next door}
+  \vstep{each edge copy crosses at least one cut, so
+         $|E|\le(m-1)(n-1)$}
+  \vstep{parallel copies invalidate the simple graph's bound of $n-1$
+         distance-one edges, so that stronger double count is unavailable}
   \vstep{any spanning tree at multiplicity $m-1$ attains it}
 \end{vsteps}}
 {\cThickTree}{\atsize{n=6,\ m=3}{10} \ \tExtremal}
-{Multigraph edge value 1.3 \ \textperiodcentered\ \ Gomory--Hu A.2 \ \textperiodcentered\ \ thickened tree A.36}
+{Multigraph edge value and thickened-tree proof 1.3 \ \textperiodcentered\ \ Gomory--Hu A.2}
 
 % ---- 6. multigraph, undirected, vertex -------------------------------------
 \vframe{Multigraph \textperiodcentered\ vertex}{K_m(n)}{\rgPartial}
@@ -1434,53 +1460,57 @@ colours: each frame carries its own, top right}\par
 % ---- 7. directed multigraph, arc -------------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}{\rgProved}
 {$(m-1)M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}every $n$ and $m$}}
-{$(m-1)\cdot2(n-1)$ \ \sProved}
+{$(m-1)M(n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{inside any feasible multigraph there is a sparse reachability skeleton}
-  \vstep{removing one copy of each of its arcs costs every reachable pair one
-         route, so the graph stays feasible one threshold lower}
+  \vstep{removing one copy of each of its arcs costs every reachable pair at least
+         one route, so the graph stays feasible one threshold lower}
   \vstep{$m-1$ such peels account for every arc, giving $m-1$ times the $m=2$
          value, and the fractional relaxation is integral so nothing is lost}
-  \vstep{a bidirected tree at multiplicity $m-1$ attains the linear branch}
+  \vstep{at multiplicity $m-1$, a bidirected tree attains the linear branch and
+         a one-way bipartite digraph the quadratic one}
 \end{vsteps}}
 {\cBidirTree}{\atsize{n=4,\ m=3}{12} \ \tExtremal}
-{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree A.36 \ \textperiodcentered\ \ integrality A.39}
+{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree and bipartite digraph A.36 \ \textperiodcentered\ \ integrality A.39}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{\rgOpen}
 {$(m-1)\floorfrac{n^2}{4}+4(m-1)^2(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}reads $210$ here, far from tight}}
-{$n(n-1)(m+1-n)$ \ \sProved}
+{$n(n-1)(m+1-n)$ \ \sProved\ \ {\scriptsize\color{black!50}$2\le n\le m$}}
 {\begin{vsteps}
-  \vstep{$\kap$ splits as $\mu+\pi$ again: direct copies plus disjoint detours}
+  \vstep{the proposed general argument splits $\kap$ into direct copies
+         plus internally disjoint detours}
   \vstep{where all six directions are present each pair has exactly one detour,
          so its multiplicity stops at $m-2=4$ rather than at the cap of five}
   \vstep{the six directions give $6\times4=24$, and enumeration leaves exactly
          one isomorphism class}
-  \vstep{it is the complete digraph thickened, the $b=3$ block of A.65}
+  \vstep{it is the thickened complete digraph of A.65, cut at size $m-1$}
 \end{vsteps}}
 {\cTriFour}{\atsize{n=3,\ m=6}{24}\par
    \vspace{2pt}\sComputed\ \tExtremal}
-{Directed incidence value A.64 \ \textperiodcentered\ \ splitting the vertex measure A.54 \ \textperiodcentered\ \ thickened complete digraph A.65}
+{Directed incidence value A.64 \ \textperiodcentered\ \ proposed splitting A.63 \ \textperiodcentered\ \ construction A.65 and proposed bound A.66}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
 \vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved}
 {$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m-1\le\binom{n-2}{r-2}$}}
 {\begin{vsteps}
-  \vstep{induction on a single hyperedge cut, with no tree anywhere in it}
-  \vstep{a hyperedge spans $r$ vertices but still serves only one route, so
-         cutting one off divides what remains by $r-1$}
+  \vstep{split along a cut of at most $m-1$ hyperedge copies and induct on
+         the two trace hypergraphs}
+  \vstep{each crossing copy adds one to the trace sums of $|e|-1$; hence
+         $(r-1)|E|\le(m-1)(n-1)$}
   \vstep{the reduction to graphs points the wrong way: replacing a hyperedge by
          a star would let two routes take two of its edges, which Berge forbids}
-  \vstep{the star hypertree attains it, and for $r\ge3$ simplicity is free}
+  \vstep{the star hypertree attains the illustrated $m=2$ case; a hub with
+         degree-capped hyperedges attains the stated general range}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49 \ \textperiodcentered\ \ lower bound A.50}
+{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}{\rgPartial}
 {$\floorfrac{n-1}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
-{$\floorfrac{n-1}{r-1}$ \ \sProved}
+{$\floorfrac{(m-1)(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}$r\ge3$, $m-1\le\binom{n-2}{r-2}$}}
 {\begin{vsteps}
   \vstep{at $m=2$ feasibility says exactly that the incidence graph is a forest,
          since a cycle in it would already be two disjoint routes}
@@ -1491,7 +1521,7 @@ colours: each frame carries its own, top right}\par
   \vstep{the star hypertree's incidence graph is a tree, so it attains it}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
+{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ general lower bound A.50 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}{\rgPartial}
@@ -1526,26 +1556,26 @@ colours: each frame carries its own, top right}\par
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}{\rgOpen}
 {$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
-{$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved}
+{$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{every route out of a vertex has to start with one of that vertex's own
          outgoing hyperedges}
   \vstep{deleting those cuts it off, so the outgoing count alone caps every pair
          it reaches, and giving each vertex $\min(m-1,\binom{n-1}{r-1})$ of them
          is feasible at any size}
-  \vstep{for general $n$ the matching upper bound is only asymptotic: a shadow
-         digraph carries the route cap onto two-step routes}
+  \vstep{for large $n$ a separate bipartite construction is asymptotically optimal;
+         a shadow digraph supplies its upper bound}
   \vstep{at this size enumeration closes the gap, and $4\times2=8$}
 \end{vsteps}}
 {\cBoundedOutdeg}{\atsize{n=4,\ r=3,\ m=3}{8}\par
    \vspace{2pt}\sComputed\ \tExtremal\par
    {\scriptsize\color{black!55}one tail of the four, each doing the same}}
-{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ one-step shadow A.71 \ \textperiodcentered\ \ two-step budget A.28}
+{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ one-step shadow A.71 \ \textperiodcentered\ \ two-step bound A.32}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}{\rgOpen}
 {$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved\ \ {\scriptsize\color{black!50}reads $12$ here, not tight}}
-{$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved}
+{$n\cdot\min\bigl(m-1,\tbinom{n-1}{r-1}\bigr)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{the outgoing cut never looks at interior vertices at all}
   \vstep{so the very same argument establishes the arc bound and the vertex
@@ -1562,16 +1592,16 @@ colours: each frame carries its own, top right}\par
 % ---- 15. directed multihypergraph, arc -------------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}{\rgOpen}
 {$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved}
-{$n(m-1)$ \ \sProved}
+{$n(m-1)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{counting tail--head pairs gives the upper bound: each hyperedge covers
          $r-1$ of them, and no ordered pair takes more than $m-1$}
-  \vstep{the outgoing cut caps each tail at $m-1$ copies, whatever those copies
-         are, so with repeats allowed the construction reaches $n(m-1)$}
+  \vstep{give each tail $m-1$ copies: every route from it uses a distinct outgoing
+         copy, so this construction is feasible and reaches $n(m-1)$}
   \vstep{at this size a tail has only one possible head set, the other two
          vertices, so repetition is the only way to grow at all}
   \vstep{the two meet here, both reading $6$, so the value needs no search:
-         it is the smallest size at which the counting bound is already tight}
+         $n(m-1)$ equals the counting bound exactly when $n=r$}
 \end{vsteps}}
 {\cRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
    \vspace{2pt}\tExtremal\par
@@ -1581,7 +1611,7 @@ colours: each frame carries its own, top right}\par
 % ---- 16. directed multihypergraph, vertex ----------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}{\rgOpen}
 {$\dfrac{(m-1)n(n-1)}{r-1}$ \ \sProved}
-{$n(m-1)$ \ \sProved}
+{$n(m-1)$ \ \sProved\ \ {\scriptsize\color{black!50}$n\ge r$}}
 {\begin{vsteps}
   \vstep{the pair count bounds this variant too, and the outgoing cut ignores
          interior vertices, so both bounds carry over from the arc problem
