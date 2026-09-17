@@ -398,7 +398,7 @@
     \foreach \i/\col in {1/metroA, 2/metroB, 3/metroC}{
       \draw[metro, \col, line width=2.5pt]
         (u\i) to[bend left=10]  (c) to[bend left=10]  (w\i);
-      \draw[metro, \col, line width=2.5pt]
+      \draw[metro, \col!55!black, line width=2.5pt]
         (u\i) to[bend right=10] (c) to[bend right=10] (w\i);}
   \end{scope}
   \node[metrostop, minimum size=5.4mm] at (c) {};
@@ -498,16 +498,18 @@
     \draw[hstar, metroC] (v3) to[bend left=22] (v1);
     \draw[hstar, metroC] (v3) to[bend left=22] (v2);
   \end{scope}
-  \foreach \i in {1,2,3}{\node[gvertex, minimum size=5.2mm] at (v\i) {};}
+  \foreach \i in {1,2,3}{\node[metrostop, minimum size=5mm] at (v\i) {};}
 \end{tikzpicture}}
 
 % n = r = 3, repeats allowed: a tail has only one possible hyperedge, namely the
 % other two vertices, so it takes m - 1 = 2 copies of it. All three tails are
 % drawn in full, each its own colour, the two copies of a tail's hyperedge
-% shaded dark/light the way the eight-models frame shades a repeated
-% hyperedge. As in \cFullTriHyper every arc bends the SAME way (left) so a
-% forward arc and its reverse land on opposite sides instead of retracing
-% each other; the two copies of one arc then nest at different bend radii.
+% shaded full/dark the way the eight-models frame shades a repeated
+% hyperedge (its multihypergraph and directed multihypergraph panels both
+% darken the repeat with !55!black, never lighten it, so this follows suit).
+% As in \cFullTriHyper every arc bends the SAME way (left) so a forward arc
+% and its reverse land on opposite sides instead of retracing each other;
+% the two copies of one arc then nest at different bend radii.
 \newcommand{\cFullRepTriHyper}{\begin{tikzpicture}[
     hstar/.style={metro, line width=2.4pt, -{Stealth[length=2.6mm]},
                   shorten >=3.0mm, shorten <=2.4mm}]
@@ -515,18 +517,18 @@
   \begin{scope}[on background layer]
     \draw[hstar, metroA]          (v1) to[bend left=16] (v2);
     \draw[hstar, metroA]          (v1) to[bend left=16] (v3);
-    \draw[hstar, metroA!50!white] (v1) to[bend left=30] (v2);
-    \draw[hstar, metroA!50!white] (v1) to[bend left=30] (v3);
+    \draw[hstar, metroA!55!black] (v1) to[bend left=30] (v2);
+    \draw[hstar, metroA!55!black] (v1) to[bend left=30] (v3);
     \draw[hstar, metroB]          (v2) to[bend left=16] (v3);
     \draw[hstar, metroB]          (v2) to[bend left=16] (v1);
-    \draw[hstar, metroB!50!white] (v2) to[bend left=30] (v3);
-    \draw[hstar, metroB!50!white] (v2) to[bend left=30] (v1);
+    \draw[hstar, metroB!55!black] (v2) to[bend left=30] (v3);
+    \draw[hstar, metroB!55!black] (v2) to[bend left=30] (v1);
     \draw[hstar, metroC]          (v3) to[bend left=16] (v1);
     \draw[hstar, metroC]          (v3) to[bend left=16] (v2);
-    \draw[hstar, metroC!50!white] (v3) to[bend left=30] (v1);
-    \draw[hstar, metroC!50!white] (v3) to[bend left=30] (v2);
+    \draw[hstar, metroC!55!black] (v3) to[bend left=30] (v1);
+    \draw[hstar, metroC!55!black] (v3) to[bend left=30] (v2);
   \end{scope}
-  \foreach \i in {1,2,3}{\node[gvertex, minimum size=5.2mm] at (v\i) {};}
+  \foreach \i in {1,2,3}{\node[metrostop, minimum size=5mm] at (v\i) {};}
 \end{tikzpicture}}
 
 % one transformation: the label on top, the picture under it
@@ -1490,7 +1492,7 @@ The badge at top right matches the status tree.\par
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{\rgOpen}
 {$(m-1)\floorfrac{n^2}{4}+4(m-1)^2(n-1)$ \ \sProved\ \ {\scriptsize\color{black!50}reads $210$ here, far from tight}}
-{$n(n-1)(m+1-n)$ \ \sProved\ \ {\scriptsize\color{black!50}$2\le n\le m$}}
+{$n(n-1)(m+1-n)$ \ \sProposed\ \ {\scriptsize\color{black!50}$2\le n\le m$}}
 {\begin{vsteps}
   \vstep{the proposed general argument splits $\kap$ into direct copies
          plus internally disjoint detours}
