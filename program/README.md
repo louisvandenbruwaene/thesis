@@ -30,8 +30,7 @@ completed enumerations.
 
 The specialised directed multigraph structural enumerators use formula-based
 prefix pruning. The now-proved bound justifies that pruning, but these runs
-cannot independently establish the formula they assume. The cut-counting MILP uses unconditional box bounds
-for its optional deletion constraints. Frozen experiments retain the historical
+cannot independently establish the formula they assume. Frozen experiments retain the historical
 code and observations that produced them.
 
 ## Layout
@@ -79,13 +78,8 @@ dependencies unpinned. The core needs only `numpy` and
 random-model sampling, and the self-check all run on those two alone, because connectivity is measured by integer max-flow on a capacity matrix (Menger).
 Small capped checks can use the optional C helper; capacities too large for
 safe int32 arithmetic use the Python-integer fallback.
-One more library backs the solver check and two are optional:
+Two libraries are optional:
 
-- `pulp` backs the MILP solver checks (`prove_directed_multigraph` and
-  `prove_integral_arc_bound`): one solver-agnostic cut-counting model that runs on
-  Gurobi when available, otherwise CBC (bundled with `pulp`). Pass
-  `use_gurobi=False` to force CBC, or `use_gurobi=True` to request Gurobi.
-  These routines raise a clear message if called without `pulp`.
 - `matplotlib` is needed only to render the figures (`make_figures.py` and the
   `plot_*` routines). Without it everything else still runs.
 - `networkx` is needed for the Gomory-Hu tree helper and the independent
@@ -106,7 +100,7 @@ the open `n = 7` classification practical on a multi-core machine. Pass
 appendix cites the second of those for `g_6(9) = 54`. Everything else, including
 the self-test, the figures, and the test suite, runs without `geng`. Every test that
 needs an optional dependency skips itself cleanly when that dependency is absent,
-`geng` for the generation pipeline, `pulp` for the MILP certifier and `networkx`
+`geng` for the generation pipeline and `networkx`
 for the Gomory-Hu view and independent witness checks, so a minimal `numpy` plus `scipy` install runs the suite
 green rather than reporting failures for tools it was never asked to have.
 
@@ -352,7 +346,7 @@ preserved under `old_stuff/figures/` in the private source repository alongside
 rows above describe their original locations. Normal figure
 rendering no longer reruns these archived experiments or refreshes their assets.
 
-The solver records (`logs/certificate_log.txt`, `logs/basecase_search_log.txt`,
+The solver records (`logs/basecase_search_log.txt`,
 `logs/basecase_search_vertex_log.txt`) were produced by the named finite
 routines on the directed cases; the appendix now tabulates them rather than
 printing them verbatim. Randomised searches use fixed seeds. Fixed seeds do not make a timed search

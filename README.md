@@ -36,8 +36,8 @@ Then, from `program/`:
 ../.venv/bin/python3 make_figures.py                # redraw the figures
 ```
 
-The core needs only NumPy and SciPy. PuLP backs the solver checks; Matplotlib
-and NetworkX support plotting and additional algorithms. Standalone scripts
+The core needs only NumPy and SciPy. Matplotlib and NetworkX support plotting
+and additional algorithms. Standalone scripts
 can have extra requirements: in particular, the block sweeps require NetworkX
 and nauty's `geng` on `PATH`. Consult each script's imports and usage notes
 before running it.
