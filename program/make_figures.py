@@ -375,6 +375,13 @@ def _exact_points(ns, m, budget, **kw):
 # unattained bound with a ``<=``.
 _SETTLED_HYPER_EDGE_SIMPLE = {(6, 6, 3): 11}
 
+# The same for the directed multihypergraph ARC panel (forward, r = 3).
+# solve(4, 3, directed=True, simple=False, hypergraph=True, r=3,
+# exhaustive=True) walks all 3^12 multiplicity assignments of the twelve forward
+# hyperedges on four vertices and completes in about ten minutes, beyond the
+# figure's per-case budget, with exactly 8 (logs/dir_multihyper_n4_log.txt).
+_SETTLED_DIR_MULTIHYPER_ARC = {(3, 4, 3): 8}
+
 
 def dir_block_bouquet_lower_bound(n: int, m: int) -> int:
     """A lower bound on ``K_m^dir(n)``: a bouquet of thickened complete digraphs.
@@ -648,6 +655,8 @@ def gather_variant_grid(m=3, exact_budget=_EXACT_BUDGET, search_budget=0.4,
         exact = _exact_points(range(first, stop), m, exact_seconds, **kw)
         if i == 8:
             exact = _with_settled_cells(exact, m, 3, _SETTLED_HYPER_EDGE_SIMPLE)
+        if i == 14:
+            exact = _with_settled_cells(exact, m, 3, _SETTLED_DIR_MULTIHYPER_ARC)
         # Direction alone no longer implies a conjectural formula. Two directed
         # graph values are proved: the multigraph arc value at every m
         # (thm:dir-multi-full) and the two simple directed values at m = 2

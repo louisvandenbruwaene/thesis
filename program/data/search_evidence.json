@@ -3094,7 +3094,7 @@
    "variant": "directed, arc",
    "search_value": 8,
    "construction_value": 8,
-   "enumeration_value": null,
+   "enumeration_value": 8,
    "search_limit_seconds": 4.0,
    "search_method": "randomised greedy",
    "search_seed": 0,

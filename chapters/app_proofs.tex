@@ -2625,6 +2625,10 @@ It supplies the exhaustive computation the branch and bound could not, so the va
 The smallest analogous gap occurs at $n=r=m=3$.
 A simple hypergraph then has one hyperedge, while a multihypergraph attains the bound with two copies.
 
+The directed multihypergraph arc panel at $m=3$ carries one further standalone value.
+At $n=4$ and $r=3$, \code{solve} with \code{exhaustive=True} checks all $3^{12}=531\,441$ multiplicity assignments of the twelve forward hyperedges in about ten minutes, beyond the figure budget, and finds exactly $8$ (\path{program/logs/dir_multihyper_n4_log.txt}).
+Every vertex of the returned witness is the tail of one hyperedge taken twice, so the bounded outgoing count of \Cref{const:bounded-outdegree-hyper} is optimal there, while the counting bound of \Cref{prop:dir-hyper-first} reads $12$.
+
 \paragraph{Finite evidence at the next vertex threshold.}
 \Cref{thm:hyper-vertex-m3} establishes the vertex bound at $m=3$, and its rank
 argument does not establish the $m=4$ case
