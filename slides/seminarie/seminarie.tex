@@ -1167,7 +1167,7 @@ $\Phi(G)\;=\;
 \end{center}
 \begin{center}
 {\footnotesize\color{black!55}$c^{\max}$ is $\lambda^{\max}$ or $\kappa^{\max}$,
-according to the separation; $\Lambda>0$ is the penalty weight.}
+according to the separation, and $\Lambda>0$ is the penalty weight.}
 \end{center}
 \vspace{22pt}
 \begin{center}
@@ -1229,7 +1229,7 @@ according to the separation; $\Lambda>0$ is the penalty weight.}
       \draw[gdir] (l3\ang) to[bend left=30]  (h3);
       \draw[gdir] (l3\ang) to[bend left=11]  (h3);
     }
-    \node[font=\footnotesize\itshape] at (0,-2.4) {double star};
+    \node[font=\footnotesize\itshape] at (0,-2.4) {bidirected star, doubled arcs};
     \node[font=\scriptsize] at (0,-2.9) {$L_3^{\dir}(4)=12$};
   \end{scope}
   % the thesis figure carries the same caveat: these are family members drawn
@@ -1390,7 +1390,7 @@ The badge at top right matches the status tree.\par
 {\begin{vsteps}
   \vstep{a Gomory--Hu tree holds every pairwise connectivity in $n-1$ cuts}
   \vstep{their total capacity is at most $(m-1)(n-1)$}
-  \vstep{at most $n-1$ edges cross only one tree cut; all others cross at least
+  \vstep{at most $n-1$ edges cross only one tree cut, and all others cross at least
          two, so $2|E|-(n-1)\le(m-1)(n-1)$}
   \vstep{a hub with an almost regular spoke graph of maximum degree $m-2$
          attains the bound when $n\ge m$}
@@ -1407,7 +1407,7 @@ The badge at top right matches the status tree.\par
          feasibility the weaker restriction, so there are more graphs to beat}
   \vstep{for $m\le4$ the two values are equal anyway, which is the cited result}
   \vstep{at $m=5$ they part: $\floorfrac{8n}{3}-4$ takes over from $n\ge14$}
-  \vstep{the same drawing attains it, every leaf having degree two}
+  \vstep{the same drawing attains it, every spoke vertex having degree two}
 \end{vsteps}}
 {\cHub}{\atsize{n=7,\ m=3}{9} \ \tExtremal}
 {B\'artfai--Bollob\'as--Leonard 1.4 \ \textperiodcentered\ \ S{\o}rensen--Thomassen 1.5 \ \textperiodcentered\ \ degree bound A.3}
@@ -1466,7 +1466,7 @@ The badge at top right matches the status tree.\par
   \vstep{between two vertices $\kap$ is exactly $\mu(u,v)+\pi(u,v)$: the copies
          of their own edge, plus the disjoint detours around it}
   \vstep{feasibility therefore caps those two \emph{together} at $m-1$}
-  \vstep{at $m=3$ that yields the same value as the edge problem}
+  \vstep{at $m=3$ the incidence-rank lemma gives the same value as the edge problem}
   \vstep{a tree edge has no detour, so a doubled tree spends the whole cap on
          multiplicity and attains it}
 \end{vsteps}}
@@ -1482,7 +1482,7 @@ The badge at top right matches the status tree.\par
   \vstep{removing one copy of each of its arcs costs every reachable pair at least
          one route, so the graph stays feasible one threshold lower}
   \vstep{$m-1$ such peels account for every arc, giving $m-1$ times the $m=2$
-         value, and the fractional relaxation is integral so nothing is lost}
+         value, and the integrality of the fractional relaxation follows}
   \vstep{at multiplicity $m-1$, a bidirected tree attains the linear branch and
          a one-way bipartite digraph the quadratic one}
 \end{vsteps}}
@@ -1500,7 +1500,7 @@ The badge at top right matches the status tree.\par
          so its multiplicity stops at $m-2=4$ rather than at the cap of five}
   \vstep{the six directions give $6\times4=24$, and enumeration leaves exactly
          one isomorphism class}
-  \vstep{it is the thickened complete digraph of A.65, cut at size $m-1$}
+  \vstep{it is A.65's thickened complete digraph at multiplicity $4$}
 \end{vsteps}}
 {\cTriFour}{\atsize{n=3,\ m=6}{24}\par
    \vspace{2pt}\sComputed\ \tExtremal}
@@ -1513,11 +1513,11 @@ The badge at top right matches the status tree.\par
 {\begin{vsteps}
   \vstep{split along a cut of at most $m-1$ hyperedge copies and induct on
          the two trace hypergraphs}
-  \vstep{each crossing copy adds one to the trace sums of $|e|-1$; hence
+  \vstep{each crossing copy adds one to the trace sums of $|e|-1$, hence
          $(r-1)|E|\le(m-1)(n-1)$}
   \vstep{the reduction to graphs points the wrong way: replacing a hyperedge by
          a star would let two routes take two of its edges, which Berge forbids}
-  \vstep{the star hypertree attains the illustrated $m=2$ case; a hub with
+  \vstep{the star hypertree attains the illustrated $m=2$ case, and a hub with
          degree-capped hyperedges attains the stated general range}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
