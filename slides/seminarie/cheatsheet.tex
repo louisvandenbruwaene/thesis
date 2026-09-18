@@ -6,9 +6,10 @@
 %  page number into ../../main.pdf where that bound's proof or construction
 %  actually sits, so a question can be answered by flipping straight to it.
 %
-%  Portrait, two pages: print duplex on one sheet and hold it like a card
-%  while presenting -- page 1 is the front (simple graphs, multigraphs),
-%  page 2 the back (hypergraphs, multihypergraphs).
+%  Portrait, three pages: print the first two duplex on one sheet and hold
+%  it like a card while presenting -- page 1 is the front (simple graphs,
+%  multigraphs), page 2 the back (hypergraphs, multihypergraphs), page 3
+%  a loose third sheet on the max-flow checker's running time.
 %
 %  Page numbers below were read out of main.aux's \newlabel entries after a
 %  full build of main.tex, e.g. lem:double-count -> {A.7}{39}, i.e. page 39.
@@ -54,6 +55,9 @@
 % ---- a page citation into main.pdf, e.g. \pg{39} or \pg{37--40} -----------
 \newcommand{\pg}[1]{{\footnotesize\color{KULblauw3b}\ [p.\,#1]}}
 
+% ---- a source citation into program/, e.g. \src{erdos915_unified.py:2300} -
+\newcommand{\src}[1]{{\footnotesize\color{KULblauw3b}\ [#1]}}
+
 % ---- one group header -------------------------------------------------
 \newcommand{\Group}[1]{%
   \vspace{7pt}\noindent{\color{KULblauw3b}\bfseries\Large #1}\par
@@ -65,6 +69,13 @@
   \vspace{2pt}
   \noindent\makebox[16pt][l]{\color{black!40}\bfseries\scriptsize UP}#4\par
   \noindent\makebox[16pt][l]{\color{black!40}\bfseries\scriptsize LO}#5\par
+  \vspace{9pt}}
+
+% ---- one complexity line: name, big-O value, one-line justification -------
+\newcommand{\Cx}[3]{%
+  \noindent{\large\color{KULblauw3b}#1}\hfill{\bfseries #2}\par
+  \vspace{2pt}
+  \noindent#3\par
   \vspace{9pt}}
 
 \newcommand{\Header}[1]{%
@@ -164,5 +175,45 @@
 \V{K_m^{\dir\,(r)}(n)}{vertex}{\sOpen}
   {$\dfrac{(m-1)n(n-1)}{r-1}$: carries over from the arc problem, and the general (any tail/head split) orientation shares the constant\pg{85,87,90}}
   {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$}: same construction\pg{86}}
+
+\clearpage
+% ============================================================================
+%  PAGE 3: checker and search complexity
+% ============================================================================
+\begin{center}
+{\Large\bfseries\color{KULblauw3b}\Erdos{} Problem 915: Cheat Sheet}\quad
+{\footnotesize\color{black!45}(complexity)}\\[3pt]
+{\footnotesize\color{black!55}crucial running times for the max-flow checker and the
+ exhaustive search built on it, citations into \texttt{program/}}
+\end{center}
+\vspace{4pt}
+
+\Group{One max-flow query}
+
+\Cx{DFS Ford--Fulkerson, capped at $k{+}1$ paths}{$O(k\,n^2)$}
+  {dense residual scan (\texttt{for y in range(n)} per popped vertex, not an
+   adjacency list), so one augmenting-path search alone costs $O(n^2)$
+   regardless of sparsity\src{erdos915\_unified.py:2300, \_erdos\_fast.c:20}}
+
+\Cx{local separation query, $k=m$: $\ell^{\max}(u,v)$ or $\kappa^{\max}(u,v)$}{$O(m\,n^2)$}
+  {the vertex version splits every node in two ($2n$ nodes) for the internally-disjoint
+   network, same exponent\src{erdos915\_unified.py:2352}}
+
+\Group{Certifying one graph}
+
+\Cx{$\ell^{\max}(G)\le m-1$ or $\kappa^{\max}(G)\le m-1$, all pairs}{$O(m\,n^4)$}
+  {$\Theta(n^2)$ pairs swept, each an $O(m\,n^2)$ query\src{\_erdos\_fast.c:78
+   \texttt{max\_connectivity\_exceeds}, erdos915\_unified.py:2431 \texttt{feasible\_after}}}
+
+\Group{The exhaustive search}
+
+\Cx{branch-and-bound over every potential arc/edge}{$O\!\bigl(2^{\Theta(n^2)}\,m\,n^4\bigr)$ worst case}
+  {$n(n-1)$ ordered arcs (directed) or $\binom n2$ edges (undirected), each
+   included/excluded, one $O(m\,n^4)$ feasibility recheck per node; the
+   feasibility-monotonicity and bound prunes cut this hugely in practice but do not
+   lower the worst-case exponent\src{erdos915\_unified.py:2374--2460}}
+
+\Cx{isomorphism reduction, base cases only}{$O(n!\,n^2)$}
+  {lex-min canonical form by Heap's algorithm, $n\le7$ in practice\src{\_erdos\_fast.c:97}}
 
 \end{document}
