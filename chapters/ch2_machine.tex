@@ -477,7 +477,7 @@ At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-ta
 \section{Proving every \texorpdfstring{$m$}{m} at once}\label{sec:prove-every-m}
 
 The search so far treats one pair $(n,m)$ at a time.
-For a directed multigraph, scaling can instead check every threshold at a fixed $n$ in one pass.
+For a directed multigraph, scaling reduces every threshold at a fixed $n$ to one problem that does not depend on $m$.
 It divides all multiplicities by $m-1$.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
@@ -489,14 +489,6 @@ Let
     M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s \ne t\Bigr\}
 \]
 denote the largest total weight of such a matrix.
-
-The program computes $M^{*}(n)$ at small $n$ as a mixed-integer linear program (MILP), solved by CBC through PuLP.
-It has one weight variable $w(u,v)\in[0,1]$ per ordered pair.
-For every ordered pair $(s,t)$ the model also chooses a cut, through a binary side variable for every other vertex with $s$ fixed on the source side and $t$ on the sink side, and caps the total weight crossing that cut at one.
-Because the solver may choose the cut, the constraint holds exactly when some $s$--$t$ cut has capacity at most one, which by \Cref{thm:menger} means $\mathrm{maxflow}(s,t;w)\le1$.
-The model is therefore exact rather than a relaxation.
-Optional valid inequalities shorten the solve without moving the optimum. The main ones say that the direct arc and the two-step detours of each pair carry total weight at most one, and a degree ordering removes relabelled copies.
-The same model with integer multiplicities in $\{0,\dots,m-1\}$ and cap $m-1$ decides whether a given arc count is feasible.
 
 Scaling then gives
 \[
@@ -510,7 +502,6 @@ Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 On the linear branch, \Cref{const:dir-multi-lower} supplies the bidirected star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
 For $n\le6$, this is the larger term of the established value $M(n)$.
-The MILP returns the same value $M^{*}(n)=2(n-1)$ at $3\le n\le6$. The solver reports these optima as proved, but it emits no independently replayable certificate of the matching bound (\Cref{sec:transcripts}).
 At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
 It then overtakes it.
 The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
@@ -522,7 +513,6 @@ An explicit construction gives attainment from below.
 Clearing denominators from a rational optimum reduces the reverse inequality to \Cref{thm:dir-multi-full}.
 Scaling the integral maximiser by $m-1$ gives the lower bound $(m-1)M^{*}(n)$.
 The preceding scaling argument gives the matching upper bound unconditionally.
-The MILP values for $3\le n\le6$ remain as supporting evidence, and \Cref{sec:transcripts} records the runs.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .

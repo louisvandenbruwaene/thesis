@@ -38,8 +38,7 @@ they can never silently masquerade as one another:
     against it.
 
   * PROVE.   Exhaustive enumeration proves upper bounds for a fixed number of
-    vertices.  The historical cut-counting optimisation is retained as an
-    independent finite solver check. It does not emit a replayable certificate.
+    vertices.
 
   * DISCOVER. The random search finds concrete dense graphs, hence
     *lower* bounds.  A construction it returns is a witness that the extremal
@@ -155,31 +154,6 @@ def _require_networkx(feature: str):
 # and therefore use a data-dependent capacity equal to the total number of
 # hyperedge copies (see _hyper_capacity_matrix) rather than this sentinel.
 _UNBOUNDED = 10 ** 6
-
-# pulp is OPTIONAL.  It backs the MILP certifier (prove_directed_multigraph and
-# prove_integral_arc_bound): one solver-agnostic cut-counting model that CBC (pulp's
-# bundled solver) runs by default and Gurobi runs by a one-line switch.  The model,
-# checker, search, enumeration, and sampling do not need it.
-try:
-    import pulp
-    # pulp 3.x emits migration notices for its 4.0 API (LpVariable construction,
-    # the PULP_CBC_CMD name).  We use the stable 3.x API on purpose and pin it in
-    # requirements.txt, so silence that forward-looking noise.
-    warnings.filterwarnings("ignore", message=r".*PuLP 4\.0.*",
-                            category=DeprecationWarning)
-    PULP_AVAILABLE = True
-except ImportError:
-    pulp = None
-    PULP_AVAILABLE = False
-
-
-def _require_pulp():
-    """Raise a clear error when the MILP certifier is used without pulp installed."""
-    if not PULP_AVAILABLE:
-        raise ImportError(
-            "the MILP certifier needs pulp (pip install pulp). The checker, search, "
-            "and enumeration do not: they run on numpy + scipy alone."
-        )
 
 import ctypes as _ct
 _C = None
@@ -1432,44 +1406,6 @@ def max_edge_connectivity_via_tree(graph: Graph) -> int:
     return int(round(max(weights)))
 
 
-# --- PROVE: MILP for M*(n) via cut-counting (one PuLP model, CBC or Gurobi) ---
-# L_m^dir(n) = (m-1)*M*(n) where M*(n) = max sum(w) s.t. maxflow(s,t;w)<=1 all pairs.
-# Flow constraint encoded exactly: choose a cut x in {0,1}^n per pair, cap crossing
-# weight via p; zero MIP gap = proof.  Shared helpers build constraints for both backends.
-
-
-@dataclass
-class ProofResult:
-    """The outcome of a proof run."""
-
-    n: int
-    status: str               # OPTIMAL, LIMIT, INFEASIBLE, UNBOUNDED, ...
-    scaled_optimum: float     # M*(n) = max total weight, exact if status OPTIMAL
-    solver_reported_optimal: bool  # solver status, not an independently replayed gap certificate
-    solve_seconds: float
-    weight_matrix: np.ndarray | None  # a witnessing matrix w, if one was found
-
-    def value_for(self, m: int) -> int | None:
-        """The proved directed multigraph value ``L_m^dir(n) = (m-1) M*(n)``.
-
-        ``None`` when the solve did not return OPTIMAL, since ``scaled_optimum``
-        is then NaN and there is no proved value to scale.  Returning it rather
-        than raising keeps a caller that sweeps several ``n`` from dying on the
-        first cell whose solve timed out.
-        """
-        # Undo the (m-1) scaling: one proved M*(n) yields every m.
-        if not self.solver_claims_optimal() or not math.isfinite(self.scaled_optimum):
-            return None
-        return (m - 1) * int(round(self.scaled_optimum))
-
-    def solver_claims_optimal(self) -> bool:
-        """Whether the solver returned its ``OPTIMAL`` status.
-
-        This is not an independently replayed optimality certificate.
-        """
-        return self.status == "OPTIMAL" and self.solver_reported_optimal
-
-
 def _matrix_cells(n: int, directed: bool) -> list[tuple[int, int]]:
     """The off-diagonal matrix cells a graph of this kind may fill.
 
@@ -1477,199 +1413,14 @@ def _matrix_cells(n: int, directed: bool) -> list[tuple[int, int]]:
     upper triangle, since ``set_multiplicity`` mirrors the lower half for us.
 
     THE one place this program decides "ordered if directed, upper triangle if
-    not".  Three separate functions used to re-derive it (the MILP's ordered
-    pairs, the annealer's addable pairs, and this) and they agreed only by
+    not".  Two separate functions used to re-derive it (the annealer's
+    addable pairs, and this) and they agreed only by
     coincidence; the tabu neighbourhood and the pair sweep read it too, so the
     rule now has one definition and lives ahead of every reader.
     """
     if directed:
         return [(u, v) for u in range(n) for v in range(n) if u != v]
     return [(u, v) for u in range(n) for v in range(n) if u < v]
-
-
-def _two_hop_triples(n: int) -> list[tuple[int, int, int]]:
-    # All (source, middle, target) with three distinct vertices: the s -> x -> t
-    # detours that the two-hop inequality reasons about.
-    return [(s, x, t)
-            for s in range(n) for t in range(n) if s != t
-            for x in range(n) if x != s and x != t]
-
-
-# M*(k) itself is defined beside directed_multigraph_arc, above: the deletion
-# cuts here and the prefix prunings in the enumerators all read the same bound.
-
-
-# ------------------------------------------------------------------
-# The cut-counting MILP: one PuLP model for both provers, any solver
-# ------------------------------------------------------------------
-# The two provers below are the SAME cut-counting optimisation over two weight
-# domains: the fractional one (prove_directed_multigraph, weights w in [0, 1], cut
-# cap 1) maximises the total weight M*(n); the integral one (prove_integral_arc_
-# bound, multiplicities mu in {0..m-1}, cut cap m-1) decides feasibility at a fixed
-# arc target.  One builder serves both, and any MILP solver runs it: CBC (bundled
-# with pulp) by default, Gurobi by a one-line switch.  Because the cut formulation
-# is exact and not a relaxation, an OPTIMAL or INFEASIBLE verdict is a genuine proof.
-
-_PULP_STATUS = {"Optimal": "OPTIMAL", "Infeasible": "INFEASIBLE",
-                "Unbounded": "UNBOUNDED"}
-
-
-def _pick_solver(time_limit: float, show_log: bool, use_gurobi: bool | None):
-    """Choose the MILP solver.  ``gapRel=0`` demands a closed gap, which is what
-    makes an OPTIMAL verdict a proof rather than a heuristic.
-
-    ``use_gurobi``: ``True`` forces Gurobi (error if it is not usable), ``False``
-    forces CBC, ``None`` uses Gurobi when its licence is active and CBC otherwise.
-    Switching to Gurobi is the whole change needed to attack the open n=7 facts.
-    """
-    if use_gurobi is not False:
-        gurobi = pulp.GUROBI_CMD(msg=show_log, timeLimit=time_limit,
-                                 options=[("MIPGap", 0)])
-        if gurobi.available():
-            return gurobi
-        if use_gurobi is True:
-            raise RuntimeError(
-                "use_gurobi=True but no usable Gurobi was found. This path runs "
-                "Gurobi through PuLP's GUROBI_CMD, which calls the gurobi_cl "
-                "command line, so gurobipy is not required: check that "
-                "`gurobi_cl --version` runs and that the licence is active."
-            )
-    return pulp.PULP_CBC_CMD(msg=show_log, timeLimit=time_limit, gapRel=0.0)
-
-
-def _cut_counting_model(n: int, *, cap: float, integer: bool, two_hop: bool,
-                        symmetry: bool, deletion: bool, degree_pair: bool):
-    """Build the shared cut-counting MILP as a PuLP model (no objective set yet).
-
-    For every ordered pair (s, t) the model CHOOSES one cut: the side indicators
-    fix s on the source side (constant 1) and t on the sink side (constant 0), and
-    every other vertex takes a binary side.  The helper p picks up each crossing
-    arc's weight through ``p >= w + cap*(x_u - x_v) - cap``, which forces ``p >= w``
-    exactly on a crossing arc (x_u = 1, x_v = 0) and leaves p free at 0 otherwise.
-    Capping the crossing total at ``cap`` says maxflow(s, t) <= cap, and letting the
-    optimisation pick the cut means it picks the MINIMUM cut, so this is exactly
-    maxflow(s, t) <= cap, the true feasible region.  ``cap=1`` with continuous
-    weights is the scaled prover; ``cap=m-1`` with integer weights the arc one.
-
-    The optional families are valid inequalities preserving the optimum: ``two_hop`` (a two-arc-disjoint
-    detour bound via z = min of the two hops), ``degree_pair`` (a flow lower bound
-    on each pair), ``deletion`` (the redundant unconditional box bound
-    on induced subgraphs), and ``symmetry`` (a degree ordering that prunes relabelled duplicates).
-    Returns ``(prob, w)`` with ``w`` the weight variables keyed by ordered pair.
-    """
-    pairs = _matrix_cells(n, directed=True)
-    prob = pulp.LpProblem("erdos915", pulp.LpMaximize)
-    category = "Integer" if integer else "Continuous"
-    w = {(u, v): pulp.LpVariable(f"w_{u}_{v}", 0, cap, cat=category)
-         for (u, v) in pairs}
-
-    for (s, t) in pairs:
-        # s is always on the source side, t always on the sink side: constants, not
-        # variables (which also avoids pulp resetting a Binary's bounds to [0, 1]).
-        side = {u: 1 if u == s else 0 if u == t
-                else pulp.LpVariable(f"x_{s}_{t}_{u}", cat="Binary")
-                for u in range(n)}
-        crossing = []
-        for (u, v) in pairs:
-            p_uv = pulp.LpVariable(f"p_{s}_{t}_{u}_{v}", 0, cap)
-            prob += p_uv >= w[(u, v)] + cap * (side[u] - side[v]) - cap
-            crossing.append(p_uv)
-        prob += pulp.lpSum(crossing) <= cap          # crossing weight <= cap
-
-    if two_hop:
-        z = {}
-        for (s, x, t) in _two_hop_triples(n):
-            z[(s, x, t)] = pulp.LpVariable(f"z_{s}_{x}_{t}", 0, cap)
-            selector = pulp.LpVariable(f"b_{s}_{x}_{t}", cat="Binary")
-            # z = min(w[s,x], w[x,t]): two upper bounds, and the selector forces z
-            # up to whichever argument is the minimum (big-M with M = cap).
-            prob += z[(s, x, t)] <= w[(s, x)]
-            prob += z[(s, x, t)] <= w[(x, t)]
-            prob += z[(s, x, t)] >= w[(s, x)] - cap * (1 - selector)
-            prob += z[(s, x, t)] >= w[(x, t)] - cap * selector
-        for (s, t) in pairs:
-            prob += w[(s, t)] + pulp.lpSum(
-                z[(s, x, t)] for x in range(n) if x != s and x != t) <= cap
-
-    if degree_pair:
-        # d+(s) + d-(t) - w[s,t] <= (n-1)*cap.  This is the two-hop bound
-        # aggregated: w[s,t] + sum_x min(w[s,x], w[x,t]) <= cap, plus each middle
-        # max(w[s,x], w[x,t]) <= cap, sums to (n-1)*cap.  It is a genuine cut, NOT
-        # trivially satisfied: the box bound alone allows the LHS up to (2n-3)*cap,
-        # and a two-route witness reaches 2(n-1)*cap (e.g. n=4: s->x1->t, s->x2->t
-        # gives LHS 4 > 3).  Dominated by two_hop when that family is on, but
-        # standalone-useful when it is off; valid in both weight domains.
-        for (s, t) in pairs:
-            prob += (pulp.lpSum(w[(s, x)] for x in range(n) if x != s)
-                     + pulp.lpSum(w[(x, t)] for x in range(n) if x != t)
-                     - w[(s, t)]) <= (n - 1) * cap
-
-    if deletion:
-        for k, holes in ((n - 1, 1), (n - 2, 2)):
-            if k < 2:
-                continue
-            bound = cap * k * (k - 1)  # unconditional box bound, not conjectural M(k)
-            for gone in combinations(range(n), holes):
-                prob += pulp.lpSum(w[(a, b)] for (a, b) in pairs
-                                   if a not in gone and b not in gone) <= bound
-
-    if symmetry:
-        degree = [pulp.lpSum(w[(u, v)] for (u, v) in pairs if v0 in (u, v))
-                  for v0 in range(n)]
-        for v0 in range(n - 1):
-            prob += degree[v0] <= degree[v0 + 1]
-
-    return prob, w
-
-
-def prove_directed_multigraph(
-    n: int,
-    *,
-    time_limit: float = 1500.0,
-    use_gurobi: bool | None = None,
-    use_two_hop: bool = True,
-    use_symmetry_breaking: bool = True,
-    use_deletion_cuts: bool = False,
-    show_solver_log: bool = False,
-) -> ProofResult:
-    """Prove ``M*(n)`` for the directed multigraph arc problem.
-
-    Returns a :class:`ProofResult` containing the solver's termination status
-    and primal weight matrix.  The method does not emit an independently
-    replayable optimality certificate. ``use_gurobi`` picks the solver (see
-    :func:`_pick_solver`). The default uses Gurobi when its licence is active and
-    CBC otherwise.
-    """
-    _require_pulp()
-    prob, w = _cut_counting_model(
-        n, cap=1.0, integer=False, two_hop=use_two_hop,
-        symmetry=use_symmetry_breaking, deletion=use_deletion_cuts,
-        degree_pair=use_deletion_cuts,
-    )
-    prob += pulp.lpSum(w.values())                  # maximise total weight = M*(n)
-
-    start = time.time()
-    prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
-    elapsed = time.time() - start
-    status = _PULP_STATUS.get(pulp.LpStatus[prob.status], "LIMIT")
-    # CBC can report LpStatusOptimal for a time-limited feasible incumbent.
-    # PuLP's separate solution status distinguishes it from a proved optimum.
-    if status == "OPTIMAL" and prob.sol_status != pulp.LpSolutionOptimal:
-        status = "LIMIT"
-
-    weight_matrix = None
-    if status == "OPTIMAL":
-        weight_matrix = np.zeros((n, n))
-        for (u, v), variable in w.items():
-            weight_matrix[u, v] = variable.value() or 0.0
-
-    return ProofResult(
-        n=n, status=status,
-        scaled_optimum=(pulp.value(prob.objective) if status == "OPTIMAL"
-                        else float("nan")),
-        solver_reported_optimal=(status == "OPTIMAL"),
-        solve_seconds=elapsed, weight_matrix=weight_matrix,
-    )
 
 
 ######################################################################
@@ -6215,41 +5966,6 @@ def save_gallery_json(gallery: dict, path: str | Path) -> None:
         json.dump(gallery, f, indent=2)
 
 
-def prove_integral_arc_bound(n: int, m: int, target: int, *,
-                               time_limit: float = 3000.0,
-                               use_gurobi: bool | None = None,
-                               show_solver_log: bool = False) -> str:
-    """Decide by MILP whether some directed multigraph on ``n`` vertices with
-    multiplicities in {0..m-1} and ``lambda^max <= m-1`` has >= ``target`` arcs.
-
-    Returns "INFEASIBLE" (proving L_m^dir(n) < target), "FEASIBLE", or
-    "LIMIT".  This is the integral companion of the fractional prover: the
-    m = 3 chain (rem:odd-step-roadmap) needs only L_3^dir(7) = 24, i.e.
-    INFEASIBLE at target 25, which is a far friendlier MILP than M*(7) because the
-    weights themselves are integers.  Same exact :func:`_cut_counting_model` with
-    cap = m-1 and integer multiplicities, all its proved-valid families on, plus the
-    one constraint that the multiplicities total at least ``target``.
-    """
-    _require_pulp()
-    prob, w = _cut_counting_model(
-        n, cap=float(m - 1), integer=True, two_hop=True,
-        symmetry=True, deletion=True, degree_pair=True,
-    )
-    prob += pulp.lpSum(w.values()) >= target        # the arc target
-    # A pure feasibility model: the question is whether ANY assignment satisfies
-    # the constraints, so the objective is empty.  Spelled with setObjective
-    # rather than the `prob += 0` idiom, which reads like a constraint.
-    prob.setObjective(pulp.lpSum([]))
-
-    prob.solve(_pick_solver(time_limit, show_solver_log, use_gurobi))
-    status = pulp.LpStatus[prob.status]
-    if status == "Infeasible":
-        return "INFEASIBLE"
-    if status == "Optimal":
-        return "FEASIBLE"
-    return "LIMIT"
-
-
 def _float_maxflow_value(capacity: np.ndarray, source: int, target: int,
                          eps: float = 1e-12) -> float:
     """Max-flow value for FLOAT capacities (Edmonds-Karp, shortest augmenting path).
@@ -6486,50 +6202,6 @@ def _run_checks() -> int:
     large_gap = sum(k < l for k, l in zip(kap_large, lam_large))
     check(f"n=16: Whitney holds and kappa^max < lambda^max on {large_gap} of 200 samples",
           large_gap > 0 and all(k <= l for k, l in zip(kap_large, lam_large)))
-
-    if not PULP_AVAILABLE:
-        section("Prover sections skipped (optional pulp not installed)")
-    else:
-        section("Prover: cut-counting proves M*(n) = 2(n-1) optimal for small n")
-        # The thesis (ch2) claims L_m^dir(n) = 2(n-1)(m-1) is proved for ALL n <= 6
-        # via the cut-counting MILP (thm:dir-multi-small).  n=3,4,5 all finish in
-        # well under 60 s and are verified here.  n=6 takes ~1315 s (~22 min) on a
-        # typical laptop and is NOT included in this fast loop -- it must be
-        # verified separately:
-        #
-        #   result = prove_directed_multigraph(6, time_limit=2000.0)
-        #   assert result.solver_claims_optimal() and round(result.scaled_optimum) == 10
-        #
-        # The confirmed run (2026-06-13) is logged in program/logs/selftest_check.log
-        # (search "n=6 OPTIMAL M*(6)=10 in 1315s").  Omitting n=6 from this loop is
-        # not an error in the proof -- the proof ran -- but it means this self-test
-        # alone does not reproduce the full n<=6 certification.
-        for n in [3, 4, 5]:
-            result = prove_directed_multigraph(n, time_limit=300.0)
-            check(f"n={n}: status={result.status}, M*={result.scaled_optimum:.1f}, solver_optimal={result.solver_claims_optimal()}",
-                  result.solver_claims_optimal() and round(result.scaled_optimum) == 2 * (n - 1))
-
-        section("Prover: the valid inequalities sharpen but never move the optimum")
-        # Turning the two-hop and symmetry-breaking rows off leaves the BARE exact
-        # cut formulation, which must still prove the same M*(3) = 4.  If any row we
-        # call a "valid inequality" were in fact invalid, it would cut a feasible
-        # point and shift this optimum -- so this is the regression tripwire that
-        # guards the prover's soundness, not just a re-run of the value.
-        bare = prove_directed_multigraph(3, time_limit=120.0,
-                                         use_two_hop=False, use_symmetry_breaking=False)
-        check(f"M*(3) with the tighteners off = {bare.scaled_optimum:.1f} (expect 4), solver_optimal={bare.solver_claims_optimal()}",
-              bare.solver_claims_optimal() and round(bare.scaled_optimum) == 4)
-
-        section("Prover (integral): an INFEASIBLE verdict is a genuine upper-bound proof")
-        # L_3^dir(4) = 12: a 12-arc multigraph exists, no 13-arc one does.  This
-        # exercises the exact mechanism behind the thesis's L_3(7) = 24 result
-        # (INFEASIBLE one above the optimum) on a value small enough to re-run here,
-        # so a regression in the integral encoding cannot pass unnoticed.
-        feasible_at_12 = prove_integral_arc_bound(4, 3, 12, time_limit=120.0)
-        infeasible_at_13 = prove_integral_arc_bound(4, 3, 13, time_limit=120.0)
-        check(f"target 12 -> {feasible_at_12} (expect FEASIBLE), "
-              f"target 13 -> {infeasible_at_13} (expect INFEASIBLE)",
-              feasible_at_12 == "FEASIBLE" and infeasible_at_13 == "INFEASIBLE")
 
     section("Search: rediscovering ell_2^dir(4) = 6 by random search")
     result = search_for_dense_graph(SIMPLE_DIRECTED, n=4, m=2, steps=6000, seed=0)

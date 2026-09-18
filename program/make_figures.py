@@ -166,7 +166,7 @@ class MachineValues:
         except (OSError, subprocess.SubprocessError):
             source_commit = None
         dependencies = {}
-        for name in ("numpy", "scipy", "pulp", "networkx", "matplotlib"):
+        for name in ("numpy", "scipy", "networkx", "matplotlib"):
             try:
                 dependencies[name] = version(name)
             except PackageNotFoundError:
