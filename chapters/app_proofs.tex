@@ -90,6 +90,7 @@ instance \Cref{lem:equality-forces,lem:skeleton-shallow} are the two steps of
   \vspace{2pt}\noindent{\color{KULblauw1}\rule{\linewidth}{0.4pt}}\par\nobreak
   \addvspace{0.4\baselineskip}}
 
+\clearpage
 \apppart{Part I. Classical machinery}{The two theorems every later argument runs on, stated with their citations and not reproved, and Mader's theorem proved here in full through the Gomory--Hu tree.}
 
 \section{Menger, Gomory--Hu, and the degree bound}
@@ -325,7 +326,7 @@ the two-range formulation of \Cref{thm:sorensen-thomassen}. Thus at $n=13$
 both avoiding counts are $30$, and the edge and vertex values first diverge
 at $n=14$.
 
-The Bollob\'{a}s--Erd\H{o}s conjecture must also retain its vertex count:
+The Bollob\'{a}s--Erd\H{o}s conjecture, discussed in \Cref{sec:simple-vertex-blocks}, must also retain its vertex count:
 the proposed forcing count $1+\binom m2 p$ is on $1+(m-1)p$ vertices.
 In the notation of this thesis its proposed avoiding rate is $m/2$, not
 $\binom m2$ per vertex.
@@ -583,26 +584,6 @@ The vertex upper bound uses \Cref{lem:reach-skeleton}.
 The arc upper bound then follows because every arc-feasible digraph is vertex-feasible.
 The completed enumerations in \Cref{tab:basecase-search} establish the values independently for $2\le n\le7$.
 They establish only those finite cases. The all-order values are what the two theorems below prove.
-
-\begin{lemma}[Two-hop lemma]\label{lem:two-hop-arc}
-Let $D$ be a simple digraph with $\lec^{\max}_D \le m-1$ containing a vertex $r$ with $d^+(r) = n-1$. Then every $v \ne r$ has at most $m-2$ in-arcs from $V \setminus \{r, v\}$.
-\end{lemma}
-
-\begin{proof}
-If $u_1, \dots, u_{m-1}$ were distinct in-neighbours of $v$ other than $r$, that is, distinct vertices each sending an arc to $v$, the paths $r \to v$ and $r \to u_i \to v$ for $i = 1, \dots, m-1$ would be $m$ arc-disjoint routes, since the $u_i$ are distinct and $d^+(r) = n-1$ supplies every starting arc. That contradicts $\lec_D(r, v) \le m-1$.
-\end{proof}
-
-\begin{theorem}[Hub upper bound]\label{thm:directed-upper}
-If a simple digraph $D$ with $\lec^{\max}_D \le m-1$ has a vertex $r$ with $d^+(r) = n-1$, then $|A(D)| \le m(n-1)$.
-\end{theorem}
-
-\begin{proof}
-Split the arcs into those leaving $r$ (exactly $n-1$), those entering $r$ (at most $n-1$), and the internal arcs avoiding $r$. By \Cref{lem:two-hop-arc} each of the $n-1$ other vertices receives at most $m-2$ internal arcs, so there are at most $(m-2)(n-1)$ internal arcs, and the total is at most $m(n-1)$.
-\end{proof}
-
-\begin{lemma}[No transitive triangle]\label{lem:no-transitive-triangle}
-A simple digraph with $\lec^{\max} \le 1$ contains no three vertices $x, y, z$ with all of $(x,y), (y,z), (x,z)$ present, since $x \to z$ and $x \to y \to z$ would be two arc-disjoint routes.
-\end{lemma}
 
 \begin{lemma}[Deletion monotonicity]\label{lem:subdigraph-monotone}
 Write $D - v_0$ for the digraph obtained from $D$ by deleting the vertex $v_0$ together with all arcs incident to it. For any digraph $D$ and vertex $v_0$,
@@ -1130,7 +1111,7 @@ The upper bound is \Cref{prop:hyper-edge}, since a simple hypergraph is a multih
 \end{proof}
 
 \begin{remark}[The hypothesis is not decorative]\label{rem:simple-hyper-necessary}
-Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the same hypothesis at $m - 1 = 2$, where it reduces to $2 < r < n$, for the same reason. \Cref{tab:summary} splits the simple and multi hypergraph rows on exactly this distinction, and the program enumerates the two models separately for the same reason, stated where each formula is used.
+Outside this range the displayed value can fail for simple hypergraphs, even though it stays a valid upper bound (\Cref{prop:hyper-edge}) and, when $(r-1) \mid (n-1)$, stays exactly attained by a multihypergraph. The smallest case already shows it. At $n = r = m = 3$ there is only one $3$-subset of a $3$-element vertex set, so a simple hypergraph carries at most one hyperedge. The hypothesis needs $m - 1 \le \binom{n-2}{r-2} = \binom{1}{1} = 1$, and $m - 1 = 2$ misses it, so the formula's value $\floor{2 \cdot 2 / 2} = 2$ is not attained by any simple hypergraph there. It is attained by the multihypergraph star, two parallel copies of that one triple. \Cref{thm:hyper-vertex-m3} carries the same hypothesis at $m - 1 = 2$, where it reduces to $2 < r < n$, for the same reason. \Cref{tab:summary} splits the simple and multi hypergraph rows on exactly this distinction.
 \end{remark}
 
 \begin{construction}[Twelve hyperedge copies on six vertices]\label{const:multihyper-six}
@@ -1387,7 +1368,7 @@ divisibility hypothesis, and \Cref{thm:hyper-vertex-m3} bounds every
 multihypergraph by that same quantity.
 \end{proof}
 
-At $m=3$ the upper bound covers every multihypergraph, and equality follows in the construction range stated below. Both rest on the rank inequality proved next, whose engine is a bound for
+At $m=3$ the upper bound covers every multihypergraph, and equality follows in the construction ranges stated above. Both rest on the rank inequality proved next, whose engine is a bound for
 graphs in which one side of a partition must stay below local
 $3$-connectivity. The hypergraph bound then falls out of the incidence
 translation. Throughout, $\mathrm{rank}(G) = |E(G)| - |V(G)| + 1$ denotes
@@ -2501,9 +2482,7 @@ were repeated with a monotonic deadline and the same seed, and the repeat
 replaces the original in every statistic.
 
 The timing rule is cooperative, so a connectivity calculation already in
-progress can overrun its target. Monotonic time also has platform-specific
-behaviour during system suspension. The records therefore include calendar
-duration, monotonic duration and CPU time. The computer was not isolated from
+progress can overrun its target. The computer was not isolated from
 other work, so this is a comparison under equal allocated search durations,
 not a controlled comparison of processor efficiency.
 
@@ -2632,6 +2611,11 @@ positive lower bound in that parameter range, not that the optimum is zero.
     \label{fig:variant-bounds-m6-hyper}
 \end{sidewaysfigure}
 
+In this section, \emph{branch and bound} means exhaustive generation in
+which a partial candidate is extended along several branches and a proved bound
+discards, or \emph{prunes}, a branch that cannot reach the target. A search
+\emph{node} is one such partial candidate.
+
 \Cref{prop:hyper-edge} bounds every simple hypergraph from above.
 It does not assert attainment outside its stated range.
 At $m=6$, $n=6$, and $r=3$, all $125\,970$ simple twelve-hyperedge candidates are infeasible, and an eleven-hyperedge family is not.
@@ -2733,11 +2717,6 @@ plotted ranges.
     \label{tab:search-evidence-m6-hypergraphs}
 \end{table}
 
-In the audit below, \emph{branch and bound} means exhaustive generation in
-which a partial candidate is extended along several branches and a proved bound
-discards, or \emph{prunes}, a branch that cannot reach the target. A search
-\emph{node} is one such partial candidate.
-
 The directed $m=2$ values for $2\le n\le7$ were established by completed pruned exhaustive searches, separately under arc and vertex separation. Each completed row in \Cref{tab:basecase-search} is a finite upper-bound computation with a matching witness. The all-order values do not follow from these rows alone. The two runs have identical node counts because their feasible families agree at $m=2$, as explained in \Cref{sec:dir-arc-m2}.
 
 \begin{table}[ht]
@@ -2773,7 +2752,7 @@ The directed $m=2$ values for $2\le n\le7$ were established by completed pruned 
   \label{tab:basecase-search}
 \end{table}
 
-The cut-counting optimisation closes the directed multigraph checks
+The cut-counting MILP of \Cref{sec:prove-every-m} closes the directed multigraph checks
 through $n=6$ but emits no independently replayable matching bound, so no
 theorem rests on it. Its raw log is \path{program/logs/certificate_log.txt}. Exact
 flow measures a supplied object, completed enumeration proves a finite optimum,

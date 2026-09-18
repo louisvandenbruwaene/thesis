@@ -102,7 +102,7 @@ Writing the answer as an extremal function,
     \ell_m(n) = \max\{\, |E(G)| : |V(G)| = n,\ \lec_G^{\max} \le m - 1 \,\},
 \]
 the problem asks for $\ell_m(n)$, the most edges possible under the cap.
-Mader proved that no graph under the cap has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case and provided the shared-clique construction, which achieves the (lower) bound but is only defined when $m-1$ divides $n-1$.
+Mader proved that no graph under the cap has more than $\floor{m(n-1)/2}$ edges (the upper bound) in the simple-graph case. The shared-clique construction of Bollob\'{a}s and Erd\H{o}s \cite{BollobasErdos62}, copies of $K_m$ sharing one vertex, achieves the (lower) bound but is only defined when $m-1$ divides $n-1$.
 The brackets $\floor{\,\cdot\,}$ round their content down to the nearest whole number and their ceiling counterpart $\ceil{\,\cdot\,}$ rounds up. Both recur throughout, because an edge count is always an integer while the formulas that bound it need not be.
 
 \begin{theorem}[Mader \cite{Mader73}]\label{thm:mader}
@@ -684,7 +684,7 @@ so for each fixed $m$,
 and, for $m\ge3$, both the leading constant $\tfrac14$ and the \emph{order} of the second-order term of the augmented bipartite count hold unconditionally. At $m=2$, \Cref{thm:dir-arc-m2-exact} instead gives $\ell_2^{\mathrm{dir}}(n)=n^2/4+O(1)$ as $n\to\infty$.
 \end{theorem}
 
-The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes: in a feasible digraph a vertex cannot have too many out-neighbours that reach one another, since the short detours through them would breach the cap, and that alone forces the arc count down to $\floor{n^2/4}$ plus a linear correction.
+The proof is in \Cref{app:proofs}. Its engine is a count of two-step routes. The routes $u \to x \to v$ through distinct midpoints $x$, together with the arc $u \to v$, are disjoint, so a feasible digraph has at most $m-1$ of them for each ordered pair. Summed over all pairs, this caps $\sum_x d^+(x)\,d^-(x)$. Deleting at every vertex the smaller of its in-arcs and out-arcs then leaves a one-directional bipartite digraph, with at most $\floor{n^2/4}$ arcs, and the deleted arcs are the linear correction.
 
 The routes this count produces are internally vertex-disjoint, not merely arc-disjoint. That is what lets the whole argument be re-run under the stricter separation, and Whitney's inequality alone would not justify the transfer, since it points the other way.
 
@@ -706,7 +706,7 @@ For all $n \ge 2$ and $m \ge 2$,
 \]
 \end{theorem}
 
-Extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited rather than a classification, and \Cref{app:proofs} says explicitly that not every linear-branch extremiser has been classified. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
+Extremisers include the thickened bidirected spanning trees on the linear branch, every edge taken in both directions at multiplicity $m-1$, and the balanced one-way bipartite multigraph at the same multiplicity on the quadratic one. On the linear branch these are constructions exhibited, not a classification. The proof deletes a \emph{subgraph} at a time rather than a vertex. Inside any feasible multigraph there is a sparse skeleton that alone preserves which vertices reach which, and removing one copy of each of its arcs costs every reachable pair at least one route. Peeling off $m-1$ such skeletons therefore accounts for every arc. The proposed equality argument would also classify the quadratic extremisers once $n\ge\max(8,2m)$ (\Cref{thm:dir-multi-uniqueness}), with classification at smaller orders left open even if that argument is verified.
 
 \begin{theorem}[The directed hypergraph constant]\label{thm:dir-hyper-constant}
 Let $r \ge 2$ and $m \ge 2$. Every forward directed $r$-uniform multihypergraph

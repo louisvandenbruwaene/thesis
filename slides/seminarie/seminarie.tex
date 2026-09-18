@@ -1305,6 +1305,45 @@ according to the separation, and $\Lambda>0$ is the penalty weight.}
 \end{center}
 \end{frame}
 
+% ============================================================================
+%  WHAT THIS THESIS PROVES  (counts follow the Contribution Statement and
+%  tab:summary in ch3_synthesis.tex: 1 complete + 12 partial + 3 not new = 16)
+% ============================================================================
+\begin{frame}{What this thesis proves}
+\vspace{2pt}
+\begin{columns}[T,onlytextwidth]
+\column{0.40\textwidth}
+{\color{KULblauw3b}\bfseries 1 variant settled completely}\\[1pt]
+{\footnotesize\color{black!55}exact for every $n$ and $m$, first proved here}\par
+\vspace{6pt}
+{\small directed multigraph \textperiodcentered\ arc\\[3pt]
+$L_m^{\dir}(n)=(m-1)\max\bigl(2(n-1),\floor{\tfrac{n^2}{4}}\bigr)$}\par
+\vspace{16pt}
+{\color{KULblauw3b}\bfseries 3 variants not new here}\\[1pt]
+{\footnotesize\color{black!55}settled or studied before}\par
+\vspace{6pt}
+{\small\renewcommand{\arraystretch}{1.3}%
+\begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
+simple graph \textperiodcentered\ edge & {\footnotesize\color{black!55}Mader}\\
+simple graph \textperiodcentered\ vertex & {\footnotesize\color{black!55}classical}\\
+multigraph \textperiodcentered\ edge & {\footnotesize\color{black!55}$(m-1)(n-1)$}\\
+\end{tabular}}
+\column{0.58\textwidth}
+{\color{KULblauw3b}\bfseries 12 variants settled partially}\\[1pt]
+{\footnotesize\color{black!55}first results here, general exact value still open}\par
+\vspace{6pt}
+{\small\renewcommand{\arraystretch}{1.3}%
+\begin{tabular}{@{}l@{\hspace{6pt}}l@{}}
+multigraph \textperiodcentered\ vertex & {\footnotesize\color{black!60}$m{=}2,3$ exact}\\
+(multi)hypergraph \textperiodcentered\ edge {\color{black!45}(2)} & {\footnotesize\color{black!60}bound, attainment}\\
+(multi)hypergraph \textperiodcentered\ vertex {\color{black!45}(2)} & {\footnotesize\color{black!60}$m{=}2$ exact, $m{=}3$ bound}\\
+simple digraph {\color{black!45}(2)} & {\footnotesize\color{black!60}$m{=}2$ exact, $\tfrac{n^2}{4}+\Theta_m(n)$}\\
+directed multigraph \textperiodcentered\ vertex & {\footnotesize\color{black!60}$m{=}2$ exact, leading term}\\
+directed (multi)hypergraph {\color{black!45}(4)} & {\footnotesize\color{black!60}leading term}\\
+\end{tabular}}
+\end{columns}
+\end{frame}
+
 \begin{frame}{AI: from reviewer to worker}
 \begin{center}
 
@@ -1326,6 +1365,7 @@ according to the separation, and $\Lambda>0$ is the penalty weight.}
 \textbf{Applied + pure mathematics}
 \\
 \vspace{5mm}
+% 32 = the 16 variants, each with a lower and an upper bound to settle, is 32 problems.
 \textbf{$\forall$ $m,n$ $\exists$ 32 problems}
 \end{center}
 
@@ -1425,12 +1465,12 @@ The badge at top right matches the status tree.\par
          one-way bipartite digraph each attain it}
 \end{vsteps}}
 {\cBipDir}{\atsize{n=7,\ m=2}{12} \ \tExtremal}
-{Arc value at $m=2$ 1.6 \ \textperiodcentered\ \ skeleton A.18--A.19 \ \textperiodcentered\ \ two-hop A.20 \ \textperiodcentered\ \ the two $m=2$ families A.25 \ \textperiodcentered\ \ directed hub A.15 \ \textperiodcentered\ \ one-way bipartite A.16}
+{Arc value at $m=2$ 1.6 \ \textperiodcentered\ \ skeleton A.18--A.19 \ \textperiodcentered\ \ the two $m=2$ families A.22 \ \textperiodcentered\ \ directed hub A.15 \ \textperiodcentered\ \ one-way bipartite A.16}
 
 % ---- 4. simple digraph, directed, vertex -----------------------------------
 \vframe{Simple digraph \textperiodcentered\ vertex}{k_m^{\dir}(n)}{\rgOpen}
 {$M(n)$ \ \sProved\ \ {\scriptsize\color{black!50}$m=2$}}
-{$\floorfrac{n^2}{4}$ \ \sProved}
+{$M(n)$ \ \sProved}
 {\begin{vsteps}
   \vstep{the routes the skeleton argument produces are internally
          vertex-disjoint, not merely arc-disjoint}
@@ -1441,7 +1481,7 @@ The badge at top right matches the status tree.\par
   \vstep{the same digraph attains both, so the two values coincide at $m=2$}
 \end{vsteps}}
 {\cBipDir}{\atsize{n=7,\ m=2}{12} \ \tExtremal}
-{Vertex value at $m=2$ 1.7 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deletion monotonicity A.23 \ \textperiodcentered\ \ one-way bipartite A.16}
+{Vertex value at $m=2$ 1.7 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deletion monotonicity A.20 \ \textperiodcentered\ \ one-way bipartite A.16}
 
 % ---- 5. multigraph, undirected, edge ---------------------------------------
 \vframe{Multigraph \textperiodcentered\ edge}{L_m(n)}{\rgProved}
@@ -1471,7 +1511,7 @@ The badge at top right matches the status tree.\par
          multiplicity and attains it}
 \end{vsteps}}
 {\cThickTree}{\atsize{n=6,\ m=3}{10} \ \tExtremal}
-{Splitting the vertex measure A.54 \ \textperiodcentered\ \ value at $m=2$ A.55 \ \textperiodcentered\ \ value at $m=3$ A.57 \ \textperiodcentered\ \ incidence rank A.52}
+{Splitting the vertex measure A.51 \ \textperiodcentered\ \ value at $m=2$ A.52 \ \textperiodcentered\ \ value at $m=3$ A.54 \ \textperiodcentered\ \ incidence rank A.49}
 
 % ---- 7. directed multigraph, arc -------------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ arc}{L_m^{\dir}(n)}{\rgProved}
@@ -1487,7 +1527,7 @@ The badge at top right matches the status tree.\par
          a one-way bipartite digraph the quadratic one}
 \end{vsteps}}
 {\cBidirTree}{\atsize{n=4,\ m=3}{12} \ \tExtremal}
-{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.37 \ \textperiodcentered\ \ thickened tree and bipartite digraph A.36 \ \textperiodcentered\ \ integrality A.39}
+{Every $n$ and $m$ 1.13 \ \textperiodcentered\ \ sparse skeleton A.19 \ \textperiodcentered\ \ deleting a skeleton A.34 \ \textperiodcentered\ \ thickened tree and bipartite digraph A.33 \ \textperiodcentered\ \ integrality A.36}
 
 % ---- 8. directed multigraph, vertex ----------------------------------------
 \vframe{Directed multigraph \textperiodcentered\ vertex}{K_m^{\dir}(n)}{\rgOpen}
@@ -1500,11 +1540,11 @@ The badge at top right matches the status tree.\par
          so its multiplicity stops at $m-2=4$ rather than at the cap of five}
   \vstep{the six directions give $6\times4=24$, and enumeration leaves exactly
          one isomorphism class}
-  \vstep{it is A.65's thickened complete digraph at multiplicity $4$}
+  \vstep{it is A.62's thickened complete digraph at multiplicity $4$}
 \end{vsteps}}
 {\cTriFour}{\atsize{n=3,\ m=6}{24}\par
    \vspace{2pt}\sComputed\ \tExtremal}
-{Directed incidence value A.64 \ \textperiodcentered\ \ proposed splitting A.63 \ \textperiodcentered\ \ construction A.65 and proposed bound A.66}
+{Directed incidence value A.61 \ \textperiodcentered\ \ proposed splitting A.60 \ \textperiodcentered\ \ construction A.62 and proposed bound A.63}
 
 % ---- 9. simple hypergraph, undirected, edge --------------------------------
 \vframe{Simple hypergraph \textperiodcentered\ edge}{\ell_m^{(r)}(n)}{\rgPartial}
@@ -1521,7 +1561,7 @@ The badge at top right matches the status tree.\par
          degree-capped hyperedges attains the stated general range}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ simplicity is free A.46 \ \textperiodcentered\ \ sparse hypergraphs A.49}
+{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.42 \ \textperiodcentered\ \ simplicity is free A.43 \ \textperiodcentered\ \ sparse hypergraphs A.46}
 
 % ---- 10. simple hypergraph, undirected, vertex -----------------------------
 \vframe{Simple hypergraph \textperiodcentered\ vertex}{k_m^{(r)}(n)}{\rgPartial}
@@ -1537,7 +1577,7 @@ The badge at top right matches the status tree.\par
   \vstep{the star hypertree's incidence graph is a tree, so it attains it}
 \end{vsteps}}
 {\cStarHyper}{\atsize{n=9,\ r=3,\ m=2}{4} \ \tExtremal}
-{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ general lower bound A.50 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ Menger for multihypergraphs A.44}
+{Vertex value at $m=2$ 1.9 \ \textperiodcentered\ \ at $m=3$ 1.10 \ \textperiodcentered\ \ general lower bound A.47 \ \textperiodcentered\ \ incidence rank A.49 \ \textperiodcentered\ \ Menger for multihypergraphs A.41}
 
 % ---- 11. multihypergraph, undirected, edge ---------------------------------
 \vframe{Multihypergraph \textperiodcentered\ edge}{L_m^{(r)}(n)}{\rgPartial}
@@ -1552,7 +1592,7 @@ The badge at top right matches the status tree.\par
   \vstep{the star hypertree with each hyperedge taken $m-1$ times attains it}
 \end{vsteps}}
 {\cRepStar}{\atsize{n=7,\ r=3,\ m=3}{6} \ \tExtremal}
-{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.45 \ \textperiodcentered\ \ multihypergraph lower bound A.51 \ \textperiodcentered\ \ twelve copies on six vertices A.48}
+{Hypergraph edge bound 1.8 \ \textperiodcentered\ \ cut induction A.42 \ \textperiodcentered\ \ multihypergraph lower bound A.48 \ \textperiodcentered\ \ twelve copies on six vertices A.45}
 
 % ---- 12. multihypergraph, undirected, vertex -------------------------------
 \vframe{Multihypergraph \textperiodcentered\ vertex}{K_m^{(r)}(n)}{\rgPartial}
@@ -1567,7 +1607,7 @@ The badge at top right matches the status tree.\par
   \vstep{from $m=3$ it adds attainment cases, and the repeated star is one}
 \end{vsteps}}
 {\cRepStar}{\atsize{n=7,\ r=3,\ m=3}{6} \ \tExtremal}
-{Vertex value at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.52 \ \textperiodcentered\ \ multihypergraph lower bound A.51}
+{Vertex value at $m=3$ 1.10 \ \textperiodcentered\ \ incidence rank A.49 \ \textperiodcentered\ \ multihypergraph lower bound A.48}
 
 % ---- 13. directed simple hypergraph, arc -----------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ arc}{\ell_m^{\dir\,(r)}(n)}{\rgOpen}
@@ -1585,7 +1625,7 @@ The badge at top right matches the status tree.\par
 \end{vsteps}}
 {\cFullTriHyper}{\atsize{n=3,\ r=3,\ m=3}{3}\par
    \vspace{2pt}\sComputed\ \tExtremal}
-{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ one-step shadow A.71 \ \textperiodcentered\ \ two-step bound A.32}
+{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.64 \ \textperiodcentered\ \ bounded outgoing count A.65 \ \textperiodcentered\ \ one-step shadow A.68 \ \textperiodcentered\ \ two-step bound A.29}
 
 % ---- 14. directed simple hypergraph, vertex --------------------------------
 \vframe{Directed simple hypergraph \textperiodcentered\ vertex}{k_m^{\dir\,(r)}(n)}{\rgOpen}
@@ -1601,7 +1641,7 @@ The badge at top right matches the status tree.\par
 \end{vsteps}}
 {\cFullTriHyper}{\atsize{n=3,\ r=3,\ m=3}{3}\par
    \vspace{2pt}\sComputed\ \tExtremal}
-{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68}
+{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.64 \ \textperiodcentered\ \ bounded outgoing count A.65}
 
 % ---- 15. directed multihypergraph, arc -------------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ arc}{L_m^{\dir\,(r)}(n)}{\rgOpen}
@@ -1619,7 +1659,7 @@ The badge at top right matches the status tree.\par
 \end{vsteps}}
 {\cFullRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
    \vspace{2pt}\tExtremal}
-{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.67 \ \textperiodcentered\ \ bounded outgoing count A.68 \ \textperiodcentered\ \ backward reverses forward A.69}
+{Directed hypergraph constant 1.14 \ \textperiodcentered\ \ first bounds A.64 \ \textperiodcentered\ \ bounded outgoing count A.65 \ \textperiodcentered\ \ backward reverses forward A.66}
 
 % ---- 16. directed multihypergraph, vertex ----------------------------------
 \vframe{Directed multihypergraph \textperiodcentered\ vertex}{K_m^{\dir\,(r)}(n)}{\rgOpen}
@@ -1638,6 +1678,6 @@ The badge at top right matches the status tree.\par
 \end{vsteps}}
 {\cFullRepTriHyper}{\atsize{n=3,\ r=3,\ m=3}{6}\par
    \vspace{2pt}\tExtremal}
-{General orientation constant A.72 \ \textperiodcentered\ \ general obeys forward A.70 \ \textperiodcentered\ \ backward reverses forward A.69 \ \textperiodcentered\ \ bounded outgoing count A.68}
+{General orientation constant A.69 \ \textperiodcentered\ \ general obeys forward A.67 \ \textperiodcentered\ \ backward reverses forward A.66 \ \textperiodcentered\ \ bounded outgoing count A.65}
 
 \end{document}

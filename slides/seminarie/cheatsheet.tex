@@ -90,7 +90,7 @@
 \Group{Simple graphs}
 
 \V{\ell_m(n)}{edge}{\sProved}
-  {$\floorfrac{m(n-1)}{2}$, every $n$: Gomory--Hu tree, at most $n-1$ edges cross one tree cut and the rest cross two, against total cut capacity $(m-1)(n-1)$\pg{36--39}}
+  {$\floorfrac{m(n-1)}{2}$, every $n$: Gomory--Hu tree, at most $n-1$ edges cross one tree cut and the rest cross two, against total cut capacity $(m-1)(n-1)$\pg{37--39}}
   {$\floorfrac{m(n-1)}{2}$ {\scriptsize\color{black!50}$n\ge m\ge2$}: hub-and-spokes graph, spoke degree $\le m-2$\pg{40}}
 
 \V{k_m(n)}{vertex}{\sPartial}
@@ -99,7 +99,7 @@
 
 \V{\ell_m^{\dir}(n)}{arc}{\sOpen}
   {$M(n)=\max(2(n-1),\floor{n^2/4})$ {\scriptsize\color{black!50}$m=2$}: a feasible digraph is its own reachability skeleton, and a skeleton has at most $M(n)$ arcs\pg{47,51}}
-  {$M(n)$: bidirected hub\pg{45} or one-way bipartite digraph\pg{46}}
+  {$M(n)$: bidirected hub\pg{46} or one-way bipartite digraph\pg{46}}
 
 \V{k_m^{\dir}(n)}{vertex}{\sOpen}
   {$M(n)$ {\scriptsize\color{black!50}$m=2$}: an arc outside the skeleton has a second route, internally disjoint from the arc itself\pg{47,50}}
@@ -108,8 +108,8 @@
 \Group{Multigraphs}
 
 \V{L_m(n)}{edge}{\sProved}
-  {$(m-1)(n-1)$, every $n,m$: Gomory--Hu, $n-1$ cuts each of capacity $\le m-1$, every edge crosses one\pg{39}}
-  {$(m-1)(n-1)$: any spanning tree at multiplicity $m-1$\pg{39}}
+  {$(m-1)(n-1)$, every $n,m$: Gomory--Hu, $n-1$ cuts each of capacity $\le m-1$, every edge crosses one\pg{40}}
+  {$(m-1)(n-1)$: any spanning tree at multiplicity $m-1$\pg{40}}
 
 \V{K_m(n)}{vertex}{\sPartial}
   {$2(n-1)$ {\scriptsize\color{black!50}$m=3$}: incidence-rank lemma at $r=2$\pg{70,75}}
@@ -117,11 +117,11 @@
 
 \V{L_m^{\dir}(n)}{arc}{\sProved}
   {$(m-1)M(n)$, every $n,m$: peel a reachability skeleton off $m-1$ times\pg{58--59}}
-  {$(m-1)M(n)$: thickened bidirected tree or one-way bipartite digraph\pg{57}}
+  {$(m-1)M(n)$: thickened bidirected tree or one-way bipartite digraph\pg{58}}
 
 \V{K_m^{\dir}(n)}{vertex}{\sOpen}
   {$(m-1)\floor{n^2/4}+4(m-1)^2(n-1)$ {\scriptsize\color{black!50}far from tight at small $n$}\pg{83}}
-  {$n(n-1)(m+1-n)$ {\scriptsize\color{black!50}proposed, $2\le n\le m$}: thickened complete digraph, $24$ at $n=3,m=6$\pg{83}}
+  {$n(n-1)(m+1-n)$ {\scriptsize\color{black!50}proposed, $2\le n\le m$}: thickened complete digraph, $24$ at $n=3,m=6$\pg{84}}
 
 \clearpage
 % ============================================================================
@@ -137,15 +137,15 @@
 
 \V{k_m^{(r)}(n)}{vertex}{\sPartial}
   {$\floorfrac{n-1}{r-1}$ {\scriptsize\color{black!50}$m=2$}: incidence graph is a forest ($r|E|\le n+|E|-1$)\pg{67}}
-  {$\floorfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$r\ge3$, $m-1\le\binom{n-2}{r-2}$}: degree-capped hub\pg{67}}
+  {$\floorfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$r\ge3$, $m-1\le\binom{n-2}{r-2}$}: degree-capped hub\pg{69}}
 
 \V{\ell_m^{\dir\,(r)}(n)}{arc}{\sOpen}
-  {$\dfrac{(m-1)n(n-1)}{r-1}$ {\scriptsize\color{black!50}not tight for large $n$}: tail--head pair counting\pg{84}}
-  {$n\cdot\min(m-1,\binom{n-1}{r-1})$ {\scriptsize\color{black!50}$n\ge r$}: bounded outgoing hyperedge count\pg{85}}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$ {\scriptsize\color{black!50}not tight for large $n$}: tail--head pair counting\pg{85}}
+  {$n\cdot\min(m-1,\binom{n-1}{r-1})$ {\scriptsize\color{black!50}$n\ge r$}: bounded outgoing hyperedge count\pg{86}}
 
 \V{k_m^{\dir\,(r)}(n)}{vertex}{\sOpen}
-  {$\dfrac{(m-1)n(n-1)}{r-1}$: same pair counting, one-step routes are also internally disjoint\pg{86}}
-  {$n\cdot\min(m-1,\binom{n-1}{r-1})$ {\scriptsize\color{black!50}$n\ge r$}: same construction, the outgoing cut ignores interior vertices\pg{85}}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$: same pair counting, one-step routes are also internally disjoint\pg{87}}
+  {$n\cdot\min(m-1,\binom{n-1}{r-1})$ {\scriptsize\color{black!50}$n\ge r$}: same construction, the outgoing cut ignores interior vertices\pg{86}}
 
 \Group{Multihypergraphs}
 
@@ -158,11 +158,11 @@
   {$\dfrac{(m-1)(n-1)}{r-1}$ {\scriptsize\color{black!50}$(r-1)\mid(n-1)$}: repeated star hypertree\pg{69}}
 
 \V{L_m^{\dir\,(r)}(n)}{arc}{\sOpen}
-  {$\dfrac{(m-1)n(n-1)}{r-1}$: tail--head pair counting\pg{84}}
-  {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$}: every tail gets $m-1$ copies, meeting the bound exactly at $n=r$\pg{85}}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$: tail--head pair counting\pg{85}}
+  {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$}: every tail gets $m-1$ copies, meeting the bound exactly at $n=r$\pg{86}}
 
 \V{K_m^{\dir\,(r)}(n)}{vertex}{\sOpen}
-  {$\dfrac{(m-1)n(n-1)}{r-1}$: carries over from the arc problem, and the general (any tail/head split) orientation shares the constant\pg{84,86,90}}
-  {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$}: same construction\pg{85}}
+  {$\dfrac{(m-1)n(n-1)}{r-1}$: carries over from the arc problem, and the general (any tail/head split) orientation shares the constant\pg{85,87,90}}
+  {$n(m-1)$ {\scriptsize\color{black!50}$n\ge r$}: same construction\pg{86}}
 
 \end{document}

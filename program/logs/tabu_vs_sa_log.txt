@@ -1,0 +1,11 @@
+============================================================================
+TABU vs SIMULATED ANNEALING   (equal 6s wall-clock per method)
+SA = the thesis's own best_of_searches (independent annealer restarts).
+variant             n  m |    C | SA best | tabu best | verdict
+----------------------------------------------------------------------------
+simple undirected   7  3 |    9 |       9 |         9 | tie (both reach C)
+multi undirected    6  3 |   10 |      10 |        10 | tie (both reach C)
+simple directed     6  3 |   15 |      15 |        15 | tie (both reach C)
+multi directed      5  3 |   16 |      15 |        16 | TABU +1 (tabu reaches C)
+multi directed      7  3 |   24 |      20 |        24 | TABU +4 (tabu reaches C)
+simple directed     7  3 |   18 |      16 |        17 | TABU +1 (neither reaches C)

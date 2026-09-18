@@ -474,12 +474,11 @@ At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-ta
     \caption{Timings for different tasks: blind maximisation, construction-seeded pruned maximisation and \texttt{geng}-based classification at a supplied target. Only the first two independently bound the optimum from above. A dash means not attempted. These are separate runs from \Cref{tab:basecase-search}, whose recorded times differ. The table is not evidence of a like-for-like speed-up.}
     \label{tab:generating-benchmark}
 \end{table}
-\section{Proving every \texorpdfstring{$m$}{m} at once}
+\section{Proving every \texorpdfstring{$m$}{m} at once}\label{sec:prove-every-m}
 
 The search so far treats one pair $(n,m)$ at a time.
 For a directed multigraph, scaling can instead check every threshold at a fixed $n$ in one pass.
 It divides all multiplicities by $m-1$.
-The formula in \Cref{thm:dir-multi-full} now supplies a lower-bound witness in \code{solve}. The cut formulation can provide a separate finite check, provided its optional cuts are valid independently of that theorem.
 
 Divide each multiplicity of a feasible directed multigraph $D$ by $m-1$.
 The resulting weights satisfy $w(u,v)\in[0,1]$.
@@ -490,6 +489,15 @@ Let
     M^{*}(n) = \max\Bigl\{\textstyle\sum_{u \ne v} w(u, v) : w(u,v) \in [0,1], \ \mathrm{maxflow}(s, t; w) \le 1 \ \text{for all } s \ne t\Bigr\}
 \]
 denote the largest total weight of such a matrix.
+
+The program computes $M^{*}(n)$ at small $n$ as a mixed-integer linear program (MILP), solved by CBC through PuLP.
+It has one weight variable $w(u,v)\in[0,1]$ per ordered pair.
+For every ordered pair $(s,t)$ the model also chooses a cut, through a binary side variable for every other vertex with $s$ fixed on the source side and $t$ on the sink side, and caps the total weight crossing that cut at one.
+Because the solver may choose the cut, the constraint holds exactly when some $s$--$t$ cut has capacity at most one, which by \Cref{thm:menger} means $\mathrm{maxflow}(s,t;w)\le1$.
+The model is therefore exact rather than a relaxation.
+Optional valid inequalities shorten the solve without moving the optimum. The main ones say that the direct arc and the two-step detours of each pair carry total weight at most one, and a degree ordering removes relabelled copies.
+The same model with integer multiplicities in $\{0,\dots,m-1\}$ and cap $m-1$ decides whether a given arc count is feasible.
+
 Scaling then gives
 \[
     L_m^{\mathrm{dir}}(n) \;\le\; (m - 1)\, M^{*}(n)
@@ -502,7 +510,7 @@ Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 On the linear branch, \Cref{const:dir-multi-lower} supplies the bidirected star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
 For $n\le6$, this is the larger term of the established value $M(n)$.
-Solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
+The MILP returns the same value $M^{*}(n)=2(n-1)$ at $3\le n\le6$. The solver reports these optima as proved, but it emits no independently replayable certificate of the matching bound (\Cref{sec:transcripts}).
 At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
 It then overtakes it.
 The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
@@ -514,7 +522,7 @@ An explicit construction gives attainment from below.
 Clearing denominators from a rational optimum reduces the reverse inequality to \Cref{thm:dir-multi-full}.
 Scaling the integral maximiser by $m-1$ gives the lower bound $(m-1)M^{*}(n)$.
 The preceding scaling argument gives the matching upper bound unconditionally.
-The finite optimisation is retained as supporting evidence for $3\le n\le6$, and \Cref{sec:transcripts} records what it ran.
+The MILP values for $3\le n\le6$ remain as supporting evidence, and \Cref{sec:transcripts} records the runs.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
@@ -583,9 +591,9 @@ and the walk perturbs itself when it stalls.
 Simulated annealing is an alternative on the same energy and neighbourhood \cite{KirkpatrickGelattVecchi83}.
 It accepts worsening moves with the probability given by the Metropolis rule \cite{Metropolis53}.
 That probability decreases as the run cools.
-In the reported comparison with equal time budgets, annealing finds fewer arcs.
+In a comparison with six seconds per method and case, recorded in \path{program/logs/tabu_vs_sa_log.txt}, annealing never finds more arcs than tabu.
 For $n=7$ and $m=3$, tabu reaches the $24$-arc directed multigraph construction, while annealing reaches $20$ arcs.
-For the simple digraph, tabu reaches $18$ arcs and annealing reaches $16$.
+For the simple digraph, tabu reaches $17$ arcs and annealing reaches $16$, both below the $18$-arc construction.
 Matrix-model discovery uses tabu search. Supplied constructions are reported separately from the search outcomes.
 Annealing is retained for the comparison above and as an independent cross-check in the program's self-test,
 where agreement provides an additional check on the search implementations.
