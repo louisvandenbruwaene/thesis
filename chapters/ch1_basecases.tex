@@ -530,7 +530,7 @@ For simple digraphs,
 
 The two constructions in \Cref{fig:simple-digraph-m2} attain the two terms: a bidirected star has $2(n-1)$ arcs, and a balanced complete bipartite digraph with all arcs in one direction has $\floor{n^2/4}$. Each is feasible because every ordered pair has at most one directed path. Any bidirected tree attains the first count; the star is the illustrated example (\Cref{sec:dir-constructions}).
 
-For the upper bound, a \emph{reachability skeleton} is a subdigraph preserving which vertices can reach which others. \Cref{lem:reach-skeleton} bounds its size by $M(n)=\max(2(n-1),\floor{n^2/4})$. At $m=2$, omitting any arc would leave another route between its endpoints, giving two internally vertex-disjoint paths. A feasible digraph must therefore equal its skeleton. This proves the upper bound under vertex separation and hence under arc separation (\Cref{sec:dir-arc-m2}).
+For the upper bound, a \emph{reachability skeleton} is a subdigraph preserving which vertices can reach which others. \Cref{lem:reach-skeleton} bounds its size by $M(n)=\max(2(n-1),\floor{n^2/4})$. At $m=2$, an arc outside the skeleton would leave a second route between its endpoints, and the two routes would be internally vertex-disjoint. A feasible digraph must therefore equal its skeleton. This proves the upper bound under vertex separation and hence under arc separation (\Cref{sec:dir-arc-m2}).
 
 \begin{theorem}[Directed vertex value at $m = 2$]\label{thm:dir-vertex-m2-exact}
 For simple digraphs, $k_2^{\mathrm{dir}}(n) = \ell_2^{\mathrm{dir}}(n)$.

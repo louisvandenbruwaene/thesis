@@ -29,8 +29,7 @@ That count proves \Cref{thm:mader,thm:multigraph-edge} from \Cref{lem:dist-1-cou
 
 \Cref{tab:conjecture-index} indexes every statement that carries the badge, so
 a reader can separate the checked results from the proposed ones without
-reading the appendix through. The table is generated from the same source walk
-that enforces the marking, so a renamed or added conjecture changes its own row.
+reading the appendix through.
 
 \begin{table}[htbp]
 \centering\small
@@ -622,7 +621,7 @@ Whitney's inequality is easy to misread: the tempting direction is the wrong one
 \[
     \{D : \lec^{\max}_D \le m-1\} \;\subseteq\; \{D : \kap^{\max}_D \le m-1\}.
 \]
-Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem; Whitney's inequality alone does not give the converse. The vertex-feasible family contains the arc-feasible one, so the inequality between the extremal numbers it hands over for free is
+Every digraph feasible for the \emph{arc} problem is feasible for the \emph{vertex} problem. Whitney's inequality alone does not give the converse. The vertex-feasible family contains the arc-feasible one, so the inequality between the extremal numbers it hands over for free is
 \[
     k_m^{\mathrm{dir}}(n) \;\ge\; \ell_m^{\mathrm{dir}}(n),
 \]
@@ -942,9 +941,6 @@ $L_3^{\mathrm{dir}}(7) = 24$.
 Substitute $m=3$ and $M(7)=12$ in \Cref{thm:dir-multi-full}.
 \end{proof}
 
-Neither historical computation settled this cell. CBC timed out when testing whether a feasible $25$-arc multigraph exists at $(n,m)=(7,3)$. A fourteen-hour enumeration was also stopped without a verdict. Those unfinished
-runs do not independently validate the general formula.
-
 \begin{corollary}[The fractional relaxation is integral]\label{cor:mstar-integral}
 For every $n \ge 2$, the $m$-free optimum $M^{*}(n)$ of \Cref{ch:certify} equals $M(n)$, and it is attained by a $\{0,1\}$ weight matrix. Consequently the scaling identity
 \[
@@ -982,7 +978,7 @@ At $m=2$, that is at $k=1$, \Cref{thm:dir-multi-full} reads $L_2^{\mathrm{dir}}(
 \end{theorem}
 
 \begin{proof}
-A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints. At $m=2$ the multigraph problem and the simple digraph problem are therefore the same problem, and the two statements are two readings of one value. Both readings rest on \Cref{thm:dir-multi-full}, so the agreement is not independent confirmation of either statement.
+A directed multigraph with $\lec^{\max} \le 1$ can carry no parallel arcs at all, since two parallel copies of one arc are already two arc-disjoint routes between their endpoints. At $m=2$ the multigraph problem and the simple digraph problem are therefore the same problem, and the two statements are two readings of one value. Both proofs rest on \Cref{lem:reach-skeleton}, so the agreement is not independent confirmation of either statement.
 \end{proof}
 
 \subsection{Extremal classification on the quadratic branch}\label{sec:quadratic-uniqueness}
@@ -1039,7 +1035,7 @@ Take $R$, $A$ and $B$ from \Cref{lem:equality-forces}, and write $\alpha = |A| \
 \emph{Step 4: every multiplicity is $m-1$.} A pair joined by $\mu(a,b)$ parallel arcs has $\lec_D(a,b) \ge \mu(a,b)$, so feasibility gives $\mu(a,b) \le m-1$ on each of the $\floor{n^2/4}$ pairs. Their total is $|A(D)| = (m-1)\floor{n^2/4}$, so every one of them attains the cap. Hence $D$ is the multiplicity-$(m-1)$ one-directional complete bipartite digraph on these two parts, and their product $\floor{n^2/4}$ forces their sizes to be $\ceil{n/2}$ and $\floor{n/2}$. Either size may be the source size, giving exactly the two displayed possibilities (which coincide up to isomorphism when $n$ is even).
 \end{proof}
 
-Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the proposed argument does not cover this range. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, and \Cref{ch:synthesis} records that indifference as the reason the value says nothing about uniqueness. That is true of the proof read forwards. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
+Three remarks. First, on where the hypothesis $n \ge 2m$ is used and what it costs. It enters once, in Step 1, where a two-arc path in the skeleton is converted into $\floor{n/2}$ arc-disjoint routes between one pair, and feasibility kills that only when $\floor{n/2}$ reaches $m$. For $n < 2m$ the proposed argument does not cover this range. Second, a degree fact falls out of the same equality, and it is what makes a direct search for extremisers finite in practice. Deleting a vertex leaves at most $(m-1)M(n-1)$ arcs, so every vertex of an extremiser carries degree at least $(m-1)\floor{n/2}$. For even $n$ the degree sum $2(m-1)\floor{n^2/4} = n \cdot (m-1)(n/2)$ leaves no slack at all, so every vertex has degree exactly $(m-1)n/2$: an extremiser at even $n$ is regular. Third, on the shape of the argument. \Cref{thm:dir-multi-full} is indifferent to which multigraph it dismantles, so read forwards its proof says nothing about uniqueness. Read backwards from equality, the same skeleton is a rigid object, and the two facts that had been mere bookkeeping, that $f$ is maximised at one end and that a minimal skeleton is triangle-free, become a determination of $q$ and an application of the equality case of Mantel's theorem.
 
 
 \apppart{Part III. The hypergraph results}{The edge bound through an elementary cut induction, the vertex problem at $m = 2$ and $m = 3$ by way of an incidence rank bound, and the directed hypergraph leading term.}
@@ -1156,8 +1152,7 @@ hyperedge-disjoint routes. The construction has $10+1+1=12$ copies, matching
 the upper bound $\floor{5(6-1)/(3-1)}=12$ from \Cref{prop:hyper-edge}.
 \end{proof}
 
-The construction was derived after a longer unaided search found a
-twelve-copy witness in this cell. Its optimality follows from the degree
+Its optimality follows from the degree
 cuts and the upper bound, not from an exhaustive search. In the
 vertex problem it supplies a lower bound of $12$ by Whitney's inequality,
 but the edge upper bound does not prove vertex optimality.
@@ -1666,7 +1661,7 @@ The divisibility condition is automatic, and the doubled star attains the
 upper bound $2(n-1)$.
 \end{proof}
 
-At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}. Turning these block scores into values of $K_4(n)$, even within the tested block range, depends on the unchecked block reduction; agreement for every $n$ remains open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
+At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multigraph-edge} as well. The first threshold at which the two values are known to differ is $m = 5$: $K_5(4) = 14$ against $L_5(4) = 12$, and $K_5(5) = 19$ against $L_5(5) = 16$, both by exhaustion. At $m = 4$ the completed block computation gives $g_4(b) = 3(b-1)$ throughout the range of \Cref{tab:multi-vertex-blocks}. Turning these block scores into values of $K_4(n)$, even within the tested block range, depends on the unchecked block reduction. Agreement for every $n$ remains open. For $m \ge 3$ at least three constructions compete, and which one wins depends on how $n$ compares with $m$, exactly as in every other variant of this thesis.
 
 \begin{itemize}
     \item \emph{The thickened tree.} Take a spanning tree and give every edge multiplicity $m-1$. Tree edges have $\pi = 0$ and non-adjacent pairs have $\pi = 1$, so this is feasible for every $m \ge 2$, and it carries $(m-1)(n-1)$ edges, the multigraph \emph{edge} value of \Cref{thm:multigraph-edge}.
@@ -1674,7 +1669,7 @@ At $m = 3$ this is the multigraph \emph{edge} value $L_3(n)$ of \Cref{thm:multig
     \item \emph{The thickened theta.} Choose two \emph{poles} and join each of the $n-2$ remaining vertices to both of them at multiplicity $m-2$, then join the poles to each other at multiplicity $m+1-n$ when that is positive. A pole and a middle vertex have $\pi = 1$, two middle vertices have $\pi = 2$, and the two poles have $\pi = n-2$, so this is feasible exactly when $n \le m+1$, and it carries $2(n-2)(m-2) + \max(0,\, m+1-n)$ edges.
 \end{itemize}
 
-The theta family is what makes this problem different from the edge problem, and it was found by the search rather than by hand. Whenever it is feasible, which is to say for $n \le m+1$, it matches the thickened tree exactly at $m = 4$ and, for $n\ge3$, beats it for every $m \ge 5$. It accounts for the first cells in which the direct exhaustion exceeds the tree, although the later block sweep finds still better blocks in some larger parameter cells. Comparing these three constructions, the tree leads once $n \ge m+2$, where the other two die for lack of route budget.
+The theta family is what makes this problem different from the edge problem. Whenever it is feasible, which is to say for $n \le m+1$, it matches the thickened tree exactly at $m = 4$ and, for $n\ge3$, beats it for every $m \ge 5$. It accounts for the first cells in which the direct exhaustion exceeds the tree, although the later block sweep finds still better blocks in some larger parameter cells. Comparing these three constructions, the tree leads once $n \ge m+2$, where the other two die for lack of route budget.
 
 An exhaustive include-or-exclude search, independently checked by a separate
 implementation on the cells where both completed, confirms these constructions
@@ -2460,10 +2455,6 @@ Where the method is needed differs by variant. For undirected graphs one could r
 The authoritative code and audit instructions are maintained in the versioned
 repository at \url{https://github.com/louisvandenbruwaene/thesis}, which
 serves this document and the \code{program/} directory it refers to.
-The source revision recorded for this PDF build is \thesiscommit. Before an
-unrecorded working build, the revision marker is reset to ``not recorded''.
-For a recorded build, \code{record\_revision.sh} is run after committing the
-sources, so the printed tag identifies the source snapshot.
 Everything this thesis refers to sits in one directory, \code{program/}: the
 unified program and its test suite, the standalone scripts behind the block
 sweeps and the conjecture checks (\code{program/scripts/}), the recorded machine
@@ -2480,28 +2471,8 @@ and the third regenerates the computational figures.
 \end{lstlisting}
 
 The four variant grids require several hundred \code{solve} calls. Their values
-are stored in \code{program/data/machine\_values.json}. This readable file records
-what each run returned. It lets the grids redraw in seconds. It also ensures
-that the document uses the recorded points rather than the outcome of a new
-timed search.
-
-Rendering and recomputing are separate operations. The third command draws
-only the figures and tables used by this thesis, using the frozen observations
-and stated formulas. It does not run searches or refresh archived experiments.
-A missing observation is an error, not permission to compute a replacement.
-Passing \code{-{}-rebuild} performs a new experiment and writes a candidate
-file beside the published record. Passing \code{-{}-compare} lists the
-differences. \code{-{}-promote} replaces the record only after review.
-Promotion is refused if two completed exact values disagree.
-Such a disagreement is a defect to investigate, not a timing fluctuation.
-
-For new rebuilds, each run records its method, requested and elapsed time,
-completion status and witness, together with source and environment information.
-The source fingerprint now covers the full program, the C source and the
-experiment driver. The earlier chapter-four cutoff omitted flow helpers
-defined later in the program. The historical observations below predate these
-additional per-run fields. Their missing information cannot be reconstructed
-by editing metadata, so it remains unknown.
+are stored in \code{program/data/machine\_values.json}, which records what
+each run returned.
 
 The block sweep is independent of that file and of the main program. Its
 self-contained implementation is
@@ -2524,19 +2495,10 @@ NetworkX 3.6.1. Installing from the lock file reproduces that environment.
 \subsection{Equal-budget search records}\label{sec:equal-budget-details}
 
 The protocol is stated in \Cref{sec:equal-budget}. Its raw records are in
-\path{program/data/equal_budget_2026-09-06/}. The original checkpoints are in
-\code{trials/} and timing replacements are in \code{replacements/trials/}.
-Both sets include full witnesses. The replacement manifest records which
-original record each new trial replaces and the clock change used to run it.
-
-The original solver used a calendar clock for its stopping rule. Nineteen runs
-had a discrepancy between that clock and the independently measured monotonic
-duration. They are retained in the data but excluded from equal-budget
-statistics. Each flagged trial was repeated with the same frozen search code
-and seed, changing only its deadline clock to a monotonic one. The replacement
-takes its original slot regardless of which run found more edges. Selecting
-the better of the two would give those slots an unfair additional chance.
-The discarded attempts are counted separately as extra computation.
+\path{program/data/equal_budget_2026-09-06/}, with full witnesses. Nineteen
+runs whose calendar deadline disagreed with the measured monotonic duration
+were repeated with a monotonic deadline and the same seed, and the repeat
+replaces the original in every statistic.
 
 The timing rule is cooperative, so a connectivity calculation already in
 progress can overrun its target. Monotonic time also has platform-specific
@@ -2546,22 +2508,14 @@ other work, so this is a comparison under equal allocated search durations,
 not a controlled comparison of processor efficiency.
 
 The selected runs used $57657.7$ seconds of measured monotonic search time
-against the $57600$-second total allocation. Including the discarded originals
-raises the saved search time to $58690.8$ seconds. These totals exclude
-validation and reporting and are not calendar durations of the experiment.
+against the $57600$-second total allocation. These totals exclude
+validation and reporting.
 
-The report separates original outcomes from replacement outcomes and names
-the selected record for every seed. An independent validator rebuilds the
+An independent validator rebuilds the
 flow networks from the saved witnesses using a separate gate construction
 and NetworkX's implementation of the Edmonds--Karp algorithm. It calls neither the thesis
 connectivity checker nor its compiled helper. Agreement is a cross-check of
 feasibility and counts, not a proof of search optimality.
-
-The construction comparison used in the tables is frozen separately in
-\path{manuscript_baseline.json}. It includes constructions added during the
-audit and is distinct from the earlier comparison snapshot in
-\path{comparison_baseline.json}. Neither file is read by the search runner.
-The historical observations in \Cref{sec:variant-grids} remain unchanged.
 
 From \code{program/}, the reporting commands are:
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
@@ -2569,9 +2523,6 @@ From \code{program/}, the reporting commands are:
 ../.venv/bin/python3 scripts/validate_benchmark.py data/equal_budget_2026-09-06
 ../.venv/bin/python3 scripts/benchmark_tables.py data/equal_budget_2026-09-06
 \end{lstlisting}
-The table renderer refuses incomplete timing coverage, unvalidated selected
-witnesses or a search count above a recorded upper bound. Its provenance file
-records the hashes of the report, comparison snapshot and witness audit.
 
 Each row of \Cref{tab:equal-budget-m3-graphs,tab:equal-budget-m6-graphs,tab:equal-budget-m3-hypergraphs,tab:equal-budget-m6-hypergraphs} contains exactly three timing-qualified runs. Search counts
 are printed without adjustment, even when a supplied construction is better.
@@ -2626,7 +2577,7 @@ Open cases have no interpolated curve.
 This keeps parity effects in the discrete data from looking like a proposed formula.
 
 \paragraph{Budgets and the limits of the record.}
-These are historical experiments, not a controlled equal-time benchmark.
+These experiments are not a controlled equal-time benchmark.
 Every matrix search starts from the empty graph and uses tabu search.
 Every hypergraph search uses randomised greedy growth. The figure driver uses
 initial seed zero. Most search cases were allocated $0.4$ seconds each.
@@ -2640,17 +2591,15 @@ $1800$ seconds for simple directed graphs and $120$ seconds for multigraph
 vertex separation. Enumeration stops sampling a panel after its first timeout.
 The standalone computation at $(m,n,r)=(6,6,3)$ is a separate experiment.
 
-The original record saves values and requested budgets, but not each run's
-elapsed time or witness. Its limits are cooperative stopping targets:
+The record saves values and requested budgets, but not each run's
+elapsed time or witness. The limits are cooperative stopping targets:
 a connectivity check already in progress can finish after the deadline.
 Consequently, neither exact one-hour runs nor equal computational effort can
 be inferred from these data. Fixed seeds do not make timed runs repeatable
-across different machines or loads. The frozen file makes the \emph{reported
-observations} reproducible. Rerunning the searches is a new experiment.
+across different machines or loads.
 
 \code{program/data/search\_evidence.json} exports the raw search and supplied
-construction values in distinct fields for every plotted order. Missing
-historical elapsed times and witnesses are explicitly marked as unknown.
+construction values in distinct fields for every plotted order.
 \Cref{tab:search-evidence-m3-graphs,tab:search-evidence-m3-hypergraphs,tab:search-evidence-m6-graphs,tab:search-evidence-m6-hypergraphs} distinguish the same sources numerically.
 A construction entry of zero means that the selected formula supplies no
 positive lower bound in that parameter range, not that the optimum is zero.
@@ -2703,15 +2652,13 @@ program. It searches both for a witness attaining the target and for one
 with one further hyperedge. Its eleven parameter pairs satisfy
 $4\le n\le9$, $r\in\{n-2,n-1\}$ and $r\ge3$.
 
-An archived research note dated 31 July 2026 reports that the target was
-attained and one further hyperedge excluded in all eleven cases. Both halves
-were rerun for this account and reproduce that outcome, in fourteen and
-thirteen seconds, and their transcript is
+In all eleven cases the target is attained and one further hyperedge is
+excluded, and the transcript is
 \code{program/logs/hyper\_vertex\_m4\_log.txt}. Exhaustiveness rests on the
 script's own two prunings, that feasibility is monotone under adding hyperedges
 and that no prefix may leave two vertices in $m$ common hyperedges, so these
-pairs are recorded here rather than entered in the generated tables, which
-report the main program's own enumerations. The $r=2$ cross-check holds at
+pairs are reported here, separately from the tables of the main program's
+enumerations. The $r=2$ cross-check holds at
 $m=3$ and at $m=4$ and fails at $m=5$, where it returns a feasible multigraph
 of $13$ edges against the formula's $12$ at $n=4$ and $17$ against $16$ at
 $n=5$, consistent with the multigraph witnesses discussed in
@@ -2813,10 +2760,9 @@ The directed $m=2$ values for $2\le n\le7$ were established by completed pruned 
   $\lambda^{\max} \le 1$, and the same run with $\kappa^{\max} \le 1$. Same
   driver, same prunes, only the inner feasibility test changes. Both columns
   agree with $M(n) = \max(2(n-1), \floor{n^2/4})$ at every size, and every run
-  completed. Neither column is load-bearing. These were the base cases of an
-  earlier induction, which \Cref{sec:dir-arc-m2} has replaced by an argument
-  from \Cref{lem:reach-skeleton} that runs at every $n$ at once, so both columns
-  now corroborate rather than prove. The node counts coincide because the two feasible
+  completed. Neither column is load-bearing: \Cref{sec:dir-arc-m2} proves the values at
+  every $n$ from \Cref{lem:reach-skeleton}, so both columns corroborate rather
+  than prove. The node counts coincide because the two feasible
   families coincide at $m=2$ (\Cref{lem:directed-m2-families}): the feasibility
   prune switches between the arc and the vertex flow test with the separation,
   but at $m=2$ the two tests accept the same partial digraphs and so cut the
@@ -2827,10 +2773,9 @@ The directed $m=2$ values for $2\le n\le7$ were established by completed pruned 
   \label{tab:basecase-search}
 \end{table}
 
-The historical cut-counting optimisation closes the directed multigraph checks
+The cut-counting optimisation closes the directed multigraph checks
 through $n=6$ but emits no independently replayable matching bound, so no
 theorem rests on it. Its raw log is \path{program/logs/certificate_log.txt}. Exact
 flow measures a supplied object, completed enumeration proves a finite optimum,
 and heuristic search supplies only a checked witness and lower bound. The file
-\code{program/README.md} records the dependencies, commands, entry points, and
-archival checklist.
+\code{program/README.md} records the dependencies, commands and entry points.

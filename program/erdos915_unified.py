@@ -3727,7 +3727,7 @@ def plot_complexity_growth(path: str | Path) -> None:
         hyper_cells = ((lambda n: n * (n - 1) * (n - 2) / 2) if directed
                        else (lambda n: n * (n - 1) * (n - 2) / 6))
         return [
-            ("simple / random", _KUL_BLUE, "-",
+            ("simple", _KUL_BLUE, "-",
              [log10_pow(2, cells(n)) for n in ns]),
             ("multigraph $m=3$", _KUL_DARK, "-",
              [log10_pow(3, cells(n)) for n in ns]),

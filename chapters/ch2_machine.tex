@@ -447,7 +447,7 @@ Because different support graphs produce disjoint search spaces, they can be pro
 The related orientation tools \texttt{directg} and \texttt{watercluster2} are not used.
 Both allow edges in both directions, but they do not assign the repeated arc multiplicities used here \cite{NautyGuide29}. The custom decoration step also applies the connectivity pruning after each assignment.
 
-\Cref{tab:generating-benchmark} records historical timings for three different single-core tasks. The distinction matters: they are not three equivalent ways of discovering an unknown optimum.
+\Cref{tab:generating-benchmark} records timings for three different single-core tasks. The distinction matters: they are not three equivalent ways of discovering an unknown optimum.
 The blind sweep maximises the arc count over all matrix assignments.
 The pruned depth-first search also maximises it, but starts with a supplied feasible construction as an incumbent.
 The \texttt{geng} pipeline is given the already known extremal arc count and lists the feasible isomorphism classes at that target, which does not rule out a larger feasible count.
@@ -471,7 +471,7 @@ At $n=7$, the recorded pruned maximisation takes $1156.6$\,s and the supplied-ta
     \centering
     \small
     \input{figures/generating_benchmark_table.tex}
-    \caption{Historical timings for different tasks: blind maximisation, construction-seeded pruned maximisation and \texttt{geng}-based classification at a supplied target. Only the first two independently bound the optimum from above. A dash means not attempted. These are separate runs from \Cref{tab:basecase-search}, whose recorded times differ. The table is not evidence of a like-for-like speed-up.}
+    \caption{Timings for different tasks: blind maximisation, construction-seeded pruned maximisation and \texttt{geng}-based classification at a supplied target. Only the first two independently bound the optimum from above. A dash means not attempted. These are separate runs from \Cref{tab:basecase-search}, whose recorded times differ. The table is not evidence of a like-for-like speed-up.}
     \label{tab:generating-benchmark}
 \end{table}
 \section{Proving every \texorpdfstring{$m$}{m} at once}
@@ -502,7 +502,7 @@ Multiplying such a matrix by $m-1$ preserves integer arc multiplicities.
 On the linear branch, \Cref{const:dir-multi-lower} supplies the bidirected star.
 It has one hub joined bidirectionally to every other vertex and has $2(n-1)$ arcs.
 For $n\le6$, this is the larger term of the established value $M(n)$.
-The historical solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
+Solver runs reported the same value for $M^{*}(n)$ at $3\le n\le6$, without an independently replayable matching bound (\Cref{sec:transcripts}).
 At the crossover $n=7$, the quadratic branch catches the linear one (\Cref{thm:dir-arc-m2-exact}).
 It then overtakes it.
 The relevant construction becomes the one-directional bipartite digraph from \Cref{const:dir-multi-lower}.
@@ -514,7 +514,7 @@ An explicit construction gives attainment from below.
 Clearing denominators from a rational optimum reduces the reverse inequality to \Cref{thm:dir-multi-full}.
 Scaling the integral maximiser by $m-1$ gives the lower bound $(m-1)M^{*}(n)$.
 The preceding scaling argument gives the matching upper bound unconditionally.
-The historical finite optimisation is retained as supporting evidence for $3\le n\le6$, and \Cref{sec:transcripts} records what it ran.
+The finite optimisation is retained as supporting evidence for $3\le n\le6$, and \Cref{sec:transcripts} records what it ran.
 \[
     L_m^{\mathrm{dir}}(n) = (m - 1)\, M^{*}(n)
     \qquad \text{for every } m \ge 2 .
@@ -714,7 +714,7 @@ In all seven validation cases in \Cref{tab:rediscovery}, it reaches the establis
 \label{fig:rediscovery-gallery}
 \end{figure}
 
-The recorded witnesses can be inspected, rather than inferring their shapes from their edge counts. They are saved with methods and elapsed times in \code{program/data/rediscovery.json}. \code{program/scripts/rediscovery.py} runs the experiment and \code{make\_figures.py} renders the table without rerunning it. Each later restart uses the next integer seed. The supplied optimum is not passed to the search. All seven saved witnesses have star-shaped support, with the direction and multiplicity specified below.
+The recorded witnesses can be inspected, rather than inferring their shapes from their edge counts. They are saved with methods and elapsed times in \code{program/data/rediscovery.json}. \code{program/scripts/rediscovery.py} runs the experiment. Each later restart uses the next integer seed. The supplied optimum is not passed to the search. All seven saved witnesses have star-shaped support, with the direction and multiplicity specified below.
 \Cref{fig:rediscovery-gallery} draws three examples.
 The undirected simple run at $m = 2$ settles on a tree. The example drawn is the path $P_6$.
 Every tree on $n$ vertices has $n-1$ edges and local edge-connectivity at most one.
@@ -763,8 +763,7 @@ optimum. Failing to reach it measures a limitation of these particular runs,
 not a failure of the construction. The detailed tables in
 \Cref{sec:equal-budget-details} retain the minimum, median and maximum across
 the three seeds instead of replacing a search value by $C$. That section also
-records the raw witnesses, the runs excluded for a clock discrepancy together
-with their timing replacements, and the measured search time against the
+records the raw witnesses and the measured search time against the
 allocation.
 
 \begin{table}[htbp]

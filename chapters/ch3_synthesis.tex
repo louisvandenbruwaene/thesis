@@ -396,9 +396,9 @@ The thickened bidirected tree and balanced one-way bipartite graph attain
 the two branches. The fractional optimum is also $M(n)$ by the checked
 rational-scaling argument (\Cref{cor:mstar-integral}). The classification
 for $n\ge\max(8,2m)$ remains conjectural, with its proposed proof retained
-in \Cref{thm:dir-multi-uniqueness}. Historical solver checks cover small
-orders. The unfinished $n=7$ run supplies no independent upper bound,
-but that value now follows from the checked general theorem.
+in \Cref{thm:dir-multi-uniqueness}. Solver checks cover small
+orders, and the value at $n=7$ follows from the general theorem
+(\Cref{cor:dir-multi-n7}).
 
 For vertex separation, multiplicity and longer detours can favour different
 constructions. Direct enumeration gives $K_6^{\mathrm{dir}}(3)=24$, whereas
@@ -467,7 +467,7 @@ map. Completed enumerations, conjectural formula values, supplied
 constructions and raw search outcomes have distinct markings. A conjectural
 upper-bound curve need not be attained. A completed finite value remains
 valid even if a proposed proof of a general formula has not been verified.
-The historical grids and equal-allocation experiment use different protocols
+The variant grids and equal-allocation experiment use different protocols
 and should not be combined into one performance comparison.
 
 \section{Contributions and limitations of the program}
@@ -487,12 +487,9 @@ success rate for proving optima. The large directed gaps show why the seven
 short validation cases cannot establish reliability at larger sizes.
 
 The repository retains witnesses and timing records for that experiment,
-including the excluded originals and their timing replacements. An
-independent checker validates the witnesses. Historical grids predate some
-of that recording and lack individual witnesses or elapsed times in some
-cells. Their reported values can be redrawn, but timed searches need not
-repeat identically on another machine. The audit gives the commands and
-distinguishes these levels of reproducibility.
+and an independent checker validates the witnesses. The variant grids record
+values without individual witnesses or elapsed times. Timed searches need not
+repeat identically on another machine. The audit gives the commands.
 
 \section{Open problems}
 
